@@ -506,7 +506,7 @@ WHERE
         },
       });
 
-      const societesiteweb=societegestion.site_web;
+      const societesiteweb=societegestion ? societegestion.site_web || '' : '';
 
     
 
