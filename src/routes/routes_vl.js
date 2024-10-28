@@ -34,8 +34,7 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
-
+const ImageModule = require('docxtemplater-image-module-free');
 
 
 
@@ -449,7 +448,7 @@ module.exports = (app) => {
     const resetToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // Lien de réinitialisation
-    const resetUrl = `${process.env.FRONTEND_URL}/societegestionpanel/login/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/panel/societegestionpanel/login/reset-password?token=${resetToken}`;
 
     // Configurer nodemailer pour envoyer l'email
     const transporter = nodemailer.createTransport({
@@ -590,6 +589,56 @@ module.exports = (app) => {
     }
   });
 
+  app.get('/api/wordexemple', async (req, res) => {
+    const content = fs.readFileSync('fichiers/Templateexport.docx', 'binary');
+    const zip = new PizZip(content);
+  //  const doc = new Docxtemplater(zip);
+
+  const imageOpts = {
+    centered: false,
+    getImage: (tagValue) => {
+        try {
+            const imageBuffer = fs.readFileSync(tagValue);
+            return imageBuffer;
+        } catch (error) {
+            console.error("Erreur de chargement de l'image:", error);
+            return Buffer.from(''); // Retourne un buffer vide si l'image n'est pas trouvée
+        }
+    },
+    getSize: () => [150, 150] // Dimensions en pixels
+};
+  const imageModule = new ImageModule(imageOpts);
+  const doc = new Docxtemplater(zip, { modules: [imageModule] });
+    // Récupérer les données depuis la base de données
+    const data = {
+        nom_fonds: "ECHIQUIER MAJOR SRI GROWTH EUROPE A",
+        date_creation: "11/03/2005",
+        valeur_liquidative: "351,48 €",
+        actif_net: "1 223 M€",
+        commentaire: "Echiquier Major SRI Growth Europe A progresse de 3,57%...",
+        image_fond: "fichiers/test.png"
+        // Ajoutez d'autres variables selon le template
+    };
+    
+    // Remplir les balises dans le template
+    doc.setData(data);
+    
+    try {
+        doc.render();
+        const buffer = doc.getZip().generate({ type: "nodebuffer" });
+        // Envoyer le fichier en tant que pièce jointe
+        res.setHeader('Content-Disposition', 'attachment; filename=output.docx');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        res.send(buffer);
+
+        // console.log("Document envoyé pour téléchargement !");
+        // fs.writeFileSync("output.docx", buffer);
+        console.log("Document créé avec succès !");
+    } catch (error) {
+      console.error('Erreur lors du traitement du template Word :', error);
+      res.status(500).json({ error: 'Erreur lors du traitement du template Word.' });
+    }
+  });
 
 
  
