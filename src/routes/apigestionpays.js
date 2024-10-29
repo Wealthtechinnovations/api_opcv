@@ -36,6 +36,7 @@ const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
 const ImageModule = require('docxtemplater-image-module').ImageModule;
+const { Op } = require('sequelize'); // Ajout de l'importation de Op
 
 
 router.get('/api/getpaysidmeta/:id', (req, res) => {
