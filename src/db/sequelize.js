@@ -38,9 +38,9 @@ const APIKEY=require('../models/apikey')
 const TSRHISTO = require('../models/tsrhisto')
 const Datevalorisation=require('../models/datevalorisation')
 const sequelize = new Sequelize(
-    'fond_opcvm',
-    'root',
-    'root',
+    'fund_opcvm',
+    'fund_opcvm',
+    '66G41zes~',
     {
         host: 'localhost',
         dialect: 'mysql',
@@ -107,8 +107,8 @@ const devises = Devise(sequelize, DataTypes)
 const pays_regulateurs = PAYS_REGULATEUR(sequelize, DataTypes)
 const portefeuilles_proposes = ROBOPORTFEUILLEPORTEFEUILLE(sequelize, DataTypes)
 const portefeuilles_proposes_vls = ROBOPORTFEUILLE(sequelize, DataTypes)
-const urll = "http://localhost:3005";
-const urllsite = "http://localhost:3000";
+const urll = "https://api.funds.chainsolutions.fr";
+const urllsite = "https://funds.chainsolutions.fr";
 
 // const urll="https://api.funds.chainsolutions.fr";
 
