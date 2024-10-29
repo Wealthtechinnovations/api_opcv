@@ -219,23 +219,82 @@ const {
 
 
 
-    await vl.findAll({
+    const response = await vl.findAll({
       where: {
-        fund_id: req.params.id
+        fund_id: req.params.id,
       },
-      order: [
-        ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
-      ]
-    })
-      .then(async (response) => {
+      order: [['date', 'ASC']],
+    });
+
+    if (!response.length) {
+      return res.status(404).json({ code: 404, message: 'Données de valeur liquidative non trouvées' });
+    }
+    const valuess = response.map(data => data.value);
+    const valuesindifrefs = response.map(data => data.indRef);
+
+    // Dupliquer la VL pour les jours de semaine
+    const datess = response.map(data => moment(data.date).format('YYYY-MM-DD'));
+  // Nouveau tableau pour stocker les objets date-valeur
+  let extendedData = datess.map((date, index) => {
+    let lastIndRef = valuesindifrefs[index]; // Dernière valeur non nulle
+    if (lastIndRef === null) {
+      for (let j = index; j >= 0; j--) {
+        if (valuesindifrefs[j] !== null) {
+          lastIndRef = valuesindifrefs[j];
+          break;
+        }
+      }
+    }
+    return {
+      date: date,
+      value: valuess[index],
+      indRef: lastIndRef !== null ? lastIndRef : valuesindifrefs[index] // Vérifier si indRef est null
+    };
+  });
+   // Remplir les jours de semaine manquants
+for (let i = 0; i < datess.length - 1; i++) {
+  const currentDate = moment(datess[i]);
+  const nextDate = moment(datess[i + 1]);
+
+  // Ajouter les jours manquants entre la date actuelle et la date suivante
+  while (currentDate.clone().add(1, 'days').isBefore(nextDate)) {
+    currentDate.add(1, 'days');  // Avancer la date d'un jour
+
+    // Vérifier si le jour est un jour de semaine (lundi à vendredi)
+    if (currentDate.isoWeekday() < 6) { // 6 = Samedi, 7 = Dimanche
+    
+      let lastIndRef = valuesindifrefs[i]; // Dernière valeur non nulle
+      if (lastIndRef === null) {
+        for (let j = i; j >= 0; j--) {
+          if (valuesindifrefs[j] !== null) {
+            lastIndRef = valuesindifrefs[j];
+            break;
+          }
+        }
+      }
+      extendedData.push({
+        date: currentDate.format('YYYY-MM-DD'),
+        value: valuess[i],  // Utilisez la valeur de la date actuelle
+        indRef: lastIndRef // Utiliser la dernière valeur non nulle
+      });
+     
+    }
+  }
+}
+
+// Trier les données par date
+extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
+
+    // Extraire les dates et valeurs triées
+    const dates = extendedData.map(item => item.date);
+    const values = extendedData.map(item => item.value);
         // const tauxsr=0.03;-0.0116;-0,0234
         // const tauxsr = -0.0234;
         let tauxsr;
         // Valeurs liquidatives
-        const values = response.map((data) => data.vl_ajuste); //todo
-        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+      
         const tsrValues = response.map((data) => data.tsr);
-        const valuesindifref = response.map((data) => data.indRef);
+        const valuesindifref = extendedData.map(item => item.indRef);
 
 
         const lastValue = values[dates.indexOf(findLastDateOfPreviousMonth(dates))];
@@ -739,7 +798,7 @@ const {
           const kurtosisjour = calculateKurtosis([...rendementsTableaujour["3_ans"]])
           const kurtosismois = calculateKurtosis([...rendementsTableaumois["3_ans"]])
 
-          const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
+          const maxDrawdown = calculateMaxDrawdown(Vls)
           const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
           const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0.01)
           const dsrjour = calculerDSRAnnualise([...rendementsTableaujour["3_ans"]], 0.01)
@@ -1936,7 +1995,7 @@ const {
 
 
 
-      })
+      
   })
   //revoir
   router.get('/api/ratiosnewithdate/:year/:id/:date', async (req, res) => {

@@ -1778,6 +1778,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
         devise,
         lastdatepreviousmonth: performanceData.lastdatepreviousmonth,
         ytd: performanceData.perf1erJanvier,
+        ytdm: performanceData.perf1erJanvierm,
         perfveille: performanceData.perfVeille,
         perf1an: performanceData.perf1An,
         perf3ans: performanceData.perf3Ans,
