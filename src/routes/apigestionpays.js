@@ -38,6 +38,26 @@ const puppeteer = require('puppeteer');
 const ImageModule = require('docxtemplater-image-module').ImageModule;
 const { Op } = require('sequelize'); // Ajout de l'importation de Op
 
+const findCategoryByFundId = async (fundId) => {
+  // Implémentez ici la logique pour récupérer la catégorie à partir de l'identifiant du fond
+  // Par exemple, vous pouvez exécuter une requête SQL pour obtenir la catégorie à partir de l'identifiant du fond
+
+  // Exemple fictif de requête SQL
+  const categoryQuery = `
+        SELECT categorie_globale
+        FROM fond_investissements
+        WHERE id = :fundId
+    `;
+
+  // Exécutez la requête SQL avec le paramètre fundId
+  const [result] = await sequelize.query(categoryQuery, {
+    replacements: { fundId: fundId },
+    type: sequelize.QueryTypes.SELECT
+  });
+
+  // Retournez la catégorie extraite de la requête
+  return result.categorie_globale;
+};
 
 router.get('/api/getpaysidmeta/:id', (req, res) => {
   const societeId = req.params.id;

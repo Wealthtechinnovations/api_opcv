@@ -199,6 +199,19 @@ const {
       });
     }
 
+    const weeklyRates = values.map((value, index) => {
+      if (index === 0) return 0; // Aucun taux hebdomadaire pour la première valeur
+      const previousValue = values[index - 1].value;
+      const currentValue = value.value;
+      const weeklyRate = Math.pow((1 + currentValue) / (1 + previousValue), 1 / 52) - 1;
+      return weeklyRate;
+    });
+
+    const hebdoValues = values.map(value => {
+      const hebdo = Math.pow((1 + value.value) / (1 + (value.value === 0 ? 0 : values[values.indexOf(value) - 1].value)), 1 / 52) - 1;
+      return hebdo;
+    });
+    
     const valueArray = values.map(record => record.value);
     const annualYield = math.mean(valueArray)
     return annualYield;
@@ -335,7 +348,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           tauxsr = await tsrhistos(lastPreviousDate, req.params.year)
           tauxsr = tauxsr / 100;
         } else {
-          tauxsr = -0.0234;
+          tauxsr = 0.01420;
         }
 
         //  tauxsr = -0.0234; // Ou toute autre valeur par défaut que vous souhaitez

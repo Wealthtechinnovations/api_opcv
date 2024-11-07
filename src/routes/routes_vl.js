@@ -5383,11 +5383,12 @@ GROUP BY f.societe_gestion;
       const selectedValues = req.query.query;
       const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
       const selectedSociete = req.query.selectedsociete; // Corrected variable name
-
+      const selectedcategorieregionale = req.query.selectedcategorieregionale;
+      const selectedcategorienationale = req.query.selectedcategorienationale;
       const valuesArray = selectedValues.split(',');
 
       // Fetch funds based on criteria
-      const funds = await fetchFundsByValorisation(valuesArray, selectedCategorie, selectedSociete, 'undefined', '');
+      const funds = await fetchFundsByValorisationfirst(valuesArray, selectedCategorie, selectedSociete, 'undefined', '',selectedcategorieregionale,selectedcategorienationale);
 
       if (!funds.length) {
         res.status(404).json({ error: 'No funds found.' });

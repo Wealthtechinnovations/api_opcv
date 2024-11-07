@@ -36,7 +36,7 @@ const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
 const ImageModule = require('docxtemplater-image-module').ImageModule;
-
+const { Op } = require('sequelize'); // Ajout de l'importation de Op
 const findCategoryByFundId = async (fundId) => {
   // Implémentez ici la logique pour récupérer la catégorie à partir de l'identifiant du fond
   // Par exemple, vous pouvez exécuter une requête SQL pour obtenir la catégorie à partir de l'identifiant du fond

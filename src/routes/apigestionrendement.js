@@ -197,34 +197,36 @@ router.get('/api/saverendements', async (req, res) => {
           .sort((a, b) => (a[0] > b[0] ? 1 : -1))
           .reverse();
 
-        let previousWeekValue = null;
-        for (const [week, value] of sortedWeeklyValues) {
-          if (previousWeekValue !== null) {
-            const rendement_semaine = (value - previousWeekValue) / previousWeekValue;
+        let precedentWeekValue = null;
+        for (let i = 0; i < sortedWeeklyValues.length; i++) {
+          const [week, value] = sortedWeeklyValues[i];
+          precedentWeekValue = (sortedWeeklyValues[i + 1] ? sortedWeeklyValues[i + 1][1] : null); // Vérification pour éviter une erreur
+          if (precedentWeekValue !== null) {
+            const rendement_semaine = (value-precedentWeekValue) / precedentWeekValue;
             await rendement.create({
               date: week,
               fond_id: fundId,
-              lastvl:value,
+              lastvl: value,
               rendement_semaine,
               rendement_mensuel: null
             });
           }
-          previousWeekValue = value;
         }
 
-        let previousMonthValue = null;
-        for (const [month, value] of sortedMonthlyValues) {
-          if (previousMonthValue !== null) {
-            const rendement_mensuel = (value - previousMonthValue) / previousMonthValue;
+        let precedentMonthValue = null;
+        for (let i = 0; i < sortedMonthlyValues.length; i++) {
+          const [month, value] = sortedMonthlyValues[i];
+          precedentMonthValue = (sortedMonthlyValues[i + 1] ? sortedMonthlyValues[i + 1][1] : null); // Vérification pour éviter une erreur
+          if (precedentMonthValue !== null) {
+            const rendement_mensuel = (value-precedentMonthValue) / precedentMonthValue;
             await rendement.create({
               date: month,
               fond_id: fundId,
-              lastvl:value,
+              lastvl: value,
               rendement_semaine: null,
               rendement_mensuel
             });
           }
-          previousMonthValue = value;
         }
       }
 
