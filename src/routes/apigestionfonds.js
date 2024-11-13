@@ -521,7 +521,7 @@ WHERE
         ],
         include: [{
           model: fond,
-          attributes: ['nom_fond'], // Sélectionner seulement le nom du fond, vous pouvez ajouter d'autres attributs si nécessaire
+          attributes: ['id','nom_fond'], // Sélectionner seulement le nom du fond, vous pouvez ajouter d'autres attributs si nécessaire
           required: true
         }],
         where: {
@@ -534,6 +534,7 @@ WHERE
       });
 
       const resultatsMeilleursFonds = meilleursFonds.map(fond => ({
+        id:fond.fond_investissement ? fond.fond_investissement.id : null, // Vérifie si fond existe
         nom_fond: fond.fond_investissement ? fond.fond_investissement.nom_fond : null, // Vérifie si fond existe
         performance_annualisee: parseFloat(fond.perfannu3an),
         performance_1_an: parseFloat(fond.perf1an),
