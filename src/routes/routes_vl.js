@@ -5114,14 +5114,22 @@ GROUP BY f.societe_gestion;
       GROUP BY pays
     `, { type: sequelize.QueryTypes.SELECT });
 
+      // Retrieve the count of companies per country from the societe table
+      const fondsPerCountry = await sequelize.query(`
+        SELECT pays, COUNT(*) AS fondsCount 
+        FROM fond_investissements
+        GROUP BY pays
+      `, { type: sequelize.QueryTypes.SELECT });
+
       // Combine the data to get the required format for countries and their respective company counts
       const countriesWithCompanies = countries.map(country => ({
         pays: country.pays,
-        companyCount: companiesPerCountry.find(c => c.pays === country.pays)?.companyCount ?? 0
+        companyCount: companiesPerCountry.find(c => c.pays === country.pays)?.companyCount ?? 0,
+        fondscount: fondsPerCountry.find(c => c.pays === country.pays)?.fondsCount ?? 0
       }));
 
       // Prepare data for table display
-      const tableData = countriesWithCompanies.map(({ pays, companyCount }) => ({ pays, companyCount }));
+      const tableData = countriesWithCompanies.map(({ pays, companyCount,fondscount }) => ({ pays, companyCount,fondscount }));
 
       res.json({
         code: 200,
