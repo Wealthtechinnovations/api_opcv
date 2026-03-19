@@ -1,4 +1,30 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# Dependencies
 /node_modules
+
+# Environment variables (NEVER commit secrets)
+.env
+.env.local
+.env.production
+uploads/.env.local
+
+# Logs
+logs.txt
+*.log
+npm-debug.log*
+
+# Generated files
+output.docx
+report.json
+efficient_frontier.png
+
+# Uploads (user data)
+/uploads/*
+!/uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

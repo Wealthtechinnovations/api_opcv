@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const FondInvestissement = sequelize.define('fond_investissements', {
     id: {
@@ -45,7 +44,6 @@ module.exports = (sequelize, DataTypes) => {
     dev_libelle: {
       type: DataTypes.STRING(255),
     },
-
     societe_gestion: {
       type: DataTypes.STRING(255),
     },
@@ -56,9 +54,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
     },
     type_investissement: {
-      type: DataTypes.STRING(255),
-    },
-    pays: {
       type: DataTypes.STRING(255),
     },
     nom_gerant: {
@@ -85,10 +80,6 @@ module.exports = (sequelize, DataTypes) => {
     frais_sortie: {
       type: DataTypes.STRING(255),
     },
-    periodicite: {
-      type: DataTypes.STRING(255),
-    },
-
     minimum_investissement: {
       type: DataTypes.STRING(255),
     },
@@ -98,15 +89,14 @@ module.exports = (sequelize, DataTypes) => {
     frais_rachat: {
       type: DataTypes.STRING(255),
     },
-    //add
     description: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.TEXT,
     },
     strategie_politique_invest: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.TEXT,
     },
     philosophie_fond: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.TEXT,
     },
     horizonplacement: {
       type: DataTypes.STRING(255),
@@ -119,6 +109,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     active: {
       type: DataTypes.INTEGER,
+      defaultValue: 1,
     },
     depositaire: {
       type: DataTypes.STRING(255),
@@ -159,64 +150,44 @@ module.exports = (sequelize, DataTypes) => {
     delai_reglement: {
       type: DataTypes.STRING(255),
     },
-    classification: {
-      type: DataTypes.STRING(255),
-    },
-    structure_fond: {
-      type: DataTypes.STRING(255),
-    },
-    affectation: {
-      type: DataTypes.STRING(255),
-    },
     souscripteur: {
       type: DataTypes.STRING(255),
     },
-
     regulateur: {
       type: DataTypes.STRING(255),
     },
     pays_one: {
       type: DataTypes.STRING(255),
     },
-   
     dividende: {
       type: DataTypes.INTEGER,
     },
-
-
     datemoispre: {
       type: DataTypes.STRING(255),
     },
-    //
     datejour: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     nombre_part: {
       type: DataTypes.INTEGER,
       allowNull: true,
-
     },
     banque: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     IBAN: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     RIB: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
-    }
-
+    },
   }, {
     timestamps: false,
-    updatedAt: false
+    updatedAt: false,
   });
 
   return FondInvestissement;

@@ -1,522 +1,355 @@
-const { startOfWeek, addDays, isWeekend, isSameDay, startOfMonth, startOfYear } = require('date-fns');
+const { startOfWeek, startOfMonth, startOfYear, isWeekend } = require('date-fns');
 
-//PAR DEFAUT TOUTES CES FONCTION SI ELLES NE TROUVENT PAS LA DATE SOUHAITEE RENVOIENT LA DERNIERE DATE DU TABLEAU
+// =============================================
+// Helper: Find nearest date in array
+// =============================================
 
-//derniere date du mois precedent il y a 3,5,8,10 selon l'année specifiée
-const findNearestDateAnnualized = (arrayOfDates, year, dateToFind) => {
-  // Step 1: Convert date strings to Date objects
-  const dateObjects = arrayOfDates.map((dateStr) => new Date(dateStr));
+/**
+ * Trouve la date la plus proche (avant) d'une date cible dans un tableau.
+ * @param {string[]} arrayOfDates - Tableau de dates au format 'YYYY-MM-DD'
+ * @param {Date} targetDate - Date cible
+ * @returns {string|null} Date au format 'YYYY-MM-DD' ou null
+ */
+function findNearestDateBefore(arrayOfDates, targetDate) {
+  const dateObjects = arrayOfDates.map(d => new Date(d));
 
-  // Step 2: Calculate the date a year behind the dateToFind
-  const dateToFindObject = new Date(dateToFind);
-  const yearBehind = new Date(dateToFindObject);
-  yearBehind.setFullYear(yearBehind.getFullYear() - year);
+  // Chercher la date exacte
+  const exact = dateObjects.find(d => d.getTime() === targetDate.getTime());
+  if (exact) return exact.toISOString().slice(0, 10);
 
-  // Step 3: Search for the calculated date in the array
-  const foundDate = dateObjects.find((date) => date.getTime() === yearBehind.getTime());
-
-  if (foundDate) {
-    // If the calculated date is found, return it
-    return foundDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-  } else {
-    // Step 4: Find the nearest date before the calculated date
-    const nearestDatesBefore = dateObjects.filter((date) => date.getTime() < yearBehind.getTime());
-    if (nearestDatesBefore.length > 0) {
-      const nearestDate = nearestDatesBefore.reduce((acc, curr) => {
-        return curr.getTime() > acc.getTime() ? curr : acc;
-      });
-      return nearestDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-    } else {
-      // If there are no dates before the calculated date, return the last date in the array
-      // return dateObjects[dateObjects.length - 1].toISOString().slice(0, 10);
-      return findLastDateOfPreviousMonth(dateObjects)
-    }
+  // Chercher la plus proche avant
+  const before = dateObjects.filter(d => d.getTime() < targetDate.getTime());
+  if (before.length > 0) {
+    const nearest = before.reduce((acc, curr) => curr.getTime() > acc.getTime() ? curr : acc);
+    return nearest.toISOString().slice(0, 10);
   }
+
+  return null;
 }
 
-//meme chose mais avec les mois
-const findNearestDateMonthlized = (arrayOfDates, months, dateToFind) => {
-  // Step 1: Convert date strings to Date objects
-  const dateObjects = arrayOfDates.map((dateStr) => new Date(dateStr));
+// =============================================
+// Date Finding Functions
+// =============================================
 
-  // Step 2: Calculate the date a specified number of months behind the dateToFind
-  const dateToFindObject = new Date(dateToFind);
-  const monthsBehind = new Date(dateToFindObject);
-  monthsBehind.setMonth(monthsBehind.getMonth() - months);
+/**
+ * Trouve la date il y a N années par rapport à dateToFind.
+ */
+const findNearestDateAnnualized = (arrayOfDates, year, dateToFind) => {
+  const target = new Date(dateToFind);
+  target.setFullYear(target.getFullYear() - year);
 
-  // Step 3: Search for the calculated date in the array
-  const foundDate = dateObjects.find((date) => date.getTime() === monthsBehind.getTime());
+  const result = findNearestDateBefore(arrayOfDates, target);
+  if (result) return result;
 
-  if (foundDate) {
-    // If the calculated date is found, return it
-    return foundDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-  } else {
-    // Step 4: Find the nearest date before the calculated date
-    const nearestDatesBefore = dateObjects.filter((date) => date.getTime() < monthsBehind.getTime());
-    if (nearestDatesBefore.length > 0) {
-      const nearestDate = nearestDatesBefore.reduce((acc, curr) => {
-        return curr.getTime() > acc.getTime() ? curr : acc;
-      });
-      return nearestDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-    } else {
-      // If there are no dates before the calculated date, return the last date in the array
-      return dateObjects[dateObjects.length - 1].toISOString().slice(0, 10);
-    }
-  }
+  // Fallback: dernière date du mois précédent
+  return findLastDateOfPreviousMonth(arrayOfDates);
 };
 
-//derniere date du mois precedent
+/**
+ * Trouve la date il y a N mois par rapport à dateToFind.
+ */
+const findNearestDateMonthlized = (arrayOfDates, months, dateToFind) => {
+  const target = new Date(dateToFind);
+  target.setMonth(target.getMonth() - months);
+
+  const result = findNearestDateBefore(arrayOfDates, target);
+  if (result) return result;
+
+  // Fallback: dernière date du tableau
+  const dateObjects = arrayOfDates.map(d => new Date(d));
+  return dateObjects[dateObjects.length - 1].toISOString().slice(0, 10);
+};
+
+/**
+ * Trouve la dernière date du mois précédent dans le tableau.
+ */
 const findLastDateOfPreviousMonth = (arrayOfDates) => {
-  // Step 1: Convert date strings to Date objects
-  const dateObjects = arrayOfDates.map((dateStr) => new Date(dateStr));
-
-  // Step 2: Find the last date and extract the month and year
+  const dateObjects = arrayOfDates.map(d => new Date(d));
   const lastDate = new Date(Math.max(...dateObjects));
-  const lastMonth = lastDate.getMonth();
-  const lastYear = lastDate.getFullYear();
+  const lastDateOfPrevMonth = new Date(lastDate.getFullYear(), lastDate.getMonth(), 0);
 
-  // Step 3: Calculate the last date of the previous month
-  const lastDateOfPreviousMonth = new Date(lastYear, lastMonth, 0);
+  const result = findNearestDateBefore(arrayOfDates, lastDateOfPrevMonth);
+  if (result) return result;
+  return lastDate.toISOString().slice(0, 10);
+};
 
-  // Step 4: Search for the last date of the previous month in the array
-  const foundDate = dateObjects.find((date) => date.getTime() === lastDateOfPreviousMonth.getTime());
-
-  if (foundDate) {
-    // If the last date of the previous month is found, return it
-    return foundDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-  } else {
-    // Step 5: Find the nearest date before the last date of the previous month in the array
-    const nearestDatesBefore = dateObjects.filter((date) => date.getTime() < lastDateOfPreviousMonth.getTime());
-    if (nearestDatesBefore.length > 0) {
-      const nearestDate = new Date(Math.max(...nearestDatesBefore));
-      return nearestDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-    } else {
-      // If there are no dates before the last date of the previous month in the array,
-      // return the last date in the array
-      return lastDate.toISOString().slice(0, 10);
-    }
-  }
-}
-
-
-
-
-//prends la derniere date du tableau et trouve son equivalent il y a year ans
+/**
+ * Trouve la date il y a N années par rapport à la dernière date du tableau.
+ */
 const findNearestDate = (arrayOfDates, year) => {
-  // Step 1: Convert date strings to Date objects
-  const dateObjects = arrayOfDates.map((dateStr) => new Date(dateStr));
-
-  // Step 2: Find the last date and calculate the date a year behind it
+  const dateObjects = arrayOfDates.map(d => new Date(d));
   const lastDate = dateObjects[dateObjects.length - 1];
-  const yearBehind = new Date(lastDate);
-  yearBehind.setFullYear(yearBehind.getFullYear() - year);
+  const target = new Date(lastDate);
+  target.setFullYear(target.getFullYear() - year);
 
-  // Step 3: Search for the calculated date in the array
-  const foundDate = dateObjects.find((date) => date.getTime() === yearBehind.getTime());
+  const result = findNearestDateBefore(arrayOfDates, target);
+  if (result) return result;
+  return lastDate.toISOString().slice(0, 10);
+};
 
-  if (foundDate) {
-    // If the calculated date is found, return it
-    return foundDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-  } else {
-    // Step 4: Find the nearest date before the calculated date
-    const nearestDatesBefore = dateObjects.filter((date) => date.getTime() < yearBehind.getTime());
-    if (nearestDatesBefore.length > 0) {
-      const nearestDate = nearestDatesBefore.reduce((acc, curr) => {
-        return curr.getTime() > acc.getTime() ? curr : acc;
-      });
-      return nearestDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-    } else {
-      // If there are no dates before the calculated date, return the last date in the array
-      return lastDate.toISOString().slice(0, 10);
-    }
-  }
-}
-
-//prends la derniere date du tableau et trouve son equivalent il y a year ans
+/**
+ * Comme findNearestDate mais retourne null si aucune date trouvée.
+ */
 const findNearestDatemois = (arrayOfDates, year) => {
-  // Step 1: Convert date strings to Date objects
-  const dateObjects = arrayOfDates.map((dateStr) => new Date(dateStr));
-
-  // Step 2: Find the last date and calculate the date a year behind it
+  const dateObjects = arrayOfDates.map(d => new Date(d));
   const lastDate = dateObjects[dateObjects.length - 1];
-  const yearBehind = new Date(lastDate);
-  yearBehind.setFullYear(yearBehind.getFullYear() - year);
+  const target = new Date(lastDate);
+  target.setFullYear(target.getFullYear() - year);
 
-  // Step 3: Search for the calculated date in the array
-  const foundDate = dateObjects.find((date) => date.getTime() === yearBehind.getTime());
+  return findNearestDateBefore(arrayOfDates, target);
+};
 
-  if (foundDate) {
-    // If the calculated date is found, return it
-    return foundDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-  } else {
-    // Step 4: Find the nearest date before the calculated date
-    const nearestDatesBefore = dateObjects.filter((date) => date.getTime() < yearBehind.getTime());
-    if (nearestDatesBefore.length > 0) {
-      const nearestDate = nearestDatesBefore.reduce((acc, curr) => {
-        return curr.getTime() > acc.getTime() ? curr : acc;
-      });
-      return nearestDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-    } else {
-      // If there are no dates before the calculated date, return the last date in the array
-      return null;
-    }
-  }
-}
-
-//prends la derniere date du tableau et trouve son equivalent il y a year ans
+/**
+ * Trouve la date il y a N années par rapport à une date spécifique.
+ */
 const findNearestDatetoyear = (arrayOfDates, year, date) => {
-  // Step 1: Convert date strings to Date objects
-  const dateObjects = arrayOfDates.map((dateStr) => new Date(dateStr));
+  const target = new Date(date);
+  target.setFullYear(target.getFullYear() - year);
 
-  // Step 2: Find the last date and calculate the date a year behind it
-  const lastDate = date;
-  const yearBehind = new Date(lastDate);
-  yearBehind.setFullYear(yearBehind.getFullYear() - year);
+  const result = findNearestDateBefore(arrayOfDates, target);
+  if (result) return result;
+  return new Date(date).toISOString().slice(0, 10);
+};
 
-  // Step 3: Search for the calculated date in the array
-  const foundDate = dateObjects.find((date) => date.getTime() === yearBehind.getTime());
-
-  if (foundDate) {
-    // If the calculated date is found, return it
-    return foundDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-  } else {
-    // Step 4: Find the nearest date before the calculated date
-    const nearestDatesBefore = dateObjects.filter((date) => date.getTime() < yearBehind.getTime());
-    if (nearestDatesBefore.length > 0) {
-      const nearestDate = nearestDatesBefore.reduce((acc, curr) => {
-        return curr.getTime() > acc.getTime() ? curr : acc;
-      });
-      return nearestDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-    } else {
-      // If there are no dates before the calculated date, return the last date in the array
-      return lastDate.toISOString().slice(0, 10);
-    }
-  }
-}
-
-//meme chose qu'avant mais pour les semaines
+/**
+ * Trouve la date 4 semaines avant la dernière date du tableau.
+ */
 const findNearestDateWeek = (arrayOfDates) => {
-  // Step 1: Convert date strings to Date objects
-  const dateObjects = arrayOfDates.map((dateStr) => new Date(dateStr));
-
-  // Step 2: Find the last date and calculate the date 4 weeks behind it
+  const dateObjects = arrayOfDates.map(d => new Date(d));
   const lastDate = dateObjects[dateObjects.length - 1];
-  const fourWeeksBehind = new Date(lastDate);
-  fourWeeksBehind.setDate(fourWeeksBehind.getDate() - 28);
+  const target = new Date(lastDate);
+  target.setDate(target.getDate() - 28);
 
-  // Step 3: Search for the calculated date in the array
-  const foundDate = dateObjects.find((date) => date.getTime() === fourWeeksBehind.getTime());
+  const result = findNearestDateBefore(arrayOfDates, target);
+  if (result) return result;
+  return lastDate.toISOString().slice(0, 10);
+};
 
-  if (foundDate) {
-    // If the calculated date is found, return it
-    return foundDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-  } else {
-    // Step 4: Find the nearest date before the calculated date
-    const nearestDatesBefore = dateObjects.filter((date) => date.getTime() < fourWeeksBehind.getTime());
-    if (nearestDatesBefore.length > 0) {
-      const nearestDate = nearestDatesBefore.reduce((acc, curr) => {
-        return curr.getTime() > acc.getTime() ? curr : acc;
-      });
-      return nearestDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-    } else {
-      // If there are no dates before the calculated date, return the last date in the array
-      return lastDate.toISOString().slice(0, 10);
-    }
-  }
-}
-
-//meme chose quavant mais trouve le 1er janvier
+/**
+ * Trouve le 1er janvier (ou la date la plus proche) de la même année.
+ */
 const findNearestDateJanuary = (arrayOfDates) => {
-  // Step 1: Convert date strings to Date objects
-  const dateObjects = arrayOfDates.map((dateStr) => new Date(dateStr));
-
-  // Step 2: Find the last date and calculate the date of 1st January of the same year
+  const dateObjects = arrayOfDates.map(d => new Date(d));
   const lastDate = dateObjects[dateObjects.length - 1];
-  const year = lastDate.getFullYear();
-  const firstJanuary = new Date(year, 0, 1);
+  const firstJanuary = new Date(lastDate.getFullYear(), 0, 1);
 
-  // Step 3: Search for the calculated date in the array
-  const foundDate = dateObjects.find((date) => date.getTime() === firstJanuary.getTime());
+  const result = findNearestDateBefore(arrayOfDates, firstJanuary);
+  if (result) return result;
+  return lastDate.toISOString().slice(0, 10);
+};
 
-  if (foundDate) {
-    // If the calculated date is found, return it
-    return foundDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-  } else {
-    // Step 4: Find the nearest date before the calculated date
-    const nearestDatesBefore = dateObjects.filter((date) => date.getTime() < firstJanuary.getTime());
-    if (nearestDatesBefore.length > 0) {
-      const nearestDate = nearestDatesBefore.reduce((acc, curr) => {
-        return curr.getTime() > acc.getTime() ? curr : acc;
-      });
-      return nearestDate.toISOString().slice(0, 10); // Convert it back to 'YYYY-MM-DD' format
-    } else {
-      // If there are no dates before the calculated date, return the last date in the array
-      return lastDate.toISOString().slice(0, 10);
+/**
+ * Trouve les dernières dates pour les 4 années précédentes.
+ */
+const findLastDatesForEachPreviousYear = (dateArray) => {
+  const dateObjects = dateArray.map(d => new Date(d));
+  const lastDate = new Date(dateArray[dateArray.length - 1]);
+
+  const results = [];
+  for (let i = 1; i <= 4; i++) {
+    const previousYear = lastDate.getFullYear() - i;
+    const yearDates = dateObjects.filter(d => d.getFullYear() === previousYear);
+    if (yearDates.length > 0) {
+      const lastOfYear = yearDates.sort((a, b) => b - a)[0];
+      results.push(lastOfYear.toISOString().substring(0, 10));
     }
   }
-}
 
-//prends la derniere date et trouve les equivalents 1,2 et 3 ans en arriere 
-const findLastDatesForEachPreviousYear = (dateArray) => {
+  return results;
+};
 
-  const dateObjects = dateArray.map((dateStr) => new Date(dateStr));
-  const lastDate = new Date(dateArray[dateArray.length - 1]); // Get the last date (most recent date)
+// =============================================
+// Date Grouping Functions
+// =============================================
 
-  const previousYears = [];
-  for (let i = 1; i <= 4; i++) {
-    const previousYear = new Date(lastDate);
-    previousYear.setFullYear(lastDate.getFullYear() - i);
-    previousYears.push(previousYear.getFullYear());
-  }
-
-
-  const year1 = dateObjects.filter(date => date.getFullYear() == previousYears[0])
-  const year2 = dateObjects.filter(date => date.getFullYear() == previousYears[1])
-  const year3 = dateObjects.filter(date => date.getFullYear() == previousYears[2])
-  const year4 = dateObjects.filter(date => date.getFullYear() == previousYears[3])
-
-
-  return [
-    year1.reverse()[0].toISOString().substring(0, 10),
-    year2.reverse()[0].toISOString().substring(0, 10),
-    year3.reverse()[0].toISOString().substring(0, 10),
-    year4.reverse()[0].toISOString().substring(0, 10)
-  ]
-
-
-}
-
-//groupes un tableau de dates par semaine
+/**
+ * Groupe un tableau de dates par semaine.
+ */
 const groupDatesByWeek = (dates) => {
   const result = [];
-  const sortedDates = dates.map(date => new Date(date)).sort((a, b) => a - b);
+  const sortedDates = dates.map(d => new Date(d)).sort((a, b) => a - b);
 
   let currentWeek = [];
   let currentWeekStart = startOfWeek(sortedDates[0]);
 
   for (const currentDate of sortedDates) {
-    if (isWeekend(currentDate)) {
-      continue;
-    }
+    if (isWeekend(currentDate)) continue;
 
-    const currentDateStartOfWeek = startOfWeek(currentDate);
-
-    if (currentDateStartOfWeek.getTime() === currentWeekStart.getTime()) {
+    const weekStart = startOfWeek(currentDate);
+    if (weekStart.getTime() === currentWeekStart.getTime()) {
       currentWeek.push(currentDate.toISOString());
     } else {
       result.push(currentWeek);
       currentWeek = [currentDate.toISOString()];
-      currentWeekStart = currentDateStartOfWeek;
+      currentWeekStart = weekStart;
     }
   }
 
-  if (currentWeek.length > 0) {
-    result.push(currentWeek);
-  }
-
+  if (currentWeek.length > 0) result.push(currentWeek);
   return result;
-}
+};
 
-//meme chose mais par mois
+/**
+ * Groupe un tableau de dates par mois.
+ */
 const groupDatesByMonth = (dates) => {
   const result = [];
-  const sortedDates = dates.map(date => new Date(date)).sort((a, b) => a - b);
+  const sortedDates = dates.map(d => new Date(d)).sort((a, b) => a - b);
 
   let currentMonth = [];
   let currentMonthStart = startOfMonth(sortedDates[0]);
 
   for (const currentDate of sortedDates) {
-    const currentDateStartOfMonth = startOfMonth(currentDate);
-
-    if (currentDateStartOfMonth.getTime() === currentMonthStart.getTime()) {
+    const monthStart = startOfMonth(currentDate);
+    if (monthStart.getTime() === currentMonthStart.getTime()) {
       currentMonth.push(currentDate.toISOString());
     } else {
       result.push(currentMonth);
       currentMonth = [currentDate.toISOString()];
-      currentMonthStart = currentDateStartOfMonth;
+      currentMonthStart = monthStart;
     }
   }
 
-  if (currentMonth.length > 0) {
-    result.push(currentMonth);
-  }
-
+  if (currentMonth.length > 0) result.push(currentMonth);
   return result;
-}
+};
 
+/**
+ * Groupe dates par mois, ne garde que les années complètes (12 mois).
+ */
 const groupDatesByMonth1 = (dates) => {
   const result = [];
-  const sortedDates = dates.map(date => new Date(date)).sort((a, b) => a - b);
+  const sortedDates = dates.map(d => new Date(d)).sort((a, b) => a - b);
 
   let currentYear = [];
   let currentYearStart = startOfYear(sortedDates[0]);
 
   for (const currentDate of sortedDates) {
-    const currentDateStartOfYear = startOfYear(currentDate);
-
-    if (currentDateStartOfYear.getTime() === currentYearStart.getTime()) {
+    const yearStart = startOfYear(currentDate);
+    if (yearStart.getTime() === currentYearStart.getTime()) {
       currentYear.push(currentDate.toISOString());
     } else {
-      if (currentYear.length === 12) {
-        result.push(currentYear);
-      }
+      if (currentYear.length === 12) result.push(currentYear);
       currentYear = [currentDate.toISOString()];
-      currentYearStart = currentDateStartOfYear;
+      currentYearStart = yearStart;
     }
   }
 
-  if (currentYear.length === 12) {
-    result.push(currentYear);
-  }
-
+  if (currentYear.length === 12) result.push(currentYear);
   return result;
-}
+};
 
-
-//meme chose mais par année
+/**
+ * Groupe un tableau de dates par année.
+ */
 const groupDatesByYear = (dates) => {
   const result = [];
-  const sortedDates = dates.map(date => new Date(date)).sort((a, b) => a - b);
+  const sortedDates = dates.map(d => new Date(d)).sort((a, b) => a - b);
 
   let currentYear = [];
   let currentYearStart = startOfYear(sortedDates[0]);
 
   for (const currentDate of sortedDates) {
-    const currentDateStartOfYear = startOfYear(currentDate);
-
-    if (currentDateStartOfYear.getTime() === currentYearStart.getTime()) {
+    const yearStart = startOfYear(currentDate);
+    if (yearStart.getTime() === currentYearStart.getTime()) {
       currentYear.push(currentDate.toISOString());
     } else {
       result.push(currentYear);
       currentYear = [currentDate.toISOString()];
-      currentYearStart = currentDateStartOfYear;
+      currentYearStart = yearStart;
     }
   }
 
-  if (currentYear.length > 0) {
-    result.push(currentYear);
-  }
-
+  if (currentYear.length > 0) result.push(currentYear);
   return result;
-}
+};
 
-//change la structure d'un tableau et le rend par semaine
-const adaptValuesToGroupedWeeks = (values, groupedDatesByWeek) => {
+// =============================================
+// Value Adaptation Functions
+// =============================================
+
+/**
+ * Adapte un tableau de valeurs selon un groupage (semaine/mois/année).
+ */
+function adaptValuesToGroups(values, groupedDates) {
   const result = [];
   let currentIndex = 0;
-
-  for (let i = 0; i < groupedDatesByWeek.length; i++) {
-    const currentWeekLength = groupedDatesByWeek[i].length;
-    const currentWeekValues = values.slice(currentIndex, currentIndex + currentWeekLength);
-    result.push(currentWeekValues);
-    currentIndex += currentWeekLength;
+  for (const group of groupedDates) {
+    result.push(values.slice(currentIndex, currentIndex + group.length));
+    currentIndex += group.length;
   }
-
   return result;
 }
 
-//meme chose mais par mois
-const adaptValuesToGroupedMonths = (values, groupedDatesByMonth) => {
-  const result = [];
-  let currentIndex = 0;
+const adaptValuesToGroupedWeeks = (values, groupedDates) => adaptValuesToGroups(values, groupedDates);
+const adaptValuesToGroupedMonths = (values, groupedDates) => adaptValuesToGroups(values, groupedDates);
+const adaptValuesToGroupedYears = (values, groupedDates) => adaptValuesToGroups(values, groupedDates);
 
-  for (let i = 0; i < groupedDatesByMonth.length; i++) {
-    const currentMonthLength = groupedDatesByMonth[i].length;
-    const currentMonthValues = values.slice(currentIndex, currentIndex + currentMonthLength);
-    result.push(currentMonthValues);
-    currentIndex += currentMonthLength;
-  }
-
-  return result;
-}
-//meme chose mais par mois
-const adaptValuesToGroupedYears = (values, groupedDatesByYear) => {
-  const result = [];
-  let currentIndex = 0;
-
-  for (let i = 0; i < groupedDatesByYear.length; i++) {
-    const currentYearLength = groupedDatesByYear[i].length;
-    const currentYearValues = values.slice(currentIndex, currentIndex + currentYearLength);
-    result.push(currentYearValues);
-    currentIndex += currentYearLength;
-  }
-
-  return result;
-}
-
-//meme chose mais par mois
+/**
+ * Calcule les rendements annuels avec dates.
+ */
 const AdaptTableauwithdate = (values, groupedDatesByYear) => {
   const result = [];
-  let currentIndex = 0;
-  groupedDatesByYear = groupedDatesByYear.reverse();
-  values = values.reverse();
-  for (let i = 0; i < groupedDatesByYear.length - 1; i++) {
-    const currentYearLength = groupedDatesByYear[i].length;
-    const currentYearValues = values[i][values[i].length - 1];
-    const currentlastYearValues = values[i + 1][values[i + 1].length - 1];
-    const year = groupedDatesByYear[i][0].slice(0, 4);
-    const valueYear = (currentYearValues - currentlastYearValues) / currentlastYearValues
+  const reversedDates = [...groupedDatesByYear].reverse();
+  const reversedValues = [...values].reverse();
 
-    result.push([year, currentYearValues, valueYear]);
-    // result[year].push(valueYear);
-    currentIndex += currentYearLength;
+  for (let i = 0; i < reversedDates.length - 1; i++) {
+    const currentValue = reversedValues[i][reversedValues[i].length - 1];
+    const previousValue = reversedValues[i + 1][reversedValues[i + 1].length - 1];
+    const year = reversedDates[i][0].slice(0, 4);
+    const rendement = (currentValue - previousValue) / previousValue;
+    result.push([year, currentValue, rendement]);
   }
 
   return result;
-}
+};
 
+/**
+ * Calcule les rendements mensuels avec dates, groupés par année.
+ */
 const AdaptTableaumonthwithdate = (values, groupedDatesByYear) => {
-  const result = [];
-  let currentIndex = 0;
-  groupedDatesByYear = groupedDatesByYear.reverse();
-  values = values.reverse();
-  for (let i = 0; i < groupedDatesByYear.length - 1; i++) {
-    const currentYearLength = groupedDatesByYear[i].length;
-    const currentYearValues = values[i][values[i].length - 1];
-    const currentlastYearValues = values[i + 1][values[i + 1].length - 1];
-    const year = groupedDatesByYear[i][0].slice(0, 4);
-    const valueYear = (currentYearValues - currentlastYearValues) / currentlastYearValues
+  const result = {};
+  const reversedDates = [...groupedDatesByYear].reverse();
+  const reversedValues = [...values].reverse();
 
-    const month = groupedDatesByYear[i][0].slice(5, 7);
+  for (let i = 0; i < reversedDates.length - 1; i++) {
+    const currentValue = reversedValues[i][reversedValues[i].length - 1];
+    const previousValue = reversedValues[i + 1][reversedValues[i + 1].length - 1];
+    const year = reversedDates[i][0].slice(0, 4);
+    const month = reversedDates[i][0].slice(5, 7);
+    const rendement = (currentValue - previousValue) / previousValue;
 
-    if (!result[year]) {
-      result[year] = [];
-    }
-
-    result[year].push([month, currentYearValues, valueYear]);
-
-    // result[year].push(valueYear);
-    currentIndex += currentYearLength;
+    if (!result[year]) result[year] = [];
+    result[year].push([month, currentValue, rendement]);
   }
 
-  // Convert the result object to the desired format
-  const finalResult = Object.entries(result).map(([year, values]) => ({
-    [year]: values,
-  }));
+  return Object.entries(result)
+    .map(([year, values]) => ({ [year]: values }))
+    .reverse();
+};
 
-  return finalResult.reverse();
-}
-
+/**
+ * Calcule les rendements hebdomadaires avec dates.
+ */
 const AdaptTableauweekwithdate = (values, groupedDatesByYear) => {
   const result = [];
-  let currentIndex = 0;
-  groupedDatesByYear = groupedDatesByYear.reverse();
-  values = values.reverse();
-  for (let i = 0; i < groupedDatesByYear.length - 1; i++) {
-    const currentYearLength = groupedDatesByYear[i].length;
-    const currentYearValues = values[i][values[i].length - 1];
-    const currentlastYearValues = values[i + 1][values[i + 1].length - 1];
-    const year = groupedDatesByYear[i][0].slice(0, 10);
-    const valueYear = (currentYearValues - currentlastYearValues) / currentlastYearValues
+  const reversedDates = [...groupedDatesByYear].reverse();
+  const reversedValues = [...values].reverse();
 
-    result.push([year, currentYearValues, valueYear]);
-    // result[year].push(valueYear);
-    currentIndex += currentYearLength;
+  for (let i = 0; i < reversedDates.length - 1; i++) {
+    const currentValue = reversedValues[i][reversedValues[i].length - 1];
+    const previousValue = reversedValues[i + 1][reversedValues[i + 1].length - 1];
+    const dateLabel = reversedDates[i][0].slice(0, 10);
+    const rendement = (currentValue - previousValue) / previousValue;
+    result.push([dateLabel, currentValue, rendement]);
   }
 
   return result;
-}
+};
 
+// =============================================
+// Exports
+// =============================================
 module.exports = {
   findNearestDateAnnualized,
   findLastDateOfPreviousMonth,
@@ -536,6 +369,5 @@ module.exports = {
   AdaptTableaumonthwithdate,
   findNearestDateMonthlized,
   groupDatesByMonth1,
-  findNearestDatemois
-}
-
+  findNearestDatemois,
+};

@@ -1,5 +1,3 @@
-const FondInvestissement = require('./fond'); // Remplacez le chemin par le chemin correct vers votre fichier FondInvestissement
-
 module.exports = (sequelize, DataTypes) => {
   const Valorisation = sequelize.define('valorisations', {
     id: {
