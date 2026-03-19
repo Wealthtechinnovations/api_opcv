@@ -1,130 +1,198 @@
-const { Sequelize, DataTypes } = require('sequelize')
-const INDICE = require('../models/indice')
-const TAUX = require('../models/tsr')
-const VL = require('../models/vl')
-const CASH = require('../models/cash')
-const TRA = require('../models/tra')
-const TSR = require('../models/tsr')
-const SOCIETE = require('../models/societe')
-const CLASSEMENTFOND = require('../models/classementfond')
-const CLASSEMENTFOND_EURS = require('../models/classementfond_eurs')
-const CLASSEMENTFOND_USDS = require('../models/classementfond_usds')
-const RENDEMENT = require('../models/rendement')
-const SIMULATION = require('../models/simulation')
-const SIMULATIONPORTEFEUILLE = require('../models/simulationportefeuille')
-const USERS = require('../models/users')
-const PERFORMENCE = require('../models/performence')
-const PERFORMENCE_EURS = require('../models/performence_eurs')
-const PERFORMENCE_USDS = require('../models/performence_usds')
-const ACTUALITE = require('../models/actualite')
-const Transaction = require('../models/transaction')
-const Investissement = require('../models/investissement')
-const Portefeuille = require('../models/portefeuille')
-const Portefeuille_vl = require('../models/portefeuille_vl')
-const Portefeuille_vl_cumul = require('../models/portefeuille_valorise')
-const Frais = require('../models/frais')
-const Fiscalite = require('../models/fiscalite')
-const Devise = require('../models/devise')
-const PAYS_REGULATEUR = require('../models/pays_regulateurs')
-const FOND = require('../models/fond')
-const ROBOPORTFEUILLE = require('../models/portefeuilles_proposes_vls')
-const ROBOPORTFEUILLEPORTEFEUILLE = require('../models/portefeuilles_proposes')
-const Portefeuille_base100 = require('../models/portefeuille_base100')
-const Favorisfonds = require('../models/favorisfonds')
-const Devisedechanges = require('../models/devisedechanges')
-const PERSONNEL = require('../models/personnel')
-const DOCUMENT = require('../models/document')
-const APIKEY=require('../models/apikey')
-const TSRHISTO = require('../models/tsrhisto')
-const Datevalorisation=require('../models/datevalorisation')
+require('dotenv').config();
+const { Sequelize, DataTypes } = require('sequelize');
+
+// ---------------------
+// Model Imports
+// ---------------------
+const INDICE = require('../models/indice');
+const TAUX = require('../models/tsr');
+const VL = require('../models/vl');
+const CASH = require('../models/cash');
+const TRA = require('../models/tra');
+const SOCIETE = require('../models/societe');
+const CLASSEMENTFOND = require('../models/classementfond');
+const CLASSEMENTFOND_EURS = require('../models/classementfond_eurs');
+const CLASSEMENTFOND_USDS = require('../models/classementfond_usds');
+const RENDEMENT = require('../models/rendement');
+const SIMULATION = require('../models/simulation');
+const SIMULATIONPORTEFEUILLE = require('../models/simulationportefeuille');
+const USERS = require('../models/users');
+const PERFORMENCE = require('../models/performence');
+const PERFORMENCE_EURS = require('../models/performence_eurs');
+const PERFORMENCE_USDS = require('../models/performence_usds');
+const ACTUALITE = require('../models/actualite');
+const Transaction = require('../models/transaction');
+const Investissement = require('../models/investissement');
+const Portefeuille = require('../models/portefeuille');
+const Portefeuille_vl = require('../models/portefeuille_vl');
+const Portefeuille_vl_cumul = require('../models/portefeuille_valorise');
+const Frais = require('../models/frais');
+const Fiscalite = require('../models/fiscalite');
+const Devise = require('../models/devise');
+const PAYS_REGULATEUR = require('../models/pays_regulateurs');
+const FOND = require('../models/fond');
+const ROBOPORTFEUILLE = require('../models/portefeuilles_proposes_vls');
+const ROBOPORTFEUILLEPORTEFEUILLE = require('../models/portefeuilles_proposes');
+const Portefeuille_base100 = require('../models/portefeuille_base100');
+const Favorisfonds = require('../models/favorisfonds');
+const Devisedechanges = require('../models/devisedechanges');
+const PERSONNEL = require('../models/personnel');
+const DOCUMENT = require('../models/document');
+const APIKEY = require('../models/apikey');
+const TSRHISTO = require('../models/tsrhisto');
+const Datevalorisation = require('../models/datevalorisation');
+
+// ---------------------
+// Database Connection (from environment variables)
+// ---------------------
 const sequelize = new Sequelize(
-    'fund_opcvm',
-    'fund_opcvm',
-    '66G41zes~',
-    {
-        host: 'localhost',
-        dialect: 'mysql',
-        dialectOptions: {
-            // collate: "utf8_general_ci",
-            timezone: '+00:00'
-        },
-        logging: false
-    }
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST || 'localhost',
+    dialect: process.env.DB_DIALECT || 'mysql',
+    dialectOptions: {
+      timezone: process.env.DB_TIMEZONE || '+00:00',
+    },
+    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  }
 );
 
+// ---------------------
+// Model Initialization
+// ---------------------
+const apikeys = APIKEY(sequelize, DataTypes);
+const indice = INDICE(sequelize, DataTypes);
+const taux = TAUX(sequelize, DataTypes);
+const tra = TRA(sequelize, DataTypes);
+const tsr = taux; // TSR and TAUX use the same model - avoid duplicate init
+const vl = VL(sequelize, DataTypes);
+const fond = FOND(sequelize, DataTypes);
+const performences = PERFORMENCE(sequelize, DataTypes);
+const performences_eurs = PERFORMENCE_EURS(sequelize, DataTypes);
+const performences_usds = PERFORMENCE_USDS(sequelize, DataTypes);
+const tsrhisto = TSRHISTO(sequelize, DataTypes);
+const cashdb = CASH(sequelize, DataTypes);
+const frais = Frais(sequelize, DataTypes);
+const fiscalite = Fiscalite(sequelize, DataTypes);
+const documentss = DOCUMENT(sequelize, DataTypes);
+const actu = ACTUALITE(sequelize, DataTypes);
+const rendement = RENDEMENT(sequelize, DataTypes);
+const simulation = SIMULATION(sequelize, DataTypes);
+const simulationportefeuille = SIMULATIONPORTEFEUILLE(sequelize, DataTypes);
+const users = USERS(sequelize, DataTypes);
+const personnel = PERSONNEL(sequelize, DataTypes);
+const societe = SOCIETE(sequelize, DataTypes);
+const classementfonds = CLASSEMENTFOND(sequelize, DataTypes);
+const classementfonds_eurs = CLASSEMENTFOND_EURS(sequelize, DataTypes);
+const classementfonds_usds = CLASSEMENTFOND_USDS(sequelize, DataTypes);
+const date_valorisation = Datevalorisation(sequelize, DataTypes);
+const favorisfonds = Favorisfonds(sequelize, DataTypes);
+const portefeuille_base100 = Portefeuille_base100(sequelize, DataTypes);
+const portefeuille = Portefeuille(sequelize, DataTypes);
+const devisedechanges = Devisedechanges(sequelize, DataTypes);
+const transaction = Transaction(sequelize, DataTypes);
+const investissement = Investissement(sequelize, DataTypes);
+const portefeuille_vl = Portefeuille_vl(sequelize, DataTypes);
+const portefeuille_vl_cumul = Portefeuille_vl_cumul(sequelize, DataTypes);
+const devises = Devise(sequelize, DataTypes);
+const pays_regulateurs = PAYS_REGULATEUR(sequelize, DataTypes);
+const portefeuilles_proposes = ROBOPORTFEUILLEPORTEFEUILLE(sequelize, DataTypes);
+const portefeuilles_proposes_vls = ROBOPORTFEUILLE(sequelize, DataTypes);
 
-const apikeys = APIKEY(sequelize, DataTypes)
-const indice = INDICE(sequelize, DataTypes)
-const taux = TAUX(sequelize, DataTypes)
-const tra = TRA(sequelize, DataTypes)
-const tsr = TSR(sequelize, DataTypes)
-const vl = VL(sequelize, DataTypes)
-const fond = FOND(sequelize, DataTypes)
-const performences = PERFORMENCE(sequelize, DataTypes)
-const performences_eurs = PERFORMENCE_EURS(sequelize, DataTypes)
-const performences_usds = PERFORMENCE_USDS(sequelize, DataTypes)
-const tsrhisto = TSRHISTO(sequelize, DataTypes)
-// Maintenant vous pouvez faire une jointure entre ces deux tables
+// ---------------------
+// Associations
+// ---------------------
+
+// Fond <-> VL (Valorisations)
 fond.hasMany(vl, { foreignKey: 'fund_id' });
 vl.belongsTo(fond, { foreignKey: 'fund_id' });
-// Maintenant vous pouvez faire une jointure entre ces deux tables
+
+// Fond <-> Performances
 fond.hasMany(performences, { foreignKey: 'fond_id' });
 performences.belongsTo(fond, { foreignKey: 'fond_id' });
 performences_eurs.belongsTo(fond, { foreignKey: 'fond_id' });
 performences_usds.belongsTo(fond, { foreignKey: 'fond_id' });
-const cashdb = CASH(sequelize, DataTypes)
-const frais = Frais(sequelize, DataTypes)
-const fiscalite = Fiscalite(sequelize, DataTypes)
-const documentss = DOCUMENT(sequelize, DataTypes)
-const actu = ACTUALITE(sequelize, DataTypes)
-const rendement = RENDEMENT(sequelize, DataTypes)
+
+// Fond <-> Rendement
 fond.hasMany(rendement, { foreignKey: 'fond_id' });
 rendement.belongsTo(fond, { foreignKey: 'fond_id' });
-const simulation = SIMULATION(sequelize, DataTypes)
-const simulationportefeuille = SIMULATIONPORTEFEUILLE(sequelize, DataTypes)
 
-const users = USERS(sequelize, DataTypes)
-const personnel = PERSONNEL(sequelize, DataTypes)
-const societe = SOCIETE(sequelize, DataTypes)
-const classementfonds = CLASSEMENTFOND(sequelize, DataTypes)
-const classementfonds_eurs = CLASSEMENTFOND_EURS(sequelize, DataTypes)
-const classementfonds_usds = CLASSEMENTFOND_USDS(sequelize, DataTypes)
-const date_valorisation = Datevalorisation(sequelize, DataTypes)
+// Date valorisation <-> VL
 date_valorisation.belongsTo(vl, { foreignKey: 'date' });
 vl.hasMany(date_valorisation, { foreignKey: 'date' });
-const favorisfonds = Favorisfonds(sequelize, DataTypes)
-const portefeuille_base100 = Portefeuille_base100(sequelize, DataTypes)
-const portefeuille = Portefeuille(sequelize, DataTypes)
-const devisedechanges = Devisedechanges(sequelize, DataTypes)
-const transaction = Transaction(sequelize, DataTypes)
+
+// Transaction associations
 transaction.belongsTo(fond, { foreignKey: 'fond_ids' });
 transaction.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
 transaction.belongsTo(devisedechanges, { foreignKey: 'date' });
-const investissement = Investissement(sequelize, DataTypes)
-const portefeuille_vl = Portefeuille_vl(sequelize, DataTypes)
-const portefeuille_vl_cumul = Portefeuille_vl_cumul(sequelize, DataTypes)
-const devises = Devise(sequelize, DataTypes)
-const pays_regulateurs = PAYS_REGULATEUR(sequelize, DataTypes)
-const portefeuilles_proposes = ROBOPORTFEUILLEPORTEFEUILLE(sequelize, DataTypes)
-const portefeuilles_proposes_vls = ROBOPORTFEUILLE(sequelize, DataTypes)
-const urll = "https://api.funds.chainsolutions.fr";
-const urllsite = "https://funds.chainsolutions.fr";
 
-// const urll="https://api.funds.chainsolutions.fr";
+// ---------------------
+// URLs (from environment)
+// ---------------------
+const urll = process.env.API_BASE_URL || 'http://localhost:3005';
+const urllsite = process.env.SITE_BASE_URL || 'http://localhost:3000';
 
-// const User = UserModel(sequelize, DataTypes)
-
+// ---------------------
+// Database Init
+// ---------------------
 const initDb = async () => {
-    //await indice.sync();
+  try {
+    await sequelize.authenticate();
+    console.log('Connexion à la base de données établie.');
     await taux.sync();
     await tra.sync();
-    // await vl.sync();
-    // return sequelize.sync({force: true}).then(_ => {
-    //   console.log('La base de donnée a bien été initialisée ! ')
-    // })
-}
+  } catch (error) {
+    console.error('Erreur de connexion à la base de données:', error.message);
+  }
+};
 
-
+// ---------------------
+// Exports
+// ---------------------
 module.exports = {
-    initDb, vl, indice, taux, tra, fond, pays_regulateurs, sequelize, urll,urllsite, portefeuille, portefeuille_vl, portefeuilles_proposes_vls, portefeuilles_proposes, users, societe, classementfonds, performences, transaction, investissement, tsr, cashdb, frais, fiscalite, portefeuille_vl_cumul, devises, portefeuille_base100, favorisfonds, devisedechanges, personnel, documentss, performences_eurs, performences_usds, classementfonds_eurs, classementfonds_usds, actu, tsrhisto, rendement, simulation, simulationportefeuille,date_valorisation,apikeys
-}
+  initDb,
+  sequelize,
+  urll,
+  urllsite,
+  // Models
+  vl,
+  indice,
+  taux,
+  tra,
+  tsr,
+  fond,
+  pays_regulateurs,
+  portefeuille,
+  portefeuille_vl,
+  portefeuilles_proposes_vls,
+  portefeuilles_proposes,
+  users,
+  societe,
+  classementfonds,
+  performences,
+  transaction,
+  investissement,
+  cashdb,
+  frais,
+  fiscalite,
+  portefeuille_vl_cumul,
+  devises,
+  portefeuille_base100,
+  favorisfonds,
+  devisedechanges,
+  personnel,
+  documentss,
+  performences_eurs,
+  performences_usds,
+  classementfonds_eurs,
+  classementfonds_usds,
+  actu,
+  tsrhisto,
+  rendement,
+  simulation,
+  simulationportefeuille,
+  date_valorisation,
+  apikeys,
+};

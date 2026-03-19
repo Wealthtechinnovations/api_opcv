@@ -330,12 +330,7 @@ module.exports = (app) => {
   * @param {Object} res - Objet de réponse.
   * @param {Function} next - Fonction pour passer à la suite.
   */
-  // Autoriser toutes les origines (pour le développement)
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin,Authorization, X-Requested-With, Content-Type, Accept');
-    next();
-  });
+  // CORS is now handled in app.js via the cors middleware
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'uploads/');
@@ -364,7 +359,7 @@ module.exports = (app) => {
   const uploadDirectory1 = path.join(parentPath, 'fichiers');
   app.use('/uploads', express.static(uploadDirectory));
 
-  const magic = new Magic("sk_live_D5E6305B1B7DCF1A");
+  const magic = new Magic(process.env.MAGIC_SECRET_KEY);
 
   app.get('/api/fill-template', async (req, res) => {
     try {
@@ -431,10 +426,7 @@ module.exports = (app) => {
     }
   });
 
-  process.env.JWT_SECRET = '88a865b9da673c6900322f74fb865b6abc76feb2b140d4d44d5bec3739a74bda57b9a626998c1def77a61ac4ca8b7be9b74b4fe5a65bbaf4e51701a467332f7';
-  process.env.EMAIL_USER = 'kouassijauressigl@gmail.com';
-  process.env.EMAIL_PASSWORD = 'itrn onhe lavz pxpn';
-  process.env.FRONTEND_URL = urllsite;
+  // Credentials are loaded from .env file via dotenv (see app.js)
   app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
 
