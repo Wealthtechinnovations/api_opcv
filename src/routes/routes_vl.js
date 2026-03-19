@@ -24,6 +24,7 @@ const quants = require('quants');
 const bodyParser = require('body-parser');
 const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 3600 }); // Cache valide pendant 1 heure
+const { generateSlug, generateFundSlug, extractIdFromSlug } = require('../functions/slug');
 const magic = new Magic(process.env.MAGIC_SECRET_KEY);
 const Bottleneck = require('bottleneck');
 const { fork } = require('child_process');
@@ -5031,6 +5032,7 @@ GROUP BY f.societe_gestion;
         const societes = response.map((data) => ({
           id: data.id,
           name: data.nom,
+          slug: generateSlug(data.nom),
           description: data.description,
           email: data.email,
           tel: data.tel,
@@ -5116,6 +5118,7 @@ GROUP BY f.societe_gestion;
       // Combine the data to get the required format for countries and their respective company counts
       const countriesWithCompanies = countries.map(country => ({
         pays: country.pays,
+        slug: generateSlug(country.pays),
         companyCount: companiesPerCountry.find(c => c.pays === country.pays)?.companyCount ?? 0,
         fondscount: fondsPerCountry.find(c => c.pays === country.pays)?.fondsCount ?? 0
       }));
@@ -6058,9 +6061,9 @@ GROUP BY f.societe_gestion;
   })
   app.get('/api/fondscharge/:id', async (req, res) => {
     try {
-      const id = req.params.id;
+      const id = extractIdFromSlug(req.params.id);
 
-      // Recherchez le personnel dans la base de données en fonction de son ID
+      // Recherchez le fond dans la base de données en fonction de son ID
       const existingPersonnel = await fond.findOne({ where: { id } });
 
       if (!existingPersonnel) {

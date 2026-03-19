@@ -118,6 +118,7 @@ const {
 const { Fond } = require('../classes/fond')
 const { Indice } = require('../classes/indice')
 const { Op } = require("sequelize");
+const { generateSlug, generateFundSlug, extractIdFromSlug } = require('../functions/slug');
 const { fastifySwaggerUi } = require("@fastify/swagger-ui");
 const { da } = require('date-fns/locale');
 const portefeuille_valorise = require('../models/portefeuille_valorise');
@@ -131,27 +132,32 @@ const apikey = require('../models/apikey');
 
 router.get('/api/getfondbyidmeta/:id', async (req, res) => {
   try {
+    // Support both numeric IDs and slugs (extract ID from slug)
+    const paramId = req.params.id;
+    const fundId = extractIdFromSlug(paramId);
+
+    if (!fundId) {
+      return res.status(400).json({ message: 'ID de fond invalide' });
+    }
+
     const response = await fond.findOne({
       where: {
-        id: parseInt(req.params.id),
-        // ...
+        id: fundId,
       },
       order: [['id', 'DESC']]
     });
 
 
-
-
-
     const funds = {
       id: response.id,
       nom_fond: response.nom_fond.toString(),
+      slug: generateFundSlug(response.nom_fond, response.code_ISIN, response.id),
       categorie_libelle: response.categorie_libelle,
       categorie_national: response.categorie_national,
-      societe_gestion:response.societe_gestion,
-      categorie_globale:response.categorie_globale,
-      pays:response.pays,
-      devise: response.dev_libelle, // assuming dev_libelle is the currency
+      societe_gestion: response.societe_gestion,
+      categorie_globale: response.categorie_globale,
+      pays: response.pays,
+      devise: response.dev_libelle,
       datejour: response.datejour,
       active: response.active,
       code_ISIN: response.code_ISIN
@@ -168,15 +174,14 @@ router.get('/api/getfondbyidmeta/:id', async (req, res) => {
 });
 router.get('/api/getfondbyid/:id', async (req, res) => {
   try {
-
+    const paramId = extractIdFromSlug(req.params.id);
 
     const distinctFundIdss = req.query.funds.replace(/[^0-9A-Za-z\s,]+/g, '').split(',')
     const distinctFundIdsParsed = distinctFundIdss.map(id => parseInt(id));
 
     const response = await fond.findAll({
       where: {
-        id: req.params.id,
-        // ...
+        id: paramId,
       },
       order: [['id', 'DESC']]
     });
@@ -296,8 +301,9 @@ WHERE
     const funds = fondsDansCategorie.map(data => ({
       label: `${data.nom_fond.toString()} ${data.code_ISIN}`,
       value: data.id,
-      // name: data.nom_fond.toString(),
-      // description: data.description.toString()
+      slug: generateFundSlug(data.nom_fond, data.code_ISIN, data.id),
+      nom_fond: data.nom_fond.toString(),
+      code_ISIN: data.code_ISIN,
     }));
 
     res.json({
@@ -354,10 +360,10 @@ WHERE
    *                       description: The date corresponding to the last value.
    */
   router.get('/api/valLiq/:id', async (req, res) => {
-    //  try {
+    const fundId = extractIdFromSlug(req.params.id);
     const response = await vl.findAll({
       where: {
-        fund_id: req.params.id
+        fund_id: fundId
       },
       order: [
         ['date', 'ASC']
@@ -604,10 +610,10 @@ WHERE
   });
 
   router.get('/api/valLiqdev/:id/:devise', async (req, res) => {
-    //  try {
+    const fundId = extractIdFromSlug(req.params.id);
     const response = await vl.findAll({
       where: {
-        fund_id: req.params.id
+        fund_id: fundId
       },
       order: [
         ['date', 'ASC']
