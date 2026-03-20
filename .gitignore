@@ -21,6 +21,15 @@ efficient_frontier.png
 /uploads/*
 !/uploads/.gitkeep
 
+# Documents with sensitive data
+*.csv
+*Mots de passe*
+
+# Backup/copy files
+*copy*.py
+*copy*.js
+*.rar
+
 # OS files
 .DS_Store
 Thumbs.db

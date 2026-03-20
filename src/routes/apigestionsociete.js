@@ -63,10 +63,9 @@ const findCategoryByFundId = async (fundId) => {
 router.post('/api/addSociete', async (req, res) => {
   try {
     const { societeadd, pays } = req.body;
-    societe.create({
+    await societe.create({
       nom: societeadd,
       pays: pays,
-      // Ajoutez d'autres champs ici
     })
 
 
@@ -78,75 +77,73 @@ router.post('/api/addSociete', async (req, res) => {
   }
 });
 router.post('/api/updateSociete', async (req, res) => {
-  const { societ, nom, description, email, tel, numeroagrement, pays, regulateur, dateimmatriculation, site_web, devise, password } = req.body;
+  try {
+    const { societ, nom, description, email, tel, numeroagrement, pays, regulateur, dateimmatriculation, site_web, devise, password } = req.body;
 
-  const updatedSociete = await societe.update(
-    {
-      //  nom: nom !== undefined ? nom : societ,
-      description: description,
-      email: email,
-      tel: tel,
-      numeroagrement: numeroagrement,
-      pays: pays,
-      regulateur: regulateur,
-      dateimmatriculation: dateimmatriculation,
-      site_web: site_web,
-      devise: devise
-    },
-    {
-      where: { nom: societ },
-    }
-  );
+    await societe.update(
+      {
+        description: description,
+        email: email,
+        tel: tel,
+        numeroagrement: numeroagrement,
+        pays: pays,
+        regulateur: regulateur,
+        dateimmatriculation: dateimmatriculation,
+        site_web: site_web,
+        devise: devise
+      },
+      {
+        where: { nom: societ },
+      }
+    );
 
-  const utilisateurs = await users.findOne({
-    where: { denomination: societ }
-  });
+    const utilisateur = await users.findOne({
+      where: { denomination: societ }
+    });
 
-  if (utilisateurs.length > 0) {
-    const utilisateur = utilisateurs[0]; // Vous pouvez modifier cela pour choisir l'utilisateur que vous souhaitez
-
-    if (password != '') {
-      // Modification du mot de passe de l'utilisateur
-      const newPassword = 'nouveauMotDePasse'; // Remplacez 'nouveauMotDePasse' par le nouveau mot de passe souhaité
-      const hashedPassword = await bcrypt.hash(newPassword, 10); // Hashage du mot de passe
-
-      // Modification du champ password dans la base de données
-      await utilisateur.update({ password: password,/* denomination: nom !== undefined ? nom : societ*/ });
+    if (utilisateur && password && password !== '') {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await utilisateur.update({ password: hashedPassword });
     }
 
+    res.json({ code: 200, message: 'Societe information updated successfully' });
+  } catch (error) {
+    console.error('Error updating societe:', error);
+    res.status(500).json({ message: 'Erreur lors de la mise à jour de la société' });
   }
-
-    res.json({code:200, message: 'Societe information updated successfully' });
-
 });
 router.get('/api/getSocietebyid/:id', async (req, res) => {
+  try {
+    const response = await societe.findOne({
+      where: { nom: req.params.id }
+    });
 
-  societe.findOne({
-    where: { nom: req.params.id }
-  })
-    .then(response => {
+    if (!response) {
+      return res.status(404).json({ error: 'Société non trouvée' });
+    }
 
-      const societe = {
-        nom: response.nom,
-        description: response.description,
-        email: response.email,
-        tel: response.tel,
-        numeroagrement: response.numeroagrement,
-        pays: response.pays,
-        regulateur: response.regulateur,
-        dateimmatriculation: response.dateimmatriculation,
-        site_web: response.site_web,
-        devise: response.devise
-
-
-      };
-      res.json({
-        code: 200,
-        data: {
-          societe
-        }
-      })
-    })
+    const societeData = {
+      nom: response.nom,
+      description: response.description,
+      email: response.email,
+      tel: response.tel,
+      numeroagrement: response.numeroagrement,
+      pays: response.pays,
+      regulateur: response.regulateur,
+      dateimmatriculation: response.dateimmatriculation,
+      site_web: response.site_web,
+      devise: response.devise
+    };
+    res.json({
+      code: 200,
+      data: {
+        societe: societeData
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching societe:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des données de la société.' });
+  }
 })
 router.get('/api/getSocietebyidfisrt/:id', async (req, res) => {
   const selectedValues = req.query.query;
