@@ -480,7 +480,7 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
           }
 
           if (actif_net_EUR !== '#N/A') {
-            totalfondscompose += totalfondscompose;
+            totalfondscompose += 1;
 
             sumActifNetByCategory[category] += parseFloat(actif_net_EUR);
           }
@@ -523,7 +523,7 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
           }
 
           if (actif_net_USD !== '#N/A') {
-            totalfondscompose += totalfondscompose;
+            totalfondscompose += 1;
 
             sumActifNetByCategory[category] += parseFloat(actif_net_USD);
           }
@@ -566,7 +566,7 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
           }
 
           if (actif_net !== '#N/A') {
-            totalfondscompose += totalfondscompose;
+            totalfondscompose += 1;
 
             sumActifNetByCategory[category] += parseFloat(actif_net);
           }

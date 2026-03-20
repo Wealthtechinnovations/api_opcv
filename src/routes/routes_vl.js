@@ -1311,18 +1311,17 @@ GROUP BY f.societe_gestion;
       const { nom, prenom, email, numero, fonction, societe, activite, photo } = req.body;
 
       if (valuesArray.length >= 1 && valuesArray[0] !== '') {
-        const formattedValues = valuesArray.map(value => `'${value}'`).join(',');
+        // Sanitize: only allow numeric IDs to prevent SQL injection
+        const sanitizedIds = valuesArray
+          .map(value => parseInt(value, 10))
+          .filter(value => !isNaN(value));
 
-        const query = `
-             UPDATE fond_investissements
-             SET nom_gerant = :nom
-             WHERE id IN (${formattedValues})
-           `;
-
-        const fondsDansCategorie = await sequelize.query(query, {
-          replacements: { nom },
-          type: sequelize.QueryTypes.UPDATE
-        });
+        if (sanitizedIds.length > 0) {
+          await fond.update(
+            { nom_gerant: nom },
+            { where: { id: sanitizedIds } }
+          );
+        }
       }
 
       const fonc = fonction.toString();
@@ -1411,18 +1410,17 @@ GROUP BY f.societe_gestion;
       const { id, nom, prenom, email, numero, fonction, activite, photo } = req.body;
 
       if (valuesArray.length >= 1 && valuesArray[0] !== '') {
-        const formattedValues = valuesArray.map(value => `'${value}'`).join(',');
+        // Sanitize: only allow numeric IDs to prevent SQL injection
+        const sanitizedIds = valuesArray
+          .map(value => parseInt(value, 10))
+          .filter(value => !isNaN(value));
 
-        const query = `
-        UPDATE fond_investissements
-        SET nom_gerant = :nom
-        WHERE id IN (${formattedValues})
-      `;
-
-        const fondsDansCategorie = await sequelize.query(query, {
-          replacements: { nom },
-          type: sequelize.QueryTypes.UPDATE
-        });
+        if (sanitizedIds.length > 0) {
+          await fond.update(
+            { nom_gerant: nom },
+            { where: { id: sanitizedIds } }
+          );
+        }
       }
 
       const fonc = fonction.toString();
@@ -2618,44 +2616,62 @@ GROUP BY f.societe_gestion;
         pays,
         typeusers,
         typeusers_id
-
-
-        // Ajoutez d'autres champs ici
       } = req.body;
-      /* const fundsData = req.body.funds;
-   
-       const fundsArray = fundsData.split(', ');
-       const fundsidData = req.body.fundids;
-   
-       const fundsidArray = fundsidData.split(', ');*/
+
+      // Validation des champs obligatoires
+      if (!email || !password) {
+        return res.status(400).json({ message: 'Email et mot de passe requis' });
+      }
+
+      // Validation du format email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: 'Format d\'email invalide' });
+      }
+
+      // Validation de la force du mot de passe
+      if (password.length < 8) {
+        return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 8 caractères' });
+      }
+
+      // Vérification de l'unicité de l'email
+      const existingUser = await users.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(409).json({ message: 'Un compte avec cet email existe déjà' });
+      }
 
       const newUser = await users.create({
-        email: email,
+        email,
         password: bcrypt.hashSync(password, 10),
-        nom: nom,
-        prenoms: prenoms,
-        denomination: denomination,
-        pays: pays,
-        typeusers: typeusers,
-        typeusers_id: typeusers_id,
+        nom: nom || null,
+        prenoms: prenoms || null,
+        denomination: denomination || null,
+        pays: pays || null,
+        typeusers: typeusers || null,
+        typeusers_id: typeusers_id || 0,
         active: typeusers_id != 1 ? 0 : 1
       });
 
-      // Retrieve additional data if needed
-      // For example, you can retrieve the user ID after creation
-      const userId = newUser;
+      // Générer un token JWT pour l'utilisateur créé
+      const { generateToken } = require('../middleware/auth');
+      const token = generateToken(newUser);
 
-      // Respond with a success message and additional data
-      res.json({
-        code: 200,
+      res.status(201).json({
+        code: 201,
         data: {
-          userId: userId
+          token,
+          user: {
+            id: newUser.id,
+            email: newUser.email,
+            nom: newUser.nom,
+            prenoms: newUser.prenoms,
+            typeusers: newUser.typeusers,
+            active: newUser.active
+          }
         }
       });
     } catch (error) {
-      // Gérez les erreurs ici
-      console.error('Erreur lors de l\'insertion en base de données :', error);
-      res.status(500).json({ message: 'Erreur lors de l\'insertion en base de données' });
+      res.status(500).json({ message: 'Erreur lors de la création du compte' });
     }
   });
   app.get('/api/userexist', async (req, res) => {
@@ -2667,82 +2683,110 @@ GROUP BY f.societe_gestion;
       }
 
       const user = await users.findOne({
-        where: {
-          email: userEmail
-        }
+        where: { email: userEmail }
       });
 
-      if (user) {
-        // L'utilisateur existe
-        return res.json({
-          code: 200,
-          data: {
-            userExists: true,
-            user: user
-          }
-        });
-      } else {
-        // L'utilisateur n'existe pas
-        return res.json({
-          code: 400,
-          data: {
-            userExists: false
-          }
-        });
-      }
+      // Ne pas retourner l'objet utilisateur complet pour éviter la fuite d'informations
+      return res.json({
+        code: user ? 200 : 400,
+        data: {
+          userExists: !!user
+        }
+      });
     } catch (error) {
-      console.error("Error in /api/userexist:", error);
       return res.status(500).json({ code: 500, message: 'Internal Server Error' });
     }
   });
 
+  // POST /api/userlogin - Authentification sécurisée (credentials dans le body, pas l'URL)
+  app.post('/api/userlogin', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ code: 400, message: 'Email et mot de passe requis' });
+      }
+
+      const user = await users.findOne({
+        where: { email }
+      });
+
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(401).json({
+          code: 401,
+          message: 'Email ou mot de passe incorrect'
+        });
+      }
+
+      // Générer le token JWT
+      const { generateToken } = require('../middleware/auth');
+      const token = generateToken(user);
+
+      return res.json({
+        code: 200,
+        data: {
+          token,
+          user: {
+            id: user.id,
+            email: user.email,
+            nom: user.nom,
+            prenoms: user.prenoms,
+            denomination: user.denomination,
+            typeusers: user.typeusers,
+            typeusers_id: user.typeusers_id,
+            active: user.active,
+            pays: user.pays
+          }
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({ code: 500, message: 'Erreur interne du serveur' });
+    }
+  });
+
+  // GET /api/userlogin - Rétrocompatibilité (déprécié, utiliser POST)
   app.get('/api/userlogin', async (req, res) => {
     try {
       const userEmail = req.query.email;
       const password = req.query.password;
 
-
-      if (!userEmail) {
-        return res.status(400).json({ code: 400, message: 'Email parameter is missing' });
+      if (!userEmail || !password) {
+        return res.status(400).json({ code: 400, message: 'Email et mot de passe requis' });
       }
 
       const user = await users.findOne({
-        where: {
-          email: userEmail
-        }
+        where: { email: userEmail }
       });
 
-      if (user) {
-        if (await bcrypt.compare(password, user.password)) {
-          return res.json({
-            code: 200,
-            data: {
-              userExists: user
-            }
-          });
-        } else {
-          // L'utilisateur n'existe pas
-          return res.json({
-            code: 400,
-            data: {
-              userExists: false
-            }
-          });
-        }
-        // L'utilisateur existe
-
-      } else {
-        // L'utilisateur n'existe pas
-        return res.json({
-          code: 400,
-          data: {
-            userExists: false
-          }
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(401).json({
+          code: 401,
+          message: 'Email ou mot de passe incorrect'
         });
       }
+
+      const { generateToken } = require('../middleware/auth');
+      const token = generateToken(user);
+
+      return res.json({
+        code: 200,
+        data: {
+          token,
+          user: {
+            id: user.id,
+            email: user.email,
+            nom: user.nom,
+            prenoms: user.prenoms,
+            denomination: user.denomination,
+            typeusers: user.typeusers,
+            typeusers_id: user.typeusers_id,
+            active: user.active,
+            pays: user.pays
+          }
+        }
+      });
     } catch (error) {
-      console.error("Error in /api/userexist:", error);
-      return res.status(500).json({ code: 500, message: 'Internal Server Error' });
+      return res.status(500).json({ code: 500, message: 'Erreur interne du serveur' });
     }
   });
 
@@ -7166,14 +7210,27 @@ GROUP BY f.societe_gestion;
 // Route d'upload de fichier avec paramètres (par exemple, `societe`)
 app.post('/api/uploadsocietefilenew/:societe', upload.single('file'), async (req, res) => {
   const file = req.file;
-  const societe = req.params.societe;
+  const societeParam = req.params.societe;
 
   if (!file) {
-    return res.status(400).send('Aucun fichier téléchargé.');
+    return res.status(400).json({ message: 'Aucun fichier téléchargé.' });
+  }
+
+  // Validation du type de fichier
+  const allowedExtensions = ['.xlsx', '.xls'];
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (!allowedExtensions.includes(ext)) {
+    fs.unlinkSync(file.path); // Supprimer le fichier invalide
+    return res.status(400).json({ message: 'Format de fichier non supporté. Utilisez un fichier Excel (.xlsx ou .xls).' });
+  }
+
+  // Limitation de taille (10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    fs.unlinkSync(file.path);
+    return res.status(400).json({ message: 'Le fichier est trop volumineux. Taille maximale : 10 MB.' });
   }
 
   try {
-    console.log('Path du fichier :', file.path);
 
     // Vérifier l'existence du fichier
     if (!fs.existsSync(file.path)) {
@@ -7188,9 +7245,6 @@ app.post('/api/uploadsocietefilenew/:societe', upload.single('file'), async (req
       console.error('Erreur lors de la lecture du fichier Excel :', error);
       return res.status(500).send('Erreur lors de la lecture du fichier Excel : ' + error.message);
     }
-
-    // Afficher le nom des feuilles du fichier Excel
-    console.log('Feuilles dans le fichier Excel :', workbook.SheetNames);
 
     // Extraction de la feuille "Data Statiques des fonds"
     const fondsSheet = workbook.Sheets['Fonds'];
@@ -7224,27 +7278,26 @@ app.post('/api/uploadsocietefilenew/:societe', upload.single('file'), async (req
       date_creation: row['Date_de_Lancement_du fonds'],
       dev_libelle: row['Libellé de la devise'],
       societe_gestion: row['Nom_societe_gestion'],
-      categorie_libelle: row['Nom_societe_gestion'],
-      classification: row['Nom_societe_gestion'],
-      type_investissement: row['Nom_societe_gestion'],
+      categorie_libelle: row['Catégorie libellé'] || null,
+      classification: row['Classification'] || null,
+      type_investissement: row["Type d'investissement"] || null,
       nom_gerant: row['nom_gerant'],
       categorie_globale: row["Catégorie/classe d'actifs"],
-      categorie_national: row['Nom_societe_gestion'],
-      categorie_regional: row['Nom_societe_gestion'],
+      categorie_national: row['Catégorie nationale'] || null,
+      categorie_regional: row['Catégorie régionale'] || null,
       frais_gestion: row["Frais de gestion (%)"],
-      frais_souscription: row['Nom_societe_gestion'],
+      frais_souscription: row["Frais de souscription (%)"] || null,
       frais_entree: row["frais_d'entrée(%)"],
       frais_sortie: row["Frais de sortie(%)"],
       minimum_investissement: row['minimum_investissement'],
       affectation: row['affectation des dividendes'],
-      frais_rachat: row['Nom_societe_gestion'],
+      frais_rachat: row["Frais de rachat (%)"] || null,
       description: row['Description du fonds'],
       strategie_politique_invest: row["Stratégie d'investissement"],
       philosophie_fond: row["Philosophie d'investissement"],
-      //  horizonplacement: row['Nom_societe_gestion'],
       date_agrement: row['Date de visa du fonds (agrément)'],
       date_premiere_vl: row['date_publication_première_vl'],
-      active: row['Nom_societe_gestion'],
+      active: row['Statut'] || 'actif',
       depositaire: row['depositaire'],
       teneur_registre: row['teneur_registre'],
       valorisateur: row['valorisateur'],
@@ -7258,18 +7311,16 @@ app.post('/api/uploadsocietefilenew/:societe', upload.single('file'), async (req
       date_cloture: row["date_cloture_de l'exercice annuel du fonds"],
       heure_cutt_off: row['heure_cutt_off'],
       delai_reglement: row['delai_reglement_Livraison'],
-      souscripteur: row['Nom_societe_gestion'],
-      datejour: row['Nom_societe_gestion'],
+      souscripteur: row['Souscripteur'] || null,
+      datejour: row['Date du jour'] || null,
       IBAN: row['IBAN du fonds'],
       RIB: row['RIB du fonds'],
       banque: row['nom de la banque (compte cash du fonds)'],
       nombre_part: row['Nombre de part'],
       horizonplacement: row["Horizon d'investissement"],
       indice_benchmark: row['Nom du Benchmark']
-    
     }));
 
-    console.log('Données extraites de "Data Statiques des fonds" :', fondsEntries);
 
     // Insérer ou mettre à jour les données des fonds dans la table `fonds`
     await fond.bulkCreate(fondsEntries, { updateOnDuplicate: ['code_ISIN'] });
@@ -7288,24 +7339,20 @@ app.post('/api/uploadsocietefilenew/:societe', upload.single('file'), async (req
 
     }));
 
-    console.log('Données extraites de "Data Statiques societes de gestion" :', societesEntries);
 
-    await societe.update(societesEntries[0], { where: { nom: societe } });
+    await societe.update(societesEntries[0], { where: { nom: societeParam } });
 
-// Insérer ou mettre à jour les données de la société de gestion
+// Insérer ou mettre à jour les données du personnel
 const personnelsEntries = personnelsData.map(row => ({
-    nom: row['Nom'],
+      nom: row['Nom'],
       prenom: row['Prenoms'],
       numero: row['Numero'],
       email: row['Email'],
       fonction: row['Fonction'],
       activite: row['Activité'],
-      societe: row['Nombre de part']
-     
-    
+      societe: row['Societe de gestion'] || societeParam
     }));
 
-    console.log('Données extraites de "Data Statiques des fonds" :', personnelsEntries);
 
     // Insérer ou mettre à jour les données des fonds dans la table `fonds`
     await personnel.bulkCreate(personnelsEntries, { updateOnDuplicate: ['email'] });
@@ -7326,8 +7373,6 @@ const personnelsEntries = personnelsData.map(row => ({
       // Extraire les données de la feuille "VL Fonds n"
       const vlData = xlsx.utils.sheet_to_json(vlSheet, { header: 2 });
 
-      console.log(`Données extraites de la feuille "${sheetName}" :`, vlData);
-
       // Correspondance des colonnes de la feuille VL avec les colonnes de la BD `valorisations`
       const vlEntries = vlData.map(row => ({
         fund_id: i, // ID du fond correspondant à la ligne dans "Data Statiques des fonds"
@@ -7344,10 +7389,18 @@ const personnelsEntries = personnelsData.map(row => ({
       await vl.bulkCreate(vlEntries);
     }
 
-    res.send('Données insérées et mises à jour avec succès.');
+    // Nettoyer le fichier uploadé après traitement
+    if (file && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+
+    res.json({ message: 'Données insérées et mises à jour avec succès.' });
   } catch (error) {
-    console.error('Erreur lors du traitement des données :', error);
-    res.status(500).send('Erreur lors du traitement des données : ' + error.message);
+    // Nettoyer le fichier en cas d'erreur
+    if (file && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+    res.status(500).json({ message: 'Erreur lors du traitement des données.' });
   }
 });
 
