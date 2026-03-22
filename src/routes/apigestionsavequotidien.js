@@ -255,8 +255,9 @@ router.get('/api/updatewithdividende', async (req, res) => {
         include: [{
           model: vl,
           order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
-        }]
+        }],
       });
+        limit: 500,
   
       // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
       for (const fonds of fondsAvecDividende) {
@@ -529,15 +530,17 @@ router.get('/api/updatewithdividende', async (req, res) => {
         fundsWithPerformance = await performences_eurs.findAll({
           where: { categorie_nationale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
-          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins
+          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
         });
+          limit: 500,
       } else {
         // Étape 1 : Récupérer toutes les performances pour la catégorie spécifiée
         fundsWithPerformance = await performences_usds.findAll({
           where: { categorie_nationale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
-          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins
+          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
         });
+          limit: 500,
       }
       // Étape 2 : Trouver les performances du fond sélectionné
       const selectedFund = fundsWithPerformance.find((fund) => fund.fond_id === selectedFundId);
@@ -699,15 +702,17 @@ router.get('/api/updatewithdividende', async (req, res) => {
         fundsWithPerformance = await performences_eurs.findAll({
           where: { categorie_regionale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
-          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins
+          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
         });
+          limit: 500,
       } else {
         // Étape 1 : Récupérer toutes les performances pour la catégorie spécifiée
         fundsWithPerformance = await performences_usds.findAll({
           where: { categorie_nationale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
-          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins
+          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
         });
+          limit: 500,
       }
 
 
@@ -1603,8 +1608,9 @@ router.get('/api/classementclickhouse', async (req, res) => {
           [Op.gt]: '2023-12-31' // Sélectionner les dates supérieures à '2021-12-31'
         }
       }, // Condition where pour filtrer par fund_id
-      order: [['date', 'DESC']] // Trier les dates en ordre chronologique
+      order: [['date', 'DESC']] // Trier les dates en ordre chronologique,
     });
+      limit: 500,
 
     const yearsSinceValorisation = await anneevalorisation(fundId);
     const years = yearsSinceValorisation[0].annee;
@@ -1648,8 +1654,9 @@ router.get('/api/classementclickhouse', async (req, res) => {
           [Op.gt]: '2024-07-31' //2024-07-31  Sélectionner les dates supérieures à '2023-12-31'
         }
       },
-      order: [['date', 'DESC']] // Trier les dates en ordre décroissant
+      order: [['date', 'DESC']] // Trier les dates en ordre décroissant,
     });
+      limit: 500,
     
     // Obtenir l'année de valorisation
     const yearsSinceValorisation = await anneevalorisation(fundId);

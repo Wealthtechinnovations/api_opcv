@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('frais', {
     id: {
@@ -24,11 +23,11 @@ module.exports = (sequelize, DataTypes) => {
     fond: {
       type: DataTypes.STRING(255),
     },
-
-
   }, {
     timestamps: true,
     updatedAt: false,
-
-  })
-}
+    indexes: [
+      { fields: ['fond_id'] },
+    ]
+  });
+};

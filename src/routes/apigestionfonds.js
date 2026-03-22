@@ -183,7 +183,8 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
       where: {
         id: paramId,
       },
-      order: [['id', 'DESC']]
+      order: [['id', 'DESC']],
+      limit: 500
     });
 
     const commonDates = await vl.findAll({
@@ -208,7 +209,8 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500
     });
 
 
@@ -367,7 +369,8 @@ WHERE
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500
     });
     if (response.length > 0) {
       /* const graphs = response.map(data => ({
@@ -617,7 +620,8 @@ WHERE
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500
     });
     if (response.length > 0) {
 
@@ -831,7 +835,8 @@ WHERE
     const fondall = await fond.findAll({
       where: whereClause, // Pas besoin d'encapsuler dans Op.and, oùClause est déjà un objet
       group: ['nom_fond'],
-      order: [['nom_fond', 'ASC']]
+      order: [['nom_fond', 'ASC']],
+      limit: 500
     });
 
     // Pour stocker les résultats finaux

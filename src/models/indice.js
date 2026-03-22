@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('indice_references', {
     id: {
@@ -23,15 +22,17 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     date: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
       allowNull: true,
-
-    }
-
+    },
   }, {
     timestamps: false,
     createdAt: 'created',
     updatedAt: false,
-
-  })
-}
+    indexes: [
+      { fields: ['id_indice'] },
+      { fields: ['date'] },
+      { fields: ['type_indice_id'] },
+    ]
+  });
+};

@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-
     value: {
       type: DataTypes.DOUBLE,
       allowNull: false,
@@ -65,88 +64,72 @@ module.exports = (sequelize, DataTypes) => {
     tsr: {
       type: DataTypes.DOUBLE,
       allowNull: false,
-
     },
     tra: {
       type: DataTypes.DOUBLE,
       allowNull: false,
-
     },
     indRef: {
       type: DataTypes.DOUBLE,
       allowNull: false,
-
     },
     indRef_EUR: {
       type: DataTypes.DOUBLE,
       allowNull: false,
-
     },
     indRef_USD: {
       type: DataTypes.DOUBLE,
       allowNull: false,
-
     },
     indice_comparaison: {
       type: DataTypes.DOUBLE,
       allowNull: false,
-
-    }
-    ,
+    },
     actif_net: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
       allowNull: false,
-
-    }
-    ,
+    },
     actif_net_USD: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
       allowNull: false,
-
-    }
-    ,
+    },
     actif_net_EUR: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
       allowNull: false,
-
-    }
-    ,
+    },
     libelle_fond: {
       type: DataTypes.STRING(255),
       allowNull: false,
-
     },
     souscription: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
       allowNull: false,
-
-    }
-    ,
+    },
     ID_indice: {
       type: DataTypes.STRING(255),
       allowNull: false,
-
     },
     rachat: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
       allowNull: false,
-
-    }
-    ,
+    },
     date: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
       allowNull: false,
-
-    }
-
+    },
   }, {
     timestamps: false,
     createdAt: 'created',
-    updatedAt: false
+    updatedAt: false,
+    indexes: [
+      { fields: ['fund_id'] },
+      { fields: ['date'] },
+      { fields: ['fund_name'] },
+      { fields: ['fund_id', 'date'], name: 'idx_valorisations_fund_id_date' },
+    ]
   });
 
   Valorisation.associate = models => {
-    // Utilisez le modèle FondInvestissement pour définir l'association
     Valorisation.belongsTo(models.FondInvestissement, { foreignKey: 'fund_id' });
   };
 

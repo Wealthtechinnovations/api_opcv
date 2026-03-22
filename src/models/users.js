@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      validate: {
+        len: [8, 255],
+      },
     },
     email: {
       type: DataTypes.STRING(255),
@@ -38,8 +41,19 @@ module.exports = (sequelize, DataTypes) => {
     typeusers_id: {
       type: DataTypes.STRING(255),
     },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+    },
   }, {
-    timestamps: false,
-    updatedAt: false,
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    indexes: [
+      { unique: true, fields: ['email'] },
+    ]
   });
 };

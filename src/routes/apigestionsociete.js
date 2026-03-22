@@ -433,8 +433,9 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             [Sequelize.Op.not]: null
           }
         },
-        group: ['categorie_globale']
+        group: ['categorie_globale'],
       });
+        limit: 500,
       var sumActifNetByCategory;
       var latestValorisations;
       var performa;
@@ -452,8 +453,9 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
           },
           where: {
             date: Sequelize.literal(`(performences_eurs.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_eurs GROUP BY fond_id)`)
-          }
+          },
         });
+          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_EUR
@@ -495,8 +497,9 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
           },
           where: {
             date: Sequelize.literal(`(performences_usds.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_usds GROUP BY fond_id)`)
-          }
+          },
         });
+          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_USD
@@ -538,8 +541,9 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
           },
           where: {
             date: Sequelize.literal(`(performences.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences GROUP BY fond_id)`)
-          }
+          },
         });
+          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net
@@ -620,8 +624,9 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
   const funds = await fond.findAll({
     where: {
       [Op.and]: [whereClause] // Utiliser Op.and pour combiner les conditions
-    }
+    },
   });
+    limit: 500,
 
 
   const fundsWithAllData = await Promise.all(funds.map(async (fund) => {
@@ -678,8 +683,9 @@ router.get('/api/getsocieterecherche', (req, res) => {
   // Première requête pour récupérer toutes les sociétés de gestion
   societe.findAll({
     group: ['nom'],
-    order: [['nom', 'ASC']]
+    order: [['nom', 'ASC']],
   }).then(societes => {
+    limit: 500,
     const societesGestion = societes.map(societe => societe.nom);
 
     // Pour chaque société de gestion, effectuez une deuxième requête pour compter le nombre de fonds associés

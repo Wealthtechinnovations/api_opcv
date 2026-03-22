@@ -369,7 +369,7 @@ module.exports = (app) => {
         return res.status(404).json({ error: 'Le fichier PDF n\'existe pas.' });
       }
 
-      const users = await societe.findAll();
+      const users = await societe.findAll({ limit: 500 });
 
       // Charger le template PDF
       const existingPdfBytes = fs.readFileSync("fichiers/template.pdf");
@@ -762,7 +762,8 @@ app.post('/api/reportingmensuelle', async (req, res) => {
       const highVolatilityFundsVLManquante = await performences.findAll({
         attributes: ['fond_id'],
         where: { anomalie: 'VL MANQUANTE' },
-        raw: true
+        raw: true,
+        limit: 500,
       });
 
       /*  const highVolatilityFundsAutreAnomalie = await performences.findAll({
@@ -932,7 +933,8 @@ app.post('/api/reportingmensuelle', async (req, res) => {
             date: {
               [Sequelize.Op.between]: [startOfWeek.format('YYYY-MM-DD'), endOfWeek.format('YYYY-MM-DD')]
             }
-          }
+          },
+          limit: 500,
         });
 
         if (weeklyVlDates.length === 0) {
@@ -996,7 +998,8 @@ app.post('/api/reportingmensuelle', async (req, res) => {
           [Op.between]: [startDate, endDate]
         }, annee: req.params.year
       },
-      order: [['date', 'ASC']]
+      order: [['date', 'ASC']],
+      limit: 500,
     });
     const valueArray = values.map(record => record.value);
     const annualYield = math.mean(valueArray)
@@ -1023,7 +1026,8 @@ app.post('/api/reportingmensuelle', async (req, res) => {
 
       const valorisations = await vl.findAll({
         where: whereClause,
-        order: [['id', 'ASC']]
+        order: [['id', 'ASC']],
+        limit: 500,
       });
 
       for (let i = 0; i < valorisations.length; i++) {
@@ -1198,7 +1202,8 @@ GROUP BY f.societe_gestion;
     try {
       // Récupérer toutes les actualités de la base de données
       const actualites = await actu.findAll({
-        order: [['id', 'DESC']] // Triez par ordre décroissant sur la colonne 'id'
+        order: [['id', 'DESC']], // Triez par ordre décroissant sur la colonne 'id'
+        limit: 500,
       });
       // Envoyer les actualités en tant que réponse
       res.status(200).json(actualites);
@@ -1515,7 +1520,8 @@ GROUP BY f.societe_gestion;
           indRef: null
         },
         attributes: ['date'], // Sélectionner uniquement la colonne 'date'
-        raw: true // Retourner les résultats en tant qu'objets JavaScript
+        raw: true, // Retourner les résultats en tant qu'objets JavaScript
+        limit: 500,
       });
 
       // Extraction des dates à partir des résultats
@@ -1552,7 +1558,8 @@ GROUP BY f.societe_gestion;
         where: {
           fund_id: req.params.id,
         },
-        attributes: ['date'], // Specify the columns you want to retrieve
+        attributes: ['date'], // Specify the columns you want to retrieve,
+        limit: 500,
       });
 
       // Extracting the 'date' values from the result
@@ -1723,7 +1730,8 @@ GROUP BY f.societe_gestion;
               date: {
                 [Op.lte]: new Date(date)
               }
-            }
+            },
+            limit: 500,
           });
 
           // Calculate average purchase price
@@ -1856,7 +1864,8 @@ GROUP BY f.societe_gestion;
         },
 
         ],
-        order: [['date', 'ASC']]
+        order: [['date', 'ASC']],
+        limit: 500,
       });
       const transactions = await Promise.all(response.map(async (data) => {
         const paire = `${data.portefeuille.devise}/${data.devise}`;
@@ -1918,7 +1927,8 @@ GROUP BY f.societe_gestion;
         where: {
           portefeuille_id: parseInt(req.params.id),
         },
-        order: [['date', 'ASC']], // Order transactions by date ascending
+        order: [['date', 'ASC']], // Order transactions by date ascending,
+        limit: 500,
       });
       await cumulvl(valos, req.params.id)
       await portefeuille.update({ maj: 1 }, {
@@ -1953,6 +1963,7 @@ GROUP BY f.societe_gestion;
           },
         },
         replacements: { fundId: req.params.id },
+        limit: 500,
       });
 
       // Convert the data to Excel format
@@ -1983,6 +1994,7 @@ GROUP BY f.societe_gestion;
           // date: { [Sequelize.Op.lte]: Sequelize.literal('CURRENT_DATE') }, // Transactions on or before today
         },
 
+        limit: 500,
       });
       if (favoritesData.length > 0) {
         res.json({ success: true, data: favoritesData });
@@ -2008,6 +2020,7 @@ GROUP BY f.societe_gestion;
           // date: { [Sequelize.Op.lte]: Sequelize.literal('CURRENT_DATE') }, // Transactions on or before today
         },
 
+        limit: 500,
       });
       if (favoritesData.length > 0) {
         res.json({ success: true, data: favoritesData });
@@ -2103,7 +2116,7 @@ GROUP BY f.societe_gestion;
 
   /*
   async function calculerPerformanceTotale(portfolioId) {
-  const transactions = await Transaction.findAll({ where: { portfolioId } });
+  const transactions = await Transaction.findAll({ where: { portfolioId } , limit: 500 });
   // Logique pour calculer la performance totale basée sur les transactions
   }*/
 
@@ -2144,7 +2157,8 @@ GROUP BY f.societe_gestion;
         },
         order: [
           ['date', 'ASC']
-        ]
+        ],
+        limit: 500,
       });
       return transactions;
     } catch (error) {
@@ -2158,7 +2172,8 @@ GROUP BY f.societe_gestion;
         order: [
           ['portefeuille_id', 'ASC'],
           ['date', 'ASC']
-        ]
+        ],
+        limit: 500,
       });
       return transactions;
     } catch (error) {
@@ -2182,7 +2197,8 @@ GROUP BY f.societe_gestion;
           fond_ids: { [Sequelize.Op.not]: null }, // Filter out transactions where fundid is null
           portefeuille_id: parseInt(portefeuilleId),
         },
-        order: [['date', 'ASC']], // Order transactions by date ascending
+        order: [['date', 'ASC']], // Order transactions by date ascending,
+        limit: 500,
       });
 
       const portefeuilleselect = await portefeuille.findOne({
@@ -2236,6 +2252,7 @@ GROUP BY f.societe_gestion;
         },
         order: [['date', 'ASC']], // Order VLs by date ascending
         distinct: true,
+        limit: 500,
       });
 
       const fundVLsvente = await vl.findOne({
@@ -2268,7 +2285,8 @@ GROUP BY f.societe_gestion;
           date: {
             [Op.lte]: new Date(transactionp.date)
           }
-        }
+        },
+        limit: 500,
       });
 
       // Calculate average purchase price
@@ -2325,6 +2343,7 @@ GROUP BY f.societe_gestion;
             },
             group: ['portefeuille_id'],
             raw: true,
+            limit: 500,
           });
 
           const totalMontant = result1.length > 0 ? result1[0].totalMontant : 0;
@@ -2458,6 +2477,7 @@ GROUP BY f.societe_gestion;
         },
         group: ['portefeuille_id'],
         raw: true,
+        limit: 500,
       });
       const portefeuilleselect = await portefeuille.findOne({
         where: {
@@ -2807,7 +2827,8 @@ GROUP BY f.societe_gestion;
 
         anomalie: 'VL MANQUANTE'
       },
-      raw: true // Assurez-vous de récupérer les résultats sous forme de tableau brut
+      raw: true, // Assurez-vous de récupérer les résultats sous forme de tableau brut
+      limit: 500,
     });
 
     const dataWithAnomalyTypeVLManquante = highVolatilityFundsVLManquante.map(fundId => ({
@@ -2900,7 +2921,8 @@ GROUP BY f.societe_gestion;
           { pertemax5an: { [Op.lt]: -50 } }
         ],
       },
-      raw: true // Assurez-vous de récupérer les résultats sous forme de tableau brut
+      raw: true, // Assurez-vous de récupérer les résultats sous forme de tableau brut
+      limit: 500,
     });
 
     // Parcourir fundIdsAutreAnomalie et ajouter les fonds avec l'anomalie "fff"
@@ -3071,12 +3093,14 @@ GROUP BY f.societe_gestion;
         where: {
           fund_id: parseInt(req.params.id)
         },
-        order: [['date', 'ASC']]
+        order: [['date', 'ASC']],
+        limit: 500,
       });
       const highVolatilityFundsData = await fond.findAll({
         where: {
           id: parseInt(req.params.id)
-        }
+        },
+        limit: 500,
       });
       const fondsWithAnomalies = [];
 
@@ -3143,7 +3167,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['id', 'ASC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -3182,7 +3207,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500,
     });
     let valorisation;
     if (resultat) {
@@ -3197,7 +3223,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500,
     });
     let valorisation_robo;
     if (resultat1) {
@@ -3214,7 +3241,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['id', 'ASC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -3362,7 +3390,8 @@ GROUP BY f.societe_gestion;
             fund_id: fondId, date: {
               [Op.gte]: date // Remplacez 'votreDate' par la date que vous souhaitez comparer.
             }
-          }
+          },
+          limit: 500,
         });
         const quantite = montantInvesti / vls[0].value;
 
@@ -3504,7 +3533,8 @@ GROUP BY f.societe_gestion;
     try {
       // Fetch all fund data in one batch
       const fundDataResults = await fond.findAll({
-        where: { id: fundIds }
+        where: { id: fundIds },
+        limit: 500,
       });
 
       // Fetch all performance data in one batch
@@ -3512,7 +3542,8 @@ GROUP BY f.societe_gestion;
         where: {
           fond_id: fundIds
         },
-        order: [['date', 'DESC']]
+        order: [['date', 'DESC']],
+        limit: 500,
       });
 
       // Create a map for performance data for quick lookup
@@ -4588,7 +4619,8 @@ GROUP BY f.societe_gestion;
 
   app.get('/api/getDevises', async (req, res) => {
     devises.findAll({
-      //where:{id:1}
+      //where:{id:1},
+      limit: 500,
     })
       .then(response => {
 
@@ -4630,7 +4662,8 @@ GROUP BY f.societe_gestion;
       const indices = await indice.findAll({
         attributes: [
           [sequelize.fn('DISTINCT', sequelize.col('id_indice')), 'nom_indice']
-        ]
+        ],
+        limit: 500,
       });
 
 
@@ -4651,13 +4684,15 @@ GROUP BY f.societe_gestion;
       const categoriesRegion = await fond.findAll({
         attributes: [
           [sequelize.fn('DISTINCT', sequelize.col('categorie_regional')), 'categorie_regional']
-        ]
+        ],
+        limit: 500,
       });
 
       const categoriesNational = await fond.findAll({
         attributes: [
           [sequelize.fn('DISTINCT', sequelize.col('categorie_national')), 'categorie_national']
-        ]
+        ],
+        limit: 500,
       });
 
       // Filtrer les valeurs vides
@@ -4693,7 +4728,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500,
     });
     const response1 = await indice.findAll({
       where: {
@@ -4701,7 +4737,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500,
     });
 
 
@@ -4792,7 +4829,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         let lastValuep = response[response.length - 1].base_100_bis; // Dernière valeur
@@ -4970,7 +5008,8 @@ GROUP BY f.societe_gestion;
         },
         order: [
           ['date', 'DESC']
-        ]
+        ],
+        limit: 500,
       })
       const response1 = await indice.findAll({
         where: {
@@ -4978,7 +5017,8 @@ GROUP BY f.societe_gestion;
         },
         order: [
           ['date', 'DESC']
-        ]
+        ],
+        limit: 500,
       })
 
       ////////////////////////////
@@ -5069,7 +5109,8 @@ GROUP BY f.societe_gestion;
 
   app.get('/api/getSocietes', async (req, res) => {
     societe.findAll({
-      //where:{id:1}
+      //where:{id:1},
+      limit: 500,
     })
       .then(response => {
 
@@ -5094,7 +5135,8 @@ GROUP BY f.societe_gestion;
     const pays = req.params.pays; // Use req.params to access route parameters
 
     societe.findAll({
-      where: { pays: pays }
+      where: { pays: pays },
+      limit: 500,
     })
       .then(response => {
 
@@ -5120,7 +5162,8 @@ GROUP BY f.societe_gestion;
       .findAll({
         attributes: ['id', 'pays'], // Ajoutez les colonnes nécessaires
         group: ['pays'],
-        order: [['pays', 'ASC']]
+        order: [['pays', 'ASC']],
+        limit: 500,
       })
       .then(response => {
 
@@ -5142,7 +5185,8 @@ GROUP BY f.societe_gestion;
       // Retrieve the list of countries from pays_regulateurs table
       const countries = await pays_regulateurs.findAll({
         attributes: [[sequelize.literal('DISTINCT pays'), 'pays']],
-        order: [['pays', 'ASC']]
+        order: [['pays', 'ASC']],
+        limit: 500,
       });
 
       // Retrieve the count of companies per country from the societe table
@@ -5277,7 +5321,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500,
     });
     if (response.length > 0) {
       let lastValuep = response[0].base_100_bis; // Dernière valeur
@@ -5364,7 +5409,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['date', 'ASC']
-      ]
+      ],
+      limit: 500,
     });
     if (response.length > 0) {
       const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
@@ -5446,7 +5492,8 @@ GROUP BY f.societe_gestion;
 
       // Fetch all fund data in one batch
       const fundDataResults = await fond.findAll({
-        where: { id: fundIds }
+        where: { id: fundIds },
+        limit: 500,
       });
 
       // Fetch all performance data in one batch
@@ -5454,7 +5501,8 @@ GROUP BY f.societe_gestion;
         where: {
           fond_id: fundIds
         },
-        order: [['date', 'DESC']]
+        order: [['date', 'DESC']],
+        limit: 500,
       });
 
       // Create a map for performance data for quick lookup
@@ -5646,7 +5694,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['id', 'DESC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -5718,7 +5767,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['id', 'DESC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -5861,7 +5911,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['id', 'DESC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -5907,7 +5958,8 @@ GROUP BY f.societe_gestion;
       where: whereClause,
       order: [
         ['id', 'DESC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -5954,7 +6006,8 @@ GROUP BY f.societe_gestion;
       where: whereClause,
       order: [
         ['id', 'DESC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -5998,7 +6051,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['id', 'DESC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -6043,7 +6097,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['id', 'DESC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -6086,7 +6141,8 @@ GROUP BY f.societe_gestion;
       },
       order: [
         ['created', 'ASC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         const funds = response.map((data) => data.id);
@@ -6491,7 +6547,8 @@ GROUP BY f.societe_gestion;
     include: [{
       model: vl,
       order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
-    }]
+    }],
+    limit: 500,
   });
 
   // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
@@ -6792,7 +6849,8 @@ GROUP BY f.societe_gestion;
         include: [{
           model: vl,
           order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
-        }]
+        }],
+        limit: 500,
       });
   
       // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
@@ -7092,6 +7150,7 @@ GROUP BY f.societe_gestion;
               fund_id: fund.id,
             },
             order: [['date', 'ASC']],
+            limit: 500,
           });
 
           /* const graphs = response.map((data) => ({
@@ -7414,7 +7473,8 @@ const personnelsEntries = personnelsData.map(row => ({
         },
         order: [
           ['date', 'ASC']
-        ]
+        ],
+        limit: 500,
       });
       return transactions;
     } catch (error) {
@@ -7430,6 +7490,7 @@ const personnelsEntries = personnelsData.map(row => ({
         // Ajoutez les conditions spécifiques en fonction de votre logique
         pays: "Nigeria",
       },
+      limit: 500,
     });
 
     const transactionDatas = await getTransactionData(req.params.id);
@@ -7442,7 +7503,8 @@ const personnelsEntries = personnelsData.map(row => ({
       },
       order: [
         ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
-      ]
+      ],
+      limit: 500,
     })
       .then(async (response) => {
 
@@ -9059,6 +9121,7 @@ const personnelsEntries = personnelsData.map(row => ({
         // Ajoutez les conditions spécifiques en fonction de votre logique
         pays: "Nigeria",
       },
+      limit: 500,
     });
 
     const transactionDatas = await getTransactionData(req.params.id);
@@ -9084,7 +9147,8 @@ const personnelsEntries = personnelsData.map(row => ({
       },
       order: [
         ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
-      ]
+      ],
+      limit: 500,
     })
       .then(async (response) => {
         let baseProperty;
@@ -10731,7 +10795,8 @@ const personnelsEntries = personnelsData.map(row => ({
             },
             order: [
               ['date', 'ASC']
-            ]
+            ],
+            limit: 500,
           });
           return {
             fundId,
@@ -10901,7 +10966,8 @@ const personnelsEntries = personnelsData.map(row => ({
             fund_id: fond, date: {
               [Op.gte]: date // Remplacez 'votreDate' par la date que vous souhaitez comparer.
             }
-          }
+          },
+          limit: 500,
         });
 
 
@@ -10970,7 +11036,8 @@ const personnelsEntries = personnelsData.map(row => ({
       },
       order: [
         ['id', 'ASC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -11173,7 +11240,8 @@ const personnelsEntries = personnelsData.map(row => ({
       },
       order: [
         ['id', 'ASC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -11205,7 +11273,8 @@ const personnelsEntries = personnelsData.map(row => ({
       },
       order: [
         ['id', 'ASC']
-      ]
+      ],
+      limit: 500,
     })
       .then(response => {
         //const funds = response.map((data) => data.id);
@@ -11229,6 +11298,69 @@ const personnelsEntries = personnelsData.map(row => ({
 
       })
   })
+  // ==================== PUT ENDPOINTS ====================
+
+  // PUT /api/fonds/:id - Update a fund
+  app.put('/api/fonds/:id', authenticate, async (req, res) => {
+    try {
+      const existingFond = await fond.findByPk(req.params.id);
+      if (!existingFond) {
+        return res.status(404).json({ error: 'Fond non trouvé' });
+      }
+      await existingFond.update(req.body);
+      res.json({ code: 200, data: existingFond });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du fond :', error);
+      res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du fond' });
+    }
+  });
+
+  // PUT /api/portefeuilles/:id - Update a portfolio
+  app.put('/api/portefeuilles/:id', authenticate, async (req, res) => {
+    try {
+      const existingPortefeuille = await portefeuille.findByPk(req.params.id);
+      if (!existingPortefeuille) {
+        return res.status(404).json({ error: 'Portefeuille non trouvé' });
+      }
+      await existingPortefeuille.update(req.body);
+      res.json({ code: 200, data: existingPortefeuille });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du portefeuille :', error);
+      res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du portefeuille' });
+    }
+  });
+
+  // PUT /api/users/:id - Update user profile (exclude password from update)
+  app.put('/api/users/:id', authenticate, async (req, res) => {
+    try {
+      const existingUser = await users.findByPk(req.params.id);
+      if (!existingUser) {
+        return res.status(404).json({ error: 'Utilisateur non trouvé' });
+      }
+      const { password, ...updateData } = req.body;
+      await existingUser.update(updateData);
+      res.json({ code: 200, data: existingUser });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'utilisateur :', error);
+      res.status(500).json({ error: 'Erreur serveur lors de la mise à jour de l\'utilisateur' });
+    }
+  });
+
+  // PUT /api/societes/:id - Update a societe
+  app.put('/api/societes/:id', authenticate, async (req, res) => {
+    try {
+      const existingSociete = await societe.findByPk(req.params.id);
+      if (!existingSociete) {
+        return res.status(404).json({ error: 'Société non trouvée' });
+      }
+      await existingSociete.update(req.body);
+      res.json({ code: 200, data: existingSociete });
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la société :', error);
+      res.status(500).json({ error: 'Erreur serveur lors de la mise à jour de la société' });
+    }
+  });
+
   app.use(require('./apigestionsociete'));
   app.use(require('./apigestionpays'));
   app.use(require('./apigestionrendement'));
