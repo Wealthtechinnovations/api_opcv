@@ -86,26 +86,23 @@ const {
   grouperParJour
 } = require('../../src/functions/utils');
 
-// Volatility helper functions (defined locally as they are not exported from newratios)
+// Volatility helper functions (copied from newratios.js as they are not exported)
 function calculerVolatilite(rendements) {
-  const n = rendements.length;
-  const mean = rendements.reduce((sum, r) => sum + r, 0) / n;
-  const variance = rendements.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / (n - 1);
-  return Math.sqrt(variance) * Math.sqrt(52); // Annualized from weekly
+  let moyenne = rendements.reduce((acc, r) => acc + r, 0) / rendements.length;
+  let variance = rendements.reduce((acc, r) => acc + Math.pow(r - moyenne, 2), 0) / rendements.length;
+  return Math.sqrt(variance) * Math.sqrt(52); // Annualisation
 }
 
 function calculerVolatilitejour(rendements) {
-  const n = rendements.length;
-  const mean = rendements.reduce((sum, r) => sum + r, 0) / n;
-  const variance = rendements.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / (n - 1);
-  return Math.sqrt(variance) * Math.sqrt(252); // Annualized from daily
+  let moyenne = rendements.reduce((acc, r) => acc + r, 0) / rendements.length;
+  let variance = rendements.reduce((acc, r) => acc + Math.pow(r - moyenne, 2), 0) / rendements.length;
+  return Math.sqrt(variance) * Math.sqrt(252); // Annualisation
 }
 
 function calculerVolatilitemois(rendements) {
-  const n = rendements.length;
-  const mean = rendements.reduce((sum, r) => sum + r, 0) / n;
-  const variance = rendements.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / (n - 1);
-  return Math.sqrt(variance) * Math.sqrt(12); // Annualized from monthly
+  let moyenne = rendements.reduce((acc, r) => acc + r, 0) / rendements.length;
+  let variance = rendements.reduce((acc, r) => acc + Math.pow(r - moyenne, 2), 0) / rendements.length;
+  return Math.sqrt(variance) * Math.sqrt(12); // Annualisation
 }
 
 const {
@@ -176,6 +173,176 @@ function calculateYearsBetweenDates(dates) {
   const diffInMs = maxDate - minDate;
   const diffInYears = diffInMs / (1000 * 60 * 60 * 24 * 365.25);
   return diffInYears;
+}
+
+// getPerformancesByCategorynow (extracted from apigestionperformance.js)
+const getPerformancesByCategorynow = async (categorie, datedebut) => {
+  const performancesCategorie = await sequelize.query(`
+    SELECT
+      categorie_nationale,
+      AVG(CASE WHEN ytd IS NOT NULL AND ytd != '-' THEN CAST(ytd AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_ytd,
+      AVG(CASE WHEN perfveille IS NOT NULL AND perfveille != '-' THEN CAST(perfveille AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfveille,
+      AVG(CASE WHEN perf1an IS NOT NULL AND perf1an != '-' THEN CAST(perf1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf1an,
+      AVG(CASE WHEN perf3ans IS NOT NULL AND perf3ans != '-' THEN CAST(perf3ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf3ans,
+      AVG(CASE WHEN perf5ans IS NOT NULL AND perf5ans != '-' THEN CAST(perf5ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf5ans,
+      AVG(CASE WHEN perf8ans IS NOT NULL AND perf8ans != '-' THEN CAST(perf8ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf8ans,
+      AVG(CASE WHEN perf10ans IS NOT NULL AND perf10ans != '-' THEN CAST(perf10ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf10ans,
+      AVG(CASE WHEN perf4s IS NOT NULL AND perf4s != '-' THEN CAST(perf4s AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf4s,
+      AVG(CASE WHEN perf3m IS NOT NULL AND perf3m != '-' THEN CAST(perf3m AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf3m,
+      AVG(CASE WHEN perf6m IS NOT NULL AND perf6m != '-' THEN CAST(perf6m AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf6m,
+      AVG(CASE WHEN perfannu1an IS NOT NULL AND perfannu1an != '-' THEN CAST(perfannu1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu1an,
+      AVG(CASE WHEN perfannu3an IS NOT NULL AND perfannu3an != '-' THEN CAST(perfannu3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu3an,
+      AVG(CASE WHEN perfannu5an IS NOT NULL AND perfannu5an != '-' THEN CAST(perfannu5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu5an,
+      AVG(CASE WHEN volatility1an IS NOT NULL AND volatility1an != '-' THEN CAST(volatility1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility1an,
+      AVG(CASE WHEN volatility3an IS NOT NULL AND volatility3an != '-' THEN CAST(volatility3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility3an,
+      AVG(CASE WHEN volatility5an IS NOT NULL AND volatility5an != '-' THEN CAST(volatility5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility5an,
+      AVG(CASE WHEN ratiosharpe3an IS NOT NULL AND ratiosharpe3an != '-' THEN CAST(ratiosharpe3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_ratiosharpe3an,
+      AVG(CASE WHEN pertemax1an IS NOT NULL AND pertemax1an != '-' THEN CAST(pertemax1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax1an,
+      AVG(CASE WHEN pertemax3an IS NOT NULL AND pertemax3an != '-' THEN CAST(pertemax3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax3an,
+      AVG(CASE WHEN pertemax5an IS NOT NULL AND pertemax5an != '-' THEN CAST(pertemax5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax5an,
+      AVG(CASE WHEN sortino3an IS NOT NULL AND sortino3an != '-' THEN CAST(sortino3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_sortino3an,
+      AVG(CASE WHEN info3an IS NOT NULL AND info3an != '-' THEN CAST(info3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_info3an,
+      AVG(CASE WHEN calamar3an IS NOT NULL AND calamar3an != '-' THEN CAST(calamar3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_calamar3an,
+      AVG(CASE WHEN var993an IS NOT NULL AND var993an != '-' THEN CAST(var993an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_var993an,
+      AVG(CASE WHEN var953an IS NOT NULL AND var953an != '-' THEN CAST(var953an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_var953an
+    FROM
+      performences
+    WHERE
+      categorie_nationale = :categorie
+      AND date = :datedebut
+    GROUP BY
+      categorie_nationale;
+  `, {
+    replacements: { categorie: categorie, datedebut: datedebut },
+    type: sequelize.QueryTypes.SELECT,
+  });
+  return performancesCategorie;
+};
+
+// handleCalculations (extracted from apigestionratios.js, used by ratiosportfeuillewithindice)
+function handleCalculations(req, res, donneesarray, donneesarrayindref, dates, values, valuesindifref, lastPreviousDate, years, tableauDonneestsr, tauxsr) {
+  let rendementsTableau = {};
+  let rendementsTableauindice = {};
+  let volatilites = {};
+  let volatilitesind = {};
+
+  let rendementsTableaujour = {};
+  let rendementsTableauindicejour = {};
+  let volatilitesjour = {};
+  let volatilitesindjour = {};
+
+  let rendementsTableaumois = {};
+  let rendementsTableauindicemois = {};
+  let volatilitesmois = {};
+  let volatilitesindmois = {};
+  const periods = {};
+  periods[`${years}_ans`] = findNearestDatetoyear(dates, years, lastPreviousDate);
+  let Vls = [];
+  let Vlsindice = [];
+  for (let [periode, dateDebut] of Object.entries(periods)) {
+
+    const donneesPeriodesemaine = grouperParSemaine(donneesarray).filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(lastPreviousDate));
+    const donneesPeriodeindicesemaine = grouperParSemaine(donneesarrayindref).filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(lastPreviousDate));
+
+    const donneesPeriodejour = grouperParJour(donneesarray).filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(lastPreviousDate));
+    const donneesPeriodeindicejour = grouperParJour(donneesarrayindref).filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(lastPreviousDate));
+
+    const donneesPeriodemois = grouperParMois(donneesarray).filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(lastPreviousDate));
+    const donneesPeriodeindicemois = grouperParMois(donneesarrayindref).filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(lastPreviousDate));
+    for (let i = 0; i <= donneesPeriodejour.length - 1; i++) {
+      Vls.push(donneesPeriodejour[i].value)
+    }
+    for (let i = 0; i <= donneesPeriodeindicejour.length - 1; i++) {
+      Vlsindice.push(donneesPeriodeindicejour[i].value)
+    }
+    rendementsTableau[periode] = calculerRendements(donneesPeriodesemaine);
+    rendementsTableauindice[periode] = calculerRendements(donneesPeriodeindicesemaine);
+    volatilites[periode] = calculerVolatilite(rendementsTableau[periode]);
+    volatilitesind[periode] = calculerVolatilite(rendementsTableauindice[periode]);
+
+    rendementsTableaujour[periode] = calculerRendements(donneesPeriodejour);
+    rendementsTableauindicejour[periode] = calculerRendements(donneesPeriodeindicejour);
+    volatilitesjour[periode] = calculerVolatilitejour(rendementsTableaujour[periode]);
+    volatilitesindjour[periode] = calculerVolatilitejour(rendementsTableauindicejour[periode]);
+
+    rendementsTableaumois[periode] = calculerRendements(donneesPeriodemois);
+    rendementsTableauindicemois[periode] = calculerRendements(donneesPeriodeindicemois);
+    volatilitesmois[periode] = calculerVolatilitemois(rendementsTableaumois[periode]);
+    volatilitesindmois[periode] = calculerVolatilitemois(rendementsTableauindicemois[periode]);
+  }
+
+  const periode = Object.keys(periods)[0];
+  const yDate = findNearestDateAnnualized(dates, parseInt(req.params.year), lastPreviousDate);
+  const CAGR = calculerCAGR(values[dates.indexOf(yDate)], values[dates.indexOf(lastPreviousDate)], parseInt(req.params.year));
+
+  const result = {
+    volatility: volatilites[periode] * 100,
+    volatilityjour: volatilitesjour[periode] * 100,
+    volatilitymois: volatilitesmois[periode] * 100,
+    volatilityInd: volatilitesind[periode] * 100,
+    volatilityIndjour: volatilitesindjour[periode] * 100,
+    volatilityIndmois: volatilitesindmois[periode] * 100,
+    beta: calculateBetanew(rendementsTableau[periode], rendementsTableauindice[periode]),
+    betajour: calculateBetanew(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
+    betamois: calculateBetanew(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
+    perfannu: calculateAnnualizedPerformance(values[dates.indexOf(lastPreviousDate)], values[dates.indexOf(yDate)], parseInt(req.params.year)) * 100,
+    CAGR,
+    perfannuInd: calculateAnnualizedPerformance(valuesindifref[dates.indexOf(lastPreviousDate)], valuesindifref[dates.indexOf(yDate)], parseInt(req.params.year)) * 100,
+    info: calculateInformationRatio(rendementsTableau[periode], rendementsTableauindice[periode]),
+    infojour: calculateInformationRatiojour(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
+    infomois: calculateInformationRatio(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
+    r2: calculerR2(rendementsTableau[periode], rendementsTableauindice[periode]),
+    r2jour: calculerR2(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
+    r2mois: calculerR2(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
+    correlation: quants.corrcoef(rendementsTableau[periode], rendementsTableauindice[periode], 0),
+    correlationjour: quants.corrcoef(rendementsTableaujour[periode], rendementsTableauindicejour[periode], 0),
+    correlationmois: quants.corrcoef(rendementsTableaumois[periode], rendementsTableauindicemois[periode], 0),
+    omega: calculateOmegaRatio(rendementsTableau[periode], 0),
+    omegajour: calculateOmegaRatio(rendementsTableaujour[periode], 0),
+    omegamois: calculateOmegaRatio(rendementsTableaumois[periode], 0),
+    sortino: calculateSortinoRatio(rendementsTableau[periode], -0.00473, 0.01),
+    sortinojour: calculateSortinoRatio(rendementsTableaujour[periode], -0.00473, 0.01),
+    sortinomois: calculateSortinoRatio(rendementsTableaumois[periode], -0.00473, 0.01),
+    calamar: calculateCalmarRatio(calculateMaxDrawdown(Vls.reverse()), CAGR),
+    pertemax: -calculateMaxDrawdown(Vls.reverse()) * 100,
+    pertemaxInd: -calculateMaxDrawdown(Vlsindice.reverse()) * 100,
+    dsr: calculerDSRAnnualise(rendementsTableau[periode], 0.01),
+    dsrjour: calculerDSRAnnualise(rendementsTableaujour[periode], 0.01),
+    dsrmois: calculerDSRAnnualise(rendementsTableaumois[periode], 0.01),
+    ratiosharpe: (CAGR - tauxsr) / volatilites[periode],
+    ratiosharpejour: (CAGR - tauxsr) / volatilitesjour[periode],
+    ratiosharpemois: (CAGR - tauxsr) / volatilitesmois[periode],
+    trackingerror: calculateTrackingError(rendementsTableau[periode], rendementsTableauindice[periode]) * 100,
+    trackingerrorjour: calculateTrackingError(rendementsTableaujour[periode], rendementsTableauindicejour[periode]) * 100,
+    trackingerrormois: calculateTrackingError(rendementsTableaumois[periode], rendementsTableauindicemois[periode]) * 100,
+    delaiRecouvrement: calculerDelaiRecouvrementFonds(Vls.reverse()),
+    betahaussier: calculateHaussierBeta(rendementsTableau[periode], rendementsTableauindice[periode]),
+    betahaussierjour: calculateHaussierBeta(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
+    betahaussiermois: calculateHaussierBeta(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
+    betabaissier: calculateDownsideBeta(rendementsTableau[periode], rendementsTableauindice[periode]),
+    betabaissierjour: calculateDownsideBeta(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
+    betabaissiermois: calculateDownsideBeta(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
+    upcapture: calculateUpCaptureRatio(rendementsTableau[periode], rendementsTableauindice[periode]),
+    upcapturejour: calculateUpCaptureRatio(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
+    upcapturemois: calculateUpCaptureRatio(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
+    downcapture: calculateDownCaptureRatio(rendementsTableau[periode], rendementsTableauindice[periode]),
+    downcapturejour: calculateDownCaptureRatio(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
+    downcapturemois: calculateDownCaptureRatio(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
+    skewness: calculerSkewness(rendementsTableau[periode], volatilites[periode]),
+    skewnessjour: calculerSkewness(rendementsTableaujour[periode], volatilitesjour[periode]),
+    skewnessmois: calculerSkewness(rendementsTableaumois[periode], volatilitesmois[periode]),
+    kurtosis: calculateKurtosis(rendementsTableau[periode]),
+    kurtosisjour: calculateKurtosis(rendementsTableaujour[periode]),
+    kurtosismois: calculateKurtosis(rendementsTableaumois[periode]),
+    var95: calculateVAR95(rendementsTableau[periode], 0.95) * 100,
+    var95jour: calculateVAR95(rendementsTableaujour[periode], 0.95) * 100,
+    var95mois: calculateVAR95(rendementsTableaumois[periode], 0.95) * 100,
+    var99: calculateVAR99(rendementsTableau[periode], 0.99) * 100,
+    var99jour: calculateVAR99(rendementsTableaujour[periode], 0.99) * 100,
+    var99mois: calculateVAR99(rendementsTableaumois[periode], 0.99) * 100
+  };
+
+  res.json({ code: 200, data: result });
 }
 
 // =====================================================
