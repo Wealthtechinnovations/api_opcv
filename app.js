@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const helmet = require('helmet');
 const sequelize = require('./src/db/sequelize');
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
@@ -15,6 +16,20 @@ const port = process.env.PORT || 3005;
 // ---------------------
 // Middleware
 // ---------------------
+
+// Security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 
 // CORS - restrict to known origins
 const allowedOrigins = [
@@ -38,6 +53,16 @@ app.use(cors({
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Input sanitization
+const { sanitizeStrings, rateLimit } = require('./src/middleware/validate');
+app.use(sanitizeStrings);
+
+// Trust proxy (for rate limiting behind reverse proxy)
+app.set('trust proxy', 1);
+
+// Rate limiting global - 200 requêtes par 15 minutes par IP
+app.use(rateLimit(200, 15 * 60 * 1000));
 
 // Logging
 if (process.env.NODE_ENV !== 'production') {
@@ -75,6 +100,16 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 // ---------------------
 require('./src/routes/routes_vl')(app);
 
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route non trouvée' });
+});
+
 // ---------------------
 // Global Error Handler
 // ---------------------
@@ -96,6 +131,15 @@ app.use((err, req, res, next) => {
 // ---------------------
 // Start Server
 // ---------------------
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Serveur démarré sur le port ${port} [${process.env.NODE_ENV || 'development'}]`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM reçu. Arrêt gracieux...');
+  server.close(() => {
+    console.log('Serveur arrêté.');
+    process.exit(0);
+  });
 });

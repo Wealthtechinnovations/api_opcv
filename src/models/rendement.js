@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('rendements', {
     id: {
@@ -6,34 +5,31 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-
     date: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
     },
     lastvl: {
-             type: DataTypes.DOUBLE,
-
+      type: DataTypes.DOUBLE,
     },
-
     rendement_semaine: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     rendement_mensuel: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     rendement_jour: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
-
     fond_id: {
-      type: DataTypes.INTEGER, // Utilisez le type de données JSON
-      allowNull: true, // Selon vos besoins
-    }
-
-
-
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   }, {
     timestamps: false,
-    updatedAt: false
-  })
-}
+    updatedAt: false,
+    indexes: [
+      { fields: ['fond_id'] },
+      { fields: ['date'] },
+    ]
+  });
+};

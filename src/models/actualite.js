@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('actualites', {
     id: {
@@ -6,11 +5,9 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
-
     date: {
       type: DataTypes.DATE,
     },
-
     description: {
       type: DataTypes.STRING(1000),
     },
@@ -23,16 +20,16 @@ module.exports = (sequelize, DataTypes) => {
     type: {
       type: DataTypes.STRING(255),
     },
-
     user_id: {
-      type: DataTypes.INTEGER, // Utilisez le type de données JSON
-      allowNull: true, // Selon vos besoins
-    }
-
-
-
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   }, {
     timestamps: false,
-    updatedAt: false
-  })
-}
+    updatedAt: false,
+    indexes: [
+      { fields: ['user_id'] },
+      { fields: ['date'] },
+    ]
+  });
+};

@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('portefeuilles_vls', {
     id: {
@@ -13,58 +12,61 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     valeur_portefeuille: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     valeur_jour: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     valeur_jour_EUR: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     valeur_jour_USD: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     cash: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     cash_USD: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     cash_EUR: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     quantite: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     montantdepense: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     investissement: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     investissement_EUR: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     investissement_USD: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     vl: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     frais: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     prix_moyen: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     date: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
       allowNull: false,
-
-    }
-
+    },
   }, {
     timestamps: false,
-    updatedAt: false
-  })
-}
+    updatedAt: false,
+    indexes: [
+      { fields: ['portefeuille_id'] },
+      { fields: ['fund_id'] },
+      { fields: ['date'] },
+    ]
+  });
+};

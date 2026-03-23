@@ -41,6 +41,7 @@ const DOCUMENT = require('../models/document');
 const APIKEY = require('../models/apikey');
 const TSRHISTO = require('../models/tsrhisto');
 const Datevalorisation = require('../models/datevalorisation');
+const TAUX_CHANGE = require('../models/taux_change');
 
 // ---------------------
 // Database Connection (from environment variables)
@@ -56,6 +57,15 @@ const sequelize = new Sequelize(
       timezone: process.env.DB_TIMEZONE || '+00:00',
     },
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    pool: {
+      max: parseInt(process.env.DB_POOL_MAX) || 20,
+      min: parseInt(process.env.DB_POOL_MIN) || 5,
+      acquire: 30000,
+      idle: 10000,
+    },
+    retry: {
+      max: 3,
+    },
   }
 );
 
@@ -100,6 +110,7 @@ const devises = Devise(sequelize, DataTypes);
 const pays_regulateurs = PAYS_REGULATEUR(sequelize, DataTypes);
 const portefeuilles_proposes = ROBOPORTFEUILLEPORTEFEUILLE(sequelize, DataTypes);
 const portefeuilles_proposes_vls = ROBOPORTFEUILLE(sequelize, DataTypes);
+const taux_change = TAUX_CHANGE(sequelize, DataTypes);
 
 // ---------------------
 // Associations
@@ -128,6 +139,84 @@ transaction.belongsTo(fond, { foreignKey: 'fond_ids' });
 transaction.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
 transaction.belongsTo(devisedechanges, { foreignKey: 'date' });
 
+// Fond <-> Investissement
+fond.hasMany(investissement, { foreignKey: 'fund_id' });
+investissement.belongsTo(fond, { foreignKey: 'fund_id' });
+
+// Portefeuille <-> Investissement
+portefeuille.hasMany(investissement, { foreignKey: 'portefeuille_id' });
+investissement.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
+
+// Fond <-> Frais
+fond.hasMany(frais, { foreignKey: 'fond_id' });
+frais.belongsTo(fond, { foreignKey: 'fond_id' });
+
+// Portefeuille <-> Portefeuille_vl
+portefeuille.hasMany(portefeuille_vl, { foreignKey: 'portefeuille_id' });
+portefeuille_vl.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
+
+// Fond <-> Portefeuille_vl
+fond.hasMany(portefeuille_vl, { foreignKey: 'fund_id' });
+portefeuille_vl.belongsTo(fond, { foreignKey: 'fund_id' });
+
+// Portefeuille <-> Portefeuille_vl_cumul
+portefeuille.hasMany(portefeuille_vl_cumul, { foreignKey: 'portefeuille_id' });
+portefeuille_vl_cumul.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
+
+// Portefeuille <-> Portefeuille_base100
+portefeuille.hasMany(portefeuille_base100, { foreignKey: 'portefeuille_id' });
+portefeuille_base100.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
+
+// User <-> Portefeuille
+users.hasMany(portefeuille, { foreignKey: 'user_id' });
+portefeuille.belongsTo(users, { foreignKey: 'user_id' });
+
+// User <-> Favorisfonds
+users.hasMany(favorisfonds, { foreignKey: 'user_id' });
+favorisfonds.belongsTo(users, { foreignKey: 'user_id' });
+
+// Fond <-> Favorisfonds
+fond.hasMany(favorisfonds, { foreignKey: 'fund_id' });
+favorisfonds.belongsTo(fond, { foreignKey: 'fund_id' });
+
+// User <-> Actualite
+users.hasMany(actu, { foreignKey: 'user_id' });
+actu.belongsTo(users, { foreignKey: 'user_id' });
+
+// Fond <-> Document
+fond.hasMany(documentss, { foreignKey: 'fond_id' });
+documentss.belongsTo(fond, { foreignKey: 'fond_id' });
+
+// User <-> Simulation
+users.hasMany(simulation, { foreignKey: 'user_id' });
+simulation.belongsTo(users, { foreignKey: 'user_id' });
+
+// Simulation <-> SimulationPortefeuille
+simulation.hasMany(simulationportefeuille, { foreignKey: 'simulation_id' });
+simulationportefeuille.belongsTo(simulation, { foreignKey: 'simulation_id' });
+
+// Portefeuille <-> SimulationPortefeuille
+portefeuille.hasMany(simulationportefeuille, { foreignKey: 'portefeuille_id' });
+simulationportefeuille.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
+
+// Portefeuille <-> Transaction (reverse association)
+portefeuille.hasMany(transaction, { foreignKey: 'portefeuille_id' });
+
+// Fond <-> Transaction (reverse)
+fond.hasMany(transaction, { foreignKey: 'fond_ids' });
+
+// User <-> ApiKey
+users.hasMany(apikeys, { foreignKey: 'user_id' });
+apikeys.belongsTo(users, { foreignKey: 'user_id' });
+
+// Portefeuille <-> Cash
+portefeuille.hasMany(cashdb, { foreignKey: 'portefeuille_id' });
+cashdb.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
+
+// Fond <-> Classementfonds
+fond.hasMany(classementfonds, { foreignKey: 'fond_id' });
+classementfonds.belongsTo(fond, { foreignKey: 'fond_id' });
+
 // ---------------------
 // URLs (from environment)
 // ---------------------
@@ -141,10 +230,15 @@ const initDb = async () => {
   try {
     await sequelize.authenticate();
     console.log('Connexion à la base de données établie.');
+
+    // Sync models that need it
     await taux.sync();
     await tra.sync();
+
+    console.log('Modèles synchronisés.');
   } catch (error) {
     console.error('Erreur de connexion à la base de données:', error.message);
+    process.exit(1); // Exit on DB connection failure
   }
 };
 
@@ -195,4 +289,5 @@ module.exports = {
   simulationportefeuille,
   date_valorisation,
   apikeys,
+  taux_change,
 };

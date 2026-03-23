@@ -117,7 +117,8 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             },
             where: {
               date: Sequelize.literal(`(performences_eurs.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_eurs GROUP BY fond_id)`)
-            }
+            },
+            limit: 500
           });
           const sumActifNetQuery = `
   SELECT SUM(latest_valorisations.actif_net_EUR) AS sumActifNet
@@ -198,7 +199,8 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             },
             where: {
               date: Sequelize.literal(`(performences_usds.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_usds GROUP BY fond_id)`)
-            }
+            },
+            limit: 500
           });
 
           const sumActifNetQuery = `
@@ -280,7 +282,8 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             },
             where: {
               date: Sequelize.literal(`(performences.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences GROUP BY fond_id)`)
-            }
+            },
+            limit: 500
           });
 
           const sumActifNetQuery = `
@@ -397,7 +400,8 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
               [Sequelize.Op.not]: null
             }
           },
-          group: ['categorie_globale']
+          group: ['categorie_globale'],
+          limit: 500
         });
         var sumActifNetByCategory;
         var latestValorisations;
@@ -417,7 +421,8 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             },
             where: {
               date: Sequelize.literal(`(performences_eurs.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_eurs GROUP BY fond_id)`)
-            }
+            },
+            limit: 500
           });
 
           latestValorisationsQuery = `
@@ -459,7 +464,8 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             },
             where: {
               date: Sequelize.literal(`(performences_usds.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_usds GROUP BY fond_id)`)
-            }
+            },
+            limit: 500
           });
 
           latestValorisationsQuery = `
@@ -502,7 +508,8 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             },
             where: {
               date: Sequelize.literal(`(performences.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences GROUP BY fond_id)`)
-            }
+            },
+            limit: 500
           });
 
           latestValorisationsQuery = `
@@ -590,7 +597,8 @@ router.post('/api/listesociete', async (req, res) => {
   const societes = await societe.findAll({
     where: whereClause, // Pas besoin d'encapsuler dans Op.and, oùClause est déjà un objet
     group: ['nom'],
-    order: [['nom', 'ASC']]
+    order: [['nom', 'ASC']],
+    limit: 500
   });
 
   // Pour stocker les résultats finaux
@@ -667,7 +675,8 @@ router.post('/api/listeproduitpayssociete/:id', async (req, res) => {
   const funds = await fond.findAll({
     where: {
       [Op.and]: [whereClause] // Utiliser Op.and pour combiner les conditions
-    }
+    },
+    limit: 500
   });
 
 
@@ -745,8 +754,8 @@ router.post('/api/listesocietepays/:id', async (req, res) => {
 
 
   const societes = await societe.findAll({
-    where: whereClause // Pas besoin d'encapsuler dans Op.and, oùClause est déjà un objet
-
+    where: whereClause, // Pas besoin d'encapsuler dans Op.and, oùClause est déjà un objet
+    limit: 500
   });
 
   // Pour stocker les résultats finaux

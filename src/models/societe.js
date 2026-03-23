@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('societes', {
     id: {
@@ -9,60 +8,57 @@ module.exports = (sequelize, DataTypes) => {
     nom: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     pays: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     email: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     tel: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
-
-
-
     description: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     numeroagrement: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     regulateur: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     dateimmatriculation: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
       allowNull: true,
-
     },
     devise: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
     },
     site_web: {
       type: DataTypes.STRING(255),
       allowNull: true,
-
-    }
-
-
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+    },
   }, {
-    timestamps: false,
-    updatedAt: false
-  })
-}
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    indexes: [
+      { fields: ['nom'] },
+      { fields: ['pays'] },
+    ]
+  });
+};

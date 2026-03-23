@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
     },
     date_creation: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
     },
     dev_libelle: {
       type: DataTypes.STRING(255),
@@ -69,25 +69,25 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
     },
     frais_gestion: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     frais_souscription: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     frais_entree: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     frais_sortie: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     minimum_investissement: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     affectation: {
       type: DataTypes.STRING(255),
     },
     frais_rachat: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     description: {
       type: DataTypes.TEXT,
@@ -102,10 +102,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
     },
     date_agrement: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
     },
     date_premiere_vl: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
     },
     active: {
       type: DataTypes.INTEGER,
@@ -133,16 +133,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
     },
     montant_premier_vl: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     montant_actif_net: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DOUBLE,
     },
     duree_investissement_recommande: {
       type: DataTypes.STRING(255),
     },
     date_cloture: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
     },
     heure_cutt_off: {
       type: DataTypes.STRING(255),
@@ -163,10 +163,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
     },
     datemoispre: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
     },
     datejour: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
     nombre_part: {
@@ -185,9 +185,24 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+    },
   }, {
-    timestamps: false,
-    updatedAt: false,
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+    indexes: [
+      { fields: ['code_ISIN'] },
+      { fields: ['societe_gestion'] },
+      { fields: ['pays'] },
+      { fields: ['categorie_libelle'] },
+      { fields: ['active'] },
+    ]
   });
 
   return FondInvestissement;

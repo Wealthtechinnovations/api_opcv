@@ -63,8 +63,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DECIMAL(15, 2),
       allowNull: true,
     },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   }, {
-    timestamps: false,
+    timestamps: true,
+    createdAt: 'created_at',
     updatedAt: false,
+    indexes: [
+      { fields: ['fond_ids'] },
+      { fields: ['portefeuille_id'] },
+      { fields: ['date'] },
+    ]
   });
 };
