@@ -19,7 +19,10 @@
     "migrate": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "migrate:status": "npx sequelize-cli db:migrate:status",
-    "seed": "npx sequelize-cli db:seed:all"
+    "seed": "npx sequelize-cli db:seed:all",
+    "db:init": "node scripts/init-db.js",
+    "db:init:alter": "node scripts/init-db.js --alter",
+    "db:init:force": "node scripts/init-db.js --force"
   },
   "dependencies": {
     "@clickhouse/client": "^1.6.0",

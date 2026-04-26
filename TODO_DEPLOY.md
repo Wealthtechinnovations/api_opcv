@@ -83,9 +83,27 @@
 - [x] **F8** Migrer home portefeuille vers `usePortfolioStore` (fetchPortfolios + portfolios array)
 - [x] **F9** Réactiver multi-select fonds dans ajoutportefeuille (fetch `/api/recherchefonds`, Select react-select)
 
+### SÉCURITÉ (Priorité 1)
+
+- [x] **S14** Ajouter `typeusers_id` au JWT
+- [x] **S15** Activer `authorize()` sur routes admin (activate-user, getusersbyadmin)
+- [x] **S16** Activer `authorize('admin', 'socGest')` sur routes fonds write + uploads
+- [x] **S17** Activer `authorize()` sur routes notification (actualite, personnel)
+- [x] **S18** Frontend middleware: vérification du type d'utilisateur via JWT decoded
+- [x] **S19** Login pages: stocker le JWT en cookie pour le middleware
+
+### QUALITÉ FRONTEND (Priorité 2-3)
+
+- [x] **Q20** Intégrer `PageHeader` + `LoadingSpinner` dans pages panel (home portefeuille + home admin)
+- [x] **Q21** Créer `error.tsx` + `loading.tsx` + `not-found.tsx` (global + panel)
+
+### BASE DE DONNÉES (Priorité 4)
+
+- [x] **DB22** Script `scripts/init-db.js` (`npm run db:init` / `db:init:alter` / `db:init:force`)
+
 ### DÉPLOIEMENT IONOS
 
 - [ ] **D10** Configurer variables d'environnement production (copier `.env.example` → `.env` sur le serveur Ionos)
 - [x] **D11** Configurer CORS — gateway lit `ALLOWED_ORIGINS` depuis env + credentials:true
-- [ ] **D12** Vérifier connexion BDD production
+- [ ] **D12** Vérifier connexion BDD production (`npm run db:init` depuis le serveur)
 - [x] **D13** Script de démarrage `start.sh` + `ecosystem.config.js` PM2
