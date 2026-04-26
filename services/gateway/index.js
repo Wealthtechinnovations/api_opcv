@@ -31,7 +31,8 @@ app.use(helmet({
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
   process.env.SITE_BASE_URL || 'http://localhost:3000',
-];
+  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : []),
+].filter((v, i, a) => a.indexOf(v) === i);
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -43,6 +44,7 @@ app.use(cors({
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Origin', 'Authorization', 'X-Requested-With', 'Content-Type', 'Accept', 'x-api-key'],
+  credentials: true,
 }));
 
 // Trust proxy (for rate limiting behind reverse proxy)

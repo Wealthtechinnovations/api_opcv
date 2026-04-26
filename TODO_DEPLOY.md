@@ -15,7 +15,7 @@
 | auth | ✅ | ✅ (11 routes) | Stubs TODO |
 | funds | ✅ | ✅ (32 routes) | Stubs TODO - créé cette session |
 | performance | ✅ | ✅ (9 routes) | Stubs TODO |
-| portfolio | ✅ | ❌ MANQUANT | **CRASH au démarrage** |
+| portfolio | ✅ | ✅ (24 routes) | Stubs TODO - créé cette session |
 | analytics | ✅ | ✅ (14 routes) | Stubs TODO |
 | reference | ✅ | ✅ (17 routes) | Stubs TODO |
 | notification | ✅ | ✅ (12 routes) | Stubs TODO |
@@ -30,9 +30,10 @@
 
 ### Fichiers clés
 - `app.js` — monolithe original (~11,375 lignes dans routes_vl.js, 113 endpoints)
-- `package.json` — scripts uniquement pour monolithe (`node app.js`)
-- `.env.example` — manque ports/URLs microservices
-- `ecosystem.config.js` — n'existe pas
+- `package.json` — ✅ scripts microservices ajoutés, main → gateway
+- `.env.example` — ✅ ports/URLs microservices ajoutés
+- `ecosystem.config.js` — ✅ créé (8 services PM2)
+- `start.sh` — ✅ script de démarrage PM2
 
 ---
 
@@ -84,7 +85,7 @@
 
 ### DÉPLOIEMENT IONOS
 
-- [ ] **D10** Configurer variables d'environnement production
-- [ ] **D11** Configurer CORS pour domaine production
+- [ ] **D10** Configurer variables d'environnement production (copier `.env.example` → `.env` sur le serveur Ionos)
+- [x] **D11** Configurer CORS — gateway lit `ALLOWED_ORIGINS` depuis env + credentials:true
 - [ ] **D12** Vérifier connexion BDD production
-- [ ] **D13** Script de démarrage PM2 / systemd
+- [x] **D13** Script de démarrage `start.sh` + `ecosystem.config.js` PM2
