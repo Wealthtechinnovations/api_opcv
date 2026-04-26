@@ -28,4 +28,32 @@ router.get('/api/getfondbyuservalide/:id', authenticate, async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
+router.get('/api/getfondbysociete/:id', authenticate, async (req, res) => {
+  res.json({ message: 'TODO' });
+});
+
+router.get('/api/getfondbypays/:id', authenticate, async (req, res) => {
+  res.json({ message: 'TODO' });
+});
+
+router.get('/api/fondscharge/:id', authenticate, async (req, res) => {
+  res.json({ message: 'TODO' });
+});
+
+router.get('/api/insertfond', authenticate, async (req, res) => {
+  res.json({ message: 'TODO' });
+});
+
+router.get('/api/getData', authenticate, async (req, res) => {
+  res.json({ message: 'TODO' });
+});
+
+router.post('/api/recherchefonds', authenticate, async (req, res) => {
+  res.json({ message: 'TODO' });
+});
+
+router.post('/api/rechercheravance-fonds', authenticate, async (req, res) => {
+  res.json({ message: 'TODO' });
+});
+
 module.exports = router;
