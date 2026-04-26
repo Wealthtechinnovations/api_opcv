@@ -77,10 +77,10 @@
 
 ### FRONTEND
 
-- [ ] **F6** Créer `src/middleware.ts` (protection routes /panel/*)
-- [ ] **F7** Corriger IDOR (userId depuis JWT au lieu de query param)
-- [ ] **F8** Migrer pages panel pour utiliser stores Zustand
-- [ ] **F9** Réactiver multi-select fonds dans ajoutportefeuille
+- [x] **F6** Créer `src/middleware.ts` (protection routes /panel/*) + sync cookies dans les 3 login pages
+- [x] **F7** Corriger IDOR — hook `useUserId` + 7 pages portefeuille migrées (home, ajout, reconstitution, profile, favoris, fondsselected, robotadvisor)
+- [x] **F8** Migrer home portefeuille vers `usePortfolioStore` (fetchPortfolios + portfolios array)
+- [x] **F9** Réactiver multi-select fonds dans ajoutportefeuille (fetch `/api/recherchefonds`, Select react-select)
 
 ### DÉPLOIEMENT IONOS
 
