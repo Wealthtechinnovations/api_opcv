@@ -74,6 +74,7 @@ const generateToken = (user, expiresIn = '24h') => {
       id: user.id,
       email: user.email,
       role: user.typeusers || 'investisseur',
+      typeusers_id: user.typeusers_id != null ? Number(user.typeusers_id) : 1,
       societe: user.denomination || null
     },
     JWT_SECRET,

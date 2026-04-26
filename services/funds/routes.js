@@ -3,23 +3,23 @@ const multer = require('multer');
 const router = express.Router();
 
 const { fond } = require('../shared/db');
-const { authenticate } = require('../shared/middleware');
+const { authenticate, authorize } = require('../shared/middleware');
 
 const upload = multer({ dest: 'uploads/' });
 
-router.post('/api/postfond', authenticate, async (req, res) => {
+router.post('/api/postfond', authenticate, authorize('admin', 'socGest'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
-router.post('/api/updatefond/:id', authenticate, async (req, res) => {
+router.post('/api/updatefond/:id', authenticate, authorize('admin', 'socGest'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
-router.post('/api/updatefondmodif/:id', authenticate, async (req, res) => {
+router.post('/api/updatefondmodif/:id', authenticate, authorize('admin', 'socGest'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
-router.get('/api/getfondbyadmin', authenticate, async (req, res) => {
+router.get('/api/getfondbyadmin', authenticate, authorize('admin'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
@@ -59,23 +59,23 @@ router.post('/api/rechercheravance-fonds', authenticate, async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
-router.post('/api/ajoutVL/:id', authenticate, async (req, res) => {
+router.post('/api/ajoutVL/:id', authenticate, authorize('admin', 'socGest'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
-router.post('/api/ajoutIndice/:id', authenticate, async (req, res) => {
+router.post('/api/ajoutIndice/:id', authenticate, authorize('admin', 'socGest'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
-router.post('/api/uploadsfilevl/:id', authenticate, upload.single('file'), async (req, res) => {
+router.post('/api/uploadsfilevl/:id', authenticate, authorize('admin', 'socGest'), upload.single('file'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
-router.post('/api/uploadsfileindice/:id', authenticate, upload.single('file'), async (req, res) => {
+router.post('/api/uploadsfileindice/:id', authenticate, authorize('admin', 'socGest'), upload.single('file'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 
-router.post('/api/uploadsocietefilenew/:societe', authenticate, upload.single('file'), async (req, res) => {
+router.post('/api/uploadsocietefilenew/:societe', authenticate, authorize('admin', 'socGest'), upload.single('file'), async (req, res) => {
   res.json({ message: 'TODO' });
 });
 

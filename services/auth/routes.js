@@ -10,7 +10,7 @@ const {
   users,
 } = require('../shared/db');
 
-const { authenticate, generateToken } = require('../shared/middleware');
+const { authenticate, authorize, generateToken } = require('../shared/middleware');
 
 const magic = new Magic(process.env.MAGIC_SECRET_KEY);
 
@@ -73,21 +73,25 @@ router.post('/api/userlogin', async (req, res) => {
     // Générer le token JWT
     const token = generateToken(user);
 
+    const userData = {
+      id: user.id,
+      email: user.email,
+      nom: user.nom,
+      prenoms: user.prenoms,
+      denomination: user.denomination,
+      typeusers: user.typeusers,
+      typeusers_id: user.typeusers_id,
+      active: user.active,
+      pays: user.pays
+    };
+
     return res.json({
       code: 200,
+      token,
       data: {
         token,
-        user: {
-          id: user.id,
-          email: user.email,
-          nom: user.nom,
-          prenoms: user.prenoms,
-          denomination: user.denomination,
-          typeusers: user.typeusers,
-          typeusers_id: user.typeusers_id,
-          active: user.active,
-          pays: user.pays
-        }
+        user: userData,
+        userExists: userData,
       }
     });
   } catch (error) {
@@ -118,21 +122,25 @@ router.get('/api/userlogin', async (req, res) => {
 
     const token = generateToken(user);
 
+    const userData = {
+      id: user.id,
+      email: user.email,
+      nom: user.nom,
+      prenoms: user.prenoms,
+      denomination: user.denomination,
+      typeusers: user.typeusers,
+      typeusers_id: user.typeusers_id,
+      active: user.active,
+      pays: user.pays
+    };
+
     return res.json({
       code: 200,
+      token,
       data: {
         token,
-        user: {
-          id: user.id,
-          email: user.email,
-          nom: user.nom,
-          prenoms: user.prenoms,
-          denomination: user.denomination,
-          typeusers: user.typeusers,
-          typeusers_id: user.typeusers_id,
-          active: user.active,
-          pays: user.pays
-        }
+        user: userData,
+        userExists: userData
       }
     });
   } catch (error) {
@@ -300,8 +308,8 @@ router.post('/api/reset-password', async (req, res) => {
   }
 });
 
-// POST /api/activate-user/:id - Activate a user account
-router.post('/api/activate-user/:id', (req, res) => {
+// POST /api/activate-user/:id - Activate a user account (admin only)
+router.post('/api/activate-user/:id', authenticate, authorize('admin'), (req, res) => {
   const userId = req.params.id;
 
   // Trouver l'utilisateur avec l'ID
@@ -352,8 +360,8 @@ router.put('/api/users/:id', authenticate, async (req, res) => {
   }
 });
 
-// GET /api/getusersbyadmin - Get all users for admin panel
-router.get('/api/getusersbyadmin', (req, res) => {
+// GET /api/getusersbyadmin - Get all users (admin only)
+router.get('/api/getusersbyadmin', authenticate, authorize('admin'), (req, res) => {
   users.findAll({
     where: {
     },

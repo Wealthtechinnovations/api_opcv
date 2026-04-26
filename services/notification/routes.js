@@ -15,6 +15,8 @@ const {
   apikeys,
 } = require('../shared/db');
 
+const { authenticate, authorize } = require('../shared/middleware');
+
 // ---------------------
 // Multer Configuration
 // ---------------------
@@ -85,8 +87,8 @@ async function checkApiKey(req, res, next) {
 // ACTUALITES (NEWS)
 // =====================
 
-// Upload a new article/actualite
-router.post('/api/actualite', upload.single('fichier'), async (req, res) => {
+// Upload a new article/actualite (socGest/admin)
+router.post('/api/actualite', authenticate, authorize('admin', 'socGest'), upload.single('fichier'), async (req, res) => {
   try {
     const { description, date, type, user_id, username } = req.body;
     const image = req.file;
@@ -158,8 +160,8 @@ router.post('/api/contact', async (req, res) => {
 // PERSONNEL MANAGEMENT
 // =====================
 
-// Create a new personnel member
-router.post('/api/personnelsociete', upload.single('photo'), async (req, res) => {
+// Create a new personnel member (socGest/admin)
+router.post('/api/personnelsociete', authenticate, authorize('admin', 'socGest'), upload.single('photo'), async (req, res) => {
   try {
     const selectedValues = req.query.query;
     let valuesArray = [];
