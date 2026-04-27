@@ -96,6 +96,10 @@
 
 - [x] **Q20** Intégrer `PageHeader` + `LoadingSpinner` dans pages panel (home portefeuille + home admin)
 - [x] **Q21** Créer `error.tsx` + `loading.tsx` + `not-found.tsx` (global + panel)
+- [x] **Q23** Nettoyer imports morts (next-auth signIn/useSession)
+- [x] **Q24** Fix logout (clear tokenEnCours + cookies)
+- [x] **Q25** Google OAuth via NextAuth (bouton + API route + SessionProvider)
+- [x] **Q26** Supprimer pages/api obsolète (remplacé par app/api)
 
 ### BASE DE DONNÉES (Priorité 4)
 
