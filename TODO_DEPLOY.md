@@ -55,11 +55,16 @@
 - `baab72c` fix: auth header, error display and loading state on portfolio creation
 - `b4f72f3` fix: align portfolio store with real API endpoints and add auth
 
-### Problèmes identifiés
-- Pas de `middleware.ts` (routes /panel/* non protégées)
-- IDOR : userId passé via URL query param `?id=` au lieu du JWT
-- Stores Zustand créés mais jamais importés dans les pages
-- Multi-select fonds désactivé dans ajoutportefeuille
+### Problèmes identifiés (tous résolus)
+- ~~Pas de `middleware.ts`~~ → ✅ Créé avec protection routes /panel/* + vérification JWT
+- ~~IDOR : userId passé via URL query param `?id=`~~ → ✅ Corrigé sur TOUTES les pages (portefeuille, admin, societegestion, payspanel, questionnaire, pages publiques)
+- ~~Stores Zustand jamais importés~~ → ✅ usePortfolioStore intégré dans home portefeuille
+- ~~Multi-select fonds désactivé~~ → ✅ Réactivé dans ajoutportefeuille
+- ~~Magic SDK dependency~~ → ✅ Supprimé de tous les fichiers (magic.js, callback, login, payspanel, societegestion)
+- ~~next/router imports~~ → ✅ Tous migrés vers next/navigation
+- ~~Dead code (testpanel, api/login.js)~~ → ✅ Supprimé
+- ~~Hardcoded credentials ClickHouse/MySQL~~ → ✅ Migrés vers variables d'environnement
+- ~~console.log excessifs~~ → ✅ ~600 supprimés
 
 ---
 
@@ -104,6 +109,21 @@
 - [x] **Q28** Remplacer sidebars inline par composant Sidebar partagé (robotadvisor/ajoutsimulation, portefeuillerobot, roboadvisor)
 - [x] **Q29** Corriger IDOR — toutes les pages société de gestion (22 pages) + sidebar
 - [x] **Q30** Corriger IDOR — toutes les pages admin (15 pages) + sidebar
+- [x] **Q31** Supprimer magic-sdk de TOUTES les pages restantes (auth/login, payspanel login/pagehome/actualite, societegestion forgot/reset-password, callback)
+- [x] **Q32** Corriger IDOR — toutes les pages payspanel (10 pages + 2 detailsfond + 2 updatefond)
+- [x] **Q33** Corriger IDOR — toutes les pages questionnaire (21 pages)
+- [x] **Q34** Corriger IDOR — toutes les pages publiques (Opcvm, pays, Fundmanager, Outils, accueil, contact, Header, Headermenu)
+- [x] **Q35** Migrer tous next/router imports vers next/navigation
+- [x] **Q36** Supprimer dead code : testpanel, magic.js, api/login.js, next.config.js test rewrite
+- [x] **Q37** Supprimer ~600 console.log + dead next/head imports
+- [x] **Q38** Convertir auth/login de Magic Link vers email/password standard
+
+### SÉCURITÉ API (Priorité 1)
+
+- [x] **SA39** Migrer credentials ClickHouse hardcodés vers .env (apigestionsavequotidien.js, migrate.js)
+- [x] **SA40** Migrer credentials MySQL hardcodés vers .env (agenda.js, migrate.js)
+- [x] **SA41** Ajouter ClickHouse config à .env.example
+- [x] **SA42** Ajouter warning JWT_SECRET manquant dans middleware
 
 ### BASE DE DONNÉES (Priorité 4)
 
