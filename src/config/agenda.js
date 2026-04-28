@@ -7,10 +7,10 @@ const agenda = new Agenda();
 // Configuration MySQL
 const mysql = require('mysql');
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'fond_opcvm'
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'fond_opcvm'
 });
 
 // Connecter Agenda à MySQL

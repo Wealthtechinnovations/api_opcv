@@ -4,10 +4,10 @@ const { createClient } = require('@clickhouse/client');
 // Connect to MySQL
 async function fetchMySQLData() {
   const connection = await mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'fond_opcvm'
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'fond_opcvm'
   });
 
   const [rows, fields] = await connection.execute('SELECT * FROM cashs');
@@ -16,10 +16,9 @@ async function fetchMySQLData() {
 
 // Connect to ClickHouse
 const clickhouse = createClient({
-    url: 'http://172.20.27.129:8123', // L'adresse IP de votre WSL et le port 8123
-    username: 'default',
-    password: 'Testing',  // ou votre mot de passe si défini
-    protocol: 'http',
+    url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+    username: process.env.CLICKHOUSE_USERNAME || 'default',
+    password: process.env.CLICKHOUSE_PASSWORD || '',
   });
 
 async function insertIntoClickHouse(rows) {

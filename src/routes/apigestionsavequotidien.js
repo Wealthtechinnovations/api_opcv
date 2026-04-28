@@ -53,10 +53,9 @@ var limiter = new Bottleneck({
 
 // Configuration de ClickHouse
 const clickhouse = new createClient({
-  url: 'http://172.20.27.129:8123', // L'adresse IP de votre WSL et le port 8123
-  username: 'default',
-  password: 'Testing',  // ou votre mot de passe si défini
-  protocol: 'http',
+  url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
+  username: process.env.CLICKHOUSE_USERNAME || 'default',
+  password: process.env.CLICKHOUSE_PASSWORD || '',
 });
 // Fonction pour écrire dans un fichier de journal
 function writeToLogFile(message) {
