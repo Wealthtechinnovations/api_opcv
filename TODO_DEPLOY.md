@@ -79,7 +79,7 @@
 ### FRONTEND
 
 - [x] **F6** Créer `src/middleware.ts` (protection routes /panel/*) + sync cookies dans les 3 login pages
-- [x] **F7** Corriger IDOR — hook `useUserId` + 7 pages portefeuille migrées (home, ajout, reconstitution, profile, favoris, fondsselected, robotadvisor)
+- [x] **F7** Corriger IDOR — hook `useUserId` + toutes les 46 pages portefeuille migrées (home, ajout, reconstitution sub-pages, KYC x9, questionnaire x19, robotadvisor sub-pages x3, profile, favoris, fondsselected, sidebar)
 - [x] **F8** Migrer home portefeuille vers `usePortfolioStore` (fetchPortfolios + portfolios array)
 - [x] **F9** Réactiver multi-select fonds dans ajoutportefeuille (fetch `/api/recherchefonds`, Select react-select)
 
@@ -100,6 +100,10 @@
 - [x] **Q24** Fix logout (clear tokenEnCours + cookies)
 - [x] **Q25** Google OAuth via NextAuth (bouton + API route + SessionProvider)
 - [x] **Q26** Supprimer pages/api obsolète (remplacé par app/api)
+- [x] **Q27** Supprimer magic-sdk des pages portefeuille (sidebar, home, profile, ajout, robotadvisor sub-pages)
+- [x] **Q28** Remplacer sidebars inline par composant Sidebar partagé (robotadvisor/ajoutsimulation, portefeuillerobot, roboadvisor)
+- [x] **Q29** Corriger IDOR — toutes les pages société de gestion (22 pages) + sidebar
+- [x] **Q30** Corriger IDOR — toutes les pages admin (15 pages) + sidebar
 
 ### BASE DE DONNÉES (Priorité 4)
 
