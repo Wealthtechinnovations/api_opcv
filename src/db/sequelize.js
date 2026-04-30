@@ -229,10 +229,15 @@ const urllsite = process.env.SITE_BASE_URL || 'http://localhost:3000';
 const initDb = async () => {
   try {
     await sequelize.authenticate();
+    console.log('Database connected successfully');
 
-    // Sync all models (alter: true updates columns without dropping data)
-    await sequelize.sync({ alter: process.env.DB_SYNC_ALTER === 'true' });
-
+    if (process.env.DB_SYNC_ALTER === 'true') {
+      await sequelize.sync({ alter: true });
+      console.log('Database tables synced (alter mode)');
+    } else if (process.env.DB_SYNC === 'true') {
+      await sequelize.sync();
+      console.log('Database tables synced');
+    }
   } catch (error) {
     console.error('Database connection error:', error.message);
     process.exit(1);
