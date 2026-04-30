@@ -23,6 +23,7 @@ const socktrader = require('@socktrader/indicators');
 const quants = require('quants');
 const bodyParser = require('body-parser');
 const NodeCache = require('node-cache');
+const { authenticate } = require('../middleware/auth');
 const cache = new NodeCache({ stdTTL: 3600 }); // Cache valide pendant 1 heure
 const { generateSlug, generateFundSlug, extractIdFromSlug } = require('../functions/slug');
 const magic = new Magic(process.env.MAGIC_SECRET_KEY);
