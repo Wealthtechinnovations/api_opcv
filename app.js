@@ -4,9 +4,19 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const sequelize = require('./src/db/sequelize');
+const { initClickHouse } = require('./src/db/clickhouse');
+const { startPeriodicSync } = require('./src/services/clickhouse-sync');
 
 // Initialize database
 sequelize.initDb();
+
+// Initialize ClickHouse (non-blocking — analytics features disabled if unavailable)
+initClickHouse().then((available) => {
+  if (available) {
+    const syncInterval = parseInt(process.env.CLICKHOUSE_SYNC_INTERVAL_MINUTES, 10) || 60;
+    startPeriodicSync(syncInterval);
+  }
+});
 
 const app = express();
 const port = process.env.PORT || 3005;
@@ -103,6 +113,9 @@ if (process.env.NODE_ENV !== 'production') {
 // Routes
 // ---------------------
 require('./src/routes/routes_vl')(app);
+
+// Analytics routes (ClickHouse-powered)
+app.use(require('./src/routes/analytics'));
 
 // Health check
 app.get('/health', (req, res) => {

@@ -230,13 +230,12 @@ const initDb = async () => {
   try {
     await sequelize.authenticate();
 
-    // Sync models that need it
-    await taux.sync();
-    await tra.sync();
+    // Sync all models (alter: true updates columns without dropping data)
+    await sequelize.sync({ alter: process.env.DB_SYNC_ALTER === 'true' });
 
   } catch (error) {
-    console.error('Erreur de connexion à la base de données:', error.message);
-    process.exit(1); // Exit on DB connection failure
+    console.error('Database connection error:', error.message);
+    process.exit(1);
   }
 };
 
