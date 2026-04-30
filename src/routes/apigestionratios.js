@@ -186,8 +186,8 @@ const {
           }, annee: parseInt(year)
         },
         order: [['date', 'ASC']],
-      });
         limit: 500,
+      });
     } else {
       values = await tsrhisto.findAll({
         where: {
@@ -197,8 +197,8 @@ const {
           indice: "MONIA"
         },
         order: [['date', 'ASC']],
-      });
         limit: 500,
+      });
     }
 
     const weeklyRates = values.map((value, index) => {
@@ -2291,8 +2291,8 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
       order: [
         ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
       ],
-    })
       limit: 500,
+    })
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234
         const tauxsr = -0.0234;
@@ -3919,8 +3919,8 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
       order: [
         ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
       ],
-    })
       limit: 500,
+    })
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234
         const tauxsr = -0.0234;
@@ -5560,8 +5560,8 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
       order: [
         ['date', 'DESC']
       ],
-    })
       limit: 500,
+    })
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234
         const tauxsr = -0.0234;

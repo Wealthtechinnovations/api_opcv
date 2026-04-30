@@ -300,8 +300,8 @@ router.get('/api/performances/fond/:id', async (req, res) => {
     order: [
       ['date', 'ASC']
     ],
-  })
     limit: 500,
+  })
     .then(response => {
       const values = response.map((data) => data.vl_ajuste); //todo
       const actif_nets = response.map((data) => data.actif_net);
@@ -485,9 +485,9 @@ router.get('/api/performancescomparaison/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       const values = response.map((data) => data.value);
       const actif_nets = response.map((data) => data.actif_net);
@@ -868,9 +868,9 @@ router.get('/api/performanceswithdate1/fond/:id/:date', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       const values = response.map((data) => data.value);
       const actif_nets = response.map((data) => data.actif_net);
@@ -1057,9 +1057,9 @@ router.get('/api/performancesindice/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       const values = response.map(data => {
         switch (selectedValues) {
@@ -1361,8 +1361,8 @@ app.get('/api/performancesdevcategorie/fond/:id/:devise', async (req, res) => {
       ],
       where: { fund_id: fondsMemeCategorie.map(fond => fond.id) },
       group: ['date'],
-    });
       limit: 500,
+    });
   } else {
     valorisationss = await vl.findAll({
       attributes: [
@@ -1371,8 +1371,8 @@ app.get('/api/performancesdevcategorie/fond/:id/:devise', async (req, res) => {
       ],
       where: { fund_id: fondsMemeCategorie.map(fond => fond.id) },
       group: ['date'],
-    });
       limit: 500,
+    });
   }
 
   const values = valorisationss.map((data) => data.dataValues.moyenne_vl);
@@ -1418,9 +1418,9 @@ router.get('/api/performancesdev/fond/:id/:devise', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       let values;
       let actif_nets;
@@ -1617,9 +1617,9 @@ router.get('/api/performancesdevwithdate/fond/:id/:devise/:date', async (req, re
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       let values;
       let actif_nets;
@@ -1802,9 +1802,9 @@ router.get('/api/performancemonthyear/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       const selectedValues = req.query.query;
       let values;
@@ -1846,9 +1846,9 @@ router.get('/api/performanceindicemonthyear/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       const selectedValues = req.query.query;
       let values;
@@ -2201,9 +2201,9 @@ router.get('/api/performancesportefeuille/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       let lastValuep = response[response.length - 1].base_100_bis; // Dernière valeur
 
@@ -2378,9 +2378,9 @@ router.get('/api/performancesportefeuilledev/fond/:id/:devise', async (req, res)
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       let baseProperty;
       if (req.params.devise === 'EUR') {
@@ -2717,9 +2717,9 @@ router.get('/api/performances/indice/:id/:type', (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],
+    ],    limit: 500,
+
   })
-    limit: 500,
     .then(response => {
       const values = response.map((data) => data.valeur);
       const lastValue = values[response.length - 1];

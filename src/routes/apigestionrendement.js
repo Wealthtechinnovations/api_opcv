@@ -62,8 +62,8 @@ app.get('/api/rendement/fonds', async (req, res) => {
             order: [['date', 'ASC']]
           }
         ],
-      });
         limit: 500,
+      });
 
       // Vérifier la périodicité
       let periodicite = 'Journalière';
@@ -112,8 +112,8 @@ async function calculatejourReturns(fundId) {
     },
     order: [['date', 'ASC']],
     attributes: ['date', 'value'],
-  });
     limit: 500,
+  });
 
   const dailyReturns = vlData.map((vl, index) => {
     if (index === 0) return null; // Pas de rendement pour le premier jour
@@ -145,8 +145,8 @@ router.get('/api/saverendementsjour', async (req, res) => {
     const fonds = await vl.findAll({
         attributes: ['fund_id'],
         group: ['fund_id'],
-      });
         limit: 500,
+      });
 
       // Traiter chaque fonds de manière séquentielle
     for (const fund of fonds) {
@@ -170,16 +170,16 @@ router.get('/api/saverendements', async (req, res) => {
       const fonds = await vl.findAll({
         attributes: ['fund_id'],
         group: ['fund_id'],
-      });
         limit: 500,
+      });
 
       for (const fund of fonds) {
         const fundId = fund.fund_id;
         const valorisations = await vl.findAll({
           where: { fund_id: fundId },
           order: [['date', 'ASC']],
-        });
           limit: 500,
+        });
 
         let weeklyValues = {};
         let monthlyValues = {};

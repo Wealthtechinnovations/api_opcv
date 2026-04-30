@@ -434,8 +434,8 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
           }
         },
         group: ['categorie_globale'],
-      });
         limit: 500,
+      });
       var sumActifNetByCategory;
       var latestValorisations;
       var performa;
@@ -625,8 +625,8 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
     where: {
       [Op.and]: [whereClause] // Utiliser Op.and pour combiner les conditions
     },
-  });
     limit: 500,
+  });
 
 
   const fundsWithAllData = await Promise.all(funds.map(async (fund) => {
@@ -684,8 +684,8 @@ router.get('/api/getsocieterecherche', (req, res) => {
   societe.findAll({
     group: ['nom'],
     order: [['nom', 'ASC']],
-  }).then(societes => {
     limit: 500,
+  }).then(societes => {
     const societesGestion = societes.map(societe => societe.nom);
 
     // Pour chaque société de gestion, effectuez une deuxième requête pour compter le nombre de fonds associés
