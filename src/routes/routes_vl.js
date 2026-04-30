@@ -52,7 +52,6 @@ async function checkAndUpdateData(filePath, res) {
     fs.createReadStream(filePath)
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
-        console.log('Headers:', headers); // Affiche les en-têtes pour vérifier leur structure
       })
       .on('data', (row) => results.push(row)) // Corrigez `data` en `row`
       .on('end', () => resolve(results))
@@ -162,7 +161,6 @@ async function insertfondfile(filePath) {
     fs.createReadStream(filePath)
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
-        console.log('Headers:', headers); // Affiche les en-têtes pour vérifier leur structure
       })
       .on('data', (row) => results.push(row)) // Corrigez `data` en `row`
       .on('end', () => resolve(results))
@@ -626,7 +624,6 @@ module.exports = (app) => {
 
         // console.log("Document envoyé pour téléchargement !");
         // fs.writeFileSync("output.docx", buffer);
-        console.log("Document créé avec succès !");
     } catch (error) {
       console.error('Erreur lors du traitement du template Word :', error);
       res.status(500).json({ error: 'Erreur lors du traitement du template Word.' });
@@ -951,7 +948,6 @@ app.post('/api/reportingmensuelle', async (req, res) => {
   app.get('/api/verifvlimport', async (req, res) => {
     try {
       checkAndUpdateData('fichiers/vl2.csv', res)
-        .then(() => console.log('Data check and update completed.'))
         .catch((error) => console.error('Error during data check and update:', error));
     } catch (error) {
       console.error(error);
@@ -962,7 +958,6 @@ app.post('/api/reportingmensuelle', async (req, res) => {
   app.get('/api/insertfond', async (req, res) => {
     try {
       insertfondfile('fichiers/Updatefondsmaroc.csv')
-        .then(() => console.log('Data check and update completed.'))
         .catch((error) => console.error('Error during data check and update:', error));
     } catch (error) {
       console.error(error);
@@ -1004,8 +999,6 @@ app.post('/api/reportingmensuelle', async (req, res) => {
     const valueArray = values.map(record => record.value);
     const annualYield = math.mean(valueArray)
     //  const annualYield = calculateAnnualYield(valueArray);
-    console.log(`Le taux sans risque à ${req.params.year} ans est de ${annualYield.toFixed(2)}%`);
-    console.log(`Le taux sans risque à ${req.params.year} ans est de ${annualYield.toFixed(2)}%`);
 
   });
 
@@ -1139,7 +1132,6 @@ app.post('/api/reportingmensuelle', async (req, res) => {
   });
 
   const dateToday = getDateToday();
-  console.log(dateToday);
   // const upload = multer({ storage: storage });
 
   function constructNomFond({ date, mois, annee, objet, typedoc, fond_name }) {
@@ -2403,7 +2395,6 @@ GROUP BY f.societe_gestion;
 
 
 
-      console.log('Portefeuille_vls table populated successfully.');
     } catch (error) {
       console.error('Error populating portfolio_vls table:', error);
       throw error;
@@ -2551,15 +2542,12 @@ GROUP BY f.societe_gestion;
 
     for (let index = 0; index < transactionDatas.length; index++) {
       const transaction = transactionDatas[index];
-      console.log("rffffff");
 
       if (index !== 0) {
         if (transaction.type === 'ajoutcash') {
 
           lastValuep += parseFloat(transaction.montant);
-          console.log("lastValue");
 
-          console.log(lastValuep);
 
         }
         if (transaction.type === 'retraitcash') {
@@ -2569,8 +2557,6 @@ GROUP BY f.societe_gestion;
 
 
         const indexe = portefeuilleDatas.findIndex((item) => item.date === transaction.date);
-        console.log("datasgraph[indexe]")
-        console.log(indexe)
 
         for (let i = indexe; i < base100Datas.length; i++) {
           base100Datas[i].base_100 = (portefeuilleDatas[i].valeur_portefeuille / lastValuep) * 100;
@@ -2897,7 +2883,6 @@ GROUP BY f.societe_gestion;
         }
       });
     }
-    console.log(dataWithAnomalyType)
     res.json({
       code: 200,
       data: dataWithAnomalyType
@@ -2992,7 +2977,6 @@ GROUP BY f.societe_gestion;
         }
       });
     }
-    console.log(dataWithAnomalyType)
     res.json({
       code: 200,
       data: dataWithAnomalyType
@@ -3516,7 +3500,6 @@ GROUP BY f.societe_gestion;
     const selectedSociete = req.query.selectedsociete; // Corrected variable name
     const frequence = req.query.frequence; // Corrected variable name
 
-    console.log(frequence.length);
     const valuesArray = selectedValues.split(',');
 
     // Fetch funds based on criteria
@@ -4886,7 +4869,6 @@ GROUP BY f.societe_gestion;
         const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
         const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
-        console.log(findLastDateOfPreviousMonth(dates))
         //Performances annualizées fin de mois
         const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
         const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
@@ -4933,7 +4915,6 @@ GROUP BY f.societe_gestion;
         });
 
 
-        console.log(multipliedValues);
         res.json({
           code: 200,
           data: {
@@ -6724,11 +6705,9 @@ GROUP BY f.societe_gestion;
     fs.createReadStream(req.file.path)
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
-        console.log('Headers:', headers); // Affiche les en-têtes pour vérifier leur structure
       })
       .on('data', (row) => {
         const promise = (async () => {
-          console.log('Row:', row); // Affichez chaque ligne pour le débogage
 
           let fonds = await fond.findOne({
             where: {
@@ -6805,7 +6784,6 @@ GROUP BY f.societe_gestion;
             vlEntry.indRef_USD = parseFloat(row.indRef) * exchangeRatesUSD.value;
           }
 
-          console.log(vlEntry); // Affichez l'entrée VL pour le débogage
 
           const existingEntry = await vl.findOne({
             where: {
@@ -6920,11 +6898,9 @@ GROUP BY f.societe_gestion;
     fs.createReadStream(req.file.path)
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
-        console.log('Headers:', headers); // Affiche les en-têtes pour vérifier leur structure
       })
       .on('data', (row) => {
         const promise = (async () => {
-          console.log('Row:', row); // Affichez chaque ligne pour le débogage
 
           let fonds = await fond.findOne({
             where: {
@@ -6979,7 +6955,6 @@ GROUP BY f.societe_gestion;
             vlEntry.indRef_USD = parseFloat(row.indRef) * exchangeRatesUSD.value;
           }
 
-          console.log(vlEntry); // Affichez l'entrée VL pour le débogage
 
           const existingVLEntry = await vl.findOne({
             where: {
@@ -7241,9 +7216,6 @@ GROUP BY f.societe_gestion;
                       fourthData: results4[index], // Données de la quatrième API
                       graphData: fund.graphData, // Conservez la propriété graphData
                     }));
-                    console.log(fundsWithGraphData);
-                    console.log(fundsWithSecondData);
-                    console.log(fundsWithThirdData);
 
                     // console.log(fundsWithFourthData);
                     res.json({
@@ -7590,7 +7562,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -7895,7 +7866,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -7957,7 +7927,6 @@ const personnelsEntries = personnelsData.map(row => ({
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -8191,8 +8160,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -8234,7 +8201,6 @@ const personnelsEntries = personnelsData.map(row => ({
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -8522,7 +8488,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -8602,7 +8567,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -8677,7 +8641,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -8757,7 +8720,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -8832,7 +8794,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -8912,7 +8873,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -8988,7 +8948,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -9067,7 +9026,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -9242,7 +9200,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -9547,7 +9504,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -9609,7 +9565,6 @@ const personnelsEntries = personnelsData.map(row => ({
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -9843,8 +9798,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -9886,7 +9839,6 @@ const personnelsEntries = personnelsData.map(row => ({
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10174,7 +10126,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10254,7 +10205,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -10329,7 +10279,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10409,7 +10358,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -10484,7 +10432,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10564,7 +10511,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -10640,7 +10586,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10719,7 +10664,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -10840,7 +10784,6 @@ const personnelsEntries = personnelsData.map(row => ({
         // Appliquer un flatMap sur chaque sous-tableau
         return sousTableau.flatMap((element) => element);
       });
-      console.log(tableauConcatené);
       const tableauTransformé = [];
       for (let i = 0; i < tableauConcatené[0].length; i++) {
         const colonne = [];
@@ -10884,7 +10827,6 @@ const personnelsEntries = personnelsData.map(row => ({
 
       const portfolios = PortfolioAllocation.meanVarianceEfficientFrontierPortfolios(meanReturns, covMatrix, opt
       );
-      console.log(portfolios)
       // Filtrer les portefeuilles en fonction des contraintes
       const filteredPortfolios = portfolios.filter(portfolio => {
         const portfolioReturn = portfolio[1];
@@ -10894,13 +10836,7 @@ const personnelsEntries = personnelsData.map(row => ({
       });
 
       // Affichage des portefeuilles efficients filtrés
-      console.log("Portefeuilles efficients filtrés :");
       filteredPortfolios.forEach((portfolio, index) => {
-        console.log(`Portefeuille ${index + 1}:`);
-        console.log("Poids:", portfolio[0]);
-        console.log("Rendement:", portfolio[1]);
-        console.log("Volatilité:", portfolio[2]);
-        console.log("------------");
       });
 
       /*
@@ -10911,8 +10847,6 @@ const personnelsEntries = personnelsData.map(row => ({
               // Vous pouvez continuer avec le reste de votre code ici...
         
               // Afficher les résultats
-              console.log('La matrice de covariance des rendements des actifs est :');
-              console.log(covMatrix);
               //var targetReturn = 0.02; // Rendement attendu de 2% par mois
              // var weights = PortfolioAllocation.proportionalMinimumVarianceWeights(covMatrix, targetReturn);
               // Calculer les poids optimaux du portefeuille qui minimise la variance
@@ -10927,9 +10861,7 @@ const personnelsEntries = personnelsData.map(row => ({
               let investmentAmounts = calculateInvestmentAmounts(weights, totalInvestment);
       
               // Afficher les résultats
-              console.log('Les poids optimaux du portefeuille sont :');
               for (var i = 0; i < fundIds.length; i++) {
-                  console.log(fundIds[i] + ' : ' + weights[i]);
               }*/
 
 

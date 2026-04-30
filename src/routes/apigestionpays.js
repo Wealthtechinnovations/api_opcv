@@ -590,7 +590,6 @@ router.post('/api/listesociete', async (req, res) => {
     whereClause.pays = selectedpays; // Filtrer par la catégorie globale si elle est renseignée
   } else {
     // Gérer le cas où selectedpays n'est pas défini
-    console.log("selectedpays n'est pas défini");
     // Ou effectuer une autre action appropriée, comme attribuer une valeur par défaut à whereClause.pays
   }
 

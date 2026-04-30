@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-if (!process.env.JWT_SECRET) {
-  console.warn('WARNING: JWT_SECRET not set in environment variables');
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
 }
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 /**
  * Middleware d'authentification JWT

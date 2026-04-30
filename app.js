@@ -4,8 +4,6 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const sequelize = require('./src/db/sequelize');
-const swaggerUI = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc');
 
 // Initialize database
 sequelize.initDb();
@@ -39,9 +37,11 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    // Allow requests with no origin only in non-production (local dev/testing)
+    if (!origin && process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
@@ -74,26 +74,30 @@ if (process.env.NODE_ENV !== 'production') {
 // ---------------------
 // Swagger Documentation
 // ---------------------
-const swaggerOptions = {
-  failOnErrors: true,
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'API OPCVM - Documentation',
-      version: '1.0.0',
-      description: 'API pour la gestion et l\'analyse de fonds OPCVM',
-    },
-    servers: [
-      {
-        url: process.env.API_BASE_URL || `http://localhost:${port}`,
+if (process.env.NODE_ENV !== 'production') {
+  const swaggerUI = require('swagger-ui-express');
+  const swaggerJsDoc = require('swagger-jsdoc');
+  const swaggerOptions = {
+    failOnErrors: true,
+    definition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'API OPCVM - Documentation',
+        version: '1.0.0',
+        description: 'API pour la gestion et l\'analyse de fonds OPCVM',
       },
-    ],
-  },
-  apis: ['./src/routes/*.js'],
-};
+      servers: [
+        {
+          url: process.env.API_BASE_URL || `http://localhost:${port}`,
+        },
+      ],
+    },
+    apis: ['./src/routes/*.js'],
+  };
 
-const specs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+  const specs = swaggerJsDoc(swaggerOptions);
+  app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+}
 
 // ---------------------
 // Routes
@@ -132,14 +136,11 @@ app.use((err, req, res, next) => {
 // Start Server
 // ---------------------
 const server = app.listen(port, () => {
-  console.log(`Serveur démarré sur le port ${port} [${process.env.NODE_ENV || 'development'}]`);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM reçu. Arrêt gracieux...');
   server.close(() => {
-    console.log('Serveur arrêté.');
     process.exit(0);
   });
 });

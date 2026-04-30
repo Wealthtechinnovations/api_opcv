@@ -413,7 +413,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -737,7 +736,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1016,8 +1014,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -1059,7 +1055,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1366,7 +1361,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1446,7 +1440,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -1540,7 +1533,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1620,7 +1612,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -1714,7 +1705,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1794,7 +1784,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -1889,7 +1878,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1968,7 +1956,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -2389,7 +2376,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -2694,7 +2680,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -2756,7 +2741,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -2990,8 +2974,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -3033,7 +3015,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3321,7 +3302,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3401,7 +3381,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -3476,7 +3455,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3556,7 +3534,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -3631,7 +3608,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3711,7 +3687,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -3787,7 +3762,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3866,7 +3840,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -4044,7 +4017,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -4349,7 +4321,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -4411,7 +4382,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -4645,8 +4615,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -4688,7 +4656,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -4976,7 +4943,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -5056,7 +5022,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -5131,7 +5096,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -5211,7 +5175,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -5286,7 +5249,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -5366,7 +5328,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -5442,7 +5403,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -5521,7 +5481,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -5699,7 +5658,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -6004,7 +5962,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -6066,7 +6023,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -6300,8 +6256,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -6343,7 +6297,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -6631,7 +6584,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -6711,7 +6663,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -6786,7 +6737,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -6866,7 +6816,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -6941,7 +6890,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -7021,7 +6969,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -7097,7 +7044,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -7176,7 +7122,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,

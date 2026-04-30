@@ -335,7 +335,6 @@ router.get('/api/performances/fond/:id', async (req, res) => {
 
       //Performances fin de mois
       const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      console.log(values[dates.indexOf(targetDate1An)])
 
       const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
       const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
@@ -403,7 +402,6 @@ router.get('/api/performances/fond/:id', async (req, res) => {
       });
 
 
-      console.log(multipliedValues);
       res.json({
         code: 200,
         data: {
@@ -523,7 +521,6 @@ router.get('/api/performancescomparaison/fond/:id', async (req, res) => {
 
       //Performances fin de mois
       const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      console.log(values[dates.indexOf(targetDate1An)])
 
       const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
       const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
@@ -591,7 +588,6 @@ router.get('/api/performancescomparaison/fond/:id', async (req, res) => {
       });
 
 
-      console.log(multipliedValues);
       res.json({
         code: 200,
         data: {
@@ -908,7 +904,6 @@ router.get('/api/performanceswithdate1/fond/:id/:date', async (req, res) => {
 
       //Performances fin de mois
       const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      console.log(values[dates.indexOf(targetDate1An)])
 
       const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
       const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
@@ -976,7 +971,6 @@ router.get('/api/performanceswithdate1/fond/:id/:date', async (req, res) => {
       });
 
 
-      console.log(multipliedValues);
       res.json({
         code: 200,
         data: {
@@ -1117,7 +1111,6 @@ router.get('/api/performancesindice/fond/:id', async (req, res) => {
 
       //Performances fin de mois
       const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      console.log(values[dates.indexOf(targetDate1An)])
 
       const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
       const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
@@ -1185,7 +1178,6 @@ router.get('/api/performancesindice/fond/:id', async (req, res) => {
       });
 
 
-      console.log(multipliedValues);
       res.json({
         code: 200,
         data: {
@@ -1473,7 +1465,6 @@ router.get('/api/performancesdev/fond/:id/:devise', async (req, res) => {
 
       //Performances fin de mois
       const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      console.log(values[dates.indexOf(targetDate1An)])
 
       const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
       const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
@@ -1541,7 +1532,6 @@ router.get('/api/performancesdev/fond/:id/:devise', async (req, res) => {
       });
 
 
-      console.log(multipliedValues);
       res.json({
         code: 200,
         data: {
@@ -1674,7 +1664,6 @@ router.get('/api/performancesdevwithdate/fond/:id/:devise/:date', async (req, re
 
       //Performances fin de mois
       const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      console.log(values[dates.indexOf(targetDate1An)])
 
       const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
       const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
@@ -1742,7 +1731,6 @@ router.get('/api/performancesdevwithdate/fond/:id/:devise/:date', async (req, re
       });
 
 
-      console.log(multipliedValues);
       res.json({
         code: 200,
         data: {
@@ -2270,7 +2258,6 @@ router.get('/api/performancesportefeuille/fond/:id', async (req, res) => {
       const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
       const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
-      console.log(findLastDateOfPreviousMonth(dates))
       //Performances annualizées fin de mois
       const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
       const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
@@ -2317,7 +2304,6 @@ router.get('/api/performancesportefeuille/fond/:id', async (req, res) => {
       });
 
 
-      console.log(multipliedValues);
       res.json({
         code: 200,
         data: {
@@ -2459,7 +2445,6 @@ router.get('/api/performancesportefeuilledev/fond/:id/:devise', async (req, res)
       const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
       const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
-      console.log(findLastDateOfPreviousMonth(dates))
       //Performances annualizées fin de mois
       const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
       const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
@@ -2506,7 +2491,6 @@ router.get('/api/performancesportefeuilledev/fond/:id/:devise', async (req, res)
       });
 
 
-      console.log(multipliedValues);
       res.json({
         code: 200,
         data: {

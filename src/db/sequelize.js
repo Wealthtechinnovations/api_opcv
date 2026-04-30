@@ -229,13 +229,11 @@ const urllsite = process.env.SITE_BASE_URL || 'http://localhost:3000';
 const initDb = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Connexion à la base de données établie.');
 
     // Sync models that need it
     await taux.sync();
     await tra.sync();
 
-    console.log('Modèles synchronisés.');
   } catch (error) {
     console.error('Erreur de connexion à la base de données:', error.message);
     process.exit(1); // Exit on DB connection failure

@@ -63,7 +63,6 @@ function writeToLogFile(message) {
     if (err) {
       console.error("Erreur lors de l'écriture dans le fichier de journal :", err);
     } else {
-      console.log("Message de journal écrit avec succès dans le fichier de journal.");
     }
   });
 }
@@ -799,7 +798,6 @@ router.get('/api/updatewithdividende', async (req, res) => {
       .then(async (resultSet) => {
           // Conversion du ResultSet en JSON
           const data = await resultSet.json(); // Assurez-vous que c'est au format JSON
-          console.log('Funds with Performance:', data);
           return data.data; // Retourne les données JSON
       })
       .catch(error => {
@@ -893,7 +891,6 @@ async function calculateRankregional(category, fundId, datedebut) {
       .then(async (resultSet) => {
           // Conversion du ResultSet en JSON
           const data = await resultSet.json(); // Assurez-vous que c'est au format JSON
-          console.log('Funds with Performance:', data);
           return data.data; // Retourne les données JSON
       })
       .catch(error => {
@@ -1047,7 +1044,6 @@ router.get('/api/classementclickhouse', async (req, res) => {
       }
     }
 
-    console.log("finishrank");
     res.json("finishrank");
   } catch (error) {
     console.error('Une erreur s\'est produite :', error);
@@ -1234,7 +1230,6 @@ router.get('/api/classementclickhouse', async (req, res) => {
             });
         }
       }
-      console.log("finishrank");
       res.json("finishrank");
     } catch (error) {
       console.error('Une erreur s\'est produite :', error);
@@ -1351,7 +1346,6 @@ router.get('/api/classementclickhouse', async (req, res) => {
             });
         }
       }
-      console.log("finishrank");
       res.json("finishrank");
     } catch (error) {
       console.error('Une erreur s\'est produite :', error);
@@ -1468,7 +1462,6 @@ router.get('/api/classementclickhouse', async (req, res) => {
             });
         }
       }
-      console.log("finishrank");
       res.json("finishrank");
     } catch (error) {
       console.error('Une erreur s\'est produite :', error);
@@ -1906,7 +1899,6 @@ async function insertIntoClickHouse(fundId, code_ISIN, categorie, categorie_nati
       format: 'JSONEachRow' // Format attendu pour l'insertion
     });
 
-    console.log('Données insérées avec succès dans ClickHouse');
   } catch (error) {
     console.error('Erreur lors de l\'insertion dans ClickHouse:', error);
   }
