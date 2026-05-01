@@ -35,7 +35,7 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 const { Op } = require('sequelize'); // Ajout de l'importation de Op
 const findCategoryByFundId = async (fundId) => {
   // Implémentez ici la logique pour récupérer la catégorie à partir de l'identifiant du fond
@@ -455,7 +455,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences_eurs.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_eurs GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_EUR
@@ -499,7 +498,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences_usds.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_usds GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_USD
@@ -543,7 +541,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net

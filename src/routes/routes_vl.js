@@ -1,4 +1,5 @@
 const { Magic } = require('@magic-sdk/admin');
+const { authenticate } = require('../middleware/auth');
 const { Sequelize, DataTypes, where } = require('sequelize');
 const { vl, indice, taux, fond, pays_regulateurs, sequelize, urll, urllsite, portefeuille, portefeuille_vl, portefeuilles_proposes_vls, portefeuilles_proposes, users, societe, classementfonds, performences, transaction, investissement, tsr, cashdb, frais, fiscalite, portefeuille_vl_cumul, devises, portefeuille_base100, favorisfonds, devisedechanges, personnel, documentss, performences_eurs, performences_usds, classementfonds_eurs, classementfonds_usds, actu, tsrhisto, rendement, simulation, simulationportefeuille, date_valorisation, apikeys } = require('../db/sequelize')
 const moment = require('moment');
@@ -23,7 +24,6 @@ const socktrader = require('@socktrader/indicators');
 const quants = require('quants');
 const bodyParser = require('body-parser');
 const NodeCache = require('node-cache');
-const { authenticate } = require('../middleware/auth');
 const cache = new NodeCache({ stdTTL: 3600 }); // Cache valide pendant 1 heure
 const { generateSlug, generateFundSlug, extractIdFromSlug } = require('../functions/slug');
 const magic = new Magic(process.env.MAGIC_SECRET_KEY);
@@ -310,7 +310,6 @@ const {
 const { Fond } = require('../classes/fond')
 const { Indice } = require('../classes/indice')
 const { Op } = require("sequelize");
-const { fastifySwaggerUi } = require("@fastify/swagger-ui");
 const { da } = require('date-fns/locale');
 const portefeuille_valorise = require('../models/portefeuille_valorise');
 const { exit } = require('process');
@@ -440,7 +439,7 @@ module.exports = (app) => {
     const resetToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // Lien de réinitialisation
-    const resetUrl = `${process.env.FRONTEND_URL}/panel/societegestionpanel/login/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/panel/management/login/reset-password?token=${resetToken}`;
 
     // Configurer nodemailer pour envoyer l'email
     const transporter = nodemailer.createTransport({

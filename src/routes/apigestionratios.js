@@ -35,7 +35,7 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 const {
     AdaptTableaumonthwithdate,
     findNearestDateAnnualized,
@@ -116,7 +116,6 @@ const {
   const { Fond } = require('../classes/fond')
   const { Indice } = require('../classes/indice')
   const { Op } = require("sequelize");
-  const { fastifySwaggerUi } = require("@fastify/swagger-ui");
   const { da } = require('date-fns/locale');
   const portefeuille_valorise = require('../models/portefeuille_valorise');
   const { exit } = require('process');
