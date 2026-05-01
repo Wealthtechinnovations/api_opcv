@@ -1,4 +1,5 @@
 const { Magic } = require('@magic-sdk/admin');
+const { authenticate } = require('../middleware/auth');
 const { Sequelize, DataTypes, where } = require('sequelize');
 const { vl, indice, taux, fond, pays_regulateurs, sequelize, urll, urllsite, portefeuille, portefeuille_vl, portefeuilles_proposes_vls, portefeuilles_proposes, users, societe, classementfonds, performences, transaction, investissement, tsr, cashdb, frais, fiscalite, portefeuille_vl_cumul, devises, portefeuille_base100, favorisfonds, devisedechanges, personnel, documentss, performences_eurs, performences_usds, classementfonds_eurs, classementfonds_usds, actu, tsrhisto, rendement, simulation, simulationportefeuille, date_valorisation, apikeys } = require('../db/sequelize')
 const moment = require('moment');
@@ -311,7 +312,6 @@ const {
 const { Fond } = require('../classes/fond')
 const { Indice } = require('../classes/indice')
 const { Op } = require("sequelize");
-const { fastifySwaggerUi } = require("@fastify/swagger-ui");
 const { da } = require('date-fns/locale');
 const portefeuille_valorise = require('../models/portefeuille_valorise');
 const { exit } = require('process');

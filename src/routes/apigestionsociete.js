@@ -35,7 +35,7 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 const { Op } = require('sequelize'); // Ajout de l'importation de Op
 const findCategoryByFundId = async (fundId) => {
   // Implémentez ici la logique pour récupérer la catégorie à partir de l'identifiant du fond
@@ -435,7 +435,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
         },
         group: ['categorie_globale'],
       });
-        limit: 500,
       var sumActifNetByCategory;
       var latestValorisations;
       var performa;
@@ -455,7 +454,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences_eurs.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_eurs GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_EUR
@@ -499,7 +497,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences_usds.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_usds GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_USD
@@ -543,7 +540,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net
@@ -626,7 +622,6 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
       [Op.and]: [whereClause] // Utiliser Op.and pour combiner les conditions
     },
   });
-    limit: 500,
 
 
   const fundsWithAllData = await Promise.all(funds.map(async (fund) => {
@@ -685,7 +680,6 @@ router.get('/api/getsocieterecherche', (req, res) => {
     group: ['nom'],
     order: [['nom', 'ASC']],
   }).then(societes => {
-    limit: 500,
     const societesGestion = societes.map(societe => societe.nom);
 
     // Pour chaque société de gestion, effectuez une deuxième requête pour compter le nombre de fonds associés

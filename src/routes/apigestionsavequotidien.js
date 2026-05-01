@@ -35,11 +35,10 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 const { Fond } = require('../classes/fond')
 const { Indice } = require('../classes/indice')
 const { Op } = require("sequelize");
-const { fastifySwaggerUi } = require("@fastify/swagger-ui");
 const { da } = require('date-fns/locale');
 const portefeuille_valorise = require('../models/portefeuille_valorise');
 const { exit } = require('process');
@@ -257,7 +256,6 @@ router.get('/api/updatewithdividende', async (req, res) => {
           order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
         }],
       });
-        limit: 500,
   
       // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
       for (const fonds of fondsAvecDividende) {
@@ -532,7 +530,6 @@ router.get('/api/updatewithdividende', async (req, res) => {
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
         });
-          limit: 500,
       } else {
         // Étape 1 : Récupérer toutes les performances pour la catégorie spécifiée
         fundsWithPerformance = await performences_usds.findAll({
@@ -540,7 +537,6 @@ router.get('/api/updatewithdividende', async (req, res) => {
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
         });
-          limit: 500,
       }
       // Étape 2 : Trouver les performances du fond sélectionné
       const selectedFund = fundsWithPerformance.find((fund) => fund.fond_id === selectedFundId);
@@ -704,7 +700,6 @@ router.get('/api/updatewithdividende', async (req, res) => {
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
         });
-          limit: 500,
       } else {
         // Étape 1 : Récupérer toutes les performances pour la catégorie spécifiée
         fundsWithPerformance = await performences_usds.findAll({
@@ -712,7 +707,6 @@ router.get('/api/updatewithdividende', async (req, res) => {
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
         });
-          limit: 500,
       }
 
 
@@ -1610,7 +1604,6 @@ router.get('/api/classementclickhouse', async (req, res) => {
       }, // Condition where pour filtrer par fund_id
       order: [['date', 'DESC']] // Trier les dates en ordre chronologique,
     });
-      limit: 500,
 
     const yearsSinceValorisation = await anneevalorisation(fundId);
     const years = yearsSinceValorisation[0].annee;
@@ -1656,7 +1649,6 @@ router.get('/api/classementclickhouse', async (req, res) => {
       },
       order: [['date', 'DESC']] // Trier les dates en ordre décroissant,
     });
-      limit: 500,
     
     // Obtenir l'année de valorisation
     const yearsSinceValorisation = await anneevalorisation(fundId);

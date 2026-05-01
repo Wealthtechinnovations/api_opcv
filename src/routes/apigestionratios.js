@@ -35,7 +35,7 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 const {
     AdaptTableaumonthwithdate,
     findNearestDateAnnualized,
@@ -116,7 +116,6 @@ const {
   const { Fond } = require('../classes/fond')
   const { Indice } = require('../classes/indice')
   const { Op } = require("sequelize");
-  const { fastifySwaggerUi } = require("@fastify/swagger-ui");
   const { da } = require('date-fns/locale');
   const portefeuille_valorise = require('../models/portefeuille_valorise');
   const { exit } = require('process');
@@ -187,7 +186,6 @@ const {
         },
         order: [['date', 'ASC']],
       });
-        limit: 500,
     } else {
       values = await tsrhisto.findAll({
         where: {
@@ -198,7 +196,6 @@ const {
         },
         order: [['date', 'ASC']],
       });
-        limit: 500,
     }
 
     const weeklyRates = values.map((value, index) => {
@@ -2305,7 +2302,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
         ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
       ],
     })
-      limit: 500,
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234
         const tauxsr = -0.0234;
@@ -3947,7 +3943,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
         ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
       ],
     })
-      limit: 500,
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234
         const tauxsr = -0.0234;
@@ -5602,7 +5597,6 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
         ['date', 'DESC']
       ],
     })
-      limit: 500,
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234
         const tauxsr = -0.0234;
