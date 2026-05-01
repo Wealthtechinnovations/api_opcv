@@ -39,7 +39,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
+    // Allow requests with no origin (server-side Next.js calls, mobile apps, curl)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
@@ -98,6 +98,7 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 // ---------------------
 // Routes
 // ---------------------
+require('./src/routes/apigestionauth')(app);
 require('./src/routes/routes_vl')(app);
 
 // Health check
