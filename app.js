@@ -112,6 +112,17 @@ if (process.env.NODE_ENV !== 'production') {
 require('./src/routes/apigestionauth')(app);
 require('./src/routes/routes_vl')(app);
 
+// Router-based route files
+app.use(require('./src/routes/apigestionfonds'));
+app.use(require('./src/routes/apigestionpays'));
+app.use(require('./src/routes/apigestionperformance'));
+app.use(require('./src/routes/apigestionquartile'));
+app.use(require('./src/routes/apigestionratios'));
+app.use(require('./src/routes/apigestionrendement'));
+app.use(require('./src/routes/apigestionsavequotidien'));
+app.use(require('./src/routes/apigestionsociete'));
+app.use(require('./src/routes/apigestionapikey'));
+
 // Analytics routes (ClickHouse-powered)
 app.use(require('./src/routes/analytics'));
 
