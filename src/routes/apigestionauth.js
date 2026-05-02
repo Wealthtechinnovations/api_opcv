@@ -13,8 +13,8 @@ function createTransporter() {
     port: parseInt(process.env.SMTP_PORT) || 587,
     secure: process.env.SMTP_SECURE === 'true',
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: process.env.SMTP_USER || process.env.EMAIL_USER,
+      pass: process.env.SMTP_PASS || process.env.EMAIL_PASSWORD,
     },
   });
 }
@@ -52,11 +52,11 @@ module.exports = (app) => {
         reset_token_expiry: expiry,
       });
 
-      const resetLink = `${FRONTEND_URL}/panel/portefeuille/login/reset-password?token=${token}`;
+      const resetLink = `${FRONTEND_URL}/panel/management/login/reset-password?token=${token}`;
 
       const transporter = createTransporter();
       await transporter.sendMail({
-        from: `"AfricaFunds" <${process.env.SMTP_USER}>`,
+        from: `"AfricaFunds" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
         to: user.email,
         subject: 'Réinitialisation de votre mot de passe - AfricaFunds',
         html: `
@@ -94,7 +94,8 @@ module.exports = (app) => {
    */
   app.post('/api/reset-password', async (req, res) => {
     try {
-      const { token, password } = req.body;
+      const token = req.body.token || req.body.tokenapp;
+      const password = req.body.password || req.body.newPassword;
 
       if (!token || !password) {
         return res.status(400).json({ code: 400, message: 'Token et nouveau mot de passe requis.' });

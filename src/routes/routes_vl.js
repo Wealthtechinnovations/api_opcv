@@ -2655,23 +2655,26 @@ GROUP BY f.societe_gestion;
         pays: pays || null,
         typeusers: typeusers || null,
         typeusers_id: typeusers_id || 0,
-        active: typeusers_id != 1 ? 0 : 1
+        active: 1
       });
 
       // Générer un token JWT pour l'utilisateur créé
       const { generateToken } = require('../middleware/auth');
       const token = generateToken(newUser);
 
-      res.status(201).json({
-        code: 201,
+      res.status(200).json({
+        code: 200,
         data: {
           token,
-          user: {
+          userId: {
             id: newUser.id,
             email: newUser.email,
             nom: newUser.nom,
             prenoms: newUser.prenoms,
             typeusers: newUser.typeusers,
+            typeusers_id: newUser.typeusers_id,
+            denomination: newUser.denomination,
+            pays: newUser.pays,
             active: newUser.active
           }
         }
@@ -2728,21 +2731,24 @@ GROUP BY f.societe_gestion;
       const { generateToken } = require('../middleware/auth');
       const token = generateToken(user);
 
+      const userData = {
+        id: user.id,
+        email: user.email,
+        nom: user.nom,
+        prenoms: user.prenoms,
+        denomination: user.denomination,
+        typeusers: user.typeusers,
+        typeusers_id: user.typeusers_id,
+        active: user.active,
+        pays: user.pays
+      };
+
       return res.json({
         code: 200,
         data: {
           token,
-          user: {
-            id: user.id,
-            email: user.email,
-            nom: user.nom,
-            prenoms: user.prenoms,
-            denomination: user.denomination,
-            typeusers: user.typeusers,
-            typeusers_id: user.typeusers_id,
-            active: user.active,
-            pays: user.pays
-          }
+          user: userData,
+          userExists: userData
         }
       });
     } catch (error) {
@@ -2774,21 +2780,24 @@ GROUP BY f.societe_gestion;
       const { generateToken } = require('../middleware/auth');
       const token = generateToken(user);
 
+      const userData = {
+        id: user.id,
+        email: user.email,
+        nom: user.nom,
+        prenoms: user.prenoms,
+        denomination: user.denomination,
+        typeusers: user.typeusers,
+        typeusers_id: user.typeusers_id,
+        active: user.active,
+        pays: user.pays
+      };
+
       return res.json({
         code: 200,
         data: {
           token,
-          user: {
-            id: user.id,
-            email: user.email,
-            nom: user.nom,
-            prenoms: user.prenoms,
-            denomination: user.denomination,
-            typeusers: user.typeusers,
-            typeusers_id: user.typeusers_id,
-            active: user.active,
-            pays: user.pays
-          }
+          user: userData,
+          userExists: userData
         }
       });
     } catch (error) {
