@@ -3378,47 +3378,63 @@ GROUP BY f.societe_gestion;
     }
   });
 
-
+  app.post('/api/deleteportefeuille/:id', async (req, res) => {
+    try {
+      const portfolioId = req.params.id;
+      const existing = await portefeuille.findOne({ where: { id: portfolioId } });
+      if (!existing) {
+        return res.status(404).json({ error: 'Portefeuille non trouvé' });
+      }
+      await portefeuille_vl.destroy({ where: { portefeuille_id: portfolioId } });
+      await portefeuille.destroy({ where: { id: portfolioId } });
+      res.json({ code: 200, message: 'Portefeuille supprimé avec succès' });
+    } catch (error) {
+      console.error('Erreur lors de la suppression du portefeuille:', error);
+      res.status(500).json({ error: 'Erreur lors de la suppression' });
+    }
+  });
 
 
   app.post('/api/reconstitution', async (req, res) => {
     try {
-      // const { entries } = req.body;
-
       const valorisations = [];
       let montantInvestissement = 0;
+      let portfolioId = null;
+
       for (const entry of req.body) {
         const { date, montantInvesti, fondId, portefeuilleselect } = entry;
-        montantInvestissement += montantInvesti
-        // Rechercher la valeur du fond pour la date spécifiée
+        montantInvestissement += montantInvesti;
+        if (!portfolioId) portfolioId = portefeuilleselect;
+
         let vls = await vl.findAll({
           where: {
             fund_id: fondId, date: {
-              [Op.gte]: date // Remplacez 'votreDate' par la date que vous souhaitez comparer.
+              [Op.gte]: date
             }
           },
           limit: 500,
         });
+
+        if (!vls || vls.length === 0) {
+          return res.status(400).json({ error: `Aucune VL trouvée pour le fonds ${fondId} à partir du ${date}` });
+        }
+
         const quantite = montantInvesti / vls[0].value;
 
         for (const dateRow of vls) {
-
           const valorisation = quantite * dateRow.value;
           valorisations.push({ date: dateRow.date, value: valorisation, fund_id: fondId, portefeuille_id: portefeuilleselect });
-
         }
-        // Insérer les nouvelles valorisations dans la table vl_portefeuille
-        await portefeuille_vl.bulkCreate(valorisations);
       }
 
-      const updatedData = {
-        montant_invest: montantInvestissement
-      };
+      await portefeuille_vl.bulkCreate(valorisations);
 
-      // Assuming 'portefeuille' is your model for updating data in your database
-      await portefeuille.update(updatedData, {
-        where: { id: portefeuille },
-      });
+      if (portfolioId) {
+        await portefeuille.update(
+          { montant_invest: montantInvestissement },
+          { where: { id: portfolioId } }
+        );
+      }
 
       return res.json({ code: 200, data: "succes" });
     } catch (error) {
