@@ -5464,10 +5464,10 @@ GROUP BY f.societe_gestion;
   app.post('/api/recherchefonds', async (req, res) => {
     try {
       const selectedValues = req.query.query;
-      const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
-      const selectedSociete = req.query.selectedsociete; // Corrected variable name
-      const selectedcategorieregionale = req.query.selectedcategorieregionale;
-      const selectedcategorienationale = req.query.selectedcategorienationale;
+      const selectedCategorie = req.query.selectedcategorie || 'undefined';
+      const selectedSociete = req.query.selectedsociete || 'undefined';
+      const selectedcategorieregionale = req.query.selectedcategorieregionale || 'undefined';
+      const selectedcategorienationale = req.query.selectedcategorienationale || 'undefined';
       const valuesArray = selectedValues.split(',');
 
       // Fetch funds based on criteria
