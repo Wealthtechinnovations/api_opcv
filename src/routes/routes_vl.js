@@ -2647,7 +2647,7 @@ GROUP BY f.societe_gestion;
       }
 
       // Valider typeusers_id (0=admin interdit via inscription publique)
-      const allowedTypes = [1, 2, 3, 4, 5];
+      const allowedTypes = [1, 2, 3, 4, 5, 6];
       const safeTypeId = allowedTypes.includes(Number(typeusers_id)) ? Number(typeusers_id) : 1;
 
       const newUser = await users.create({
