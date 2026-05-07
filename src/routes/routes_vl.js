@@ -2646,6 +2646,10 @@ GROUP BY f.societe_gestion;
         return res.status(409).json({ message: 'Un compte avec cet email existe déjà' });
       }
 
+      // Valider typeusers_id (0=admin interdit via inscription publique)
+      const allowedTypes = [1, 2, 3, 4, 5];
+      const safeTypeId = allowedTypes.includes(Number(typeusers_id)) ? Number(typeusers_id) : 1;
+
       const newUser = await users.create({
         email,
         password: bcrypt.hashSync(password, 10),
@@ -2654,7 +2658,7 @@ GROUP BY f.societe_gestion;
         denomination: denomination || null,
         pays: pays || null,
         typeusers: typeusers || null,
-        typeusers_id: typeusers_id || 0,
+        typeusers_id: safeTypeId,
         active: 1
       });
 
