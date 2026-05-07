@@ -2650,6 +2650,8 @@ GROUP BY f.societe_gestion;
       const allowedTypes = [1, 2, 3, 4, 5, 6];
       const safeTypeId = allowedTypes.includes(Number(typeusers_id)) ? Number(typeusers_id) : 1;
 
+      const isActiveByDefault = safeTypeId !== 2;
+
       const newUser = await users.create({
         email,
         password: bcrypt.hashSync(password, 10),
@@ -2659,7 +2661,7 @@ GROUP BY f.societe_gestion;
         pays: pays || null,
         typeusers: typeusers || null,
         typeusers_id: safeTypeId,
-        active: 1
+        active: isActiveByDefault ? 1 : 0
       });
 
       // Générer un token JWT pour l'utilisateur créé
@@ -2728,6 +2730,13 @@ GROUP BY f.societe_gestion;
         return res.status(401).json({
           code: 401,
           message: 'Email ou mot de passe incorrect'
+        });
+      }
+
+      if (user.active === 0) {
+        return res.status(403).json({
+          code: 403,
+          message: 'Votre compte est en attente de validation par un administrateur'
         });
       }
 
@@ -5472,6 +5481,19 @@ GROUP BY f.societe_gestion;
       const selectedSociete = req.query.selectedsociete || 'undefined';
       const selectedcategorieregionale = req.query.selectedcategorieregionale || 'undefined';
       const selectedcategorienationale = req.query.selectedcategorienationale || 'undefined';
+
+      if (!selectedValues) {
+        const allFunds = await fond.findAll({ limit: 500 });
+        return res.json({
+          code: 200,
+          data: allFunds.map(f => ({
+            id: f.id,
+            nom_fond: f.nom_fond,
+            isin: f.code_ISIN,
+          })),
+        });
+      }
+
       const valuesArray = selectedValues.split(',');
 
       // Fetch funds based on criteria
@@ -5676,40 +5698,74 @@ GROUP BY f.societe_gestion;
 
   //Users adamin valide
   app.get('/api/getusersbyadmin', (req, res) => {
-    ///  const searchTerm = req.query.query;
-
-    // Vérifiez si searchTerm existe
-    /*if (!searchTerm) {
-        return res.status(400).json({ error: 'Le paramètre query est manquant.' });
-    }*/
-
     users.findAll({
-      where: {
-      },
-      order: [
-        ['id', 'DESC']
-      ],
+      order: [['id', 'DESC']],
       limit: 500,
     })
       .then(response => {
-        //const funds = response.map((data) => data.id);
-
         const userss = response.map(data => ({
           id: data.id,
-          email: data.email, // Remplacez avec la propriété correcte de l'objet
-          nom: data.nom, // Remplacez avec la propriété correcte de l'objet
+          email: data.email,
+          nom: data.nom,
           prenoms: data.prenoms,
-          active: data.active
-
+          denomination: data.denomination,
+          pays: data.pays,
+          typeusers: data.typeusers,
+          typeusers_id: data.typeusers_id,
+          active: data.active,
+          created_at: data.created_at,
         }));
         res.json({
           code: 200,
-          data: {
-            userss
-          }
-        })
-
+          data: { userss }
+        });
       })
+      .catch(error => {
+        res.status(500).json({ error: error.message });
+      });
+  });
+
+  app.get('/api/pending-accounts', (req, res) => {
+    users.findAll({
+      where: { active: 0 },
+      order: [['id', 'DESC']],
+      limit: 500,
+    })
+      .then(response => {
+        const userss = response.map(data => ({
+          id: data.id,
+          email: data.email,
+          nom: data.nom,
+          prenoms: data.prenoms,
+          denomination: data.denomination,
+          pays: data.pays,
+          typeusers: data.typeusers,
+          typeusers_id: data.typeusers_id,
+          active: data.active,
+          created_at: data.created_at,
+        }));
+        res.json({
+          code: 200,
+          data: { userss }
+        });
+      })
+      .catch(error => {
+        res.status(500).json({ error: error.message });
+      });
+  });
+
+  app.post('/api/reject-user/:id', (req, res) => {
+    const userId = req.params.id;
+    users.destroy({ where: { id: userId, active: 0 } })
+      .then(deleted => {
+        if (!deleted) {
+          return res.status(404).json({ error: 'Utilisateur non trouvé ou déjà actif' });
+        }
+        res.json({ code: 200, message: 'Compte rejeté et supprimé' });
+      })
+      .catch(error => {
+        res.status(500).json({ error: error.message });
+      });
   })
 
   app.post('/api/activate-user/:id', (req, res) => {
