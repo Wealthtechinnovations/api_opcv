@@ -1082,9 +1082,11 @@ app.post('/api/reportingmensuelle', async (req, res) => {
 
     let mailOptions = {
       from: email,
-      to: process.env.EMAIL_USER,
-      subject: `Nouveau message de ${name}`,
-      text: description,
+      to: 'contact@chainsolutions.fr',
+      replyTo: email,
+      subject: `[Fundafrique] Nouveau message de ${name}`,
+      text: `Nom: ${name}\nEmail: ${email}\n\nMessage:\n${description}`,
+      html: `<h3>Nouveau message depuis Fundafrique</h3><p><strong>Nom:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><hr/><p>${description.replace(/\n/g, '<br/>')}</p>`,
     };
 
     try {
