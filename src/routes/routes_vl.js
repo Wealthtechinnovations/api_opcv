@@ -1072,28 +1072,43 @@ app.post('/api/reportingmensuelle', async (req, res) => {
 
 
   app.post('/api/contact', async (req, res) => {
-    const { name, email, description } = req.body;
-
-    let transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT),
-      secure: process.env.EMAIL_SECURE === 'true',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    let mailOptions = {
-      from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
-      to: 'contact@chainsolutions.fr',
-      replyTo: email,
-      subject: `[Fundafrique] Nouveau message de ${name}`,
-      text: `Nom: ${name}\nEmail: ${email}\n\nMessage:\n${description}`,
-      html: `<h3>Nouveau message depuis Fundafrique</h3><p><strong>Nom:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><hr/><p>${description.replace(/\n/g, '<br/>')}</p>`,
-    };
-
     try {
+      const { name, email, description } = req.body;
+
+      if (!name || !email || !description) {
+        return res.status(400).json({ success: false, message: 'Tous les champs sont requis.' });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ success: false, message: 'Adresse email invalide.' });
+      }
+
+      const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+      const safeName = escapeHtml(name);
+      const safeEmail = escapeHtml(email);
+      const safeDesc = escapeHtml(description);
+
+      const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT),
+        secure: process.env.EMAIL_SECURE === 'true',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
+        to: 'contact@chainsolutions.fr',
+        replyTo: email,
+        subject: `[Fundafrique] Nouveau message de ${safeName}`,
+        text: `Nom: ${name}\nEmail: ${email}\n\nMessage:\n${description}`,
+        html: `<h3>Nouveau message depuis Fundafrique</h3><p><strong>Nom:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><hr/><p>${safeDesc.replace(/\n/g, '<br/>')}</p>`,
+      };
+
       await transporter.sendMail(mailOptions);
       res.status(200).json({ success: true, message: 'Email envoyé avec succès' });
     } catch (error) {

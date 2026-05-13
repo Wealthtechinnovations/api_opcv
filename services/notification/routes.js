@@ -130,26 +130,45 @@ router.get('/api/getactualite', async (req, res) => {
 
 // Send a contact email
 router.post('/api/contact', async (req, res) => {
-  const { name, email, description } = req.body;
-
-  let transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-
-  let mailOptions = {
-    from: email,
-    to: process.env.EMAIL_USER,
-    subject: `Nouveau message de ${name}`,
-    text: description,
-  };
-
   try {
+    const { name, email, description } = req.body;
+
+    if (!name || !email || !description) {
+      return res.status(400).json({ success: false, message: 'Tous les champs sont requis.' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: 'Adresse email invalide.' });
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST || undefined,
+      port: process.env.EMAIL_PORT ? parseInt(process.env.EMAIL_PORT) : undefined,
+      secure: process.env.EMAIL_SECURE === 'true',
+      service: process.env.EMAIL_HOST ? undefined : 'Gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeDesc = escapeHtml(description);
+
+    const mailOptions = {
+      from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
+      to: process.env.EMAIL_CONTACT || process.env.EMAIL_USER,
+      replyTo: email,
+      subject: `[Fundafrique] Nouveau message de ${safeName}`,
+      text: `Nom: ${name}\nEmail: ${email}\n\nMessage:\n${description}`,
+      html: `<h3>Nouveau message depuis Fundafrique</h3><p><strong>Nom:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><hr/><p>${safeDesc.replace(/\n/g, '<br/>')}</p>`,
+    };
+
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ success: true, message: 'Email envoye avec succes' });
+    res.status(200).json({ success: true, message: 'Email envoyé avec succès' });
   } catch (error) {
     console.error('Erreur lors de l\'envoi de l\'email:', error);
     res.status(500).json({ success: false, message: 'Erreur lors de l\'envoi de l\'email' });
