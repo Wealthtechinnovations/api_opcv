@@ -9,9 +9,9 @@ const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 heure
 
 function createTransporter() {
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === 'true',
+    host: process.env.SMTP_HOST || process.env.EMAIL_HOST,
+    port: parseInt(process.env.SMTP_PORT || process.env.EMAIL_PORT) || 465,
+    secure: (process.env.SMTP_SECURE || process.env.EMAIL_SECURE) === 'true',
     auth: {
       user: process.env.SMTP_USER || process.env.EMAIL_USER,
       pass: process.env.SMTP_PASS || process.env.EMAIL_PASSWORD,
