@@ -443,7 +443,9 @@ module.exports = (app) => {
 
     // Configurer nodemailer pour envoyer l'email
     const transporter = nodemailer.createTransport({
-      service: 'Gmail',
+      host: process.env.EMAIL_HOST,
+      port: parseInt(process.env.EMAIL_PORT),
+      secure: process.env.EMAIL_SECURE === 'true',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD,
@@ -451,9 +453,9 @@ module.exports = (app) => {
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'Réinitialisation de mot de passe',
+      subject: 'Réinitialisation de mot de passe - Fundafrique',
       html: `<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p>
              <a href="${resetUrl}">Réinitialiser le mot de passe</a>`,
     };
@@ -1073,7 +1075,9 @@ app.post('/api/reportingmensuelle', async (req, res) => {
     const { name, email, description } = req.body;
 
     let transporter = nodemailer.createTransport({
-      service: 'Gmail',
+      host: process.env.EMAIL_HOST,
+      port: parseInt(process.env.EMAIL_PORT),
+      secure: process.env.EMAIL_SECURE === 'true',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD,
@@ -1081,7 +1085,7 @@ app.post('/api/reportingmensuelle', async (req, res) => {
     });
 
     let mailOptions = {
-      from: email,
+      from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
       to: 'contact@chainsolutions.fr',
       replyTo: email,
       subject: `[Fundafrique] Nouveau message de ${name}`,
