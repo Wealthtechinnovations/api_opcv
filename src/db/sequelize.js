@@ -123,7 +123,9 @@ vl.belongsTo(fond, { foreignKey: 'fund_id' });
 // Fond <-> Performances
 fond.hasMany(performences, { foreignKey: 'fond_id' });
 performences.belongsTo(fond, { foreignKey: 'fond_id' });
+fond.hasMany(performences_eurs, { foreignKey: 'fond_id' });
 performences_eurs.belongsTo(fond, { foreignKey: 'fond_id' });
+fond.hasMany(performences_usds, { foreignKey: 'fond_id' });
 performences_usds.belongsTo(fond, { foreignKey: 'fond_id' });
 
 // Fond <-> Rendement
@@ -213,9 +215,17 @@ apikeys.belongsTo(users, { foreignKey: 'user_id' });
 portefeuille.hasMany(cashdb, { foreignKey: 'portefeuille_id' });
 cashdb.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
 
-// Fond <-> Classementfonds
+// Fond <-> Classementfonds (local + EUR + USD)
 fond.hasMany(classementfonds, { foreignKey: 'fond_id' });
 classementfonds.belongsTo(fond, { foreignKey: 'fond_id' });
+fond.hasMany(classementfonds_eurs, { foreignKey: 'fond_id' });
+classementfonds_eurs.belongsTo(fond, { foreignKey: 'fond_id' });
+fond.hasMany(classementfonds_usds, { foreignKey: 'fond_id' });
+classementfonds_usds.belongsTo(fond, { foreignKey: 'fond_id' });
+
+// Fond <-> Societe (by societe_id)
+fond.belongsTo(societe, { foreignKey: 'societe_id' });
+societe.hasMany(fond, { foreignKey: 'societe_id' });
 
 // ---------------------
 // URLs (from environment)
