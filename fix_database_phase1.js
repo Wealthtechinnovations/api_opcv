@@ -225,10 +225,10 @@ async function run() {
 
       // Look up devise and regulateur from pays_regulateurs
       const [paysInfo] = await conn.execute(
-        `SELECT devise, regulateur FROM pays_regulateurs WHERE pays = ? LIMIT 1`, [pays]
+        `SELECT symboledevise, regulateur FROM pays_regulateurs WHERE pays = ? LIMIT 1`, [pays]
       );
 
-      const devise = paysInfo.length > 0 ? paysInfo[0].devise : null;
+      const devise = paysInfo.length > 0 ? paysInfo[0].symboledevise : null;
       const regulateur = paysInfo.length > 0 ? paysInfo[0].regulateur : null;
 
       await conn.execute(
@@ -252,12 +252,12 @@ async function run() {
     let metaFixed = 0;
     for (const soc of nullMeta) {
       const [pr] = await conn.execute(
-        `SELECT devise, regulateur FROM pays_regulateurs WHERE pays = ? LIMIT 1`, [soc.pays]
+        `SELECT symboledevise, regulateur FROM pays_regulateurs WHERE pays = ? LIMIT 1`, [soc.pays]
       );
       if (pr.length > 0) {
         await conn.execute(
           `UPDATE societes SET devise = ?, regulateur = ? WHERE id = ?`,
-          [pr[0].devise, pr[0].regulateur, soc.id]
+          [pr[0].symboledevise, pr[0].regulateur, soc.id]
         );
         metaFixed++;
       }
@@ -342,18 +342,16 @@ async function run() {
     console.log('\n=== STEP 6: De-duplicate devises ===');
 
     const [dupeDevises] = await conn.execute(`
-      SELECT code_devise, GROUP_CONCAT(id ORDER BY id) as ids, COUNT(*) as cnt
+      SELECT Symbole, GROUP_CONCAT(id ORDER BY id) as ids, COUNT(*) as cnt
       FROM devises
-      GROUP BY code_devise
+      GROUP BY Symbole
       HAVING cnt > 1
     `);
 
     for (const dupe of dupeDevises) {
       const ids = dupe.ids.split(',').map(Number);
-      const keepId = ids[0]; // Keep first
-      const removeIds = ids.slice(1);
-      // Don't delete - just flag. Check if any table references these IDs first.
-      console.log(`  Duplicate devise: ${dupe.code_devise} (ids: ${dupe.ids}) - keeping id=${keepId}`);
+      const keepId = ids[0];
+      console.log(`  Duplicate devise: ${dupe.Symbole} (ids: ${dupe.ids}) - keeping id=${keepId}`);
     }
 
     // =========================================================================
