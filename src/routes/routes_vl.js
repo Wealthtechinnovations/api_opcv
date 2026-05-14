@@ -2845,185 +2845,123 @@ GROUP BY f.societe_gestion;
  
 
   app.get('/api/getallfondsvlmanquant', async (req, res) => {
-    const societegestion = req.query.societegestion;
-    const pays = req.query.pays;
+    try {
+      const societegestion = req.query.societegestion;
+      const pays = req.query.pays;
 
+      const fundWhere = { active: 1 };
+      if (societegestion) fundWhere.societe_gestion = societegestion;
+      else if (pays) fundWhere.pays = pays;
 
-    // Requête pour récupérer les fonds avec une anomalie de type "VL MANQUANTE"
-    const highVolatilityFundsVLManquante = await performences.findAll({
-      attributes: ['fond_id'], // Sélectionnez uniquement la colonne fond_id
-      where: {
-
-        anomalie: 'VL MANQUANTE'
-      },
-      raw: true, // Assurez-vous de récupérer les résultats sous forme de tableau brut
-      limit: 500,
-    });
-
-    const dataWithAnomalyTypeVLManquante = highVolatilityFundsVLManquante.map(fundId => ({
-      id: fundId.fond_id,
-      anomalie: 'VL MANQUANTE'
-    }));
-
-    // Combiner les deux ensembles
-    const combinedData = [...dataWithAnomalyTypeVLManquante,];
-
-    // Récupérer les données des fonds à partir des IDs combinés
-    const highVolatilityFundsData = [];
-
-    for (const data of combinedData) {
-      let fundData;
-      if (societegestion) {
-        fundData = await fond.findOne({ where: { id: data.id, societe_gestion: societegestion } });
-      } else if (pays) {
-        fundData = await fond.findOne({ where: { id: data.id, pays: pays } });
-      }
-
-      else {
-        fundData = await fond.findOne({ where: { id: data.id } });
-      }
-      if (fundData) {
-        highVolatilityFundsData.push(fundData);
-      }
-    }
-
-
-    // Associer les données récupérées avec le type d'anomalie correspondant
-    const dataWithAnomalyType = [];
-    const idCounts = {};
-    const seenCombinations = new Set();
-
-    for (const fund of highVolatilityFundsData) {
-      const id = fund.id;
-      /* let anomalyType = 'VL MANQUANTE';
-   
-       if (idCounts[id]) {
-         idCounts[id]++;
-         anomalyType = `ANOMALIE VL`;
-       } else {
-         idCounts[id] = 1;
-       }*/
-
-      const correspondingData = combinedData.filter(data => data.id === id);
-      /*correspondingData.forEach(data => {
-        dataWithAnomalyType.push({
-          ...fund.toJSON(),
-          type_anomalie: data.anomalie,
-          // Vous pouvez également ajouter les autres propriétés de data si nécessaire
-        });
-      });*/
-
-      correspondingData.forEach(data => {
-        const combinationKey = `${fund.id}-${data.anomalie}`; // Assurez-vous que fund.id est une propriété unique pour chaque fund
-
-        if (!seenCombinations.has(combinationKey)) {
-          seenCombinations.add(combinationKey);
-          dataWithAnomalyType.push({
-            ...fund.toJSON(),
-            type_anomalie: data.anomalie,
-            // Ajoutez les autres propriétés de data si nécessaire
-          });
-        }
+      const perfWithMissing = await performences.findAll({
+        attributes: ['fond_id'],
+        where: { anomalie: 'VL MANQUANTE' },
+        raw: true,
+        limit: 500,
       });
+
+      const missingFundIds = new Set(perfWithMissing.map(p => p.fond_id));
+
+      const matchingFunds = await fond.findAll({
+        where: {
+          ...fundWhere,
+          id: { [Op.in]: [...missingFundIds] }
+        },
+        raw: true,
+        limit: 500,
+      });
+
+      const dataWithAnomalyType = matchingFunds.map(f => ({
+        ...f,
+        type_anomalie: 'VL MANQUANTE'
+      }));
+
+      res.json({ code: 200, data: dataWithAnomalyType });
+    } catch (error) {
+      console.error('Erreur getallfondsvlmanquant:', error);
+      res.status(500).json({ code: 500, message: 'Erreur serveur' });
     }
-    res.json({
-      code: 200,
-      data: dataWithAnomalyType
-    });
   });
 
   app.get('/api/getallfondsvlanomalie', async (req, res) => {
-    const societegestion = req.query.societegestion;
-    const pays = req.query.pays;
+    try {
+      const societegestion = req.query.societegestion;
+      const pays = req.query.pays;
 
-    // Requête pour récupérer les fonds avec une autre anomalie que "VL MANQUANTE"
-    const highVolatilityFundsAutreAnomalie = await performences.findAll({
-      attributes: ['fond_id'], // Sélectionnez uniquement la colonne fond_id
-      where: {
-        [Sequelize.Op.or]: [
-          { volatility3an: { [Op.gt]: 50 } },
-          { volatility1an: { [Op.gt]: 50 } },
-          { volatility5an: { [Op.gt]: 50 } },
-          { pertemax1an: { [Op.lt]: -50 } },
-          { pertemax3an: { [Op.lt]: -50 } },
-          { pertemax5an: { [Op.lt]: -50 } }
-        ],
-      },
-      raw: true, // Assurez-vous de récupérer les résultats sous forme de tableau brut
-      limit: 500,
-    });
+      const fundWhere = { active: 1 };
+      if (societegestion) fundWhere.societe_gestion = societegestion;
+      else if (pays) fundWhere.pays = pays;
 
-    // Parcourir fundIdsAutreAnomalie et ajouter les fonds avec l'anomalie "fff"
-    const dataWithAnomalyTypeAutreAnomalie = highVolatilityFundsAutreAnomalie.map(fundId => ({
-      id: fundId.fond_id,
-      anomalie: 'ANOMALIE VL'
-    }));
+      const allFunds = await fond.findAll({ where: fundWhere, raw: true, limit: 1000 });
+      const dataWithAnomalyType = [];
+      const seenCombinations = new Set();
 
-    // Combiner les deux ensembles
-    const combinedData = [ ...dataWithAnomalyTypeAutreAnomalie];
+      const fundIds = allFunds.map(f => f.id);
 
-    // Récupérer les données des fonds à partir des IDs combinés
-    const highVolatilityFundsData = [];
-
-    for (const data of combinedData) {
-      let fundData;
-      if (societegestion) {
-        fundData = await fond.findOne({ where: { id: data.id, societe_gestion: societegestion } });
-      } else if (pays) {
-        fundData = await fond.findOne({ where: { id: data.id, pays: pays } });
-      }
-
-      else {
-        fundData = await fond.findOne({ where: { id: data.id } });
-      }
-      if (fundData) {
-        highVolatilityFundsData.push(fundData);
-      }
-    }
-
-
-    // Associer les données récupérées avec le type d'anomalie correspondant
-    const dataWithAnomalyType = [];
-    const idCounts = {};
-    const seenCombinations = new Set();
-
-    for (const fund of highVolatilityFundsData) {
-      const id = fund.id;
-      /* let anomalyType = 'VL MANQUANTE';
-   
-       if (idCounts[id]) {
-         idCounts[id]++;
-         anomalyType = `ANOMALIE VL`;
-       } else {
-         idCounts[id] = 1;
-       }*/
-
-      const correspondingData = combinedData.filter(data => data.id === id);
-      /*correspondingData.forEach(data => {
-        dataWithAnomalyType.push({
-          ...fund.toJSON(),
-          type_anomalie: data.anomalie,
-          // Vous pouvez également ajouter les autres propriétés de data si nécessaire
-        });
-      });*/
-
-      correspondingData.forEach(data => {
-        const combinationKey = `${fund.id}-${data.anomalie}`; // Assurez-vous que fund.id est une propriété unique pour chaque fund
-
-        if (!seenCombinations.has(combinationKey)) {
-          seenCombinations.add(combinationKey);
-          dataWithAnomalyType.push({
-            ...fund.toJSON(),
-            type_anomalie: data.anomalie,
-            // Ajoutez les autres propriétés de data si nécessaire
-          });
-        }
+      const highVolatilityPerfs = await performences.findAll({
+        attributes: ['fond_id'],
+        where: {
+          fond_id: { [Op.in]: fundIds },
+          [Sequelize.Op.or]: [
+            { volatility3an: { [Op.gt]: 50 } },
+            { volatility1an: { [Op.gt]: 50 } },
+            { volatility5an: { [Op.gt]: 50 } },
+            { pertemax1an: { [Op.lt]: -50 } },
+            { pertemax3an: { [Op.lt]: -50 } },
+            { pertemax5an: { [Op.lt]: -50 } }
+          ],
+        },
+        raw: true,
+        limit: 500,
       });
+
+      const highVolFundIds = new Set(highVolatilityPerfs.map(p => p.fond_id));
+
+      for (const fundData of allFunds) {
+        if (highVolFundIds.has(fundData.id)) {
+          const key = `${fundData.id}-VOLATILITE_EXTREME`;
+          if (!seenCombinations.has(key)) {
+            seenCombinations.add(key);
+            dataWithAnomalyType.push({ ...fundData, type_anomalie: 'VOLATILITE EXTREME' });
+          }
+        }
+
+        const recentVLs = await vl.findAll({
+          where: { fund_id: fundData.id },
+          order: [['date', 'DESC']],
+          limit: 60,
+          raw: true,
+        });
+
+        if (recentVLs.length >= 2) {
+          const sorted = recentVLs.sort((a, b) => new Date(a.date) - new Date(b.date));
+          let hasGapAnomaly = false;
+          for (let i = 1; i < sorted.length; i++) {
+            const prev = sorted[i - 1].value;
+            const curr = sorted[i].value;
+            if (prev && curr && prev > 0) {
+              const pctChange = Math.abs((curr - prev) / prev) * 100;
+              if (pctChange >= 10) {
+                hasGapAnomaly = true;
+                break;
+              }
+            }
+          }
+          if (hasGapAnomaly) {
+            const key = `${fundData.id}-ECART_VL`;
+            if (!seenCombinations.has(key)) {
+              seenCombinations.add(key);
+              dataWithAnomalyType.push({ ...fundData, type_anomalie: 'ECART VL SUSPECT' });
+            }
+          }
+        }
+      }
+
+      res.json({ code: 200, data: dataWithAnomalyType });
+    } catch (error) {
+      console.error('Erreur getallfondsvlanomalie:', error);
+      res.status(500).json({ code: 500, message: 'Erreur serveur' });
     }
-    res.json({
-      code: 200,
-      data: dataWithAnomalyType
-    });
   });
   app.get('/api/vlspresui/:id/:value/:date', async (req, res) => {
     try {
