@@ -357,9 +357,101 @@ async function run() {
     }
 
     // =========================================================================
-    // STEP 7: Fix invalid VL dates (0000-00-00)
+    // STEP 7: Activate fonds that have VL data (by country, excluding Nigeria)
     // =========================================================================
-    console.log('\n=== STEP 7: Check invalid VL dates ===');
+    console.log('\n=== STEP 7: Activate fonds with VL data ===');
+
+    // Nigeria fonds stay inactive (no VL data yet, will be imported later)
+    // Activate fonds from MAROC, TUNISIE, UEMOA, CEMAC that have at least 1 VL
+    const [activatedFonds] = await conn.execute(`
+      UPDATE fond_investissements f
+      SET f.active = 1
+      WHERE f.active = 0
+        AND f.pays != 'Nigeria'
+        AND f.id IN (SELECT DISTINCT fund_id FROM valorisations WHERE fund_id IS NOT NULL)
+    `);
+    console.log(`  Activated ${activatedFonds.affectedRows} fonds (with VL, excluding Nigeria)`);
+
+    // Show breakdown by country
+    const [activeByPays] = await conn.execute(`
+      SELECT pays, COUNT(*) as cnt FROM fond_investissements WHERE active = 1 GROUP BY pays ORDER BY cnt DESC
+    `);
+    for (const row of activeByPays) {
+      console.log(`    ${row.pays}: ${row.cnt} fonds actifs`);
+    }
+
+    const [stillInactive] = await conn.execute(`
+      SELECT pays, COUNT(*) as cnt FROM fond_investissements WHERE active = 0 GROUP BY pays ORDER BY cnt DESC
+    `);
+    console.log('  Still inactive:');
+    for (const row of stillInactive) {
+      console.log(`    ${row.pays}: ${row.cnt} fonds (no VL or Nigeria)`);
+    }
+
+    // =========================================================================
+    // STEP 8: Clean aberrant VL BRIDGE data
+    // =========================================================================
+    console.log('\n=== STEP 8: Clean VL BRIDGE aberrant data ===');
+
+    // FCP BRIDGE EQUILIBRE (id=2592) and FCP BRIDGE OBLIGATIONS (id=2640)
+    // have VL alternating between ~5500 XOF (unitaire) and ~29M XOF (actif net)
+    // The real VL unitaire is ~5500 range. Values > 1M are actif net mixed in.
+    const BRIDGE_FUND_IDS = [2592, 2640];
+    let bridgeCleaned = 0;
+
+    for (const fundId of BRIDGE_FUND_IDS) {
+      // First check if this fund exists and has the issue
+      const [check] = await conn.execute(`
+        SELECT COUNT(*) as c FROM valorisations
+        WHERE fund_id = ? AND valeur > 1000000
+      `, [fundId]);
+
+      if (check[0].c > 0) {
+        // Get the median-range VL to understand what the real VL should be
+        const [normalVL] = await conn.execute(`
+          SELECT AVG(valeur) as avg_vl, MIN(valeur) as min_vl, MAX(valeur) as max_vl
+          FROM valorisations
+          WHERE fund_id = ? AND valeur < 1000000 AND valeur > 0
+        `, [fundId]);
+
+        console.log(`  Fund ${fundId}: ${check[0].c} aberrant VL (>1M). Normal range: ${normalVL[0].min_vl} - ${normalVL[0].max_vl}`);
+
+        // Delete the aberrant rows (actif net mixed in as VL)
+        const [deleted] = await conn.execute(`
+          DELETE FROM valorisations WHERE fund_id = ? AND valeur > 1000000
+        `, [fundId]);
+        bridgeCleaned += deleted.affectedRows;
+        console.log(`  Deleted ${deleted.affectedRows} aberrant VL for fund ${fundId}`);
+      }
+    }
+
+    // Also catch any other funds with extreme VL jumps (>500% in one day)
+    // Just report them, don't auto-delete
+    const [otherAberrant] = await conn.execute(`
+      SELECT v1.fund_id, f.nom_fond, COUNT(*) as cnt
+      FROM valorisations v1
+      INNER JOIN valorisations v2 ON v1.fund_id = v2.fund_id
+        AND v2.date = (SELECT MIN(v3.date) FROM valorisations v3 WHERE v3.fund_id = v1.fund_id AND v3.date > v1.date)
+      INNER JOIN fond_investissements f ON f.id = v1.fund_id
+      WHERE v1.valeur > 0 AND v2.valeur > 0
+        AND (v2.valeur / v1.valeur > 5 OR v1.valeur / v2.valeur > 5)
+        AND v1.fund_id NOT IN (${BRIDGE_FUND_IDS.join(',')})
+      GROUP BY v1.fund_id, f.nom_fond
+      HAVING cnt > 2
+      LIMIT 20
+    `);
+
+    if (otherAberrant.length > 0) {
+      console.log('  Other funds with suspicious VL jumps (>500%):');
+      for (const row of otherAberrant) {
+        console.log(`    fund=${row.fund_id} "${row.nom_fond}" -> ${row.cnt} jumps`);
+      }
+    }
+
+    // =========================================================================
+    // STEP 9: Fix invalid VL dates (0000-00-00)
+    // =========================================================================
+    console.log('\n=== STEP 9: Check invalid VL dates ===');
 
     const [invalidDates] = await conn.execute(`
       SELECT COUNT(*) as c FROM valorisations WHERE date = '0000-00-00' OR date IS NULL
@@ -367,9 +459,9 @@ async function run() {
     console.log(`  VL with date=0000-00-00 or NULL: ${invalidDates[0].c}`);
 
     // =========================================================================
-    // STEP 8: Add missing forex pairs for XAF
+    // STEP 10: Generate EUR/XAF fixed peg + check missing forex pairs
     // =========================================================================
-    console.log('\n=== STEP 8: Check missing forex pairs ===');
+    console.log('\n=== STEP 10: Forex pairs ===');
 
     const [pairsExist] = await conn.execute(`
       SELECT DISTINCT paire FROM devisedechanges ORDER BY paire
@@ -377,22 +469,56 @@ async function run() {
     const existingPairs = pairsExist.map(r => r.paire);
     console.log('  Existing pairs:', existingPairs.join(', '));
 
-    const neededPairs = ['EUR/XAF', 'USD/XAF', 'EUR/NGN', 'USD/NGN'];
+    // EUR/XAF is a fixed peg: 1 EUR = 655.957 XAF (CFA franc zone)
+    // Generate entries matching the date range of EUR/XOF
+    if (!existingPairs.includes('EUR/XAF')) {
+      const [xofDates] = await conn.execute(`
+        SELECT MIN(date) as minDate, MAX(date) as maxDate
+        FROM devisedechanges WHERE paire = 'EUR/XOF'
+      `);
+      if (xofDates[0].minDate) {
+        // Insert EUR/XAF rows by copying EUR/XOF dates with fixed rate
+        const [inserted] = await conn.execute(`
+          INSERT IGNORE INTO devisedechanges (paire, date, value)
+          SELECT 'EUR/XAF', date, 655.957
+          FROM devisedechanges
+          WHERE paire = 'EUR/XOF'
+        `);
+        console.log(`  Generated EUR/XAF (fixed peg 655.957): ${inserted.affectedRows} entries`);
+      }
+    } else {
+      console.log('  EUR/XAF already exists');
+    }
+
+    // USD/XAF: derive from EUR/USD and EUR/XAF
+    if (!existingPairs.includes('USD/XAF')) {
+      const [insertedUsdXaf] = await conn.execute(`
+        INSERT IGNORE INTO devisedechanges (paire, date, value)
+        SELECT 'USD/XAF', eurusd.date, 655.957 / eurusd.value
+        FROM devisedechanges eurusd
+        WHERE eurusd.paire = 'EUR/USD' AND eurusd.value > 0
+      `);
+      console.log(`  Generated USD/XAF (derived from EUR/USD): ${insertedUsdXaf.affectedRows} entries`);
+    } else {
+      console.log('  USD/XAF already exists');
+    }
+
+    const neededPairs = ['EUR/NGN', 'USD/NGN'];
     const missingPairs = neededPairs.filter(p => !existingPairs.includes(p));
     if (missingPairs.length > 0) {
-      console.log('  Missing pairs (need manual data import):', missingPairs.join(', '));
-      // XAF is pegged to EUR: 1 EUR = 655.957 XAF (fixed rate since 1999)
-      if (missingPairs.includes('EUR/XAF')) {
-        console.log('  NOTE: EUR/XAF is a FIXED peg at 655.957 - can be auto-generated');
-      }
+      console.log(`  Still missing (need external data): ${missingPairs.join(', ')}`);
+      console.log('  -> NGN rates will be needed when Nigeria VL data is imported');
     }
 
     // =========================================================================
     // FINAL SUMMARY
     // =========================================================================
-    console.log('\n=== FINAL VERIFICATION ===');
+    console.log('\n' + '='.repeat(80));
+    console.log('  FINAL VERIFICATION');
+    console.log('='.repeat(80));
 
     const [totalFonds] = await conn.execute(`SELECT COUNT(*) as c FROM fond_investissements`);
+    const [activeFonds] = await conn.execute(`SELECT COUNT(*) as c FROM fond_investissements WHERE active = 1`);
     const [fondsWithSocId] = await conn.execute(`SELECT COUNT(*) as c FROM fond_investissements WHERE societe_id IS NOT NULL`);
     const [totalSocietes] = await conn.execute(`SELECT COUNT(*) as c FROM societes`);
     const [distinctSG] = await conn.execute(`SELECT COUNT(DISTINCT societe_gestion) as c FROM fond_investissements`);
@@ -401,20 +527,26 @@ async function run() {
       LEFT JOIN societes s ON TRIM(f.societe_gestion) = TRIM(s.nom)
       WHERE s.id IS NULL AND f.societe_gestion IS NOT NULL
     `);
+    const [totalVL] = await conn.execute(`SELECT COUNT(*) as c FROM valorisations`);
+    const [totalPairs] = await conn.execute(`SELECT COUNT(DISTINCT paire) as c FROM devisedechanges`);
 
-    console.log(`  Total fonds: ${totalFonds[0].c}`);
-    console.log(`  Fonds with societe_id: ${fondsWithSocId[0].c} (${(fondsWithSocId[0].c / totalFonds[0].c * 100).toFixed(1)}%)`);
-    console.log(`  Total societes: ${totalSocietes[0].c}`);
-    console.log(`  Distinct societe_gestion in fonds: ${distinctSG[0].c}`);
-    console.log(`  Remaining orphans: ${orphans[0].c}`);
+    console.log(`  Total fonds:            ${totalFonds[0].c}`);
+    console.log(`  Fonds actifs:           ${activeFonds[0].c} (${(activeFonds[0].c / totalFonds[0].c * 100).toFixed(1)}%)`);
+    console.log(`  Fonds with societe_id:  ${fondsWithSocId[0].c} (${(fondsWithSocId[0].c / totalFonds[0].c * 100).toFixed(1)}%)`);
+    console.log(`  Total societes:         ${totalSocietes[0].c}`);
+    console.log(`  Distinct SG in fonds:   ${distinctSG[0].c}`);
+    console.log(`  Remaining orphans:      ${orphans[0].c}`);
+    console.log(`  Total VL:               ${totalVL[0].c}`);
+    console.log(`  Forex pairs:            ${totalPairs[0].c}`);
+    console.log(`  VL BRIDGE cleaned:      ${bridgeCleaned}`);
 
     console.log('\n=== PHASE 1 COMPLETE ===');
-    console.log('\nNEXT STEPS (to run manually):');
-    console.log('1. Review results above');
-    console.log('2. Run Phase 2 to add Sequelize model changes and ORM associations');
-    console.log('3. Import missing forex data (EUR/XAF at 655.957, NGN rates)');
-    console.log('4. Import TSR data for Tunisia, UEMOA, CEMAC');
-    console.log('5. Decide on active flag for fonds (all are currently active=0)');
+    console.log('\nREMAINING MANUAL TASKS:');
+    console.log('1. Import Nigeria VL data from SEC Nigeria Excel files');
+    console.log('2. Import EUR/NGN and USD/NGN forex rates');
+    console.log('3. Import TSR for Tunisia (TMM), UEMOA (BCEAO), CEMAC (BEAC)');
+    console.log('4. Run EUR/USD performance batch to fill performences_eurs/usds');
+    console.log('5. pm2 restart 10 (API) then pm2 restart 11 (frontend)');
 
   } catch (error) {
     console.error('ERROR:', error.message);
