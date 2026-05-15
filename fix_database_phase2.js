@@ -99,60 +99,61 @@ async function run() {
     }
 
     // =========================================================================
-    // STEP 3: Populate forme_juridique from fund name prefix
+    // STEP 3: Populate structure_fond from fund name prefix
+    // (Note: forme_juridique column does NOT exist, using structure_fond instead)
     // =========================================================================
-    console.log('\n=== STEP 3: Populate forme_juridique ===');
+    console.log('\n=== STEP 3: Populate structure_fond ===');
 
     // FCP = Fonds Commun de Placement
     const [fcpUpdate] = await conn.execute(`
       UPDATE fond_investissements
-      SET forme_juridique = 'FCP'
-      WHERE (forme_juridique IS NULL OR forme_juridique = '')
+      SET structure_fond = 'FCP'
+      WHERE (structure_fond IS NULL OR structure_fond = '')
         AND (nom_fond LIKE 'FCP %' OR nom_fond LIKE 'FCP-%')
     `);
-    console.log(`  Set forme_juridique=FCP for ${fcpUpdate.affectedRows} fonds`);
+    console.log(`  Set structure_fond=FCP for ${fcpUpdate.affectedRows} fonds`);
 
     // SICAV = Societe d'Investissement a Capital Variable
     const [sicavUpdate] = await conn.execute(`
       UPDATE fond_investissements
-      SET forme_juridique = 'SICAV'
-      WHERE (forme_juridique IS NULL OR forme_juridique = '')
+      SET structure_fond = 'SICAV'
+      WHERE (structure_fond IS NULL OR structure_fond = '')
         AND (nom_fond LIKE 'SICAV %' OR nom_fond LIKE 'SICAV-%')
     `);
-    console.log(`  Set forme_juridique=SICAV for ${sicavUpdate.affectedRows} fonds`);
+    console.log(`  Set structure_fond=SICAV for ${sicavUpdate.affectedRows} fonds`);
 
     // FCPR = Fonds Commun de Placement a Risques
     const [fcprUpdate] = await conn.execute(`
       UPDATE fond_investissements
-      SET forme_juridique = 'FCPR'
-      WHERE (forme_juridique IS NULL OR forme_juridique = '')
+      SET structure_fond = 'FCPR'
+      WHERE (structure_fond IS NULL OR structure_fond = '')
         AND (nom_fond LIKE 'FCPR %' OR nom_fond LIKE 'FCPR-%')
     `);
-    console.log(`  Set forme_juridique=FCPR for ${fcprUpdate.affectedRows} fonds`);
+    console.log(`  Set structure_fond=FCPR for ${fcprUpdate.affectedRows} fonds`);
 
     // OPCVM (generic)
     const [opcvmUpdate] = await conn.execute(`
       UPDATE fond_investissements
-      SET forme_juridique = 'OPCVM'
-      WHERE (forme_juridique IS NULL OR forme_juridique = '')
+      SET structure_fond = 'OPCVM'
+      WHERE (structure_fond IS NULL OR structure_fond = '')
         AND (nom_fond LIKE 'OPCVM %' OR nom_fond LIKE 'OPCVM-%')
     `);
-    console.log(`  Set forme_juridique=OPCVM for ${opcvmUpdate.affectedRows} fonds`);
+    console.log(`  Set structure_fond=OPCVM for ${opcvmUpdate.affectedRows} fonds`);
 
     // Nigeria: Mutual Fund (open-end)
     const [mfUpdate] = await conn.execute(`
       UPDATE fond_investissements
-      SET forme_juridique = 'Mutual Fund'
-      WHERE (forme_juridique IS NULL OR forme_juridique = '')
+      SET structure_fond = 'Mutual Fund'
+      WHERE (structure_fond IS NULL OR structure_fond = '')
         AND pays = 'Nigeria'
     `);
-    console.log(`  Set forme_juridique=Mutual Fund for ${mfUpdate.affectedRows} Nigeria fonds`);
+    console.log(`  Set structure_fond=Mutual Fund for ${mfUpdate.affectedRows} Nigeria fonds`);
 
     const [stillNoForme] = await conn.execute(`
       SELECT COUNT(*) as c FROM fond_investissements
-      WHERE forme_juridique IS NULL OR forme_juridique = ''
+      WHERE structure_fond IS NULL OR structure_fond = ''
     `);
-    console.log(`  Remaining without forme_juridique: ${stillNoForme[0].c}`);
+    console.log(`  Remaining without structure_fond: ${stillNoForme[0].c}`);
 
     // =========================================================================
     // STEP 4: Populate categorie_globale from classification or fund name
