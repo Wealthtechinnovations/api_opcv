@@ -1280,9 +1280,9 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRanking.type_classement = 1;
           await existingRanking.save();
         } else {
-          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond
+          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond EUR
           if (rankingData.code == 200)
-            await classementfonds.create({
+            await classementfonds_eurs.create({
               fond_id: fundId,
               categorie_nationale: category,
               type_classement: 1,
@@ -1318,13 +1318,13 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingregional.rank3Anstotal = rankingDataregional.data.rank3Anstotal;
           existingRankingregional.rank5Anstotal = rankingDataregional.data.rank5Anstotal;
           existingRankingregional.rank1erJanviertotal = rankingDataregional.data.rank1erJanviertotal;
-          existingRankingregional.type_classement = 1;
+          existingRankingregional.type_classement = 2;
           await existingRankingregional.save();
         } else {
 
-          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond
+          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond EUR
           if (rankingDataregional.code == 200)
-            await classementfonds.create({
+            await classementfonds_eurs.create({
               fond_id: fundId,
               categorie_nationale: category,
               type_classement: 2,
@@ -1396,9 +1396,9 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRanking.type_classement = 1;
           await existingRanking.save();
         } else {
-          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond
+          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond USD
           if (rankingData.code == 200)
-            await classementfonds.create({
+            await classementfonds_usds.create({
               fond_id: fundId,
               categorie_nationale: category,
               type_classement: 1,
@@ -1434,13 +1434,13 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingregional.rank3Anstotal = rankingDataregional.data.rank3Anstotal;
           existingRankingregional.rank5Anstotal = rankingDataregional.data.rank5Anstotal;
           existingRankingregional.rank1erJanviertotal = rankingDataregional.data.rank1erJanviertotal;
-          existingRankingregional.type_classement = 1;
+          existingRankingregional.type_classement = 2;
           await existingRankingregional.save();
         } else {
 
-          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond
+          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond USD
           if (rankingDataregional.code == 200)
-            await classementfonds.create({
+            await classementfonds_usds.create({
               fond_id: fundId,
               categorie_nationale: category,
               type_classement: 2,
@@ -1467,6 +1467,127 @@ router.get('/api/classementclickhouse', async (req, res) => {
     }
   });
 
+  // ====================================================================
+  // BATCH: Peupler performences_eurs depuis performancesdev EUR
+  // ====================================================================
+  router.get('/api/saveperfdateeur/:fond1/:fond2', async (req, res) => {
+    try {
+      const allFunds = await fetchFundsByValorisation1([], 'undefined', 'undefined', 'undefined', 'undefined', parseInt(req.params.fond1), parseInt(req.params.fond2));
+      let processed = 0;
+      let errors = 0;
+      for (const fund of allFunds) {
+        try {
+          await processFundDevise(fund, 'EUR', performences_eurs);
+          processed++;
+        } catch (error) {
+          errors++;
+          console.error(`Error processing fund EUR ${fund.id}:`, error.message);
+        }
+      }
+      res.json({ message: `EUR performances: ${processed} fonds traites, ${errors} erreurs` });
+    } catch (error) {
+      console.error('Erreur saveperfdateeur:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ====================================================================
+  // BATCH: Peupler performences_usds depuis performancesdev USD
+  // ====================================================================
+  router.get('/api/saveperfdateusd/:fond1/:fond2', async (req, res) => {
+    try {
+      const allFunds = await fetchFundsByValorisation1([], 'undefined', 'undefined', 'undefined', 'undefined', parseInt(req.params.fond1), parseInt(req.params.fond2));
+      let processed = 0;
+      let errors = 0;
+      for (const fund of allFunds) {
+        try {
+          await processFundDevise(fund, 'USD', performences_usds);
+          processed++;
+        } catch (error) {
+          errors++;
+          console.error(`Error processing fund USD ${fund.id}:`, error.message);
+        }
+      }
+      res.json({ message: `USD performances: ${processed} fonds traites, ${errors} erreurs` });
+    } catch (error) {
+      console.error('Erreur saveperfdateusd:', error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  async function processFundDevise(fund, devise, perfTable) {
+    const fundId = fund.id;
+    const code_ISIN = fund.code_ISIN;
+    const categorie_nationale = fund.categorie_national;
+    const categorie_regionale = fund.categorie_regional;
+
+    const latestPerf = await perfTable.findOne({
+      where: { fond_id: fundId },
+      order: [['date', 'DESC']],
+    });
+    const sinceDate = latestPerf ? latestPerf.date : '2020-01-01';
+
+    const allVlDates = await vl.findAll({
+      attributes: ['date'],
+      where: {
+        fund_id: fundId,
+        date: { [Op.gt]: sinceDate }
+      },
+      order: [['date', 'DESC']],
+      limit: 500,
+    });
+
+    if (allVlDates.length === 0) return;
+
+    for (let i = 0; i < allVlDates.length; i++) {
+      const currentDate = moment(allVlDates[i].date).format('YYYY-MM-DD');
+      try {
+        const performanceResponse = await fetch(`${urll}/api/performancesdev/fond/${fundId}/${devise}`);
+        if (performanceResponse.status === 200) {
+          const performanceData = await performanceResponse.json();
+          if (performanceData.data) {
+            await upsertPerformanceDevise(fundId, code_ISIN, categorie_nationale, categorie_regionale, devise, currentDate, performanceData.data, perfTable);
+          }
+        }
+      } catch (error) {
+        console.error(`Erreur perf ${devise} fond ${fundId} date ${currentDate}:`, error.message);
+        continue;
+      }
+    }
+  }
+
+  async function upsertPerformanceDevise(fundId, code_ISIN, categorie_nationale, categorie_regionale, devise, currentDate, data, perfTable) {
+    const existing = await perfTable.findOne({ where: { fond_id: fundId, date: currentDate } });
+    const fields = {
+      ytd: data.perf1erJanvier,
+      perfveille: data.perfVeille,
+      perf1an: data.perf1An,
+      perf3ans: data.perf3Ans,
+      perf5ans: data.perf5Ans,
+      perf8ans: data.perf8Ans,
+      perf10ans: data.perf10Ans,
+      perf4s: data.perf4Semaines,
+      perf3m: data.perf3Mois,
+      perf6m: data.perf6Mois,
+    };
+
+    if (existing) {
+      Object.assign(existing, fields);
+      await existing.save();
+    } else {
+      await perfTable.create({
+        date: currentDate,
+        fond_id: fundId,
+        fond: fundId.toString(),
+        code_ISIN,
+        categorie: data.category || categorie_nationale,
+        categorie_nationale,
+        categorie_regionale,
+        devise,
+        ...fields,
+      });
+    }
+  }
 
   app.get('/api/killlimiter', async (req, res) => {
     limiter.stop();
