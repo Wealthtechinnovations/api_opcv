@@ -33,6 +33,34 @@ async function run() {
 
   try {
     // =========================================================================
+    // STEP 0: Clean duplicate societes from previous runs
+    // =========================================================================
+    console.log('\n=== STEP 0: Clean duplicate societes ===');
+
+    const [dupeSocietes] = await conn.execute(`
+      SELECT nom, GROUP_CONCAT(id ORDER BY id) as ids, COUNT(*) as cnt
+      FROM societes
+      GROUP BY nom
+      HAVING cnt > 1
+    `);
+    for (const dupe of dupeSocietes) {
+      const ids = dupe.ids.split(',').map(Number);
+      const keepId = ids[0];
+      const removeIds = ids.slice(1);
+      // Point any fond_investissements.societe_id to the kept id
+      for (const removeId of removeIds) {
+        await conn.execute(`UPDATE fond_investissements SET societe_id = ? WHERE societe_id = ?`, [keepId, removeId]);
+        await conn.execute(`UPDATE documents SET societe_id = ? WHERE societe_id = ?`, [keepId, removeId]);
+        await conn.execute(`UPDATE personnel_sgs SET societe_id = ? WHERE societe_id = ?`, [keepId, removeId]);
+        await conn.execute(`DELETE FROM societes WHERE id = ?`, [removeId]);
+      }
+      console.log(`  Dedup societe "${dupe.nom}": kept id=${keepId}, removed ids=${removeIds.join(',')}`);
+    }
+    if (dupeSocietes.length === 0) {
+      console.log('  No duplicates found');
+    }
+
+    // =========================================================================
     // STEP 1: Fix naming mismatches in societes table
     // =========================================================================
     console.log('\n=== STEP 1: Fix societe naming mismatches ===');
@@ -355,9 +383,99 @@ async function run() {
     }
 
     // =========================================================================
-    // STEP 7: Activate fonds that have VL data (by country, excluding Nigeria)
+    // STEP 7: Fix special pays values + populate static data on all fonds
     // =========================================================================
-    console.log('\n=== STEP 7: Activate fonds with VL data ===');
+    console.log('\n=== STEP 7: Fix pays & populate static fond data ===');
+
+    // 7a. Fix "8 pays de l'Afrique de l'Ouest" -> UEMOA
+    const [scrFix] = await conn.execute(`
+      UPDATE societes SET pays = 'UEMOA' WHERE pays LIKE '%8 pays%Afrique%Ouest%'
+    `);
+    if (scrFix.affectedRows > 0) {
+      console.log(`  Fixed societe SCR: "8 pays de l'Afrique de l'Ouest" -> "UEMOA" (${scrFix.affectedRows} rows)`);
+    }
+
+    // 7b. Populate dev_libelle (currency) on fonds from pays_regulateurs where missing
+    const PAYS_DEVISE_MAP = {
+      'MAROC': 'MAD',
+      'TUNISIE': 'TND',
+      'UEMOA': 'XOF',
+      'CEMAC': 'XAF',
+      'Nigeria': 'NGN',
+      'AFRIQUE DU SUD': 'ZAR',
+      'EGYPTE': 'EGP',
+      'KENYA': 'KES',
+      'GHANA': 'GHS',
+    };
+
+    let devisePopulated = 0;
+    for (const [pays, devise] of Object.entries(PAYS_DEVISE_MAP)) {
+      const [upd] = await conn.execute(`
+        UPDATE fond_investissements
+        SET dev_libelle = ?
+        WHERE pays = ? AND (dev_libelle IS NULL OR dev_libelle = '')
+      `, [devise, pays]);
+      if (upd.affectedRows > 0) {
+        devisePopulated += upd.affectedRows;
+        console.log(`  Set dev_libelle=${devise} for ${upd.affectedRows} fonds in ${pays}`);
+      }
+    }
+    console.log(`  Total dev_libelle populated: ${devisePopulated} fonds`);
+
+    // 7c. Populate categorie_regional from pays where missing
+    const PAYS_REGION_MAP = {
+      'MAROC': 'Maghreb',
+      'TUNISIE': 'Maghreb',
+      'UEMOA': 'Afrique de l\'Ouest',
+      'CEMAC': 'Afrique Centrale',
+      'Nigeria': 'Afrique de l\'Ouest',
+      'AFRIQUE DU SUD': 'Afrique Australe',
+      'KENYA': 'Afrique de l\'Est',
+      'GHANA': 'Afrique de l\'Ouest',
+      'EGYPTE': 'Afrique du Nord',
+    };
+
+    let regionPopulated = 0;
+    for (const [pays, region] of Object.entries(PAYS_REGION_MAP)) {
+      const [upd] = await conn.execute(`
+        UPDATE fond_investissements
+        SET categorie_regional = ?
+        WHERE pays = ? AND (categorie_regional IS NULL OR categorie_regional = '')
+      `, [region, pays]);
+      if (upd.affectedRows > 0) {
+        regionPopulated += upd.affectedRows;
+        console.log(`  Set categorie_regional="${region}" for ${upd.affectedRows} fonds in ${pays}`);
+      }
+    }
+    console.log(`  Total categorie_regional populated: ${regionPopulated} fonds`);
+
+    // 7d. Populate regulateur on fonds from pays_regulateurs where missing
+    let regulateurPopulated = 0;
+    const [fondsNoReg] = await conn.execute(`
+      SELECT DISTINCT f.pays FROM fond_investissements f
+      WHERE (f.regulateur IS NULL OR f.regulateur = '') AND f.pays IS NOT NULL
+    `);
+    for (const { pays } of fondsNoReg) {
+      const [pr] = await conn.execute(
+        `SELECT regulateur FROM pays_regulateurs WHERE pays = ? LIMIT 1`, [pays]
+      );
+      if (pr.length > 0 && pr[0].regulateur) {
+        const [upd] = await conn.execute(`
+          UPDATE fond_investissements SET regulateur = ?
+          WHERE pays = ? AND (regulateur IS NULL OR regulateur = '')
+        `, [pr[0].regulateur, pays]);
+        if (upd.affectedRows > 0) {
+          regulateurPopulated += upd.affectedRows;
+          console.log(`  Set regulateur for ${upd.affectedRows} fonds in ${pays}`);
+        }
+      }
+    }
+    console.log(`  Total regulateur populated: ${regulateurPopulated} fonds`);
+
+    // =========================================================================
+    // STEP 8: Activate fonds that have VL data (by country, excluding Nigeria)
+    // =========================================================================
+    console.log('\n=== STEP 8: Activate fonds with VL data ===');
 
     // Nigeria fonds stay inactive (no VL data yet, will be imported later)
     // Activate fonds from MAROC, TUNISIE, UEMOA, CEMAC that have at least 1 VL
@@ -387,9 +505,9 @@ async function run() {
     }
 
     // =========================================================================
-    // STEP 8: Clean aberrant VL BRIDGE data
+    // STEP 9: Clean aberrant VL BRIDGE data
     // =========================================================================
-    console.log('\n=== STEP 8: Clean VL BRIDGE aberrant data ===');
+    console.log('\n=== STEP 9: Clean VL BRIDGE aberrant data ===');
 
     // FCP BRIDGE EQUILIBRE (id=2592) and FCP BRIDGE OBLIGATIONS (id=2640)
     // have VL alternating between ~5500 XOF (unitaire) and ~29M XOF (actif net)
@@ -398,58 +516,50 @@ async function run() {
     let bridgeCleaned = 0;
 
     for (const fundId of BRIDGE_FUND_IDS) {
-      // First check if this fund exists and has the issue
       const [check] = await conn.execute(`
         SELECT COUNT(*) as c FROM valorisations
-        WHERE fund_id = ? AND valeur > 1000000
+        WHERE fund_id = ? AND value > 1000000
       `, [fundId]);
 
       if (check[0].c > 0) {
-        // Get the median-range VL to understand what the real VL should be
         const [normalVL] = await conn.execute(`
-          SELECT AVG(valeur) as avg_vl, MIN(valeur) as min_vl, MAX(valeur) as max_vl
+          SELECT AVG(value) as avg_vl, MIN(value) as min_vl, MAX(value) as max_vl
           FROM valorisations
-          WHERE fund_id = ? AND valeur < 1000000 AND valeur > 0
+          WHERE fund_id = ? AND value < 1000000 AND value > 0
         `, [fundId]);
 
         console.log(`  Fund ${fundId}: ${check[0].c} aberrant VL (>1M). Normal range: ${normalVL[0].min_vl} - ${normalVL[0].max_vl}`);
 
-        // Delete the aberrant rows (actif net mixed in as VL)
         const [deleted] = await conn.execute(`
-          DELETE FROM valorisations WHERE fund_id = ? AND valeur > 1000000
+          DELETE FROM valorisations WHERE fund_id = ? AND value > 1000000
         `, [fundId]);
         bridgeCleaned += deleted.affectedRows;
         console.log(`  Deleted ${deleted.affectedRows} aberrant VL for fund ${fundId}`);
       }
     }
 
-    // Also catch any other funds with extreme VL jumps (>500% in one day)
-    // Just report them, don't auto-delete
-    const [otherAberrant] = await conn.execute(`
-      SELECT v1.fund_id, f.nom_fond, COUNT(*) as cnt
-      FROM valorisations v1
-      INNER JOIN valorisations v2 ON v1.fund_id = v2.fund_id
-        AND v2.date = (SELECT MIN(v3.date) FROM valorisations v3 WHERE v3.fund_id = v1.fund_id AND v3.date > v1.date)
-      INNER JOIN fond_investissements f ON f.id = v1.fund_id
-      WHERE v1.valeur > 0 AND v2.valeur > 0
-        AND (v2.valeur / v1.valeur > 5 OR v1.valeur / v2.valeur > 5)
-        AND v1.fund_id NOT IN (${BRIDGE_FUND_IDS.join(',')})
-      GROUP BY v1.fund_id, f.nom_fond
-      HAVING cnt > 2
+    // Report other funds with suspicious extreme values (>10M) - don't auto-delete
+    const [otherExtreme] = await conn.execute(`
+      SELECT fund_id, fund_name, COUNT(*) as cnt, MAX(value) as max_val
+      FROM valorisations
+      WHERE value > 10000000
+        AND fund_id NOT IN (${BRIDGE_FUND_IDS.join(',')})
+      GROUP BY fund_id, fund_name
+      ORDER BY max_val DESC
       LIMIT 20
     `);
 
-    if (otherAberrant.length > 0) {
-      console.log('  Other funds with suspicious VL jumps (>500%):');
-      for (const row of otherAberrant) {
-        console.log(`    fund=${row.fund_id} "${row.nom_fond}" -> ${row.cnt} jumps`);
+    if (otherExtreme.length > 0) {
+      console.log('  Other funds with extreme VL (>10M) - review manually:');
+      for (const row of otherExtreme) {
+        console.log(`    fund=${row.fund_id} "${row.fund_name}" -> ${row.cnt} rows, max=${row.max_val}`);
       }
     }
 
     // =========================================================================
-    // STEP 9: Fix invalid VL dates (0000-00-00)
+    // STEP 10: Fix invalid VL dates (0000-00-00)
     // =========================================================================
-    console.log('\n=== STEP 9: Check invalid VL dates ===');
+    console.log('\n=== STEP 10: Check invalid VL dates ===');
 
     const [invalidDates] = await conn.execute(`
       SELECT COUNT(*) as c FROM valorisations WHERE date = '0000-00-00' OR date IS NULL
@@ -457,9 +567,9 @@ async function run() {
     console.log(`  VL with date=0000-00-00 or NULL: ${invalidDates[0].c}`);
 
     // =========================================================================
-    // STEP 10: Generate EUR/XAF fixed peg + check missing forex pairs
+    // STEP 11: Generate EUR/XAF fixed peg + check missing forex pairs
     // =========================================================================
-    console.log('\n=== STEP 10: Forex pairs ===');
+    console.log('\n=== STEP 11: Forex pairs ===');
 
     const [pairsExist] = await conn.execute(`
       SELECT DISTINCT paire FROM devisedechanges ORDER BY paire
