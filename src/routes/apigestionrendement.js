@@ -38,7 +38,7 @@ const router = express.Router();
 
 
 
-app.get('/api/rendement/fonds', async (req, res) => {
+router.get('/api/rendement/fonds', async (req, res) => {
     const { categorie, ids } = req.query;
     let whereClause = {};
 

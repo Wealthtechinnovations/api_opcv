@@ -1336,7 +1336,7 @@ router.get('/api/performancescategorie/fond/:id', async (req, res) => {
   });
 
 })
-app.get('/api/performancesdevcategorie/fond/:id/:devise', async (req, res) => {
+router.get('/api/performancesdevcategorie/fond/:id/:devise', async (req, res) => {
   const resultat = await fond.findOne({
     attributes: ['categorie_libelle', 'categorie_national'],
     where: {
