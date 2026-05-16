@@ -4,22 +4,37 @@
  * Source: https://fundshare.asfim.ma/api/performances/export/?date=YYYY-MM-DD
  * L'API retourne un fichier XLSX pour chaque jour ouvrable.
  *
- * Ce script:
- *   1. Genere toutes les dates ouvrables entre DATE_DEBUT et aujourd'hui
- *   2. Telecharge le XLSX pour chaque date depuis l'API ASFIM
- *   3. Parse le fichier et insere VL + AN directement dans la base
- *   4. Non-destructif: INSERT IGNORE (ne duplique jamais)
+ * Structure ASFIM (28 colonnes, identique 2013-2026):
+ *   Ligne 0: titre "Tableau des performances quotidiennes/hebdomadaires au DD-MM-YYYY"
+ *   Ligne 1: headers (CODE ISIN, Code Maroclear, OPCVM, ...)
+ *   Ligne 2+: donnees (1 ligne = 1 fonds) ou lignes vides a ignorer
+ *
+ *   col[0]  CODE ISIN           -> fond.code_ISIN
+ *   col[1]  Code Maroclear      -> (reference interne)
+ *   col[2]  OPCVM               -> fond.nom_fond, vl.fund_name
+ *   col[3]  Societe de Gestion  -> fond.societe_gestion
+ *   col[4]  Nature juridique    -> fond.structure_fond (SICAV/FCP)
+ *   col[5]  Classification      -> fond.classification (MONETAIRE/OMLT/OCT/ACTIONS/DIVERSIFIE)
+ *   col[6]  Sensibilite         -> fond.sensibilite
+ *   col[7]  Indice Benchmark    -> fond.indice_benchmark
+ *   col[8]  Periodicite VL      -> fond.periodicite (QUOTIDIENNE/HEBDOMADAIRE)
+ *   col[9]  Souscripteurs       -> fond.souscripteur
+ *   col[10] Affectation         -> fond.affectation
+ *   col[11] Commission souscr.  -> fond.frais_souscription
+ *   col[12] Commission rachat   -> fond.frais_rachat
+ *   col[13] Frais de gestion    -> fond.frais_gestion
+ *   col[14] Depositaire         -> fond.depositaire
+ *   col[15] Reseau placeur      -> fond.reseau_placeur
+ *   col[16] AN                  -> vl.actif_net
+ *   col[17] VL                  -> vl.value
+ *   col[18-27] Performances     -> (non importees, calculees par l'app)
  *
  * Usage:
  *   node scrape_asfim_import.js                    # depuis 2013-01-01
  *   node scrape_asfim_import.js 2024-10-01         # depuis une date specifique
  *   node scrape_asfim_import.js 2024-10-01 2026-03-12  # plage specifique
  *
- * Comportement NON-DESTRUCTIF:
- *   - Si un fonds existe deja: on le garde, on met a jour les champs vides seulement
- *   - Si une VL existe deja pour une date: INSERT IGNORE, on ne l'ecrase pas
- *   - Nouveaux fonds crees avec active=1, pays=MAROC, dev_libelle=MAD, regulateur=AMMC
- *   - Conversion MAD->EUR et MAD->USD avec taux du jour depuis devisedechanges
+ * NON-DESTRUCTIF: INSERT IGNORE, ne modifie jamais les donnees existantes
  */
 
 const mysql = require('mysql2/promise');
@@ -53,10 +68,32 @@ const CLASSIFICATION_MAP = {
   'CONTRACTUEL': 'Diversifie',
 };
 
+// Indices de colonnes fixes dans les fichiers ASFIM (stables 2013-2026)
+const COL = {
+  ISIN: 0,
+  MAROCLEAR: 1,
+  OPCVM: 2,
+  SOCIETE: 3,
+  NATURE: 4,
+  CLASSIFICATION: 5,
+  SENSIBILITE: 6,
+  BENCHMARK: 7,
+  PERIODICITE: 8,
+  SOUSCRIPTEURS: 9,
+  AFFECTATION: 10,
+  COMM_SOUSCRIPTION: 11,
+  COMM_RACHAT: 12,
+  FRAIS_GESTION: 13,
+  DEPOSITAIRE: 14,
+  RESEAU_PLACEUR: 15,
+  AN: 16,
+  VL: 17,
+};
+
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function downloadXlsx(dateStr) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const url = API_URL + dateStr;
     const proto = url.startsWith('https') ? https : http;
 
@@ -68,22 +105,14 @@ function downloadXlsx(dateStr) {
         'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, */*',
       }
     }, (res) => {
-      if (res.statusCode === 404 || res.statusCode === 204) {
-        resolve(null);
-        return;
-      }
-      if (res.statusCode !== 200) {
-        resolve(null);
-        return;
-      }
+      if (res.statusCode !== 200) { resolve(null); return; }
 
       const chunks = [];
       res.on('data', chunk => chunks.push(chunk));
       res.on('end', () => {
         const buf = Buffer.concat(chunks);
-        if (buf.length < 500) { resolve(null); return; }
-        // Check PK magic bytes (ZIP/XLSX)
-        if (buf[0] !== 0x50 || buf[1] !== 0x4B) { resolve(null); return; }
+        // Minimum 500 octets + magic PK (ZIP/XLSX)
+        if (buf.length < 500 || buf[0] !== 0x50 || buf[1] !== 0x4B) { resolve(null); return; }
         resolve(buf);
       });
       res.on('error', () => resolve(null));
@@ -97,31 +126,59 @@ function downloadXlsx(dateStr) {
 function parseAsfimXlsx(buffer, dateStr) {
   const wb = XLSX.read(buffer, { type: 'buffer' });
   const sheet = wb.Sheets[wb.SheetNames[0]];
-  const data = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+  // Lecture brute en tableau de tableaux (indices stables)
+  const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-  if (data.length <= 1) return [];
+  if (raw.length < 3) return [];
 
-  const titleCol = Object.keys(data[0])[0];
+  // Trouver la ligne d'en-tete (contient "CODE ISIN" en col 0)
+  let headerRow = -1;
+  for (let i = 0; i < Math.min(5, raw.length); i++) {
+    if (String(raw[i][0]).trim().toUpperCase() === 'CODE ISIN') {
+      headerRow = i;
+      break;
+    }
+  }
+  if (headerRow === -1) return [];
+
   const rows = [];
 
-  for (let i = 1; i < data.length; i++) {
-    const row = data[i];
-    const isin = String(row[titleCol] || '').trim();
-    const nom = String(row['__EMPTY_1'] || '').trim();
-    const societe = String(row['__EMPTY_2'] || '').trim();
-    const nature = String(row['__EMPTY_3'] || '').trim();
-    const classification = String(row['__EMPTY_4'] || '').trim();
-    const periodicite = String(row['__EMPTY_7'] || '').trim();
-    const depositaire = String(row['__EMPTY_13'] || '').trim();
-    const an = parseFloat(row['__EMPTY_15']);
-    const vl = parseFloat(row['__EMPTY_16']);
+  for (let i = headerRow + 1; i < raw.length; i++) {
+    const r = raw[i];
+    const isin = String(r[COL.ISIN] || '').trim();
+    // Filtrer: ISIN doit commencer par MA + 10 chiffres
+    if (!isin.match(/^MA\d{10}/)) continue;
 
-    if (!nom || isNaN(vl) || vl <= 0) continue;
-    if (!isin.startsWith('MA')) continue;
+    const nom = String(r[COL.OPCVM] || '').trim();
+    if (!nom) continue;
+
+    const vl = parseFloat(r[COL.VL]);
+    if (isNaN(vl) || vl <= 0) continue;
+
+    const an = parseFloat(r[COL.AN]);
+    const commSouscr = parseFloat(r[COL.COMM_SOUSCRIPTION]);
+    const commRachat = parseFloat(r[COL.COMM_RACHAT]);
+    const fraisGestion = parseFloat(r[COL.FRAIS_GESTION]);
 
     rows.push({
-      isin, nom, societe, nature, classification, periodicite,
-      depositaire, an: isNaN(an) ? 0 : an, vl, date: dateStr,
+      isin,
+      nom,
+      societe: String(r[COL.SOCIETE] || '').trim(),
+      nature: String(r[COL.NATURE] || '').trim(),
+      classification: String(r[COL.CLASSIFICATION] || '').trim(),
+      sensibilite: String(r[COL.SENSIBILITE] || '').trim(),
+      benchmark: String(r[COL.BENCHMARK] || '').trim(),
+      periodicite: String(r[COL.PERIODICITE] || '').trim(),
+      souscripteurs: String(r[COL.SOUSCRIPTEURS] || '').trim(),
+      affectation: String(r[COL.AFFECTATION] || '').trim(),
+      frais_souscription: isNaN(commSouscr) ? null : commSouscr,
+      frais_rachat: isNaN(commRachat) ? null : commRachat,
+      frais_gestion: isNaN(fraisGestion) ? null : fraisGestion,
+      depositaire: String(r[COL.DEPOSITAIRE] || '').trim(),
+      reseau_placeur: String(r[COL.RESEAU_PLACEUR] || '').trim(),
+      an: isNaN(an) ? 0 : an,
+      vl,
+      date: dateStr,
     });
   }
 
@@ -231,20 +288,19 @@ async function run() {
     vlInserted: 0,
     vlSkipped: 0,
     fondsCreated: 0,
+    fondsUpdated: 0,
     errors: [],
   };
 
   for (let i = 0; i < weekdays.length; i++) {
     const dateStr = weekdays[i];
 
-    // Download
-    let buffer;
-    let retries = 0;
-    while (retries < 3) {
+    // Download avec retry
+    let buffer = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
       buffer = await downloadXlsx(dateStr);
-      if (buffer !== undefined) break;
-      retries++;
-      await sleep(2000 * retries);
+      if (buffer !== null) break;
+      if (attempt < 2) await sleep(2000 * (attempt + 1));
     }
 
     report.datesScraped++;
@@ -252,7 +308,7 @@ async function run() {
     if (!buffer) {
       report.datesEmpty++;
       if ((i + 1) % 100 === 0) {
-        console.log(`  [${i + 1}/${weekdays.length}] ${dateStr} - ${report.datesWithData} dates avec data, ${report.vlInserted} VL inserees`);
+        console.log(`  [${i + 1}/${weekdays.length}] ${dateStr} - ${report.datesWithData} dates OK, ${report.vlInserted} VL inserees`);
       }
       await sleep(DELAY_MS);
       continue;
@@ -296,12 +352,18 @@ async function run() {
             `INSERT INTO fond_investissements
              (nom_fond, code_ISIN, pays, dev_libelle, regulateur, active,
               societe_gestion, societe_id, structure_fond, classification,
-              categorie_globale, categorie_libelle, categorie_regional, categorie_national, periodicite)
-             VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              categorie_globale, categorie_libelle, categorie_regional, categorie_national,
+              periodicite, sensibilite, indice_benchmark, souscripteur, affectation,
+              frais_souscription, frais_rachat, frais_gestion, depositaire, reseau_placeur)
+             VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [row.nom, row.isin, PAYS, DEVISE, REGULATEUR,
              row.societe, socId, row.nature || null, row.classification || null,
              catGlob, catGlob, 'Afrique du Nord', catGlob + ' ' + PAYS,
-             row.periodicite || null]
+             row.periodicite || null, row.sensibilite || null,
+             row.benchmark || null, row.souscripteurs || null,
+             row.affectation || null, row.frais_souscription,
+             row.frais_rachat, row.frais_gestion,
+             row.depositaire || null, row.reseau_placeur || null]
           );
           fund = { id: result.insertId, nom_fond: row.nom, code_ISIN: row.isin };
           fondByIsin[row.isin] = fund;
@@ -312,6 +374,31 @@ async function run() {
             report.errors.push(`Create "${row.nom}": ${e.message}`);
           }
           continue;
+        }
+      } else {
+        // Mettre a jour les champs vides du fonds existant (non-destructif)
+        if (!fund._updated && row.isin) {
+          await conn.execute(
+            `UPDATE fond_investissements SET
+               code_ISIN = COALESCE(NULLIF(code_ISIN, ''), ?),
+               depositaire = COALESCE(NULLIF(depositaire, ''), ?),
+               reseau_placeur = COALESCE(NULLIF(reseau_placeur, ''), ?),
+               sensibilite = COALESCE(NULLIF(sensibilite, ''), ?),
+               indice_benchmark = COALESCE(NULLIF(indice_benchmark, ''), ?),
+               souscripteur = COALESCE(NULLIF(souscripteur, ''), ?),
+               affectation = COALESCE(NULLIF(affectation, ''), ?),
+               frais_souscription = COALESCE(frais_souscription, ?),
+               frais_rachat = COALESCE(frais_rachat, ?),
+               frais_gestion = COALESCE(frais_gestion, ?)
+             WHERE id = ?`,
+            [row.isin, row.depositaire || null, row.reseau_placeur || null,
+             row.sensibilite || null, row.benchmark || null,
+             row.souscripteurs || null, row.affectation || null,
+             row.frais_souscription, row.frais_rachat, row.frais_gestion,
+             fund.id]
+          ).catch(() => {});
+          fund._updated = true;
+          report.fondsUpdated++;
         }
       }
 
@@ -326,7 +413,10 @@ async function run() {
       const actifNetEur = row.an > 0 ? row.an / eurMadRate : 0;
       const actifNetUsd = row.an > 0 ? row.an / usdMadRate : 0;
 
-      vlBatch.push([fund.id, dateStr, row.vl, row.an, valueEur, valueUsd, valueEur, valueUsd, actifNetEur, actifNetUsd]);
+      // fund_id, fund_name, date, value, actif_net, value_EUR, value_USD,
+      // vl_ajuste_EUR, vl_ajuste_USD, actif_net_EUR, actif_net_USD
+      vlBatch.push([fund.id, row.nom, dateStr, row.vl, row.an,
+                     valueEur, valueUsd, valueEur, valueUsd, actifNetEur, actifNetUsd]);
       existingVlSet.add(vlKey);
     }
 
@@ -337,11 +427,12 @@ async function run() {
       const BATCH_SIZE = 200;
       for (let b = 0; b < vlBatch.length; b += BATCH_SIZE) {
         const chunk = vlBatch.slice(b, b + BATCH_SIZE);
-        const placeholders = chunk.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+        const placeholders = chunk.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
         try {
           const [result] = await conn.execute(
             `INSERT IGNORE INTO valorisations
-             (fund_id, date, value, actif_net, value_EUR, value_USD, vl_ajuste_EUR, vl_ajuste_USD, actif_net_EUR, actif_net_USD)
+             (fund_id, fund_name, date, value, actif_net, value_EUR, value_USD,
+              vl_ajuste_EUR, vl_ajuste_USD, actif_net_EUR, actif_net_USD)
              VALUES ${placeholders}`,
             chunk.flat()
           );
@@ -351,12 +442,13 @@ async function run() {
             try {
               await conn.execute(
                 `INSERT IGNORE INTO valorisations
-                 (fund_id, date, value, actif_net, value_EUR, value_USD, vl_ajuste_EUR, vl_ajuste_USD, actif_net_EUR, actif_net_USD)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, r
+                 (fund_id, fund_name, date, value, actif_net, value_EUR, value_USD,
+                  vl_ajuste_EUR, vl_ajuste_USD, actif_net_EUR, actif_net_USD)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, r
               );
               report.vlInserted++;
             } catch (e2) {
-              report.errors.push(`VL ${r[0]} ${r[1]}: ${e2.message}`);
+              report.errors.push(`VL ${r[0]} ${r[2]}: ${e2.message}`);
             }
           }
         }
@@ -364,7 +456,7 @@ async function run() {
     }
 
     if ((i + 1) % 50 === 0 || i === weekdays.length - 1) {
-      console.log(`  [${i + 1}/${weekdays.length}] ${dateStr} - ${rows.length} fonds, ${vlBatch.length} inseres, ${dateSkipped} existants`);
+      console.log(`  [${i + 1}/${weekdays.length}] ${dateStr} - ${rows.length} fonds, +${vlBatch.length} VL, ${dateSkipped} existants (total: ${report.vlInserted})`);
     }
 
     await sleep(DELAY_MS);
@@ -393,6 +485,7 @@ async function run() {
   console.log(`VL inserees:          ${report.vlInserted}`);
   console.log(`VL deja existantes:   ${report.vlSkipped}`);
   console.log(`Fonds crees:          ${report.fondsCreated}`);
+  console.log(`Fonds mis a jour:     ${report.fondsUpdated}`);
   console.log(`Erreurs:              ${report.errors.length}`);
   if (report.errors.length > 0) {
     console.log('\nPremieres erreurs (max 10):');
