@@ -162,6 +162,7 @@ function parseAsfimXlsx(buffer, dateStr) {
 
     rows.push({
       isin,
+      maroclear: String(r[COL.MAROCLEAR] || '').trim(),
       nom,
       societe: String(r[COL.SOCIETE] || '').trim(),
       nature: String(r[COL.NATURE] || '').trim(),
@@ -244,17 +245,33 @@ async function run() {
     return null;
   }
 
-  // Charger fonds existants
+  // Charger fonds existants — index multi-criteres pour matching robuste
   const [existingFonds] = await conn.execute(
-    `SELECT id, nom_fond, code_ISIN, societe_gestion FROM fond_investissements WHERE pays = 'MAROC'`
+    `SELECT id, nom_fond, code_ISIN, code, societe_gestion FROM fond_investissements WHERE pays = 'MAROC'`
   );
-  const fondByIsin = {};
-  const fondByName = {};
+  const fondByIsin = {};       // Priorite 1: CODE ISIN exact (MA0000030132)
+  const fondByCode = {};       // Priorite 2: Code Maroclear (3013)
+  const fondByName = {};       // Priorite 3: nom exact uppercase
+  const fondByNormName = {};   // Priorite 4: nom normalise (sans accents/espaces)
+  const fondByNameSoc = {};    // Priorite 5: nom + societe (desambiguation)
+
+  function normalize(s) {
+    return s.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^A-Z0-9]/g, '');
+  }
+
   for (const f of existingFonds) {
     if (f.code_ISIN) fondByIsin[f.code_ISIN.trim()] = f;
-    if (f.nom_fond) fondByName[f.nom_fond.trim().toUpperCase()] = f;
+    if (f.code) fondByCode[String(f.code).trim()] = f;
+    if (f.nom_fond) {
+      fondByName[f.nom_fond.trim().toUpperCase()] = f;
+      fondByNormName[normalize(f.nom_fond)] = f;
+      if (f.societe_gestion) {
+        fondByNameSoc[f.nom_fond.trim().toUpperCase() + '|' + f.societe_gestion.trim().toUpperCase()] = f;
+      }
+    }
   }
-  console.log(`${existingFonds.length} fonds MAROC existants`);
+  console.log(`${existingFonds.length} fonds MAROC existants (${Object.keys(fondByIsin).length} avec ISIN, ${Object.keys(fondByCode).length} avec code)`);
 
   // Charger societes
   const [societes] = await conn.execute(`SELECT id, nom FROM societes`);
@@ -340,8 +357,12 @@ async function run() {
     let dateSkipped = 0;
 
     for (const row of rows) {
-      // Find or create fund
-      let fund = fondByIsin[row.isin] || fondByName[row.nom.toUpperCase()];
+      // Matching multi-criteres (5 niveaux de priorite)
+      let fund = fondByIsin[row.isin]                                          // 1. CODE ISIN exact
+             || fondByCode[row.maroclear]                                      // 2. Code Maroclear
+             || fondByName[row.nom.toUpperCase()]                              // 3. Nom exact
+             || fondByNormName[normalize(row.nom)]                             // 4. Nom normalise (sans accents)
+             || fondByNameSoc[row.nom.toUpperCase() + '|' + row.societe.toUpperCase()]; // 5. Nom + societe
 
       if (!fund) {
         const catGlob = CLASSIFICATION_MAP[row.classification.toUpperCase()] || 'Diversifie';
@@ -350,13 +371,13 @@ async function run() {
         try {
           const [result] = await conn.execute(
             `INSERT INTO fond_investissements
-             (nom_fond, code_ISIN, pays, dev_libelle, regulateur, active,
+             (nom_fond, code_ISIN, code, pays, dev_libelle, regulateur, active,
               societe_gestion, societe_id, structure_fond, classification,
               categorie_globale, categorie_libelle, categorie_regional, categorie_national,
               periodicite, sensibilite, indice_benchmark, souscripteur, affectation,
               frais_souscription, frais_rachat, frais_gestion, depositaire, reseau_placeur)
-             VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [row.nom, row.isin, PAYS, DEVISE, REGULATEUR,
+             VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [row.nom, row.isin, row.maroclear || null, PAYS, DEVISE, REGULATEUR,
              row.societe, socId, row.nature || null, row.classification || null,
              catGlob, catGlob, 'Afrique du Nord', catGlob + ' ' + PAYS,
              row.periodicite || null, row.sensibilite || null,
@@ -367,7 +388,10 @@ async function run() {
           );
           fund = { id: result.insertId, nom_fond: row.nom, code_ISIN: row.isin };
           fondByIsin[row.isin] = fund;
+          if (row.maroclear) fondByCode[row.maroclear] = fund;
           fondByName[row.nom.toUpperCase()] = fund;
+          fondByNormName[normalize(row.nom)] = fund;
+          fondByNameSoc[row.nom.toUpperCase() + '|' + row.societe.toUpperCase()] = fund;
           report.fondsCreated++;
         } catch (e) {
           if (!e.message.includes('Duplicate')) {
