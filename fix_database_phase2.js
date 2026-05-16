@@ -451,7 +451,7 @@ async function run() {
     const [stats] = await conn.execute(`
       SELECT
         COUNT(*) as total,
-        SUM(actif=1) as actifs,
+        SUM(active=1) as actifs,
         SUM(societe_id IS NOT NULL) as has_sg_id,
         SUM(dev_libelle IS NOT NULL AND dev_libelle != '') as has_devise,
         SUM(regulateur IS NOT NULL AND regulateur != '') as has_regul,
@@ -459,7 +459,7 @@ async function run() {
         SUM(categorie_globale IS NOT NULL AND categorie_globale != '') as has_cat_glob,
         SUM(categorie_libelle IS NOT NULL AND categorie_libelle != '') as has_cat_lib,
         SUM(categorie_national IS NOT NULL AND categorie_national != '') as has_cat_nat,
-        SUM(forme_juridique IS NOT NULL AND forme_juridique != '') as has_forme,
+        SUM(structure_fond IS NOT NULL AND structure_fond != '') as has_forme,
         SUM(classification IS NOT NULL AND classification != '') as has_classif,
         SUM(date_premiere_vl IS NOT NULL AND date_premiere_vl != '0000-00-00') as has_dpvl,
         SUM(montant_premier_vl IS NOT NULL AND montant_premier_vl > 0) as has_mpvl,
@@ -478,7 +478,7 @@ async function run() {
     console.log(`  categorie_globale:      ${s.has_cat_glob} (${(s.has_cat_glob/s.total*100).toFixed(1)}%)`);
     console.log(`  categorie_libelle:      ${s.has_cat_lib} (${(s.has_cat_lib/s.total*100).toFixed(1)}%)`);
     console.log(`  categorie_national:     ${s.has_cat_nat} (${(s.has_cat_nat/s.total*100).toFixed(1)}%)`);
-    console.log(`  forme_juridique:        ${s.has_forme} (${(s.has_forme/s.total*100).toFixed(1)}%)`);
+    console.log(`  structure_fond:          ${s.has_forme} (${(s.has_forme/s.total*100).toFixed(1)}%)`);
     console.log(`  classification:         ${s.has_classif} (${(s.has_classif/s.total*100).toFixed(1)}%)`);
     console.log(`  date_premiere_vl:       ${s.has_dpvl} (${(s.has_dpvl/s.total*100).toFixed(1)}%)`);
     console.log(`  montant_premier_vl:     ${s.has_mpvl} (${(s.has_mpvl/s.total*100).toFixed(1)}%)`);
@@ -488,9 +488,9 @@ async function run() {
     // By country
     const [byPays] = await conn.execute(`
       SELECT pays, COUNT(*) as nb,
-        SUM(actif=1) as actifs,
+        SUM(active=1) as actifs,
         SUM(categorie_globale IS NOT NULL AND categorie_globale != '') as cat_glob,
-        SUM(forme_juridique IS NOT NULL AND forme_juridique != '') as forme,
+        SUM(structure_fond IS NOT NULL AND structure_fond != '') as forme,
         SUM(date_premiere_vl IS NOT NULL AND date_premiere_vl != '0000-00-00') as dpvl,
         SUM(periodicite IS NOT NULL AND periodicite != '') as perio
       FROM fond_investissements GROUP BY pays ORDER BY nb DESC
