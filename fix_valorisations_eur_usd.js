@@ -22,7 +22,7 @@
 const mysql = require('mysql2/promise');
 
 const DB_CONFIG = {
-  host: 'localhost',
+  host: '127.0.0.1',
   user: 'fund_opcvm',
   password: '66G41zes~',
   database: 'fund_opcvm',
