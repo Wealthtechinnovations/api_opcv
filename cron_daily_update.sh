@@ -3,10 +3,12 @@
 # Mise a jour quotidienne automatique - Africafunds
 #
 # Ce script est lance par cron chaque jour ouvre a 20h (apres cloture marches)
-# Il fait 3 choses:
+# Il fait 5 choses:
 #   1. Scrape les VL ASFIM (Maroc) des 5 derniers jours
 #   2. Met a jour les paires de devises (derniers 5 jours)
-#   3. Recalcule les performances
+#   3. Recalcule les VL Ajustees (Total Return NAV avec dividendes)
+#   4. Recalcule les performances (fonds 1-600)
+#   5. Recalcule les performances (fonds 601-1200)
 #
 # Installation cron (une seule fois):
 #   crontab -e
@@ -36,14 +38,22 @@ node scrape_asfim_import.js "$START_DATE" "$TODAY" 2>&1 | tee -a "$LOG_FILE"
 
 # 2. Mise a jour Forex
 echo "" | tee -a "$LOG_FILE"
-echo "[2/3] Mise a jour Forex (derniers jours)..." | tee -a "$LOG_FILE"
+echo "[2/5] Mise a jour Forex (derniers jours)..." | tee -a "$LOG_FILE"
 node scrape_forex_import.js today 2>&1 | tee -a "$LOG_FILE"
 
-# 3. Recalcul performances (optionnel - decommenter si necessaire)
-# echo "" | tee -a "$LOG_FILE"
-# echo "[3/3] Recalcul performances..." | tee -a "$LOG_FILE"
-# curl -s http://localhost:3005/api/saveperfdatemysql/1/600 | tee -a "$LOG_FILE"
-# curl -s http://localhost:3005/api/saveperfdatemysql/601/1200 | tee -a "$LOG_FILE"
+# 3. Recalcul VL Ajuste (Total Return NAV)
+echo "" | tee -a "$LOG_FILE"
+echo "[3/5] Recalcul VL Ajuste (tous fonds actifs)..." | tee -a "$LOG_FILE"
+node recalc_vl_ajuste.js 2>&1 | tee -a "$LOG_FILE"
+
+# 4. Recalcul performances
+echo "" | tee -a "$LOG_FILE"
+echo "[4/5] Recalcul performances (fonds 1-600)..." | tee -a "$LOG_FILE"
+curl -s http://localhost:3005/api/saveperfdatemysql/1/600 2>&1 | tee -a "$LOG_FILE"
+
+echo "" | tee -a "$LOG_FILE"
+echo "[5/5] Recalcul performances (fonds 601-1200)..." | tee -a "$LOG_FILE"
+curl -s http://localhost:3005/api/saveperfdatemysql/601/1200 2>&1 | tee -a "$LOG_FILE"
 
 echo "" | tee -a "$LOG_FILE"
 echo "=== MISE A JOUR TERMINEE $(date) ===" | tee -a "$LOG_FILE"
