@@ -115,6 +115,51 @@ function detectStructure(name) {
   return 'OPCVM';
 }
 
+// ============================================================
+// FUSION DES DOUBLONS (noms longs = societe + fonds concatenes)
+// Les VL de la variante longue sont rattachees au nom canonique court
+// ============================================================
+const MERGE_MAP = {
+  'EDC Investment Corporation FCP ECOBANK UEMOA DIVERSIFIE': 'FCP ECOBANK UEMOA DIVERSIFIE',
+  'BOA CAPITAL SECURITIES FCP Emergence': 'FCP Emergence',
+  'SGI AFRICAINE DE BOURSE ATTIJARI OBLIG': 'ATTIJARI OBLIG',
+  'Phoenix Capital Management FCP PAM DIVERSIFIE EQUILIBRE': 'FCP PAM DIVERSIFIE EQUILIBRE',
+  'ENKO CAPITAL WEST AFRICA SOCIETE GENERALE COTE FCP ENKO CAPITAL GARANTI': 'FCP ENKO CAPITAL GARANTI',
+  'ENKO CAPITAL WEST AFRICA EDC Investment Corporation FCP ENKO CAPITAL GARANTI': 'FCP ENKO CAPITAL GARANTI',
+  'BOA CAPITAL SECURITIES FCP Boa Sécurité': 'FCP Boa Sécurité',
+  'ENKO CAPITAL WEST AFRICA EDC Investment Corporation FCP ENKO CAPITAL LIQUIDITE': 'FCP ENKO CAPITAL LIQUIDITE',
+};
+
+// ============================================================
+// NETTOYAGE DES SOCIETES FRAGMENTEES
+// Certaines cellules Excel contiennent des fragments de texte ("D'IVOIRE", "SECURITIES")
+// On les remplace par la vraie societe de gestion deduite du contexte
+// ============================================================
+const SOCIETE_FIXES = {
+  'FCP SOAGA EPARGNE ACTIONS': 'SOAGA-SA',
+  'FCP SOAGA EPARGNE OBLIGATIONS': 'SOAGA-SA',
+  'FCP BOAD CAPITAL RETRAITE': 'CGF BOURSE',
+  'FCP PATRIMOINE': 'ENKO CAPITAL WEST AFRICA',
+  'FCP ENKO CAPITAL OBLIGATIONS': 'ENKO CAPITAL WEST AFRICA',
+  'FCP CONFORT PLUS': 'AFRICAINE DE GESTION D\'ACTIFS',
+};
+
+function isFragmentSociete(s) {
+  if (!s || s.length < 4) return true;
+  if (s === 'SECURITIES' || s === "D'IVOIRE" || s === "D'ACTIFS") return true;
+  return false;
+}
+
+function cleanSociete(fondName, rawSociete) {
+  if (SOCIETE_FIXES[fondName]) return SOCIETE_FIXES[fondName];
+  if (isFragmentSociete(rawSociete)) return null;
+  return rawSociete;
+}
+
+function canonicalName(name) {
+  return MERGE_MAP[name] || name;
+}
+
 async function run() {
   const filePath = process.argv[2];
   if (!filePath) {
@@ -137,17 +182,38 @@ async function run() {
   console.log(`Fonds_resume: ${fondsResume.length} fonds`);
 
   const fondsMeta = new Map();
+  let mergedCount = 0;
   for (const row of fondsResume) {
-    const nom = String(row['Fonds'] || '').trim();
+    let nom = String(row['Fonds'] || '').trim();
     if (!nom) continue;
+
+    // Appliquer le merge: stocker les metadata sous le nom canonique
+    const canonical = canonicalName(nom);
+    if (canonical !== nom) {
+      mergedCount++;
+      nom = canonical;
+    }
+
+    const rawSociete = String(row['Société'] || '').trim() || null;
+    const societe = cleanSociete(nom, rawSociete);
+
+    // Si le nom canonique existe deja, enrichir (pas ecraser)
+    if (fondsMeta.has(nom)) {
+      const existing = fondsMeta.get(nom);
+      if (!existing.societe && societe) existing.societe = societe;
+      if (!existing.depositaire && row['Dépositaire']) existing.depositaire = String(row['Dépositaire']).trim();
+      continue;
+    }
+
     fondsMeta.set(nom, {
-      societe: String(row['Société'] || '').trim() || null,
+      societe: societe,
       depositaire: String(row['Dépositaire'] || '').trim() || null,
       categorie: String(row['Catégorie'] || '').trim(),
       valeurOrigine: parseFloat(row['Valeur Origine']) || null,
       dateOrigine: excelDateToISO(row['Date Origine']),
     });
   }
+  console.log(`  -> ${fondsMeta.size} fonds canoniques (${mergedCount} variantes fusionnees)`);
 
   // ============================================================
   // 2. Lire VL_nettoyees
@@ -164,8 +230,9 @@ async function run() {
   const fondsByName = new Map();
   let skippedRows = 0;
 
+  let mergedVL = 0;
   for (const row of vlRows) {
-    const nomFond = String(row['Fonds'] || '').trim();
+    let nomFond = String(row['Fonds'] || '').trim();
     const dateSerial = row['Date VL'];
     const vlValue = parseFloat(row['VL retenue']);
     const categorie = String(row['Catégorie'] || '').trim();
@@ -173,6 +240,13 @@ async function run() {
     if (!nomFond || isNaN(vlValue) || vlValue <= 0) {
       skippedRows++;
       continue;
+    }
+
+    // Appliquer la fusion des doublons
+    const canonical = canonicalName(nomFond);
+    if (canonical !== nomFond) {
+      mergedVL++;
+      nomFond = canonical;
     }
 
     const dateStr = excelDateToISO(dateSerial);
@@ -198,8 +272,9 @@ async function run() {
     fondEntry.vls.set(dateStr, vlValue);
   }
 
-  console.log(`Fonds distincts: ${fondsByName.size}`);
+  console.log(`Fonds distincts: ${fondsByName.size} (apres fusion doublons)`);
   console.log(`Lignes ignorees: ${skippedRows}`);
+  console.log(`VL fusionnees (variantes -> canonique): ${mergedVL}`);
 
   // ============================================================
   // 3. Connexion DB et import
