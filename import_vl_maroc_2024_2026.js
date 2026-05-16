@@ -151,11 +151,11 @@ async function run() {
 
   // Charger societe_id mapping
   const [societes] = await conn.execute(
-    `SELECT id, nom_societe FROM societes`
+    `SELECT id, nom FROM societes`
   );
   const societeByName = {};
   for (const s of societes) {
-    if (s.nom_societe) societeByName[s.nom_societe.trim().toUpperCase()] = s.id;
+    if (s.nom) societeByName[s.nom.trim().toUpperCase()] = s.id;
   }
 
   // Process each file
