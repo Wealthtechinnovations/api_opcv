@@ -1429,7 +1429,7 @@ router.get('/api/performancesdev/fond/:id/:devise', async (req, res) => {
 
       } else {
         values = response.map((data) => data.value_EUR);
-        actif_nets = response.map((data) => data.actif_net_USD);
+        actif_nets = response.map((data) => data.actif_net_EUR);
 
 
       }
@@ -1628,7 +1628,7 @@ router.get('/api/performancesdevwithdate/fond/:id/:devise/:date', async (req, re
 
       } else {
         values = response.map((data) => data.value_EUR);
-        actif_nets = response.map((data) => data.actif_net_USD);
+        actif_nets = response.map((data) => data.actif_net_EUR);
 
 
       }

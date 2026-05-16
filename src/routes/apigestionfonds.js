@@ -624,17 +624,29 @@ WHERE
     });
     if (response.length > 0) {
 
+      const indRefField = req.params.devise == "USD" ? 'indRef_USD' : 'indRef_EUR';
+      const valueField = req.params.devise == "USD" ? 'vl_ajuste_USD' : 'vl_ajuste_EUR';
+      const hasIndRef = response.some(data => data[indRefField] !== null);
+
       const graphs = response.map(data => {
-        if (data.value !== null && data.indRef_EUR !== null) {
-          return {
-            dates: moment(data.date).format('YYYY-MM-DD'), // Remplacez avec la propriété correcte de l'objet
-            values: data.value, // Remplacez avec la propriété correcte de l'objet
-            valuesInd: req.params.devise == "USD" ? data.indRef_USD : data.indRef_EUR,
-          };
+        if (hasIndRef) {
+          if (data[valueField] !== null && data[indRefField] !== null) {
+            return {
+              dates: moment(data.date).format('YYYY-MM-DD'),
+              values: data[valueField],
+              valuesInd: data[indRefField],
+            };
+          }
         } else {
-          return null; // Ignorer les lignes où la condition n'est pas satisfaite
+          if (data[valueField] !== null) {
+            return {
+              dates: moment(data.date).format('YYYY-MM-DD'),
+              values: data[valueField],
+            };
+          }
         }
-      }).filter(Boolean); // Supprimer les valeurs nulles de l'array
+        return null;
+      }).filter(Boolean);
       let values;
       if (req.params.devise == "USD") {
         values = response.map((data) => data.value_USD);
@@ -705,7 +717,7 @@ WHERE
       const resultat = await fond.findOne({
         attributes: ['structure_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
         where: {
-          id: req.params.id,
+          id: fundId,
         },
       });
       const affectation = resultat.affectation;

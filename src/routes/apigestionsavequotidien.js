@@ -416,9 +416,8 @@ router.get('/api/updatewithdividende', async (req, res) => {
           fund[period] != null && fund[period] != "-"
         );
 
-        // Si toutes les performances pour ce champ sont invalides, retourner null
         if (validPerformances.length === 0) {
-          return null;
+          return [null, 0];
         }
         const rantotal = validPerformances.length;
         // Sinon, effectuer le classement
@@ -553,9 +552,8 @@ router.get('/api/updatewithdividende', async (req, res) => {
           fund[period] !== null && fund[period] != "-"
         );
 
-        // Si toutes les performances pour ce champ sont invalides, retourner null
         if (validPerformances.length === 0) {
-          return null;
+          return [null, 0];
         }
         const rantotal = validPerformances.length;
         // Sinon, effectuer le classement
@@ -643,9 +641,8 @@ router.get('/api/updatewithdividende', async (req, res) => {
           fund[period] !== null && fund[period] != "-"
         );
 
-        // Si toutes les performances pour ce champ sont invalides, retourner null
         if (validPerformances.length === 0) {
-          return null;
+          return [null, 0];
         }
         const rantotal = validPerformances.length;
         // Sinon, effectuer le classement
@@ -703,11 +700,10 @@ router.get('/api/updatewithdividende', async (req, res) => {
           limit: 500,
         });
       } else {
-        // Étape 1 : Récupérer toutes les performances pour la catégorie spécifiée
         fundsWithPerformance = await performences_usds.findAll({
-          where: { categorie_nationale: selectedFundCategory },
+          where: { categorie_regionale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
-          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
+          order: [['fond_id', 'DESC']],
           limit: 500,
         });
       }
@@ -727,9 +723,8 @@ router.get('/api/updatewithdividende', async (req, res) => {
           fund[period] !== null && fund[period] != "-"
         );
 
-        // Si toutes les performances pour ce champ sont invalides, retourner null
         if (validPerformances.length === 0) {
-          return null;
+          return [null, 0];
         }
         const rantotal = validPerformances.length;
         // Sinon, effectuer le classement
@@ -1542,7 +1537,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
     for (let i = 0; i < allVlDates.length; i++) {
       const currentDate = moment(allVlDates[i].date).format('YYYY-MM-DD');
       try {
-        const performanceResponse = await fetch(`${urll}/api/performancesdev/fond/${fundId}/${devise}`);
+        const performanceResponse = await fetch(`${urll}/api/performancesdevwithdate/fond/${fundId}/${devise}/${currentDate}`);
         if (performanceResponse.status === 200) {
           const performanceData = await performanceResponse.json();
           if (performanceData.data) {

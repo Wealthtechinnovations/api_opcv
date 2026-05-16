@@ -3933,14 +3933,12 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
         }
         const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
         const tsrValues = response.map((data) => data.tsr);
-        const valuesindifref = response.map((data) => data.indRef);
-        /* let valuesindifref;
-         if (req.params.devise == "USD") {
-           valuesindifref = response.map((data) => data.indRef_USD);
-         } else {
-           valuesindifref = response.map((data) => data.indRef_EUR);
-   
-         }*/
+        let valuesindifref;
+        if (req.params.devise == "USD") {
+          valuesindifref = response.map((data) => data.indRef_USD);
+        } else {
+          valuesindifref = response.map((data) => data.indRef_EUR);
+        }
 
 
         const lastValue = values[dates.indexOf(findLastDateOfPreviousMonth(dates))];
@@ -5574,14 +5572,12 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
         }
         const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
         const tsrValues = response.map((data) => data.tsr);
-        const valuesindifref = response.map((data) => data.indRef);
-        /* let valuesindifref;
-         if (req.params.devise == "USD") {
-           valuesindifref = response.map((data) => data.indRef_USD);
-         } else {
-           valuesindifref = response.map((data) => data.indRef_EUR);
-   
-         }*/
+        let valuesindifref;
+        if (req.params.devise == "USD") {
+          valuesindifref = response.map((data) => data.indRef_USD);
+        } else {
+          valuesindifref = response.map((data) => data.indRef_EUR);
+        }
 
 
         const lastValue = values[dates.indexOf(findLastDateOfPreviousMonth(dates))];

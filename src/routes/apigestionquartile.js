@@ -174,17 +174,11 @@ router.get('/api/classementquartilemysql/:id', async (req, res) => {
       }
 
 
-      if (!classementType1 || !classementType2) {
-        return res.status(404).json({ error: 'Classement not found for the specified fund ID.' });
-      }
-
-      // Assuming you want to send both classements in the response
       res.json({
         code: 200, data: {
-          classementType1: classementType1.toJSON(),
-          classementType2: classementType2.toJSON(),
+          classementType1: classementType1 ? classementType1.toJSON() : {},
+          classementType2: classementType2 ? classementType2.toJSON() : {},
         }
-
       });
     } catch (error) {
       console.error('Erreur lors de la recherche du classement :', error);
