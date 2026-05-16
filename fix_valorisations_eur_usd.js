@@ -36,13 +36,12 @@ async function run() {
   const conn = await mysql.createConnection(DB_CONFIG);
   console.log('Connecte a la base fund_opcvm');
 
-  // Charger les taux de change disponibles
+  // Charger les taux de change disponibles (le plus recent pour chaque paire)
   const rates = {};
   try {
     const [rows] = await conn.execute(
       `SELECT paire, value FROM devisedechanges
        WHERE value > 0
-       GROUP BY paire
        ORDER BY date DESC`
     );
     for (const r of rows) {
@@ -58,6 +57,7 @@ async function run() {
   const usdTnd = rates['USD/TND'] || 3.07;
   const eurUsd = rates['EUR/USD'] || 1.08;
 
+  console.log(`Taux disponibles: ${Object.keys(rates).length} paires`);
   console.log(`Taux: EUR/MAD=${eurMad}, USD/MAD=${usdMad}, EUR/TND=${eurTnd}, EUR/USD=${eurUsd}`);
   console.log(`Taux fixes: EUR/XOF=${EUR_XOF}, EUR/XAF=${EUR_XAF}`);
 
@@ -113,23 +113,23 @@ async function run() {
         eurRate = 1;
         usdRate = 1 / eurUsd;
         break;
-      case 'NGN':
-      case 'ZAR':
-      case 'EGP':
-      case 'KES':
-      case 'GHS':
-        console.log(`\n  SKIP ${devise} (${fondsList.length} fonds) - pas de taux disponible`);
-        report.fondsSkipped += fondsList.length;
-        continue;
       default:
         if (!devise || devise === '') {
           console.log(`\n  SKIP devise vide (${fondsList.length} fonds)`);
           report.fondsSkipped += fondsList.length;
           continue;
         }
-        console.log(`\n  SKIP devise inconnue "${devise}" (${fondsList.length} fonds)`);
-        report.fondsSkipped += fondsList.length;
-        continue;
+        // Chercher dynamiquement dans devisedechanges
+        eurRate = rates[`EUR/${devise}`];
+        usdRate = rates[`USD/${devise}`];
+        if (!eurRate && !usdRate) {
+          console.log(`\n  SKIP ${devise} (${fondsList.length} fonds) - pas de taux EUR/${devise} ni USD/${devise}`);
+          report.fondsSkipped += fondsList.length;
+          continue;
+        }
+        if (!eurRate) eurRate = usdRate / eurUsd;
+        if (!usdRate) usdRate = eurRate / eurUsd;
+        break;
     }
 
     console.log(`\n  Traitement ${devise}: ${fondsList.length} fonds (1 ${devise} = ${(1/eurRate).toFixed(6)} EUR = ${(1/usdRate).toFixed(6)} USD)`);
