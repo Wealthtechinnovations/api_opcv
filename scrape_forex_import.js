@@ -40,6 +40,7 @@ const EUR_XOF = 655.957;
 // Paires a telecharger depuis Yahoo Finance
 // Format: { ticker: 'EURMAD=X', paire: 'EUR/MAD' }
 const YAHOO_PAIRS = [
+  { ticker: 'EURUSD=X', paire: 'EUR/USD' },
   { ticker: 'EURMAD=X', paire: 'EUR/MAD' },
   { ticker: 'USDMAD=X', paire: 'USD/MAD' },
   { ticker: 'EURTND=X', paire: 'EUR/TND' },
@@ -221,10 +222,10 @@ async function run() {
   const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000);
   console.log(`Scrape Forex - depuis ${startDate}\n`);
 
-  // 1. Telecharger EUR/USD depuis FRED
+  // 1. Telecharger EUR/USD depuis FRED (source primaire)
   const eurUsdData = await fetchFredEurUsd(startTimestamp);
 
-  // 2. Telecharger les autres paires depuis Yahoo Finance
+  // 2. Telecharger les paires depuis Yahoo Finance (EUR/USD inclus comme fallback)
   const allPairData = {};
   if (eurUsdData.length > 0) {
     allPairData['EUR/USD'] = eurUsdData;
@@ -234,14 +235,23 @@ async function run() {
     console.log(`  Telechargement ${paire} (${ticker})...`);
     const data = await fetchYahooFinance(ticker, paire, startTimestamp);
     if (data.length > 0) {
-      allPairData[paire] = data;
+      if (paire === 'EUR/USD' && allPairData['EUR/USD']) {
+        // Fusionner FRED + Yahoo: Yahoo complete les dates manquantes de FRED
+        const fredDates = new Set(allPairData['EUR/USD'].map(d => d.date));
+        const newEntries = data.filter(d => !fredDates.has(d.date));
+        allPairData['EUR/USD'] = [...allPairData['EUR/USD'], ...newEntries].sort((a, b) => a.date.localeCompare(b.date));
+        console.log(`    EUR/USD: fusionne FRED(${fredDates.size}) + Yahoo(${newEntries.length} nouvelles)`);
+      } else {
+        allPairData[paire] = data;
+      }
     }
     await sleep(500);
   }
 
   // 3. Generer les paires CFA (fixes pour EUR, calculees pour USD)
-  console.log('\n  Generation paires CFA (parite fixe 655.957)...');
-  const cfaPairs = generateCfaPairs(eurUsdData, startTimestamp);
+  const eurUsdAll = allPairData['EUR/USD'] || [];
+  console.log(`\n  Generation paires CFA (parite fixe 655.957, EUR/USD: ${eurUsdAll.length} dates)...`);
+  const cfaPairs = generateCfaPairs(eurUsdAll, startTimestamp);
   for (const [paire, data] of Object.entries(cfaPairs)) {
     if (data.length > 0 && !allPairData[paire]) {
       allPairData[paire] = data;
