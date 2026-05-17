@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       index: true
     },
     annee: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.NUMBER,
       allowNull: false,
       index: true
     }
