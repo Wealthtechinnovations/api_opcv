@@ -610,23 +610,25 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
     valuesArray = selectedValues.split(',');
   }
 
-  let whereClause = { societe_gestion: req.params.id }; // Utilisation de let au lieu de const
+  let conditions = [];
 
   if (valuesArray) {
-    whereClause = {
+    conditions.push({
       [Op.or]: valuesArray.map(value => ({
-        id: value // Créer une condition pour chaque valeur dans valuesArray
+        id: value
       }))
-    };
+    });
+  } else {
+    conditions.push(sequelize.where(sequelize.fn('LOWER', sequelize.col('societe_gestion')), req.params.id.toLowerCase()));
   }
 
   if (typeof selectedCategorie !== 'undefined' && selectedCategorie !== 'undefined') {
-    whereClause.categorie_globale = selectedCategorie; // Filtrer par la catégorie globale si elle est renseignée
+    conditions.push(sequelize.where(sequelize.fn('LOWER', sequelize.col('categorie_globale')), selectedCategorie.toLowerCase()));
   }
 
   const funds = await fond.findAll({
     where: {
-      [Op.and]: [whereClause] // Utiliser Op.and pour combiner les conditions
+      [Op.and]: conditions
     },
     limit: 500,
   });
@@ -661,7 +663,7 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
       const fundCombinedData = {
         id: fund.id,
         fundData: fundData.toJSON(),
-        performanceData: performanceResults.toJSON(),
+        performanceData: performanceResults ? performanceResults.toJSON() : null,
       };
 
       return fundCombinedData;
