@@ -185,7 +185,7 @@ const {
           }, annee: parseInt(year)
         },
         order: [['date', 'ASC']],
-        limit: 500,
+        limit: 10000,
       });
     } else {
       values = await tsrhisto.findAll({
@@ -196,7 +196,7 @@ const {
           indice: "MONIA"
         },
         order: [['date', 'ASC']],
-        limit: 500,
+        limit: 10000,
       });
     }
 
@@ -238,7 +238,7 @@ const {
         fund_id: req.params.id,
       },
       order: [['date', 'ASC']],
-      limit: 500,
+      limit: 10000,
     });
 
     if (!response.length) {
@@ -2006,7 +2006,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
       const tauxSansRisques = await tsr.findAll({
         attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
         where: { pays: "Nigeria" },
-        limit: 500,
+        limit: 10000,
       });
 
       const tableauDonneestsr = tauxSansRisques.map(d => ({
@@ -2025,7 +2025,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
           date: { [Op.lte]: req.params.date },
         },
         order: [['date', 'ASC']],
-        limit: 500,
+        limit: 10000,
       });
   
       if (!response.length) {
@@ -2264,7 +2264,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
         // Ajoutez les conditions spécifiques en fonction de votre logique
         pays: "Nigeria",
       },
-      limit: 500,
+      limit: 10000,
     });
 
     // Tableau pour stocker les résultats
@@ -2290,7 +2290,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
       order: [
         ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
       ],
-      limit: 500,
+      limit: 10000,
     })
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234
@@ -3893,7 +3893,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
         // Ajoutez les conditions spécifiques en fonction de votre logique
         pays: "Nigeria",
       },
-      limit: 500,
+      limit: 10000,
     });
 
     // Tableau pour stocker les résultats
@@ -3918,7 +3918,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
       order: [
         ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
       ],
-      limit: 500,
+      limit: 10000,
     })
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234
@@ -5531,7 +5531,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
         // Ajoutez les conditions spécifiques en fonction de votre logique
         pays: "Nigeria",
       },
-      limit: 500,
+      limit: 10000,
     });
 
     // Tableau pour stocker les résultats
@@ -5557,7 +5557,7 @@ extendedData.sort((a, b) =>  new Date(b.date)  - new Date(a.date));
       order: [
         ['date', 'DESC']
       ],
-      limit: 500,
+      limit: 10000,
     })
       .then(async (response) => {
         // const tauxsr=0.03;-0.0116;-0,0234

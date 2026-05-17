@@ -253,7 +253,7 @@ router.get('/api/updatewithdividende', async (req, res) => {
           model: vl,
           order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
         }],
-        limit: 500,
+        limit: 10000,
       });
   
       // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
@@ -527,7 +527,7 @@ router.get('/api/updatewithdividende', async (req, res) => {
           where: { categorie_nationale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
-          limit: 500,
+          limit: 10000,
         });
       } else {
         // Étape 1 : Récupérer toutes les performances pour la catégorie spécifiée
@@ -535,7 +535,7 @@ router.get('/api/updatewithdividende', async (req, res) => {
           where: { categorie_nationale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
-          limit: 500,
+          limit: 10000,
         });
       }
       // Étape 2 : Trouver les performances du fond sélectionné
@@ -697,14 +697,14 @@ router.get('/api/updatewithdividende', async (req, res) => {
           where: { categorie_regionale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
-          limit: 500,
+          limit: 10000,
         });
       } else {
         fundsWithPerformance = await performences_usds.findAll({
           where: { categorie_regionale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']],
-          limit: 500,
+          limit: 10000,
         });
       }
 
@@ -1529,7 +1529,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
         date: { [Op.gt]: sinceDate }
       },
       order: [['date', 'DESC']],
-      limit: 500,
+      limit: 10000,
     });
 
     if (allVlDates.length === 0) return;
@@ -1716,7 +1716,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
         }
       }, // Condition where pour filtrer par fund_id
       order: [['date', 'DESC']], // Trier les dates en ordre chronologique
-      limit: 500,
+      limit: 10000,
     });
 
     const yearsSinceValorisation = await anneevalorisation(fundId);
@@ -1762,7 +1762,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
         }
       },
       order: [['date', 'DESC']], // Trier les dates en ordre décroissant
-      limit: 500,
+      limit: 10000,
     });
 
     // Obtenir l'année de valorisation

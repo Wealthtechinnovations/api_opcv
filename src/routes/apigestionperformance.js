@@ -299,7 +299,7 @@ router.get('/api/performances/fond/:id', async (req, res) => {
     order: [
       ['date', 'ASC']
     ],
-    limit: 500,
+    limit: 10000,
   })
     .then(response => {
       const values = response.map((data) => data.vl_ajuste); //todo
@@ -484,7 +484,7 @@ router.get('/api/performancescomparaison/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -673,7 +673,7 @@ router.get('/api/performanceswithdate/fond/:id/:date', async (req, res) => {
         date: { [Op.lte]: req.params.date },
       },
       order: [['date', 'ASC']],
-      limit: 500,
+      limit: 10000,
     });
 
     if (!response.length) {
@@ -867,7 +867,7 @@ router.get('/api/performanceswithdate1/fond/:id/:date', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -1056,7 +1056,7 @@ router.get('/api/performancesindice/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -1255,7 +1255,7 @@ router.get('/api/performancescategorie/fond/:id', async (req, res) => {
   const fondsMemeCategorie = await fond.findAll({
     attributes: ['id'],
     where: { categorie_national: categorie_national },
-    limit: 500,
+    limit: 10000,
   });
   const fondIds = fondsMemeCategorie.map(f => f.id);
 
@@ -1288,7 +1288,7 @@ router.get('/api/performancescategorie/fond/:id', async (req, res) => {
       ['year', 'DESC'],
       ['latest_date', 'DESC']
     ],
-    limit: 500,
+    limit: 10000,
   });
   // Transform the result to calculate performance
   let fundPerformances = {};
@@ -1349,7 +1349,7 @@ router.get('/api/performancesdevcategorie/fond/:id/:devise', async (req, res) =>
   const fondsMemeCategorie = await fond.findAll({
     attributes: ['id'],
     where: { categorie_national: categorie_national },
-    limit: 500,
+    limit: 10000,
   });
   let valorisationss;
   if (req.params.devise == "USD") {
@@ -1360,7 +1360,7 @@ router.get('/api/performancesdevcategorie/fond/:id/:devise', async (req, res) =>
       ],
       where: { fund_id: fondsMemeCategorie.map(fond => fond.id) },
       group: ['date'],
-      limit: 500,
+      limit: 10000,
     });
   } else {
     valorisationss = await vl.findAll({
@@ -1370,7 +1370,7 @@ router.get('/api/performancesdevcategorie/fond/:id/:devise', async (req, res) =>
       ],
       where: { fund_id: fondsMemeCategorie.map(fond => fond.id) },
       group: ['date'],
-      limit: 500,
+      limit: 10000,
     });
   }
 
@@ -1417,7 +1417,7 @@ router.get('/api/performancesdev/fond/:id/:devise', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -1616,7 +1616,7 @@ router.get('/api/performancesdevwithdate/fond/:id/:devise/:date', async (req, re
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -1801,7 +1801,7 @@ router.get('/api/performancemonthyear/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -1845,7 +1845,7 @@ router.get('/api/performanceindicemonthyear/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -2200,7 +2200,7 @@ router.get('/api/performancesportefeuille/fond/:id', async (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -2377,7 +2377,7 @@ router.get('/api/performancesportefeuilledev/fond/:id/:devise', async (req, res)
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -2716,7 +2716,7 @@ router.get('/api/performances/indice/:id/:type', (req, res) => {
     },
     order: [
       ['date', 'ASC']
-    ],    limit: 500,
+    ],    limit: 10000,
 
   })
     .then(response => {
@@ -2993,7 +2993,7 @@ router.get('/api/performances/ecart/:id', async (req, res) => {
       ['created', 'ASC']
     ],
   }).then((t) => {
-    limit: 500,
+    limit: 10000,
     values = t.map((data) => data.value);
     valuesindifref = t.map((data) => data.indRef);
     dates = t.map((data) => moment(data.created).format('YYYY-MM-DD'));
