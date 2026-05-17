@@ -216,17 +216,36 @@ async function run() {
   const allRows = readCSV(csvPath);
   console.log(`${allRows.length} lignes lues depuis le CSV`);
 
-  // Filtrer: uniquement les lignes avec date + prix VL valide
-  const validRows = allRows.filter(r =>
-    r.valuation_date &&
-    /^\d{4}-\d{2}-\d{2}$/.test(r.valuation_date) &&
-    r.vl_price &&
-    parseFloat(r.vl_price) > 0 &&
-    r.fund_name_clean
-  );
+  // Filtrer: uniquement les lignes avec date + prix VL valide + bornes raisonnables
+  const VL_MIN = 0.0001;
+  const VL_MAX = 1000000;    // prix unitaire max 1M NGN (raisonnable)
+  const NAV_MAX = 5e12;      // NAV total max 5 000 milliards NGN
+  let rejectedBounds = 0;
+  let rejectedMissing = 0;
+
+  const validRows = allRows.filter(r => {
+    if (!r.valuation_date || !/^\d{4}-\d{2}-\d{2}$/.test(r.valuation_date) || !r.fund_name_clean) {
+      rejectedMissing++;
+      return false;
+    }
+    const vl = parseFloat(r.vl_price);
+    if (!vl || vl <= VL_MIN || vl > VL_MAX) {
+      rejectedBounds++;
+      return false;
+    }
+    const nav = parseFloat(r.nav_value) || parseFloat(r.nav_ngn) || 0;
+    if (nav > NAV_MAX) {
+      rejectedBounds++;
+      return false;
+    }
+    return true;
+  });
   console.log(`${validRows.length} lignes valides (avec date + prix + nom)`);
+  if (rejectedMissing > 0) console.log(`  ${rejectedMissing} lignes rejetees (champs manquants)`);
+  if (rejectedBounds > 0) console.log(`  ${rejectedBounds} lignes rejetees (VL hors bornes [${VL_MIN}-${VL_MAX}] ou NAV > ${NAV_MAX})`);
 
   // Grouper par fonds (fund_name_key + fund_manager_key)
+  // Preference: CURRENT block > PREVIOUS block (fichiers 2018-2021 ont 2 blocs)
   const fondsMap = new Map();
   for (const row of validRows) {
     const fundKey = row.fund_name_key || normalizeNameForMatch(row.fund_name_clean);
@@ -249,13 +268,18 @@ async function run() {
     const date = row.valuation_date;
     const vlPrice = parseFloat(row.vl_price);
     const navValue = parseFloat(row.nav_value) || parseFloat(row.nav_ngn) || 0;
+    const blockType = (row.block_type || row.previous_or_current_hint || '').toUpperCase();
+    const isCurrent = blockType.includes('CURRENT');
 
-    if (!fond.vls.has(date) || vlPrice > 0) {
+    // Garder l'entree CURRENT si on a deja un PREVIOUS pour la meme date
+    const existing = fond.vls.get(date);
+    if (!existing || isCurrent || (!existing.isCurrent && vlPrice > 0)) {
       fond.vls.set(date, {
         date,
         vl: vlPrice,
         nav: navValue,
         currency: row.currency_code || 'NGN',
+        isCurrent,
       });
     }
   }
@@ -326,9 +350,17 @@ async function run() {
     `SELECT id, nom_fond, societe_gestion, pays, dev_libelle, classification,
             categorie_globale, categorie_national, categorie_regional,
             structure_fond, societe_id, regulateur
-     FROM fond_investissements WHERE pays = ? OR pays = 'NIGERIA'`,
-    [PAYS]
+     FROM fond_investissements WHERE LOWER(pays) = 'nigeria'`
   );
+
+  // Normaliser le pays pour les fonds existants mal casses
+  if (existingFunds.some(f => f.pays !== PAYS)) {
+    const toFix = existingFunds.filter(f => f.pays !== PAYS);
+    if (toFix.length > 0 && !dryRun) {
+      await conn.execute(`UPDATE fond_investissements SET pays = ? WHERE LOWER(pays) = 'nigeria' AND pays != ?`, [PAYS, PAYS]);
+      console.log(`  ${toFix.length} fonds normalises: pays -> '${PAYS}'`);
+    }
+  }
   console.log(`${existingFunds.length} fonds Nigeria existants en base`);
 
   // Index de matching (par nom normalise)
@@ -464,7 +496,7 @@ async function run() {
             [
               fondData.fund_name_clean,
               fondData.fund_manager_clean || '',
-              PAYS, currency === 'USD' ? 'USD' : DEVISE, 'West Africa',
+              PAYS, currency === 'USD' ? 'USD' : currency === 'EUR' ? 'EUR' : DEVISE, 'West Africa',
               structure, REGULATEUR,
               classif.classification,
               classif.categorie_globale,
@@ -509,11 +541,23 @@ async function run() {
       }));
 
       // Preparer les VL a inserer
+      // IMPORTANT: value = prix unitaire (offer/unit price), actif_net = NAV total du fonds
+      // Le NAV total est normalement >> prix unitaire (NAV = prix * nb_parts)
       const toInsert = [];
+      let vlSuspectCount = 0;
       for (const [dateStr, vlData] of fondData.vls) {
         if (existingDates.has(dateStr)) {
           report.vlAlreadyExist++;
           continue;
+        }
+
+        // Controle: si le NAV total est < prix unitaire, c'est suspect
+        // (sauf si NAV = 0 = non renseigne)
+        if (vlData.nav > 0 && vlData.nav < vlData.vl) {
+          vlSuspectCount++;
+          if (vlSuspectCount <= 3) {
+            report.errors.push(`SUSPECT ${fondData.fund_name_clean} ${dateStr}: NAV(${vlData.nav}) < VL(${vlData.vl}) - verifie le mapping`);
+          }
         }
 
         const valueEUR = convertToEUR(vlData.vl, dateStr, vlData.currency);
@@ -533,6 +577,9 @@ async function run() {
           navEUR: vlData.nav > 0 ? (convertToEUR(vlData.nav, dateStr, vlData.currency) || 0) : 0,
           navUSD: vlData.nav > 0 ? (convertToUSD(vlData.nav, dateStr, vlData.currency) || 0) : 0,
         });
+      }
+      if (vlSuspectCount > 0) {
+        report.errors.push(`${fondData.fund_name_clean}: ${vlSuspectCount} VL suspectes (NAV < prix unitaire)`);
       }
 
       // --------------------------------------------------------
@@ -555,8 +602,8 @@ async function run() {
         }
 
         try {
-          await conn.execute(
-            `INSERT IGNORE INTO valorisations
+          const [insertResult] = await conn.execute(
+            `INSERT INTO valorisations
              (fund_id, fund_name, value, value_EUR, value_USD,
               actif_net, actif_net_EUR, actif_net_USD,
               dividende, dividende_EUR, dividende_USD,
@@ -573,7 +620,7 @@ async function run() {
           for (const item of batch) {
             try {
               await conn.execute(
-                `INSERT IGNORE INTO valorisations
+                `INSERT INTO valorisations
                  (fund_id, fund_name, value, value_EUR, value_USD,
                   actif_net, actif_net_EUR, actif_net_USD,
                   dividende, dividende_EUR, dividende_USD,
@@ -590,6 +637,23 @@ async function run() {
               report.vlInserted++;
             } catch (e2) {
               report.errors.push(`VL ${fondData.fund_name_clean} ${item.date}: ${e2.message}`);
+            }
+          }
+        }
+      }
+
+      // Detecter les variations extremes entre VL consecutives (>50%)
+      if (toInsert.length >= 2) {
+        const sorted = [...toInsert].sort((a, b) => a.date.localeCompare(b.date));
+        for (let i = 1; i < sorted.length; i++) {
+          const prev = sorted[i - 1].vl;
+          const curr = sorted[i].vl;
+          if (prev > 0) {
+            const variation = Math.abs((curr - prev) / prev);
+            if (variation > 0.5) {
+              report.errors.push(
+                `VARIATION EXTREME ${fondData.fund_name_clean}: ${sorted[i-1].date}(${prev}) -> ${sorted[i].date}(${curr}) = ${(variation*100).toFixed(1)}%`
+              );
             }
           }
         }
