@@ -88,6 +88,9 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
       where: { pays: req.params.id }
     })
       .then(async response => {
+        if (!response) {
+          return res.status(404).json({ code: 404, error: 'Pays non trouvé.' });
+        }
         // Récupération des informations de base de la société
         const societeData = {
           nom: response.pays,
@@ -387,6 +390,9 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
       where: { pays: req.params.id }
     })
       .then(async response => {
+        if (!response) {
+          return res.status(404).json({ code: 404, error: 'Pays non trouvé.' });
+        }
         // Récupération des informations de base de la société
         const societeData = {
           nom: response.pays,

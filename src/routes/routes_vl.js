@@ -5185,8 +5185,8 @@ GROUP BY f.societe_gestion;
       const countriesWithCompanies = countries.map(country => ({
         pays: country.pays,
         slug: generateSlug(country.pays),
-        companyCount: companiesPerCountry.find(c => c.pays === country.pays)?.companyCount ?? 0,
-        fondscount: fondsPerCountry.find(c => c.pays === country.pays)?.fondsCount ?? 0
+        companyCount: companiesPerCountry.find(c => c.pays?.toLowerCase() === country.pays?.toLowerCase())?.companyCount ?? 0,
+        fondscount: fondsPerCountry.find(c => c.pays?.toLowerCase() === country.pays?.toLowerCase())?.fondsCount ?? 0
       }));
 
       // Prepare data for table display
