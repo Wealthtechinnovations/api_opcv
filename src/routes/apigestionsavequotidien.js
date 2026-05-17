@@ -1756,19 +1756,28 @@ router.get('/api/classementclickhouse', async (req, res) => {
     const allVlDates = await vl.findAll({
       attributes: ['date'],
       where: {
-        fund_id: fundId, 
+        fund_id: fundId,
         date: {
-          [Op.gt]: '2024-07-31' //2024-07-31  Sélectionner les dates supérieures à '2023-12-31'
+          [Op.gt]: '2019-12-31'
         }
       },
-      order: [['date', 'DESC']], // Trier les dates en ordre décroissant
+      order: [['date', 'DESC']],
       limit: 10000,
     });
 
+    if (allVlDates.length === 0) {
+      writeToLogFile(`Aucune VL pour fond ${fundId}, skip`);
+      return;
+    }
+
     // Obtenir l'année de valorisation
     const yearsSinceValorisation = await anneevalorisation(fundId);
+    if (!yearsSinceValorisation || yearsSinceValorisation.length === 0) {
+      writeToLogFile(`Pas de donnees anneevalorisation pour fond ${fundId}, skip`);
+      return;
+    }
     const years = yearsSinceValorisation[0].annee;
-    
+
     // Extraire les dates dans un tableau moment.js pour manipulation
     let allDates = allVlDates.map(vl => moment(vl.date, 'YYYY-MM-DD'));
     
