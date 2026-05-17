@@ -174,8 +174,8 @@ async function run() {
       // 3a. Chercher le fonds en base
       const [existingFonds] = await conn.execute(
         `SELECT id, nom_fond, societe_gestion, pays, categorie_globale, dev_libelle, datejour
-         FROM fond_investissements WHERE nom_fond = ?`,
-        [nomFond]
+         FROM fond_investissements WHERE nom_fond = ? AND LOWER(pays) = LOWER(?)`,
+        [nomFond, PAYS]
       );
 
       let fondId;

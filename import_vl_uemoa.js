@@ -343,8 +343,8 @@ async function run() {
         `SELECT id, nom_fond, societe_gestion, depositaire, pays, dev_libelle, region,
                 classification, categorie_globale, categorie_national, categorie_regional,
                 structure_fond, date_creation, montant_premier_vl, societe_id
-         FROM fond_investissements WHERE nom_fond = ? LIMIT 1`,
-        [nomFond]
+         FROM fond_investissements WHERE nom_fond = ? AND LOWER(pays) = LOWER(?) LIMIT 1`,
+        [nomFond, PAYS]
       );
 
       let fondId;
