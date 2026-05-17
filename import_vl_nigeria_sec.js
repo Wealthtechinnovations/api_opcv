@@ -410,7 +410,7 @@ async function run() {
         let bestFund = null;
         for (const [key, fund] of existingByKey) {
           const sim = similarity(fundNameKey, key);
-          if (sim > bestSim && sim >= 0.85) {
+          if (sim > bestSim && sim >= 0.95) {
             bestSim = sim;
             bestFund = fund;
           }
