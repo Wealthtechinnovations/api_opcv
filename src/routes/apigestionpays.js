@@ -663,66 +663,48 @@ router.post('/api/listeproduitpayssociete/:id', async (req, res) => {
     valuesArray = selectedValues.split(',');
   }
 
-  let whereClause = { pays: req.params.id }; // Utilisation de let au lieu de const
+  let whereClause = {};
 
   if (valuesArray) {
     whereClause = {
       [Op.or]: valuesArray.map(value => ({
-        id: value // Créer une condition pour chaque valeur dans valuesArray
+        id: value
       }))
     };
+  } else {
+    whereClause = sequelize.where(sequelize.fn('LOWER', sequelize.col('pays')), req.params.id.toLowerCase());
   }
 
+  let conditions = [whereClause];
   if (typeof selectedCategorie !== 'undefined') {
-    whereClause.categorie_globale = selectedCategorie; // Filtrer par la catégorie globale si elle est renseignée
+    conditions.push(sequelize.where(sequelize.fn('LOWER', sequelize.col('categorie_globale')), selectedCategorie.toLowerCase()));
   }
 
   const funds = await fond.findAll({
     where: {
-      [Op.and]: [whereClause] // Utiliser Op.and pour combiner les conditions
+      [Op.and]: conditions
     },
     limit: 500
   });
 
+  const fundIds = funds.map(f => f.id);
+  const allPerformances = fundIds.length > 0 ? await performences.findAll({
+    where: { fond_id: fundIds },
+    order: [['date', 'DESC']],
+  }) : [];
+  const perfMap = {};
+  allPerformances.forEach(p => {
+    if (!perfMap[p.fond_id]) perfMap[p.fond_id] = p;
+  });
 
-  const fundsWithAllData = await Promise.all(funds.map(async (fund) => {
-    try {
-      const fundData = await fond.findByPk(fund.id);
-
-      if (!fundData) {
-        return { error: `Aucun élément trouvé pour l'ID ${fund.id}` };
-      }
-
-      // Create an array of promises for the external API calls
-      const promessesPerformances = performences.findOne({
-        where: {
-          fond_id: fund.id,
-        },
-        order: [
-          ['date', 'DESC']
-        ]
-      })
-        .catch((error) => {
-          console.error('Erreur lors de la recherche des performances :', error);
-          return { error: 'Erreur lors de la recherche des performances.' };
-        });
-
-      // Use Promise.all to wait for all queries to finish
-      const [performanceResults] = await Promise.all([promessesPerformances]);
-
-      // Combine data from both sources
-      const fundCombinedData = {
-        id: fund.id,
-        fundData: fundData.toJSON(),
-        performanceData: performanceResults.toJSON(),
-      };
-
-      return fundCombinedData;
-    } catch (error) {
-      console.error('Erreur lors de la recherche des données :', error);
-      return { error: 'Une erreur est survenue lors de la récupération des données.' };
-    }
-  }));
+  const fundsWithAllData = funds.map(fund => {
+    const perf = perfMap[fund.id] || null;
+    return {
+      id: fund.id,
+      fundData: fund.toJSON(),
+      performanceData: perf ? perf.toJSON() : null,
+    };
+  });
 
 
 
@@ -746,29 +728,27 @@ router.post('/api/listesocietepays/:id', async (req, res) => {
     valuesArray = selectedValues.split(',');
   }
 
-  let whereClause = { pays: req.params.id }; // Utilisation de let au lieu de const
+  let whereClause;
 
   if (valuesArray) {
     whereClause = {
       [Op.or]: valuesArray.map(value => ({
-        nom: value // Créer une condition pour chaque valeur dans valuesArray
+        nom: value
       }))
     };
+  } else {
+    whereClause = sequelize.where(sequelize.fn('LOWER', sequelize.col('pays')), req.params.id.toLowerCase());
   }
 
-
-
   const societes = await societe.findAll({
-    where: whereClause, // Pas besoin d'encapsuler dans Op.and, oùClause est déjà un objet
+    where: whereClause,
     limit: 500
   });
 
-  // Pour stocker les résultats finaux
   let resultats = [];
 
-  // Boucle à travers chaque société pour obtenir le nombre de fonds et la somme des actifs nets
   for (const soc of societes) {
-    const nombreFonds = await fond.count({ where: { societe_gestion: soc.nom } });
+    const nombreFonds = await fond.count({ where: sequelize.where(sequelize.fn('LOWER', sequelize.col('societe_gestion')), soc.nom.toLowerCase()) });
     //   const fonds = await fond.findAll({ where: { societe_gestion: soc.nom } });
     let sommeActifNet = 0;
 

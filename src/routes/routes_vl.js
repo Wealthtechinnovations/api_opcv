@@ -3423,50 +3423,26 @@ GROUP BY f.societe_gestion;
       }
 
       if (selectedcategorie != 'undefined') {
-        query += `
-   
-        AND f.categorie_globale = :selectedcategorie
-    
-  `;
+        query += ` AND LOWER(f.categorie_globale) = LOWER(:selectedcategorie)`;
       }
 
       if (selectedDevise != 'undefined') {
-        query += `
-   
-        AND f.dev_libelle = :selectedDevise
-    
-  `;
+        query += ` AND LOWER(f.dev_libelle) = LOWER(:selectedDevise)`;
       }
 
       if (frequence != 'undefined' && frequence.length >= 1) {
-        query += `
-   
-        AND f.periodicite = :frequence
-    
-  `;
+        query += ` AND LOWER(f.periodicite) = LOWER(:frequence)`;
       }
 
       if (selectedsociete != 'undefined') {
-        query += `
-   
-        AND f.societe_gestion = :selectedsociete
-    
-  `;
+        query += ` AND LOWER(f.societe_gestion) = LOWER(:selectedsociete)`;
       }
 
       if (selectedcategorienationale != 'undefined') {
-        query += `
-   
-        AND f.categorie_national = :selectedcategorienationale
-    
-  `;
+        query += ` AND LOWER(f.categorie_national) = LOWER(:selectedcategorienationale)`;
       }
       if (selectedcategorieregionale != 'undefined') {
-        query += `
-   
-        AND f.categorie_regional = :selectedcategorieregionale
-    
-  `;
+        query += ` AND LOWER(f.categorie_regional) = LOWER(:selectedcategorieregionale)`;
       }
 
       const fondsDansCategorie = await sequelize.query(query, {
@@ -3490,14 +3466,14 @@ GROUP BY f.societe_gestion;
   app.post('/api/rechercheravance-fonds', async (req, res) => {
     const formData = req.body.formData;
     const selectedValues = req.query.query;
-    const selectedcategorieregionale = req.query.selectedcategorieregionale;
-    const selectedcategorienationale = req.query.selectedcategorienationale;
-    const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
-    const selectedDevise = req.query.selecteddevise; // Corrected variable name
-    const selectedSociete = req.query.selectedsociete; // Corrected variable name
-    const frequence = req.query.frequence; // Corrected variable name
+    const selectedcategorieregionale = req.query.selectedcategorieregionale || 'undefined';
+    const selectedcategorienationale = req.query.selectedcategorienationale || 'undefined';
+    const selectedCategorie = req.query.selectedcategorie || 'undefined';
+    const selectedDevise = req.query.selecteddevise || 'undefined';
+    const selectedSociete = req.query.selectedsociete || 'undefined';
+    const frequence = req.query.frequence || 'undefined';
 
-    const valuesArray = selectedValues.split(',');
+    const valuesArray = selectedValues ? selectedValues.split(',') : [''];
 
     // Fetch funds based on criteria
     const funds = await fetchFundsByValorisationfirst(valuesArray, selectedCategorie, selectedSociete, selectedDevise, frequence, selectedcategorieregionale, selectedcategorienationale);
@@ -4661,37 +4637,40 @@ GROUP BY f.societe_gestion;
 
   app.get('/api/getCategories', async (req, res) => {
     try {
-      const categoriesRegion = await fond.findAll({
-        attributes: [
-          [sequelize.fn('DISTINCT', sequelize.col('categorie_regional')), 'categorie_regional']
-        ],
-        limit: 500,
-      });
+      const [categoriesGlobal, categoriesRegion, categoriesNational] = await Promise.all([
+        fond.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('categorie_globale')), 'categorie_globale']],
+          where: { active: 1 },
+          limit: 500,
+        }),
+        fond.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('categorie_regional')), 'categorie_regional']],
+          where: { active: 1 },
+          limit: 500,
+        }),
+        fond.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('categorie_national')), 'categorie_national']],
+          where: { active: 1 },
+          limit: 500,
+        }),
+      ]);
 
-      const categoriesNational = await fond.findAll({
-        attributes: [
-          [sequelize.fn('DISTINCT', sequelize.col('categorie_national')), 'categorie_national']
-        ],
-        limit: 500,
-      });
-
-      // Filtrer les valeurs vides
-      const filteredCategoriesRegion = categoriesRegion
+      const filteredGlobal = categoriesGlobal
+        .map(item => item.get('categorie_globale'))
+        .filter(c => c !== null && c !== '');
+      const filteredRegion = categoriesRegion
         .map(item => item.get('categorie_regional'))
-        .filter(categorie => categorie !== null && categorie !== '');
-
-      const filteredCategoriesNational = categoriesNational
+        .filter(c => c !== null && c !== '');
+      const filteredNational = categoriesNational
         .map(item => item.get('categorie_national'))
-        .filter(categorie => categorie !== null && categorie !== '');
-
-      const distinctCategorieregional = filteredCategoriesRegion.map(category => category);
-      const distinctNationalCategories = filteredCategoriesNational.map(category => category);
+        .filter(c => c !== null && c !== '');
 
       res.json({
         code: 200,
         data: {
-          categoriesRegional: distinctCategorieregional,
-          categoriesNational: distinctNationalCategories
+          categoriesGlobal: filteredGlobal,
+          categoriesRegional: filteredRegion,
+          categoriesNational: filteredNational
         }
       });
     } catch (error) {
@@ -5457,7 +5436,9 @@ GROUP BY f.societe_gestion;
       const selectedcategorieregionale = req.query.selectedcategorieregionale || 'undefined';
       const selectedcategorienationale = req.query.selectedcategorienationale || 'undefined';
 
-      if (!selectedValues) {
+      const hasFilters = (selectedCategorie !== 'undefined') || (selectedSociete !== 'undefined') || (selectedcategorieregionale !== 'undefined') || (selectedcategorienationale !== 'undefined');
+
+      if (!selectedValues && !hasFilters) {
         const allFunds = await fond.findAll({ limit: 500 });
         return res.json({
           code: 200,
@@ -5469,7 +5450,7 @@ GROUP BY f.societe_gestion;
         });
       }
 
-      const valuesArray = selectedValues.split(',');
+      const valuesArray = selectedValues ? selectedValues.split(',') : [''];
 
       // Fetch funds based on criteria
       const funds = await fetchFundsByValorisationfirst(valuesArray, selectedCategorie, selectedSociete, 'undefined', '',selectedcategorieregionale,selectedcategorienationale);
@@ -6114,12 +6095,7 @@ GROUP BY f.societe_gestion;
     }*/
 
     fond.findAll({
-      where: {
-        pays: req.params.id,
-        /* id: {
-           //  [Sequelize.Op.like]: `%${searchTerm}%`
-         }*/
-      },
+      where: sequelize.where(sequelize.fn('LOWER', sequelize.col('pays')), req.params.id.toLowerCase()),
       order: [
         ['id', 'DESC']
       ],
