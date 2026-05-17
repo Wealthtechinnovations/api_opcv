@@ -153,6 +153,9 @@ router.get('/api/getSocietebyidfisrt/:id', async (req, res) => {
     where: { nom: req.params.id }
   })
     .then(async response => {
+      if (!response) {
+        return res.status(404).json({ code: 404, error: 'Société de gestion non trouvée.' });
+      }
       // Récupération des informations de base de la société
       const societeData = {
         nom: response.nom,
@@ -411,6 +414,9 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
     where: { nom: req.params.id }
   })
     .then(async response => {
+      if (!response) {
+        return res.status(404).json({ code: 404, error: 'Société de gestion non trouvée.' });
+      }
       // Récupération des informations de base de la société
       const societeData = {
         nom: response.nom,

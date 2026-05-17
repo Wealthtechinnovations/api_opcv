@@ -132,14 +132,14 @@ performences_usds.belongsTo(fond, { foreignKey: 'fond_id' });
 fond.hasMany(rendement, { foreignKey: 'fond_id' });
 rendement.belongsTo(fond, { foreignKey: 'fond_id' });
 
-// Date valorisation <-> VL
-date_valorisation.belongsTo(vl, { foreignKey: 'date' });
-vl.hasMany(date_valorisation, { foreignKey: 'date' });
+// Date valorisation <-> VL (disabled: incompatible FK types - date is STRING, vl.id is INTEGER)
+// date_valorisation.belongsTo(vl, { foreignKey: 'date' });
+// vl.hasMany(date_valorisation, { foreignKey: 'date' });
 
 // Transaction associations
 transaction.belongsTo(fond, { foreignKey: 'fond_ids' });
 transaction.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
-transaction.belongsTo(devisedechanges, { foreignKey: 'date' });
+// transaction.belongsTo(devisedechanges, { foreignKey: 'date' }); // disabled: incompatible FK types
 
 // Fond <-> Investissement
 fond.hasMany(investissement, { foreignKey: 'fund_id' });

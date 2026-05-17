@@ -507,17 +507,27 @@ async function run() {
           fondId = result.insertId;
           report.fondsCreated++;
 
-          // Rattacher a societe si possible
+          // Rattacher ou creer societe de gestion
           if (fondData.fund_manager_clean) {
             try {
               const [socs] = await conn.execute(
-                `SELECT id FROM societes WHERE nom LIKE ? LIMIT 1`,
-                [`%${fondData.fund_manager_clean}%`]
+                `SELECT id FROM societes WHERE nom = ? LIMIT 1`,
+                [fondData.fund_manager_clean]
               );
+              let socId;
               if (socs.length > 0) {
-                await conn.execute(`UPDATE fond_investissements SET societe_id = ? WHERE id = ?`, [socs[0].id, fondId]);
+                socId = socs[0].id;
+              } else {
+                const [newSoc] = await conn.execute(
+                  `INSERT INTO societes (nom, pays, regulateur, devise, created_at, updated_at)
+                   VALUES (?, ?, ?, ?, NOW(), NOW())`,
+                  [fondData.fund_manager_clean, PAYS, REGULATEUR, DEVISE]
+                );
+                socId = newSoc.insertId;
+                console.log(`  Societe creee: "${fondData.fund_manager_clean}" (id=${socId})`);
               }
-            } catch (e) { /* societes table might not exist */ }
+              await conn.execute(`UPDATE fond_investissements SET societe_id = ? WHERE id = ?`, [socId, fondId]);
+            } catch (e) { console.warn('  Warning societe:', e.message); }
           }
 
           // Ajouter au cache de matching pour eviter les doublons dans le meme run
