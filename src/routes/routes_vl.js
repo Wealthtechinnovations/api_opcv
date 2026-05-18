@@ -7153,17 +7153,18 @@ GROUP BY f.societe_gestion;
              values: data.value, // Remplacez avec la propriété correcte de l'objet
              valuesInd: data.indRef,
            }));*/
+          const hasIndRef = response.some(d => d.indRef !== null);
           const graphs = response.map(data => {
-            if (data.value !== null && data.indRef !== null) {
-              return {
-                dates: moment(data.date).format('YYYY-MM-DD'), // Remplacez avec la propriété correcte de l'objet
-                values: data.value, // Remplacez avec la propriété correcte de l'objet
-                valuesInd: data.indRef,
-              };
-            } else {
-              return null; // Ignorer les lignes où la condition n'est pas satisfaite
+            if (data.value === null) return null;
+            const point = {
+              dates: moment(data.date).format('YYYY-MM-DD'),
+              values: data.value,
+            };
+            if (hasIndRef && data.indRef != null) {
+              point.valuesInd = data.indRef;
             }
-          }).filter(Boolean); // Supprimer les valeurs nulles de l'array
+            return point;
+          }).filter(Boolean);
 
           // Ajoutez la propriété graphData à l'objet fund
           return {

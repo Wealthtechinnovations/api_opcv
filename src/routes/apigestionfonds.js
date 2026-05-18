@@ -380,22 +380,16 @@ WHERE
       const hasIndRef = response.some(data => data.indRef !== null);
 
       const graphs = response.map(data => {
-        if (hasIndRef) {
-          if (data.value !== null && data.indRef !== null) {
-            return {
-              dates: moment(data.date).format('YYYY-MM-DD'), // Remplacez avec la propriété correcte de l'objet
-              values: data.vl_ajuste, //todo Remplacez avec la propriété correcte de l'objet
-              valuesInd: data.indRef, // Inclure indRef seulement si non nul
-            };
-          };
-        } else {
-          return {
-            dates: moment(data.date).format('YYYY-MM-DD'), // Remplacez avec la propriété correcte de l'objet
-            values: data.value, // Remplacez avec la propriété correcte de l'objet
-          };
+        if (data.value === null) return null;
+        const point = {
+          dates: moment(data.date).format('YYYY-MM-DD'),
+          values: hasIndRef ? data.vl_ajuste : data.value,
+        };
+        if (hasIndRef && data.indRef != null) {
+          point.valuesInd = data.indRef;
         }
-
-      }).filter(Boolean); // Supprimer les valeurs nulles de l'array
+        return point;
+      }).filter(Boolean);
 
       // Faites ce que vous voulez avec l'array `graphs` ici
 
@@ -629,23 +623,15 @@ WHERE
       const hasIndRef = response.some(data => data[indRefField] !== null);
 
       const graphs = response.map(data => {
-        if (hasIndRef) {
-          if (data[valueField] !== null && data[indRefField] !== null) {
-            return {
-              dates: moment(data.date).format('YYYY-MM-DD'),
-              values: data[valueField],
-              valuesInd: data[indRefField],
-            };
-          }
-        } else {
-          if (data[valueField] !== null) {
-            return {
-              dates: moment(data.date).format('YYYY-MM-DD'),
-              values: data[valueField],
-            };
-          }
+        if (data[valueField] === null) return null;
+        const point = {
+          dates: moment(data.date).format('YYYY-MM-DD'),
+          values: data[valueField],
+        };
+        if (hasIndRef && data[indRefField] != null) {
+          point.valuesInd = data[indRefField];
         }
-        return null;
+        return point;
       }).filter(Boolean);
       let values;
       if (req.params.devise == "USD") {
