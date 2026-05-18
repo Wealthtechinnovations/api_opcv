@@ -170,7 +170,7 @@ const mysql = require('mysql2/promise');
   state.routes_test = {
     valLiq_866: await testUrl('$API_URL/api/valLiq/866'),
     valLiq_1141: await testUrl('$API_URL/api/valLiq/1141'),
-    lastvl: await testUrl('$API_URL/api/lastVl1'),
+    actualites: await testUrl('$API_URL/api/getactualite'),
     pays: await testUrl('$API_URL/api/getPaysall'),
   };
 
