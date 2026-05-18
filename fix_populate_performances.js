@@ -1,13 +1,14 @@
 /**
  * Calcule et insere les performances pour la DATE LA PLUS RECENTE
- * de chaque fond actif. Beaucoup plus rapide que saveperfdatemysql
- * qui essaie de traiter chaque date historique.
+ * de chaque fond actif. Calcul DIRECT en SQL+JS sans passer par l'API.
+ *
+ * L'ancienne version appelait /api/performanceswithdate qui crash
+ * pour 96% des fonds. Cette version fait tout le calcul localement.
  *
  * Pour chaque fond:
- *   1. Recupere la derniere date VL
- *   2. Appelle /api/performanceswithdate/fond/{id}/{date}
- *   3. Appelle /api/ratiosnewithdate/{years}/{id}/{date} si applicable
- *   4. INSERT/UPDATE dans la table performences
+ *   1. Recupere les VL triees par date ASC
+ *   2. Calcule les perfs glissantes (veille, 4s, 3m, 6m, YTD, 1an..10an)
+ *   3. INSERT/UPDATE dans la table performences
  *
  * Usage: node fix_populate_performances.js
  * Options:
@@ -26,8 +27,6 @@ const DB_CONFIG = {
   charset: 'utf8mb4',
 };
 
-const API_BASE = 'http://localhost:3005';
-
 function parseArgs() {
   const args = process.argv.slice(2);
   const opts = { pays: null, fondId: null, force: false };
@@ -39,10 +38,84 @@ function parseArgs() {
   return opts;
 }
 
-async function fetchJSON(url) {
-  const resp = await fetch(url);
-  if (resp.status !== 200) return null;
-  return resp.json();
+function perf(current, previous) {
+  if (!previous || previous === 0 || current == null || previous == null) return null;
+  if (current === previous) return 0;
+  return ((current - previous) / previous) * 100;
+}
+
+function findValueAtDate(dates, values, targetDate) {
+  const targetTs = targetDate.getTime();
+  let bestIdx = -1;
+  let bestDiff = Infinity;
+  for (let i = dates.length - 1; i >= 0; i--) {
+    const d = dates[i].getTime();
+    if (d <= targetTs) {
+      const diff = targetTs - d;
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestIdx = i;
+      }
+      break;
+    }
+  }
+  if (bestIdx === -1 && dates.length > 0) {
+    bestIdx = 0;
+  }
+  return bestIdx >= 0 ? values[bestIdx] : null;
+}
+
+function findValueAtYearsAgo(dates, values, lastDate, years) {
+  const target = new Date(lastDate);
+  target.setFullYear(target.getFullYear() - years);
+  return findValueAtDate(dates, values, target);
+}
+
+function findValueAtMonthsAgo(dates, values, lastDate, months) {
+  const target = new Date(lastDate);
+  target.setMonth(target.getMonth() - months);
+  return findValueAtDate(dates, values, target);
+}
+
+function findValueAtWeeksAgo(dates, values, lastDate, weeks) {
+  const target = new Date(lastDate);
+  target.setDate(target.getDate() - weeks * 7);
+  return findValueAtDate(dates, values, target);
+}
+
+function findValueAtJanuary1(dates, values, lastDate) {
+  const year = lastDate.getFullYear();
+  const jan1 = new Date(year, 0, 1);
+  return findValueAtDate(dates, values, jan1);
+}
+
+function findLastDateOfPreviousMonth(dates, values, lastDate) {
+  const prevMonthEnd = new Date(lastDate.getFullYear(), lastDate.getMonth(), 0);
+  return findValueAtDate(dates, values, prevMonthEnd);
+}
+
+function findValueAtJanuary1ForDate(dates, values, refDate) {
+  const year = refDate.getFullYear();
+  const jan1 = new Date(year, 0, 1);
+  return findValueAtDate(dates, values, jan1);
+}
+
+function findValueAtWeeksAgoForDate(dates, values, refDate, weeks) {
+  const target = new Date(refDate);
+  target.setDate(target.getDate() - weeks * 7);
+  return findValueAtDate(dates, values, target);
+}
+
+function findValueAtMonthsAgoForDate(dates, values, refDate, months) {
+  const target = new Date(refDate);
+  target.setMonth(target.getMonth() - months);
+  return findValueAtDate(dates, values, target);
+}
+
+function findValueAtYearsAgoForDate(dates, values, refDate, years) {
+  const target = new Date(refDate);
+  target.setFullYear(target.getFullYear() - years);
+  return findValueAtDate(dates, values, target);
 }
 
 async function run() {
@@ -51,7 +124,6 @@ async function run() {
   console.log('Connecte a la base fund_opcvm');
   console.log(`Options: pays=${opts.pays || 'TOUS'}, force=${opts.force}`);
 
-  // Get all active funds
   let fondQuery = `
     SELECT f.id, f.nom_fond, f.pays, f.code_ISIN, f.dev_libelle,
            f.categorie_globale, f.categorie_national, f.categorie_regional
@@ -71,12 +143,7 @@ async function run() {
   const [fonds] = await conn.execute(fondQuery, fondParams);
   console.log(`${fonds.length} fonds a traiter\n`);
 
-  // Get latest VL date and years for each fund
-  let processed = 0;
-  let inserted = 0;
-  let updated = 0;
-  let skipped = 0;
-  let errors = 0;
+  let processed = 0, inserted = 0, updated = 0, skipped = 0, errors = 0;
   const byPays = {};
 
   for (let i = 0; i < fonds.length; i++) {
@@ -84,112 +151,102 @@ async function run() {
     const pays = f.pays || 'INCONNU';
 
     try {
-      // Get latest VL date
       const [vlRows] = await conn.execute(
-        'SELECT MAX(date) as maxdate, MIN(date) as mindate FROM valorisations WHERE fund_id = ? AND value > 0',
+        'SELECT date, value FROM valorisations WHERE fund_id = ? AND value > 0 ORDER BY date ASC',
         [f.id]
       );
-      if (!vlRows[0].maxdate) { skipped++; continue; }
 
-      const latestDate = String(vlRows[0].maxdate).slice(0, 10);
-      const minDate = String(vlRows[0].mindate).slice(0, 10);
-      const yearsDiff = (new Date(latestDate) - new Date(minDate)) / (365.25 * 24 * 60 * 60 * 1000);
+      if (vlRows.length < 2) { skipped++; continue; }
 
-      // Check if we already have a recent performance record
+      const dates = vlRows.map(r => new Date(r.date));
+      const values = vlRows.map(r => parseFloat(r.value));
+      const lastDate = dates[dates.length - 1];
+      const latestDateStr = lastDate.toISOString().slice(0, 10);
+
       if (!opts.force) {
         const [existing] = await conn.execute(
           'SELECT id, date FROM performences WHERE fond_id = ? ORDER BY date DESC LIMIT 1',
           [f.id]
         );
-        if (existing.length > 0 && String(existing[0].date).slice(0, 10) === latestDate) {
+        if (existing.length > 0 && String(existing[0].date).slice(0, 10) === latestDateStr) {
           skipped++;
           continue;
         }
       }
 
-      // Fetch performance from API
-      const perfData = await fetchJSON(`${API_BASE}/api/performanceswithdate/fond/${f.id}/${latestDate}`);
-      if (!perfData || !perfData.data) {
-        errors++;
-        console.error(`  [ERROR] ${f.nom_fond} (${f.id}): API returned no data`);
-        continue;
-      }
-      const pd = perfData.data;
+      const lastValue = values[values.length - 1];
+      const prevValue = values[values.length - 2];
 
-      // Fetch ratios if enough years
-      let ratioData = {};
-      if (yearsDiff > 1) {
-        const r1 = await fetchJSON(`${API_BASE}/api/ratiosnewithdate/1/${f.id}/${latestDate}`);
-        if (r1) ratioData.data1an = r1;
-      }
-      if (yearsDiff > 3) {
-        const r3 = await fetchJSON(`${API_BASE}/api/ratiosnewithdate/3/${f.id}/${latestDate}`);
-        if (r3) ratioData.data3an = r3;
-      }
-      if (yearsDiff > 5) {
-        const r5 = await fetchJSON(`${API_BASE}/api/ratiosnewithdate/5/${f.id}/${latestDate}`);
-        if (r5) ratioData.data5an = r5;
+      // Performances glissantes a date
+      const perfVeille = perf(lastValue, prevValue);
+      const perf4s = perf(lastValue, findValueAtWeeksAgo(dates, values, lastDate, 4));
+      const ytd = perf(lastValue, findValueAtJanuary1(dates, values, lastDate));
+      const perf3m = perf(lastValue, findValueAtMonthsAgo(dates, values, lastDate, 3));
+      const perf6m = perf(lastValue, findValueAtMonthsAgo(dates, values, lastDate, 6));
+      const perf1an = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 1));
+      const perf3ans = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 3));
+      const perf5ans = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 5));
+      const perf8ans = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 8));
+      const perf10ans = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 10));
+
+      // Performances glissantes fin de mois precedent
+      const prevMonthEnd = new Date(lastDate.getFullYear(), lastDate.getMonth(), 0);
+      const prevMonthValue = findLastDateOfPreviousMonth(dates, values, lastDate);
+
+      let perfveillem = null, perf4sm = null, ytdm = null, perf3mm = null, perf6mm = null;
+      let perf1anm = null, perf3ansm = null, perf5ansm = null, perf8ansm = null, perf10ansm = null;
+
+      if (prevMonthValue != null) {
+        // Find the value just before prevMonthEnd for "veille"
+        const prevMonthPrevDay = new Date(prevMonthEnd);
+        prevMonthPrevDay.setDate(prevMonthPrevDay.getDate() - 1);
+        const prevMonthPrevValue = findValueAtDate(dates, values, prevMonthPrevDay);
+        perfveillem = perf(prevMonthValue, prevMonthPrevValue);
+        perf4sm = perf(prevMonthValue, findValueAtWeeksAgoForDate(dates, values, prevMonthEnd, 4));
+        ytdm = perf(prevMonthValue, findValueAtJanuary1ForDate(dates, values, prevMonthEnd));
+        perf3mm = perf(prevMonthValue, findValueAtMonthsAgoForDate(dates, values, prevMonthEnd, 3));
+        perf6mm = perf(prevMonthValue, findValueAtMonthsAgoForDate(dates, values, prevMonthEnd, 6));
+        perf1anm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 1));
+        perf3ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 3));
+        perf5ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 5));
+        perf8ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 8));
+        perf10ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 10));
       }
 
-      // Build ratio fields
-      const ratioFields = {};
-      const ratioFieldNames = ['perfannu', 'volatility', 'ratiosharpe', 'pertemax', 'sortino', 'info', 'calamar', 'var99', 'var95', 'trackingerror', 'betahaussier', 'betabaissier', 'beta', 'omega', 'dsr', 'downcapture', 'upcapture', 'skewness', 'kurtosis'];
-      for (const period of ['1an', '3an', '5an']) {
-        for (const field of ratioFieldNames) {
-          const key = `${field}${period}`;
-          ratioFields[key] = ratioData[`data${period}`]?.data?.[field] ?? null;
-        }
-      }
-
-      // Upsert into performences table
+      // Upsert
       const [existingPerf] = await conn.execute(
         'SELECT id FROM performences WHERE fond_id = ? AND date = ?',
-        [f.id, latestDate]
+        [f.id, latestDateStr]
       );
 
       const perfValues = {
         fond_id: f.id,
         code_ISIN: f.code_ISIN,
-        categorie: pd.category || f.categorie_globale,
+        categorie: f.categorie_globale,
         categorie_nationale: f.categorie_national,
         categorie_regionale: f.categorie_regional,
         devise: f.dev_libelle,
-        date: latestDate,
-        ytd: pd.perf1erJanvier,
-        perfveille: pd.perfVeille,
-        perf1an: pd.perf1An,
-        perf3ans: pd.perf3Ans,
-        perf5ans: pd.perf5Ans,
-        perf8ans: pd.perf8Ans,
-        perf10ans: pd.perf10Ans,
-        perf4s: pd.perf4Semaines,
-        perf3m: pd.perf3Mois,
-        perf6m: pd.perf6Mois,
-        ytdm: pd.perf1erJanvierm,
-        perfveillem: pd.perfVeillem,
-        perf1anm: pd.perf1Anm,
-        perf3ansm: pd.perf3Ansm,
-        perf5ansm: pd.perf5Ansm,
-        perf8ansm: pd.perf8Ansm,
-        perf10ansm: pd.perf10Ansm,
-        perf4sm: pd.perf4Semainesm,
-        perf3mm: pd.perf3Moism,
-        perf6mm: pd.perf6Moism,
-        ...ratioFields,
+        date: latestDateStr,
+        ytd, perfveille: perfVeille,
+        perf1an, perf3ans, perf5ans, perf8ans, perf10ans,
+        perf4s, perf3m, perf6m,
+        ytdm, perfveillem,
+        perf1anm, perf3ansm, perf5ansm, perf8ansm, perf10ansm,
+        perf4sm, perf3mm, perf6mm,
       };
 
       if (existingPerf.length > 0) {
         const sets = Object.keys(perfValues).filter(k => k !== 'fond_id' && k !== 'date')
-          .map(k => `${k} = ?`).join(', ');
+          .map(k => `\`${k}\` = ?`).join(', ');
         const vals = Object.keys(perfValues).filter(k => k !== 'fond_id' && k !== 'date')
           .map(k => perfValues[k]);
         await conn.execute(
           `UPDATE performences SET ${sets} WHERE fond_id = ? AND date = ?`,
-          [...vals, f.id, latestDate]
+          [...vals, f.id, latestDateStr]
         );
         updated++;
       } else {
-        const cols = Object.keys(perfValues).join(', ');
+        const cols = Object.keys(perfValues).map(k => `\`${k}\``).join(', ');
         const placeholders = Object.keys(perfValues).map(() => '?').join(', ');
         const vals = Object.values(perfValues);
         await conn.execute(
@@ -204,7 +261,7 @@ async function run() {
       byPays[pays]++;
 
       if ((i + 1) % 50 === 0 || i === fonds.length - 1) {
-        console.log(`  [${i + 1}/${fonds.length}] ${f.nom_fond} (${pays}) date=${latestDate} years=${yearsDiff.toFixed(1)}`);
+        console.log(`  [${i + 1}/${fonds.length}] ${f.nom_fond} (${pays}) date=${latestDateStr}`);
       }
     } catch (err) {
       errors++;
