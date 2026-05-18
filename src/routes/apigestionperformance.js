@@ -279,376 +279,388 @@ const apikey = require('../models/apikey');
  *                       description: Annualized performance since the fund's inception.
  */
 router.get('/api/performances/fond/:id', async (req, res) => {
-  const dateee = req.query.date;
-  const resultat = await fond.findOne({
-    attributes: ['categorie_libelle', 'categorie_national'],
-    where: {
-      id: req.params.id,
-    },
-  });
-  const categorie = resultat.categorie_libelle;
-  const categorie_national = resultat.categorie_national;
-  let performancesCategorie;
-  if (dateee) {
-    performancesCategorie = await getPerformancesByCategorynow(categorie_national, dateee);
+  try {
+    const dateee = req.query.date;
+    const resultat = await fond.findOne({
+      attributes: ['categorie_libelle', 'categorie_national'],
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!resultat) return res.status(404).json({ message: 'Introuvable' });
+    const categorie = resultat.categorie_libelle;
+    const categorie_national = resultat.categorie_national;
+    let performancesCategorie;
+    if (dateee) {
+      performancesCategorie = await getPerformancesByCategorynow(categorie_national, dateee);
+    }
+    vl.findAll({
+      where: {
+        fund_id: req.params.id
+      },
+      order: [
+        ['date', 'ASC']
+      ],
+      limit: 10000,
+    })
+      .then(response => {
+        const values = response.map((data) => data.vl_ajuste); //todo
+        const actif_nets = response.map((data) => data.actif_net);
+        const lastValueactif_net = actif_nets[actif_nets.length - 1];
+
+        const lastValue = values[values.length - 1];
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
+
+        const targetYear = groupDatesByYear(dates).length
+
+        const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
+        const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
+
+        //Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+
+
+        //Performances annualizées fin de mois
+        const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
+        const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
+        const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
+        const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
+        const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
+        const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
+        const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
+        const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
+        const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+
+
+        //Performances cumulées fin de mois
+        const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+        //Performances annualizées à date
+        const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        //Performances  annee calendaire
+        const ArrayDates = groupDatesByYear(dates);
+        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+        const multipliedValues = adaptValues1.map(item => {
+          const year = item[0];
+          const value1 = item[1];
+          const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+          return [year, value1, value3];
+        });
+
+
+        res.json({
+          code: 200,
+          data: {
+            fund_id: req.params.id,
+            lastdatepreviousmonth: lastdatepreviousmonth,
+            category: categorie,
+            perf3Moisactif_net: perf3Moisactif_net,
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf15Ans: perf15Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
+            perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
+            perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
+            perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
+            perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
+            perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
+            perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
+            perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
+            perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
+            perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
+            perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
+            perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
+            perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
+            perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
+            perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
+            perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
+            perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
+            perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
+            perfAnnualizedtodate1An: perfAnnualizedtodate1An,
+            perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
+            perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
+            perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
+            perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
+            perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
+            perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
+            perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
+            perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
+            adaptValues1: multipliedValues,
+            performancesCategorie: dateee ? performancesCategorie : null
+          }
+        })
+
+  } catch (error) {
+    console.error('Erreur route /api/performances/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
-  vl.findAll({
-    where: {
-      fund_id: req.params.id
-    },
-    order: [
-      ['date', 'ASC']
-    ],
-    limit: 10000,
-  })
-    .then(response => {
-      const values = response.map((data) => data.vl_ajuste); //todo
-      const actif_nets = response.map((data) => data.actif_net);
-      const lastValueactif_net = actif_nets[actif_nets.length - 1];
-
-      const lastValue = values[values.length - 1];
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
-
-      const targetYear = groupDatesByYear(dates).length
-
-      const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-      const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
-
-      //Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-
-
-      //Performances annualizées fin de mois
-      const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
-      const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
-      const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
-      const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
-      const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
-      const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
-      const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
-      const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
-      const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-
-
-      //Performances cumulées fin de mois
-      const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-      //Performances annualizées à date
-      const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-      //Performances  annee calendaire
-      const ArrayDates = groupDatesByYear(dates);
-      const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-      const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-      const multipliedValues = adaptValues1.map(item => {
-        const year = item[0];
-        const value1 = item[1];
-        const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-        return [year, value1, value3];
-      });
-
-
-      res.json({
-        code: 200,
-        data: {
-          fund_id: req.params.id,
-          lastdatepreviousmonth: lastdatepreviousmonth,
-          category: categorie,
-          perf3Moisactif_net: perf3Moisactif_net,
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf15Ans: perf15Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
-          perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
-          perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
-          perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
-          perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
-          perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
-          perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
-          perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
-          perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
-          perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
-          perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
-          perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
-          perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
-          perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
-          perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
-          perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
-          perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
-          perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
-          perfAnnualizedtodate1An: perfAnnualizedtodate1An,
-          perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
-          perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
-          perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
-          perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
-          perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
-          perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
-          perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
-          perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
-          adaptValues1: multipliedValues,
-          performancesCategorie: dateee ? performancesCategorie : null
-        }
-      })
-
     })
 })
 router.get('/api/performancescomparaison/fond/:id', async (req, res) => {
-  const dateee = req.query.date;
-  const resultat = await fond.findOne({
-    attributes: ['categorie_libelle', 'categorie_national'],
-    where: {
-      id: req.params.id,
-    },
-  });
-  const categorie = resultat.categorie_libelle;
-  const categorie_national = resultat.categorie_national;
+  try {
+    const dateee = req.query.date;
+    const resultat = await fond.findOne({
+      attributes: ['categorie_libelle', 'categorie_national'],
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!resultat) return res.status(404).json({ message: 'Introuvable' });
+    const categorie = resultat.categorie_libelle;
+    const categorie_national = resultat.categorie_national;
 
-  // const performancesCategorie = await getPerformancesByCategorynow(categorie_national, dateee);
+    // const performancesCategorie = await getPerformancesByCategorynow(categorie_national, dateee);
 
-  vl.findAll({
-    where: {
-      fund_id: req.params.id
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
+    vl.findAll({
+      where: {
+        fund_id: req.params.id
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
-  })
-    .then(response => {
-      const values = response.map((data) => data.value);
-      const actif_nets = response.map((data) => data.actif_net);
-      const lastValueactif_net = actif_nets[actif_nets.length - 1];
+    })
+      .then(response => {
+        const values = response.map((data) => data.value);
+        const actif_nets = response.map((data) => data.actif_net);
+        const lastValueactif_net = actif_nets[actif_nets.length - 1];
 
-      const lastValue = values[values.length - 1];
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
+        const lastValue = values[values.length - 1];
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
 
-      const targetYear = groupDatesByYear(dates).length
+        const targetYear = groupDatesByYear(dates).length
 
-      const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-      const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
+        const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
 
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
 
-      //Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+        //Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
 
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-
-
-      //Performances annualizées fin de mois
-      const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
-      const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
-      const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
-      const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
-      const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
-      const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
-      const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
-      const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
-      const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
 
-      //Performances cumulées fin de mois
-      const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
-      //Performances annualizées à date
-      const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-      //Performances  annee calendaire
-      const ArrayDates = groupDatesByYear(dates);
-      const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-      const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-      const multipliedValues = adaptValues1.map(item => {
-        const year = item[0];
-        const value1 = item[1];
-        const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-        return [year, value1, value3];
-      });
+        //Performances annualizées fin de mois
+        const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
+        const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
+        const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
+        const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
+        const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
+        const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
+        const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
+        const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
+        const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
 
 
-      res.json({
-        code: 200,
-        data: {
-          fund_id: req.params.id,
-          lastdatepreviousmonth: lastdatepreviousmonth,
-          category: categorie,
-          perf3Moisactif_net: perf3Moisactif_net,
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf15Ans: perf15Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
-          perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
-          perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
-          perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
-          perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
-          perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
-          perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
-          perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
-          perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
-          perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
-          perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
-          perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
-          perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
-          perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
-          perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
-          perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
-          perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
-          perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
-          perfAnnualizedtodate1An: perfAnnualizedtodate1An,
-          perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
-          perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
-          perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
-          perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
-          perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
-          perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
-          perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
-          perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
-          adaptValues1: multipliedValues,
-          //  performancesCategorie: performancesCategorie
-        }
-      })
+        //Performances cumulées fin de mois
+        const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
+        //Performances annualizées à date
+        const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        //Performances  annee calendaire
+        const ArrayDates = groupDatesByYear(dates);
+        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+        const multipliedValues = adaptValues1.map(item => {
+          const year = item[0];
+          const value1 = item[1];
+          const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+          return [year, value1, value3];
+        });
+
+
+        res.json({
+          code: 200,
+          data: {
+            fund_id: req.params.id,
+            lastdatepreviousmonth: lastdatepreviousmonth,
+            category: categorie,
+            perf3Moisactif_net: perf3Moisactif_net,
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf15Ans: perf15Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
+            perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
+            perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
+            perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
+            perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
+            perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
+            perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
+            perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
+            perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
+            perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
+            perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
+            perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
+            perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
+            perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
+            perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
+            perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
+            perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
+            perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
+            perfAnnualizedtodate1An: perfAnnualizedtodate1An,
+            perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
+            perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
+            perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
+            perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
+            perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
+            perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
+            perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
+            perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
+            adaptValues1: multipliedValues,
+            //  performancesCategorie: performancesCategorie
+          }
+        })
+
+  } catch (error) {
+    console.error('Erreur route /api/performancescomparaison/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
     })
 })
 /////revoir
@@ -847,1039 +859,1085 @@ function calculateAnnualizedToDate(dates, values, lastValue, targetYear) {
 ///////
 //////////////////////////////////
 router.get('/api/performanceswithdate1/fond/:id/:date', async (req, res) => {
-  const resultat = await fond.findOne({
-    attributes: ['categorie_libelle', 'categorie_national'],
-    where: {
-      id: req.params.id,
-    },
-  });
-  const categorie = resultat.categorie_libelle;
-  const categorie_national = resultat.categorie_national;
+  try {
+    const resultat = await fond.findOne({
+      attributes: ['categorie_libelle', 'categorie_national'],
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!resultat) return res.status(404).json({ message: 'Introuvable' });
+    const categorie = resultat.categorie_libelle;
+    const categorie_national = resultat.categorie_national;
 
-  const performancesCategorie = await getPerformancesByCategory(categorie_national);
+    const performancesCategorie = await getPerformancesByCategory(categorie_national);
 
-  const date = new Date(req.params.date); // Convertir la chaîne de date en objet Date
+    const date = new Date(req.params.date); // Convertir la chaîne de date en objet Date
 
-  vl.findAll({
-    where: {
-      fund_id: req.params.id,
-      date: { [Op.lte]: req.params.date } // Filtrer les valeurs inférieures ou égales à la date fournie
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
+    vl.findAll({
+      where: {
+        fund_id: req.params.id,
+        date: { [Op.lte]: req.params.date } // Filtrer les valeurs inférieures ou égales à la date fournie
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
-  })
-    .then(response => {
-      const values = response.map((data) => data.value);
-      const actif_nets = response.map((data) => data.actif_net);
-      const lastValueactif_net = actif_nets[actif_nets.length - 1];
+    })
+      .then(response => {
+        const values = response.map((data) => data.value);
+        const actif_nets = response.map((data) => data.actif_net);
+        const lastValueactif_net = actif_nets[actif_nets.length - 1];
 
-      const lastValue = values[values.length - 1];
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
+        const lastValue = values[values.length - 1];
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
 
-      const targetYear = groupDatesByYear(dates).length
+        const targetYear = groupDatesByYear(dates).length
 
-      const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-      const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
+        const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
 
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
 
-      //Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+        //Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
 
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-
-
-      //Performances annualizées fin de mois
-      const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
-      const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
-      const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
-      const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
-      const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
-      const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
-      const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
-      const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
-      const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
 
-      //Performances cumulées fin de mois
-      const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
-      //Performances annualizées à date
-      const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-      //Performances  annee calendaire
-      const ArrayDates = groupDatesByYear(dates);
-      const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-      const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-      const multipliedValues = adaptValues1.map(item => {
-        const year = item[0];
-        const value1 = item[1];
-        const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-        return [year, value1, value3];
-      });
+        //Performances annualizées fin de mois
+        const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
+        const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
+        const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
+        const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
+        const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
+        const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
+        const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
+        const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
+        const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
 
 
-      res.json({
-        code: 200,
-        data: {
-          fund_id: req.params.id,
-          lastdatepreviousmonth: lastdatepreviousmonth,
-          category: categorie,
-          perf3Moisactif_net: perf3Moisactif_net,
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf15Ans: perf15Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
-          perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
-          perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
-          perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
-          perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
-          perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
-          perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
-          perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
-          perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
-          perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
-          perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
-          perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
-          perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
-          perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
-          perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
-          perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
-          perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
-          perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
-          perfAnnualizedtodate1An: perfAnnualizedtodate1An,
-          perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
-          perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
-          perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
-          perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
-          perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
-          perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
-          perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
-          perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
-          adaptValues1: multipliedValues,
-          performancesCategorie: performancesCategorie
-        }
-      })
+        //Performances cumulées fin de mois
+        const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
+        //Performances annualizées à date
+        const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        //Performances  annee calendaire
+        const ArrayDates = groupDatesByYear(dates);
+        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+        const multipliedValues = adaptValues1.map(item => {
+          const year = item[0];
+          const value1 = item[1];
+          const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+          return [year, value1, value3];
+        });
+
+
+        res.json({
+          code: 200,
+          data: {
+            fund_id: req.params.id,
+            lastdatepreviousmonth: lastdatepreviousmonth,
+            category: categorie,
+            perf3Moisactif_net: perf3Moisactif_net,
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf15Ans: perf15Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
+            perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
+            perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
+            perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
+            perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
+            perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
+            perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
+            perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
+            perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
+            perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
+            perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
+            perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
+            perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
+            perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
+            perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
+            perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
+            perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
+            perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
+            perfAnnualizedtodate1An: perfAnnualizedtodate1An,
+            perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
+            perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
+            perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
+            perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
+            perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
+            perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
+            perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
+            perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
+            adaptValues1: multipliedValues,
+            performancesCategorie: performancesCategorie
+          }
+        })
+
+  } catch (error) {
+    console.error('Erreur route /api/performanceswithdate1/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
     })
 })
 
 
 //////////////////////////////////
 router.get('/api/performancesindice/fond/:id', async (req, res) => {
-  const selectedValues = req.query.query;
-  const resultat = await fond.findOne({
-    attributes: ['categorie_libelle', 'categorie_national'],
-    where: {
-      id: req.params.id,
-    },
-  });
-  const categorie = resultat.categorie_libelle;
-  const categorie_national = resultat.categorie_national;
+  try {
+    const selectedValues = req.query.query;
+    const resultat = await fond.findOne({
+      attributes: ['categorie_libelle', 'categorie_national'],
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!resultat) return res.status(404).json({ message: 'Introuvable' });
+    const categorie = resultat.categorie_libelle;
+    const categorie_national = resultat.categorie_national;
 
-  // const performancesCategorie = await getPerformancesByCategory(categorie_national);
+    // const performancesCategorie = await getPerformancesByCategory(categorie_national);
 
-  vl.findAll({
-    where: {
-      fund_id: req.params.id
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
+    vl.findAll({
+      where: {
+        fund_id: req.params.id
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
-  })
-    .then(response => {
-      const values = response.map(data => {
-        switch (selectedValues) {
-          case 'USD':
-            return data.indRef_USD; // Assurez-vous d'avoir les valeurs en USD dans votre base de données
-          case 'EUR':
-            return data.indRef_EUR; // Assurez-vous d'avoir les valeurs en USD dans votre base de données
-          default:
-            return data.indRef;
-        }
-      });
-      const actif_nets = response.map(data => {
-        switch (selectedValues) {
-          case 'USD':
-            return data.actif_net_USD; // Assurez-vous d'avoir les valeurs en USD dans votre base de données
-          case 'EUR':
-            return data.actif_net_EUR; // Assurez-vous d'avoir les valeurs en USD dans votre base de données
-          default:
-            return data.actif_net;
-        }
-      });
-      const lastValueactif_net = actif_nets[actif_nets.length - 1];
+    })
+      .then(response => {
+        const values = response.map(data => {
+          switch (selectedValues) {
+            case 'USD':
+              return data.indRef_USD; // Assurez-vous d'avoir les valeurs en USD dans votre base de données
+            case 'EUR':
+              return data.indRef_EUR; // Assurez-vous d'avoir les valeurs en USD dans votre base de données
+            default:
+              return data.indRef;
+          }
+        });
+        const actif_nets = response.map(data => {
+          switch (selectedValues) {
+            case 'USD':
+              return data.actif_net_USD; // Assurez-vous d'avoir les valeurs en USD dans votre base de données
+            case 'EUR':
+              return data.actif_net_EUR; // Assurez-vous d'avoir les valeurs en USD dans votre base de données
+            default:
+              return data.actif_net;
+          }
+        });
+        const lastValueactif_net = actif_nets[actif_nets.length - 1];
 
-      const lastValue = values[values.length - 1];
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
+        const lastValue = values[values.length - 1];
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
 
-      const targetYear = groupDatesByYear(dates).length
+        const targetYear = groupDatesByYear(dates).length
 
-      const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-      const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
+        const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
 
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
 
-      //Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+        //Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
 
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-
-
-      //Performances annualizées fin de mois
-      const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
-      const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
-      const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
-      const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
-      const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
-      const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
-      const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
-      const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
-      const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
 
-      //Performances cumulées fin de mois
-      const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
-      //Performances annualizées à date
-      const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-      //Performances  annee calendaire
-      const ArrayDates = groupDatesByYear(dates);
-      const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-      const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-      const multipliedValues = adaptValues1.map(item => {
-        const year = item[0];
-        const value1 = item[1];
-        const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-        return [year, value1, value3];
-      });
+        //Performances annualizées fin de mois
+        const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
+        const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
+        const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
+        const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
+        const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
+        const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
+        const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
+        const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
+        const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
 
 
-      res.json({
-        code: 200,
-        data: {
-          fund_id: req.params.id,
-          lastdatepreviousmonth: lastdatepreviousmonth,
-          category: categorie,
-          perf3Moisactif_net: perf3Moisactif_net,
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf15Ans: perf15Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
-          perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
-          perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
-          perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
-          perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
-          perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
-          perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
-          perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
-          perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
-          perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
-          perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
-          perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
-          perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
-          perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
-          perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
-          perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
-          perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
-          perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
-          perfAnnualizedtodate1An: perfAnnualizedtodate1An,
-          perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
-          perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
-          perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
-          perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
-          perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
-          perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
-          perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
-          perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
-          adaptValues1: multipliedValues,
-          //    performancesCategorie: performancesCategorie
-        }
-      })
+        //Performances cumulées fin de mois
+        const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
+        //Performances annualizées à date
+        const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        //Performances  annee calendaire
+        const ArrayDates = groupDatesByYear(dates);
+        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+        const multipliedValues = adaptValues1.map(item => {
+          const year = item[0];
+          const value1 = item[1];
+          const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+          return [year, value1, value3];
+        });
+
+
+        res.json({
+          code: 200,
+          data: {
+            fund_id: req.params.id,
+            lastdatepreviousmonth: lastdatepreviousmonth,
+            category: categorie,
+            perf3Moisactif_net: perf3Moisactif_net,
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf15Ans: perf15Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
+            perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
+            perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
+            perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
+            perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
+            perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
+            perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
+            perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
+            perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
+            perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
+            perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
+            perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
+            perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
+            perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
+            perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
+            perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
+            perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
+            perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
+            perfAnnualizedtodate1An: perfAnnualizedtodate1An,
+            perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
+            perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
+            perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
+            perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
+            perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
+            perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
+            perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
+            perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
+            adaptValues1: multipliedValues,
+            //    performancesCategorie: performancesCategorie
+          }
+        })
+
+  } catch (error) {
+    console.error('Erreur route /api/performancesindice/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
     })
 })
 
 router.get('/api/performancescategorie/fond/:id', async (req, res) => {
-  const resultat = await fond.findOne({
-    attributes: ['categorie_libelle', 'categorie_national'],
-    where: {
-      id: req.params.id,
-    },
-  });
-  const categorie = resultat.categorie_libelle;
-  const categorie_national = resultat.categorie_national;
-  // Recherche des fonds ayant la même catégorie nationale
-  const fondsMemeCategorie = await fond.findAll({
-    attributes: ['id'],
-    where: { categorie_national: categorie_national },
-    limit: 10000,
-  });
-  const fondIds = fondsMemeCategorie.map(f => f.id);
+  try {
+    const resultat = await fond.findOne({
+      attributes: ['categorie_libelle', 'categorie_national'],
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!resultat) return res.status(404).json({ message: 'Introuvable' });
+    const categorie = resultat.categorie_libelle;
+    const categorie_national = resultat.categorie_national;
+    // Recherche des fonds ayant la même catégorie nationale
+    const fondsMemeCategorie = await fond.findAll({
+      attributes: ['id'],
+      where: { categorie_national: categorie_national },
+      limit: 10000,
+    });
+    const fondIds = fondsMemeCategorie.map(f => f.id);
 
 
-  const selectedValues = req.query.query; // Récupérer la devise à partir des paramètres de la requête
+    const selectedValues = req.query.query; // Récupérer la devise à partir des paramètres de la requête
 
-  let valueColumn;
-  if (selectedValues === 'EUR') {
-    valueColumn = 'value_EUR';
-  } else if (selectedValues === 'USD') {
-    valueColumn = 'value_USD';
-  } else {
-    valueColumn = 'value'; // Valeur par défaut
-  }
-
-  // Requête pour récupérer les valorisations avec la colonne de valeur appropriée
-  const valorisationss = await vl.findAll({
-    attributes: [
-      'fund_id',
-      [Sequelize.fn('MAX', Sequelize.col('date')), 'latest_date'],
-      [Sequelize.col(valueColumn), 'value'],
-      [Sequelize.fn('YEAR', Sequelize.col('date')), 'year']
-    ],
-    where: {
-      fund_id: fondIds,
-    },
-    group: ['fund_id', 'year'],
-    order: [
-      ['fund_id', 'ASC'],
-      ['year', 'DESC'],
-      ['latest_date', 'DESC']
-    ],
-    limit: 10000,
-  });
-  // Transform the result to calculate performance
-  let fundPerformances = {};
-  valorisationss.forEach(val => {
-    const { fund_id, year, value, latest_date } = val.dataValues;
-    if (!fundPerformances[fund_id]) {
-      fundPerformances[fund_id] = {};
+    let valueColumn;
+    if (selectedValues === 'EUR') {
+      valueColumn = 'value_EUR';
+    } else if (selectedValues === 'USD') {
+      valueColumn = 'value_USD';
+    } else {
+      valueColumn = 'value'; // Valeur par défaut
     }
-    fundPerformances[fund_id][year] = { value, date: latest_date };
-  });
 
-  let annualPerformances = {};
-  for (let fund_id in fundPerformances) {
-    let years = Object.keys(fundPerformances[fund_id]).sort((a, b) => b - a);
-    for (let i = 0; i < years.length - 1; i++) {
-      let currentYear = years[i];
-      let previousYear = years[i + 1];
-      let currentValue = fundPerformances[fund_id][currentYear].value;
-      let previousValue = fundPerformances[fund_id][previousYear].value;
-      let performance = (currentValue - previousValue) / previousValue;
-      if (previousValue == 0) {
-        performance = 0
-
+    // Requête pour récupérer les valorisations avec la colonne de valeur appropriée
+    const valorisationss = await vl.findAll({
+      attributes: [
+        'fund_id',
+        [Sequelize.fn('MAX', Sequelize.col('date')), 'latest_date'],
+        [Sequelize.col(valueColumn), 'value'],
+        [Sequelize.fn('YEAR', Sequelize.col('date')), 'year']
+      ],
+      where: {
+        fund_id: fondIds,
+      },
+      group: ['fund_id', 'year'],
+      order: [
+        ['fund_id', 'ASC'],
+        ['year', 'DESC'],
+        ['latest_date', 'DESC']
+      ],
+      limit: 10000,
+    });
+    // Transform the result to calculate performance
+    let fundPerformances = {};
+    valorisationss.forEach(val => {
+      const { fund_id, year, value, latest_date } = val.dataValues;
+      if (!fundPerformances[fund_id]) {
+        fundPerformances[fund_id] = {};
       }
-      if (!annualPerformances[currentYear]) {
-        annualPerformances[currentYear] = [];
+      fundPerformances[fund_id][year] = { value, date: latest_date };
+    });
+
+    let annualPerformances = {};
+    for (let fund_id in fundPerformances) {
+      let years = Object.keys(fundPerformances[fund_id]).sort((a, b) => b - a);
+      for (let i = 0; i < years.length - 1; i++) {
+        let currentYear = years[i];
+        let previousYear = years[i + 1];
+        let currentValue = fundPerformances[fund_id][currentYear].value;
+        let previousValue = fundPerformances[fund_id][previousYear].value;
+        let performance = (currentValue - previousValue) / previousValue;
+        if (previousValue == 0) {
+          performance = 0
+
+        }
+        if (!annualPerformances[currentYear]) {
+          annualPerformances[currentYear] = [];
+        }
+        annualPerformances[currentYear].push(performance);
       }
-      annualPerformances[currentYear].push(performance);
     }
-  }
 
-  let multipliedValues = [];
-  for (let year in annualPerformances) {
-    let averagePerformance = annualPerformances[year].reduce((a, b) => a + b, 0) / annualPerformances[year].length;
-    multipliedValues.push([parseInt(year), averagePerformance * 100]);
-  }
-
-
-  multipliedValues.reverse();
-  res.json({
-    code: 200,
-    data: {
-      multipliedValues
+    let multipliedValues = [];
+    for (let year in annualPerformances) {
+      let averagePerformance = annualPerformances[year].reduce((a, b) => a + b, 0) / annualPerformances[year].length;
+      multipliedValues.push([parseInt(year), averagePerformance * 100]);
     }
-  });
+
+
+    multipliedValues.reverse();
+    res.json({
+      code: 200,
+      data: {
+        multipliedValues
+      }
+    });
+  } catch (error) {
+    console.error('Erreur route /api/performancescategorie/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 
 })
 router.get('/api/performancesdevcategorie/fond/:id/:devise', async (req, res) => {
-  const resultat = await fond.findOne({
-    attributes: ['categorie_libelle', 'categorie_national'],
-    where: {
-      id: req.params.id,
-    },
-  });
-  const categorie = resultat.categorie_libelle;
-  const categorie_national = resultat.categorie_national;
-  // Recherche des fonds ayant la même catégorie nationale
-  const fondsMemeCategorie = await fond.findAll({
-    attributes: ['id'],
-    where: { categorie_national: categorie_national },
-    limit: 10000,
-  });
-  let valorisationss;
-  if (req.params.devise == "USD") {
-    valorisationss = await vl.findAll({
-      attributes: [
-        [Sequelize.fn('AVG', Sequelize.col('value_USD')), 'moyenne_vl'],
-        'date'
-      ],
-      where: { fund_id: fondsMemeCategorie.map(fond => fond.id) },
-      group: ['date'],
+  try {
+    const resultat = await fond.findOne({
+      attributes: ['categorie_libelle', 'categorie_national'],
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!resultat) return res.status(404).json({ message: 'Introuvable' });
+    const categorie = resultat.categorie_libelle;
+    const categorie_national = resultat.categorie_national;
+    // Recherche des fonds ayant la même catégorie nationale
+    const fondsMemeCategorie = await fond.findAll({
+      attributes: ['id'],
+      where: { categorie_national: categorie_national },
       limit: 10000,
     });
-  } else {
-    valorisationss = await vl.findAll({
-      attributes: [
-        [Sequelize.fn('AVG', Sequelize.col('value_EUR')), 'moyenne_vl'],
-        'date'
-      ],
-      where: { fund_id: fondsMemeCategorie.map(fond => fond.id) },
-      group: ['date'],
-      limit: 10000,
-    });
-  }
-
-  const values = valorisationss.map((data) => data.dataValues.moyenne_vl);
-  const dates = valorisationss.map((data) => moment(data.dataValues.date).format('YYYY-MM-DD'));
-  //Performances  annee calendaire
-  const ArrayDates = groupDatesByYear(dates);
-  const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-  const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-  const multipliedValues = adaptValues1.map(item => {
-    const year = item[0];
-    const value1 = item[1];
-    const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-    return [year, value1, value3];
-  });
-  res.json({
-    code: 200,
-    data: {
-      multipliedValues
+    let valorisationss;
+    if (req.params.devise == "USD") {
+      valorisationss = await vl.findAll({
+        attributes: [
+          [Sequelize.fn('AVG', Sequelize.col('value_USD')), 'moyenne_vl'],
+          'date'
+        ],
+        where: { fund_id: fondsMemeCategorie.map(fond => fond.id) },
+        group: ['date'],
+        limit: 10000,
+      });
+    } else {
+      valorisationss = await vl.findAll({
+        attributes: [
+          [Sequelize.fn('AVG', Sequelize.col('value_EUR')), 'moyenne_vl'],
+          'date'
+        ],
+        where: { fund_id: fondsMemeCategorie.map(fond => fond.id) },
+        group: ['date'],
+        limit: 10000,
+      });
     }
-  });
+
+    const values = valorisationss.map((data) => data.dataValues.moyenne_vl);
+    const dates = valorisationss.map((data) => moment(data.dataValues.date).format('YYYY-MM-DD'));
+    //Performances  annee calendaire
+    const ArrayDates = groupDatesByYear(dates);
+    const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+    const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+    const multipliedValues = adaptValues1.map(item => {
+      const year = item[0];
+      const value1 = item[1];
+      const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+      return [year, value1, value3];
+    });
+    res.json({
+      code: 200,
+      data: {
+        multipliedValues
+      }
+    });
+  } catch (error) {
+    console.error('Erreur route /api/performancesdevcategorie/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 
 })
 
 router.get('/api/performancesdev/fond/:id/:devise', async (req, res) => {
-  const dateee = req.query.date;
+  try {
+    const dateee = req.query.date;
 
-  const resultat = await fond.findOne({
-    attributes: ['categorie_libelle', 'categorie_national'],
-    where: {
-      id: req.params.id,
-    },
-  });
-  const categorie = resultat.categorie_libelle;
-  const categorie_national = resultat.categorie_national;
+    const resultat = await fond.findOne({
+      attributes: ['categorie_libelle', 'categorie_national'],
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!resultat) return res.status(404).json({ message: 'Introuvable' });
+    const categorie = resultat.categorie_libelle;
+    const categorie_national = resultat.categorie_national;
 
-  if (dateee) {
-    performancesCategorie = await getPerformancesByCategorynow(categorie_national, dateee);
-  }
-  vl.findAll({
-    where: {
-      fund_id: req.params.id
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
+    if (dateee) {
+      performancesCategorie = await getPerformancesByCategorynow(categorie_national, dateee);
+    }
+    vl.findAll({
+      where: {
+        fund_id: req.params.id
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
-  })
-    .then(response => {
-      let values;
-      let actif_nets;
-      if (req.params.devise == "USD") {
-        values = response.map((data) => data.value_USD);
-        actif_nets = response.map((data) => data.actif_net_USD);
+    })
+      .then(response => {
+        let values;
+        let actif_nets;
+        if (req.params.devise == "USD") {
+          values = response.map((data) => data.value_USD);
+          actif_nets = response.map((data) => data.actif_net_USD);
 
-      } else {
-        values = response.map((data) => data.value_EUR);
-        actif_nets = response.map((data) => data.actif_net_EUR);
-
-
-      }
-
-      // const values = response.map((data) => data.value);
-      const lastValue = values[values.length - 1];
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
-      const lastValueactif_net = actif_nets[actif_nets.length - 1];
-
-      const targetYear = groupDatesByYear(dates).length
-      const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-
-      const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
-
-      //Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+        } else {
+          values = response.map((data) => data.value_EUR);
+          actif_nets = response.map((data) => data.actif_net_EUR);
 
 
-
-      //Performances annualizées fin de mois
-      const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
-      const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
-      const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
-      const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
-      const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
-      const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
-      const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
-      const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
-      const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-
-
-      //Performances cumulées fin de mois
-      const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-      //Performances annualizées à date
-      const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-      //Performances  annee calendaire
-      const ArrayDates = groupDatesByYear(dates);
-      const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-      const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-      const multipliedValues = adaptValues1.map(item => {
-        const year = item[0];
-        const value1 = item[1];
-        const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-        return [year, value1, value3];
-      });
-
-
-      res.json({
-        code: 200,
-        data: {
-          fund_id: req.params.id,
-          lastdatepreviousmonth: lastdatepreviousmonth,
-          perf3Moisactif_net: perf3Moisactif_net,
-          category: categorie,
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf15Ans: perf15Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
-          perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
-          perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
-          perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
-          perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
-          perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
-          perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
-          perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
-          perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
-          perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
-          perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
-          perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
-          perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
-          perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
-          perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
-          perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
-          perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
-          perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
-          perfAnnualizedtodate1An: perfAnnualizedtodate1An,
-          perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
-          perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
-          perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
-          perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
-          perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
-          perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
-          perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
-          perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
-          adaptValues1: multipliedValues,
-          performancesCategorie: dateee ? performancesCategorie : null
         }
-      })
 
+        // const values = response.map((data) => data.value);
+        const lastValue = values[values.length - 1];
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
+        const lastValueactif_net = actif_nets[actif_nets.length - 1];
+
+        const targetYear = groupDatesByYear(dates).length
+        const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+
+        const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
+
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
+
+        //Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+
+
+        //Performances annualizées fin de mois
+        const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
+        const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
+        const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
+        const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
+        const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
+        const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
+        const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
+        const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
+        const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+
+
+        //Performances cumulées fin de mois
+        const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+        //Performances annualizées à date
+        const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        //Performances  annee calendaire
+        const ArrayDates = groupDatesByYear(dates);
+        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+        const multipliedValues = adaptValues1.map(item => {
+          const year = item[0];
+          const value1 = item[1];
+          const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+          return [year, value1, value3];
+        });
+
+
+        res.json({
+          code: 200,
+          data: {
+            fund_id: req.params.id,
+            lastdatepreviousmonth: lastdatepreviousmonth,
+            perf3Moisactif_net: perf3Moisactif_net,
+            category: categorie,
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf15Ans: perf15Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
+            perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
+            perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
+            perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
+            perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
+            perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
+            perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
+            perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
+            perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
+            perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
+            perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
+            perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
+            perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
+            perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
+            perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
+            perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
+            perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
+            perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
+            perfAnnualizedtodate1An: perfAnnualizedtodate1An,
+            perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
+            perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
+            perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
+            perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
+            perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
+            perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
+            perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
+            perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
+            adaptValues1: multipliedValues,
+            performancesCategorie: dateee ? performancesCategorie : null
+          }
+        })
+
+  } catch (error) {
+    console.error('Erreur route /api/performancesdev/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
     })
 })
 
 router.get('/api/performancesdevwithdate/fond/:id/:devise/:date', async (req, res) => {
+  try {
 
-  const resultat = await fond.findOne({
-    attributes: ['categorie_libelle', 'categorie_national'],
-    where: {
-      id: req.params.id,
-    },
-  });
-  const categorie = resultat.categorie_libelle;
-  const categorie_national = resultat.categorie_national;
+    const resultat = await fond.findOne({
+      attributes: ['categorie_libelle', 'categorie_national'],
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!resultat) return res.status(404).json({ message: 'Introuvable' });
+    const categorie = resultat.categorie_libelle;
+    const categorie_national = resultat.categorie_national;
 
-  //const performancesCategorie = await getPerformancesByCategory(categorie_national);
+    //const performancesCategorie = await getPerformancesByCategory(categorie_national);
 
-  vl.findAll({
-    where: {
-      fund_id: req.params.id,
-      date: { [Op.lte]: req.params.date } // Filtrer les valeurs inférieures ou égales à la date fournie
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
+    vl.findAll({
+      where: {
+        fund_id: req.params.id,
+        date: { [Op.lte]: req.params.date } // Filtrer les valeurs inférieures ou égales à la date fournie
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
-  })
-    .then(response => {
-      let values;
-      let actif_nets;
-      if (req.params.devise == "USD") {
-        values = response.map((data) => data.value_USD);
-        actif_nets = response.map((data) => data.actif_net_USD);
+    })
+      .then(response => {
+        let values;
+        let actif_nets;
+        if (req.params.devise == "USD") {
+          values = response.map((data) => data.value_USD);
+          actif_nets = response.map((data) => data.actif_net_USD);
 
-      } else {
-        values = response.map((data) => data.value_EUR);
-        actif_nets = response.map((data) => data.actif_net_EUR);
-
-
-      }
-
-      // const values = response.map((data) => data.value);
-      const lastValue = values[values.length - 1];
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
-      const lastValueactif_net = actif_nets[actif_nets.length - 1];
-
-      const targetYear = groupDatesByYear(dates).length
-      const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-
-      const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
-
-      //Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+        } else {
+          values = response.map((data) => data.value_EUR);
+          actif_nets = response.map((data) => data.actif_net_EUR);
 
 
-
-      //Performances annualizées fin de mois
-      const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
-      const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
-      const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
-      const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
-      const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
-      const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
-      const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
-      const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
-      const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-
-
-      //Performances cumulées fin de mois
-      const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-      //Performances annualizées à date
-      const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-      //Performances  annee calendaire
-      const ArrayDates = groupDatesByYear(dates);
-      const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-      const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-      const multipliedValues = adaptValues1.map(item => {
-        const year = item[0];
-        const value1 = item[1];
-        const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-        return [year, value1, value3];
-      });
-
-
-      res.json({
-        code: 200,
-        data: {
-          fund_id: req.params.id,
-          lastdatepreviousmonth: lastdatepreviousmonth,
-          perf3Moisactif_net: perf3Moisactif_net,
-          category: categorie,
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf15Ans: perf15Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
-          perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
-          perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
-          perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
-          perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
-          perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
-          perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
-          perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
-          perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
-          perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
-          perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
-          perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
-          perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
-          perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
-          perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
-          perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
-          perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
-          perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
-          perfAnnualizedtodate1An: perfAnnualizedtodate1An,
-          perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
-          perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
-          perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
-          perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
-          perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
-          perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
-          perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
-          perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
-          adaptValues1: multipliedValues,
-          //  performancesCategorie: performancesCategorie
         }
-      })
 
+        // const values = response.map((data) => data.value);
+        const lastValue = values[values.length - 1];
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
+        const lastValueactif_net = actif_nets[actif_nets.length - 1];
+
+        const targetYear = groupDatesByYear(dates).length
+        const perf3Moisactif_net = calculatePerformance(lastValueactif_net, actif_nets[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+
+        const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
+
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
+
+        //Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+
+
+        //Performances annualizées fin de mois
+        const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
+        const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
+        const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
+        const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
+        const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
+        const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
+        const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
+        const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
+        const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+
+
+        //Performances cumulées fin de mois
+        const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+        //Performances annualizées à date
+        const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        //Performances  annee calendaire
+        const ArrayDates = groupDatesByYear(dates);
+        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+        const multipliedValues = adaptValues1.map(item => {
+          const year = item[0];
+          const value1 = item[1];
+          const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+          return [year, value1, value3];
+        });
+
+
+        res.json({
+          code: 200,
+          data: {
+            fund_id: req.params.id,
+            lastdatepreviousmonth: lastdatepreviousmonth,
+            perf3Moisactif_net: perf3Moisactif_net,
+            category: categorie,
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf15Ans: perf15Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
+            perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
+            perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
+            perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
+            perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
+            perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
+            perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
+            perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
+            perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
+            perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
+            perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
+            perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
+            perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
+            perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
+            perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
+            perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
+            perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
+            perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
+            perfAnnualizedtodate1An: perfAnnualizedtodate1An,
+            perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
+            perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
+            perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
+            perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
+            perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
+            perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
+            perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
+            perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
+            adaptValues1: multipliedValues,
+            //  performancesCategorie: performancesCategorie
+          }
+        })
+
+  } catch (error) {
+    console.error('Erreur route /api/performancesdevwithdate/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
     })
 })
 router.get('/api/performancemonthyear/fond/:id', async (req, res) => {
-  vl.findAll({
-    where: {
-      fund_id: req.params.id
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
+  try {
+    vl.findAll({
+      where: {
+        fund_id: req.params.id
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
-  })
-    .then(response => {
-      const selectedValues = req.query.query;
-      let values;
-      let monthlyPerformance;
-      let annualPerformance;
-      let dates;
-      if (selectedValues == "EUR") {
-        values = response.map((data) => data.value_EUR);
+    })
+      .then(response => {
+        const selectedValues = req.query.query;
+        let values;
+        let monthlyPerformance;
+        let annualPerformance;
+        let dates;
+        if (selectedValues == "EUR") {
+          values = response.map((data) => data.value_EUR);
 
-        dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+          dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
 
-        monthlyPerformance = calculatemPerformance(values, dates);
-        annualPerformance = calculateAnnualPerformance(values, dates);
-      } else if (selectedValues == "USD") {
-        values = response.map((data) => data.value_USD);
+          monthlyPerformance = calculatemPerformance(values, dates);
+          annualPerformance = calculateAnnualPerformance(values, dates);
+        } else if (selectedValues == "USD") {
+          values = response.map((data) => data.value_USD);
 
-        dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+          dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
 
-        monthlyPerformance = calculatemPerformance(values, dates);
-        annualPerformance = calculateAnnualPerformance(values, dates);
-      } else {
-        values = response.map((data) => data.value);
+          monthlyPerformance = calculatemPerformance(values, dates);
+          annualPerformance = calculateAnnualPerformance(values, dates);
+        } else {
+          values = response.map((data) => data.value);
 
-        dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+          dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
 
-        monthlyPerformance = calculatemPerformance(values, dates);
-        annualPerformance = calculateAnnualPerformance(values, dates);
-      }
+          monthlyPerformance = calculatemPerformance(values, dates);
+          annualPerformance = calculateAnnualPerformance(values, dates);
+        }
 
-      res.json({ monthlyPerformance, annualPerformance });
+        res.json({ monthlyPerformance, annualPerformance });
 
-    });
+      });
+  } catch (error) {
+    console.error('Erreur route /api/performancemonthyear/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 })
 
 router.get('/api/performanceindicemonthyear/fond/:id', async (req, res) => {
-  vl.findAll({
-    where: {
-      fund_id: req.params.id
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
+  try {
+    vl.findAll({
+      where: {
+        fund_id: req.params.id
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
-  })
-    .then(response => {
-      const selectedValues = req.query.query;
-      let values;
-      let monthlyPerformance;
-      let annualPerformance;
-      let dates;
-      if (selectedValues == "EUR") {
-        values = response.map((data) => data.indRef_EUR);
+    })
+      .then(response => {
+        const selectedValues = req.query.query;
+        let values;
+        let monthlyPerformance;
+        let annualPerformance;
+        let dates;
+        if (selectedValues == "EUR") {
+          values = response.map((data) => data.indRef_EUR);
 
-        dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+          dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
 
-        monthlyPerformance = calculatemPerformance(values, dates);
-        annualPerformance = calculateAnnualPerformance(values, dates);
-      } else if (selectedValues == "USD") {
-        values = response.map((data) => data.indRef_USD);
+          monthlyPerformance = calculatemPerformance(values, dates);
+          annualPerformance = calculateAnnualPerformance(values, dates);
+        } else if (selectedValues == "USD") {
+          values = response.map((data) => data.indRef_USD);
 
-        dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+          dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
 
-        monthlyPerformance = calculatemPerformance(values, dates);
-        annualPerformance = calculateAnnualPerformance(values, dates);
-      } else {
-        values = response.map((data) => data.indRef);
+          monthlyPerformance = calculatemPerformance(values, dates);
+          annualPerformance = calculateAnnualPerformance(values, dates);
+        } else {
+          values = response.map((data) => data.indRef);
 
-        dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+          dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
 
-        monthlyPerformance = calculatemPerformance(values, dates);
-        annualPerformance = calculateAnnualPerformance(values, dates);
-      }
+          monthlyPerformance = calculatemPerformance(values, dates);
+          annualPerformance = calculateAnnualPerformance(values, dates);
+        }
 
-      res.json({ monthlyPerformance, annualPerformance });
+        res.json({ monthlyPerformance, annualPerformance });
 
-    });
+      });
+  } catch (error) {
+    console.error('Erreur route /api/performanceindicemonthyear/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 })
 
 // Fonction pour calculer les performances mensuelles
@@ -2191,366 +2249,376 @@ GROUP BY
 
 
 router.get('/api/performancesportefeuille/fond/:id', async (req, res) => {
+  try {
 
 
 
-  portefeuille_vl_cumul.findAll({
-    where: {
-      portefeuille_id: req.params.id
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
-
-  })
-    .then(response => {
-      let lastValuep = response[response.length - 1].base_100_bis; // Dernière valeur
-
-
-      // Valeurs liquidatives
-      const values = response.map((data) => data.base_100_bis);
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-
-      //  const values = response.map((data) => data.value);
-      const lastValue = lastValuep;
-      //  const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
-
-      const targetYear = groupDatesByYear(dates).length
-
-      const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
-
-      //Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-      //Performances annualizées fin de mois
-      const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
-      const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
-      const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
-      const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
-      const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
-      const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
-      const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
-      const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
-      const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-
-
-      //Performances cumulées fin de mois
-      const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-      //Performances annualizées à date
-      const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-      //Performances  annee calendaire
-      const ArrayDates = groupDatesByYear(dates);
-      const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-      const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-      const multipliedValues = adaptValues1.map(item => {
-        const year = item[0];
-        const value1 = item[1];
-        const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-        return [year, value1, value3];
-      });
-
-
-      res.json({
-        code: 200,
-        data: {
-          portefeuille: req.params.id,
-          lastdatepreviousmonth: lastdatepreviousmonth,
-          //    perf3Moisactif_net: perf3Moisactif_net,
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf15Ans: perf15Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
-          perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
-          perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
-          perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
-          perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
-          perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
-          perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
-          perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
-          perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
-          perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
-          perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
-          perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
-          perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
-          perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
-          perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
-          perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
-          perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
-          perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
-          perfAnnualizedtodate1An: perfAnnualizedtodate1An,
-          perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
-          perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
-          perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
-          perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
-          perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
-          perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
-          perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
-          perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
-          adaptValues1: multipliedValues,
-          //  performancesCategorie:performancesCategorie
-        }
-      })
+    portefeuille_vl_cumul.findAll({
+      where: {
+        portefeuille_id: req.params.id
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
     })
+      .then(response => {
+        let lastValuep = response[response.length - 1].base_100_bis; // Dernière valeur
+
+
+        // Valeurs liquidatives
+        const values = response.map((data) => data.base_100_bis);
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+
+        //  const values = response.map((data) => data.value);
+        const lastValue = lastValuep;
+        //  const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
+
+        const targetYear = groupDatesByYear(dates).length
+
+        const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
+
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
+
+        //Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+        //Performances annualizées fin de mois
+        const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
+        const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
+        const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
+        const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
+        const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
+        const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
+        const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
+        const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
+        const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+
+
+        //Performances cumulées fin de mois
+        const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+        //Performances annualizées à date
+        const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        //Performances  annee calendaire
+        const ArrayDates = groupDatesByYear(dates);
+        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+        const multipliedValues = adaptValues1.map(item => {
+          const year = item[0];
+          const value1 = item[1];
+          const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+          return [year, value1, value3];
+        });
+
+
+        res.json({
+          code: 200,
+          data: {
+            portefeuille: req.params.id,
+            lastdatepreviousmonth: lastdatepreviousmonth,
+            //    perf3Moisactif_net: perf3Moisactif_net,
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf15Ans: perf15Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
+            perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
+            perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
+            perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
+            perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
+            perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
+            perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
+            perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
+            perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
+            perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
+            perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
+            perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
+            perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
+            perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
+            perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
+            perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
+            perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
+            perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
+            perfAnnualizedtodate1An: perfAnnualizedtodate1An,
+            perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
+            perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
+            perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
+            perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
+            perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
+            perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
+            perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
+            perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
+            adaptValues1: multipliedValues,
+            //  performancesCategorie:performancesCategorie
+          }
+        })
+
+      })
+  } catch (error) {
+    console.error('Erreur route /api/performancesportefeuille/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 })
 
 router.get('/api/performancesportefeuilledev/fond/:id/:devise', async (req, res) => {
+  try {
 
 
 
-  portefeuille_vl_cumul.findAll({
-    where: {
-      portefeuille_id: req.params.id
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
-
-  })
-    .then(response => {
-      let baseProperty;
-      if (req.params.devise === 'EUR') {
-        baseProperty = 'base_100_bis_EUR';
-      } else if (req.params.devise === 'USD') {
-        baseProperty = 'base_100_bis_USD';
-      } else {
-        // Handle other cases or set a default property
-        baseProperty = 'base_100_bis';
-      }
-      let lastValuep = response[response.length - 1][baseProperty]; // Dernière valeur
-
-      // const tauxsr=0.03;-0.0116;-0,0234
-      const tauxsr = -0.0234;
-      // Valeurs liquidatives
-      const values = response.map((data) => data[baseProperty]);
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-
-      //  const values = response.map((data) => data.value);
-      const lastValue = lastValuep;
-      //  const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
-
-      const targetYear = groupDatesByYear(dates).length
-
-      const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
-
-      //Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-      //Performances annualizées fin de mois
-      const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
-      const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
-      const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
-      const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
-      const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
-      const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
-      const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
-      const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
-      const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-
-
-      //Performances cumulées fin de mois
-      const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
-      const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
-      const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
-      const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
-      const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
-      const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
-      const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
-      const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
-      const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-      //Performances annualizées à date
-      const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-      //Performances  annee calendaire
-      const ArrayDates = groupDatesByYear(dates);
-      const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-      const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-      const multipliedValues = adaptValues1.map(item => {
-        const year = item[0];
-        const value1 = item[1];
-        const value3 = item[2] * 100; // Multipliez la troisième position par 100
-
-        return [year, value1, value3];
-      });
-
-
-      res.json({
-        code: 200,
-        data: {
-          portefeuille: req.params.id,
-          lastdatepreviousmonth: lastdatepreviousmonth,
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf15Ans: perf15Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
-          perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
-          perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
-          perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
-          perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
-          perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
-          perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
-          perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
-          perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
-          perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
-          perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
-          perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
-          perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
-          perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
-          perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
-          perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
-          perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
-          perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
-          perfAnnualizedtodate1An: perfAnnualizedtodate1An,
-          perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
-          perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
-          perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
-          perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
-          perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
-          perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
-          perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
-          perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
-          adaptValues1: multipliedValues,
-          //  performancesCategorie:performancesCategorie
-        }
-      })
+    portefeuille_vl_cumul.findAll({
+      where: {
+        portefeuille_id: req.params.id
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
     })
+      .then(response => {
+        let baseProperty;
+        if (req.params.devise === 'EUR') {
+          baseProperty = 'base_100_bis_EUR';
+        } else if (req.params.devise === 'USD') {
+          baseProperty = 'base_100_bis_USD';
+        } else {
+          // Handle other cases or set a default property
+          baseProperty = 'base_100_bis';
+        }
+        let lastValuep = response[response.length - 1][baseProperty]; // Dernière valeur
+
+        // const tauxsr=0.03;-0.0116;-0,0234
+        const tauxsr = -0.0234;
+        // Valeurs liquidatives
+        const values = response.map((data) => data[baseProperty]);
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+
+        //  const values = response.map((data) => data.value);
+        const lastValue = lastValuep;
+        //  const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
+
+        const targetYear = groupDatesByYear(dates).length
+
+        const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
+
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf15Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
+
+        //Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+        //Performances annualizées fin de mois
+        const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
+        const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
+        const perfFindeMoisAnnualized5Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates)))], 5);
+        const perfFindeMoisAnnualized8Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates)))], 8);
+        const perfFindeMoisAnnualized10Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates)))], 10);
+        const perfFindeMoisAnnualized12Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates)))], 12);
+        const perfFindeMoisAnnualized15Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates)))], 15);
+        const perfFindeMoisAnnualized20Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates)))], 20);
+        const perfFindeMoisAnnualizedOrigine = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+
+
+        //Performances cumulées fin de mois
+        const perfCumuleeFindeMois1An = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate1An)])
+        const perfCumuleeFindeMois3Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate3Ans)])
+        const perfCumuleeFindeMois5Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate5Ans)])
+        const perfCumuleeFindeMois8Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate8Ans)])
+        const perfCumuleeFindeMois10Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate10Ans)])
+        const perfCumuleeFindeMois12Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate12Ans)])
+        const perfCumuleeFindeMois15Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate15Ans)])
+        const perfCumuleeFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
+        const perfCumuleeFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+        //Performances annualizées à date
+        const perfAnnualizedtodate1An = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualizedtodate3Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualizedtodate5Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualizedtodate8Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualizedtodate10Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualizedtodate12Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualizedtodate15Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualizedtodate20Ans = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const perfAnnualizedtodateOrigine = calculateAnnualizedPerformanceper100(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+        //Performances  annee calendaire
+        const ArrayDates = groupDatesByYear(dates);
+        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
+        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
+        const multipliedValues = adaptValues1.map(item => {
+          const year = item[0];
+          const value1 = item[1];
+          const value3 = item[2] * 100; // Multipliez la troisième position par 100
+
+          return [year, value1, value3];
+        });
+
+
+        res.json({
+          code: 200,
+          data: {
+            portefeuille: req.params.id,
+            lastdatepreviousmonth: lastdatepreviousmonth,
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf15Ans: perf15Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfFindeMoisAnnualized1An: perfFindeMoisAnnualized1An,
+            perfFindeMoisAnnualized3An: perfFindeMoisAnnualized3Ans,
+            perfFindeMoisAnnualized5Ans: perfFindeMoisAnnualized5Ans,
+            perfFindeMoisAnnualized8Ans: perfFindeMoisAnnualized8Ans,
+            perfFindeMoisAnnualized10Ans: perfFindeMoisAnnualized10Ans,
+            perfFindeMoisAnnualized12Ans: perfFindeMoisAnnualized12Ans,
+            perfFindeMoisAnnualized15Ans: perfFindeMoisAnnualized15Ans,
+            perfFindeMoisAnnualized20Ans: perfFindeMoisAnnualized20Ans,
+            perfFindeMoisAnnualizedOrigine: perfFindeMoisAnnualizedOrigine,
+            perfCumuleeFindeMois1An: perfCumuleeFindeMois1An,
+            perfCumuleeFindeMois3Ans: perfCumuleeFindeMois3Ans,
+            perfCumuleeFindeMois5Ans: perfCumuleeFindeMois5Ans,
+            perfCumuleeFindeMois8Ans: perfCumuleeFindeMois8Ans,
+            perfCumuleeFindeMois10Ans: perfCumuleeFindeMois10Ans,
+            perfCumuleeFindeMois12Ans: perfCumuleeFindeMois12Ans,
+            perfCumuleeFindeMois15Ans: perfCumuleeFindeMois15Ans,
+            perfCumuleeFindeMois20Ans: perfCumuleeFindeMois20Ans,
+            perfCumuleeFindeMoisOrigine: perfCumuleeFindeMoisOrigine,
+            perfAnnualizedtodate1An: perfAnnualizedtodate1An,
+            perfAnnualizedtodate3Ans: perfAnnualizedtodate3Ans,
+            perfAnnualizedtodate5Ans: perfAnnualizedtodate5Ans,
+            perfAnnualizedtodate8Ans: perfAnnualizedtodate8Ans,
+            perfAnnualizedtodate10Ans: perfAnnualizedtodate10Ans,
+            perfAnnualizedtodate12Ans: perfAnnualizedtodate12Ans,
+            perfAnnualizedtodate15Ans: perfAnnualizedtodate15Ans,
+            perfAnnualizedtodate20Ans: perfAnnualizedtodate20Ans,
+            perfAnnualizedtodateOrigine: perfAnnualizedtodateOrigine,
+            adaptValues1: multipliedValues,
+            //  performancesCategorie:performancesCategorie
+          }
+        })
+
+      })
+  } catch (error) {
+    console.error('Erreur route /api/performancesportefeuilledev/fond:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 })
 
 
@@ -2709,115 +2777,120 @@ router.get('/api/performancesportefeuilledev/fond/:id/:devise', async (req, res)
  *                       description: Annualized performance since the fund's inception.
  */
 router.get('/api/performances/indice/:id/:type', (req, res) => {
-  indice.findAll({
-    where: {
-      id_indice: req.params.id,
-      type_indice_id: req.params.type
-    },
-    order: [
-      ['date', 'ASC']
-    ],    limit: 10000,
-
-  })
-    .then(response => {
-      const values = response.map((data) => data.valeur);
-      const lastValue = values[response.length - 1];
-      const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-      const lastDate = dates[dates.length - 1]
-
-
-      // Calcul des performances glissantes
-      const previousValue = values[values.length - 2];
-      const perfVeille = calculatePerformance(lastValue, previousValue);
-      const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
-      const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-      const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-      const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-      const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
-      const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
-      const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
-      const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
-      const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
-      const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
-      const perf18Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 18))]);
-      const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
-      const perfOrigine = calculatePerformance(lastValue, values[0]);
-
-
-
-      ///Performances fin de mois
-      const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-      const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-      const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-      const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-      const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-      const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-      const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-      const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-      const targetDateOrigine = groupDatesByMonth(dates)[0]
-      const perfFindeMois1An = calculatePerformance(lastValue, values[dates.indexOf(targetDate1An)])
-      const perfFindeMois3Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate3Ans)])
-      const perfFindeMois5Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate5Ans)])
-      const perfFindeMois8Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate8Ans)])
-      const perfFindeMois10Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate10Ans)])
-      const perfFindeMois12Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate12Ans)])
-      const perfFindeMois15Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate15Ans)])
-      const perfFindeMois20Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate20Ans)])
-      const perfFindeMoisOrigine = calculatePerformance(lastValue, values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
-
-
-      //Performances annualisée
-      const perfAnnualized1An = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
-      const perfAnnualized3Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
-      const perfAnnualized5Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
-      const perfAnnualized8Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
-      const perfAnnualized10Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
-      const perfAnnualized12Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
-      const perfAnnualized15Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
-      const perfAnnualized20Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
-      const targetYear = groupDatesByYear(dates).length
-      const perfAnnualizedOrigine = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
-
-      res.json({
-        code: 200,
-        data: {
-          perfVeille: perfVeille,
-          perf4Semaines: perf4Semaines,
-          perf1erJanvier: perf1erJanvier,
-          perf3Mois: perf3Mois,
-          perf6Mois: perf6Mois,
-          perf1An: perf1An,
-          perf3Ans: perf3Ans,
-          perf5Ans: perf5Ans,
-          perf8Ans: perf8Ans,
-          perf10Ans: perf10Ans,
-          perf12Ans: perf12Ans,
-          perf18Ans: perf18Ans,
-          perf20Ans: perf20Ans,
-          perfOrigine: perfOrigine,
-          perfFindeMois1An: perfFindeMois1An,
-          perfFindeMois3Ans: perfFindeMois3Ans,
-          perfFindeMois5Ans: perfFindeMois5Ans,
-          perfFindeMois8Ans: perfFindeMois8Ans,
-          perfFindeMois10Ans: perfFindeMois10Ans,
-          perfFindeMois12Ans: perfFindeMois12Ans,
-          perfFindeMois15Ans: perfFindeMois15Ans,
-          perfFindeMois20Ans: perfFindeMois20Ans,
-          perfFindeMoisOrigine: perfFindeMoisOrigine,
-          perfAnnualized1An: perfAnnualized1An,
-          perfAnnualized3Ans: perfAnnualized3Ans,
-          perfAnnualized5Ans: perfAnnualized5Ans,
-          perfAnnualized8Ans: perfAnnualized8Ans,
-          perfAnnualized10Ans: perfAnnualized10Ans,
-          perfAnnualized12Ans: perfAnnualized12Ans,
-          perfAnnualized15Ans: perfAnnualized15Ans,
-          perfAnnualized20Ans: perfAnnualized20Ans,
-          perfAnnualizedOrigine: perfAnnualizedOrigine,
-        }
-      })
+  try {
+    indice.findAll({
+      where: {
+        id_indice: req.params.id,
+        type_indice_id: req.params.type
+      },
+      order: [
+        ['date', 'ASC']
+      ],    limit: 10000,
 
     })
+      .then(response => {
+        const values = response.map((data) => data.valeur);
+        const lastValue = values[response.length - 1];
+        const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
+        const lastDate = dates[dates.length - 1]
 
+
+        // Calcul des performances glissantes
+        const previousValue = values[values.length - 2];
+        const perfVeille = calculatePerformance(lastValue, previousValue);
+        const perf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]);
+        const perf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+        const perf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+        const perf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+        const perf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]);
+        const perf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]);
+        const perf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]);
+        const perf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]);
+        const perf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]);
+        const perf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]);
+        const perf18Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 18))]);
+        const perf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]);
+        const perfOrigine = calculatePerformance(lastValue, values[0]);
+
+
+
+        ///Performances fin de mois
+        const targetDate1An = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+        const targetDate3Ans = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+        const targetDate5Ans = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+        const targetDate8Ans = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+        const targetDate10Ans = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+        const targetDate12Ans = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+        const targetDate15Ans = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+        const targetDate20Ans = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+        const targetDateOrigine = groupDatesByMonth(dates)[0]
+        const perfFindeMois1An = calculatePerformance(lastValue, values[dates.indexOf(targetDate1An)])
+        const perfFindeMois3Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate3Ans)])
+        const perfFindeMois5Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate5Ans)])
+        const perfFindeMois8Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate8Ans)])
+        const perfFindeMois10Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate10Ans)])
+        const perfFindeMois12Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate12Ans)])
+        const perfFindeMois15Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate15Ans)])
+        const perfFindeMois20Ans = calculatePerformance(lastValue, values[dates.indexOf(targetDate20Ans)])
+        const perfFindeMoisOrigine = calculatePerformance(lastValue, values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
+
+
+        //Performances annualisée
+        const perfAnnualized1An = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1);
+        const perfAnnualized3Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3);
+        const perfAnnualized5Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5);
+        const perfAnnualized8Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8);
+        const perfAnnualized10Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10);
+        const perfAnnualized12Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12);
+        const perfAnnualized15Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15);
+        const perfAnnualized20Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20);
+        const targetYear = groupDatesByYear(dates).length
+        const perfAnnualizedOrigine = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear);
+
+        res.json({
+          code: 200,
+          data: {
+            perfVeille: perfVeille,
+            perf4Semaines: perf4Semaines,
+            perf1erJanvier: perf1erJanvier,
+            perf3Mois: perf3Mois,
+            perf6Mois: perf6Mois,
+            perf1An: perf1An,
+            perf3Ans: perf3Ans,
+            perf5Ans: perf5Ans,
+            perf8Ans: perf8Ans,
+            perf10Ans: perf10Ans,
+            perf12Ans: perf12Ans,
+            perf18Ans: perf18Ans,
+            perf20Ans: perf20Ans,
+            perfOrigine: perfOrigine,
+            perfFindeMois1An: perfFindeMois1An,
+            perfFindeMois3Ans: perfFindeMois3Ans,
+            perfFindeMois5Ans: perfFindeMois5Ans,
+            perfFindeMois8Ans: perfFindeMois8Ans,
+            perfFindeMois10Ans: perfFindeMois10Ans,
+            perfFindeMois12Ans: perfFindeMois12Ans,
+            perfFindeMois15Ans: perfFindeMois15Ans,
+            perfFindeMois20Ans: perfFindeMois20Ans,
+            perfFindeMoisOrigine: perfFindeMoisOrigine,
+            perfAnnualized1An: perfAnnualized1An,
+            perfAnnualized3Ans: perfAnnualized3Ans,
+            perfAnnualized5Ans: perfAnnualized5Ans,
+            perfAnnualized8Ans: perfAnnualized8Ans,
+            perfAnnualized10Ans: perfAnnualized10Ans,
+            perfAnnualized12Ans: perfAnnualized12Ans,
+            perfAnnualized15Ans: perfAnnualized15Ans,
+            perfAnnualized20Ans: perfAnnualized20Ans,
+            perfAnnualizedOrigine: perfAnnualizedOrigine,
+          }
+        })
+
+      })
+
+  } catch (error) {
+    console.error('Erreur route /api/performances/indice:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 })
 
 
@@ -2980,149 +3053,154 @@ router.get('/api/performances/indice/:id/:type', (req, res) => {
  *                       description: Annualized performance since the fund's inception.
  */
 router.get('/api/performances/ecart/:id', async (req, res) => {
-  let values = []
-  let dates = []
-  let valuesindifref = []
-  let indref;
+  try {
+    let values = []
+    let dates = []
+    let valuesindifref = []
+    let indref;
 
-  await vl.findAll({
-    where: {
-      fund_id: req.params.id
-    },
-    order: [
-      ['created', 'ASC']
-    ],
-  }).then((t) => {
-    limit: 10000,
-    values = t.map((data) => data.value);
-    valuesindifref = t.map((data) => data.indRef);
-    dates = t.map((data) => moment(data.created).format('YYYY-MM-DD'));
-    indref = t[0].indRef
-  })
+    await vl.findAll({
+      where: {
+        fund_id: req.params.id
+      },
+      order: [
+        ['created', 'ASC']
+      ],
+    }).then((t) => {
+      limit: 10000,
+      values = t.map((data) => data.value);
+      valuesindifref = t.map((data) => data.indRef);
+      dates = t.map((data) => moment(data.created).format('YYYY-MM-DD'));
+      indref = t[0].indRef
+    })
 
-  /* await indice.findAll({
-       where: {
-           fund_id: indref
-       },
-       order: [
-           ['created', 'ASC']
-       ]
-   }).then((t) => {
-       valuesindifref = t.map((data) => data.value);
-       dates = t.map((data) => moment(data.created).format('YYYY-MM-DD'));
-   })*/
+    /* await indice.findAll({
+         where: {
+             fund_id: indref
+         },
+         order: [
+             ['created', 'ASC']
+         ]
+     }).then((t) => {
+         valuesindifref = t.map((data) => data.value);
+         dates = t.map((data) => moment(data.created).format('YYYY-MM-DD'));
+     })*/
 
-  const lastValue = values[values.length - 1];
-  const previousValue = values[values.length - 2]
-  const lastValueInd = values[valuesindifref.length - 1];
-  const previousValueInd = values[valuesindifref.length - 2]
-  const lastDate = dates[dates.length - 1]
+    const lastValue = values[values.length - 1];
+    const previousValue = values[values.length - 2]
+    const lastValueInd = values[valuesindifref.length - 1];
+    const previousValueInd = values[valuesindifref.length - 2]
+    const lastDate = dates[dates.length - 1]
 
-  //Ecart performances glissantes
-  const EcartperfVeille = calculatePerformance(lastValue, previousValue) - calculatePerformance(lastValueInd, previousValueInd);
-  const Ecartperf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDateWeek(dates))])
-  const Ecartperf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
-  const Ecartperf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
-  const Ecartperf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
-  const Ecartperf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 1))]);
-  const Ecartperf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 3))]);
-  const Ecartperf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 5))])
-  const Ecartperf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 8))])
-  const Ecartperf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 10))])
-  const Ecartperf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 12))])
-  const Ecartperf18Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 15))])
-  const Ecartperf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 20))])
-  const EcartperfOrigine = calculatePerformance(lastValue, values[0]) - calculatePerformance(lastValueInd, valuesindifref[0]);
-
-
-  //Ecart performances fin de mois
-  const targetDate1AnFond = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-  const targetDate3AnsFond = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-  const targetDate5AnsFond = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-  const targetDate8AnsFond = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-  const targetDate10AnsFond = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-  const targetDate12AnsFond = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-  const targetDate15AnsFond = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-  const targetDate20AnsFond = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-  const targetDateOrigineFond = groupDatesByMonth(dates)[0]
-
-  const targetDate1AnIndice = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
-  const targetDate3AnsIndice = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
-  const targetDate5AnsIndice = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
-  const targetDate8AnsIndice = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
-  const targetDate10AnsIndice = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
-  const targetDate12AnsIndice = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
-  const targetDate15AnsIndice = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
-  const targetDate20AnsIndice = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
-  const targetDateOrigineIndice = groupDatesByMonth(dates)[0]
-
-  const EcartperfFindeMois1AnFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate1AnFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate1AnIndice)])
-  const EcartperfFindeMois3AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate3AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate3AnsIndice)])
-  const EcartperfFindeMois5AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate5AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate5AnsIndice)])
-  const EcartperfFindeMois8AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate8AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate8AnsIndice)])
-  const EcartperfFindeMois10AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate10AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate10AnsIndice)])
-  const EcartperfFindeMois12AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate12AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate12AnsIndice)])
-  const EcartperfFindeMois15AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate15AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate15AnsIndice)])
-  const EcartperfFindeMois20AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate20AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate20AnsIndice)])
-  const EcartperfFindeMoisOrigineFond = calculatePerformance(lastValue, values[dates.indexOf(targetDateOrigineFond[targetDateOrigineFond.length - 1])]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDateOrigineIndice[targetDateOrigineIndice.length - 1])])
+    //Ecart performances glissantes
+    const EcartperfVeille = calculatePerformance(lastValue, previousValue) - calculatePerformance(lastValueInd, previousValueInd);
+    const Ecartperf4Semaines = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateWeek(dates))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDateWeek(dates))])
+    const Ecartperf1erJanvier = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateJanuary(dates))]);
+    const Ecartperf3Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 3, lastDate))]);
+    const Ecartperf6Mois = calculatePerformance(lastValue, values[dates.indexOf(findNearestDateMonthlized(dates, 6, lastDate))]);
+    const Ecartperf1An = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 1))]);
+    const Ecartperf3Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 3))]);
+    const Ecartperf5Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 5))])
+    const Ecartperf8Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 8))])
+    const Ecartperf10Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 10))])
+    const Ecartperf12Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 12))])
+    const Ecartperf18Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 15))])
+    const Ecartperf20Ans = calculatePerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 20))])
+    const EcartperfOrigine = calculatePerformance(lastValue, values[0]) - calculatePerformance(lastValueInd, valuesindifref[0]);
 
 
-  //Ecart performances annualisées
-  const EcartperfAnnualized1An = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 1))], 1)
-  const EcartperfAnnualized3Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 3))], 3)
-  const EcartperfAnnualized5Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 5))], 5)
-  const EcartperfAnnualized8Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 8))], 8)
-  const EcartperfAnnualized10Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 10))], 10)
-  const EcartperfAnnualized12Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 12))], 12)
-  const EcartperfAnnualized15Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 15))], 15)
-  const EcartperfAnnualized20Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 20))], 20)
-  const targetYear = groupDatesByYear(dates).length
-  const targetYearInd = groupDatesByYear(dates).length
-  const EcartperfAnnualizedOrigine = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, targetYearInd))], targetYearInd);
+    //Ecart performances fin de mois
+    const targetDate1AnFond = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+    const targetDate3AnsFond = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+    const targetDate5AnsFond = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+    const targetDate8AnsFond = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+    const targetDate10AnsFond = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+    const targetDate12AnsFond = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+    const targetDate15AnsFond = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+    const targetDate20AnsFond = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+    const targetDateOrigineFond = groupDatesByMonth(dates)[0]
 
-  res.json({
-    code: 200,
-    data: {
-      // ecart perf glissantes
-      EcartperfVeille: EcartperfVeille,
-      Ecartperf4Semaines: Ecartperf4Semaines,
-      Ecartperf1erJanvier: Ecartperf1erJanvier,
-      Ecartperf3Mois: Ecartperf3Mois,
-      Ecartperf6Mois: Ecartperf6Mois,
-      Ecartperf1An: Ecartperf1An,
-      Ecartperf3Ans: Ecartperf3Ans,
-      Ecartperf5Ans: Ecartperf5Ans,
-      Ecartperf8Ans: Ecartperf8Ans,
-      Ecartperf10Ans: Ecartperf10Ans,
-      Ecartperf12Ans: Ecartperf12Ans,
-      Ecartperf18Ans: Ecartperf18Ans,
-      Ecartperf20Ans: Ecartperf20Ans,
-      EcartperfOrigine: EcartperfOrigine,
+    const targetDate1AnIndice = findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates))
+    const targetDate3AnsIndice = findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates))
+    const targetDate5AnsIndice = findNearestDateAnnualized(dates, 5, findLastDateOfPreviousMonth(dates))
+    const targetDate8AnsIndice = findNearestDateAnnualized(dates, 8, findLastDateOfPreviousMonth(dates))
+    const targetDate10AnsIndice = findNearestDateAnnualized(dates, 10, findLastDateOfPreviousMonth(dates))
+    const targetDate12AnsIndice = findNearestDateAnnualized(dates, 12, findLastDateOfPreviousMonth(dates))
+    const targetDate15AnsIndice = findNearestDateAnnualized(dates, 15, findLastDateOfPreviousMonth(dates))
+    const targetDate20AnsIndice = findNearestDateAnnualized(dates, 20, findLastDateOfPreviousMonth(dates))
+    const targetDateOrigineIndice = groupDatesByMonth(dates)[0]
 
-      // ecart perf fin de mois
-      EcartperfFindeMois1AnFond: EcartperfFindeMois1AnFond,
-      EcartperfFindeMois3AnsFond: EcartperfFindeMois3AnsFond,
-      EcartperfFindeMois5AnsFond: EcartperfFindeMois5AnsFond,
-      EcartperfFindeMois8AnsFond: EcartperfFindeMois8AnsFond,
-      EcartperfFindeMois10AnsFond: EcartperfFindeMois10AnsFond,
-      EcartperfFindeMois12AnsFond: EcartperfFindeMois12AnsFond,
-      EcartperfFindeMois15AnsFond: EcartperfFindeMois15AnsFond,
-      EcartperfFindeMois20AnsFond: EcartperfFindeMois20AnsFond,
-      EcartperfFindeMoisOrigineFond: EcartperfFindeMoisOrigineFond,
+    const EcartperfFindeMois1AnFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate1AnFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate1AnIndice)])
+    const EcartperfFindeMois3AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate3AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate3AnsIndice)])
+    const EcartperfFindeMois5AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate5AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate5AnsIndice)])
+    const EcartperfFindeMois8AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate8AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate8AnsIndice)])
+    const EcartperfFindeMois10AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate10AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate10AnsIndice)])
+    const EcartperfFindeMois12AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate12AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate12AnsIndice)])
+    const EcartperfFindeMois15AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate15AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate15AnsIndice)])
+    const EcartperfFindeMois20AnsFond = calculatePerformance(lastValue, values[dates.indexOf(targetDate20AnsFond)]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDate20AnsIndice)])
+    const EcartperfFindeMoisOrigineFond = calculatePerformance(lastValue, values[dates.indexOf(targetDateOrigineFond[targetDateOrigineFond.length - 1])]) - calculatePerformance(lastValueInd, valuesindifref[dates.indexOf(targetDateOrigineIndice[targetDateOrigineIndice.length - 1])])
 
-      //ecart perf annualisée
-      EcartperfAnnualized1An: EcartperfAnnualized1An,
-      EcartperfAnnualized3Ans: EcartperfAnnualized3Ans,
-      EcartperfAnnualized5Ans: EcartperfAnnualized5Ans,
-      EcartperfAnnualized8Ans: EcartperfAnnualized8Ans,
-      EcartperfAnnualized10Ans: EcartperfAnnualized10Ans,
-      EcartperfAnnualized12Ans: EcartperfAnnualized12Ans,
-      EcartperfAnnualized15Ans: EcartperfAnnualized15Ans,
-      EcartperfAnnualized20Ans: EcartperfAnnualized20Ans,
-      EcartperfAnnualizedOrigine: EcartperfAnnualizedOrigine
-    }
-  })
 
+    //Ecart performances annualisées
+    const EcartperfAnnualized1An = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 1))], 1) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 1))], 1)
+    const EcartperfAnnualized3Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 3))], 3) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 3))], 3)
+    const EcartperfAnnualized5Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 5))], 5) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 5))], 5)
+    const EcartperfAnnualized8Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 8))], 8) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 8))], 8)
+    const EcartperfAnnualized10Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 10))], 10) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 10))], 10)
+    const EcartperfAnnualized12Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 12))], 12) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 12))], 12)
+    const EcartperfAnnualized15Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 15))], 15) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 15))], 15)
+    const EcartperfAnnualized20Ans = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, 20))], 20) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, 20))], 20)
+    const targetYear = groupDatesByYear(dates).length
+    const targetYearInd = groupDatesByYear(dates).length
+    const EcartperfAnnualizedOrigine = calculateAnnualizedPerformance(lastValue, values[dates.indexOf(findNearestDate(dates, targetYear))], targetYear) - calculateAnnualizedPerformance(lastValueInd, valuesindifref[dates.indexOf(findNearestDate(dates, targetYearInd))], targetYearInd);
+
+    res.json({
+      code: 200,
+      data: {
+        // ecart perf glissantes
+        EcartperfVeille: EcartperfVeille,
+        Ecartperf4Semaines: Ecartperf4Semaines,
+        Ecartperf1erJanvier: Ecartperf1erJanvier,
+        Ecartperf3Mois: Ecartperf3Mois,
+        Ecartperf6Mois: Ecartperf6Mois,
+        Ecartperf1An: Ecartperf1An,
+        Ecartperf3Ans: Ecartperf3Ans,
+        Ecartperf5Ans: Ecartperf5Ans,
+        Ecartperf8Ans: Ecartperf8Ans,
+        Ecartperf10Ans: Ecartperf10Ans,
+        Ecartperf12Ans: Ecartperf12Ans,
+        Ecartperf18Ans: Ecartperf18Ans,
+        Ecartperf20Ans: Ecartperf20Ans,
+        EcartperfOrigine: EcartperfOrigine,
+
+        // ecart perf fin de mois
+        EcartperfFindeMois1AnFond: EcartperfFindeMois1AnFond,
+        EcartperfFindeMois3AnsFond: EcartperfFindeMois3AnsFond,
+        EcartperfFindeMois5AnsFond: EcartperfFindeMois5AnsFond,
+        EcartperfFindeMois8AnsFond: EcartperfFindeMois8AnsFond,
+        EcartperfFindeMois10AnsFond: EcartperfFindeMois10AnsFond,
+        EcartperfFindeMois12AnsFond: EcartperfFindeMois12AnsFond,
+        EcartperfFindeMois15AnsFond: EcartperfFindeMois15AnsFond,
+        EcartperfFindeMois20AnsFond: EcartperfFindeMois20AnsFond,
+        EcartperfFindeMoisOrigineFond: EcartperfFindeMoisOrigineFond,
+
+        //ecart perf annualisée
+        EcartperfAnnualized1An: EcartperfAnnualized1An,
+        EcartperfAnnualized3Ans: EcartperfAnnualized3Ans,
+        EcartperfAnnualized5Ans: EcartperfAnnualized5Ans,
+        EcartperfAnnualized8Ans: EcartperfAnnualized8Ans,
+        EcartperfAnnualized10Ans: EcartperfAnnualized10Ans,
+        EcartperfAnnualized12Ans: EcartperfAnnualized12Ans,
+        EcartperfAnnualized15Ans: EcartperfAnnualized15Ans,
+        EcartperfAnnualized20Ans: EcartperfAnnualized20Ans,
+        EcartperfAnnualizedOrigine: EcartperfAnnualizedOrigine
+      }
+    })
+
+  } catch (error) {
+    console.error('Erreur route /api/performances/ecart:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 })
 
 

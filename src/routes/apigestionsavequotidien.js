@@ -422,7 +422,7 @@ router.get('/api/updatewithdividende', async (req, res) => {
         const rantotal = validPerformances.length;
         // Sinon, effectuer le classement
         // Vérifier si le champ est 'pertemax3an' pour déterminer l'ordre du tri
-        if (period === 'pertemax3an' || period === "calamar3an" || period === "betabaissier3an" || period === "volatility3an" || period === "dsr3an") {
+        if (period === 'pertemax3an' || period === "betabaissier3an" || period === "volatility3an" || period === "dsr3an") {
           // Pour 'pertemax3an', les valeurs plus proches de zéro sont meilleures
           validPerformances.sort((a, b) => a[period] - b[period]);
         } else {
@@ -816,7 +816,7 @@ router.get('/api/updatewithdividende', async (req, res) => {
             }
 
             validPerformances.sort((a, b) => {
-                if (period === 'pertemax3an' || period === 'calamar3an') {
+                if (period === 'pertemax3an') {
                     return a[period] - b[period]; // Plus proche de zéro est meilleur
                 }
                 return b[period] - a[period]; // Plus haut est meilleur
