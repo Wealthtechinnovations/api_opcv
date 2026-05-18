@@ -361,6 +361,7 @@ WHERE
    *                       description: The date corresponding to the last value.
    */
   router.get('/api/valLiq/:id', async (req, res) => {
+    try {
     const fundId = extractIdFromSlug(req.params.id);
     const response = await vl.findAll({
       where: {
@@ -408,58 +409,44 @@ WHERE
       const fundname = fundnames[response.length - 1];
       const fundid = fundids[response.length - 1];
       const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-      const baseUrl = urll; // Remplacez par votre URL de base
-      const lastValResponse = await fetch(`${baseUrl}/api/performances/fond/${fundid}?date=${lastDate}`);
+      const baseUrl = urll;
       const libelle_indice = libelle_indices[response.length - 1];
       const ID_indice = ID_indices[0];
       const currentDate = moment();
 
-      // Calculate the number of missing days
       const daysDiff = currentDate.diff(lastDate, 'days');
-
-      // Calculate the number of missing weekends
       const weekends = Array.from({ length: daysDiff }, (_, i) => moment(lastValue).add(i, 'days'))
         .filter(date => date.day() === 0 || date.day() === 6)
         .length;
-
-      // Calculate the number of missing Vl dates
       const missingVl = daysDiff - weekends;
-      if (!lastValResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
 
-      const lastValData = await lastValResponse.json();
+      const safeFetch = async (url) => {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) return {};
+          return await resp.json();
+        } catch (e) {
+          console.error('Erreur fetch interne:', url, e.message);
+          return {};
+        }
+      };
 
-      const last1ansRatiosResponse = await fetch(`${baseUrl}/api/ratiosnew/1/${fundid}`);
-
-      if (!last1ansRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const last1ansRatiosData = await last1ansRatiosResponse.json();
-
-      const lastRatiosResponse = await fetch(`${baseUrl}/api/ratiosnew/3/${fundid}`);
-
-      if (!lastRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const lastRatiosData = await lastRatiosResponse.json();
-
-      const last5ansRatiosResponse = await fetch(`${baseUrl}/api/ratiosnew/5/${fundid}`);
-
-      if (!last5ansRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const last5ansRatiosData = await last5ansRatiosResponse.json();
+      const [lastValData, last1ansRatiosData, lastRatiosData, last5ansRatiosData] = await Promise.all([
+        safeFetch(`${baseUrl}/api/performances/fond/${fundid}?date=${lastDate}`),
+        safeFetch(`${baseUrl}/api/ratiosnew/1/${fundid}`),
+        safeFetch(`${baseUrl}/api/ratiosnew/3/${fundid}`),
+        safeFetch(`${baseUrl}/api/ratiosnew/5/${fundid}`),
+      ]);
 
       const resultat = await fond.findOne({
         attributes: ['indice_benchmark','indice', 'structure_fond', 'strategie_politique_invest', 'philosophie_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
         where: {
-          id: parseInt(req.params.id),
+          id: fundId,
         },
       });
+      if (!resultat) {
+        return res.status(404).json({ message: 'Fonds introuvable', code: 404 });
+      }
       const indice_benchmark = resultat.indice_benchmark;
       const indice = resultat.indice;
       const affectation = resultat.affectation;
@@ -489,17 +476,17 @@ WHERE
       const nom_gerant = resultat.nom_gerant;
       const libelle_fond = resultat.nom_fond;
 
-      const pays_regul = await pays_regulateurs.findOne({
+      const pays_regul = pays ? await pays_regulateurs.findOne({
         attributes: ['regulateur', 'sitewebregulateur', 'nomdelabourse', 'URLdelabourse', 'nomdevise', 'symboledevise'],
         where: {
           pays: pays,
         },
-      });
-      const regulateur = pays_regul.regulateur;
-      const sitewebregulateur = pays_regul.sitewebregulateur;
-      const nomdelabourse = pays_regul.nomdelabourse;
-      const URLdelabourse = pays_regul.URLdelabourse;
-      const symboledevise = pays_regul.symboledevise;
+      }) : null;
+      const regulateur = pays_regul ? pays_regul.regulateur : null;
+      const sitewebregulateur = pays_regul ? pays_regul.sitewebregulateur : null;
+      const nomdelabourse = pays_regul ? pays_regul.nomdelabourse : null;
+      const URLdelabourse = pays_regul ? pays_regul.URLdelabourse : null;
+      const symboledevise = pays_regul ? pays_regul.symboledevise : null;
 
       const societegestion = await societe.findOne({
         attributes: ['nom', 'description', 'site_web'],
@@ -599,13 +586,14 @@ WHERE
       res.status(500).json({ message: 'Erreur lors de la récupération des données' });
 
     }
-    /* } catch (error) {
-       console.error('Erreur lors de la récupération des données:', error);
+    } catch (error) {
+       console.error('Erreur lors de la récupération des données valLiq:', error);
        res.status(500).json({ message: 'Erreur lors de la récupération des données' });
-     }*/
+    }
   });
 
   router.get('/api/valLiqdev/:id/:devise', async (req, res) => {
+    try {
     const fundId = extractIdFromSlug(req.params.id);
     const response = await vl.findAll({
       where: {
@@ -654,51 +642,34 @@ WHERE
       const fundname = fundnames[response.length - 1];
       const fundid = fundids[response.length - 1];
       const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-      const baseUrl = urll; // Remplacez par votre URL de base
-      const lastValResponse = await fetch(`${baseUrl}/api/performancesdev/fond/${fundid}/${req.params.devise}?date=${lastDate}`);
+      const baseUrl = urll;
       const libelle_indice = libelle_indices[response.length - 1];
       const ID_indice = ID_indices[response.length - 1];
       const currentDate = moment();
 
-      // Calculate the number of missing days
       const daysDiff = currentDate.diff(lastDate, 'days');
-
-      // Calculate the number of missing weekends
       const weekends = Array.from({ length: daysDiff }, (_, i) => moment(lastValue).add(i, 'days'))
         .filter(date => date.day() === 0 || date.day() === 6)
         .length;
-
-      // Calculate the number of missing Vl dates
       const missingVl = daysDiff - weekends;
-      if (!lastValResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
 
-      const lastValData = await lastValResponse.json();
+      const safeFetch = async (url) => {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) return {};
+          return await resp.json();
+        } catch (e) {
+          console.error('Erreur fetch interne:', url, e.message);
+          return {};
+        }
+      };
 
-      const last1ansRatiosResponse = await fetch(`${baseUrl}/api/ratiosnewdev/1/${fundid}/${req.params.devise}`);
-
-      if (!last1ansRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const last1ansRatiosData = await last1ansRatiosResponse.json();
-
-      const lastRatiosResponse = await fetch(`${baseUrl}/api/ratiosnewdev/3/${fundid}/${req.params.devise}`);
-
-      if (!lastRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const lastRatiosData = await lastRatiosResponse.json();
-
-      const last5ansRatiosResponse = await fetch(`${baseUrl}/api/ratiosnewdev/5/${fundid}/${req.params.devise}`);
-
-      if (!last5ansRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const last5ansRatiosData = await last5ansRatiosResponse.json();
+      const [lastValData, last1ansRatiosData, lastRatiosData, last5ansRatiosData] = await Promise.all([
+        safeFetch(`${baseUrl}/api/performancesdev/fond/${fundid}/${req.params.devise}?date=${lastDate}`),
+        safeFetch(`${baseUrl}/api/ratiosnewdev/1/${fundid}/${req.params.devise}`),
+        safeFetch(`${baseUrl}/api/ratiosnewdev/3/${fundid}/${req.params.devise}`),
+        safeFetch(`${baseUrl}/api/ratiosnewdev/5/${fundid}/${req.params.devise}`),
+      ]);
 
       const resultat = await fond.findOne({
         attributes: ['structure_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
@@ -706,6 +677,9 @@ WHERE
           id: fundId,
         },
       });
+      if (!resultat) {
+        return res.status(404).json({ message: 'Fonds introuvable', code: 404 });
+      }
       const affectation = resultat.affectation;
       const structure_fond = resultat.structure_fond;
       const code_ISIN = resultat.code_ISIN;
@@ -731,17 +705,17 @@ WHERE
       const nom_gerant = resultat.nom_gerant;
       const libelle_fond = resultat.nom_fond;
 
-      const pays_regul = await pays_regulateurs.findOne({
+      const pays_regul = pays ? await pays_regulateurs.findOne({
         attributes: ['regulateur', 'sitewebregulateur', 'nomdelabourse', 'URLdelabourse', 'nomdevise', 'symboledevise'],
         where: {
           pays: pays,
         },
-      });
-      const regulateur = pays_regul.regulateur;
-      const sitewebregulateur = pays_regul.sitewebregulateur;
-      const nomdelabourse = pays_regul.nomdelabourse;
-      const URLdelabourse = pays_regul.URLdelabourse;
-      const symboledevise = pays_regul.symboledevise;
+      }) : null;
+      const regulateur = pays_regul ? pays_regul.regulateur : null;
+      const sitewebregulateur = pays_regul ? pays_regul.sitewebregulateur : null;
+      const nomdelabourse = pays_regul ? pays_regul.nomdelabourse : null;
+      const URLdelabourse = pays_regul ? pays_regul.URLdelabourse : null;
+      const symboledevise = pays_regul ? pays_regul.symboledevise : null;
 
 
       res.json({
@@ -792,10 +766,10 @@ WHERE
       res.status(500).json({ message: 'Erreur lors de la récupération des données' });
 
     }
-    /* } catch (error) {
-       console.error('Erreur lors de la récupération des données:', error);
+    } catch (error) {
+       console.error('Erreur lors de la récupération des données valLiqdev:', error);
        res.status(500).json({ message: 'Erreur lors de la récupération des données' });
-     }*/
+    }
   });
 
 
