@@ -1,23 +1,25 @@
 /**
  * Nettoyage complet des VL anormales pour TOUS les fonds.
  *
- * 3 etapes de detection:
+ * 4 etapes de detection:
  *
  * ETAPE 1 - DOUBLONS DE DATE:
  *   Plusieurs VL pour la meme date sur un meme fond.
  *   On garde celle dont la valeur est la plus proche de la mediane
  *   des voisins (entree precedente + entree suivante par date).
  *
- * ETAPE 2 - PICS (seuil 15%):
+ * ETAPE 2 - PICS (seuil 15%) & ERREURS DE SAISIE (seuil 30%):
  *   Une VL est un PIC si elle devie de +15% ou -15% par rapport
  *   a SES DEUX VOISINS DIRECTS (precedent ET suivant).
  *   Iteratif: on supprime les pics et on re-scanne jusqu a convergence.
+ *   Les ecarts >30% sont categorises comme ERREUR DE SAISIE dans le rapport.
  *
- * ETAPE 3 - ERREURS DE SAISIE (seuil 30%):
- *   Meme logique bidirectionnelle mais avec seuil 30%.
- *   Separe pour le rapport (les erreurs >30% sont les plus graves).
- *   Note: toute erreur >30% est deja detectee par l etape 2 (>15%).
- *   L etape 3 sert uniquement a categoriser dans le rapport final.
+ * ETAPE 3 - INDREF PARASITES (graphique base 100):
+ *   Le champ indRef dans valorisations stocke l indice de reference.
+ *   Certains fonds ont des valeurs parasites intercalees (proches de 0
+ *   ou 2x la valeur normale) qui creent des pics sur le graphique base 100.
+ *   On detecte les indRef qui devient de >50% des 2 voisins et on les
+ *   corrige par interpolation lineaire.
  *
  * Modes:
  *   --report  (defaut) : affiche les anomalies sans modifier
@@ -348,6 +350,135 @@ async function run() {
   }
 
   // ==========================================
+  // ETAPE 3: INDREF PARASITES (graphique base 100)
+  // ==========================================
+  console.log('\n========== ETAPE 3: INDREF PARASITES ==========');
+  console.log('Regle: indRef deviant > +/-50% vs les 2 voisins directs → correction par interpolation');
+
+  let totalIndRefFixed = 0;
+  const indRefByPays = {};
+  const indRefAnomalies = [];
+
+  for (const fond of fonds) {
+    const [rows] = await conn.execute(
+      `SELECT id, date, indRef FROM valorisations
+       WHERE fund_id = ? AND indRef IS NOT NULL AND indRef != 0
+       ORDER BY date ASC`,
+      [fond.id]
+    );
+    if (rows.length < 3) continue;
+
+    const fixes = [];
+    for (let i = 1; i < rows.length - 1; i++) {
+      const prev = Number(rows[i - 1].indRef);
+      const curr = Number(rows[i].indRef);
+      const next = Number(rows[i + 1].indRef);
+
+      if (prev <= 0 || curr <= 0 || next <= 0) continue;
+
+      const ecartPrev = Math.abs(pctChange(prev, curr));
+      const ecartNext = Math.abs(pctChange(next, curr));
+
+      if (ecartPrev > 50 && ecartNext > 50) {
+        const interpolated = (prev + next) / 2;
+        fixes.push({
+          id: rows[i].id,
+          date: String(rows[i].date).slice(0, 10),
+          oldVal: curr,
+          newVal: interpolated,
+          prevVal: prev,
+          nextVal: next,
+          ecartPrev,
+          ecartNext,
+        });
+      }
+    }
+
+    // Edge: first entry
+    if (rows.length >= 3) {
+      const fv = Number(rows[0].indRef);
+      const sv = Number(rows[1].indRef);
+      const tv = Number(rows[2].indRef);
+      if (fv > 0 && sv > 0 && tv > 0) {
+        const ecart1to2 = Math.abs(pctChange(sv, fv));
+        const ecart2to3 = Math.abs(pctChange(sv, tv));
+        if (ecart1to2 > 50 && ecart2to3 < 50) {
+          fixes.push({
+            id: rows[0].id,
+            date: String(rows[0].date).slice(0, 10),
+            oldVal: fv,
+            newVal: sv,
+            prevVal: null,
+            nextVal: sv,
+            ecartPrev: null,
+            ecartNext: ecart1to2,
+          });
+        }
+      }
+    }
+
+    // Edge: last entry
+    if (rows.length >= 3) {
+      const lv = Number(rows[rows.length - 1].indRef);
+      const slv = Number(rows[rows.length - 2].indRef);
+      const tlv = Number(rows[rows.length - 3].indRef);
+      if (lv > 0 && slv > 0 && tlv > 0) {
+        const ecartLast = Math.abs(pctChange(slv, lv));
+        const ecartSlTl = Math.abs(pctChange(tlv, slv));
+        if (ecartLast > 50 && ecartSlTl < 50) {
+          fixes.push({
+            id: rows[rows.length - 1].id,
+            date: String(rows[rows.length - 1].date).slice(0, 10),
+            oldVal: lv,
+            newVal: slv,
+            prevVal: slv,
+            nextVal: null,
+            ecartPrev: ecartLast,
+            ecartNext: null,
+          });
+        }
+      }
+    }
+
+    // Deduplicate by id
+    const seen = new Set();
+    const uniqueFixes = fixes.filter(f => {
+      if (seen.has(f.id)) return false;
+      seen.add(f.id);
+      return true;
+    });
+
+    if (uniqueFixes.length === 0) continue;
+
+    totalIndRefFixed += uniqueFixes.length;
+    const pays = fond.pays || 'INCONNU';
+    if (!indRefByPays[pays]) indRefByPays[pays] = { count: 0, fonds: 0 };
+    indRefByPays[pays].count += uniqueFixes.length;
+    indRefByPays[pays].fonds++;
+
+    console.log(`  ${fond.nom_fond} (${pays}, id=${fond.id}): ${uniqueFixes.length} indRef parasites`);
+    for (const fix of uniqueFixes) {
+      const epStr = fix.ecartPrev !== null ? `${fix.ecartPrev.toFixed(1)}%` : '-';
+      const enStr = fix.ecartNext !== null ? `${fix.ecartNext.toFixed(1)}%` : '-';
+      console.log(`    ${fix.date}: ${fix.oldVal.toFixed(4)} → ${fix.newVal.toFixed(4)} (prev:${epStr} next:${enStr})`);
+
+      indRefAnomalies.push({ ...fix, fundId: fond.id, fundName: fond.nom_fond, pays });
+
+      if (doDelete) {
+        await conn.execute(
+          'UPDATE valorisations SET indRef = ? WHERE id = ?',
+          [fix.newVal, fix.id]
+        );
+      }
+    }
+  }
+
+  console.log(`Total indRef corrigees: ${totalIndRefFixed}`);
+  for (const [p, d] of Object.entries(indRefByPays).sort((a, b) => b[1].count - a[1].count)) {
+    console.log(`  ${p}: ${d.count} corrections dans ${d.fonds} fonds`);
+  }
+
+  // ==========================================
   // RAPPORT FINAL
   // ==========================================
   const totalToProcess = totalDuplicates + grandTotalAnomalies;
@@ -361,8 +492,10 @@ async function run() {
   console.log(`Doublons de date:         ${totalDuplicates}`);
   console.log(`Pics (>${opts.seuil}%):           ${totalPics}`);
   console.log(`Erreurs saisie (>30%):    ${totalErreurs}`);
+  console.log(`IndRef parasites:         ${totalIndRefFixed} (corrigees par interpolation)`);
   console.log(`---`);
   console.log(`TOTAL VL ${doDelete ? 'supprimees' : 'a supprimer'}:     ${totalToProcess}`);
+  console.log(`TOTAL indRef ${doDelete ? 'corrigees' : 'a corriger'}:    ${totalIndRefFixed}`);
 
   console.log('\n=== PAR PAYS ===');
   for (const [p, d] of Object.entries(anomaliesByPays).sort((a, b) => (b[1].pics + b[1].erreurs) - (a[1].pics + a[1].erreurs))) {
@@ -372,6 +505,12 @@ async function run() {
     console.log('  Doublons:');
     for (const [p, d] of Object.entries(dupsByPays).sort((a, b) => b[1].count - a[1].count)) {
       console.log(`    ${p}: ${d.count} doublons dans ${d.fonds} fonds`);
+    }
+  }
+  if (Object.keys(indRefByPays).length > 0) {
+    console.log('  IndRef parasites:');
+    for (const [p, d] of Object.entries(indRefByPays).sort((a, b) => b[1].count - a[1].count)) {
+      console.log(`    ${p}: ${d.count} corrections dans ${d.fonds} fonds`);
     }
   }
 
@@ -405,10 +544,13 @@ async function run() {
     }
   }
 
-  if (doDelete && totalToProcess > 0) {
+  if (doDelete && (totalToProcess > 0 || totalIndRefFixed > 0)) {
     console.log(`\n=== ACTIONS POST-NETTOYAGE REQUISES ===`);
     console.log('1. Recalculer VL ajustees:   node recalc_vl_ajuste.js');
     console.log('2. Recalculer performances:  node fix_populate_performances.js --force');
+    if (totalIndRefFixed > 0) {
+      console.log('3. Les indRef corrigees ameliorent directement le graphique base 100');
+    }
   }
 
   await conn.end();
