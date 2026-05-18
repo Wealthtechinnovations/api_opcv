@@ -464,12 +464,12 @@ router.get('/api/performances/fond/:id', async (req, res) => {
             performancesCategorie: dateee ? performancesCategorie : null
           }
         })
+      })
 
   } catch (error) {
     console.error('Erreur route /api/performances/fond:', error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
-    })
 })
 router.get('/api/performancescomparaison/fond/:id', async (req, res) => {
   try {
@@ -656,12 +656,12 @@ router.get('/api/performancescomparaison/fond/:id', async (req, res) => {
             //  performancesCategorie: performancesCategorie
           }
         })
+      })
 
   } catch (error) {
     console.error('Erreur route /api/performancescomparaison/fond:', error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
-    })
 })
 /////revoir
 router.get('/api/performanceswithdate/fond/:id/:date', async (req, res) => {
@@ -1045,12 +1045,12 @@ router.get('/api/performanceswithdate1/fond/:id/:date', async (req, res) => {
             performancesCategorie: performancesCategorie
           }
         })
+      })
 
   } catch (error) {
     console.error('Erreur route /api/performanceswithdate1/fond:', error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
-    })
 })
 
 
@@ -1258,12 +1258,12 @@ router.get('/api/performancesindice/fond/:id', async (req, res) => {
             //    performancesCategorie: performancesCategorie
           }
         })
+      })
 
   } catch (error) {
     console.error('Erreur route /api/performancesindice/fond:', error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
-    })
 })
 
 router.get('/api/performancescategorie/fond/:id', async (req, res) => {
@@ -1630,12 +1630,12 @@ router.get('/api/performancesdev/fond/:id/:devise', async (req, res) => {
             performancesCategorie: dateee ? performancesCategorie : null
           }
         })
+      })
 
   } catch (error) {
     console.error('Erreur route /api/performancesdev/fond:', error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
-    })
 })
 
 router.get('/api/performancesdevwithdate/fond/:id/:devise/:date', async (req, res) => {
@@ -1835,12 +1835,12 @@ router.get('/api/performancesdevwithdate/fond/:id/:devise/:date', async (req, re
             //  performancesCategorie: performancesCategorie
           }
         })
+      })
 
   } catch (error) {
     console.error('Erreur route /api/performancesdevwithdate/fond:', error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
-    })
 })
 router.get('/api/performancemonthyear/fond/:id', async (req, res) => {
   try {
@@ -2884,7 +2884,6 @@ router.get('/api/performances/indice/:id/:type', (req, res) => {
             perfAnnualizedOrigine: perfAnnualizedOrigine,
           }
         })
-
       })
 
   } catch (error) {
@@ -2892,8 +2891,6 @@ router.get('/api/performances/indice/:id/:type', (req, res) => {
     res.status(500).json({ message: 'Erreur serveur' });
   }
 })
-
-
 
 
 
