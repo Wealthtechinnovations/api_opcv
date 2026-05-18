@@ -67,6 +67,7 @@ const {
     calculateSharpeRatio,
     calculateVAR95,
     calculateTrackingError,
+    calculateTrackingErrormois,
     calculateVolatilityJour,
     calculateVolatilityMois,
     calculateVAR99,
@@ -88,6 +89,7 @@ const {
     calculateCovariance,
     calculateBetanew,
     calculateInformationRatiojour,
+    calculateInformationRatiomois,
     calculerR2,
     calculerSkewness,
     calculateKurtosis,
@@ -471,7 +473,7 @@ const {
 
               const info = calculateInformationRatio([...rendementsTableau['1_an']], [...rendementsTableauindice['1_an']])
               const infojour = calculateInformationRatiojour([...rendementsTableaujour['1_an']], [...rendementsTableauindicejour['1_an']])
-              const infomois = calculateInformationRatio([...rendementsTableaumois['1_an']], [...rendementsTableauindicemois['1_an']])
+              const infomois = calculateInformationRatiomois([...rendementsTableaumois['1_an']], [...rendementsTableauindicemois['1_an']])
 
               // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
               const beta = calculateBetanew(rendementsTableau['1_an'], rendementsTableauindice['1_an'])
@@ -521,7 +523,7 @@ const {
 
               const trackingError = calculateTrackingError([...rendementsTableau["1_an"]], [...rendementsTableauindice["1_an"]])
               const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
-              const trackingErrormois = calculateTrackingError([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
+              const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
 
               const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["1_an"]], [...rendementsTableauindice["1_an"]])
               const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
@@ -789,7 +791,7 @@ const {
 
             const info = calculateInformationRatio([...rendementsTableau['3_ans']], [...rendementsTableauindice['3_ans']])
             const infojour = calculateInformationRatiojour([...rendementsTableaujour['3_ans']], [...rendementsTableauindicejour['3_ans']])
-            const infomois = calculateInformationRatiojour([...rendementsTableaumois['3_ans']], [...rendementsTableauindicemois['3_ans']])
+            const infomois = calculateInformationRatiomois([...rendementsTableaumois['3_ans']], [...rendementsTableauindicemois['3_ans']])
 
             // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
             const beta = calculateBetanew(rendementsTableau['3_ans'], rendementsTableauindice['3_ans'])
@@ -838,7 +840,7 @@ const {
 
             const trackingError = calculateTrackingError([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
-            const trackingErrormois = calculateTrackingError([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
+            const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
 
             const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
@@ -1105,7 +1107,7 @@ const {
             //    const cov = calculateCovariance(rendementsTableau['5_ans'], [...rendementsTableauindice['5_ans']])
             const info = calculateInformationRatio([...rendementsTableau['5_ans']], [...rendementsTableauindice['5_ans']])
             const infojour = calculateInformationRatiojour([...rendementsTableaujour['5_ans']], [...rendementsTableauindicejour['5_ans']])
-            const infomois = calculateInformationRatiojour([...rendementsTableaumois['5_ans']], [...rendementsTableauindicemois['5_ans']])
+            const infomois = calculateInformationRatiomois([...rendementsTableaumois['5_ans']], [...rendementsTableauindicemois['5_ans']])
 
             // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
             const beta = calculateBetanew(rendementsTableau['5_ans'], rendementsTableauindice['5_ans'])
@@ -1153,7 +1155,7 @@ const {
 
             const trackingError = calculateTrackingError([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
-            const trackingErrormois = calculateTrackingError([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
+            const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
 
             const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
@@ -2205,7 +2207,7 @@ const {
       perfannuInd: calculateAnnualizedPerformance(valuesindifref[dates.indexOf(lastPreviousDate)], valuesindifref[dates.indexOf(yDate)], parseInt(req.params.year)) * 100,
       info: calculateInformationRatio(rendementsTableau[periode], rendementsTableauindice[periode]),
       infojour: calculateInformationRatiojour(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
-      infomois: calculateInformationRatio(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
+      infomois: calculateInformationRatiomois(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
       r2: calculerR2(rendementsTableau[periode], rendementsTableauindice[periode]),
       r2jour: calculerR2(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
       r2mois: calculerR2(rendementsTableaumois[periode], rendementsTableauindicemois[periode]),
@@ -2229,7 +2231,7 @@ const {
       ratiosharpemois: (CAGR - tauxsr) / volatilitesmois[periode],
       trackingerror: calculateTrackingError(rendementsTableau[periode], rendementsTableauindice[periode]) * 100,
       trackingerrorjour: calculateTrackingError(rendementsTableaujour[periode], rendementsTableauindicejour[periode]) * 100,
-      trackingerrormois: calculateTrackingError(rendementsTableaumois[periode], rendementsTableauindicemois[periode]) * 100,
+      trackingerrormois: calculateTrackingErrormois(rendementsTableaumois[periode], rendementsTableauindicemois[periode]) * 100,
       delaiRecouvrement: calculerDelaiRecouvrementFonds(Vls.reverse()),
       betahaussier: calculateHaussierBeta(rendementsTableau[periode], rendementsTableauindice[periode]),
       betahaussierjour: calculateHaussierBeta(rendementsTableaujour[periode], rendementsTableauindicejour[periode]),
@@ -2439,7 +2441,7 @@ const {
 
               const info = calculateInformationRatio([...rendementsTableau['1_an']], [...rendementsTableauindice['1_an']])
               const infojour = calculateInformationRatiojour([...rendementsTableaujour['1_an']], [...rendementsTableauindicejour['1_an']])
-              const infomois = calculateInformationRatio([...rendementsTableaumois['1_an']], [...rendementsTableauindicemois['1_an']])
+              const infomois = calculateInformationRatiomois([...rendementsTableaumois['1_an']], [...rendementsTableauindicemois['1_an']])
 
               // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
               const beta = calculateBetanew(rendementsTableau['1_an'], rendementsTableauindice['1_an'])
@@ -2489,7 +2491,7 @@ const {
 
               const trackingError = calculateTrackingError([...rendementsTableau["1_an"]], [...rendementsTableauindice["1_an"]])
               const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
-              const trackingErrormois = calculateTrackingError([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
+              const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
 
               const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["1_an"]], [...rendementsTableauindice["1_an"]])
               const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
@@ -2773,7 +2775,7 @@ const {
             */
             const info = calculateInformationRatio([...rendementsTableau['3_ans']], [...rendementsTableauindice['3_ans']])
             const infojour = calculateInformationRatiojour([...rendementsTableaujour['3_ans']], [...rendementsTableauindicejour['3_ans']])
-            const infomois = calculateInformationRatiojour([...rendementsTableaumois['3_ans']], [...rendementsTableauindicemois['3_ans']])
+            const infomois = calculateInformationRatiomois([...rendementsTableaumois['3_ans']], [...rendementsTableauindicemois['3_ans']])
 
             // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
             const beta = calculateBetanew(rendementsTableau['3_ans'], rendementsTableauindice['3_ans'])
@@ -2822,7 +2824,7 @@ const {
 
             const trackingError = calculateTrackingError([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
-            const trackingErrormois = calculateTrackingError([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
+            const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
 
             const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
@@ -3070,7 +3072,7 @@ const {
             //    const cov = calculateCovariance(rendementsTableau['5_ans'], [...rendementsTableauindice['5_ans']])
             const info = calculateInformationRatio([...rendementsTableau['5_ans']], [...rendementsTableauindice['5_ans']])
             const infojour = calculateInformationRatiojour([...rendementsTableaujour['5_ans']], [...rendementsTableauindicejour['5_ans']])
-            const infomois = calculateInformationRatiojour([...rendementsTableaumois['5_ans']], [...rendementsTableauindicemois['5_ans']])
+            const infomois = calculateInformationRatiomois([...rendementsTableaumois['5_ans']], [...rendementsTableauindicemois['5_ans']])
 
             // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
             const beta = calculateBetanew(rendementsTableau['5_ans'], rendementsTableauindice['5_ans'])
@@ -3118,7 +3120,7 @@ const {
 
             const trackingError = calculateTrackingError([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
-            const trackingErrormois = calculateTrackingError([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
+            const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
 
             const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
@@ -4083,7 +4085,7 @@ const {
 
               const info = calculateInformationRatio([...rendementsTableau['1_an']], [...rendementsTableauindice['1_an']])
               const infojour = calculateInformationRatiojour([...rendementsTableaujour['1_an']], [...rendementsTableauindicejour['1_an']])
-              const infomois = calculateInformationRatio([...rendementsTableaumois['1_an']], [...rendementsTableauindicemois['1_an']])
+              const infomois = calculateInformationRatiomois([...rendementsTableaumois['1_an']], [...rendementsTableauindicemois['1_an']])
 
               // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
               const beta = calculateBetanew(rendementsTableau['1_an'], rendementsTableauindice['1_an'])
@@ -4133,7 +4135,7 @@ const {
 
               const trackingError = calculateTrackingError([...rendementsTableau["1_an"]], [...rendementsTableauindice["1_an"]])
               const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
-              const trackingErrormois = calculateTrackingError([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
+              const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
 
               const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["1_an"]], [...rendementsTableauindice["1_an"]])
               const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
@@ -4417,7 +4419,7 @@ const {
             */
             const info = calculateInformationRatio([...rendementsTableau['3_ans']], [...rendementsTableauindice['3_ans']])
             const infojour = calculateInformationRatiojour([...rendementsTableaujour['3_ans']], [...rendementsTableauindicejour['3_ans']])
-            const infomois = calculateInformationRatiojour([...rendementsTableaumois['3_ans']], [...rendementsTableauindicemois['3_ans']])
+            const infomois = calculateInformationRatiomois([...rendementsTableaumois['3_ans']], [...rendementsTableauindicemois['3_ans']])
 
             // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
             const beta = calculateBetanew(rendementsTableau['3_ans'], rendementsTableauindice['3_ans'])
@@ -4466,7 +4468,7 @@ const {
 
             const trackingError = calculateTrackingError([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
-            const trackingErrormois = calculateTrackingError([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
+            const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
 
             const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
@@ -4714,7 +4716,7 @@ const {
             //    const cov = calculateCovariance(rendementsTableau['5_ans'], [...rendementsTableauindice['5_ans']])
             const info = calculateInformationRatio([...rendementsTableau['5_ans']], [...rendementsTableauindice['5_ans']])
             const infojour = calculateInformationRatiojour([...rendementsTableaujour['5_ans']], [...rendementsTableauindicejour['5_ans']])
-            const infomois = calculateInformationRatiojour([...rendementsTableaumois['5_ans']], [...rendementsTableauindicemois['5_ans']])
+            const infomois = calculateInformationRatiomois([...rendementsTableaumois['5_ans']], [...rendementsTableauindicemois['5_ans']])
 
             // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
             const beta = calculateBetanew(rendementsTableau['5_ans'], rendementsTableauindice['5_ans'])
@@ -4762,7 +4764,7 @@ const {
 
             const trackingError = calculateTrackingError([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
-            const trackingErrormois = calculateTrackingError([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
+            const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
 
             const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
@@ -5727,7 +5729,7 @@ const {
 
               const info = calculateInformationRatio([...rendementsTableau['1_an']], [...rendementsTableauindice['1_an']])
               const infojour = calculateInformationRatiojour([...rendementsTableaujour['1_an']], [...rendementsTableauindicejour['1_an']])
-              const infomois = calculateInformationRatio([...rendementsTableaumois['1_an']], [...rendementsTableauindicemois['1_an']])
+              const infomois = calculateInformationRatiomois([...rendementsTableaumois['1_an']], [...rendementsTableauindicemois['1_an']])
 
               // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
               const beta = calculateBetanew(rendementsTableau['1_an'], rendementsTableauindice['1_an'])
@@ -5777,7 +5779,7 @@ const {
 
               const trackingError = calculateTrackingError([...rendementsTableau["1_an"]], [...rendementsTableauindice["1_an"]])
               const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
-              const trackingErrormois = calculateTrackingError([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
+              const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
 
               const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["1_an"]], [...rendementsTableauindice["1_an"]])
               const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
@@ -6061,7 +6063,7 @@ const {
             */
             const info = calculateInformationRatio([...rendementsTableau['3_ans']], [...rendementsTableauindice['3_ans']])
             const infojour = calculateInformationRatiojour([...rendementsTableaujour['3_ans']], [...rendementsTableauindicejour['3_ans']])
-            const infomois = calculateInformationRatiojour([...rendementsTableaumois['3_ans']], [...rendementsTableauindicemois['3_ans']])
+            const infomois = calculateInformationRatiomois([...rendementsTableaumois['3_ans']], [...rendementsTableauindicemois['3_ans']])
 
             // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
             const beta = calculateBetanew(rendementsTableau['3_ans'], rendementsTableauindice['3_ans'])
@@ -6110,7 +6112,7 @@ const {
 
             const trackingError = calculateTrackingError([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
-            const trackingErrormois = calculateTrackingError([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
+            const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
 
             const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
@@ -6358,7 +6360,7 @@ const {
             //    const cov = calculateCovariance(rendementsTableau['5_ans'], [...rendementsTableauindice['5_ans']])
             const info = calculateInformationRatio([...rendementsTableau['5_ans']], [...rendementsTableauindice['5_ans']])
             const infojour = calculateInformationRatiojour([...rendementsTableaujour['5_ans']], [...rendementsTableauindicejour['5_ans']])
-            const infomois = calculateInformationRatiojour([...rendementsTableaumois['5_ans']], [...rendementsTableauindicemois['5_ans']])
+            const infomois = calculateInformationRatiomois([...rendementsTableaumois['5_ans']], [...rendementsTableauindicemois['5_ans']])
 
             // const info= calculateInformationRationew(portfolioReturns,benchmarkReturns)* Math.sqrt(52);
             const beta = calculateBetanew(rendementsTableau['5_ans'], rendementsTableauindice['5_ans'])
@@ -6406,7 +6408,7 @@ const {
 
             const trackingError = calculateTrackingError([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const trackingErrorjour = calculateTrackingError([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
-            const trackingErrormois = calculateTrackingError([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
+            const trackingErrormois = calculateTrackingErrormois([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
 
             const DownCaptureRatio = calculateDownCaptureRatio([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const DownCaptureRatiojour = calculateDownCaptureRatio([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])

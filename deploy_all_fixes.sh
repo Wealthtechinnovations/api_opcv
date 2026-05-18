@@ -86,25 +86,73 @@ if [ "$STATUS1" != "200" ] || [ "$STATUS2" != "200" ] || [ "$STATUS3" != "200" ]
 fi
 
 # -----------------------------------------------
-# ETAPE 6: Repeupler performances EUR + USD
+# ETAPE 5b: Index composite + fix_database_phase2
 # -----------------------------------------------
 echo ""
-echo "--- ETAPE 6/7: Repeupler performances EUR + USD ---"
+echo "--- ETAPE 5b: Index composite valorisations(fund_id, date) ---"
+cd "$API_DIR"
+node -e "
+const mysql = require('mysql2/promise');
+(async () => {
+  const c = await mysql.createConnection({host:'127.0.0.1',user:'fund_opcvm',password:'66G41zes~',database:'fund_opcvm'});
+  try {
+    const [idx] = await c.query(\"SHOW INDEX FROM valorisations WHERE Key_name = 'idx_fund_date'\");
+    if (idx.length === 0) {
+      console.log('  Creation index composite idx_fund_date...');
+      await c.query('CREATE INDEX idx_fund_date ON valorisations(fund_id, date)');
+      console.log('  -> Index cree');
+    } else {
+      console.log('  -> Index idx_fund_date existe deja');
+    }
+  } catch(e) { console.error('  Erreur index:', e.message); }
+  await c.end();
+})();
+"
+
+echo ""
+echo "--- ETAPE 5c: fix_database_phase2 (enrichissement donnees) ---"
+node fix_database_phase2.js 2>&1 | tail -20
+
+# -----------------------------------------------
+# ETAPE 6: Recalculer performances monnaie locale
+# -----------------------------------------------
+echo ""
+echo "--- ETAPE 6/9: Recalculer performances monnaie locale ---"
+echo "  (Met a jour avec les corrections Sortino/Calmar/VAR...)"
+cd "$API_DIR"
+node fix_populate_performances.js --force 2>&1 | tail -15
+
+# -----------------------------------------------
+# ETAPE 7: Repeupler performances EUR + USD
+# -----------------------------------------------
+echo ""
+echo "--- ETAPE 7/9: Repeupler performances EUR + USD ---"
 echo "  (Cela prend 2-5 minutes pour 1174 fonds...)"
 cd "$API_DIR"
 node fix_populate_performances_eur_usd.js --force --devise BOTH 2>&1 | tail -30
 
 # -----------------------------------------------
-# ETAPE 7: Recalculer classements EUR + USD
+# ETAPE 8: Recalculer classements (local + EUR + USD)
 # -----------------------------------------------
 echo ""
-echo "--- ETAPE 7/7: Recalculer classements EUR + USD ---"
+echo "--- ETAPE 8/9: Recalculer classements ---"
+echo "  Classement local..."
+curl -s "$API_URL/api/classement" --max-time 300 | head -c 200
+echo ""
 echo "  Classement EUR..."
 curl -s "$API_URL/api/classementeur" --max-time 300 | head -c 200
 echo ""
 echo "  Classement USD..."
 curl -s "$API_URL/api/classementusd" --max-time 300 | head -c 200
 echo ""
+
+# -----------------------------------------------
+# ETAPE 9: Sync production snapshot
+# -----------------------------------------------
+echo ""
+echo "--- ETAPE 9/9: Sync production snapshot ---"
+cd "$API_DIR"
+bash sync_production.sh 2>&1 | tail -10
 
 # -----------------------------------------------
 # VERIFICATION FINALE

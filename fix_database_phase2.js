@@ -24,8 +24,8 @@ const mysql = require('mysql2/promise');
 
 const DB_CONFIG = {
   host: process.env.DB_HOST || '127.0.0.1',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
+  user: process.env.DB_USER || 'fund_opcvm',
+  password: process.env.DB_PASSWORD || '66G41zes~',
   database: process.env.DB_NAME || 'fund_opcvm',
   multipleStatements: true,
 };
