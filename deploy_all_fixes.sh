@@ -137,7 +137,7 @@ node fix_populate_performances_eur_usd.js --force --devise BOTH 2>&1 | tail -30
 echo ""
 echo "--- ETAPE 8/9: Recalculer classements ---"
 echo "  Classement local..."
-curl -s "$API_URL/api/classement" --max-time 300 | head -c 200
+curl -s "$API_URL/api/classementmysql" --max-time 300 | head -c 200
 echo ""
 echo "  Classement EUR..."
 curl -s "$API_URL/api/classementeur" --max-time 300 | head -c 200
