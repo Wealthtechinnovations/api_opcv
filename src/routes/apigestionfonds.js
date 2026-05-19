@@ -384,7 +384,7 @@ WHERE
         if (data.value === null) return null;
         const point = {
           dates: moment(data.date).format('YYYY-MM-DD'),
-          values: hasIndRef ? data.vl_ajuste : data.value,
+          values: hasIndRef ? (data.vl_ajuste ?? data.value) : data.value,
         };
         if (hasIndRef && data.indRef != null) {
           point.valuesInd = data.indRef;
@@ -610,11 +610,13 @@ WHERE
       const valueField = req.params.devise == "USD" ? 'vl_ajuste_USD' : 'vl_ajuste_EUR';
       const hasIndRef = response.some(data => data[indRefField] !== null);
 
+      const rawValueField = req.params.devise == "USD" ? 'value_USD' : 'value_EUR';
       const graphs = response.map(data => {
-        if (data[valueField] === null) return null;
+        const val = data[valueField] ?? data[rawValueField];
+        if (val === null) return null;
         const point = {
           dates: moment(data.date).format('YYYY-MM-DD'),
-          values: data[valueField],
+          values: val,
         };
         if (hasIndRef && data[indRefField] != null) {
           point.valuesInd = data[indRefField];
