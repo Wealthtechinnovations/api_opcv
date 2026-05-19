@@ -6547,9 +6547,8 @@ GROUP BY f.societe_gestion;
     where: { id:parseInt(req.params.id) },
     include: [{
       model: vl,
-      order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
+      order: [['date', 'ASC']]
     }],
-    limit: 500,
   });
 
   // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
@@ -6846,9 +6845,8 @@ GROUP BY f.societe_gestion;
         where: { id:parseInt(req.params.id) },
         include: [{
           model: vl,
-          order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
+          order: [['date', 'ASC']]
         }],
-        limit: 500,
       });
   
       // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes

@@ -251,9 +251,8 @@ router.get('/api/updatewithdividende', async (req, res) => {
         where: { affectation: "Distribuant" },
         include: [{
           model: vl,
-          order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
+          order: [['date', 'ASC']]
         }],
-        limit: 10000,
       });
   
       // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
