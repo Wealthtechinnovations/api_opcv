@@ -157,21 +157,28 @@ const {
   }
 
 
-  async function tsrhistos(datee, year) {
+  const TSR_DEFAULTS = {
+    'MAROC': 0.0275,
+    'NIGERIA': 0.275,
+    'TUNISIE': 0.08,
+    'UEMOA': 0.035,
+    'CEMAC': 0.05,
+  };
 
-    // Récupérer la dernière valeur du mois précédent
+  async function tsrhistos(datee, year, pays) {
+    const paysUpper = pays ? pays.toUpperCase() : null;
+    const paysFilter = paysUpper ? { pays: paysUpper } : {};
+
     const lastValue = await tsrhisto.findOne({
       where: {
-        date: {
-          //  [Op.lt]: new Date(new Date().setDate(0))  // Dernier jour du mois précédent
-          [Op.lt]: datee
-        },
+        date: { [Op.lt]: datee },
+        ...paysFilter,
       },
       order: [['date', 'DESC']]
     });
 
     if (!lastValue) {
-      throw new Error('No data found for the last month.');
+      return null;
     }
 
     const endDate = lastValue.date;
@@ -179,44 +186,42 @@ const {
     startDate.setFullYear(startDate.getFullYear() - parseInt(year));
     let values;
     if (parseInt(year) == 5 || parseInt(year) == 10) {
-      // Récupérer les valeurs sur les 10 dernières années
       values = await tsrhisto.findAll({
         where: {
-          date: {
-            [Op.between]: [startDate, endDate]
-          }, annee: parseInt(year)
+          date: { [Op.between]: [startDate, endDate] },
+          annee: parseInt(year),
+          ...paysFilter,
         },
         order: [['date', 'ASC']],
         limit: 10000,
       });
+      if (!values.length) {
+        values = await tsrhisto.findAll({
+          where: {
+            date: { [Op.between]: [startDate, endDate] },
+            ...paysFilter,
+          },
+          order: [['date', 'ASC']],
+          limit: 10000,
+        });
+      }
     } else {
       values = await tsrhisto.findAll({
         where: {
-          date: {
-            [Op.between]: [startDate, endDate]
-          },
-          indice: "MONIA"
+          date: { [Op.between]: [startDate, endDate] },
+          ...paysFilter,
         },
         order: [['date', 'ASC']],
         limit: 10000,
       });
     }
 
-    const weeklyRates = values.map((value, index) => {
-      if (index === 0) return 0; // Aucun taux hebdomadaire pour la première valeur
-      const previousValue = values[index - 1].value;
-      const currentValue = value.value;
-      const weeklyRate = Math.pow((1 + currentValue) / (1 + previousValue), 1 / 52) - 1;
-      return weeklyRate;
-    });
+    if (!values.length) {
+      return null;
+    }
 
-    const hebdoValues = values.map(value => {
-      const hebdo = Math.pow((1 + value.value) / (1 + (value.value === 0 ? 0 : values[values.indexOf(value) - 1].value)), 1 / 52) - 1;
-      return hebdo;
-    });
-    
     const valueArray = values.map(record => record.value);
-    const annualYield = math.mean(valueArray)
+    const annualYield = math.mean(valueArray);
     return annualYield;
   }
   router.get('/api/ratiosnew/:year/:id', async (req, res) => {
@@ -348,12 +353,15 @@ const {
           /*   tableauDonneestsr.forEach((expObject) => {
          expObject.date = grouperTauxParSemaine(expObject.semaine);
        });*/
-          //   let tauxsrannu = trouverElementLePlusProche(tableauDonneestsr, findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)));
-          if (paysFond == "Maroc") {
-            tauxsr = await tsrhistos(lastPreviousDate, req.params.year)
-            tauxsr = tauxsr / 100;
-          } else {
-            tauxsr = 0.01420;
+          try {
+            const tsrResult = await tsrhistos(lastPreviousDate, req.params.year, paysFond);
+            if (tsrResult !== null) {
+              tauxsr = tsrResult / 100;
+            } else {
+              tauxsr = TSR_DEFAULTS[paysFond?.toUpperCase()] || 0.01420;
+            }
+          } catch (e) {
+            tauxsr = TSR_DEFAULTS[paysFond?.toUpperCase()] || 0.01420;
           }
 
           //  tauxsr = -0.0234; // Ou toute autre valeur par défaut que vous souhaitez
