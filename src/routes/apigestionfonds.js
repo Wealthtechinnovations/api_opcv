@@ -618,8 +618,12 @@ WHERE
       });
       const baseVal = firstValid ? (firstValid[valueField] ?? firstValid[rawValueField]) : 1;
 
-      const firstValidInd = hasIndRef ? response.find(d => d[indRefField] && d[indRefField] > 0) : null;
-      const baseInd = firstValidInd ? firstValidInd[indRefField] : 1;
+      let baseInd = 1;
+      if (hasIndRef && firstValid) {
+        const startIdx = response.indexOf(firstValid);
+        const firstValidInd = response.slice(startIdx).find(d => d[indRefField] && d[indRefField] > 0);
+        if (firstValidInd) baseInd = firstValidInd[indRefField];
+      }
 
       const graphs = response.map(data => {
         const val = data[valueField] ?? data[rawValueField];
