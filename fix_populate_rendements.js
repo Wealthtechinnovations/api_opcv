@@ -14,6 +14,11 @@
  *   - rendement_semaine / rendement_semaine_eur / rendement_semaine_usd
  *   - rendement_mensuel / rendement_mensuel_eur / rendement_mensuel_usd
  *
+ * REGLE FINANCIERE:
+ *   Utilise vl_ajuste (Total Return NAV) qui inclut les dividendes reinvestis.
+ *   Fallback sur value brute si vl_ajuste = 0 ou NULL.
+ *   vl_ajuste_EUR / vl_ajuste_USD pour les devises converties.
+ *
  * Auto-migration: detecte et ajoute les colonnes manquantes (ensureSchema).
  * NON-DESTRUCTIF: INSERT IGNORE (ne duplique pas)
  *
@@ -89,6 +94,16 @@ function toDateStr(d) {
   return String(d);
 }
 
+function vlLocal(v) {
+  return (v.vl_ajuste > 0) ? v.vl_ajuste : v.value;
+}
+function vlEur(v) {
+  return (v.vl_ajuste_EUR > 0) ? v.vl_ajuste_EUR : v.value_EUR;
+}
+function vlUsd(v) {
+  return (v.vl_ajuste_USD > 0) ? v.vl_ajuste_USD : v.value_USD;
+}
+
 async function run() {
   const args = process.argv.slice(2);
   const fondId = args.includes('--fond') ? parseInt(args[args.indexOf('--fond') + 1]) : null;
@@ -130,7 +145,8 @@ async function run() {
     const f = fonds[i];
     try {
       const [vls] = await conn.execute(
-        `SELECT date, value, value_EUR, value_USD FROM valorisations
+        `SELECT date, value, value_EUR, value_USD,
+                vl_ajuste, vl_ajuste_EUR, vl_ajuste_USD FROM valorisations
          WHERE fund_id = ? AND value IS NOT NULL AND value > 0
          ORDER BY date ASC`,
         [f.id]
@@ -143,13 +159,13 @@ async function run() {
 
       const batch = [];
 
-      // --- Rendements journaliers ---
+      // --- Rendements journaliers (vl_ajuste avec fallback value) ---
       for (let j = 1; j < vls.length; j++) {
         const prev = vls[j - 1];
         const curr = vls[j];
-        const rLocal = safeRend(curr.value, prev.value);
-        const rEur   = safeRend(curr.value_EUR, prev.value_EUR);
-        const rUsd   = safeRend(curr.value_USD, prev.value_USD);
+        const rLocal = safeRend(vlLocal(curr), vlLocal(prev));
+        const rEur   = safeRend(vlEur(curr), vlEur(prev));
+        const rUsd   = safeRend(vlUsd(curr), vlUsd(prev));
         if (rLocal !== null || rEur !== null || rUsd !== null) {
           batch.push([
             toDateStr(curr.date), f.id,
@@ -174,9 +190,9 @@ async function run() {
       for (let j = 1; j < weekKeys.length; j++) {
         const prev = byWeek[weekKeys[j - 1]];
         const curr = byWeek[weekKeys[j]];
-        const rLocal = safeRend(curr.value, prev.value);
-        const rEur   = safeRend(curr.value_EUR, prev.value_EUR);
-        const rUsd   = safeRend(curr.value_USD, prev.value_USD);
+        const rLocal = safeRend(vlLocal(curr), vlLocal(prev));
+        const rEur   = safeRend(vlEur(curr), vlEur(prev));
+        const rUsd   = safeRend(vlUsd(curr), vlUsd(prev));
         if (rLocal !== null || rEur !== null || rUsd !== null) {
           batch.push([
             toDateStr(curr.date), f.id,
@@ -198,9 +214,9 @@ async function run() {
       for (let j = 1; j < monthKeys.length; j++) {
         const prev = byMonth[monthKeys[j - 1]];
         const curr = byMonth[monthKeys[j]];
-        const rLocal = safeRend(curr.value, prev.value);
-        const rEur   = safeRend(curr.value_EUR, prev.value_EUR);
-        const rUsd   = safeRend(curr.value_USD, prev.value_USD);
+        const rLocal = safeRend(vlLocal(curr), vlLocal(prev));
+        const rEur   = safeRend(vlEur(curr), vlEur(prev));
+        const rUsd   = safeRend(vlUsd(curr), vlUsd(prev));
         if (rLocal !== null || rEur !== null || rUsd !== null) {
           batch.push([
             toDateStr(curr.date), f.id,
