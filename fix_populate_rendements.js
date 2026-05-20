@@ -30,6 +30,31 @@ const DB_CONFIG = {
   charset: 'utf8mb4',
 };
 
+async function ensureSchema(conn) {
+  const [cols] = await conn.execute('SHOW COLUMNS FROM rendements');
+  const existing = new Set(cols.map(c => c.Field));
+  console.log('Colonnes actuelles:', [...existing].join(', '));
+
+  const required = [
+    { name: 'rendement_jour',    type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_semaine', type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_mensuel', type: 'DOUBLE DEFAULT NULL' },
+    { name: 'lastvl',            type: 'DOUBLE DEFAULT NULL' },
+    { name: 'fond_id',           type: 'INT DEFAULT NULL' },
+  ];
+
+  for (const col of required) {
+    if (!existing.has(col.name)) {
+      console.log(`  + ALTER TABLE: ajout colonne ${col.name} (${col.type})`);
+      await conn.execute(`ALTER TABLE rendements ADD COLUMN \`${col.name}\` ${col.type}`);
+    }
+  }
+
+  const [colsAfter] = await conn.execute('SHOW COLUMNS FROM rendements');
+  console.log('Colonnes apres migration:', colsAfter.map(c => c.Field).join(', '));
+  console.log('');
+}
+
 async function run() {
   const args = process.argv.slice(2);
   const fondId = args.includes('--fond') ? parseInt(args[args.indexOf('--fond') + 1]) : null;
@@ -38,6 +63,8 @@ async function run() {
 
   const conn = await mysql.createConnection(DB_CONFIG);
   console.log('Connecte a fund_opcvm\n');
+
+  await ensureSchema(conn);
 
   if (truncate) {
     console.log('TRUNCATE rendements...');
