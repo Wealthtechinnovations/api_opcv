@@ -439,7 +439,7 @@ WHERE
       ]);
 
       const resultat = await fond.findOne({
-        attributes: ['indice_benchmark','indice', 'structure_fond', 'strategie_politique_invest', 'philosophie_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
+        attributes: ['indice_benchmark','indice', 'structure_fond', 'strategie_politique_invest', 'philosophie_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant', 'indice_fundafrica', 'indice_fundafrica_id', 'categorie_fundafrica_locale', 'categorie_fundafrica_regionale', 'categorie_fundafrica_globale'],
         where: {
           id: fundId,
         },
@@ -687,7 +687,7 @@ WHERE
       ]);
 
       const resultat = await fond.findOne({
-        attributes: ['indice_benchmark', 'indice', 'structure_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
+        attributes: ['indice_benchmark', 'indice', 'structure_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant', 'indice_fundafrica', 'indice_fundafrica_id', 'categorie_fundafrica_locale', 'categorie_fundafrica_regionale', 'categorie_fundafrica_globale'],
         where: {
           id: fundId,
         },

@@ -189,6 +189,26 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    indice_fundafrica: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    indice_fundafrica_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    categorie_fundafrica_locale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    categorie_fundafrica_regionale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    categorie_fundafrica_globale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
