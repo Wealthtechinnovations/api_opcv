@@ -181,3 +181,15 @@ Apres chaque intervention, documenter dans SUIVI.md :
 - Verifications effectuees en production
 - Risques de regression
 - Prochaines etapes
+
+## Gouvernance documentaire
+
+1. **SUIVI.md** est le fichier operationnel principal. Le lire avant chaque intervention, le mettre a jour apres chaque intervention significative.
+2. Les autres fichiers documentaires ne doivent pas etre mis a jour mecaniquement.
+3. **CLAUDE.md** : ne mettre a jour que si les regles permanentes changent.
+4. **README_DEV.md** : ne mettre a jour que si l'architecture, les commandes, les environnements, les tests, les procedures de deploiement ou les informations developpeur durables changent.
+5. **ROADMAP.md** : ne mettre a jour que si une decision produit ou technique moyen/long terme est ajoutee ou modifiee.
+6. **CODE_REVIEW.md** : ne mettre a jour que si une revue de code, un audit, une dette technique, un risque ou une recommandation structurelle est identifie.
+7. **CHANGELOG.md** : ne mettre a jour que si une modification significative est livree ou deployee.
+8. Ne pas disperser la meme information dans plusieurs fichiers.
+9. Toute mise a jour d'un fichier documentaire complementaire doit etre mentionnee brievement dans SUIVI.md.
