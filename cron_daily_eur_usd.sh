@@ -2,8 +2,8 @@
 # ===========================================================================
 # CRON QUOTIDIEN — Recalcul performances EUR/USD + classements
 # ===========================================================================
-# A ajouter au crontab du serveur de production:
-#   30 6 * * * cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api && bash cron_daily_eur_usd.sh >> /var/log/cron_eur_usd.log 2>&1
+# Schedule: 21h30 quotidien (apres le cron principal de 20h)
+#   30 21 * * * cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api && bash cron_daily_eur_usd.sh >> /var/log/cron_eur_usd.log 2>&1
 #
 # S'execute APRES le cron quotidien principal qui importe les VL du jour.
 # ===========================================================================

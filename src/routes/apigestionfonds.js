@@ -613,7 +613,7 @@ WHERE
       const rawValueField = req.params.devise == "USD" ? 'value_USD' : 'value_EUR';
       const graphs = response.map(data => {
         const val = data[valueField] ?? data[rawValueField];
-        if (val === null) return null;
+        if (!val) return null;
         const point = {
           dates: moment(data.date).format('YYYY-MM-DD'),
           values: val,
