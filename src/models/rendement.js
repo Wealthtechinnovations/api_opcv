@@ -11,13 +11,31 @@ module.exports = (sequelize, DataTypes) => {
     lastvl: {
       type: DataTypes.DOUBLE,
     },
+    rendement_jour: {
+      type: DataTypes.DOUBLE,
+    },
+    rendement_jour_eur: {
+      type: DataTypes.DOUBLE,
+    },
+    rendement_jour_usd: {
+      type: DataTypes.DOUBLE,
+    },
     rendement_semaine: {
+      type: DataTypes.DOUBLE,
+    },
+    rendement_semaine_eur: {
+      type: DataTypes.DOUBLE,
+    },
+    rendement_semaine_usd: {
       type: DataTypes.DOUBLE,
     },
     rendement_mensuel: {
       type: DataTypes.DOUBLE,
     },
-    rendement_jour: {
+    rendement_mensuel_eur: {
+      type: DataTypes.DOUBLE,
+    },
+    rendement_mensuel_usd: {
       type: DataTypes.DOUBLE,
     },
     fond_id: {

@@ -2,15 +2,19 @@
  * fix_populate_rendements.js
  *
  * Peuple la table `rendements` avec les rendements journaliers, hebdomadaires
- * et mensuels pour tous les fonds actifs.
+ * et mensuels pour tous les fonds actifs, en 3 devises :
+ *   - Devise locale (value)
+ *   - EUR (value_EUR)
+ *   - USD (value_USD)
  *
  * Calcul direct SQL — pas d'appel API interne.
  *
- * Colonnes peuplees:
- *   - rendement_jour:    (VL(t) - VL(t-1)) / VL(t-1)
- *   - rendement_semaine: (VL fin semaine - VL fin semaine precedente) / VL precedente
- *   - rendement_mensuel: (VL fin mois - VL fin mois precedent) / VL precedent
+ * Colonnes peuplees (9 colonnes de rendement):
+ *   - rendement_jour / rendement_jour_eur / rendement_jour_usd
+ *   - rendement_semaine / rendement_semaine_eur / rendement_semaine_usd
+ *   - rendement_mensuel / rendement_mensuel_eur / rendement_mensuel_usd
  *
+ * Auto-migration: detecte et ajoute les colonnes manquantes (ensureSchema).
  * NON-DESTRUCTIF: INSERT IGNORE (ne duplique pas)
  *
  * Usage:
@@ -30,29 +34,59 @@ const DB_CONFIG = {
   charset: 'utf8mb4',
 };
 
+const INSERT_COLS = [
+  'date', 'fond_id',
+  'rendement_jour', 'rendement_jour_eur', 'rendement_jour_usd',
+  'rendement_semaine', 'rendement_semaine_eur', 'rendement_semaine_usd',
+  'rendement_mensuel', 'rendement_mensuel_eur', 'rendement_mensuel_usd',
+];
+const PLACEHOLDER = `(${INSERT_COLS.map(() => '?').join(', ')})`;
+
 async function ensureSchema(conn) {
   const [cols] = await conn.execute('SHOW COLUMNS FROM rendements');
   const existing = new Set(cols.map(c => c.Field));
   console.log('Colonnes actuelles:', [...existing].join(', '));
 
   const required = [
-    { name: 'rendement_jour',    type: 'DOUBLE DEFAULT NULL' },
-    { name: 'rendement_semaine', type: 'DOUBLE DEFAULT NULL' },
-    { name: 'rendement_mensuel', type: 'DOUBLE DEFAULT NULL' },
-    { name: 'lastvl',            type: 'DOUBLE DEFAULT NULL' },
-    { name: 'fond_id',           type: 'INT DEFAULT NULL' },
+    { name: 'fond_id',               type: 'INT DEFAULT NULL' },
+    { name: 'rendement_jour',        type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_jour_eur',    type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_jour_usd',    type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_semaine',     type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_semaine_eur', type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_semaine_usd', type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_mensuel',     type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_mensuel_eur', type: 'DOUBLE DEFAULT NULL' },
+    { name: 'rendement_mensuel_usd', type: 'DOUBLE DEFAULT NULL' },
+    { name: 'lastvl',                type: 'DOUBLE DEFAULT NULL' },
   ];
 
+  let added = 0;
   for (const col of required) {
     if (!existing.has(col.name)) {
       console.log(`  + ALTER TABLE: ajout colonne ${col.name} (${col.type})`);
       await conn.execute(`ALTER TABLE rendements ADD COLUMN \`${col.name}\` ${col.type}`);
+      added++;
     }
   }
 
-  const [colsAfter] = await conn.execute('SHOW COLUMNS FROM rendements');
-  console.log('Colonnes apres migration:', colsAfter.map(c => c.Field).join(', '));
+  if (added > 0) {
+    const [colsAfter] = await conn.execute('SHOW COLUMNS FROM rendements');
+    console.log('Colonnes apres migration:', colsAfter.map(c => c.Field).join(', '));
+  } else {
+    console.log('Schema OK — aucune colonne manquante.');
+  }
   console.log('');
+}
+
+function safeRend(curr, prev) {
+  if (prev > 0 && curr != null && curr > 0) return (curr - prev) / prev;
+  return null;
+}
+
+function toDateStr(d) {
+  if (d instanceof Date) return d.toISOString().split('T')[0];
+  return String(d);
 }
 
 async function run() {
@@ -96,7 +130,7 @@ async function run() {
     const f = fonds[i];
     try {
       const [vls] = await conn.execute(
-        `SELECT date, value FROM valorisations
+        `SELECT date, value, value_EUR, value_USD FROM valorisations
          WHERE fund_id = ? AND value IS NOT NULL AND value > 0
          ORDER BY date ASC`,
         [f.id]
@@ -113,12 +147,16 @@ async function run() {
       for (let j = 1; j < vls.length; j++) {
         const prev = vls[j - 1];
         const curr = vls[j];
-        if (prev.value > 0) {
-          const rendJour = (curr.value - prev.value) / prev.value;
-          const dateStr = curr.date instanceof Date
-            ? curr.date.toISOString().split('T')[0]
-            : String(curr.date);
-          batch.push([dateStr, rendJour, null, null, f.id]);
+        const rLocal = safeRend(curr.value, prev.value);
+        const rEur   = safeRend(curr.value_EUR, prev.value_EUR);
+        const rUsd   = safeRend(curr.value_USD, prev.value_USD);
+        if (rLocal !== null || rEur !== null || rUsd !== null) {
+          batch.push([
+            toDateStr(curr.date), f.id,
+            rLocal, rEur, rUsd,
+            null, null, null,
+            null, null, null,
+          ]);
         }
       }
 
@@ -130,18 +168,22 @@ async function run() {
         const jan1 = new Date(yr, 0, 1);
         const week = Math.ceil(((d - jan1) / 86400000 + jan1.getDay() + 1) / 7);
         const key = `${yr}-W${String(week).padStart(2, '0')}`;
-        byWeek[key] = { date: v.date, value: v.value };
+        byWeek[key] = v;
       }
       const weekKeys = Object.keys(byWeek).sort();
       for (let j = 1; j < weekKeys.length; j++) {
         const prev = byWeek[weekKeys[j - 1]];
         const curr = byWeek[weekKeys[j]];
-        if (prev.value > 0) {
-          const rendSem = (curr.value - prev.value) / prev.value;
-          const dateStr = curr.date instanceof Date
-            ? curr.date.toISOString().split('T')[0]
-            : String(curr.date);
-          batch.push([dateStr, null, rendSem, null, f.id]);
+        const rLocal = safeRend(curr.value, prev.value);
+        const rEur   = safeRend(curr.value_EUR, prev.value_EUR);
+        const rUsd   = safeRend(curr.value_USD, prev.value_USD);
+        if (rLocal !== null || rEur !== null || rUsd !== null) {
+          batch.push([
+            toDateStr(curr.date), f.id,
+            null, null, null,
+            rLocal, rEur, rUsd,
+            null, null, null,
+          ]);
         }
       }
 
@@ -150,18 +192,22 @@ async function run() {
       for (const v of vls) {
         const d = v.date instanceof Date ? v.date : new Date(v.date);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        byMonth[key] = { date: v.date, value: v.value };
+        byMonth[key] = v;
       }
       const monthKeys = Object.keys(byMonth).sort();
       for (let j = 1; j < monthKeys.length; j++) {
         const prev = byMonth[monthKeys[j - 1]];
         const curr = byMonth[monthKeys[j]];
-        if (prev.value > 0) {
-          const rendMens = (curr.value - prev.value) / prev.value;
-          const dateStr = curr.date instanceof Date
-            ? curr.date.toISOString().split('T')[0]
-            : String(curr.date);
-          batch.push([dateStr, null, null, rendMens, f.id]);
+        const rLocal = safeRend(curr.value, prev.value);
+        const rEur   = safeRend(curr.value_EUR, prev.value_EUR);
+        const rUsd   = safeRend(curr.value_USD, prev.value_USD);
+        if (rLocal !== null || rEur !== null || rUsd !== null) {
+          batch.push([
+            toDateStr(curr.date), f.id,
+            null, null, null,
+            null, null, null,
+            rLocal, rEur, rUsd,
+          ]);
         }
       }
 
@@ -171,10 +217,10 @@ async function run() {
         let inserted = 0;
         for (let b = 0; b < batch.length; b += BATCH_SIZE) {
           const chunk = batch.slice(b, b + BATCH_SIZE);
-          const placeholders = chunk.map(() => '(?, ?, ?, ?, ?)').join(', ');
+          const placeholders = chunk.map(() => PLACEHOLDER).join(', ');
           try {
             const [result] = await conn.execute(
-              `INSERT IGNORE INTO rendements (date, rendement_jour, rendement_semaine, rendement_mensuel, fond_id)
+              `INSERT IGNORE INTO rendements (${INSERT_COLS.join(', ')})
                VALUES ${placeholders}`,
               chunk.flat()
             );
@@ -199,6 +245,9 @@ async function run() {
   // Verification
   const [count] = await conn.execute('SELECT COUNT(*) as c FROM rendements');
   const [fondCount] = await conn.execute('SELECT COUNT(DISTINCT fond_id) as c FROM rendements');
+  const [jourCount] = await conn.execute('SELECT COUNT(*) as c FROM rendements WHERE rendement_jour IS NOT NULL');
+  const [eurCount] = await conn.execute('SELECT COUNT(*) as c FROM rendements WHERE rendement_jour_eur IS NOT NULL');
+  const [usdCount] = await conn.execute('SELECT COUNT(*) as c FROM rendements WHERE rendement_jour_usd IS NOT NULL');
 
   console.log('\n=== RESUME ===');
   console.log(`Fonds traites:      ${fonds.length}`);
@@ -206,6 +255,9 @@ async function run() {
   console.log(`Rendements inseres: ${totalInserted}`);
   console.log(`Erreurs:            ${errors}`);
   console.log(`Total en base:      ${count[0].c} rendements / ${fondCount[0].c} fonds`);
+  console.log(`  dont jour local:  ${jourCount[0].c}`);
+  console.log(`  dont jour EUR:    ${eurCount[0].c}`);
+  console.log(`  dont jour USD:    ${usdCount[0].c}`);
 
   await conn.end();
   console.log('\nTermine.');
