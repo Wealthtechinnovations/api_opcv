@@ -410,8 +410,8 @@ WHERE
       const fundid = fundids[response.length - 1];
       const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
       const baseUrl = urll;
-      const libelle_indice = libelle_indices[response.length - 1];
-      const ID_indice = ID_indices[0];
+      const libelle_indice = libelle_indices.find(v => v) || null;
+      const ID_indice = ID_indices.find(v => v) || null;
       const currentDate = moment();
 
       const daysDiff = currentDate.diff(lastDate, 'days');
@@ -658,8 +658,8 @@ WHERE
       const fundid = fundids[response.length - 1];
       const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
       const baseUrl = urll;
-      const libelle_indice = libelle_indices[response.length - 1];
-      const ID_indice = ID_indices[response.length - 1];
+      const libelle_indice = libelle_indices.find(v => v) || null;
+      const ID_indice = ID_indices.find(v => v) || null;
       const currentDate = moment();
 
       const daysDiff = currentDate.diff(lastDate, 'days');
@@ -687,7 +687,7 @@ WHERE
       ]);
 
       const resultat = await fond.findOne({
-        attributes: ['structure_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
+        attributes: ['indice_benchmark', 'indice', 'structure_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
         where: {
           id: fundId,
         },
@@ -695,6 +695,7 @@ WHERE
       if (!resultat) {
         return res.status(404).json({ message: 'Fonds introuvable', code: 404 });
       }
+      const indice_benchmark = resultat.indice_benchmark;
       const affectation = resultat.affectation;
       const structure_fond = resultat.structure_fond;
       const code_ISIN = resultat.code_ISIN;
@@ -737,6 +738,7 @@ WHERE
         code: 200,
         data: {
           ID_indice,
+          indice_benchmark,
           affectation,
           frais_souscription,
           frais_rachat,
