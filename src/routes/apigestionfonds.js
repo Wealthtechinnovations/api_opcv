@@ -611,15 +611,25 @@ WHERE
       const hasIndRef = response.some(data => data[indRefField] !== null);
 
       const rawValueField = req.params.devise == "USD" ? 'value_USD' : 'value_EUR';
+
+      const firstValid = response.find(d => {
+        const v = d[valueField] ?? d[rawValueField];
+        return v && v > 0;
+      });
+      const baseVal = firstValid ? (firstValid[valueField] ?? firstValid[rawValueField]) : 1;
+
+      const firstValidInd = hasIndRef ? response.find(d => d[indRefField] && d[indRefField] > 0) : null;
+      const baseInd = firstValidInd ? firstValidInd[indRefField] : 1;
+
       const graphs = response.map(data => {
         const val = data[valueField] ?? data[rawValueField];
         if (!val) return null;
         const point = {
           dates: moment(data.date).format('YYYY-MM-DD'),
-          values: val,
+          values: (val / baseVal) * 100,
         };
         if (hasIndRef && data[indRefField] != null) {
-          point.valuesInd = data[indRefField];
+          point.valuesInd = (data[indRefField] / baseInd) * 100;
         }
         return point;
       }).filter(Boolean);
