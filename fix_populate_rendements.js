@@ -91,7 +91,7 @@ async function run() {
           const dateStr = curr.date instanceof Date
             ? curr.date.toISOString().split('T')[0]
             : String(curr.date);
-          batch.push([dateStr, curr.value, rendJour, null, null, f.id]);
+          batch.push([dateStr, rendJour, null, null, f.id]);
         }
       }
 
@@ -114,7 +114,7 @@ async function run() {
           const dateStr = curr.date instanceof Date
             ? curr.date.toISOString().split('T')[0]
             : String(curr.date);
-          batch.push([dateStr, curr.value, null, rendSem, null, f.id]);
+          batch.push([dateStr, null, rendSem, null, f.id]);
         }
       }
 
@@ -134,7 +134,7 @@ async function run() {
           const dateStr = curr.date instanceof Date
             ? curr.date.toISOString().split('T')[0]
             : String(curr.date);
-          batch.push([dateStr, curr.value, null, null, rendMens, f.id]);
+          batch.push([dateStr, null, null, rendMens, f.id]);
         }
       }
 
@@ -144,10 +144,10 @@ async function run() {
         let inserted = 0;
         for (let b = 0; b < batch.length; b += BATCH_SIZE) {
           const chunk = batch.slice(b, b + BATCH_SIZE);
-          const placeholders = chunk.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
+          const placeholders = chunk.map(() => '(?, ?, ?, ?, ?)').join(', ');
           try {
             const [result] = await conn.execute(
-              `INSERT IGNORE INTO rendements (date, lastvl, rendement_jour, rendement_semaine, rendement_mensuel, fond_id)
+              `INSERT IGNORE INTO rendements (date, rendement_jour, rendement_semaine, rendement_mensuel, fond_id)
                VALUES ${placeholders}`,
               chunk.flat()
             );
