@@ -35,14 +35,16 @@ const COLUMNS_TO_ADD = [
 ];
 
 async function ensureColumn(conn, table, colName, colType) {
-  const [cols] = await conn.execute(
+  // MariaDB does not support prepared statements for SHOW COLUMNS — use query()
+  const [cols] = await conn.query(
     `SHOW COLUMNS FROM \`${table}\` LIKE ?`, [colName]
   );
   if (cols.length > 0) {
+    console.log(`  ${table}.${colName} — existe deja`);
     return false;
   }
   if (EXECUTE) {
-    await conn.execute(`ALTER TABLE \`${table}\` ADD COLUMN \`${colName}\` ${colType}`);
+    await conn.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${colName}\` ${colType}`);
     console.log(`  ALTER TABLE ${table} ADD COLUMN ${colName} — OK`);
   } else {
     console.log(`  [DRY] ALTER TABLE ${table} ADD COLUMN ${colName} ${colType}`);
@@ -68,7 +70,7 @@ async function run() {
 
   // STEP 2: Check fond_investissements coverage
   console.log('=== ETAPE 2: COUVERTURE fond_investissements ===');
-  const [coverage] = await conn.execute(`
+  const [coverage] = await conn.query(`
     SELECT
       COUNT(*) as total,
       SUM(CASE WHEN categorie_fundafrica_regionale IS NOT NULL AND categorie_fundafrica_regionale != '' THEN 1 ELSE 0 END) as has_regional,
@@ -80,7 +82,7 @@ async function run() {
   console.log(`Avec categorie_fundafrica_globale: ${coverage[0].has_global} (${(coverage[0].has_global/coverage[0].total*100).toFixed(1)}%)`);
 
   // Show distribution
-  const [distRegional] = await conn.execute(`
+  const [distRegional] = await conn.query(`
     SELECT categorie_fundafrica_regionale as cat, COUNT(*) as nb
     FROM fond_investissements WHERE active = 1
       AND categorie_fundafrica_regionale IS NOT NULL AND categorie_fundafrica_regionale != ''
@@ -89,7 +91,7 @@ async function run() {
   console.log(`\n${distRegional.length} categories regionales FundAfrica distinctes:`);
   distRegional.forEach(r => console.log(`  ${(r.cat || '').padEnd(40)} ${r.nb} fonds`));
 
-  const [distGlobal] = await conn.execute(`
+  const [distGlobal] = await conn.query(`
     SELECT categorie_fundafrica_globale as cat, COUNT(*) as nb
     FROM fond_investissements WHERE active = 1
       AND categorie_fundafrica_globale IS NOT NULL AND categorie_fundafrica_globale != ''
@@ -101,7 +103,7 @@ async function run() {
   // STEP 3: Backfill performences tables
   console.log('\n=== ETAPE 3: BACKFILL TABLES PERFORMANCES ===');
   for (const table of TABLES_PERF) {
-    const [before] = await conn.execute(`
+    const [before] = await conn.query(`
       SELECT COUNT(*) as total,
         SUM(CASE WHEN categorie_fundafrica_regionale IS NOT NULL AND categorie_fundafrica_regionale != '' THEN 1 ELSE 0 END) as filled_reg,
         SUM(CASE WHEN categorie_fundafrica_globale IS NOT NULL AND categorie_fundafrica_globale != '' THEN 1 ELSE 0 END) as filled_glob
@@ -110,7 +112,7 @@ async function run() {
     console.log(`\n${table}: ${before[0].total} lignes, ${before[0].filled_reg} avec regionale, ${before[0].filled_glob} avec globale`);
 
     if (EXECUTE && before[0].total > 0) {
-      const [result] = await conn.execute(`
+      const [result] = await conn.query(`
         UPDATE \`${table}\` p
         JOIN fond_investissements f ON f.id = p.fond_id
         SET p.categorie_fundafrica_regionale = f.categorie_fundafrica_regionale,
@@ -119,7 +121,7 @@ async function run() {
       `);
       console.log(`  -> ${result.affectedRows} lignes mises a jour`);
     } else if (!EXECUTE && before[0].total > 0) {
-      const [preview] = await conn.execute(`
+      const [preview] = await conn.query(`
         SELECT COUNT(*) as c FROM \`${table}\` p
         JOIN fond_investissements f ON f.id = p.fond_id
         WHERE f.categorie_fundafrica_regionale IS NOT NULL
@@ -132,7 +134,7 @@ async function run() {
   console.log('\n=== ETAPE 4: VERIFICATION ===');
   if (EXECUTE) {
     for (const table of TABLES_PERF) {
-      const [after] = await conn.execute(`
+      const [after] = await conn.query(`
         SELECT COUNT(*) as total,
           SUM(CASE WHEN categorie_fundafrica_regionale IS NOT NULL AND categorie_fundafrica_regionale != '' THEN 1 ELSE 0 END) as filled_reg,
           SUM(CASE WHEN categorie_fundafrica_globale IS NOT NULL AND categorie_fundafrica_globale != '' THEN 1 ELSE 0 END) as filled_glob
