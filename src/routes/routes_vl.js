@@ -6505,17 +6505,17 @@ GROUP BY f.societe_gestion;
           fund_id: vlEntry.fund_id,
           date: vlEntry.date,
           value: parseFloat(vlEntry.value),
-          value_EUR: exchangeRatesEUR ? parseFloat(vlEntry.value) * exchangeRatesEUR.value : null,
-          value_USD: exchangeRatesUSD ? parseFloat(vlEntry.value) * exchangeRatesUSD.value : null,
+          value_EUR: exchangeRatesEUR ? parseFloat(vlEntry.value) / exchangeRatesEUR.value : null,
+          value_USD: exchangeRatesUSD ? parseFloat(vlEntry.value) / exchangeRatesUSD.value : null,
           dividende:vlEntry.dividende? parseFloat(vlEntry.dividende):0,
-          dividende_EUR: vlEntry.dividende ? parseFloat(vlEntry.dividende) * exchangeRatesEUR.value : null,
-          dividende_USD: vlEntry.dividende  ? parseFloat(vlEntry.dividende) * exchangeRatesUSD.value : null,
+          dividende_EUR: vlEntry.dividende ? parseFloat(vlEntry.dividende) / exchangeRatesEUR.value : null,
+          dividende_USD: vlEntry.dividende  ? parseFloat(vlEntry.dividende) / exchangeRatesUSD.value : null,
           actif_net: parseFloat(vlEntry.actif_net),
-          actif_net_EUR: exchangeRatesEUR ? parseFloat(vlEntry.actif_net) * exchangeRatesEUR.value : null,
-          actif_net_USD: exchangeRatesUSD ? parseFloat(vlEntry.actif_net) * exchangeRatesUSD.value : null,
+          actif_net_EUR: exchangeRatesEUR ? parseFloat(vlEntry.actif_net) / exchangeRatesEUR.value : null,
+          actif_net_USD: exchangeRatesUSD ? parseFloat(vlEntry.actif_net) / exchangeRatesUSD.value : null,
           indRef: vlEntry.indRef != undefined ? parseFloat(vlEntry.indRef) : null,
-          indRef_EUR: vlEntry.indRef != undefined ? parseFloat(vlEntry.indRef) * exchangeRatesEUR.value : null,
-          indRef_USD: vlEntry.indRef != undefined ? parseFloat(vlEntry.indRef) * exchangeRatesUSD.value : null
+          indRef_EUR: vlEntry.indRef != undefined && exchangeRatesEUR ? parseFloat(vlEntry.indRef) / exchangeRatesEUR.value : null,
+          indRef_USD: vlEntry.indRef != undefined && exchangeRatesUSD ? parseFloat(vlEntry.indRef) / exchangeRatesUSD.value : null
         };
         const existingEntry = await vl.findOne({
           where: {
@@ -6636,8 +6636,8 @@ GROUP BY f.societe_gestion;
           fund_id: vlEntry.fund_id,
           date: vlEntry.date,
           indRef: vlEntry.value != undefined ? parseFloat(vlEntry.value) : null,
-          indRef_EUR: vlEntry.value != undefined ? parseFloat(vlEntry.value) * exchangeRatesEUR.value : null,
-          indRef_USD: vlEntry.value != undefined ? parseFloat(vlEntry.value) * exchangeRatesUSD.value : null
+          indRef_EUR: vlEntry.value != undefined && exchangeRatesEUR ? parseFloat(vlEntry.value) / exchangeRatesEUR.value : null,
+          indRef_USD: vlEntry.value != undefined && exchangeRatesUSD ? parseFloat(vlEntry.value) / exchangeRatesUSD.value : null
         };
         const indiceEntryNEW = {
           date: vlEntry.date,
@@ -6799,8 +6799,8 @@ GROUP BY f.societe_gestion;
 
           if ('indRef' in row && exchangeRatesEUR && exchangeRatesUSD) {
             vlEntry.indRef = parseFloat(row.indRef);
-            vlEntry.indRef_EUR = parseFloat(row.indRef) * exchangeRatesEUR.value;
-            vlEntry.indRef_USD = parseFloat(row.indRef) * exchangeRatesUSD.value;
+            vlEntry.indRef_EUR = parseFloat(row.indRef) / exchangeRatesEUR.value;
+            vlEntry.indRef_USD = parseFloat(row.indRef) / exchangeRatesUSD.value;
           }
 
 
@@ -6969,8 +6969,8 @@ GROUP BY f.societe_gestion;
           if ('indRef' in row && exchangeRatesEUR && exchangeRatesUSD) {
             indiceEntry.valeur = parseFloat(row.indRef);
             vlEntry.indRef = parseFloat(row.indRef);
-            vlEntry.indRef_EUR = parseFloat(row.indRef) * exchangeRatesEUR.value;
-            vlEntry.indRef_USD = parseFloat(row.indRef) * exchangeRatesUSD.value;
+            vlEntry.indRef_EUR = parseFloat(row.indRef) / exchangeRatesEUR.value;
+            vlEntry.indRef_USD = parseFloat(row.indRef) / exchangeRatesUSD.value;
           }
 
 

@@ -606,9 +606,10 @@ WHERE
     });
     if (response.length > 0) {
 
+      const indRefField = req.params.devise == "USD" ? 'indRef_USD' : 'indRef_EUR';
       const valueField = req.params.devise == "USD" ? 'vl_ajuste_USD' : 'vl_ajuste_EUR';
       const rawValueField = req.params.devise == "USD" ? 'value_USD' : 'value_EUR';
-      const hasIndRef = response.some(data => data.indRef !== null);
+      const hasIndRef = response.some(data => data[indRefField] !== null && data[indRefField] > 0);
 
       const firstValid = response.find(d => {
         const v = d[valueField] ?? d[rawValueField];
@@ -619,8 +620,8 @@ WHERE
       let baseInd = 1;
       if (hasIndRef && firstValid) {
         const startIdx = response.indexOf(firstValid);
-        const firstValidInd = response.slice(startIdx).find(d => d.indRef && d.indRef > 0);
-        if (firstValidInd) baseInd = firstValidInd.indRef;
+        const firstValidInd = response.slice(startIdx).find(d => d[indRefField] && d[indRefField] > 0);
+        if (firstValidInd) baseInd = firstValidInd[indRefField];
       }
 
       const graphs = response.map(data => {
@@ -630,8 +631,8 @@ WHERE
           dates: moment(data.date).format('YYYY-MM-DD'),
           values: (val / baseVal) * 100,
         };
-        if (hasIndRef && data.indRef != null && data.indRef > 0) {
-          point.valuesInd = (data.indRef / baseInd) * 100;
+        if (hasIndRef && data[indRefField] != null && data[indRefField] > 0) {
+          point.valuesInd = (data[indRefField] / baseInd) * 100;
         }
         return point;
       }).filter(Boolean);

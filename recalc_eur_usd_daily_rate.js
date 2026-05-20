@@ -180,7 +180,7 @@ async function run() {
 
     // Charger toutes les VL du fonds
     const [vlRows] = await conn.execute(
-      `SELECT id, date, value, vl_ajuste, actif_net, dividende,
+      `SELECT id, date, value, vl_ajuste, actif_net, dividende, indRef,
               value_EUR, value_USD
        FROM valorisations
        WHERE fund_id = ? AND value IS NOT NULL AND value > 0
@@ -268,6 +268,9 @@ async function run() {
       const newActifNetUSD = actifNet > 0 ? actifNet / usdRate : 0;
       const newDividendeEUR = dividende > 0 ? dividende / eurRate : 0;
       const newDividendeUSD = dividende > 0 ? dividende / usdRate : 0;
+      const indRef = parseFloat(row.indRef) || 0;
+      const newIndRefEUR = indRef > 0 ? indRef / eurRate : null;
+      const newIndRefUSD = indRef > 0 ? indRef / usdRate : null;
 
       updates.push({
         id: row.id,
@@ -279,6 +282,8 @@ async function run() {
         actif_net_USD: newActifNetUSD,
         dividende_EUR: newDividendeEUR,
         dividende_USD: newDividendeUSD,
+        indRef_EUR: newIndRefEUR,
+        indRef_USD: newIndRefUSD,
       });
     }
 
@@ -299,6 +304,8 @@ async function run() {
         const caseAnUSD = chunk.map(u => `WHEN ${u.id} THEN ${u.actif_net_USD}`).join(' ');
         const caseDivEUR = chunk.map(u => `WHEN ${u.id} THEN ${u.dividende_EUR}`).join(' ');
         const caseDivUSD = chunk.map(u => `WHEN ${u.id} THEN ${u.dividende_USD}`).join(' ');
+        const caseIndRefEUR = chunk.map(u => `WHEN ${u.id} THEN ${u.indRef_EUR === null ? 'NULL' : u.indRef_EUR}`).join(' ');
+        const caseIndRefUSD = chunk.map(u => `WHEN ${u.id} THEN ${u.indRef_USD === null ? 'NULL' : u.indRef_USD}`).join(' ');
 
         try {
           await conn.execute(`
@@ -310,7 +317,9 @@ async function run() {
               actif_net_EUR = CASE id ${caseAnEUR} END,
               actif_net_USD = CASE id ${caseAnUSD} END,
               dividende_EUR = CASE id ${caseDivEUR} END,
-              dividende_USD = CASE id ${caseDivUSD} END
+              dividende_USD = CASE id ${caseDivUSD} END,
+              indRef_EUR = CASE id ${caseIndRefEUR} END,
+              indRef_USD = CASE id ${caseIndRefUSD} END
             WHERE id IN (${ids.join(',')})
           `);
         } catch (e) {
