@@ -126,7 +126,8 @@ async function run() {
 
   let fondQuery = `
     SELECT f.id, f.nom_fond, f.pays, f.code_ISIN, f.dev_libelle,
-           f.categorie_globale, f.categorie_national, f.categorie_regional
+           f.categorie_globale, f.categorie_national, f.categorie_regional,
+           f.categorie_fundafrica_regionale, f.categorie_fundafrica_globale
     FROM fond_investissements f
     WHERE f.active = 1 AND f.id IN (SELECT DISTINCT fund_id FROM valorisations)
   `;
@@ -225,6 +226,8 @@ async function run() {
         categorie: f.categorie_globale,
         categorie_nationale: f.categorie_national,
         categorie_regionale: f.categorie_regional,
+        categorie_fundafrica_regionale: f.categorie_fundafrica_regionale || null,
+        categorie_fundafrica_globale: f.categorie_fundafrica_globale || null,
         devise: f.dev_libelle,
         date: latestDateStr,
         ytd, perfveille: perfVeille,

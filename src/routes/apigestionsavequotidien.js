@@ -608,17 +608,17 @@ router.get('/api/updatewithdividende', async (req, res) => {
       const selectedFundCategory = category;
 
       const fundsWithPerformance = await sequelize.query(`
-       SELECT 
-        p1.fond_id, 
-        p1.perf3m, 
-        p1.perf6m, 
-        p1.perf1an, 
-        p1.perf3ans, 
-        p1.perf5ans, 
+       SELECT
+        p1.fond_id,
+        p1.perf3m,
+        p1.perf6m,
+        p1.perf1an,
+        p1.perf3ans,
+        p1.perf5ans,
         p1.ytd
       FROM performences p1
-      
-        WHERE date= :datedebut  and  categorie_regionale = :selectedFundCategory
+
+        WHERE date= :datedebut  and  categorie_fundafrica_regionale = :selectedFundCategory
 
         GROUP BY fond_id
     `, {
@@ -691,16 +691,15 @@ router.get('/api/updatewithdividende', async (req, res) => {
       let fundsWithPerformance;
 
       if (devise == "EUR") {
-        // Étape 1 : Récupérer toutes les performances pour la catégorie spécifiée
         fundsWithPerformance = await performences_eurs.findAll({
-          where: { categorie_regionale: selectedFundCategory },
+          where: { categorie_fundafrica_regionale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
-          order: [['fond_id', 'DESC']], // Choisissez la colonne de tri et l'ordre en fonction de vos besoins,
+          order: [['fond_id', 'DESC']],
           limit: 10000,
         });
       } else {
         fundsWithPerformance = await performences_usds.findAll({
-          where: { categorie_regionale: selectedFundCategory },
+          where: { categorie_fundafrica_regionale: selectedFundCategory },
           attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
           order: [['fond_id', 'DESC']],
           limit: 10000,
@@ -763,6 +762,81 @@ router.get('/api/updatewithdividende', async (req, res) => {
     } catch (error) {
       console.error('Erreur lors de la récupération des données :', error);
       return { error: 'Erreur lors de la récupération des données.' };
+    }
+  }
+
+  async function calculateRankGlobaldev(category, fundId, devise) {
+    try {
+      if (!category) return { error: 'Pas de categorie globale FundAfrica.' };
+      const selectedFundId = fundId;
+      const selectedFundCategory = category;
+      let fundsWithPerformance;
+
+      if (devise == "EUR") {
+        fundsWithPerformance = await performences_eurs.findAll({
+          where: { categorie_fundafrica_globale: selectedFundCategory },
+          attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
+          order: [['fond_id', 'DESC']],
+          limit: 10000,
+        });
+      } else {
+        fundsWithPerformance = await performences_usds.findAll({
+          where: { categorie_fundafrica_globale: selectedFundCategory },
+          attributes: ['fond_id', 'perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'],
+          order: [['fond_id', 'DESC']],
+          limit: 10000,
+        });
+      }
+
+      const selectedFund = fundsWithPerformance.find((fund) => fund.fond_id === selectedFundId);
+
+      if (!selectedFund) {
+        return { error: 'Fond non trouvé.' };
+      }
+
+      const calculateRankForPeriod = (period) => {
+        const validPerformances = fundsWithPerformance.filter((fund) =>
+          fund[period] !== null && fund[period] != "-"
+        );
+
+        if (validPerformances.length === 0) {
+          return [null, 0];
+        }
+        const rantotal = validPerformances.length;
+        validPerformances.sort((a, b) => b[period] - a[period]);
+        const rank = validPerformances.findIndex((fund) => fund.fond_id === selectedFundId) + 1;
+        return [rank, rantotal];
+      };
+
+      const rank3Mois = calculateRankForPeriod('perf3m');
+      const rank6Mois = calculateRankForPeriod('perf6m');
+      const rank1An = calculateRankForPeriod('perf1an');
+      const rank3Ans = calculateRankForPeriod('perf3ans');
+      const rank5Ans = calculateRankForPeriod('perf5ans');
+      const rank1erJanvier = calculateRankForPeriod('ytd');
+
+      return {
+        code: 200,
+        data: {
+          rank3Mois: rank3Mois[0],
+          rank6Mois: rank6Mois[0],
+          rank1An: rank1An[0],
+          rank3Ans: rank3Ans[0],
+          rank5Ans: rank5Ans[0],
+          rank1erJanvier: rank1erJanvier[0],
+          rank3Moistotal: rank3Mois[1],
+          rank6Moistotal: rank6Mois[1],
+          rank1Antotal: rank1An[1],
+          rank3Anstotal: rank3Ans[1],
+          rank5Anstotal: rank5Ans[1],
+          rank1erJanviertotal: rank1erJanvier[1],
+          ranktotal: fundsWithPerformance.length,
+          category: selectedFundCategory,
+        },
+      };
+    } catch (error) {
+      console.error('Erreur calculateRankGlobaldev:', error);
+      return { error: 'Erreur lors du calcul du classement global.' };
     }
   }
 
@@ -1055,6 +1129,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
         const fundId = fund.id;
         const category = fund.categorie_national;
         const categorie_regionale = fund.categorie_regional;
+        const categorie_fundafrica_regionale = fund.categorie_fundafrica_regionale;
         const categorie_libelle = fund.categorie_libelle;
         const datemoispre = fund.datemoispre;
         const datejour = fund.datejour;
@@ -1070,7 +1145,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
 
         // Calculez le classement en fonction de la catégorie
         const rankingData = await calculateRankmysql(category, fundId, datejour);
-        const rankingDataregional = await calculateRankregionalmysql(categorie_regionale, fundId, datejour);
+        const rankingDataregional = await calculateRankregionalmysql(categorie_fundafrica_regionale, fundId, datejour);
 
 
         if (existingRanking) {
@@ -1131,6 +1206,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
               categorie_nationale: category,
               type_classement: 1,
               categorie_regionale: categorie_regionale,
+              categorie_fundafrica_regionale: fund.categorie_fundafrica_regionale || null,
+              categorie_fundafrica_globale: fund.categorie_fundafrica_globale || null,
               categorie: categorie_libelle,
               rank3Mois: rankingData.data.rank3Mois,
               rank6Mois: rankingData.data.rank6Mois,
@@ -1196,7 +1273,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingregional.rank3Anstotal = rankingDataregional.data.rank3Anstotal;
           existingRankingregional.rank5Anstotal = rankingDataregional.data.rank5Anstotal;
           existingRankingregional.rank1erJanviertotal = rankingDataregional.data.rank1erJanviertotal;
-          existingRankingregional.type_classement = 1;
+          existingRankingregional.type_classement = 2;
           await existingRankingregional.save();
         } else {
 
@@ -1207,6 +1284,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
               categorie_nationale: category,
               type_classement: 2,
               categorie_regionale: categorie_regionale,
+              categorie_fundafrica_regionale: fund.categorie_fundafrica_regionale || null,
+              categorie_fundafrica_globale: fund.categorie_fundafrica_globale || null,
               categorie: categorie_libelle,
               rank3Mois: rankingDataregional.data.rank3Mois,
               rank6Mois: rankingDataregional.data.rank6Mois,
@@ -1240,6 +1319,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
         const fundId = fund.id;
         const category = fund.categorie_national;
         const categorie_regionale = fund.categorie_regional;
+        const categorie_fundafrica_regionale = fund.categorie_fundafrica_regionale;
+        const categorie_fundafrica_globale = fund.categorie_fundafrica_globale;
         const categorie_libelle = fund.categorie_libelle;
 
         // Vérifiez si le fond existe dans la table classementfond
@@ -1251,9 +1332,14 @@ router.get('/api/classementclickhouse', async (req, res) => {
           where: { fond_id: fundId, type_classement: 2 },
         });
 
+        const existingRankingGlobal = await classementfonds_eurs.findOne({
+          where: { fond_id: fundId, type_classement: 3 },
+        });
+
         // Calculez le classement en fonction de la catégorie
         const rankingData = await calculateRankdev(category, fundId, "EUR");
-        const rankingDataregional = await calculateRankregionaldev(categorie_regionale, fundId, "EUR");
+        const rankingDataregional = await calculateRankregionaldev(categorie_fundafrica_regionale, fundId, "EUR");
+        const rankingDataGlobal = await calculateRankGlobaldev(categorie_fundafrica_globale, fundId, "EUR");
 
 
         if (existingRanking) {
@@ -1281,6 +1367,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
               categorie_nationale: category,
               type_classement: 1,
               categorie_regionale: categorie_regionale,
+              categorie_fundafrica_regionale: categorie_fundafrica_regionale || null,
+              categorie_fundafrica_globale: categorie_fundafrica_globale || null,
               categorie: categorie_libelle,
               rank3Mois: rankingData.data.rank3Mois,
               rank6Mois: rankingData.data.rank6Mois,
@@ -1298,13 +1386,11 @@ router.get('/api/classementclickhouse', async (req, res) => {
         }
 
         if (existingRankingregional) {
-          // Le fond existe, mettez à jour son classement en fonction de la catégorie
           existingRankingregional.rank3Mois = rankingDataregional.data.rank3Mois;
           existingRankingregional.rank6Mois = rankingDataregional.data.rank6Mois;
           existingRankingregional.rank1An = rankingDataregional.data.rank1An;
           existingRankingregional.rank3Ans = rankingDataregional.data.rank3Ans;
           existingRankingregional.rank5Ans = rankingDataregional.data.rank5Ans;
-          existingRankingregional.rank1erJanvier = rankingDataregional.data.rank1erJanvier;
           existingRankingregional.rank1erJanvier = rankingDataregional.data.rank1erJanvier;
           existingRankingregional.rank3Moistotal = rankingDataregional.data.rank3Moistotal;
           existingRankingregional.rank6Moistotal = rankingDataregional.data.rank6Moistotal;
@@ -1315,14 +1401,14 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingregional.type_classement = 2;
           await existingRankingregional.save();
         } else {
-
-          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond EUR
           if (rankingDataregional.code == 200)
             await classementfonds_eurs.create({
               fond_id: fundId,
               categorie_nationale: category,
               type_classement: 2,
               categorie_regionale: categorie_regionale,
+              categorie_fundafrica_regionale: categorie_fundafrica_regionale || null,
+              categorie_fundafrica_globale: categorie_fundafrica_globale || null,
               categorie: categorie_libelle,
               rank3Mois: rankingDataregional.data.rank3Mois,
               rank6Mois: rankingDataregional.data.rank6Mois,
@@ -1337,6 +1423,49 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rank5Anstotal: rankingDataregional.data.rank5Anstotal,
               rank1erJanviertotal: rankingDataregional.data.rank1erJanviertotal,
             });
+        }
+
+        // Type 3 : Classement Afrique (par categorie_fundafrica_globale)
+        if (categorie_fundafrica_globale) {
+          if (existingRankingGlobal) {
+            existingRankingGlobal.rank3Mois = rankingDataGlobal.data.rank3Mois;
+            existingRankingGlobal.rank6Mois = rankingDataGlobal.data.rank6Mois;
+            existingRankingGlobal.rank1An = rankingDataGlobal.data.rank1An;
+            existingRankingGlobal.rank3Ans = rankingDataGlobal.data.rank3Ans;
+            existingRankingGlobal.rank5Ans = rankingDataGlobal.data.rank5Ans;
+            existingRankingGlobal.rank1erJanvier = rankingDataGlobal.data.rank1erJanvier;
+            existingRankingGlobal.rank3Moistotal = rankingDataGlobal.data.rank3Moistotal;
+            existingRankingGlobal.rank6Moistotal = rankingDataGlobal.data.rank6Moistotal;
+            existingRankingGlobal.rank1Antotal = rankingDataGlobal.data.rank1Antotal;
+            existingRankingGlobal.rank3Anstotal = rankingDataGlobal.data.rank3Anstotal;
+            existingRankingGlobal.rank5Anstotal = rankingDataGlobal.data.rank5Anstotal;
+            existingRankingGlobal.rank1erJanviertotal = rankingDataGlobal.data.rank1erJanviertotal;
+            existingRankingGlobal.type_classement = 3;
+            await existingRankingGlobal.save();
+          } else {
+            if (rankingDataGlobal && rankingDataGlobal.code == 200)
+              await classementfonds_eurs.create({
+                fond_id: fundId,
+                categorie_nationale: category,
+                type_classement: 3,
+                categorie_regionale: categorie_regionale,
+                categorie_fundafrica_regionale: categorie_fundafrica_regionale || null,
+                categorie_fundafrica_globale: categorie_fundafrica_globale || null,
+                categorie: categorie_libelle,
+                rank3Mois: rankingDataGlobal.data.rank3Mois,
+                rank6Mois: rankingDataGlobal.data.rank6Mois,
+                rank1An: rankingDataGlobal.data.rank1An,
+                rank3Ans: rankingDataGlobal.data.rank3Ans,
+                rank5Ans: rankingDataGlobal.data.rank5Ans,
+                rank1erJanvier: rankingDataGlobal.data.rank1erJanvier,
+                rank3Moistotal: rankingDataGlobal.data.rank3Moistotal,
+                rank6Moistotal: rankingDataGlobal.data.rank6Moistotal,
+                rank1Antotal: rankingDataGlobal.data.rank1Antotal,
+                rank3Anstotal: rankingDataGlobal.data.rank3Anstotal,
+                rank5Anstotal: rankingDataGlobal.data.rank5Anstotal,
+                rank1erJanviertotal: rankingDataGlobal.data.rank1erJanviertotal,
+              });
+          }
         }
       }
       res.json("finishrank");
@@ -1356,9 +1485,10 @@ router.get('/api/classementclickhouse', async (req, res) => {
         const fundId = fund.id;
         const category = fund.categorie_national;
         const categorie_regionale = fund.categorie_regional;
+        const categorie_fundafrica_regionale = fund.categorie_fundafrica_regionale;
+        const categorie_fundafrica_globale = fund.categorie_fundafrica_globale;
         const categorie_libelle = fund.categorie_libelle;
 
-        // Vérifiez si le fond existe dans la table classementfond
         const existingRanking = await classementfonds_usds.findOne({
           where: { fond_id: fundId, type_classement: 1 },
         });
@@ -1367,19 +1497,20 @@ router.get('/api/classementclickhouse', async (req, res) => {
           where: { fond_id: fundId, type_classement: 2 },
         });
 
-        // Calculez le classement en fonction de la catégorie
-        const rankingData = await calculateRankdev(category, fundId, "USD");
-        const rankingDataregional = await calculateRankregionaldev(categorie_regionale, fundId, "USD");
+        const existingRankingGlobal = await classementfonds_usds.findOne({
+          where: { fond_id: fundId, type_classement: 3 },
+        });
 
+        const rankingData = await calculateRankdev(category, fundId, "USD");
+        const rankingDataregional = await calculateRankregionaldev(categorie_fundafrica_regionale, fundId, "USD");
+        const rankingDataGlobal = await calculateRankGlobaldev(categorie_fundafrica_globale, fundId, "USD");
 
         if (existingRanking) {
-          // Le fond existe, mettez à jour son classement en fonction de la catégorie
           existingRanking.rank3Mois = rankingData.data.rank3Mois;
           existingRanking.rank6Mois = rankingData.data.rank6Mois;
           existingRanking.rank1An = rankingData.data.rank1An;
           existingRanking.rank3Ans = rankingData.data.rank3Ans;
           existingRanking.rank5Ans = rankingData.data.rank5Ans;
-          existingRanking.rank1erJanvier = rankingData.data.rank1erJanvier;
           existingRanking.rank1erJanvier = rankingData.data.rank1erJanvier;
           existingRanking.rank3Moistotal = rankingData.data.rank3Moistotal;
           existingRanking.rank6Moistotal = rankingData.data.rank6Moistotal;
@@ -1390,13 +1521,14 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRanking.type_classement = 1;
           await existingRanking.save();
         } else {
-          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond USD
           if (rankingData.code == 200)
             await classementfonds_usds.create({
               fond_id: fundId,
               categorie_nationale: category,
               type_classement: 1,
               categorie_regionale: categorie_regionale,
+              categorie_fundafrica_regionale: categorie_fundafrica_regionale || null,
+              categorie_fundafrica_globale: categorie_fundafrica_globale || null,
               categorie: categorie_libelle,
               rank3Mois: rankingData.data.rank3Mois,
               rank6Mois: rankingData.data.rank6Mois,
@@ -1414,13 +1546,11 @@ router.get('/api/classementclickhouse', async (req, res) => {
         }
 
         if (existingRankingregional) {
-          // Le fond existe, mettez à jour son classement en fonction de la catégorie
           existingRankingregional.rank3Mois = rankingDataregional.data.rank3Mois;
           existingRankingregional.rank6Mois = rankingDataregional.data.rank6Mois;
           existingRankingregional.rank1An = rankingDataregional.data.rank1An;
           existingRankingregional.rank3Ans = rankingDataregional.data.rank3Ans;
           existingRankingregional.rank5Ans = rankingDataregional.data.rank5Ans;
-          existingRankingregional.rank1erJanvier = rankingDataregional.data.rank1erJanvier;
           existingRankingregional.rank1erJanvier = rankingDataregional.data.rank1erJanvier;
           existingRankingregional.rank3Moistotal = rankingDataregional.data.rank3Moistotal;
           existingRankingregional.rank6Moistotal = rankingDataregional.data.rank6Moistotal;
@@ -1431,14 +1561,14 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingregional.type_classement = 2;
           await existingRankingregional.save();
         } else {
-
-          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond USD
           if (rankingDataregional.code == 200)
             await classementfonds_usds.create({
               fond_id: fundId,
               categorie_nationale: category,
               type_classement: 2,
               categorie_regionale: categorie_regionale,
+              categorie_fundafrica_regionale: categorie_fundafrica_regionale || null,
+              categorie_fundafrica_globale: categorie_fundafrica_globale || null,
               categorie: categorie_libelle,
               rank3Mois: rankingDataregional.data.rank3Mois,
               rank6Mois: rankingDataregional.data.rank6Mois,
@@ -1453,6 +1583,49 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rank5Anstotal: rankingDataregional.data.rank5Anstotal,
               rank1erJanviertotal: rankingDataregional.data.rank1erJanviertotal,
             });
+        }
+
+        // Type 3 : Classement Afrique (par categorie_fundafrica_globale)
+        if (categorie_fundafrica_globale) {
+          if (existingRankingGlobal) {
+            existingRankingGlobal.rank3Mois = rankingDataGlobal.data.rank3Mois;
+            existingRankingGlobal.rank6Mois = rankingDataGlobal.data.rank6Mois;
+            existingRankingGlobal.rank1An = rankingDataGlobal.data.rank1An;
+            existingRankingGlobal.rank3Ans = rankingDataGlobal.data.rank3Ans;
+            existingRankingGlobal.rank5Ans = rankingDataGlobal.data.rank5Ans;
+            existingRankingGlobal.rank1erJanvier = rankingDataGlobal.data.rank1erJanvier;
+            existingRankingGlobal.rank3Moistotal = rankingDataGlobal.data.rank3Moistotal;
+            existingRankingGlobal.rank6Moistotal = rankingDataGlobal.data.rank6Moistotal;
+            existingRankingGlobal.rank1Antotal = rankingDataGlobal.data.rank1Antotal;
+            existingRankingGlobal.rank3Anstotal = rankingDataGlobal.data.rank3Anstotal;
+            existingRankingGlobal.rank5Anstotal = rankingDataGlobal.data.rank5Anstotal;
+            existingRankingGlobal.rank1erJanviertotal = rankingDataGlobal.data.rank1erJanviertotal;
+            existingRankingGlobal.type_classement = 3;
+            await existingRankingGlobal.save();
+          } else {
+            if (rankingDataGlobal && rankingDataGlobal.code == 200)
+              await classementfonds_usds.create({
+                fond_id: fundId,
+                categorie_nationale: category,
+                type_classement: 3,
+                categorie_regionale: categorie_regionale,
+                categorie_fundafrica_regionale: categorie_fundafrica_regionale || null,
+                categorie_fundafrica_globale: categorie_fundafrica_globale || null,
+                categorie: categorie_libelle,
+                rank3Mois: rankingDataGlobal.data.rank3Mois,
+                rank6Mois: rankingDataGlobal.data.rank6Mois,
+                rank1An: rankingDataGlobal.data.rank1An,
+                rank3Ans: rankingDataGlobal.data.rank3Ans,
+                rank5Ans: rankingDataGlobal.data.rank5Ans,
+                rank1erJanvier: rankingDataGlobal.data.rank1erJanvier,
+                rank3Moistotal: rankingDataGlobal.data.rank3Moistotal,
+                rank6Moistotal: rankingDataGlobal.data.rank6Moistotal,
+                rank1Antotal: rankingDataGlobal.data.rank1Antotal,
+                rank3Anstotal: rankingDataGlobal.data.rank3Anstotal,
+                rank5Anstotal: rankingDataGlobal.data.rank5Anstotal,
+                rank1erJanviertotal: rankingDataGlobal.data.rank1erJanviertotal,
+              });
+          }
         }
       }
       res.json("finishrank");
@@ -1514,6 +1687,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
     const code_ISIN = fund.code_ISIN;
     const categorie_nationale = fund.categorie_national;
     const categorie_regionale = fund.categorie_regional;
+    const categorie_fundafrica_regionale = fund.categorie_fundafrica_regionale || null;
+    const categorie_fundafrica_globale = fund.categorie_fundafrica_globale || null;
 
     const latestPerf = await perfTable.findOne({
       where: { fond_id: fundId },
@@ -1540,7 +1715,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
         if (performanceResponse.status === 200) {
           const performanceData = await performanceResponse.json();
           if (performanceData.data) {
-            await upsertPerformanceDevise(fundId, code_ISIN, categorie_nationale, categorie_regionale, devise, currentDate, performanceData.data, perfTable);
+            await upsertPerformanceDevise(fundId, code_ISIN, categorie_nationale, categorie_regionale, categorie_fundafrica_regionale, categorie_fundafrica_globale, devise, currentDate, performanceData.data, perfTable);
           }
         }
       } catch (error) {
@@ -1550,7 +1725,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
     }
   }
 
-  async function upsertPerformanceDevise(fundId, code_ISIN, categorie_nationale, categorie_regionale, devise, currentDate, data, perfTable) {
+  async function upsertPerformanceDevise(fundId, code_ISIN, categorie_nationale, categorie_regionale, categorie_fundafrica_regionale, categorie_fundafrica_globale, devise, currentDate, data, perfTable) {
     const existing = await perfTable.findOne({ where: { fond_id: fundId, date: currentDate } });
     const fields = {
       ytd: data.perf1erJanvier,
@@ -1567,6 +1742,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
 
     if (existing) {
       Object.assign(existing, fields);
+      if (!existing.categorie_fundafrica_regionale) existing.categorie_fundafrica_regionale = categorie_fundafrica_regionale;
+      if (!existing.categorie_fundafrica_globale) existing.categorie_fundafrica_globale = categorie_fundafrica_globale;
       await existing.save();
     } else {
       await perfTable.create({
@@ -1577,6 +1754,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
         categorie: data.category || categorie_nationale,
         categorie_nationale,
         categorie_regionale,
+        categorie_fundafrica_regionale,
+        categorie_fundafrica_globale,
         devise,
         ...fields,
       });
@@ -1752,6 +1931,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
     const code_ISIN = fund.code_ISIN;
     const categorie_nationale = fund.categorie_national;
     const categorie_regionale = fund.categorie_regional;
+    const categorie_fundafrica_regionale = fund.categorie_fundafrica_regionale || null;
+    const categorie_fundafrica_globale = fund.categorie_fundafrica_globale || null;
     const allVlDates = await vl.findAll({
       attributes: ['date'],
       where: {
@@ -1820,8 +2001,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
           const performanceData = await performanceResponse.json();
 
           const ratioData = await fetchRatioData(fundId, currentDate, years);
-          await upsertPerformance(fundId, code_ISIN, categorie_nationale, categorie_regionale, fund.dev_libelle, currentDate, performanceData.data, ratioData);
-         // await insertIntoClickHouse(fundId, code_ISIN, categorie_nationale,categorie_nationale, categorie_regionale, fund.dev_libelle, currentDate, performanceData.data, ratioData);
+          await upsertPerformance(fundId, code_ISIN, categorie_nationale, categorie_regionale, categorie_fundafrica_regionale, categorie_fundafrica_globale, fund.dev_libelle, currentDate, performanceData.data, ratioData);
 
         } else {
           writeToLogFile(`Erreur lors de l'appel à l'API pour le fond avec l'ID ${fundId}`)
@@ -1858,7 +2038,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
     return ratioData;
   }
 
-  async function upsertPerformance(fundId, code_ISIN, categorie_nationale, categorie_regionale, devise, currentDate, performanceData, ratioData) {
+  async function upsertPerformance(fundId, code_ISIN, categorie_nationale, categorie_regionale, categorie_fundafrica_regionale, categorie_fundafrica_globale, devise, currentDate, performanceData, ratioData) {
     const existingperf = await performences.findOne({ where: { fond_id: fundId, date: currentDate } });
 
     if (existingperf) {
@@ -1897,6 +2077,8 @@ router.get('/api/classementclickhouse', async (req, res) => {
         categorie: performanceData.category,
         categorie_nationale,
         categorie_regionale,
+        categorie_fundafrica_regionale,
+        categorie_fundafrica_globale,
         devise,
         lastdatepreviousmonth: performanceData.lastdatepreviousmonth,
         ytd: performanceData.perf1erJanvier,

@@ -21,6 +21,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    categorie_fundafrica_regionale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    categorie_fundafrica_globale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
     rank3Mois: {
       type: DataTypes.INTEGER,
       allowNull: true,

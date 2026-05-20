@@ -58,13 +58,18 @@ router.get('/api/classementquartilemysql/:id', async (req, res) => {
         },
       });
 
+      const classementType3 = await classementfonds.findOne({
+        where: {
+          fond_id: fundId,
+          type_classement: 3,
+        },
+      });
 
-
-      // Assuming you want to send both classements in the response
       res.json({
         code: 200, data: {
           classementType1: classementType1 ? classementType1.toJSON() : {},
           classementType2: classementType2 ? classementType2.toJSON() : {},
+          classementType3: classementType3 ? classementType3.toJSON() : {},
         },
 
       });
@@ -143,41 +148,34 @@ router.get('/api/classementquartilemysql/:id', async (req, res) => {
       const devise = req.params.dev;
       let classementType1, classementType2;
       // Assuming classementfond has a field called 'type' to distinguish between type 1 and type 2
+      let classementType3;
       if (devise == "EUR") {
         classementType1 = await classementfonds_eurs.findOne({
-          where: {
-            fond_id: fundId,
-            type_classement: 1,
-          },
+          where: { fond_id: fundId, type_classement: 1 },
         });
-
         classementType2 = await classementfonds_eurs.findOne({
-          where: {
-            fond_id: fundId,
-            type_classement: 2,
-          },
+          where: { fond_id: fundId, type_classement: 2 },
+        });
+        classementType3 = await classementfonds_eurs.findOne({
+          where: { fond_id: fundId, type_classement: 3 },
         });
       } else {
         classementType1 = await classementfonds_usds.findOne({
-          where: {
-            fond_id: fundId,
-            type_classement: 1,
-          },
+          where: { fond_id: fundId, type_classement: 1 },
         });
-
         classementType2 = await classementfonds_usds.findOne({
-          where: {
-            fond_id: fundId,
-            type_classement: 2,
-          },
+          where: { fond_id: fundId, type_classement: 2 },
+        });
+        classementType3 = await classementfonds_usds.findOne({
+          where: { fond_id: fundId, type_classement: 3 },
         });
       }
-
 
       res.json({
         code: 200, data: {
           classementType1: classementType1 ? classementType1.toJSON() : {},
           classementType2: classementType2 ? classementType2.toJSON() : {},
+          classementType3: classementType3 ? classementType3.toJSON() : {},
         }
       });
     } catch (error) {
