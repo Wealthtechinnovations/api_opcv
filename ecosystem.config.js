@@ -40,5 +40,17 @@ module.exports = {
       script: 'services/notification/index.js',
       env: { NODE_ENV: 'production' },
     },
+    {
+      name: 'worker-recalculation',
+      script: 'src/workers/worker-recalculation.js',
+      env: {
+        NODE_ENV: 'production',
+        WORKER_POLL_INTERVAL: 10000,
+        WORKER_LOCK_TIMEOUT: 300000,
+        WORKER_ID: 'recalc-1',
+      },
+      max_restarts: 10,
+      restart_delay: 5000,
+    },
   ],
 };
