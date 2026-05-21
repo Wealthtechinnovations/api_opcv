@@ -617,12 +617,15 @@ router.get('/api/updatewithdividende', async (req, res) => {
         p1.perf5ans,
         p1.ytd
       FROM performences p1
-
-        WHERE date= :datedebut  and  categorie_fundafrica_regionale = :selectedFundCategory
-
+      INNER JOIN (
+        SELECT fond_id, MAX(date) as max_date
+        FROM performences
+        WHERE categorie_fundafrica_regionale = :selectedFundCategory
         GROUP BY fond_id
+      ) p2 ON p1.fond_id = p2.fond_id AND p1.date = p2.max_date
+        WHERE p1.categorie_fundafrica_regionale = :selectedFundCategory
     `, {
-        replacements: { selectedFundCategory, datedebut },
+        replacements: { selectedFundCategory },
         type: sequelize.QueryTypes.SELECT,
       });
 
