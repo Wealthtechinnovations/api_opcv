@@ -115,7 +115,7 @@ async function run() {
 
   const [fonds] = await conn.query(`
     SELECT id, nom_fond, pays, categorie_national, categorie_regional,
-           categorie_fundafrica, dev_libelle
+           categorie_fundafrica_globale, dev_libelle
     FROM fond_investissements
     WHERE active = 1
   `);
@@ -181,7 +181,7 @@ async function run() {
     const classTypes = [
       { type: 1, label: 'national', getCategorie: (f) => f.categorie_national },
       { type: 2, label: 'regional', getCategorie: (f) => f.categorie_regional },
-      { type: 3, label: 'global', getCategorie: (f) => f.categorie_fundafrica },
+      { type: 3, label: 'global', getCategorie: (f) => f.categorie_fundafrica_globale },
     ];
 
     const batch = [];
