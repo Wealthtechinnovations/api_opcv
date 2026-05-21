@@ -94,7 +94,8 @@ cd "$API_DIR"
 node -e "
 const mysql = require('mysql2/promise');
 (async () => {
-  const c = await mysql.createConnection({host:'127.0.0.1',user:'fund_opcvm',password:'66G41zes~',database:'fund_opcvm'});
+  require('dotenv').config();
+  const c = await mysql.createConnection({host:process.env.DB_HOST||'127.0.0.1',user:process.env.DB_USER||'fund_opcvm',password:process.env.DB_PASSWORD,database:process.env.DB_NAME||'fund_opcvm'});
   try {
     const [idx] = await c.query(\"SHOW INDEX FROM valorisations WHERE Key_name = 'idx_fund_date'\");
     if (idx.length === 0) {
@@ -111,7 +112,7 @@ const mysql = require('mysql2/promise');
 
 echo ""
 echo "--- ETAPE 5c: fix_database_phase2 (enrichissement donnees) ---"
-node fix_database_phase2.js 2>&1 | tail -20
+node scripts/fix/fix_database_phase2.js 2>&1 | tail -20
 
 # -----------------------------------------------
 # ETAPE 6: Recalculer performances monnaie locale
@@ -120,7 +121,7 @@ echo ""
 echo "--- ETAPE 6/9: Recalculer performances monnaie locale ---"
 echo "  (Met a jour avec les corrections Sortino/Calmar/VAR...)"
 cd "$API_DIR"
-node fix_populate_performances.js --force 2>&1 | tail -15
+node scripts/fix/fix_populate_performances.js --force 2>&1 | tail -15
 
 # -----------------------------------------------
 # ETAPE 7: Repeupler performances EUR + USD
@@ -129,7 +130,7 @@ echo ""
 echo "--- ETAPE 7/9: Repeupler performances EUR + USD ---"
 echo "  (Cela prend 2-5 minutes pour 1174 fonds...)"
 cd "$API_DIR"
-node fix_populate_performances_eur_usd.js --force --devise BOTH 2>&1 | tail -30
+node scripts/fix/fix_populate_performances_eur_usd.js --force --devise BOTH 2>&1 | tail -30
 
 # -----------------------------------------------
 # ETAPE 8: Recalculer classements (local + EUR + USD)
@@ -152,7 +153,7 @@ echo ""
 echo ""
 echo "--- ETAPE 9/9: Sync production snapshot ---"
 cd "$API_DIR"
-bash sync_production.sh 2>&1 | tail -10
+bash scripts/deploy/sync_production.sh 2>&1 | tail -10
 
 # -----------------------------------------------
 # VERIFICATION FINALE
@@ -165,7 +166,8 @@ cd "$API_DIR"
 node -e "
 const mysql = require('mysql2/promise');
 (async () => {
-  const c = await mysql.createConnection({host:'127.0.0.1',user:'fund_opcvm',password:'66G41zes~',database:'fund_opcvm'});
+  require('dotenv').config();
+  const c = await mysql.createConnection({host:process.env.DB_HOST||'127.0.0.1',user:process.env.DB_USER||'fund_opcvm',password:process.env.DB_PASSWORD,database:process.env.DB_NAME||'fund_opcvm'});
   const tables = ['performences','performences_eurs','performences_usds','classementfonds','classementfonds_eurs','classementfonds_usds'];
   for (const t of tables) {
     const [r] = await c.query('SELECT COUNT(*) as cnt, COUNT(DISTINCT fond_id) as fonds FROM ??', [t]);

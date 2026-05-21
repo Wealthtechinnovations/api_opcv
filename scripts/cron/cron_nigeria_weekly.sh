@@ -22,7 +22,7 @@
 # Installation cron (une seule fois):
 #   crontab -e
 #   Ajouter la ligne:
-#   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
+#   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
 #
 # =============================================================================
 
@@ -60,17 +60,17 @@ fi
 # 2. Import dans MySQL
 echo "" | tee -a "$LOG_FILE"
 echo "[2/7] Import VL Nigeria dans MySQL..." | tee -a "$LOG_FILE"
-node import_vl_nigeria_sec.js sec_ng_latest.csv 2>&1 | tee -a "$LOG_FILE"
+node scripts/import/import_vl_nigeria_sec.js sec_ng_latest.csv 2>&1 | tee -a "$LOG_FILE"
 
 # 3. Recalcul taux EUR/USD quotidiens
 echo "" | tee -a "$LOG_FILE"
 echo "[3/7] Recalcul EUR/USD taux quotidiens..." | tee -a "$LOG_FILE"
-node recalc_eur_usd_daily_rate.js 2>&1 | tee -a "$LOG_FILE"
+node scripts/recalc/recalc_eur_usd_daily_rate.js 2>&1 | tee -a "$LOG_FILE"
 
 # 4. Recalcul VL Ajuste
 echo "" | tee -a "$LOG_FILE"
 echo "[4/7] Recalcul VL Ajuste (tous fonds actifs)..." | tee -a "$LOG_FILE"
-node recalc_vl_ajuste.js 2>&1 | tee -a "$LOG_FILE"
+node scripts/recalc/recalc_vl_ajuste.js 2>&1 | tee -a "$LOG_FILE"
 
 # 5. Recalcul performances (locale)
 echo "" | tee -a "$LOG_FILE"

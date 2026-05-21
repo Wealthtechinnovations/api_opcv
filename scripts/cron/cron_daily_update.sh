@@ -17,7 +17,7 @@
 # Installation cron (une seule fois):
 #   crontab -e
 #   Ajouter la ligne:
-#   0 20 * * 1-5 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/cron_daily_update.sh >> /var/log/africafunds_cron.log 2>&1
+#   0 20 * * 1-5 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_daily_update.sh >> /var/log/africafunds_cron.log 2>&1
 #
 # =============================================================================
 
@@ -38,22 +38,22 @@ TODAY=$(date +%Y-%m-%d)
 # 1. Scrape VL ASFIM (Maroc)
 echo "" | tee -a "$LOG_FILE"
 echo "[1/9] Scrape ASFIM VL Maroc ($START_DATE -> $TODAY)..." | tee -a "$LOG_FILE"
-node scrape_asfim_import.js "$START_DATE" "$TODAY" 2>&1 | tee -a "$LOG_FILE"
+node scripts/import/scrape_asfim_import.js "$START_DATE" "$TODAY" 2>&1 | tee -a "$LOG_FILE"
 
 # 2. Mise a jour Forex
 echo "" | tee -a "$LOG_FILE"
 echo "[2/9] Mise a jour Forex (derniers jours)..." | tee -a "$LOG_FILE"
-node scrape_forex_import.js today 2>&1 | tee -a "$LOG_FILE"
+node scripts/import/scrape_forex_import.js today 2>&1 | tee -a "$LOG_FILE"
 
 # 3. Recalcul EUR/USD daily rates
 echo "" | tee -a "$LOG_FILE"
 echo "[3/9] Recalcul EUR/USD daily rates..." | tee -a "$LOG_FILE"
-node recalc_eur_usd_daily_rate.js 2>&1 | tee -a "$LOG_FILE"
+node scripts/recalc/recalc_eur_usd_daily_rate.js 2>&1 | tee -a "$LOG_FILE"
 
 # 4. Recalcul VL Ajuste (Total Return NAV)
 echo "" | tee -a "$LOG_FILE"
 echo "[4/9] Recalcul VL Ajuste (tous fonds actifs)..." | tee -a "$LOG_FILE"
-node recalc_vl_ajuste.js 2>&1 | tee -a "$LOG_FILE"
+node scripts/recalc/recalc_vl_ajuste.js 2>&1 | tee -a "$LOG_FILE"
 
 # 5. Recalcul performances locale (fonds 1-600)
 echo "" | tee -a "$LOG_FILE"
@@ -73,7 +73,7 @@ curl -s http://localhost:3005/api/saveperfdatemysql/1201/3000 2>&1 | tee -a "$LO
 # 8. Recalcul performances EUR/USD
 echo "" | tee -a "$LOG_FILE"
 echo "[8/9] Recalcul performances EUR/USD..." | tee -a "$LOG_FILE"
-node fix_populate_performances_eur_usd.js --devise BOTH 2>&1 | tee -a "$LOG_FILE"
+node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH 2>&1 | tee -a "$LOG_FILE"
 
 # 9. Classements local + EUR + USD
 echo "" | tee -a "$LOG_FILE"
