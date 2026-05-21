@@ -111,6 +111,7 @@ if (process.env.NODE_ENV !== 'production') {
 // ---------------------
 require('./src/routes/apigestionauth')(app);
 require('./src/routes/routes_vl')(app);
+require('./src/routes/routes_recalc_admin')(app);
 
 // Router-based route files
 app.use(require('./src/routes/apigestionfonds'));
