@@ -41,6 +41,16 @@ module.exports = {
       env: { NODE_ENV: 'production' },
     },
     {
+      name: 'worker-scheduler',
+      script: 'src/workers/worker-scheduler.js',
+      env: {
+        NODE_ENV: 'production',
+        SCHEDULER_LOG_DIR: '/var/log',
+      },
+      max_restarts: 10,
+      restart_delay: 5000,
+    },
+    {
       name: 'worker-recalculation',
       script: 'src/workers/worker-recalculation.js',
       env: {
