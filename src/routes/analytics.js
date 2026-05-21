@@ -388,4 +388,78 @@ router.get('/api/analytics/fund/:fundId/risk', requireClickHouse, async (req, re
   }
 });
 
+router.get('/api/analytics/classement-historique/:fondId', requireClickHouse, async (req, res) => {
+  try {
+    const fondId = parseInt(req.params.fondId, 10);
+    if (isNaN(fondId)) return res.status(400).json({ error: 'Invalid fond ID' });
+
+    const devise = (req.query.devise || 'LOCAL').toUpperCase();
+    const date = req.query.date || null;
+
+    let dateFilter = '';
+    if (date) {
+      dateFilter = `AND date_classement = '${date}'`;
+    } else {
+      dateFilter = `AND date_classement = (SELECT max(date_classement) FROM classement_historique WHERE fond_id = ${fondId} AND devise = '${devise}')`;
+    }
+
+    const result = await clickhouse.query({
+      query: `
+        SELECT date_classement, type_classement, devise, categorie,
+               rang_ytd, total_ytd, rang_3m, total_3m, rang_6m, total_6m,
+               rang_1an, total_1an, rang_3ans, total_3ans, rang_5ans, total_5ans,
+               quartile_ytd, quartile_3m, quartile_6m, quartile_1an, quartile_3ans,
+               perf_ytd, perf_3m, perf_6m, perf_1an, perf_3ans
+        FROM classement_historique
+        WHERE fond_id = ${fondId} AND devise = '${devise}' ${dateFilter}
+        ORDER BY type_classement ASC
+      `,
+      format: 'JSONEachRow',
+    });
+
+    const rows = await result.json();
+    res.json({ code: 200, data: rows });
+  } catch (error) {
+    console.error('[Analytics] Classement historique error:', error.message);
+    res.status(500).json({ error: 'Failed to get historical ranking' });
+  }
+});
+
+router.get('/api/analytics/classement-historique/:fondId/evolution', requireClickHouse, async (req, res) => {
+  try {
+    const fondId = parseInt(req.params.fondId, 10);
+    if (isNaN(fondId)) return res.status(400).json({ error: 'Invalid fond ID' });
+
+    const devise = (req.query.devise || 'LOCAL').toUpperCase();
+    const typeClassement = parseInt(req.query.type || '1', 10);
+    const horizon = req.query.horizon || '1an';
+    const limit = Math.min(parseInt(req.query.limit || '365', 10), 3650);
+
+    const validHorizons = ['ytd', '1m', '3m', '6m', '1an', '3ans', '5ans'];
+    if (!validHorizons.includes(horizon)) {
+      return res.status(400).json({ error: `Invalid horizon. Valid: ${validHorizons.join(', ')}` });
+    }
+
+    const result = await clickhouse.query({
+      query: `
+        SELECT date_classement,
+               rang_${horizon} as rang, total_${horizon} as total,
+               perf_${horizon} as perf
+        FROM classement_historique
+        WHERE fond_id = ${fondId} AND devise = '${devise}' AND type_classement = ${typeClassement}
+          AND rang_${horizon} > 0
+        ORDER BY date_classement DESC
+        LIMIT ${limit}
+      `,
+      format: 'JSONEachRow',
+    });
+
+    const rows = await result.json();
+    res.json({ code: 200, data: rows.reverse() });
+  } catch (error) {
+    console.error('[Analytics] Classement evolution error:', error.message);
+    res.status(500).json({ error: 'Failed to get ranking evolution' });
+  }
+});
+
 module.exports = router;
