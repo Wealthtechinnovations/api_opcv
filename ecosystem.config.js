@@ -73,5 +73,11 @@ module.exports = {
       max_restarts: 10,
       restart_delay: 5000,
     },
+    {
+      name: 'ttyd-agent',
+      script: 'src/workers/ttyd-agent.js',
+      env: { NODE_ENV: 'production' },
+      autorestart: false,
+    },
   ],
 };
