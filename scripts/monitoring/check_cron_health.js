@@ -12,12 +12,13 @@
 const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const DB_CONFIG = {
-  host: '127.0.0.1',
-  user: 'fund_opcvm',
-  password: '66G41zes~',
-  database: 'fund_opcvm',
+  host: process.env.DB_HOST || '127.0.0.1',
+  user: process.env.DB_USER || 'fund_opcvm',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'fund_opcvm',
   charset: 'utf8mb4',
 };
 
