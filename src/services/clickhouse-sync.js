@@ -11,6 +11,12 @@ const { Sequelize } = require('sequelize');
 
 const BATCH_SIZE = 5000;
 
+function safeFloat(val) {
+  if (val == null) return 0;
+  const n = parseFloat(val);
+  return isFinite(n) ? n : 0;
+}
+
 /**
  * Sync VL (valeur liquidative) data from MySQL to ClickHouse fund_performance table.
  * Fetches recent VL records joined with fond data and inserts into ClickHouse.
@@ -64,13 +70,13 @@ async function syncFundPerformance() {
       fund_name: record.fund_name || record.fond_investissement?.nom_fond || '',
       isin: record.fond_investissement?.code_ISIN || '',
       date: record.date,
-      nav: record.value || 0,
-      daily_return: record.tsr || 0,
-      cumulative_return: record.base_100 || 0,
+      nav: safeFloat(record.value),
+      daily_return: safeFloat(record.tsr),
+      cumulative_return: safeFloat(record.base_100),
       country: record.fond_investissement?.pays || '',
       management_company: record.fond_investissement?.societe_gestion || '',
       currency: record.fond_investissement?.dev_libelle || '',
-      actif_net: record.actif_net || 0,
+      actif_net: safeFloat(record.actif_net),
     }));
 
     await clickhouse.insert({
