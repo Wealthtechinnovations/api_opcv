@@ -39,7 +39,7 @@ async function run() {
 
   const [fonds] = await conn.query(`
     SELECT id, nom_fond, pays, classification, categorie_globale, categorie_national,
-           categorie_regionale, categorie_fundafrica_nationale, indice_fundafrica,
+           categorie_regional, categorie_fundafrica_locale, indice_fundafrica,
            societe_gestion, active
     FROM fond_investissements
     WHERE classification IS NULL OR classification = ''
