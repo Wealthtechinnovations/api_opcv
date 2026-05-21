@@ -141,10 +141,15 @@ async function run() {
     if (vlRows.length === 0) continue;
 
     const vlMap = {};
-    for (const r of vlRows) vlMap[r.fund_id] = r.vl;
+    for (const r of vlRows) {
+      if (r.fund_id != null && !isNaN(r.fund_id)) vlMap[r.fund_id] = r.vl;
+    }
+
+    const validFundIds = Object.keys(vlMap).map(Number).filter(n => !isNaN(n) && n > 0);
+    if (validFundIds.length === 0) continue;
 
     const fundPerfs = {};
-    for (const fundId of Object.keys(vlMap)) {
+    for (const fundId of validFundIds) {
       fundPerfs[fundId] = {};
     }
 
@@ -163,17 +168,16 @@ async function run() {
           AND ${valueCol} IS NOT NULL AND ${valueCol} > 0
           AND fund_id IN (?)
         ORDER BY ABS(DATEDIFF(date, ?)) ASC
-      `, [startDate, startDate, Object.keys(vlMap).map(Number), startDate]);
+      `, [startDate, startDate, validFundIds, startDate]);
 
       const startMap = {};
       for (const r of startVls) {
         if (!startMap[r.fund_id]) startMap[r.fund_id] = r.vl;
       }
 
-      for (const fundId of Object.keys(vlMap)) {
-        const fid = parseInt(fundId);
+      for (const fid of validFundIds) {
         if (startMap[fid] && startMap[fid] > 0) {
-          fundPerfs[fundId][horizon.key] = (vlMap[fid] - startMap[fid]) / startMap[fid] * 100;
+          fundPerfs[fid][horizon.key] = (vlMap[fid] - startMap[fid]) / startMap[fid] * 100;
         }
       }
     }
@@ -188,13 +192,13 @@ async function run() {
 
     for (const ct of classTypes) {
       const groups = {};
-      for (const fundId of Object.keys(vlMap)) {
-        const f = fondMap[parseInt(fundId)];
+      for (const fid of validFundIds) {
+        const f = fondMap[fid];
         if (!f) continue;
         const cat = ct.getCategorie(f);
         if (!cat) continue;
         if (!groups[cat]) groups[cat] = [];
-        groups[cat].push({ fundId: parseInt(fundId), perfs: fundPerfs[fundId] });
+        groups[cat].push({ fundId: fid, perfs: fundPerfs[fid] });
       }
 
       for (const [categorie, fundList] of Object.entries(groups)) {
