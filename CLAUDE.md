@@ -194,6 +194,19 @@ Apres chaque intervention, documenter dans SUIVI.md :
 8. Ne pas disperser la meme information dans plusieurs fichiers.
 9. Toute mise a jour d'un fichier documentaire complementaire doit etre mentionnee brievement dans SUIVI.md.
 
+## Regle obligatoire — Lecture du snapshot production avant toute action
+
+Le fichier `PRODUCTION_STATE.json` est genere automatiquement par `sync_production.sh` (cron horaire).
+Il contient l'etat reel de la production : tables, counts, derniere VL, dernier classement, git log, PM2 status.
+
+A chaque reprise de session ou nouvelle tache, Claude doit :
+1. Verifier que `PRODUCTION_STATE.json` existe et sa date de derniere modification
+2. Considerer ce fichier comme la source de verite sur l'etat de production
+3. Ne jamais supposer un etat de production sans l'avoir verifie (via ce fichier ou via curl API)
+4. En cas de doute, interroger directement l'API de production (`curl https://africafunds.chainsolutions.fr/api/...`)
+
+Ce fichier NE DOIT PAS etre modifie manuellement. Il est genere automatiquement.
+
 ## Protocole anti-compactage, anti-limite et anti-taches inachevees
 
 ### 1. Principe general
