@@ -126,9 +126,71 @@ app.use(require('./src/routes/apigestionapikey'));
 // Analytics routes (ClickHouse-powered)
 app.use(require('./src/routes/analytics'));
 
-// Health check
+// Health check (basic)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Health check (detailed) — etat complet de la plateforme
+app.get('/health/detailed', async (req, res) => {
+  const result = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    database: { status: 'unknown' },
+    clickhouse: { status: 'unknown' },
+    tables: {},
+  };
+
+  try {
+    const db = sequelize.sequelize;
+    const [tables] = await db.query(`
+      SELECT 'fond_investissements' as tbl, COUNT(*) as cnt FROM fond_investissements WHERE active = 1
+      UNION ALL SELECT 'valorisations', COUNT(*) FROM valorisations
+      UNION ALL SELECT 'performences', COUNT(*) FROM performences
+      UNION ALL SELECT 'performences_eurs', COUNT(*) FROM performences_eurs
+      UNION ALL SELECT 'performences_usds', COUNT(*) FROM performences_usds
+      UNION ALL SELECT 'classementfonds', COUNT(*) FROM classementfonds
+      UNION ALL SELECT 'classementfonds_eurs', COUNT(*) FROM classementfonds_eurs
+      UNION ALL SELECT 'classementfonds_usds', COUNT(*) FROM classementfonds_usds
+      UNION ALL SELECT 'rendements', COUNT(*) FROM rendements
+      UNION ALL SELECT 'devisedechanges', COUNT(*) FROM devisedechanges
+      UNION ALL SELECT 'societes', COUNT(*) FROM societes
+      UNION ALL SELECT 'indice_references', COUNT(*) FROM indice_references
+    `, { type: db.QueryTypes.SELECT });
+    for (const row of tables) {
+      result.tables[row.tbl] = parseInt(row.cnt);
+    }
+    result.database.status = 'connected';
+
+    const [lastVlRows] = await db.query(
+      `SELECT MAX(date) as last_date, COUNT(DISTINCT fund_id) as fonds FROM valorisations WHERE date > DATE_SUB(NOW(), INTERVAL 30 DAY)`
+    );
+    const lastVl = lastVlRows[0];
+    result.database.last_vl_date = lastVl?.last_date || null;
+    result.database.fonds_with_recent_vl = parseInt(lastVl?.fonds) || 0;
+
+    const [lastClassementRows] = await db.query(
+      `SELECT MAX(updatedAt) as last_update, COUNT(DISTINCT fond_id) as fonds FROM classementfonds`
+    );
+    const lastClassement = lastClassementRows[0];
+    result.database.last_classement_update = lastClassement?.last_update || null;
+    result.database.fonds_with_classement = parseInt(lastClassement?.fonds) || 0;
+  } catch (err) {
+    result.database.status = 'error';
+    result.database.error = err.message;
+    result.status = 'degraded';
+  }
+
+  try {
+    const { isClickHouseAvailable } = require('./src/db/clickhouse');
+    result.clickhouse.status = isClickHouseAvailable() ? 'connected' : 'unavailable';
+  } catch (err) {
+    result.clickhouse.status = 'unavailable';
+  }
+
+  res.json(result);
 });
 
 // 404 handler

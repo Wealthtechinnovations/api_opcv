@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const fs = require('fs');
-const cron = require('node-cron');
 const _ = require('lodash');
 const path = require('path');
 const express = require('express');
