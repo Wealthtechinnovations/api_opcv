@@ -60,8 +60,19 @@ const TASKS = [
 let running = true;
 const lastRun = {};
 
+function loadRuntimeOverrides() {
+  try {
+    const statePath = path.join(API_DIR, 'scheduler-state.json');
+    return JSON.parse(fs.readFileSync(statePath, 'utf-8'));
+  } catch (_) {
+    return {};
+  }
+}
+
 function shouldRunNow(task) {
-  if (!task.enabled) return false;
+  const overrides = loadRuntimeOverrides();
+  const enabled = overrides[task.name] !== undefined ? overrides[task.name] : task.enabled;
+  if (!enabled) return false;
 
   const now = new Date();
   const hour = now.getHours();

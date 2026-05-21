@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { sequelize } = require('../db/sequelize');
 const recalcEvent = require('../services/recalc-event.service');
 
@@ -192,6 +194,34 @@ module.exports = (app) => {
         return res.status(400).json({ error: 'Tables recalc pas encore creees' });
       }
       console.error('[recalc-admin] import trigger error:', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.get('/api/admin/scheduler/status', (req, res) => {
+    try {
+      const schedulerState = path.join(__dirname, '../../scheduler-state.json');
+      let state = {};
+      try { state = JSON.parse(fs.readFileSync(schedulerState, 'utf-8')); } catch (_) {}
+      res.json({ code: 200, data: state });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/admin/scheduler/toggle', (req, res) => {
+    try {
+      const { taskName, enabled } = req.body;
+      if (!taskName || typeof enabled !== 'boolean') {
+        return res.status(400).json({ error: 'taskName (string) et enabled (boolean) requis' });
+      }
+      const schedulerState = path.join(__dirname, '../../scheduler-state.json');
+      let state = {};
+      try { state = JSON.parse(fs.readFileSync(schedulerState, 'utf-8')); } catch (_) {}
+      state[taskName] = enabled;
+      fs.writeFileSync(schedulerState, JSON.stringify(state, null, 2));
+      res.json({ code: 200, message: `Tache ${taskName} ${enabled ? 'activee' : 'desactivee'}` });
+    } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
