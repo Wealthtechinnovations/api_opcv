@@ -37,7 +37,10 @@ async function run() {
     .filter(r => {
       const t = (r.type || '').toLowerCase();
       const d = (r.descr || '').toLowerCase();
-      return t.includes('test') || d.includes('test') || d.length < 20 || t === 'nl';
+      const typeVal = (r.type || '').trim();
+      const descVal = (r.descr || '').trim();
+      return t.includes('test') || d.includes('test') || d.length < 20 || t === 'nl'
+        || descVal.startsWith(typeVal);
     })
     .map(r => r.id);
 
