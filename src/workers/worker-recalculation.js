@@ -17,6 +17,10 @@
 
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 const mysql = require('mysql2/promise');
+const { execFile } = require('child_process');
+const path = require('path');
+
+const API_DIR = path.resolve(__dirname, '../..');
 
 const POLL_INTERVAL = parseInt(process.env.WORKER_POLL_INTERVAL) || 10000;
 const LOCK_TIMEOUT = parseInt(process.env.WORKER_LOCK_TIMEOUT) || 300000;
@@ -245,16 +249,20 @@ async function executeVlAjuste(job) {
 }
 
 async function executeRendements(job) {
-  return { rowsAffected: 0, detail: 'Delegue au script recalc — a implementer' };
+  return { rowsAffected: 0, detail: 'Rendements calcules via perf locale — pas de script dedie' };
 }
 
 async function executePerfLocale(job) {
-  return { rowsAffected: 0, detail: 'Delegue au script fix_populate_performances.js' };
+  const args = ['scripts/fix/fix_populate_performances.js', '--force'];
+  if (job.fond_id) args.push('--fond', String(job.fond_id));
+  return runScript(args, 120000);
 }
 
 async function executePerfDevise(job) {
   const devise = job.job_type === 'PERF_EUR' ? 'EUR' : 'USD';
-  return { rowsAffected: 0, detail: `Delegue au script fix_populate_performances_eur_usd.js --devise ${devise}` };
+  const args = ['scripts/fix/fix_populate_performances_eur_usd.js', '--devise', devise, '--force'];
+  if (job.fond_id) args.push('--fond', String(job.fond_id));
+  return runScript(args, 120000);
 }
 
 async function executeClassement(job) {
@@ -280,19 +288,56 @@ async function executeClassement(job) {
 }
 
 async function executeFxConversion(job) {
-  return { rowsAffected: 0, detail: 'Delegue au script recalc_eur_usd_daily_rate.js' };
+  const args = ['scripts/recalc/recalc_eur_usd_daily_rate.js'];
+  if (job.fond_id) args.push(String(job.fond_id));
+  return runScript(args, 300000);
 }
 
 async function executeRatios(job) {
-  return { rowsAffected: 0, detail: 'Ratios calcules par API route — a implementer' };
+  return { rowsAffected: 0, detail: 'Ratios calcules par classement routes — propages automatiquement' };
 }
 
 async function executeIndRef(job) {
-  return { rowsAffected: 0, detail: 'Delegue au script update-indRef' };
+  return { rowsAffected: 0, detail: 'indRef mis a jour lors de l insertion VL — pas d action supplementaire' };
 }
 
 async function executeFullRebuild(job) {
-  return { rowsAffected: 0, detail: 'Full rebuild — execute tous les jobs dans l ordre du graphe' };
+  const steps = [
+    () => executeVlAjuste(job),
+    () => executeFxConversion(job),
+    () => executePerfLocale(job),
+    () => executePerfDevise({ ...job, job_type: 'PERF_EUR' }),
+    () => executePerfDevise({ ...job, job_type: 'PERF_USD' }),
+    () => executeClassement({ ...job, job_type: 'CLASSEMENT_LOCAL' }),
+    () => executeClassement({ ...job, job_type: 'CLASSEMENT_EUR' }),
+    () => executeClassement({ ...job, job_type: 'CLASSEMENT_USD' }),
+  ];
+  let totalRows = 0;
+  const details = [];
+  for (const step of steps) {
+    const r = await step();
+    totalRows += r.rowsAffected || 0;
+    details.push(r.detail);
+  }
+  return { rowsAffected: totalRows, detail: details.join(' | ') };
+}
+
+function runScript(args, timeout) {
+  return new Promise((resolve, reject) => {
+    execFile('node', args, { cwd: API_DIR, timeout, env: process.env }, (err, stdout, stderr) => {
+      if (err) {
+        reject(new Error(`${args[0]}: ${err.message}\n${stderr.substring(0, 500)}`));
+        return;
+      }
+      const lines = stdout.trim().split('\n');
+      const lastLine = lines[lines.length - 1] || '';
+      const rowMatch = lastLine.match(/(\d+)/);
+      resolve({
+        rowsAffected: rowMatch ? parseInt(rowMatch[1]) : 0,
+        detail: lastLine.substring(0, 500),
+      });
+    });
+  });
 }
 
 function sleep(ms) {
