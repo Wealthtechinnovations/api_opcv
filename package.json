@@ -15,7 +15,7 @@
     "start:notification": "node services/notification/index.js",
     "start:services": "npm run start:gateway & npm run start:auth & npm run start:funds & npm run start:performance & npm run start:portfolio & npm run start:analytics & npm run start:reference & npm run start:notification",
     "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --forceExit",
     "migrate": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",
     "migrate:status": "npx sequelize-cli db:migrate:status",
@@ -66,6 +66,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "jest": "^30.4.2",
     "nodemon": "^3.0.1",
     "sequelize-cli": "^6.6.5"
   },
