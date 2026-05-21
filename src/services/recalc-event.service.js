@@ -70,6 +70,18 @@ async function propagateEvent(eventId) {
 
 async function emitAndPropagate(eventType, fondId, impactDate, triggeredBy, metadata = null) {
   try {
+    const [recent] = await sequelize.query(`
+      SELECT id FROM recalc_events
+      WHERE event_type = :eventType AND fond_id <=> :fondId AND impact_date = :impactDate
+        AND created_at > DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+      LIMIT 1
+    `, {
+      replacements: { eventType, fondId: fondId || null, impactDate },
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    if (recent) return;
+
     const [result] = await sequelize.query(`
       INSERT INTO recalc_events (event_type, fond_id, impact_date, triggered_by, metadata, status)
       VALUES (:eventType, :fondId, :impactDate, :triggeredBy, :metadata, 'NEW')

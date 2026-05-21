@@ -56,6 +56,7 @@ async function main() {
   console.log(`[${WORKER_ID}] Worker recalculation demarre — poll ${POLL_INTERVAL}ms`);
 
   await releaseStaleJobs();
+  await markDeadLetterJobs();
 
   while (running) {
     try {
@@ -108,6 +109,17 @@ async function claimNextJob() {
     throw err;
   } finally {
     conn.release();
+  }
+}
+
+async function markDeadLetterJobs() {
+  const [result] = await pool.query(`
+    UPDATE recalc_jobs
+    SET status = 'FAILED', error_message = CONCAT(COALESCE(error_message,''), ' [DEAD_LETTER: max_attempts reached]')
+    WHERE status = 'PENDING' AND attempts >= max_attempts
+  `);
+  if (result.affectedRows > 0) {
+    console.log(`[${WORKER_ID}] ${result.affectedRows} jobs dead-letter (max attempts)`);
   }
 }
 
@@ -165,7 +177,19 @@ async function propagateDependencies(completedJob) {
     WHERE source_job_type = ? AND active = 1
   `, [completedJob.job_type]);
 
+  let created = 0;
   for (const dep of deps) {
+    const [existing] = await pool.query(`
+      SELECT id FROM recalc_jobs
+      WHERE job_type = ? AND fond_id <=> ? AND date_from = ?
+        AND status = 'PENDING'
+      LIMIT 1
+    `, [dep.target_job_type, completedJob.fond_id, completedJob.date_from]);
+
+    if (existing.length > 0) {
+      continue;
+    }
+
     await pool.query(`
       INSERT INTO recalc_jobs (event_id, job_type, fond_id, categorie, date_from, date_to, priority)
       VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -178,10 +202,11 @@ async function propagateDependencies(completedJob) {
       completedJob.date_to,
       Math.min(completedJob.priority + 1, 9),
     ]);
+    created++;
   }
 
-  if (deps.length > 0) {
-    console.log(`[${WORKER_ID}] Propage ${deps.length} jobs dependants depuis #${completedJob.id}`);
+  if (created > 0) {
+    console.log(`[${WORKER_ID}] Propage ${created}/${deps.length} jobs dependants depuis #${completedJob.id}`);
   }
 }
 
