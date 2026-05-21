@@ -21,8 +21,8 @@
  *   node seed_referentiel_fundafrica.js --execute  # appliquer
  */
 
-const mysql = require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-require('mysql2/promise');
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
 

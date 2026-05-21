@@ -37,8 +37,8 @@
  * NON-DESTRUCTIF: INSERT IGNORE, ne modifie jamais les donnees existantes
  */
 
-const mysql = require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-require('mysql2/promise');
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+const mysql = require('mysql2/promise');
 const XLSX = require('xlsx');
 const https = require('https');
 const http = require('http');

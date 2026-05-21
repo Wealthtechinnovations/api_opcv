@@ -17,8 +17,8 @@
  *   --force            : recalculer meme si une perf recente existe deja
  */
 
-const mysql = require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-require('mysql2/promise');
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+const mysql = require('mysql2/promise');
 
 const DB_CONFIG = {
   host: process.env.DB_HOST || '127.0.0.1',

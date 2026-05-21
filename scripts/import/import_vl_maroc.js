@@ -17,8 +17,8 @@
  *   5. Genere un rapport detaille
  */
 
-const mysql = require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-require('mysql2/promise');
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
 

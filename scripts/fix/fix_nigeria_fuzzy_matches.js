@@ -16,8 +16,8 @@
  * Usage: node fix_nigeria_fuzzy_matches.js
  */
 
-const mysql = require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-require('mysql2/promise');
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+const mysql = require('mysql2/promise');
 const fs = require('fs');
 
 const DB_CONFIG = {

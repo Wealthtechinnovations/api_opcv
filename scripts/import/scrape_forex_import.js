@@ -21,8 +21,8 @@
  *   - Ne modifie pas les entrees existantes
  */
 
-const mysql = require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-require('mysql2/promise');
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+const mysql = require('mysql2/promise');
 const https = require('https');
 const http = require('http');
 
