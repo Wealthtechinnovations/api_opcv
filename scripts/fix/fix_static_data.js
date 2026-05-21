@@ -26,7 +26,7 @@ const DRY_RUN = process.argv.includes('--dry-run');
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'fund_opcvm',
   process.env.DB_USER || 'fund_opcvm',
-  process.env.DB_PASSWORD || '66G41zes~',
+  process.env.DB_PASSWORD,
   {
     host: process.env.DB_HOST || '127.0.0.1',
     dialect: 'mysql',
