@@ -321,13 +321,8 @@ const apikey = require('../models/apikey');
  * @param {Object} app - Instance de l'application Fastify.
  */
 module.exports = (app) => {
-  /**
-  * Middleware pour autoriser toutes les origines (pour le développement).
-  *
-  * @param {Object} req - Objet de requête.
-  * @param {Object} res - Objet de réponse.
-  * @param {Function} next - Fonction pour passer à la suite.
-  */
+  const recalcEvent = require('../services/recalc-event.service');
+
   // CORS is now handled in app.js via the cors middleware
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -3044,6 +3039,9 @@ GROUP BY f.societe_gestion;
           value_USD: exchangeRatesUSD ? parseFloat(val) * exchangeRatesUSD.value : null
         }, { where: { fund_id: parseInt(req.params.id), date: date } });
       }
+
+      const earliestDate = nupdatedDataList[0]?.date || pupdatedDataList[0]?.date || new Date().toISOString().split('T')[0];
+      recalcEvent.emitAndPropagate('VL_UPDATE', parseInt(req.params.id), earliestDate, 'api_updateValues').catch(() => {});
 
       res.status(200).json({ message: 'Valorisations updated successfully' });
     } catch (error) {
@@ -6111,10 +6109,10 @@ GROUP BY f.societe_gestion;
   }
 
 
-      // Respond with a success message or appropriate response
+      recalcEvent.emitAndPropagate('VL_INSERT', parseInt(req.params.id), vlEntries[0]?.date || new Date().toISOString().split('T')[0], 'api_ajoutVL').catch(() => {});
+
       res.status(200).json({ message: 'Data inserted successfully' });
     } catch (error) {
-      // Handle errors here
       console.error('Error inserting data into the database:', error);
       res.status(500).json({ message: 'Error inserting data into the database' });
     }
@@ -6217,7 +6215,7 @@ GROUP BY f.societe_gestion;
       // if (indiceEntriesNEW.length > 0)
       //   await indice.bulkCreate(indiceEntriesNEW);
 
-
+      recalcEvent.emitAndPropagate('INDEX_UPDATE', parseInt(req.params.id), vlEntries[0]?.date || new Date().toISOString().split('T')[0], 'api_ajoutIndice').catch(() => {});
 
       // Respond with a success message or appropriate response
       res.status(200).json({ message: 'Data inserted successfully' });
@@ -6408,6 +6406,8 @@ GROUP BY f.societe_gestion;
         }
       }
 
+          recalcEvent.emitAndPropagate('VL_INSERT', parseInt(req.params.id), vlEntries[0]?.date || new Date().toISOString().split('T')[0], 'api_uploadsfilevl').catch(() => {});
+
           res.status(200).send('File uploaded and data saved successfully.');
         } catch (error) {
           console.error('Database error:', error);
@@ -6554,6 +6554,8 @@ GROUP BY f.societe_gestion;
 
           // Supprimez le fichier temporaire
           fs.unlinkSync(req.file.path);
+
+          recalcEvent.emitAndPropagate('INDEX_UPDATE', parseInt(req.params.id), vlEntries[0]?.date || new Date().toISOString().split('T')[0], 'api_uploadsfileindice').catch(() => {});
 
           res.status(200).send('File uploaded and data saved successfully.');
         } catch (error) {
