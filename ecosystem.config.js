@@ -62,5 +62,16 @@ module.exports = {
       max_restarts: 10,
       restart_delay: 5000,
     },
+    {
+      name: 'worker-data-import',
+      script: 'src/workers/worker-data-import.js',
+      env: {
+        NODE_ENV: 'production',
+        IMPORT_POLL_INTERVAL: 30000,
+        WORKER_ID: 'import-1',
+      },
+      max_restarts: 10,
+      restart_delay: 5000,
+    },
   ],
 };

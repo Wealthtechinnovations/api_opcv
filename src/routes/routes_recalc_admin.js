@@ -173,4 +173,27 @@ module.exports = (app) => {
     }
   });
 
+  app.post('/api/admin/import/trigger', async (req, res) => {
+    try {
+      const { importType } = req.body;
+      const validTypes = ['IMPORT_ASFIM', 'IMPORT_FOREX', 'IMPORT_NIGERIA'];
+      if (!importType || !validTypes.includes(importType)) {
+        return res.status(400).json({ error: `importType requis. Valides: ${validTypes.join(', ')}` });
+      }
+
+      await sequelize.query(`
+        INSERT INTO recalc_jobs (job_type, date_from, priority, status)
+        VALUES (:importType, CURDATE(), 3, 'PENDING')
+      `, { replacements: { importType } });
+
+      res.json({ code: 200, message: `Import ${importType} programme` });
+    } catch (err) {
+      if (err.message && err.message.includes("doesn't exist")) {
+        return res.status(400).json({ error: 'Tables recalc pas encore creees' });
+      }
+      console.error('[recalc-admin] import trigger error:', err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
 };
