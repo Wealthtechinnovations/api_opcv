@@ -1722,6 +1722,8 @@ async function insertIntoClickHouse(fundId, code_ISIN, categorie, categorie_nati
           betahaussier1an: safeValue(ratioData.data1an?.betahaussier),
           betabaissier1an: safeValue(ratioData.data1an?.betabaissier),
           beta1an: safeValue(ratioData.data1an?.beta),
+          r2_1an: safeValue(ratioData.data1an?.r2),
+          alpha1an: safeValue(ratioData.data1an?.alphaJensen),
           perfannu3an: safeValue(ratioData.data3an?.perfannu),
           volatility3an: safeValue(ratioData.data3an?.volatility),
           ratiosharpe3an: safeValue(ratioData.data3an?.ratiosharpe),
@@ -1741,6 +1743,8 @@ async function insertIntoClickHouse(fundId, code_ISIN, categorie, categorie_nati
           betahaussier3an: safeValue(ratioData.data3an?.betahaussier),
           betabaissier3an: safeValue(ratioData.data3an?.betabaissier),
           beta3an: safeValue(ratioData.data3an?.beta),
+          r2_3an: safeValue(ratioData.data3an?.r2),
+          alpha3an: safeValue(ratioData.data3an?.alphaJensen),
           perfannu5an: safeValue(ratioData.data5an?.perfannu),
           volatility5an: safeValue(ratioData.data5an?.volatility),
           ratiosharpe5an: safeValue(ratioData.data5an?.ratiosharpe),
@@ -1759,10 +1763,12 @@ async function insertIntoClickHouse(fundId, code_ISIN, categorie, categorie_nati
           trackingerror5an: safeValue(ratioData.data5an?.trackingerror),
           betahaussier5an: safeValue(ratioData.data5an?.betahaussier),
           betabaissier5an: safeValue(ratioData.data5an?.betabaissier),
-          beta5an: safeValue(ratioData.data5an?.beta)
+          beta5an: safeValue(ratioData.data5an?.beta),
+          r2_5an: safeValue(ratioData.data5an?.r2),
+          alpha5an: safeValue(ratioData.data5an?.alphaJensen)
         }
       ],
-      format: 'JSONEachRow' // Format attendu pour l'insertion
+      format: 'JSONEachRow'
     });
 
   } catch (error) {
@@ -1774,10 +1780,14 @@ async function insertIntoClickHouse(fundId, code_ISIN, categorie, categorie_nati
   function getRatioDataFields(ratioData, period) {
     const fields = ['perfannu', 'volatility', 'ratiosharpe', 'pertemax', 'sortino', 'info', 'calamar', 'var99', 'var95', 'trackingerror', 'betahaussier', 'betabaissier', 'beta', 'omega', 'dsr', 'downcapture', 'upcapture', 'skewness', 'kurtosis'];
     const result = {};
+    const data = ratioData[`data${period}`]?.data;
 
     fields.forEach(field => {
-      result[`${field}${period}`] = ratioData[`data${period}`] ? ratioData[`data${period}`].data[field] : '-';
+      result[`${field}${period}`] = data ? data[field] : '-';
     });
+
+    result[`r2_${period}`] = data ? data.r2 : '-';
+    result[`alpha${period}`] = data ? data.alphaJensen : '-';
 
     return result;
   }

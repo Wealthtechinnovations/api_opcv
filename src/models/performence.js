@@ -353,6 +353,30 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DOUBLE,
       allowNull: true,
     },
+    r2_1an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    r2_3an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    r2_5an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    alpha1an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    alpha3an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    alpha5an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
     date: {
       type: DataTypes.DATEONLY,
       allowNull: true,

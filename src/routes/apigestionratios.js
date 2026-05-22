@@ -559,7 +559,7 @@ const {
               const r2jour = calculerR2([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
               const r2mois = calculerR2([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
 
-
+              const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
               res.json({
                 code: 200,
@@ -583,6 +583,7 @@ const {
                   r2,
                   r2jour,
                   r2mois,
+                  alphaJensen,
                   // skewness,
                   correlation,
                   correlationjour,
@@ -659,6 +660,7 @@ const {
                   perfAnnualiseeInd: '-',
                   info: '-',
                   r2: '-',
+                  alphaJensen: '-',
                   // skewness,
                   correlation: '-',
                   omega: '-',
@@ -875,6 +877,7 @@ const {
             const r2 = calculerR2([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const r2jour = calculerR2([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
             const r2mois = calculerR2([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
+            const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
 
 
@@ -1190,6 +1193,7 @@ const {
             const r2 = calculerR2([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const r2jour = calculerR2([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
             const r2mois = calculerR2([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
+            const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
 
 
@@ -2527,7 +2531,7 @@ const {
               const r2jour = calculerR2([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
               const r2mois = calculerR2([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
 
-
+              const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
               res.json({
                 code: 200,
@@ -2551,6 +2555,7 @@ const {
                   r2,
                   r2jour,
                   r2mois,
+                  alphaJensen,
                   // skewness,
                   correlation,
                   correlationjour,
@@ -2627,6 +2632,7 @@ const {
                   perfAnnualiseeInd: '-',
                   info: '-',
                   r2: '-',
+                  alphaJensen: '-',
                   // skewness,
                   correlation: '-',
                   omega: '-',
@@ -2859,6 +2865,7 @@ const {
             const r2 = calculerR2([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const r2jour = calculerR2([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
             const r2mois = calculerR2([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
+            const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
 
 
@@ -3155,6 +3162,7 @@ const {
             const r2 = calculerR2([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const r2jour = calculerR2([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
             const r2mois = calculerR2([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
+            const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
 
 
@@ -4171,7 +4179,7 @@ const {
               const r2jour = calculerR2([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
               const r2mois = calculerR2([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
 
-
+              const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
               res.json({
                 code: 200,
@@ -4195,6 +4203,7 @@ const {
                   r2,
                   r2jour,
                   r2mois,
+                  alphaJensen,
                   // skewness,
                   correlation,
                   correlationjour,
@@ -4271,6 +4280,7 @@ const {
                   perfAnnualiseeInd: '-',
                   info: '-',
                   r2: '-',
+                  alphaJensen: '-',
                   // skewness,
                   correlation: '-',
                   omega: '-',
@@ -4503,6 +4513,7 @@ const {
             const r2 = calculerR2([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const r2jour = calculerR2([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
             const r2mois = calculerR2([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
+            const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
 
 
@@ -4799,6 +4810,7 @@ const {
             const r2 = calculerR2([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const r2jour = calculerR2([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
             const r2mois = calculerR2([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
+            const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
 
 
@@ -5815,7 +5827,7 @@ const {
               const r2jour = calculerR2([...rendementsTableaujour["1_an"]], [...rendementsTableauindicejour["1_an"]])
               const r2mois = calculerR2([...rendementsTableaumois["1_an"]], [...rendementsTableauindicemois["1_an"]])
 
-
+              const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
               res.json({
                 code: 200,
@@ -5839,6 +5851,7 @@ const {
                   r2,
                   r2jour,
                   r2mois,
+                  alphaJensen,
                   // skewness,
                   correlation,
                   correlationjour,
@@ -5915,6 +5928,7 @@ const {
                   perfAnnualiseeInd: '-',
                   info: '-',
                   r2: '-',
+                  alphaJensen: '-',
                   // skewness,
                   correlation: '-',
                   omega: '-',
@@ -6147,6 +6161,7 @@ const {
             const r2 = calculerR2([...rendementsTableau["3_ans"]], [...rendementsTableauindice["3_ans"]])
             const r2jour = calculerR2([...rendementsTableaujour["3_ans"]], [...rendementsTableauindicejour["3_ans"]])
             const r2mois = calculerR2([...rendementsTableaumois["3_ans"]], [...rendementsTableauindicemois["3_ans"]])
+            const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
 
 
@@ -6443,6 +6458,7 @@ const {
             const r2 = calculerR2([...rendementsTableau["5_ans"]], [...rendementsTableauindice["5_ans"]])
             const r2jour = calculerR2([...rendementsTableaujour["5_ans"]], [...rendementsTableauindicejour["5_ans"]])
             const r2mois = calculerR2([...rendementsTableaumois["5_ans"]], [...rendementsTableauindicemois["5_ans"]])
+            const alphaJensen = perfAnnualisee - (tauxsr + beta * (perfAnnualiseeInd - tauxsr));
 
 
 
