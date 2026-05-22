@@ -127,6 +127,9 @@ app.use(require('./src/routes/apigestionapikey'));
 // Analytics routes (ClickHouse-powered)
 app.use(require('./src/routes/analytics'));
 
+// Referentiel FundAfrica routes
+app.use(require('./src/routes/apigestionreferentiel'));
+
 // Health check (basic)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
