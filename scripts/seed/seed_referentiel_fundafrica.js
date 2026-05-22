@@ -41,7 +41,7 @@ async function run() {
   console.log('Connecte a fund_opcvm');
   console.log(EXECUTE ? 'MODE: EXECUTE\n' : 'MODE: DIAGNOSTIC (dry run, --execute pour appliquer)\n');
 
-  const dataPath = path.join(__dirname, 'referentiel_fundafrica.json');
+  const dataPath = path.join(__dirname, '../../referentiel_fundafrica.json');
   if (!fs.existsSync(dataPath)) {
     console.error('ERREUR: referentiel_fundafrica.json introuvable. Generer avec le script Excel.');
     process.exit(1);
