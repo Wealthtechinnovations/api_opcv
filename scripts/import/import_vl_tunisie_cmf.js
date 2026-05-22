@@ -43,7 +43,7 @@ const DEVISE = 'TND';
 const REGULATEUR = 'Conseil du Marché Financier (CMF)';
 const REGION = 'Afrique du Nord';
 
-const DATA_DIR = '/home/user/data_tunisie/TUNISIE VL/final_v183';
+const DATA_DIR = process.env.TUNISIE_DATA_DIR || path.resolve(__dirname, '../../data_tunisie');
 
 const CLASSIFICATION_MAP = {
   'ACTIONS':     { classification: 'ACTIONS',     categorie_globale: 'ACTIONS',     categorie_national: 'ACTIONS Tunisie',     categorie_regional: 'ACTIONS Afrique du Nord' },
