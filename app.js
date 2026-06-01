@@ -71,6 +71,13 @@ app.set('trust proxy', 1);
 // Rate limiting global - 200 requêtes par 15 minutes par IP
 app.use(rateLimit(200, 15 * 60 * 1000));
 
+// Stricter rate limiting for auth routes — 10 attempts per 15 minutes
+const authRateLimit = rateLimit(10, 15 * 60 * 1000);
+app.use('/api/login', authRateLimit);
+app.use('/api/userlogin', authRateLimit);
+app.use('/api/forgot-password', authRateLimit);
+app.use('/api/reset-password', authRateLimit);
+
 // Logging
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
