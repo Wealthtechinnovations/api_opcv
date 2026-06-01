@@ -3543,9 +3543,9 @@ GROUP BY f.societe_gestion;
                   if (Ratioinf !== '-' && Ratioinf !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Ratioinf} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Ratioinf) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Ratioinf} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Ratioinf) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3557,9 +3557,9 @@ GROUP BY f.societe_gestion;
                   if (Var95 !== '-' && Var95 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var95} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var95) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var95} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var95) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3571,9 +3571,9 @@ GROUP BY f.societe_gestion;
                   if (Var99 !== '-' && Var99 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var99} < ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var99) < parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var99} > ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var99) > parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3585,9 +3585,9 @@ GROUP BY f.societe_gestion;
                   if (Calamar !== '-' && Calamar !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Calamar} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Calamar) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Calamar} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Calamar) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3599,9 +3599,9 @@ GROUP BY f.societe_gestion;
                   if (PerfAnnu !== '-' && PerfAnnu !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfAnnu} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfAnnu) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfAnnu} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfAnnu) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3613,9 +3613,9 @@ GROUP BY f.societe_gestion;
                   if (Sharpe !== '-' && Sharpe !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sharpe} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sharpe) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sharpe} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sharpe) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3627,9 +3627,9 @@ GROUP BY f.societe_gestion;
                   if (Pertemax !== '-' && Pertemax !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Pertemax} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Pertemax) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Pertemax} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Pertemax) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3641,9 +3641,9 @@ GROUP BY f.societe_gestion;
                   if (Volatilite !== '-' && Volatilite !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Volatilite} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Volatilite) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Volatilite} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Volatilite) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3655,9 +3655,9 @@ GROUP BY f.societe_gestion;
                   if (Trakingerror !== '-' && Trakingerror !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Trakingerror} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Trakingerror) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Trakingerror} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Trakingerror) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3669,9 +3669,9 @@ GROUP BY f.societe_gestion;
                   if (Sortino !== '-' && Sortino !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sortino} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sortino) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sortino} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sortino) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3683,9 +3683,9 @@ GROUP BY f.societe_gestion;
                   if (Omega !== '-' && Omega !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Omega} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Omega) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Omega} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Omega) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3697,9 +3697,9 @@ GROUP BY f.societe_gestion;
                   if (Dsr !== '-' && Dsr !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Dsr} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Dsr) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Dsr} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Dsr) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3711,9 +3711,9 @@ GROUP BY f.societe_gestion;
                   if (Betahaussier !== '-' && Betahaussier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betahaussier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betahaussier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betahaussier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betahaussier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3725,9 +3725,9 @@ GROUP BY f.societe_gestion;
                   if (Betabaissier !== '-' && Betabaissier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betabaissier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betabaissier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betabaissier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betabaissier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3739,9 +3739,9 @@ GROUP BY f.societe_gestion;
                   if (Downcapture !== '-' && Downcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Downcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Downcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Downcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Downcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3753,9 +3753,9 @@ GROUP BY f.societe_gestion;
                   if (Upcapture !== '-' && Upcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Upcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Upcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Upcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Upcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3767,9 +3767,9 @@ GROUP BY f.societe_gestion;
                   if (Skewness !== '-' && Skewness !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Skewness} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Skewness) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Skewness} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Skewness) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3781,9 +3781,9 @@ GROUP BY f.societe_gestion;
                   if (Kurtosis !== '-' && Kurtosis !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Kurtosis} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Kurtosis) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Kurtosis} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Kurtosis) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3795,9 +3795,9 @@ GROUP BY f.societe_gestion;
                   if (Beta !== '-' && Beta !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Beta} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Beta) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Beta} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Beta) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3810,9 +3810,9 @@ GROUP BY f.societe_gestion;
                   if (Ratioinf !== '-' && Ratioinf !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Ratioinf} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Ratioinf) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Ratioinf} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Ratioinf) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3824,9 +3824,9 @@ GROUP BY f.societe_gestion;
                   if (Var95 !== '-' && Var95 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var95} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var95) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var95} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var95) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3838,9 +3838,9 @@ GROUP BY f.societe_gestion;
                   if (Var99 !== '-' && Var99 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var99} < ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var99) < parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var99} > ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var99) > parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3852,9 +3852,9 @@ GROUP BY f.societe_gestion;
                   if (Calamar !== '-' && Calamar !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Calamar} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Calamar) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Calamar} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Calamar) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3866,9 +3866,9 @@ GROUP BY f.societe_gestion;
                   if (PerfAnnu !== '-' && PerfAnnu !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfAnnu} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfAnnu) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfAnnu} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfAnnu) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3880,9 +3880,9 @@ GROUP BY f.societe_gestion;
                   if (Sharpe !== '-' && Sharpe !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sharpe} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sharpe) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sharpe} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sharpe) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3894,9 +3894,9 @@ GROUP BY f.societe_gestion;
                   if (Pertemax !== '-' && Pertemax !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Pertemax} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Pertemax) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Pertemax} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Pertemax) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3908,9 +3908,9 @@ GROUP BY f.societe_gestion;
                   if (Volatilite !== '-' && Volatilite !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Volatilite} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Volatilite) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Volatilite} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Volatilite) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3922,9 +3922,9 @@ GROUP BY f.societe_gestion;
                   if (Trakingerror !== '-' && Trakingerror !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Trakingerror} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Trakingerror) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Trakingerror} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Trakingerror) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3936,9 +3936,9 @@ GROUP BY f.societe_gestion;
                   if (Sortino !== '-' && Sortino !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sortino} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sortino) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sortino} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sortino) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3950,9 +3950,9 @@ GROUP BY f.societe_gestion;
                   if (Omega !== '-' && Omega !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Omega} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Omega) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Omega} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Omega) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3964,9 +3964,9 @@ GROUP BY f.societe_gestion;
                   if (Dsr !== '-' && Dsr !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Dsr} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Dsr) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Dsr} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Dsr) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3978,9 +3978,9 @@ GROUP BY f.societe_gestion;
                   if (Betahaussier !== '-' && Betahaussier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betahaussier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betahaussier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betahaussier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betahaussier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3992,9 +3992,9 @@ GROUP BY f.societe_gestion;
                   if (Betabaissier !== '-' && Betabaissier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betabaissier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betabaissier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betabaissier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betabaissier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4006,9 +4006,9 @@ GROUP BY f.societe_gestion;
                   if (Downcapture !== '-' && Downcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Downcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Downcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Downcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Downcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4020,9 +4020,9 @@ GROUP BY f.societe_gestion;
                   if (Upcapture !== '-' && Upcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Upcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Upcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Upcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Upcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4034,9 +4034,9 @@ GROUP BY f.societe_gestion;
                   if (Skewness !== '-' && Skewness !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Skewness} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Skewness) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Skewness} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Skewness) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4048,9 +4048,9 @@ GROUP BY f.societe_gestion;
                   if (Kurtosis !== '-' && Kurtosis !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Kurtosis} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Kurtosis) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Kurtosis} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Kurtosis) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4062,9 +4062,9 @@ GROUP BY f.societe_gestion;
                   if (Beta !== '-' && Beta !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Beta} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Beta) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Beta} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Beta) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4077,9 +4077,9 @@ GROUP BY f.societe_gestion;
                   if (Ratioinf !== '-' && Ratioinf !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Ratioinf} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Ratioinf) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Ratioinf} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Ratioinf) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4091,9 +4091,9 @@ GROUP BY f.societe_gestion;
                   if (Var95 !== '-' && Var95 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var95} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var95) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var95} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var95) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4105,9 +4105,9 @@ GROUP BY f.societe_gestion;
                   if (Var99 !== '-' && Var99 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var99} < ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var99) < parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var99} > ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var99) > parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4118,9 +4118,9 @@ GROUP BY f.societe_gestion;
                   // Ajoutez d'autres propriétés si nécessaire
                   if (Calamar !== '-' && Calamar !== null) {
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Calamar} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Calamar) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Calamar} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Calamar) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4132,9 +4132,9 @@ GROUP BY f.societe_gestion;
                   if (PerfAnnu !== '-' && PerfAnnu !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfAnnu} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfAnnu) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfAnnu} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfAnnu) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4145,9 +4145,9 @@ GROUP BY f.societe_gestion;
                   // Ajoutez d'autres propriétés si nécessaire
                   if (Sharpe !== '-' && Sharpe !== null) {
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sharpe} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sharpe) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sharpe} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sharpe) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4159,9 +4159,9 @@ GROUP BY f.societe_gestion;
                   if (Pertemax !== '-' && Pertemax !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Pertemax} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Pertemax) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Pertemax} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Pertemax) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4173,9 +4173,9 @@ GROUP BY f.societe_gestion;
                   if (Volatilite !== '-' && Volatilite !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Volatilite} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Volatilite) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Volatilite} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Volatilite) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4187,9 +4187,9 @@ GROUP BY f.societe_gestion;
                   if (Trakingerror !== '-' && Trakingerror !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Trakingerror} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Trakingerror) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Trakingerror} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Trakingerror) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4201,9 +4201,9 @@ GROUP BY f.societe_gestion;
                   if (Sortino !== '-' && Sortino !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sortino} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sortino) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sortino} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sortino) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4215,9 +4215,9 @@ GROUP BY f.societe_gestion;
                   if (Omega !== '-' && Omega !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Omega} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Omega) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Omega} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Omega) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4229,9 +4229,9 @@ GROUP BY f.societe_gestion;
                   if (Dsr !== '-' && Dsr !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Dsr} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Dsr) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Dsr} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Dsr) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4243,9 +4243,9 @@ GROUP BY f.societe_gestion;
                   if (Betahaussier !== '-' && Betahaussier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betahaussier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betahaussier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betahaussier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betahaussier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4257,9 +4257,9 @@ GROUP BY f.societe_gestion;
                   if (Betabaissier !== '-' && Betabaissier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betabaissier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betabaissier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betabaissier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betabaissier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4271,9 +4271,9 @@ GROUP BY f.societe_gestion;
                   if (Downcapture !== '-' && Downcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Downcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Downcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Downcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Downcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4285,9 +4285,9 @@ GROUP BY f.societe_gestion;
                   if (Upcapture !== '-' && Upcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Upcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Upcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Upcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Upcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4299,9 +4299,9 @@ GROUP BY f.societe_gestion;
                   if (Skewness !== '-' && Skewness !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Skewness} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Skewness) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Skewness} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Skewness) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4313,9 +4313,9 @@ GROUP BY f.societe_gestion;
                   if (Kurtosis !== '-' && Kurtosis !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Kurtosis} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Kurtosis) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Kurtosis} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Kurtosis) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4327,9 +4327,9 @@ GROUP BY f.societe_gestion;
                   if (Beta !== '-' && Beta !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Beta} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Beta) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Beta} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Beta) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4341,9 +4341,9 @@ GROUP BY f.societe_gestion;
                   // Ajoutez d'autres propriétés si nécessaire
                   if (PerfCummul !== '-' && PerfCummul !== null) {
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4357,9 +4357,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4373,9 +4373,9 @@ GROUP BY f.societe_gestion;
 
                   // Comparez les valeurs avec les critères
                   if (PerfCummul !== '-' && PerfCummul !== null) {
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
 
@@ -4390,9 +4390,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                     // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4405,9 +4405,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4421,9 +4421,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4436,9 +4436,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4452,9 +4452,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4468,9 +4468,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Fraissous} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Fraissous) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Fraissous} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Fraissous) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4479,9 +4479,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Fraisgestion} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Fraisgestion) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Fraisgestion} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Fraisgestion) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4490,9 +4490,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Fraisrachat} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Fraisrachat) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Fraisrachat} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Fraisrachat) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4501,9 +4501,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Fraiscourant} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Fraiscourant) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Fraiscourant} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Fraiscourant) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4513,9 +4513,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Mininvest} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Mininvest) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Mininvest} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Mininvest) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4524,9 +4524,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Actifnet} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Actifnet) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Actifnet} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Actifnet) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4538,7 +4538,7 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (eval(`${Typeinvest} == ${value}`)) {
+                if (String(Typeinvest) === String(value)) {
                   correspondances++;
                 }
               }
@@ -5942,8 +5942,7 @@ GROUP BY f.societe_gestion;
         // Si le fond existe déjà, mettez à jour ses informations
         const updatedValues = {};
 
-        Object.keys(existingFond.toJSON()).forEach(key => {
-          if (key in {
+        const fieldValues = {
             nom_fond, pays, periodicite, structure_fond, code_ISIN, date_creation, dev_libelle,
             societe_gestion, categorie_libelle, classification, type_investissement, nom_gerant,
             categorie_globale, frais_gestion, frais_souscription,
@@ -5952,12 +5951,11 @@ GROUP BY f.societe_gestion;
             depositaire, teneur_registre, valorisateur, centralisateur, agent_transfert, agent_payeur,
             numero_agrement, montant_premier_vl, montant_actif_net, duree_investissement_recommande,
             date_cloture, heure_cutt_off, delai_reglement, souscripteur, datejour, horizonplacement, IBAN,
-            RIB,
-            banque,
-            nombre_part,
-            indice_benchmark, regulateur
-          }) {
-            const value = eval(key);
+            RIB, banque, nombre_part, indice_benchmark, regulateur
+        };
+        Object.keys(existingFond.toJSON()).forEach(key => {
+          if (key in fieldValues) {
+            const value = fieldValues[key];
             if (value !== '' && value !== undefined) {
               updatedValues[key] = value;
             }
