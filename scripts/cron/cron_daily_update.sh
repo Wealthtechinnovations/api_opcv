@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # =============================================================================
 # Mise a jour quotidienne automatique - Africafunds
 #

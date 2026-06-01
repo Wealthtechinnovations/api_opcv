@@ -393,14 +393,20 @@ router.get('/api/analytics/classement-historique/:fondId', requireClickHouse, as
     const fondId = parseInt(req.params.fondId, 10);
     if (isNaN(fondId)) return res.status(400).json({ error: 'Invalid fond ID' });
 
+    const validDevises = ['LOCAL', 'EUR', 'USD'];
     const devise = (req.query.devise || 'LOCAL').toUpperCase();
+    if (!validDevises.includes(devise)) return res.status(400).json({ error: 'Invalid devise. Valid: LOCAL, EUR, USD' });
+
     const date = req.query.date || null;
+    if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
 
     let dateFilter = '';
+    let queryParams = { fondId, devise };
     if (date) {
-      dateFilter = `AND date_classement = '${date}'`;
+      dateFilter = `AND date_classement = {date:String}`;
+      queryParams.date = date;
     } else {
-      dateFilter = `AND date_classement = (SELECT max(date_classement) FROM classement_historique WHERE fond_id = ${fondId} AND devise = '${devise}')`;
+      dateFilter = `AND date_classement = (SELECT max(date_classement) FROM classement_historique WHERE fond_id = {fondId:UInt32} AND devise = {devise:String})`;
     }
 
     const result = await clickhouse.query({
@@ -411,9 +417,10 @@ router.get('/api/analytics/classement-historique/:fondId', requireClickHouse, as
                quartile_ytd, quartile_3m, quartile_6m, quartile_1an, quartile_3ans,
                perf_ytd, perf_3m, perf_6m, perf_1an, perf_3ans
         FROM classement_historique
-        WHERE fond_id = ${fondId} AND devise = '${devise}' ${dateFilter}
+        WHERE fond_id = {fondId:UInt32} AND devise = {devise:String} ${dateFilter}
         ORDER BY type_classement ASC
       `,
+      query_params: queryParams,
       format: 'JSONEachRow',
     });
 
@@ -430,8 +437,13 @@ router.get('/api/analytics/classement-historique/:fondId/evolution', requireClic
     const fondId = parseInt(req.params.fondId, 10);
     if (isNaN(fondId)) return res.status(400).json({ error: 'Invalid fond ID' });
 
+    const validDevises = ['LOCAL', 'EUR', 'USD'];
     const devise = (req.query.devise || 'LOCAL').toUpperCase();
+    if (!validDevises.includes(devise)) return res.status(400).json({ error: 'Invalid devise. Valid: LOCAL, EUR, USD' });
+
     const typeClassement = parseInt(req.query.type || '1', 10);
+    if (![1, 2, 3].includes(typeClassement)) return res.status(400).json({ error: 'Invalid type. Valid: 1, 2, 3' });
+
     const horizon = req.query.horizon || '1an';
     const limit = Math.min(parseInt(req.query.limit || '365', 10), 3650);
 
@@ -446,11 +458,12 @@ router.get('/api/analytics/classement-historique/:fondId/evolution', requireClic
                rang_${horizon} as rang, total_${horizon} as total,
                perf_${horizon} as perf
         FROM classement_historique
-        WHERE fond_id = ${fondId} AND devise = '${devise}' AND type_classement = ${typeClassement}
+        WHERE fond_id = {fondId:UInt32} AND devise = {devise:String} AND type_classement = {typeClassement:UInt8}
           AND rang_${horizon} > 0
         ORDER BY date_classement DESC
-        LIMIT ${limit}
+        LIMIT {limit:UInt32}
       `,
+      query_params: { fondId, devise, typeClassement, limit },
       format: 'JSONEachRow',
     });
 

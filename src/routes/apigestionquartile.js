@@ -130,8 +130,8 @@ router.get('/api/classementquartilemysql/:id', async (req, res) => {
         res.json({
             code: 200,
             data: {
-              classementType1: classementType1 ? classementType1.toJSON() : {},
-              classementType2: classementType2 ? classementType2.toJSON() : {},
+              classementType1: classementType1 || {},
+              classementType2: classementType2 || {},
             },
         });
     } catch (error) {
