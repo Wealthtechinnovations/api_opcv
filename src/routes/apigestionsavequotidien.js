@@ -362,18 +362,16 @@ router.get('/api/updatewithdividende', async (req, res) => {
 
         const performanceQuery = {
           query: `
-              SELECT 
-        fond_id, 
+              SELECT
+        fond_id,
         perfveille, perf3m, perf6m, perf1an, perf3ans, perf5ans, ytd,
         perfveillem, perf3mm, perf6mm, perf1anm, perf3ansm, perf5ansm, ytdm,
-        volatility3an, ratiosharpe3an, pertemax3an, sortino3an, info3an, 
+        volatility3an, ratiosharpe3an, pertemax3an, sortino3an, info3an,
         calamar3an, var953an, betabaissier3an, omega3an, dsr3an
     FROM performences
-    WHERE date = '${datedebut}' AND categorie_nationale = '${selectedFundCategory}' 
+    WHERE date = {datedebut:String} AND categorie_nationale = {category:String}
               `,
-          clickhouse_settings: {
-              // Optional settings can be added here
-          },
+          query_params: { datedebut: String(datedebut), category: String(selectedFundCategory) },
       };
 
       const fundsWithPerformance = await clickhouse.query(performanceQuery)
@@ -457,16 +455,13 @@ async function calculateRankregional(category, fundId, datedebut) {
 
      const performanceQuery = {
           query: `
-          SELECT 
-              fond_id, 
+          SELECT
+              fond_id,
               perf3m, perf6m, perf1an, perf3ans, perf5ans, ytd
           FROM performances
-          WHERE date = '${datedebut}' AND categorie_regionale = '${selectedFundCategory}'
-          
-      ` ,
-      clickhouse_settings: {
-          // Optional settings can be added here
-      },
+          WHERE date = {datedebut:String} AND categorie_regionale = {category:String}
+      `,
+      query_params: { datedebut: String(datedebut), category: String(selectedFundCategory) },
   };
 
       const fundsWithPerformance = await clickhouse.query(performanceQuery)
@@ -534,25 +529,20 @@ router.get('/api/classementclickhouse', async (req, res) => {
        // Query for existing ranking
     const existingRanking = await clickhouse.query({
       query: `
-          SELECT * FROM classementfonds 
-          WHERE fond_id = ${fundId} AND type_classement = 1 
+          SELECT * FROM classementfonds
+          WHERE fond_id = {fundId:UInt32} AND type_classement = 1
           LIMIT 1
-      `, // Directly inject parameters into the query
-      clickhouse_settings: {
-          // Optional settings can be added here
-      }
+      `,
+      query_params: { fundId: Number(fundId) },
   });
 
-  // Query for existing regional ranking
   const existingRankingRegional = await clickhouse.query({
       query: `
-          SELECT * FROM classementfonds 
-          WHERE fond_id = ${fundId} AND type_classement = 2 
+          SELECT * FROM classementfonds
+          WHERE fond_id = {fundId:UInt32} AND type_classement = 2
           LIMIT 1
-      `, // Directly inject parameters into the query
-      clickhouse_settings: {
-          // Optional settings can be added here
-      }
+      `,
+      query_params: { fundId: Number(fundId) },
   });
 
       // Calculez les classements
