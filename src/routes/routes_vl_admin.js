@@ -124,6 +124,10 @@ module.exports = (app) => {
           data: { frais: fraisData }
         })
       })
+      .catch(error => {
+        console.error('getfraisbyadmin error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+      })
   })
 
   app.get('/api/getfraisbyadminid/:id', (req, res) => {
@@ -228,6 +232,10 @@ module.exports = (app) => {
         }));
         res.json({ code: 200, data: { funds } })
       })
+      .catch(error => {
+        console.error('getfondbyadmin error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+      })
   })
 
   app.get('/api/getfondbyuser/:id', (req, res) => {
@@ -254,6 +262,10 @@ module.exports = (app) => {
           code_ISIN: data.code_ISIN,
         }));
         res.json({ code: 200, data: { funds } })
+      })
+      .catch(error => {
+        console.error('getfondbyuser error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
       })
   })
 
@@ -282,6 +294,10 @@ module.exports = (app) => {
         }));
         res.json({ code: 200, data: { funds } })
       })
+      .catch(error => {
+        console.error('getfondbyuservalide error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+      })
   })
 
   app.get('/api/getfondbysociete/:id', (req, res) => {
@@ -303,6 +319,10 @@ module.exports = (app) => {
         }));
         res.json({ code: 200, data: { funds } })
       })
+      .catch(error => {
+        console.error('getfondbysociete error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+      })
   })
 
   app.get('/api/getfondbypays/:id', (req, res) => {
@@ -323,6 +343,10 @@ module.exports = (app) => {
           code_ISIN: data.code_ISIN,
         }));
         res.json({ code: 200, data: { funds } })
+      })
+      .catch(error => {
+        console.error('getfondbypays error:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
       })
   })
 

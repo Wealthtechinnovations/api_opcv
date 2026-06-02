@@ -704,10 +704,13 @@ router.get('/api/getsocieterecherche', (req, res) => {
     // Attendez que toutes les promesses soient résolues
     return Promise.all(promises)
       .then(counts => {
-        const societesAvecCounts = societesGestion.map((societeGestion, index) => ({
-          ...societes.find(societe => societe.nom === societeGestion).toJSON(), // Ajouter toutes les colonnes de la société
-          nbre_fonds: counts[index]
-        }));
+        const societesAvecCounts = societesGestion.map((societeGestion, index) => {
+          const found = societes.find(societe => societe.nom === societeGestion);
+          return {
+            ...(found ? found.toJSON() : { nom: societeGestion }),
+            nbre_fonds: counts[index]
+          };
+        });
         return societesAvecCounts;
       });
   })

@@ -145,10 +145,13 @@ router.get('/api/getfondbyidmeta/:id', async (req, res) => {
       order: [['id', 'DESC']]
     });
 
+    if (!response) {
+      return res.status(404).json({ message: 'Fonds introuvable' });
+    }
 
     const funds = {
       id: response.id,
-      nom_fond: response.nom_fond.toString(),
+      nom_fond: (response.nom_fond || '').toString(),
       slug: generateFundSlug(response.nom_fond, response.code_ISIN, response.id),
       categorie_libelle: response.categorie_libelle,
       categorie_national: response.categorie_national,
@@ -174,8 +177,11 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
   try {
     const paramId = extractIdFromSlug(req.params.id);
 
+    if (!req.query.funds) {
+      return res.status(400).json({ message: 'Paramètre funds requis' });
+    }
     const distinctFundIdss = req.query.funds.replace(/[^0-9A-Za-z\s,]+/g, '').split(',')
-    const distinctFundIdsParsed = distinctFundIdss.map(id => parseInt(id));
+    const distinctFundIdsParsed = distinctFundIdss.map(id => parseInt(id)).filter(id => !isNaN(id));
 
     const response = await fond.findAll({
       where: {
@@ -226,8 +232,7 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
       lastValue: lastValue,
       lastValue_EUR: lastValue_EUR,
       lastValue_USD: lastValue_USD,
-      nom_fond: data.nom_fond.toString(),
-      code_ISIN: data.dev_libelle,
+      nom_fond: (data.nom_fond || '').toString(),
       categorie_libelle: data.categorie_libelle,
       categorie_national: data.categorie_national,
       devise: data.dev_libelle,
@@ -259,50 +264,41 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
 
 router.get('/api/searchFunds', async (req, res) => {
   const { minHorizon, maxHorizon, selectedPays, selectedRegion } = req.query;
-  let query = `
-  SELECT DISTINCT f.id, f.nom_fond, f.code_ISIN
-  FROM fond_investissements AS f
-  INNER JOIN valorisations AS v ON f.id = v.fund_id
-`;
+  const conditions = ['f.active = 1'];
+  const replacements = {};
 
   if (minHorizon && maxHorizon) {
-    query += `
-    WHERE v.date >= :minHorizon
-    AND v.date <= :maxHorizon
-  `;
+    conditions.push('v.date >= :minHorizon AND v.date <= :maxHorizon');
+    replacements.minHorizon = minHorizon;
+    replacements.maxHorizon = maxHorizon;
   }
-
   if (selectedPays) {
-    query = ` SELECT DISTINCT f.id, f.nom_fond, f.code_ISIN
-  FROM fond_investissements AS f
-  INNER JOIN valorisations AS v ON f.id = v.fund_id
-WHERE
-         f.pays = :selectedPays
-
-  `;
+    conditions.push('LOWER(f.pays) = LOWER(:selectedPays)');
+    replacements.selectedPays = selectedPays;
   }
-
   if (selectedRegion) {
-    query = ` SELECT DISTINCT f.id, f.nom_fond, f.code_ISIN
-  FROM fond_investissements AS f
-  INNER JOIN valorisations AS v ON f.id = v.fund_id
-WHERE
-     f.region = :selectedRegion
-   
-  `;
+    conditions.push('LOWER(f.region) = LOWER(:selectedRegion)');
+    replacements.selectedRegion = selectedRegion;
   }
+
+  const query = `
+    SELECT DISTINCT f.id, f.nom_fond, f.code_ISIN
+    FROM fond_investissements AS f
+    INNER JOIN valorisations AS v ON f.id = v.fund_id
+    WHERE ${conditions.join(' AND ')}
+  `;
 
   try {
     const fondsDansCategorie = await sequelize.query(query, {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { minHorizon, maxHorizon },
+      replacements,
     });
 
     const funds = fondsDansCategorie.map(data => ({
-      label: `${data.nom_fond.toString()} ${data.code_ISIN}`,
+      label: `${data.nom_fond || ''} ${data.code_ISIN || ''}`.trim(),
       value: data.id,
       slug: generateFundSlug(data.nom_fond, data.code_ISIN, data.id),
-      nom_fond: data.nom_fond.toString(),
+      nom_fond: (data.nom_fond || '').toString(),
       code_ISIN: data.code_ISIN,
     }));
 

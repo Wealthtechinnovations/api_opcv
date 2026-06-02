@@ -54,8 +54,7 @@ const findCategoryByFundId = async (fundId) => {
     type: sequelize.QueryTypes.SELECT
   });
 
-  // Retournez la catégorie extraite de la requête
-  return result.categorie_globale;
+  return result?.categorie_globale || null;
 };
 
 router.get('/api/getpaysidmeta/:id', (req, res) => {
@@ -157,7 +156,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             type: sequelize.QueryTypes.SELECT
           });
 
-          latestDate = result5.latestDate;
+          latestDate = result5?.latestDate || null;
 
           const latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_EUR, YEAR(valorisations.date) AS year
@@ -240,7 +239,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             type: sequelize.QueryTypes.SELECT
           });
 
-          latestDate = result5.latestDate;
+          latestDate = result5?.latestDate || null;
 
           const latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_USD, YEAR(valorisations.date) AS year
@@ -323,7 +322,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             type: sequelize.QueryTypes.SELECT
           });
 
-          latestDate = result5.latestDate;
+          latestDate = result5?.latestDate || null;
 
           const latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net, YEAR(valorisations.date) AS year
@@ -454,7 +453,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
               sumActifNetByCategory[category] = 0;
             }
             if (actif_net_EUR !== '#N/A') {
-              totalfondscompose += totalfondscompose;
+              totalfondscompose += 1;
               sumActifNetByCategory[category] += parseFloat(actif_net_EUR);
             }
 
@@ -498,7 +497,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             }
 
             if (actif_net_USD !== '#N/A') {
-              totalfondscompose += totalfondscompose;
+              totalfondscompose += 1;
 
               sumActifNetByCategory[category] += parseFloat(actif_net_USD);
             }
@@ -542,7 +541,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             }
 
             if (actif_net !== '#N/A') {
-              totalfondscompose += totalfondscompose;
+              totalfondscompose += 1;
               sumActifNetByCategory[category] += parseFloat(actif_net);
             }
           }
