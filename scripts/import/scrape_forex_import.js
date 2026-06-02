@@ -170,6 +170,53 @@ async function fetchYahooFinance(ticker, paire, startTimestamp) {
   }
 }
 
+async function fetchEcbRates(currency, startTimestamp) {
+  const startDate = new Date(startTimestamp * 1000).toISOString().split('T')[0];
+  const paire = `EUR/${currency}`;
+  const url = `https://data-api.ecb.europa.eu/service/data/EXR/D.${currency}.EUR.SP00.A?startPeriod=${startDate}&format=csvdata`;
+
+  try {
+    console.log(`    ECB fallback ${paire}...`);
+    const resp = await httpGet(url);
+    if (resp.status !== 200) {
+      console.log(`    ECB ${paire}: HTTP ${resp.status}`);
+      return [];
+    }
+
+    const lines = resp.body.split('\n').filter(l => l.trim());
+    if (lines.length < 2) return [];
+
+    const header = lines[0].split(',');
+    const dateIdx = header.findIndex(h => h.includes('TIME_PERIOD') || h.includes('PERIOD'));
+    const valIdx = header.findIndex(h => h.includes('OBS_VALUE') || h.includes('VALUE'));
+    if (dateIdx < 0 || valIdx < 0) {
+      console.log(`    ECB ${paire}: header format unknown`);
+      return [];
+    }
+
+    const results = [];
+    for (let i = 1; i < lines.length; i++) {
+      const parts = lines[i].split(',');
+      if (parts.length <= Math.max(dateIdx, valIdx)) continue;
+      const dateStr = parts[dateIdx].replace(/"/g, '').trim();
+      const valStr = parts[valIdx].replace(/"/g, '').trim();
+      if (!dateStr || !valStr || valStr === 'NaN') continue;
+      const val = parseFloat(valStr);
+      if (val <= 0 || isNaN(val)) continue;
+      if (dateStr < '2000-01-01') continue;
+      results.push({ date: dateStr, value: val });
+    }
+
+    console.log(`    ECB ${paire}: ${results.length} entrees`);
+    return results;
+  } catch (e) {
+    console.log(`    ECB ${paire}: erreur ${e.message}`);
+    return [];
+  }
+}
+
+const ECB_CURRENCIES = ['TND', 'NGN', 'MAD', 'GHS', 'KES', 'ZAR', 'EGP', 'NAD'];
+
 function generateCfaPairs(eurUsdData, startTimestamp) {
   const results = { 'EUR/XOF': [], 'USD/XOF': [], 'EUR/XAF': [], 'USD/XAF': [] };
 
@@ -249,6 +296,52 @@ async function run() {
     await sleep(500);
   }
 
+  // 2b. ECB fallback for EUR/* pairs where Yahoo returned insufficient data
+  console.log('\n  ECB fallback pour paires EUR/* insuffisantes...');
+  for (const currency of ECB_CURRENCIES) {
+    const eurPaire = `EUR/${currency}`;
+    const existing = allPairData[eurPaire] || [];
+    if (existing.length < 100) {
+      console.log(`  ${eurPaire}: seulement ${existing.length} Yahoo — essai ECB...`);
+      const ecbData = await fetchEcbRates(currency, startTimestamp);
+      if (ecbData.length > existing.length) {
+        const existDates = new Set(existing.map(d => d.date));
+        const newEntries = ecbData.filter(d => !existDates.has(d.date));
+        allPairData[eurPaire] = [...existing, ...newEntries].sort((a, b) => a.date.localeCompare(b.date));
+        console.log(`    ${eurPaire}: fusionne Yahoo(${existing.length}) + ECB(${newEntries.length} nouvelles) = ${allPairData[eurPaire].length}`);
+      }
+      await sleep(300);
+    }
+  }
+
+  // 2c. Derive USD/* from EUR/* and EUR/USD for pairs with insufficient USD data
+  const eurUsdForCross = allPairData['EUR/USD'] || [];
+  const eurUsdByDate = {};
+  for (const d of eurUsdForCross) eurUsdByDate[d.date] = d.value;
+
+  console.log('\n  Cross-rate derivation USD/* depuis EUR/* et EUR/USD...');
+  for (const currency of ECB_CURRENCIES) {
+    const usdPaire = `USD/${currency}`;
+    const eurPaire = `EUR/${currency}`;
+    const usdExisting = allPairData[usdPaire] || [];
+    const eurData = allPairData[eurPaire] || [];
+    if (usdExisting.length < 100 && eurData.length > 100) {
+      const usdDates = new Set(usdExisting.map(d => d.date));
+      const derived = [];
+      for (const d of eurData) {
+        if (usdDates.has(d.date)) continue;
+        const eurUsd = eurUsdByDate[d.date];
+        if (eurUsd && eurUsd > 0) {
+          derived.push({ date: d.date, value: d.value / eurUsd });
+        }
+      }
+      if (derived.length > 0) {
+        allPairData[usdPaire] = [...usdExisting, ...derived].sort((a, b) => a.date.localeCompare(b.date));
+        console.log(`    ${usdPaire}: derive ${derived.length} entrees depuis ${eurPaire}/EUR-USD = ${allPairData[usdPaire].length} total`);
+      }
+    }
+  }
+
   // 3. Generer les paires CFA (fixes pour EUR, calculees pour USD)
   const eurUsdAll = allPairData['EUR/USD'] || [];
   console.log(`\n  Generation paires CFA (parite fixe 655.957, EUR/USD: ${eurUsdAll.length} dates)...`);
@@ -320,12 +413,43 @@ async function run() {
     console.log(`  ${paire.padEnd(10)}: ${stats.inserted} inseres, ${stats.skipped} existants`);
   }
 
+  // 4b. Fix value=0 entries: update existing zero-value rows with proper data
+  console.log('\nCorrection des entrees value=0...');
+  let totalFixed = 0;
+  for (const [paire, data] of Object.entries(allPairData)) {
+    const BATCH = 100;
+    let fixed = 0;
+    for (let i = 0; i < data.length; i += BATCH) {
+      const chunk = data.slice(i, i + BATCH);
+      for (const d of chunk) {
+        try {
+          const [result] = await conn.execute(
+            `UPDATE devisedechanges SET value = ? WHERE paire = ? AND date = ? AND (value = 0 OR value IS NULL)`,
+            [d.value, paire, d.date]
+          );
+          fixed += result.affectedRows;
+        } catch (e) { /* ignore */ }
+      }
+    }
+    if (fixed > 0) {
+      console.log(`  ${paire.padEnd(10)}: ${fixed} entrees corrigees (0 -> valeur)`);
+      totalFixed += fixed;
+    }
+  }
+  if (totalFixed > 0) {
+    console.log(`  Total corrige: ${totalFixed} entrees\n`);
+  } else {
+    console.log(`  Aucune correction necessaire\n`);
+  }
+  report.totalFixed = totalFixed;
+
   // Rapport
   console.log('\n==========================================');
   console.log('=== RAPPORT IMPORT FOREX ===');
   console.log('==========================================');
   console.log(`Total inseres:      ${report.totalInserted}`);
   console.log(`Total existants:    ${report.totalSkipped}`);
+  console.log(`Total corriges:     ${report.totalFixed || 0}`);
 
   // Verification
   const [verif] = await conn.execute(`
