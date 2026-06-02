@@ -72,8 +72,8 @@ pm2 list
 
 echo ""
 echo "Testing API..."
-API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3005/api/pays)
-echo "API /api/pays: HTTP $API_STATUS"
+API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3005/api/ref/pays)
+echo "API /api/ref/pays: HTTP $API_STATUS"
 
 FUND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3005/api/valLiq/866)
 echo "API /api/valLiq/866: HTTP $FUND_STATUS"
