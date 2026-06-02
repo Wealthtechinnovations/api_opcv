@@ -624,11 +624,9 @@ router.get('/api/classementclickhouse', async (req, res) => {
 });
 
   router.get('/api/classementmysql', async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-      await classementfonds.destroy({
-
-        truncate: true
-      });
+      await classementfonds.destroy({ where: {}, transaction });
       const allFunds = await fetchFundsByValorisation([], 'undefined', 'undefined', 'undefined', '');
       for (const fund of allFunds) {
         const fundId = fund.id;
@@ -853,18 +851,19 @@ router.get('/api/classementclickhouse', async (req, res) => {
             });
         }
       }
+      await transaction.commit();
       res.json("finishrank");
     } catch (error) {
+      await transaction.rollback();
       console.error('Une erreur s\'est produite :', error);
+      res.status(500).json({ error: 'Erreur classement local' });
     }
   });
 
   router.get('/api/classementeur', async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-      await classementfonds_eurs.destroy({
-
-        truncate: true
-      });
+      await classementfonds_eurs.destroy({ where: {}, transaction });
       const allFunds = await fetchFundsByValorisation([], 'undefined', 'undefined', 'undefined', '');
       for (const fund of allFunds) {
         const fundId = fund.id;
@@ -1019,18 +1018,19 @@ router.get('/api/classementclickhouse', async (req, res) => {
           }
         }
       }
+      await transaction.commit();
       res.json("finishrank");
     } catch (error) {
+      await transaction.rollback();
       console.error('Une erreur s\'est produite :', error);
+      res.status(500).json({ error: 'Erreur classement EUR' });
     }
   });
 
   router.get('/api/classementusd', async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-      await classementfonds_usds.destroy({
-
-        truncate: true
-      });
+      await classementfonds_usds.destroy({ where: {}, transaction });
       const allFunds = await fetchFundsByValorisation([], 'undefined', 'undefined', 'undefined', '');
       for (const fund of allFunds) {
         const fundId = fund.id;
@@ -1179,9 +1179,12 @@ router.get('/api/classementclickhouse', async (req, res) => {
           }
         }
       }
+      await transaction.commit();
       res.json("finishrank");
     } catch (error) {
+      await transaction.rollback();
       console.error('Une erreur s\'est produite :', error);
+      res.status(500).json({ error: 'Erreur classement USD' });
     }
   });
 
