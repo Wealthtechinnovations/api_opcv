@@ -30,6 +30,11 @@ efficient_frontier.png
 *copy*.js
 *.rar
 
+# CMF Tunisie scraper data (downloads, staging, logs)
+/data/tunisie_cmf/downloads/
+/data/tunisie_cmf/staging/
+/data/tunisie_cmf/logs/
+
 # OS files
 .DS_Store
 Thumbs.db
