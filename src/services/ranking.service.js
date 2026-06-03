@@ -52,14 +52,38 @@ function buildRankResult(fundsWithPerformance, fundId, category, periods) {
   return data;
 }
 
+// Les tables performences_eurs/usds contiennent plusieurs dates par fond.
+// On ne garde que la derniere date par fond pour eviter de gonfler les totaux
+// de classement (doublons) et fausser les rangs.
+function keepLatestPerFund(rows) {
+  const byFund = new Map();
+  for (const r of rows) {
+    const prev = byFund.get(r.fond_id);
+    if (!prev || new Date(r.date) > new Date(prev.date)) {
+      byFund.set(r.fond_id, r);
+    }
+  }
+  return Array.from(byFund.values());
+}
+
 async function calculateRankNational(category, fundId, date) {
+  // Chaque fond est compare a sa derniere performance disponible (MAX(date) par fond),
+  // comme pour le classement regional/global. L'ancien filtre `date = :date` fixe
+  // excluait la quasi-totalite des pairs (dernieres VL a des dates differentes),
+  // laissant le classement national vide. Le parametre `date` est conserve pour
+  // compatibilite de signature mais n'est plus utilise.
   const fundsWithPerformance = await sequelize.query(`
-    SELECT fond_id, ${PERF_PERIODS_FULL.join(', ')}
-    FROM performences
-    WHERE date = :date AND categorie_nationale = :category
-    GROUP BY fond_id
+    SELECT p1.fond_id, ${PERF_PERIODS_FULL.map(p => `p1.${p}`).join(', ')}
+    FROM performences p1
+    INNER JOIN (
+      SELECT fond_id, MAX(date) as max_date
+      FROM performences
+      WHERE categorie_nationale = :category
+      GROUP BY fond_id
+    ) p2 ON p1.fond_id = p2.fond_id AND p1.date = p2.max_date
+    WHERE p1.categorie_nationale = :category
   `, {
-    replacements: { category, date },
+    replacements: { category },
     type: sequelize.QueryTypes.SELECT,
   });
 
@@ -117,12 +141,12 @@ async function calculateRankGlobal(category, fundId) {
 
 async function calculateRankNationalDev(category, fundId, devise) {
   const model = devise === 'EUR' ? performences_eurs : performences_usds;
-  const fundsWithPerformance = await model.findAll({
+  const rows = await model.findAll({
     where: { categorie_nationale: category },
-    attributes: ['fond_id', ...PERF_PERIODS],
-    order: [['fond_id', 'DESC']],
+    attributes: ['fond_id', 'date', ...PERF_PERIODS],
     limit: 10000,
   });
+  const fundsWithPerformance = keepLatestPerFund(rows);
 
   const selectedFund = fundsWithPerformance.find((f) => f.fond_id === fundId);
   if (!selectedFund) return { error: 'Fond non trouvé.' };
@@ -132,12 +156,12 @@ async function calculateRankNationalDev(category, fundId, devise) {
 
 async function calculateRankRegionalDev(category, fundId, devise) {
   const model = devise === 'EUR' ? performences_eurs : performences_usds;
-  const fundsWithPerformance = await model.findAll({
+  const rows = await model.findAll({
     where: { categorie_fundafrica_regionale: category },
-    attributes: ['fond_id', ...PERF_PERIODS],
-    order: [['fond_id', 'DESC']],
+    attributes: ['fond_id', 'date', ...PERF_PERIODS],
     limit: 10000,
   });
+  const fundsWithPerformance = keepLatestPerFund(rows);
 
   const selectedFund = fundsWithPerformance.find((f) => f.fond_id === fundId);
   if (!selectedFund) return { error: 'Fond non trouvé.' };
@@ -149,12 +173,12 @@ async function calculateRankGlobalDev(category, fundId, devise) {
   if (!category) return { error: 'Pas de categorie globale FundAfrica.' };
 
   const model = devise === 'EUR' ? performences_eurs : performences_usds;
-  const fundsWithPerformance = await model.findAll({
+  const rows = await model.findAll({
     where: { categorie_fundafrica_globale: category },
-    attributes: ['fond_id', ...PERF_PERIODS],
-    order: [['fond_id', 'DESC']],
+    attributes: ['fond_id', 'date', ...PERF_PERIODS],
     limit: 10000,
   });
+  const fundsWithPerformance = keepLatestPerFund(rows);
 
   const selectedFund = fundsWithPerformance.find((f) => f.fond_id === fundId);
   if (!selectedFund) return { error: 'Fond non trouvé.' };
