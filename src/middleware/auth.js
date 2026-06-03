@@ -40,7 +40,8 @@ const authorize = (...roles) => {
       return res.status(401).json({ error: 'Authentification requise' });
     }
 
-    if (!roles.includes(req.user.role)) {
+    const isAdmin = roles.includes('admin') && req.user.typeusers_id === 0;
+    if (!isAdmin && !roles.includes(req.user.role)) {
       return res.status(403).json({ error: 'Accès non autorisé pour ce rôle' });
     }
 

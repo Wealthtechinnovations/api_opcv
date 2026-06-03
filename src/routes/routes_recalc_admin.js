@@ -2,10 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const { sequelize } = require('../db/sequelize');
 const recalcEvent = require('../services/recalc-event.service');
+const { authenticate, authorize } = require('../middleware/auth');
 
 module.exports = (app) => {
 
-  app.get('/api/admin/recalc/dashboard', async (req, res) => {
+  app.get('/api/admin/recalc/dashboard', authenticate, authorize('admin'), async (req, res) => {
     try {
       const [summary] = await sequelize.query(`
         SELECT
@@ -57,7 +58,7 @@ module.exports = (app) => {
     }
   });
 
-  app.post('/api/admin/recalc/retry/:jobId', async (req, res) => {
+  app.post('/api/admin/recalc/retry/:jobId', authenticate, authorize('admin'), async (req, res) => {
     try {
       const jobId = parseInt(req.params.jobId);
       if (isNaN(jobId)) return res.status(400).json({ error: 'jobId invalide' });
@@ -93,7 +94,7 @@ module.exports = (app) => {
     }
   });
 
-  app.post('/api/admin/recalc/trigger', async (req, res) => {
+  app.post('/api/admin/recalc/trigger', authenticate, authorize('admin'), async (req, res) => {
     try {
       const { eventType, fondId, impactDate } = req.body;
       if (!eventType || !impactDate) {
@@ -117,7 +118,7 @@ module.exports = (app) => {
     }
   });
 
-  app.get('/api/admin/recalc/audit', async (req, res) => {
+  app.get('/api/admin/recalc/audit', authenticate, authorize('admin'), async (req, res) => {
     try {
       const limit = Math.min(parseInt(req.query.limit) || 50, 200);
       const fondId = req.query.fondId ? parseInt(req.query.fondId) : null;
@@ -145,7 +146,7 @@ module.exports = (app) => {
     }
   });
 
-  app.post('/api/admin/recalc/cancel/:jobId', async (req, res) => {
+  app.post('/api/admin/recalc/cancel/:jobId', authenticate, authorize('admin'), async (req, res) => {
     try {
       const jobId = parseInt(req.params.jobId);
       if (isNaN(jobId)) return res.status(400).json({ error: 'jobId invalide' });
@@ -175,7 +176,7 @@ module.exports = (app) => {
     }
   });
 
-  app.post('/api/admin/import/trigger', async (req, res) => {
+  app.post('/api/admin/import/trigger', authenticate, authorize('admin'), async (req, res) => {
     try {
       const { importType } = req.body;
       const validTypes = ['IMPORT_ASFIM', 'IMPORT_FOREX', 'IMPORT_NIGERIA'];
@@ -198,7 +199,7 @@ module.exports = (app) => {
     }
   });
 
-  app.get('/api/admin/scheduler/status', (req, res) => {
+  app.get('/api/admin/scheduler/status', authenticate, authorize('admin'), (req, res) => {
     try {
       const schedulerState = path.join(__dirname, '../../scheduler-state.json');
       let state = {};
@@ -209,7 +210,7 @@ module.exports = (app) => {
     }
   });
 
-  app.post('/api/admin/scheduler/toggle', (req, res) => {
+  app.post('/api/admin/scheduler/toggle', authenticate, authorize('admin'), (req, res) => {
     try {
       const { taskName, enabled } = req.body;
       if (!taskName || typeof enabled !== 'boolean') {
