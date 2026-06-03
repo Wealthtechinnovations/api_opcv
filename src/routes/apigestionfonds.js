@@ -358,6 +358,9 @@ router.get('/api/searchFunds', async (req, res) => {
   router.get('/api/valLiq/:id', async (req, res) => {
     try {
     const fundId = extractIdFromSlug(req.params.id);
+    if (!fundId) {
+      return res.status(400).json({ message: 'ID de fond invalide', code: 400 });
+    }
     const response = await vl.findAll({
       where: {
         fund_id: fundId
@@ -583,7 +586,7 @@ router.get('/api/searchFunds', async (req, res) => {
         }
       });
     } else {
-      res.status(500).json({ message: 'Erreur lors de la récupération des données' });
+      res.status(404).json({ message: 'Aucune donnée VL trouvée pour ce fonds', code: 404 });
 
     }
     } catch (error) {
@@ -595,6 +598,9 @@ router.get('/api/searchFunds', async (req, res) => {
   router.get('/api/valLiqdev/:id/:devise', async (req, res) => {
     try {
     const fundId = extractIdFromSlug(req.params.id);
+    if (!fundId) {
+      return res.status(400).json({ message: 'ID de fond invalide', code: 400 });
+    }
     const response = await vl.findAll({
       where: {
         fund_id: fundId
@@ -785,7 +791,7 @@ router.get('/api/searchFunds', async (req, res) => {
         }
       });
     } else {
-      res.status(500).json({ message: 'Erreur lors de la récupération des données' });
+      res.status(404).json({ message: 'Aucune donnée VL trouvée pour ce fonds', code: 404 });
 
     }
     } catch (error) {
