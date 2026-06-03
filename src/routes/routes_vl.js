@@ -3160,6 +3160,10 @@ GROUP BY f.societe_gestion;
         })
 
       })
+      .catch(err => {
+        console.error('[getportefeuillebyuser] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation portefeuilles' });
+      })
   })
   app.get('/api/getportefeuille/:id', async (req, res) => {
     const resultat = await portefeuille_vl_cumul.findAll({
@@ -3236,6 +3240,10 @@ GROUP BY f.societe_gestion;
           }
         })
 
+      })
+      .catch(err => {
+        console.error('[getportefeuille] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation portefeuille' });
       })
   })
   app.post('/api/postportefeuille', async (req, res) => {
@@ -4590,6 +4598,10 @@ GROUP BY f.societe_gestion;
           }
         })
       })
+      .catch(err => {
+        console.error('[getDevises] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation devises' });
+      })
   })
   app.post('/api/assignportefeuille', async (req, res) => {
     const { portfolioId, indices, categories, tsr, tacc } = req.body;
@@ -4950,6 +4962,10 @@ GROUP BY f.societe_gestion;
         })
 
       })
+      .catch(err => {
+        console.error('[performancesportefeuillewithindice] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur calcul performances portefeuille' });
+      })
   })
 
   app.get('/api/ratiosportfeuillewithindice/:year/:id/:tsr/:indice', async (req, res) => {
@@ -5084,6 +5100,10 @@ GROUP BY f.societe_gestion;
           }
         })
       })
+      .catch(err => {
+        console.error('[getSocietes] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation societes' });
+      })
   })
   app.get('/api/getSocietesbypays/:pays', async (req, res) => {
     const pays = req.params.pays; // Use req.params to access route parameters
@@ -5109,6 +5129,10 @@ GROUP BY f.societe_gestion;
           }
         })
       })
+      .catch(err => {
+        console.error('[getSocietesbypays] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation societes par pays' });
+      })
   })
   app.get('/api/getPays', (req, res) => {
     // Récupérez la liste des pays depuis la base de données
@@ -5131,6 +5155,10 @@ GROUP BY f.societe_gestion;
             paysOptions
           }
         })
+      })
+      .catch(err => {
+        console.error('[getPays] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation pays' });
       })
   });
 
@@ -5678,6 +5706,10 @@ GROUP BY f.societe_gestion;
           }
         })
 
+      })
+      .catch(err => {
+        console.error('[getData] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation donnees' });
       })
   })
   app.get('/api/fondscharge/:id', async (req, res) => {
@@ -8610,6 +8642,10 @@ const personnelsEntries = personnelsData.map(row => ({
 
 
       })
+      .catch(err => {
+        console.error('[ratiosportefeuille] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille' });
+      })
   })
 
   app.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
@@ -10247,6 +10283,10 @@ const personnelsEntries = personnelsData.map(row => ({
 
 
 
+      })
+      .catch(err => {
+        console.error('[ratiosportefeuilledev] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille devise' });
       })
   })
 
