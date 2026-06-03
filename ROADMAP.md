@@ -4,7 +4,9 @@
 > Ce fichier note les chantiers techniques backend moyen/long terme.
 
 ## Court terme
-- Fiabilisation classements (national + EUR/USD) — corrige, recalcul a planifier
+- ~~Fiabilisation classements (national + EUR/USD)~~ — CORRIGE et DEPLOYE 2026-06-03 (type1 OK)
+- Amelioration couverture indRef EUR/USD : recalc TND, mapping BRVM→UEMOA, decision CEMAC (cf T13_DIAGNOSTIC_INDICES.md)
+- Fix conversion routes_vl.js multiplication→division (#32)
 - Automatisation data UEMOA (scraper BRVM) et CEMAC (COSUMAF)
 
 ## Moyen terme

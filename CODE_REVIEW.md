@@ -15,5 +15,7 @@
 - #5 apigestionsavequotidien.js monolithique (~1800 l) — extraction en cours (ranking.service.js)
 - #15 INSERT ClickHouse batch non parametres (risque faible, donnees internes)
 - #27 ClickHouse performance_historique jamais peuple
+- #31 Couverture indRef EUR/USD (diagnostic T13, `e06798b`): TUNISIE 24%, UEMOA 22%, CEMAC 0%
+- #32 Incohérence conversion routes_vl.js:3027-3039 (multiplication vs division)
 
 Voir l'audit complet et l'historique dans `../front_end_opcvm/CODE_REVIEW.md`.
