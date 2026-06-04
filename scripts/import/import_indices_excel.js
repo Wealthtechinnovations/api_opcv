@@ -160,6 +160,49 @@ function readExcelData() {
   return data;
 }
 
+/**
+ * FALLBACK: reconstruit le meme format que readExcelData() a partir de la
+ * table indice_references (deja peuplee par l'etape 1 lors d'un import precedent).
+ * Permet a l'etape 2 (peuplement indRef) de fonctionner meme si le fichier Excel
+ * n'est pas present sur le serveur de production.
+ */
+async function loadIndexDataFromDB(conn) {
+  console.log('  Source: table indice_references (fichier Excel absent)');
+  // Map id_indice -> excelColumn
+  const idToColumn = {};
+  for (const cfg of INDEX_CONFIG) idToColumn[cfg.id_indice] = cfg.excelColumn;
+
+  const [refRows] = await conn.execute(
+    `SELECT id_indice, date, valeur FROM indice_references
+     WHERE valeur IS NOT NULL AND valeur > 0
+     ORDER BY date ASC`
+  );
+
+  const byDate = new Map();
+  for (const r of refRows) {
+    const col = idToColumn[r.id_indice];
+    if (!col) continue;
+    const d = r.date instanceof Date ? r.date.toISOString().slice(0, 10) : String(r.date).slice(0, 10);
+    if (!byDate.has(d)) {
+      const entry = { date: d };
+      for (const cfg of INDEX_CONFIG) entry[cfg.excelColumn] = null;
+      byDate.set(d, entry);
+    }
+    byDate.get(d)[col] = parseFloat(r.valeur);
+  }
+
+  const data = Array.from(byDate.values()).sort((a, b) => a.date.localeCompare(b.date));
+  console.log(`  Lignes reconstruites depuis DB: ${data.length}`);
+  if (data.length > 0) {
+    console.log(`  Periode: ${data[0].date} -> ${data[data.length - 1].date}`);
+  }
+  for (const cfg of INDEX_CONFIG) {
+    const count = data.filter(d => d[cfg.excelColumn] !== null).length;
+    console.log(`  ${cfg.excelColumn}: ${count} valeurs`);
+  }
+  return data;
+}
+
 // ===================================================
 // ETAPE 1: Import indices -> indice_references
 // ===================================================
@@ -514,14 +557,20 @@ async function main() {
   if (opts.fondId) console.log(`Fond filtre: ${opts.fondId}`);
   console.log('============================================================\n');
 
-  console.log('--- Lecture du fichier Excel ---');
-  let excelData;
-  try {
-    excelData = readExcelData();
-  } catch (err) {
-    console.error('ERREUR lecture Excel:', err.message);
-    console.error('Assurez-vous que le fichier existe:', EXCEL_FILE);
-    process.exit(1);
+  // L'etape 4 (conversion EUR/USD) n'a PAS besoin du fichier Excel (lit la DB).
+  // Les etapes 1 et 2 ont besoin des valeurs d'indice : Excel en priorite,
+  // sinon fallback sur la table indice_references.
+  const needsIndexData = (opts.step === 'all' || opts.step === '1' || opts.step === '2');
+  let excelData = null;
+  if (needsIndexData) {
+    console.log('--- Lecture du fichier Excel ---');
+    try {
+      excelData = readExcelData();
+    } catch (err) {
+      console.warn('Fichier Excel absent ou illisible:', err.message);
+      console.warn('-> Tentative de fallback sur la table indice_references.');
+      excelData = null; // sera charge depuis la DB apres connexion
+    }
   }
 
   const conn = await mysql.createConnection(DB_CONFIG);
@@ -530,12 +579,25 @@ async function main() {
   try {
     const results = {};
 
+    // Si Excel absent, reconstruire les donnees depuis la DB pour les etapes 1/2
+    if (needsIndexData && !excelData) {
+      excelData = await loadIndexDataFromDB(conn);
+    }
+
     if (opts.step === 'all' || opts.step === '1') {
-      results.step1 = await importIndicesToDB(conn, excelData, opts);
+      if (!excelData || excelData.length === 0) {
+        console.warn('Etape 1 ignoree: pas de source de donnees indice (Excel absent et indice_references vide).');
+      } else {
+        results.step1 = await importIndicesToDB(conn, excelData, opts);
+      }
     }
 
     if (opts.step === 'all' || opts.step === '2') {
-      results.step2 = await populateIndRef(conn, excelData, opts);
+      if (!excelData || excelData.length === 0) {
+        console.warn('Etape 2 ignoree: pas de source de donnees indice (Excel absent et indice_references vide).');
+      } else {
+        results.step2 = await populateIndRef(conn, excelData, opts);
+      }
     }
 
     if (opts.step === 'all' || opts.step === '4') {
