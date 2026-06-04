@@ -70,7 +70,7 @@ const INDEX_CONFIG = [
     id_indice: 'BRVM',
     nom_indice: 'BRVM Composite',
     type_indice_id: 1,
-    pays: ['Côte d\'Ivoire', 'Cote d\'Ivoire', 'Senegal', 'Sénégal', 'Burkina Faso', 'Mali', 'Togo', 'Benin', 'Bénin', 'Niger', 'Guinee-Bissau', 'Guinée-Bissau'],
+    pays: ['Côte d\'Ivoire', 'Cote d\'Ivoire', 'Senegal', 'Sénégal', 'Burkina Faso', 'Mali', 'Togo', 'Benin', 'Bénin', 'Niger', 'Guinee-Bissau', 'Guinée-Bissau', 'UEMOA'],
     devise_locale: 'XOF',
   },
   {
@@ -473,8 +473,8 @@ async function convertIndRefCurrency(conn, opts) {
         continue;
       }
 
-      const indRefEUR = vl.indRef * rateEUR[0].value;
-      const indRefUSD = vl.indRef * rateUSD[0].value;
+      const indRefEUR = vl.indRef / rateEUR[0].value;
+      const indRefUSD = vl.indRef / rateUSD[0].value;
 
       if (opts.mode === 'execute') {
         await conn.execute(
