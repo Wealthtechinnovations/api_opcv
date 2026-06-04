@@ -3024,8 +3024,8 @@ GROUP BY f.societe_gestion;
         await vl.update({
           date: date,
           value: parseFloat(val),
-          value_EUR: exchangeRatesEUR ? parseFloat(val) * exchangeRatesEUR.value : null,
-          value_USD: exchangeRatesUSD ? parseFloat(val) * exchangeRatesUSD.value : null
+          value_EUR: exchangeRatesEUR ? parseFloat(val) / exchangeRatesEUR.value : null,
+          value_USD: exchangeRatesUSD ? parseFloat(val) / exchangeRatesUSD.value : null
         }, { where: { fund_id: parseInt(req.params.id), date: date } });
       }
 
@@ -3035,8 +3035,8 @@ GROUP BY f.societe_gestion;
         await vl.update({
           date: date,
           value: parseFloat(val),
-          value_EUR: exchangeRatesEUR ? parseFloat(val) * exchangeRatesEUR.value : null,
-          value_USD: exchangeRatesUSD ? parseFloat(val) * exchangeRatesUSD.value : null
+          value_EUR: exchangeRatesEUR ? parseFloat(val) / exchangeRatesEUR.value : null,
+          value_USD: exchangeRatesUSD ? parseFloat(val) / exchangeRatesUSD.value : null
         }, { where: { fund_id: parseInt(req.params.id), date: date } });
       }
 
@@ -6331,20 +6331,20 @@ GROUP BY f.societe_gestion;
 
           if ('value' in row && exchangeRatesEUR && exchangeRatesUSD) {
             vlEntry.value = parseFloat(row.value);
-            vlEntry.value_EUR = parseFloat(row.value) * exchangeRatesEUR.value;
-            vlEntry.value_USD = parseFloat(row.value) * exchangeRatesUSD.value;
+            vlEntry.value_EUR = parseFloat(row.value) / exchangeRatesEUR.value;
+            vlEntry.value_USD = parseFloat(row.value) / exchangeRatesUSD.value;
           }
 
           if ('actif_net' in row && exchangeRatesEUR && exchangeRatesUSD) {
             vlEntry.actif_net = parseFloat(row.actif_net);
-            vlEntry.actif_net_EUR = parseFloat(row.actif_net) * exchangeRatesEUR.value;
-            vlEntry.actif_net_USD = parseFloat(row.actif_net) * exchangeRatesUSD.value;
+            vlEntry.actif_net_EUR = parseFloat(row.actif_net) / exchangeRatesEUR.value;
+            vlEntry.actif_net_USD = parseFloat(row.actif_net) / exchangeRatesUSD.value;
           }
 
           if ('dividende' in row && exchangeRatesEUR && exchangeRatesUSD) {
             vlEntry.dividende = parseFloat(row.dividende);
-            vlEntry.dividende_EUR = parseFloat(row.dividende) * exchangeRatesEUR.value;
-            vlEntry.dividende_USD = parseFloat(row.dividende) * exchangeRatesUSD.value;
+            vlEntry.dividende_EUR = parseFloat(row.dividende) / exchangeRatesEUR.value;
+            vlEntry.dividende_USD = parseFloat(row.dividende) / exchangeRatesUSD.value;
           }
 
           if ('indRef' in row && exchangeRatesEUR && exchangeRatesUSD) {

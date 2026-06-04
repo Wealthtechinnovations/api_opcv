@@ -4,12 +4,13 @@
 > Ce fichier liste uniquement les jalons cote API pour un developpeur travaillant dans ce depot.
 > Eviter la duplication : detail complet dans le CHANGELOG frontend et SUIVI.md.
 
-## [2026-06-04] — DEPLOYE EN PRODUCTION (T15/T15b/T15c)
-- **UEMOA indRef 22% → 100%**: 111/111 fonds, 33830/33830 VL (local + EUR + USD)
+## [2026-06-04] — DEPLOYE (T15) + A DEPLOYER (T17)
+- **UEMOA indRef 22% → 100%** (DEPLOYE): 111/111 fonds, 33830/33830 VL (local + EUR + USD)
 - T15 (`f6d7cb2`): Ajout 'UEMOA' dans BRVM_UEMOA pays mapping + step 4 multiplication→division
 - T15b (`ac1cf98`, `2990351`): DB fallback si Excel absent + case-insensitive id_indice matching
 - Nouveau script: `scripts/diag/check_indref_coverage.js` (read-only diagnostic)
 - Execution prod T15c: step 2 (33829 VL), step 4 (26253 VL), perfs EUR/USD (108 fonds), classements recalcules
+- **T17** (A DEPLOYER): Fix routes_vl.js 10 lignes multiplication→division (updateValues + uploadsfilevl) — conversion local→EUR/USD en base
 
 ## [2026-06-03] — DEPLOYE EN PRODUCTION
 - Classements: national local (MAX(date)/fond) + dedup EUR/USD — `src/services/ranking.service.js` (`6644682`). **Recalcul effectue, type1 OK.**

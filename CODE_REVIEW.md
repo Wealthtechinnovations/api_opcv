@@ -16,7 +16,7 @@
 - #15 INSERT ClickHouse batch non parametres (risque faible, donnees internes)
 - #27 ClickHouse performance_historique jamais peuple
 - ~~#31 UEMOA indRef~~ RESOLU T15c: 22%→**100%** (111/111 fonds, 33830/33830 VL). TUNISIE 24% EUR/USD (attente fichier). CEMAC 0% (sourcer BVMAC).
-- #32 Incohérence conversion routes_vl.js:3027-3039 (multiplication vs division) — route prod, T17
+- ~~#32~~ CORRIGE T17: routes_vl.js 10 lignes multiplication→division (updateValues + uploadsfilevl)
 - ~~#33~~ CORRIGE ET DEPLOYE T15c: import_indices_excel.js step4 multiplication→division `f6d7cb2`
 
 Voir l'audit complet et l'historique dans `../front_end_opcvm/CODE_REVIEW.md`.
