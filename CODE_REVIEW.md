@@ -15,8 +15,8 @@
 - #5 apigestionsavequotidien.js monolithique (~1800 l) — extraction en cours (ranking.service.js)
 - #15 INSERT ClickHouse batch non parametres (risque faible, donnees internes)
 - #27 ClickHouse performance_historique jamais peuple
-- #31 Couverture indRef EUR/USD (diagnostic T13, `e06798b`): TUNISIE 24% (diagnostic en cours), UEMOA 22%→FIX T15 `f6d7cb2`, CEMAC 0% (sourcer indice BVMAC)
+- ~~#31 UEMOA indRef~~ RESOLU T15c: 22%→**100%** (111/111 fonds, 33830/33830 VL). TUNISIE 24% EUR/USD (attente fichier). CEMAC 0% (sourcer BVMAC).
 - #32 Incohérence conversion routes_vl.js:3027-3039 (multiplication vs division) — route prod, T17
-- #33 import_indices_excel.js step4 multiplication→division — FIX T15 `f6d7cb2`
+- ~~#33~~ CORRIGE ET DEPLOYE T15c: import_indices_excel.js step4 multiplication→division `f6d7cb2`
 
 Voir l'audit complet et l'historique dans `../front_end_opcvm/CODE_REVIEW.md`.
