@@ -10,7 +10,7 @@
 
 ## Actions a venir (suite T13 diagnostic indices)
 - [ ] T15: Recalc indRef TND complet (dry-run puis production) — couverture TUNISIE 24%→100%
-- [ ] T15: Corriger mapping BRVM→UEMOA dans import_indices_excel.js — couverture UEMOA 22%→100%
+- [x] T15: Corriger mapping BRVM→UEMOA dans import_indices_excel.js — FAIT (commit `f6d7cb2`), a deployer+executer
 - [ ] T15: Decision metier CEMAC (sourcer indice BVMAC) — couverture CEMAC 0%
 - [ ] T17: Fix routes_vl.js lignes 3027-3039 multiplication→division (conversion devise)
 

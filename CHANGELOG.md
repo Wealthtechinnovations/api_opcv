@@ -4,6 +4,11 @@
 > Ce fichier liste uniquement les jalons cote API pour un developpeur travaillant dans ce depot.
 > Eviter la duplication : detail complet dans le CHANGELOG frontend et SUIVI.md.
 
+## [2026-06-04] — Commite, a deployer
+- T15: Fix import_indices_excel.js (`f6d7cb2`):
+  - Ajout 'UEMOA' dans BRVM_UEMOA pays mapping (111 fonds ne matchaient pas)
+  - Step 4 indRef EUR/USD: multiplication→division (regle OPCVM: `indRef_local / taux`)
+
 ## [2026-06-03] — DEPLOYE EN PRODUCTION
 - Classements: national local (MAX(date)/fond) + dedup EUR/USD — `src/services/ranking.service.js` (`6644682`). **Recalcul effectue, type1 OK.**
 - routes_vl.js: 10 `.catch()` ajoutes (`5b70838`)

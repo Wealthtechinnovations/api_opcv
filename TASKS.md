@@ -6,6 +6,7 @@
 Les lots (LOT Tx) sont traces dans `../front_end_opcvm/TASKS.md` et detailles dans `../front_end_opcvm/SUIVI.md`.
 
 Derniers lots API :
+- T15 (`f6d7cb2`) — fix indRef: UEMOA mapping + step4 multiplication→division — Commite, a deployer+executer
 - T13 (`e06798b`) — diagnostic liaison indices↔fonds (couverture indRef EUR/USD)
 - T10/T11 (`6644682`) — classements national local + dedup EUR/USD — DEPLOYE + RECALCUL OK
 - T9 (`5b70838`) — routes_vl.js .catch() — DEPLOYE
