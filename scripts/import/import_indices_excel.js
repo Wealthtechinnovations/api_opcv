@@ -168,9 +168,10 @@ function readExcelData() {
  */
 async function loadIndexDataFromDB(conn) {
   console.log('  Source: table indice_references (fichier Excel absent)');
-  // Map id_indice -> excelColumn
+  // Map id_indice -> excelColumn (insensible a la casse: DB a 'Tunindex',
+  // INDEX_CONFIG a 'TUNINDEX', etc.)
   const idToColumn = {};
-  for (const cfg of INDEX_CONFIG) idToColumn[cfg.id_indice] = cfg.excelColumn;
+  for (const cfg of INDEX_CONFIG) idToColumn[cfg.id_indice.toUpperCase()] = cfg.excelColumn;
 
   const [refRows] = await conn.execute(
     `SELECT id_indice, date, valeur FROM indice_references
@@ -180,7 +181,7 @@ async function loadIndexDataFromDB(conn) {
 
   const byDate = new Map();
   for (const r of refRows) {
-    const col = idToColumn[r.id_indice];
+    const col = idToColumn[String(r.id_indice).toUpperCase()];
     if (!col) continue;
     const d = r.date instanceof Date ? r.date.toISOString().slice(0, 10) : String(r.date).slice(0, 10);
     if (!byDate.has(d)) {
