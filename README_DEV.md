@@ -15,6 +15,21 @@ cp .env.example .env   # renseigner DB_HOST/DB_USER/DB_PASSWORD/JWT_SECRET (jama
 node src/app.js        # ou via pm2
 ```
 
+## Tests
+```bash
+npm test            # lance jest --forceExit (125 tests, 9 suites)
+npx jest tests/slug.test.js   # lancer un fichier specifique
+```
+
+Fichiers de tests : `tests/`
+- `slug.test.js` — generateSlug, generateFundSlug, extractIdFromSlug
+- `dates.test.js` — date finding + grouping functions
+- `performances.test.js` — calculatePerformance, annualized variants
+- `newratios2.test.js` — maxDrawdown, covariance, variance
+- `utils.test.js` — rendements journaliers/hebdo/mensuels, groupers
+- `delai_Beta.test.js` — recouvrement, beta, betaHaussier/Baissier
+- `forex.service.test.js`, `ranking.service.test.js`, `performance.service.test.js` — services
+
 ## Fichiers cles
 - Routes : `src/routes/` (apigestionfonds, apigestionperformance, apigestionratios, apigestionsavequotidien, apigestionquartile, routes_vl, routes_recalc_admin)
 - Services : `src/services/ranking.service.js` (calculs classements national/regional/global, local + EUR/USD, keepLatestPerFund dedup)
@@ -38,7 +53,7 @@ node src/app.js        # ou via pm2
 0 22 * * *     cron_health_check.sh      — Monitoring sante systeme
 0 10 * * 1     cron_nigeria_weekly.sh    — SEC Nigeria import + recalc
 0 * * * *      sync_production.sh        — Snapshot horaire
-*/5 * * * *    fix-brvm-nginx.py         — Fix Nginx BRVM
+*/5 * * * *    fix-brvm-nginx.py         — Fix Nginx BRVM (ATTENTION: script absent du filesystem)
 ```
 
 ## Deploiement
