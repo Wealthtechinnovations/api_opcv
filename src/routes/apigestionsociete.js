@@ -37,24 +37,23 @@ const puppeteer = require('puppeteer');
 const ImageModule = require('docxtemplater-image-module-free');
 const { Op } = require('sequelize'); // Ajout de l'importation de Op
 const findCategoryByFundId = async (fundId) => {
-  // Implémentez ici la logique pour récupérer la catégorie à partir de l'identifiant du fond
-  // Par exemple, vous pouvez exécuter une requête SQL pour obtenir la catégorie à partir de l'identifiant du fond
+  try {
+    const categoryQuery = `
+          SELECT categorie_globale
+          FROM fond_investissements
+          WHERE id = :fundId
+      `;
 
-  // Exemple fictif de requête SQL
-  const categoryQuery = `
-        SELECT categorie_globale
-        FROM fond_investissements
-        WHERE id = :fundId
-    `;
+    const [result] = await sequelize.query(categoryQuery, {
+      replacements: { fundId: fundId },
+      type: sequelize.QueryTypes.SELECT
+    });
 
-  // Exécutez la requête SQL avec le paramètre fundId
-  const [result] = await sequelize.query(categoryQuery, {
-    replacements: { fundId: fundId },
-    type: sequelize.QueryTypes.SELECT
-  });
-
-  // Retournez la catégorie extraite de la requête
-  return result.categorie_globale;
+    return result?.categorie_globale || null;
+  } catch (error) {
+    console.error('Erreur findCategoryByFundId:', error);
+    return null;
+  }
 };
 
 
