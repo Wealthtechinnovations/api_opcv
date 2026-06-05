@@ -570,6 +570,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
  
 
 router.post('/api/listesociete', async (req, res) => {
+  try {
   const formData = req.body.formData;
   const selectedValues = req.query.query;
   const selectedpays = req.query.selectedpays; // Corrected variable name
@@ -648,9 +649,14 @@ router.post('/api/listesociete', async (req, res) => {
     code: 200,
     data: { societes: resultats }
   });
+  } catch (error) {
+    console.error('Erreur /api/listesociete:', error.message);
+    res.status(500).json({ code: 500, message: 'Erreur serveur' });
+  }
 });
 
 router.post('/api/listeproduitpayssociete/:id', async (req, res) => {
+  try {
   const formData = req.body.formData;
   const selectedValues = req.query.query;
   const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
@@ -714,8 +720,13 @@ router.post('/api/listeproduitpayssociete/:id', async (req, res) => {
     code: 200,
     data: { funds: resultats }
   });
+  } catch (error) {
+    console.error('Erreur /api/listeproduitpayssociete:', error.message);
+    res.status(500).json({ code: 500, message: 'Erreur serveur' });
+  }
 });
 router.post('/api/listesocietepays/:id', async (req, res) => {
+  try {
   const formData = req.body.formData;
   const selectedValues = req.query.query;
   const selectedpays = req.query.selectedpays; // Corrected variable name
@@ -785,6 +796,10 @@ router.post('/api/listesocietepays/:id', async (req, res) => {
     code: 200,
     data: { societes: resultats }
   });
+  } catch (error) {
+    console.error('Erreur /api/listesocietepays:', error.message);
+    res.status(500).json({ code: 500, message: 'Erreur serveur' });
+  }
 });
 
   module.exports = router;

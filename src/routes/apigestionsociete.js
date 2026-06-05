@@ -599,6 +599,7 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
     });
 });
 router.post('/api/listeproduitsociete/:id', async (req, res) => {
+  try {
   const formData = req.body.formData;
   const selectedValues = req.query.query;
   const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
@@ -682,6 +683,10 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
     code: 200,
     data: { funds: resultats }
   });
+  } catch (error) {
+    console.error('Erreur listeproduitsociete:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des produits de la société.' });
+  }
 });
 router.get('/api/getsocieterecherche', (req, res) => {
   // Première requête pour récupérer toutes les sociétés de gestion
