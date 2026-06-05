@@ -169,7 +169,7 @@ app.get(['/health/detailed', '/api/health/detailed'], async (req, res) => {
       UNION ALL SELECT 'devisedechanges', COUNT(*) FROM devisedechanges
       UNION ALL SELECT 'societes', COUNT(*) FROM societes
       UNION ALL SELECT 'indice_references', COUNT(*) FROM indice_references
-    `, { type: db.QueryTypes.SELECT });
+    `);
     for (const row of tables) {
       result.tables[row.tbl] = parseInt(row.cnt);
     }
