@@ -182,11 +182,11 @@ app.get(['/health/detailed', '/api/health/detailed'], async (req, res) => {
     result.database.last_vl_date = lastVl?.last_date || null;
     result.database.fonds_with_recent_vl = parseInt(lastVl?.fonds) || 0;
 
+    // Note: classementfonds n'a pas de colonne timestamp (timestamps: false dans le modele)
     const [lastClassementRows] = await db.query(
-      `SELECT MAX(updatedAt) as last_update, COUNT(DISTINCT fond_id) as fonds FROM classementfonds`
+      `SELECT COUNT(DISTINCT fond_id) as fonds FROM classementfonds`
     );
     const lastClassement = lastClassementRows[0];
-    result.database.last_classement_update = lastClassement?.last_update || null;
     result.database.fonds_with_classement = parseInt(lastClassement?.fonds) || 0;
   } catch (err) {
     result.database.status = 'error';
