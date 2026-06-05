@@ -138,12 +138,12 @@ app.use(require('./src/routes/analytics'));
 app.use(require('./src/routes/apigestionreferentiel'));
 
 // Health check (basic)
-app.get('/health', (req, res) => {
+app.get(['/health', '/api/health'], (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Health check (detailed) — etat complet de la plateforme
-app.get('/health/detailed', async (req, res) => {
+app.get(['/health/detailed', '/api/health/detailed'], async (req, res) => {
   const result = {
     status: 'ok',
     timestamp: new Date().toISOString(),
