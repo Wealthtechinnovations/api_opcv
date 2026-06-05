@@ -802,6 +802,7 @@ router.get('/api/searchFunds', async (req, res) => {
 
 
   router.post('/api/listeopcvm', async (req, res) => {
+    try {
     const formData = req.body.formData;
     const selectedValues = req.query.query;
     const selectedpays = req.query.selectedpays; // Corrected variable name
@@ -851,6 +852,10 @@ router.get('/api/searchFunds', async (req, res) => {
       code: 200,
       data: { fonds: fondall }
     });
+    } catch (error) {
+      console.error('Erreur listeopcvm:', error);
+      res.status(500).json({ error: 'Erreur lors de la récupération des fonds.' });
+    }
   });
 
   module.exports = router;

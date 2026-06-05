@@ -201,6 +201,7 @@ function isWeekend(date) {
 }
 
 router.get('/api/savevlmanquante', async (req, res) => {
+  try {
   const allFunds = await fetchFundsByValorisation([], 'undefined', 'undefined', 'undefined', 'undefined');
 
   //const allFunds = await fond.findAll();
@@ -242,6 +243,10 @@ router.get('/api/savevlmanquante', async (req, res) => {
     code: 200,
     data: "OK"
   });
+  } catch (error) {
+    console.error('Erreur savevlmanquante:', error);
+    res.status(500).json({ error: 'Erreur lors de la détection des VL manquantes.' });
+  }
 });
 // Fonction pour parcourir les fonds avec "dividende" à "oui" et mettre à jour les VL en fonction du cumul des dividendes.
 router.get('/api/updatewithdividende', async (req, res) => {

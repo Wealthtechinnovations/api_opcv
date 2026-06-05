@@ -963,6 +963,7 @@ app.post('/api/reportingmensuelle', async (req, res) => {
 
   //Taux sans risque
   app.get('/api/tsr/:year', async (req, res) => {
+    try {
     // Récupérer la dernière valeur du mois précédent
     const lastValue = await tsrhisto.findOne({
       where: {
@@ -975,7 +976,7 @@ app.post('/api/reportingmensuelle', async (req, res) => {
     });
 
     if (!lastValue) {
-      throw new Error('No data found for the last month.');
+      return res.status(404).json({ error: 'No data found for the last month.' });
     }
 
     const endDate = lastValue.date;
@@ -994,8 +995,12 @@ app.post('/api/reportingmensuelle', async (req, res) => {
     });
     const valueArray = values.map(record => record.value);
     const annualYield = math.mean(valueArray)
-    //  const annualYield = calculateAnnualYield(valueArray);
 
+    res.json({ code: 200, data: { annualYield } });
+    } catch (error) {
+      console.error('Erreur tsr:', error);
+      res.status(500).json({ error: 'Erreur lors du calcul du TSR.' });
+    }
   });
 
   app.get('/update-indRef/:idDebu/:idFin', async (req, res) => {
@@ -1113,6 +1118,7 @@ app.post('/api/reportingmensuelle', async (req, res) => {
 
   // Route dynamique pour servir des fichiers
   app.get('/doc/:pays/:societe/:opcvm/:nomfichier/:id', async (req, res) => {
+    try {
     const { id } = req.params;
     const document = await documentss.findOne({
       where: {
@@ -1133,6 +1139,10 @@ app.post('/api/reportingmensuelle', async (req, res) => {
         res.status(err.status).end();
       }
     });
+    } catch (error) {
+      console.error('Erreur doc:', error);
+      res.status(500).json({ error: 'Erreur lors de la récupération du document.' });
+    }
   });
   // Définir une route statique pour servir les fichiers depuis le dossier upload
   app.get('/api/upload', async (req, res) => {
@@ -3166,6 +3176,7 @@ GROUP BY f.societe_gestion;
       })
   })
   app.get('/api/getportefeuille/:id', async (req, res) => {
+    try {
     const resultat = await portefeuille_vl_cumul.findAll({
       attributes: ['date', 'valeur_portefeuille'],
       where: {
@@ -3245,6 +3256,10 @@ GROUP BY f.societe_gestion;
         console.error('[getportefeuille] error:', err.message);
         res.status(500).json({ code: 500, message: 'Erreur recuperation portefeuille' });
       })
+    } catch (error) {
+      console.error('Erreur getportefeuille:', error);
+      res.status(500).json({ code: 500, message: 'Erreur recuperation portefeuille' });
+    }
   })
   app.post('/api/postportefeuille', async (req, res) => {
     try {
@@ -4604,6 +4619,7 @@ GROUP BY f.societe_gestion;
       })
   })
   app.post('/api/assignportefeuille', async (req, res) => {
+    try {
     const { portfolioId, indices, categories, tsr, tacc } = req.body;
 
     // Appeler l'endpoint pour récupérer les performances
@@ -4620,6 +4636,10 @@ GROUP BY f.societe_gestion;
         performanceData
       }
     });
+    } catch (error) {
+      console.error('Erreur assignportefeuille:', error);
+      res.status(500).json({ error: 'Erreur lors de l\'assignation du portefeuille.' });
+    }
   });
 
   app.get('/api/getIndice', async (req, res) => {
@@ -4688,7 +4708,7 @@ GROUP BY f.societe_gestion;
   });
 
   app.get('/api/valLiqportefeuillewithindice/:id/:indice/:tsr/:categorie', async (req, res) => {
-
+    try {
     const portefeuilleId = parseInt(req.params.id)
     const response = await portefeuille_vl_cumul.findAll({
       where: {
@@ -4780,14 +4800,14 @@ GROUP BY f.societe_gestion;
       res.status(500).json({ message: 'Erreur lors de la récupération des données' });
 
     }
-    /* } catch (error) {
-       console.error('Erreur lors de la récupération des données:', error);
-       res.status(500).json({ message: 'Erreur lors de la récupération des données' });
-     }*/
+    } catch (error) {
+      console.error('Erreur valLiqportefeuillewithindice:', error);
+      res.status(500).json({ message: 'Erreur lors de la récupération des données' });
+    }
   });
 
   app.get('/api/performancesportefeuillewithindice/fond/:id/:categorie/:date', async (req, res) => {
-
+    try {
     performancesCategorie = await getPerformancesByCategorynow(req.params.categorie, "2024-03-22");
 
 
@@ -4966,6 +4986,10 @@ GROUP BY f.societe_gestion;
         console.error('[performancesportefeuillewithindice] error:', err.message);
         res.status(500).json({ code: 500, message: 'Erreur calcul performances portefeuille' });
       })
+    } catch (error) {
+      console.error('Erreur performancesportefeuillewithindice:', error);
+      res.status(500).json({ code: 500, message: 'Erreur calcul performances portefeuille' });
+    }
   })
 
   app.get('/api/ratiosportfeuillewithindice/:year/:id/:tsr/:indice', async (req, res) => {
@@ -5066,6 +5090,7 @@ GROUP BY f.societe_gestion;
   }
 
   app.post('/api/calculatePerformance', async (req, res) => {
+    try {
     const { selectedIndex, selectedCategory } = req.body;
 
     // Implémentez ici votre logique pour calculer les performances
@@ -5075,6 +5100,10 @@ GROUP BY f.societe_gestion;
       code: 200,
       data: performances
     });
+    } catch (error) {
+      console.error('Erreur calculatePerformance:', error);
+      res.status(500).json({ error: 'Erreur lors du calcul des performances.' });
+    }
   });
 
   app.get('/api/getSocietes', async (req, res) => {
@@ -5537,6 +5566,7 @@ GROUP BY f.societe_gestion;
 
 
   app.get('/api/searchFundsreconstitution', async (req, res) => {
+    try {
     const { categorie, univers, universsous, selectedPays, selectedRegion } = req.query;
 
     const categories = categorie.split(',');
@@ -5647,6 +5677,10 @@ GROUP BY f.societe_gestion;
         fundsByNationalCategorie,
       },
     });
+    } catch (error) {
+      console.error('Erreur searchFundsreconstitution:', error);
+      res.status(500).json({ error: 'Erreur lors de la recherche des fonds.' });
+    }
   });
   app.post('/api/updatefond/:id', async (req, res) => {
     try {
@@ -7028,6 +7062,7 @@ const personnelsEntries = personnelsData.map(row => ({
   }
 
   app.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
+    try {
     // Récupérer les taux_sans_risques en fonction des valeurs de la table fond
     const tauxSansRisques = await tsr.findAll({
       attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
@@ -8646,9 +8681,14 @@ const personnelsEntries = personnelsData.map(row => ({
         console.error('[ratiosportefeuille] error:', err.message);
         res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille' });
       })
+    } catch (error) {
+      console.error('Erreur ratiosportefeuille:', error);
+      res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille' });
+    }
   })
 
   app.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
+    try {
     // Récupérer les taux_sans_risques en fonction des valeurs de la table fond
     const tauxSansRisques = await tsr.findAll({
       attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
@@ -10288,6 +10328,10 @@ const personnelsEntries = personnelsData.map(row => ({
         console.error('[ratiosportefeuilledev] error:', err.message);
         res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille devise' });
       })
+    } catch (error) {
+      console.error('Erreur ratiosportefeuilledev:', error);
+      res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille devise' });
+    }
   })
 
 
