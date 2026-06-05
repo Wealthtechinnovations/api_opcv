@@ -3914,59 +3914,94 @@ const {
 
   router.get('/api/ratiosnewdev/:year/:id/:devise', async (req, res) => {
     try {
-      // Récupérer les taux_sans_risques en fonction des valeurs de la table fond
-      const tauxSansRisques = await tsr.findAll({
-        attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
-        where: {
-          // Ajoutez les conditions spécifiques en fonction de votre logique
-          pays: "Nigeria",
-        },
-        limit: 10000,
-      });
+      const fonds = await fond.findOne({ where: { id: req.params.id } });
+      if (!fonds) {
+        return res.status(404).json({ message: "Fond non trouvé" });
+      }
+      const paysFond = fonds.pays;
 
-      // Tableau pour stocker les résultats
-      const tableauDonneestsr = [];
-
-      // Boucle à travers les résultats et stocke les données dans le tableau
-      tauxSansRisques.forEach(d => {
-        tableauDonneestsr.push({
-          valeur: d.valeur,
-          valeur2: d.valeur2,
-          semaine: d.semaine,
-          rate: d.rate,
-          date: d.date,
-          pays: d.pays,
-        });
-      });
-
-      await vl.findAll({
+      const response = await vl.findAll({
         where: {
           fund_id: req.params.id
         },
         order: [
-          ['date', 'DESC'] // Modification ici pour trier par date en ordre décroissant
+          ['date', 'ASC']
         ],
         limit: 10000,
-      })
-        .then(async (response) => {
-          // const tauxsr=0.03;-0.0116;-0,0234
-          const tauxsr = -0.0234;
-          let values;
-          // Valeurs liquidatives
-          if (req.params.devise == "USD") {
-            values = response.map((data) => data.value_USD);
-          } else {
-            values = response.map((data) => data.value_EUR);
+      });
 
+      if (!response.length) {
+        return res.status(404).json({ code: 404, message: 'Données de valeur liquidative non trouvées' });
+      }
+
+      // Weekday gap filling (same as ratiosnew)
+      const isUSD = req.params.devise == "USD";
+      const rawValues = response.map(data => isUSD ? data.value_USD : data.value_EUR);
+      const rawIndRefs = response.map(data => isUSD ? data.indRef_USD : data.indRef_EUR);
+      const rawDates = response.map(data => moment(data.date).format('YYYY-MM-DD'));
+
+      let extendedData = rawDates.map((date, index) => {
+        let lastIndRef = rawIndRefs[index];
+        if (lastIndRef === null) {
+          for (let j = index; j >= 0; j--) {
+            if (rawIndRefs[j] !== null) { lastIndRef = rawIndRefs[j]; break; }
           }
-          const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-          const tsrValues = response.map((data) => data.tsr);
-          let valuesindifref;
-          if (req.params.devise == "USD") {
-            valuesindifref = response.map((data) => data.indRef_USD);
-          } else {
-            valuesindifref = response.map((data) => data.indRef_EUR);
+        }
+        return { date, value: rawValues[index], indRef: lastIndRef !== null ? lastIndRef : rawIndRefs[index] };
+      });
+
+      for (let i = 0; i < rawDates.length - 1; i++) {
+        const currentDate = moment(rawDates[i]);
+        const nextDate = moment(rawDates[i + 1]);
+        while (currentDate.clone().add(1, 'days').isBefore(nextDate)) {
+          currentDate.add(1, 'days');
+          if (currentDate.isoWeekday() < 6) {
+            let lastIndRef = rawIndRefs[i];
+            if (lastIndRef === null) {
+              for (let j = i; j >= 0; j--) {
+                if (rawIndRefs[j] !== null) { lastIndRef = rawIndRefs[j]; break; }
+              }
+            }
+            extendedData.push({ date: currentDate.format('YYYY-MM-DD'), value: rawValues[i], indRef: lastIndRef });
           }
+        }
+      }
+
+      extendedData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Extract sorted values
+      const dates = extendedData.map(item => item.date);
+      const values = extendedData.map(item => item.value);
+      const valuesindifref = extendedData.map(item => item.indRef);
+      const tsrValues = response.map(data => data.tsr);
+
+      // Dynamic TSR (same as ratiosnew)
+      let tauxsr;
+      const lastPreviousDateForTsr = findLastDateOfPreviousMonth(dates);
+      try {
+        const tsrResult = await tsrhistos(lastPreviousDateForTsr, req.params.year, paysFond);
+        if (tsrResult !== null) {
+          tauxsr = tsrResult / 100;
+        } else {
+          tauxsr = TSR_DEFAULTS[paysFond?.toUpperCase()] || 0.01420;
+        }
+      } catch (e) {
+        tauxsr = TSR_DEFAULTS[paysFond?.toUpperCase()] || 0.01420;
+      }
+
+      // TSR table for trouverElementLePlusProche
+      const tauxSansRisques = await tsr.findAll({
+        attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
+        where: { pays: paysFond },
+        limit: 10000,
+      });
+      const tableauDonneestsr = tauxSansRisques.map(d => ({
+        valeur: d.valeur, valeur2: d.valeur2, semaine: d.semaine,
+        rate: d.rate, date: d.date, pays: d.pays,
+      }));
+
+      // Legacy .then() wrapper preserved for minimal structural change
+      await Promise.resolve(response).then(async (response) => {
 
 
           const lastValue = values[dates.indexOf(findLastDateOfPreviousMonth(dates))];
@@ -5561,60 +5596,90 @@ const {
 
   router.get('/api/ratiosnewdevwithdate/:year/:id/:devise/:date', async (req, res) => {
     try {
-      // Récupérer les taux_sans_risques en fonction des valeurs de la table fond
-      const tauxSansRisques = await tsr.findAll({
-        attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
-        where: {
-          // Ajoutez les conditions spécifiques en fonction de votre logique
-          pays: "Nigeria",
-        },
-        limit: 10000,
-      });
+      const fonds = await fond.findOne({ where: { id: req.params.id } });
+      if (!fonds) {
+        return res.status(404).json({ message: "Fond non trouvé" });
+      }
+      const paysFond = fonds.pays;
 
-      // Tableau pour stocker les résultats
-      const tableauDonneestsr = [];
-
-      // Boucle à travers les résultats et stocke les données dans le tableau
-      tauxSansRisques.forEach(d => {
-        tableauDonneestsr.push({
-          valeur: d.valeur,
-          valeur2: d.valeur2,
-          semaine: d.semaine,
-          rate: d.rate,
-          date: d.date,
-          pays: d.pays,
-        });
-      });
-
-      await vl.findAll({
+      const response = await vl.findAll({
         where: {
           fund_id: req.params.id,
-          date: { [Op.lte]: req.params.date } // Filtrer les valeurs inférieures ou égales à la date fournie
+          date: { [Op.lte]: req.params.date }
         },
         order: [
-          ['date', 'DESC']
+          ['date', 'ASC']
         ],
         limit: 10000,
-      })
-        .then(async (response) => {
-          // const tauxsr=0.03;-0.0116;-0,0234
-          const tauxsr = -0.0234;
-          let values;
-          // Valeurs liquidatives
-          if (req.params.devise == "USD") {
-            values = response.map((data) => data.value_USD);
-          } else {
-            values = response.map((data) => data.value_EUR);
+      });
 
+      if (!response.length) {
+        return res.status(404).json({ code: 404, message: 'Données de valeur liquidative non trouvées' });
+      }
+
+      const isUSD = req.params.devise == "USD";
+      const rawValues = response.map(data => isUSD ? data.value_USD : data.value_EUR);
+      const rawIndRefs = response.map(data => isUSD ? data.indRef_USD : data.indRef_EUR);
+      const rawDates = response.map(data => moment(data.date).format('YYYY-MM-DD'));
+
+      let extendedData = rawDates.map((date, index) => {
+        let lastIndRef = rawIndRefs[index];
+        if (lastIndRef === null) {
+          for (let j = index; j >= 0; j--) {
+            if (rawIndRefs[j] !== null) { lastIndRef = rawIndRefs[j]; break; }
           }
-          const dates = response.map((data) => moment(data.date).format('YYYY-MM-DD'));
-          const tsrValues = response.map((data) => data.tsr);
-          let valuesindifref;
-          if (req.params.devise == "USD") {
-            valuesindifref = response.map((data) => data.indRef_USD);
-          } else {
-            valuesindifref = response.map((data) => data.indRef_EUR);
+        }
+        return { date, value: rawValues[index], indRef: lastIndRef !== null ? lastIndRef : rawIndRefs[index] };
+      });
+
+      for (let i = 0; i < rawDates.length - 1; i++) {
+        const currentDate = moment(rawDates[i]);
+        const nextDate = moment(rawDates[i + 1]);
+        while (currentDate.clone().add(1, 'days').isBefore(nextDate)) {
+          currentDate.add(1, 'days');
+          if (currentDate.isoWeekday() < 6) {
+            let lastIndRef = rawIndRefs[i];
+            if (lastIndRef === null) {
+              for (let j = i; j >= 0; j--) {
+                if (rawIndRefs[j] !== null) { lastIndRef = rawIndRefs[j]; break; }
+              }
+            }
+            extendedData.push({ date: currentDate.format('YYYY-MM-DD'), value: rawValues[i], indRef: lastIndRef });
           }
+        }
+      }
+
+      extendedData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const dates = extendedData.map(item => item.date);
+      const values = extendedData.map(item => item.value);
+      const valuesindifref = extendedData.map(item => item.indRef);
+      const tsrValues = response.map(data => data.tsr);
+
+      let tauxsr;
+      const lastPreviousDateForTsr = findLastDateOfPreviousMonth(dates);
+      try {
+        const tsrResult = await tsrhistos(lastPreviousDateForTsr, req.params.year, paysFond);
+        if (tsrResult !== null) {
+          tauxsr = tsrResult / 100;
+        } else {
+          tauxsr = TSR_DEFAULTS[paysFond?.toUpperCase()] || 0.01420;
+        }
+      } catch (e) {
+        tauxsr = TSR_DEFAULTS[paysFond?.toUpperCase()] || 0.01420;
+      }
+
+      const tauxSansRisques = await tsr.findAll({
+        attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
+        where: { pays: paysFond },
+        limit: 10000,
+      });
+      const tableauDonneestsr = tauxSansRisques.map(d => ({
+        valeur: d.valeur, valeur2: d.valeur2, semaine: d.semaine,
+        rate: d.rate, date: d.date, pays: d.pays,
+      }));
+
+      await Promise.resolve(response).then(async (response) => {
 
 
           const lastValue = values[dates.indexOf(findLastDateOfPreviousMonth(dates))];
