@@ -137,6 +137,9 @@ app.use(require('./src/routes/analytics'));
 // Referentiel FundAfrica routes
 app.use(require('./src/routes/apigestionreferentiel'));
 
+// Module BRVM BOC (VL OPCVM UEMOA) — supervision lecture seule
+app.use(require('./src/routes/apibrvmboc'));
+
 // Health check (basic)
 app.get(['/health', '/api/health'], (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

@@ -56,5 +56,29 @@ Fichiers de tests : `tests/`
 */5 * * * *    fix-brvm-nginx.py         — Fix Nginx BRVM (ATTENTION: script absent du filesystem)
 ```
 
+Cron additionnel A INSTALLER apres validation (module BRVM BOC) :
+```
+30 19 * * 1-5  cron_brvm_daily.sh        — BOC BRVM : VL OPCVM UEMOA (idempotent)
+```
+
+## Module BRVM BOC (VL OPCVM UEMOA)
+- Script : `scripts/scraper/brvm_boc_daily.py` (deps : `scripts/scraper/requirements_brvm.txt`)
+- Cron wrapper : `scripts/cron/cron_brvm_daily.sh`
+- Source officielle : Bulletins Officiels de la Cote `https://bfin.brvm.org/boc/BOC_JOUR/BOC_YYYYMMDD.pdf`
+- Tables additives (creees par le script) : `brvm_boc_sources`, `brvm_boc_navs_raw`,
+  `brvm_fund_aliases`, `brvm_import_logs`, `brvm_missing_navs`
+- Promotion vers `valorisations` : jamais d'overwrite, ND jamais inseres,
+  conflits conserves en staging, fonds inconnus en attente de validation
+- Routes supervision (lecture seule) : `/api/brvm/boc/status`, `/imports`, `/unmatched`, `/missing`
+- Commandes :
+  ```bash
+  python3 scripts/scraper/brvm_boc_daily.py --selftest
+  python3 scripts/scraper/brvm_boc_daily.py --latest --dry-run
+  python3 scripts/scraper/brvm_boc_daily.py --latest --production
+  python3 scripts/scraper/brvm_boc_daily.py --start-date 2026-01-01 --end-date 2026-06-12 --production --throttle 3
+  python3 scripts/scraper/brvm_boc_daily.py --repair-missing --production            # diagnostic
+  python3 scripts/scraper/brvm_boc_daily.py --repair-missing --apply --production    # comblement
+  ```
+
 ## Deploiement
 Voir `../front_end_opcvm/SUIVI.md` (POINT DE REPRISE > Prochaine action).
