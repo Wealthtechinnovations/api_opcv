@@ -715,7 +715,7 @@ def promote_row(conn, row, usd_xof, stats):
                 indice_name, base_100, base_100_InRef, tsr, tra,
                 indRef, indRef_EUR, indRef_USD,
                 indice_comparaison, libelle_fond, souscription, ID_indice, rachat, date)
-               VALUES (%s,%s,%s,%s,%s, 0,0,0, 0,0,0, %s,%s,%s, '',0,0,0,0, 0,0,0, %s,0,'',0,%s)""",
+               VALUES (%s,%s,%s,%s,%s, 0,0,0, 0,0,0, %s,%s,%s, '',0,0,0,0, 0,0,0, 0,%s,0,'',0,%s)""",
             (fund_id, nom, value, value_eur, value_usd,
              value, value_eur, value_usd, nom, nav_date),
         )
