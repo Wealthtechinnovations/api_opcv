@@ -1445,14 +1445,18 @@ router.get('/api/classementclickhouse', async (req, res) => {
     const categorie_nationale = fund.categorie_national;
     const categorie_regionale = fund.categorie_regional;
 
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    const startDate = twoYearsAgo.toISOString().split('T')[0];
+
     const allVlDates = await vl.findAll({
       attributes: ['date'],
       where: {
         fund_id: fundId, date: {
-          [Op.gt]: '2023-12-31' // Sélectionner les dates supérieures à '2021-12-31'
+          [Op.gt]: startDate
         }
-      }, // Condition where pour filtrer par fund_id
-      order: [['date', 'DESC']], // Trier les dates en ordre chronologique
+      },
+      order: [['date', 'DESC']],
       limit: 10000,
     });
 

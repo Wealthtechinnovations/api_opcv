@@ -4808,7 +4808,7 @@ GROUP BY f.societe_gestion;
 
   app.get('/api/performancesportefeuillewithindice/fond/:id/:categorie/:date', async (req, res) => {
     try {
-    performancesCategorie = await getPerformancesByCategorynow(req.params.categorie, "2024-03-22");
+    performancesCategorie = await getPerformancesByCategorynow(req.params.categorie, req.params.date);
 
 
     portefeuille_vl_cumul.findAll({

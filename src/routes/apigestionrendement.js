@@ -102,16 +102,18 @@ router.get('/api/rendement/fonds', async (req, res) => {
 
 // Fonction pour calculer les rendements quotidiens
 async function calculatejourReturns(fundId) {
+  const twoYearsAgo = new Date();
+  twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+  const startDate = twoYearsAgo.toISOString().split('T')[0];
   const vlData = await vl.findAll({
     where: {
       fund_id: fundId,
       date: {
-        [Op.between]: ['2023-01-01', '2023-12-31']
+        [Op.gte]: startDate
       }
     },
     order: [['date', 'ASC']],
     attributes: ['date', 'value'],
-    limit: 500,
   });
 
   const dailyReturns = vlData.map((vl, index) => {
