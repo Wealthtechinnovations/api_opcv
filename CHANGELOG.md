@@ -4,7 +4,24 @@
 > Ce fichier liste uniquement les jalons cote API pour un developpeur travaillant dans ce depot.
 > Eviter la duplication : detail complet dans le CHANGELOG frontend et SUIVI.md.
 
-## [2026-06-04] — DEPLOYE (T15) + A DEPLOYER (T17)
+## [2026-06-13] — DEPLOYE (AUDIT-C/D)
+- **#42** Route ClickHouse `/api/classementquartile/:id` → stub 410 Gone (dead code, `clickhouse` jamais importe)
+- **#43** Path traversal multer filename → `path.basename()` (`routes_vl.js:332`)
+- **#48** SQL injection worker-recalculation.js : `fund_id` parametrise
+- Commit: `e5dddb6` (deploye + pm2 restart api-monolith)
+
+## [2026-06-12] — DEPLOYE (T35 BRVM BOC)
+- **Module BRVM BOC complet** : scraper PDF, parseur multi-format, promotion VL, route /api/brvm/boc/status
+- **4406 VL UEMOA promues** (111 fonds, gap comble depuis 2022)
+- **cron_brvm_daily.sh** installe (lun-ven 19h30)
+- Tables: brvm_boc_sources, brvm_boc_navs_raw, brvm_fund_aliases, brvm_import_logs, brvm_missing_navs
+- Commit: `8a3a707`
+
+## [2026-06-05] — DEPLOYE (T17, T19, T20)
+- **T17** Fix routes_vl.js 10 lignes multiplication→division (updateValues + uploadsfilevl)
+- **T20** Nigeria : 21 fichiers SEC 2026, 82 VL inserees, recalc EUR/USD + classements
+
+## [2026-06-04] — DEPLOYE (T15)
 - **UEMOA indRef 22% → 100%** (DEPLOYE): 111/111 fonds, 33830/33830 VL (local + EUR + USD)
 - T15 (`f6d7cb2`): Ajout 'UEMOA' dans BRVM_UEMOA pays mapping + step 4 multiplication→division
 - T15b (`ac1cf98`, `2990351`): DB fallback si Excel absent + case-insensitive id_indice matching

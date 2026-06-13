@@ -6,8 +6,11 @@
 Les lots (LOT Tx) sont traces dans `../front_end_opcvm/TASKS.md` et detailles dans `../front_end_opcvm/SUIVI.md`.
 
 Derniers lots API :
-- T15 (`f6d7cb2`) — fix indRef: UEMOA mapping + step4 multiplication→division — Commite, a deployer+executer
-- T13 (`e06798b`) — diagnostic liaison indices↔fonds (couverture indRef EUR/USD)
-- T10/T11 (`6644682`) — classements national local + dedup EUR/USD — DEPLOYE + RECALCUL OK
+- AUDIT-D — worker SQL injection fix (#48) — DEPLOYE 2026-06-13
+- AUDIT-C (`e5dddb6`) — ClickHouse dead route 410 + multer path traversal — DEPLOYE 2026-06-13
+- T35 (`8a3a707`) — module BRVM BOC + 4406 VL UEMOA + cron_brvm_daily.sh — DEPLOYE 2026-06-12
+- T17 — routes_vl.js mul→div (10 lignes) — DEPLOYE 2026-06-05
+- T15 (`f6d7cb2`) — indRef UEMOA 100% — DEPLOYE 2026-06-04
+- T10/T11 (`6644682`) — classements national local + dedup EUR/USD — DEPLOYE 2026-06-03
 - T9 (`5b70838`) — routes_vl.js .catch() — DEPLOYE
 - T8 (`5540d95`, `bb03081`) — auth admin + valLiq 404 — DEPLOYE

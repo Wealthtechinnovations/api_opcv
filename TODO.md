@@ -3,18 +3,29 @@
 > **Doc canonique** : `../front_end_opcvm/TODO.md` et `SUIVI.md` (frontend). Deploiement detaille : `TODO_DEPLOY.md` (ce depot).
 > Ce fichier liste les actions backend a court terme.
 
-## Deploye le 2026-06-03
-- [x] `git pull --rebase` + `pm2 restart api-monolith` — FAIT
-- [x] Recalcul classements : `classementmysql`, `classementeur`, `classementusd` — FAIT, type1 OK
-- [x] Crons ajoutes : `cron_tunisie_daily.sh` (19h L-V), `cron_health_check.sh` (22h) — FAIT
+## Deploye (confirme en production)
+- [x] T8-T12 : classements, securite admin, .catch routes — 2026-06-03
+- [x] T15 : indRef UEMOA 100% — 2026-06-04
+- [x] T17 : routes_vl.js multiplication→division — 2026-06-05
+- [x] T20 : Nigeria mise a jour — 2026-06-05
+- [x] T35 : module BRVM BOC + cron_brvm_daily.sh — 2026-06-12
+- [x] AUDIT-C : ClickHouse 410 + multer path traversal — 2026-06-13
+- [x] AUDIT-D : worker SQL injection fix — 2026-06-13
 
-## Actions a venir (suite T13 diagnostic indices)
-- [ ] T15: Recalc indRef TND complet (dry-run puis production) — couverture TUNISIE 24%→100%
-- [x] T15: Corriger mapping BRVM→UEMOA dans import_indices_excel.js — FAIT (commit `f6d7cb2`), a deployer+executer
-- [ ] T15: Decision metier CEMAC (sourcer indice BVMAC) — couverture CEMAC 0%
-- [ ] T17: Fix routes_vl.js lignes 3027-3039 multiplication→division (conversion devise)
+## Actions crons (sans risque de regression)
+- [ ] **#49** cron_daily_update.sh : remplacer `set -e` par gardes par etape
+- [ ] **#50** Ajouter validation HTTP status aux curl
+- [ ] **#40** Supprimer ghost cron fix-brvm-nginx.py
 
-## Dette technique backend (cf ../front_end_opcvm/CODE_REVIEW.md)
-- [ ] #2 Index UNIQUE valorisations(fund_id, date) apres nettoyage doublons
-- [ ] #15 Parametrer INSERT ClickHouse batch (apigestionsavequotidien.js)
-- [ ] #27 Backfill ClickHouse performance_historique
+## Dette technique (cf ../front_end_opcvm/CODE_REVIEW.md)
+- [ ] #46 — .catch() promise chains apigestionperformance.js
+- [ ] #45 — CSV formula injection sanitisation
+- [ ] #44 — authenticate middleware sur POST routes (attente Eric)
+- [ ] #2 — Index UNIQUE valorisations(fund_id, date) (attente Eric)
+- [ ] #15 — Parametrer INSERT ClickHouse batch
+- [ ] #27 — Backfill ClickHouse performance_historique
+
+## Donnees en attente
+- [ ] TUNISIE EUR/USD gap 24% (attente fichier dividendes)
+- [ ] CEMAC 0% couverture (decision metier sourcer indice BVMAC)
+- [ ] UEMOA Excel (attente fichiers + script Python Eric)
