@@ -445,6 +445,10 @@ def quality_check(row, boc_date_iso):
         return "REJECT_NO_DATE"
     if row["nav_date"] > boc_date_iso:
         return "REJECT_FUTURE_DATE"
+    # Artefacts PDF type "04/11/1022" : aucun OPCVM UEMOA avant la creation
+    # de la BRVM (1998) — date anterieure = chiffre corrompu dans le bulletin
+    if row["nav_date"] < "1998-01-01":
+        return "REJECT_IMPLAUSIBLE_DATE"
     if not row["fund_name_raw"]:
         return "REJECT_NO_NAME"
     if (row["previous_nav"] and row["previous_nav"] > 0
@@ -988,6 +992,10 @@ def selftest():
         if m:
             break
     assert m and fr_num(m.group("curr")) is None
+    bad_date_row = {"raw_line": "x", "fund_name_raw": "FCP TEST",
+                    "current_nav": 5000.0, "previous_nav": None,
+                    "nav_date": "1022-11-04"}
+    assert quality_check(bad_date_row, "2026-06-12") == "REJECT_IMPLAUSIBLE_DATE"
     print("SELFTEST OK — normalisation et patterns valides")
 
 
