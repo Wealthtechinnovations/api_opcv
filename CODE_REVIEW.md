@@ -19,4 +19,11 @@
 - ~~#32~~ CORRIGE T17: routes_vl.js 10 lignes multiplication→division (updateValues + uploadsfilevl)
 - ~~#33~~ CORRIGE ET DEPLOYE T15c: import_indices_excel.js step4 multiplication→division `f6d7cb2`
 
+## Audit securite 2026-06-13
+- ~~#42~~ CORRIGE: Route ClickHouse /api/classementquartile/:id crash ReferenceError → 410 Gone
+- ~~#43~~ CORRIGE: Path traversal multer filename → path.basename()
+- #44 Routes POST sans authenticate (ajoutVL, uploadsfilevl, postfond, updatefond) — a corriger apres validation Eric
+- #45 CSV formula injection (uploadsfilevl/indice) — sanitisation a ajouter
+- #46 Promise chains sans .catch() (apigestionperformance.js)
+
 Voir l'audit complet et l'historique dans `../front_end_opcvm/CODE_REVIEW.md`.

@@ -78,67 +78,11 @@ router.get('/api/classementquartilemysql/:id', async (req, res) => {
     }
   });
 
-  router.get('/api/classementquartile/:id', async (req, res) => {
-    try {
-        const fundId = req.params.id;
-
-        // Requête pour le classement de type 1
-        const classementType1Query = {
-            query: `
-                SELECT * FROM classementfonds 
-                WHERE fond_id = ? AND type_classement = 1 
-                LIMIT 1
-            `,
-            clickhouse_settings: {
-                // Optional settings can be added here
-            },
-        };
-
-        const classementType1 = await clickhouse.query(classementType1Query)
-            .then(async (resultSet) => {
-                const data = await resultSet.json();
-                return data.length > 0 ? data[0] : {}; // Retourne le premier élément ou un objet vide
-            })
-            .catch(error => {
-                console.error('Error querying classementType1:', error);
-                return {}; // Retourne un objet vide en cas d'erreur
-            });
-
-        // Requête pour le classement de type 2
-        const classementType2Query = {
-            query: `
-                SELECT * FROM classementfonds 
-                WHERE fond_id = ? AND type_classement = 2 
-                LIMIT 1
-            `,
-            clickhouse_settings: {
-                // Optional settings can be added here
-            },
-        };
-
-        const classementType2 = await clickhouse.query(classementType2Query)
-            .then(async (resultSet) => {
-                const data = await resultSet.json();
-                return data.length > 0 ? data[0] : {}; // Retourne le premier élément ou un objet vide
-            })
-            .catch(error => {
-                console.error('Error querying classementType2:', error);
-                return {}; // Retourne un objet vide en cas d'erreur
-            });
-
-        // Réponse avec les classements
-        res.json({
-            code: 200,
-            data: {
-              classementType1: classementType1 || {},
-              classementType2: classementType2 || {},
-            },
-        });
-    } catch (error) {
-        console.error('Erreur lors de la recherche du classement :', error);
-        res.status(500).json({ error: 'Une erreur est survenue lors de la recherche du classement.' });
-    }
-});
+  // DEPRECATED: ClickHouse route — ClickHouse n'est pas installe en production.
+  // Utiliser /api/classementquartilemysql/:id a la place.
+  router.get('/api/classementquartile/:id', (req, res) => {
+    res.status(410).json({ error: 'Route deprecee. Utiliser /api/classementquartilemysql/:id' });
+  });
 
 
   router.get('/api/classementquartiledev/:id/:dev', async (req, res) => {

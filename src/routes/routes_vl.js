@@ -329,7 +329,7 @@ module.exports = (app) => {
       cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
-      cb(null, Date.now() + '-' + file.originalname);
+      cb(null, Date.now() + '-' + path.basename(file.originalname));
     }
   });
 
