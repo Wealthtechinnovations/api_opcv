@@ -52,18 +52,29 @@ async function run() {
     else ok.push(`${row.pays}: VL a jour`);
   }
 
-  // 2. Verifier dernier classement
-  const [lastClassement] = await conn.query(`
-    SELECT MAX(updatedAt) as last_update, COUNT(DISTINCT fond_id) as fonds
+  // 2. Verifier les classements (local)
+  // La table classementfonds n'a aucune colonne temporelle (timestamps: false).
+  // On controle donc son peuplement, et on derive la fraicheur via performences.date
+  // (le batch quotidien recalcule les performances PUIS les classements).
+  const [classementCount] = await conn.query(`
+    SELECT COUNT(*) as lignes, COUNT(DISTINCT fond_id) as fonds
     FROM classementfonds
   `);
-  console.log('\n--- Dernier classement ---');
-  const lastCl = lastClassement[0];
-  if (lastCl.last_update) {
-    const ageH = Math.floor((Date.now() - new Date(lastCl.last_update).getTime()) / 3600000);
-    console.log(`  Derniere MAJ: ${lastCl.last_update} (${ageH}h) — ${lastCl.fonds} fonds`);
-    if (ageH > 48) issues.push(`Classement pas mis a jour depuis ${ageH}h`);
-    else ok.push('Classement a jour');
+  const [lastPerfDate] = await conn.query(`
+    SELECT MAX(date) as last_date FROM performences
+  `);
+  console.log('\n--- Classements (local) ---');
+  const cl = classementCount[0];
+  console.log(`  ${cl.lignes} lignes / ${cl.fonds} fonds classes`);
+  if (parseInt(cl.fonds) < 100) issues.push(`Classement local sous-peuple: ${cl.fonds} fonds`);
+  else ok.push('Classement local peuple');
+  const perfDate = lastPerfDate[0].last_date;
+  if (perfDate) {
+    const d = perfDate instanceof Date ? perfDate.toISOString().split('T')[0] : perfDate;
+    const ageJ = Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
+    console.log(`  Derniere date performances (proxy fraicheur classement): ${d} (${ageJ}j)`);
+    if (ageJ > 7) issues.push(`Performances/classements pas recalcules depuis ${ageJ}j`);
+    else ok.push('Performances/classements recents');
   }
 
   // 3. Verifier forex recent
