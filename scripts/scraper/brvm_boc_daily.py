@@ -428,6 +428,34 @@ def parse_opcvm_page(page, page_number):
     return rows, failures
 
 
+def salvage_implausible_year(nav_date, boc_date_iso):
+    """Repare une annee corrompue par un artefact PDF (ex: '1022-11-04' au lieu de
+    '2021-11-04'). Le jour/mois sont generalement corrects ; seule l'annee est
+    aberrante. On la remplace par l'annee du bulletin BOC (source fiable), puis par
+    annee_BOC-1 pour les bulletins de debut janvier referencant fin decembre.
+    Ne corrige QUE les annees < 1998 (impossibles : BRVM creee en 1998) et seulement
+    si la date corrigee est plausible (1998 <= date <= date du BOC).
+    Retourne (date_corrigee_ou_originale, bool_corrige)."""
+    if nav_date is None:
+        return None, False
+    try:
+        y, mm, dd = nav_date.split("-")
+    except ValueError:
+        return nav_date, False
+    if int(y) >= 1998:
+        return nav_date, False  # annee plausible, aucune correction
+    boc_year = int(boc_date_iso[:4])
+    for cand_year in (boc_year, boc_year - 1):
+        try:
+            date(cand_year, int(mm), int(dd))  # valide le jour/mois (ex: 29/02)
+        except ValueError:
+            continue
+        cand = f"{cand_year:04d}-{mm}-{dd}"
+        if "1998-01-01" <= cand <= boc_date_iso:
+            return cand, True
+    return nav_date, False  # non reparable -> sera rejete par quality_check
+
+
 def quality_check(row, boc_date_iso):
     """Statut qualite d'une ligne extraite. Ne JAMAIS inventer/corriger une valeur."""
     if row["current_nav"] is None:
@@ -472,6 +500,11 @@ def parse_boc_pdf(path, boc_date_iso):
                 all_fail += fails
                 opcvm_pages.append(i + 1)
     for r in all_rows:
+        fixed, salvaged = salvage_implausible_year(r.get("nav_date"), boc_date_iso)
+        if salvaged:
+            log.info("Annee nav_date reparee via BOC %s: %s -> %s (%s)",
+                     boc_date_iso, r["nav_date"], fixed, r.get("fund_name_raw"))
+            r["nav_date"] = fixed
         r["quality_status"] = quality_check(r, boc_date_iso)
     return all_rows, all_fail, pages_count, opcvm_pages
 
@@ -996,6 +1029,17 @@ def selftest():
                     "current_nav": 5000.0, "previous_nav": None,
                     "nav_date": "1022-11-04"}
     assert quality_check(bad_date_row, "2026-06-12") == "REJECT_IMPLAUSIBLE_DATE"
+    # salvage_implausible_year : repare l'annee via le bulletin BOC
+    assert salvage_implausible_year("1022-11-04", "2021-11-05") == ("2021-11-04", True)
+    assert salvage_implausible_year("1022-12-30", "2021-01-06") == ("2020-12-30", True)
+    assert salvage_implausible_year("2021-11-04", "2021-11-05") == ("2021-11-04", False)
+    assert salvage_implausible_year("1022-11-04", "1990-11-05") == ("1022-11-04", False)
+    assert salvage_implausible_year(None, "2021-11-05") == (None, False)
+    # une date reparee doit ensuite passer quality_check a OK
+    salv_row = {"raw_line": "x", "fund_name_raw": "EVOLUTIS",
+                "current_nav": 9500.0, "previous_nav": 9400.0,
+                "nav_date": salvage_implausible_year("1022-11-04", "2021-11-05")[0]}
+    assert quality_check(salv_row, "2021-11-05") == "OK"
     print("SELFTEST OK — normalisation et patterns valides")
 
 
