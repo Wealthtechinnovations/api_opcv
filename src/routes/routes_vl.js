@@ -37,8 +37,18 @@ const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
 const ImageModule = require('docxtemplater-image-module-free');
 
+function sanitizeCellValue(val) {
+  if (typeof val !== 'string') return val;
+  return val.replace(/^[\t\r\n]+/, '').replace(/^[=@]/, "'$&");
+}
 
-
+function sanitizeRow(obj) {
+  const result = {};
+  for (const [k, v] of Object.entries(obj)) {
+    result[k] = sanitizeCellValue(v);
+  }
+  return result;
+}
 
 
 
@@ -6309,7 +6319,8 @@ GROUP BY f.societe_gestion;
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
       })
-      .on('data', (row) => {
+      .on('data', (rawRow) => {
+        const row = sanitizeRow(rawRow);
         const promise = (async () => {
 
           let fonds = await fond.findOne({
@@ -6503,7 +6514,8 @@ GROUP BY f.societe_gestion;
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
       })
-      .on('data', (row) => {
+      .on('data', (rawRow) => {
+        const row = sanitizeRow(rawRow);
         const promise = (async () => {
 
           let fonds = await fond.findOne({
@@ -6901,9 +6913,9 @@ app.post('/api/uploadsocietefilenew/:societe', upload.single('file'), async (req
     }
 
     // Conversion de la feuille "Data Statiques des fonds" en JSON
-    const fondsData = xlsx.utils.sheet_to_json(fondsSheet, { header: 2 }); // Lignes de fonds à partir de la ligne 3
-    const societesData = xlsx.utils.sheet_to_json(societesSheet, { header: 2 });
-    const personnelsData = xlsx.utils.sheet_to_json(personnelSheet, { header: 2 });
+    const fondsData = xlsx.utils.sheet_to_json(fondsSheet, { header: 2 }).map(sanitizeRow);
+    const societesData = xlsx.utils.sheet_to_json(societesSheet, { header: 2 }).map(sanitizeRow);
+    const personnelsData = xlsx.utils.sheet_to_json(personnelSheet, { header: 2 }).map(sanitizeRow);
 
     // Correspondance des colonnes de la feuille avec les colonnes de la BD
     const fondsEntries = fondsData.map(row => ({
