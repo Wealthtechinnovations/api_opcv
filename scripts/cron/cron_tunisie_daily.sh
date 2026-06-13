@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # CMF Tunisie Daily VL Scraper
 # Cron: 0 19 * * 1-5  (Mon-Fri at 19h, before the main cron_daily_update at 20h)

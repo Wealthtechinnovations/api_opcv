@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # BRVM BOC OPCVM VL — import quotidien
 # Cron recommande : 30 19 * * 1-5 (lun-ven 19h30 UTC, apres publication du BOC,

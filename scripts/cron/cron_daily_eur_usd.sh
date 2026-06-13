@@ -8,33 +8,54 @@
 # S'execute APRES le cron quotidien principal qui importe les VL du jour.
 # ===========================================================================
 
-set -e
-
 API_DIR="/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api"
 API_URL="http://localhost:3005"
+ERRORS=0
 
 echo "============================================"
 echo "CRON EUR/USD — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "============================================"
 
-cd "$API_DIR"
+cd "$API_DIR" || exit 1
 
 # 1. Recalcul performances EUR + USD (seulement les fonds pas a jour)
-echo "--- Performances EUR + USD ---"
-node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH 2>&1 | tail -15
+echo "--- [1/3] Performances EUR + USD ---"
+if node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH 2>&1 | tail -15; then
+  echo "[1/3] OK"
+else
+  echo "[1/3] ERREUR"
+  ERRORS=$((ERRORS + 1))
+fi
 
 # 2. Recalcul classements EUR + USD
 echo ""
-echo "--- Classements EUR ---"
-curl -s "$API_URL/api/classementeur" --max-time 300 | head -c 100
+echo "--- [2/3] Classements EUR ---"
+HTTP_EUR=$(curl -s -o /dev/stdout -w '\n%{http_code}' "$API_URL/api/classementeur" --max-time 300)
+HTTP_EUR_CODE=$(echo "$HTTP_EUR" | tail -1)
+echo "$HTTP_EUR" | head -c 100
 echo ""
+if [ "$HTTP_EUR_CODE" -ge 200 ] && [ "$HTTP_EUR_CODE" -lt 300 ] 2>/dev/null; then
+  echo "[2a/3] OK (HTTP $HTTP_EUR_CODE)"
+else
+  echo "[2a/3] ERREUR (HTTP $HTTP_EUR_CODE)"
+  ERRORS=$((ERRORS + 1))
+fi
+
 echo "--- Classements USD ---"
-curl -s "$API_URL/api/classementusd" --max-time 300 | head -c 100
+HTTP_USD=$(curl -s -o /dev/stdout -w '\n%{http_code}' "$API_URL/api/classementusd" --max-time 300)
+HTTP_USD_CODE=$(echo "$HTTP_USD" | tail -1)
+echo "$HTTP_USD" | head -c 100
 echo ""
+if [ "$HTTP_USD_CODE" -ge 200 ] && [ "$HTTP_USD_CODE" -lt 300 ] 2>/dev/null; then
+  echo "[2b/3] OK (HTTP $HTTP_USD_CODE)"
+else
+  echo "[2b/3] ERREUR (HTTP $HTTP_USD_CODE)"
+  ERRORS=$((ERRORS + 1))
+fi
 
 # 3. Verification
 echo ""
-echo "--- Verification ---"
+echo "--- [3/3] Verification ---"
 node -e "
 require('dotenv').config();
 const mysql = require('mysql2/promise');
@@ -46,7 +67,11 @@ const mysql = require('mysql2/promise');
   }
   await c.end();
 })();
-"
+" 2>&1 || echo "[3/3] Verification ERREUR"
 
 echo ""
-echo "CRON EUR/USD TERMINE — $(date '+%Y-%m-%d %H:%M:%S')"
+if [ "$ERRORS" -eq 0 ]; then
+  echo "CRON EUR/USD TERMINE SANS ERREUR — $(date '+%Y-%m-%d %H:%M:%S')"
+else
+  echo "CRON EUR/USD TERMINE AVEC $ERRORS ERREUR(S) — $(date '+%Y-%m-%d %H:%M:%S')"
+fi

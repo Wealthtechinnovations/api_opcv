@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 # =============================================================================
 # Mise a jour quotidienne automatique - Africafunds
 #
@@ -24,65 +23,94 @@ set -e
 
 API_DIR="/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api"
 LOG_FILE="/var/log/africafunds_daily_$(date +%Y%m%d).log"
+ERRORS=0
 
-echo "========================================" | tee -a "$LOG_FILE"
-echo "=== AFRICAFUNDS DAILY UPDATE ===" | tee -a "$LOG_FILE"
-echo "=== $(date) ===" | tee -a "$LOG_FILE"
-echo "========================================" | tee -a "$LOG_FILE"
+log() {
+  echo "$1" | tee -a "$LOG_FILE"
+}
+
+run_step() {
+  local step_num="$1"
+  local step_desc="$2"
+  shift 2
+
+  log ""
+  log "[$step_num] $step_desc..."
+  if "$@" 2>&1 | tee -a "$LOG_FILE"; then
+    log "[$step_num] OK"
+  else
+    log "[$step_num] ERREUR (exit code $?)"
+    ERRORS=$((ERRORS + 1))
+  fi
+}
+
+run_curl() {
+  local step_num="$1"
+  local step_desc="$2"
+  local url="$3"
+  local max_time="${4:-300}"
+
+  log ""
+  log "[$step_num] $step_desc..."
+  local http_code
+  http_code=$(curl -s -o >(tee -a "$LOG_FILE") -w '%{http_code}' "$url" --max-time "$max_time" 2>&1)
+  if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ] 2>/dev/null; then
+    log ""
+    log "[$step_num] OK (HTTP $http_code)"
+  else
+    log ""
+    log "[$step_num] ERREUR (HTTP $http_code)"
+    ERRORS=$((ERRORS + 1))
+  fi
+}
+
+log "========================================"
+log "=== AFRICAFUNDS DAILY UPDATE ==="
+log "=== $(date) ==="
+log "========================================"
 
 cd "$API_DIR" || exit 1
 
-# Date de debut = il y a 5 jours (couvre le weekend + jours feries)
 START_DATE=$(date -d "-5 days" +%Y-%m-%d)
 TODAY=$(date +%Y-%m-%d)
 
-# 1. Scrape VL ASFIM (Maroc)
-echo "" | tee -a "$LOG_FILE"
-echo "[1/9] Scrape ASFIM VL Maroc ($START_DATE -> $TODAY)..." | tee -a "$LOG_FILE"
-node scripts/import/scrape_asfim_import.js "$START_DATE" "$TODAY" 2>&1 | tee -a "$LOG_FILE"
+run_step "1/9" "Scrape ASFIM VL Maroc ($START_DATE -> $TODAY)" \
+  node scripts/import/scrape_asfim_import.js "$START_DATE" "$TODAY"
 
-# 2. Mise a jour Forex
-echo "" | tee -a "$LOG_FILE"
-echo "[2/9] Mise a jour Forex (derniers jours)..." | tee -a "$LOG_FILE"
-node scripts/import/scrape_forex_import.js today 2>&1 | tee -a "$LOG_FILE"
+run_step "2/9" "Mise a jour Forex (derniers jours)" \
+  node scripts/import/scrape_forex_import.js today
 
-# 3. Recalcul EUR/USD daily rates
-echo "" | tee -a "$LOG_FILE"
-echo "[3/9] Recalcul EUR/USD daily rates..." | tee -a "$LOG_FILE"
-node scripts/recalc/recalc_eur_usd_daily_rate.js 2>&1 | tee -a "$LOG_FILE"
+run_step "3/9" "Recalcul EUR/USD daily rates" \
+  node scripts/recalc/recalc_eur_usd_daily_rate.js
 
-# 4. Recalcul VL Ajuste (Total Return NAV)
-echo "" | tee -a "$LOG_FILE"
-echo "[4/9] Recalcul VL Ajuste (tous fonds actifs)..." | tee -a "$LOG_FILE"
-node scripts/recalc/recalc_vl_ajuste.js 2>&1 | tee -a "$LOG_FILE"
+run_step "4/9" "Recalcul VL Ajuste (tous fonds actifs)" \
+  node scripts/recalc/recalc_vl_ajuste.js
 
-# 5. Recalcul performances locale (fonds 1-600)
-echo "" | tee -a "$LOG_FILE"
-echo "[5/9] Recalcul performances locale (fonds 1-600)..." | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdatemysql/1/600 2>&1 | tee -a "$LOG_FILE"
+run_curl "5/9" "Recalcul performances locale (fonds 1-600)" \
+  "http://localhost:3005/api/saveperfdatemysql/1/600"
 
-# 6. Recalcul performances locale (fonds 601-1200)
-echo "" | tee -a "$LOG_FILE"
-echo "[6/9] Recalcul performances locale (fonds 601-1200)..." | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdatemysql/601/1200 2>&1 | tee -a "$LOG_FILE"
+run_curl "6/9" "Recalcul performances locale (fonds 601-1200)" \
+  "http://localhost:3005/api/saveperfdatemysql/601/1200"
 
-# 7. Recalcul performances locale (fonds 1201-3000)
-echo "" | tee -a "$LOG_FILE"
-echo "[7/9] Recalcul performances locale (fonds 1201-3000)..." | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdatemysql/1201/3000 2>&1 | tee -a "$LOG_FILE"
+run_curl "7/9" "Recalcul performances locale (fonds 1201-3000)" \
+  "http://localhost:3005/api/saveperfdatemysql/1201/3000"
 
-# 8. Recalcul performances EUR/USD
-echo "" | tee -a "$LOG_FILE"
-echo "[8/9] Recalcul performances EUR/USD..." | tee -a "$LOG_FILE"
-node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH 2>&1 | tee -a "$LOG_FILE"
+run_step "8/9" "Recalcul performances EUR/USD" \
+  node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH
 
-# 9. Classements local + EUR + USD
-echo "" | tee -a "$LOG_FILE"
-echo "[9/9] Classements local + EUR + USD..." | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/classementmysql --max-time 300 2>&1 | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/classementeur --max-time 300 2>&1 | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/classementusd --max-time 300 2>&1 | tee -a "$LOG_FILE"
+run_curl "9a/9" "Classement local" \
+  "http://localhost:3005/api/classementmysql"
 
-echo "" | tee -a "$LOG_FILE"
-echo "=== MISE A JOUR TERMINEE $(date) ===" | tee -a "$LOG_FILE"
-echo "========================================" | tee -a "$LOG_FILE"
+run_curl "9b/9" "Classement EUR" \
+  "http://localhost:3005/api/classementeur"
+
+run_curl "9c/9" "Classement USD" \
+  "http://localhost:3005/api/classementusd"
+
+log ""
+if [ "$ERRORS" -eq 0 ]; then
+  log "=== MISE A JOUR TERMINEE SANS ERREUR $(date) ==="
+else
+  log "=== MISE A JOUR TERMINEE AVEC $ERRORS ERREUR(S) $(date) ==="
+fi
+log "========================================"

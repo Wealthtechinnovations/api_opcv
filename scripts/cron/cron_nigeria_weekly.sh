@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 # =============================================================================
 # Mise a jour hebdomadaire Nigeria - Africafunds
 #
@@ -30,17 +29,56 @@ set -e
 API_DIR="/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api"
 LOG_FILE="/var/log/africafunds_nigeria_$(date +%Y%m%d).log"
 YEAR=$(date +%Y)
+ERRORS=0
 
-echo "========================================" | tee -a "$LOG_FILE"
-echo "=== AFRICAFUNDS NIGERIA WEEKLY UPDATE ===" | tee -a "$LOG_FILE"
-echo "=== $(date) ===" | tee -a "$LOG_FILE"
-echo "========================================" | tee -a "$LOG_FILE"
+log() {
+  echo "$1" | tee -a "$LOG_FILE"
+}
+
+run_step() {
+  local step_num="$1"
+  local step_desc="$2"
+  shift 2
+
+  log ""
+  log "[$step_num] $step_desc..."
+  if "$@" 2>&1 | tee -a "$LOG_FILE"; then
+    log "[$step_num] OK"
+  else
+    log "[$step_num] ERREUR (exit code $?)"
+    ERRORS=$((ERRORS + 1))
+  fi
+}
+
+run_curl() {
+  local step_num="$1"
+  local step_desc="$2"
+  local url="$3"
+
+  log ""
+  log "[$step_num] $step_desc..."
+  local http_code
+  http_code=$(curl -s -o >(tee -a "$LOG_FILE") -w '%{http_code}' "$url" --max-time 300 2>&1)
+  if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ] 2>/dev/null; then
+    log ""
+    log "[$step_num] OK (HTTP $http_code)"
+  else
+    log ""
+    log "[$step_num] ERREUR (HTTP $http_code)"
+    ERRORS=$((ERRORS + 1))
+  fi
+}
+
+log "========================================"
+log "=== AFRICAFUNDS NIGERIA WEEKLY UPDATE ==="
+log "=== $(date) ==="
+log "========================================"
 
 cd "$API_DIR" || exit 1
 
 # 1. Extraction SEC Nigeria (annee courante uniquement)
-echo "" | tee -a "$LOG_FILE"
-echo "[1/7] Extraction SEC Nigeria ($YEAR)..." | tee -a "$LOG_FILE"
+log ""
+log "[1/7] Extraction SEC Nigeria ($YEAR)..."
 python3 sec_ng_nav_extractor_v6.py \
   --years "$YEAR" \
   --cache-dir sec_ng_downloads \
@@ -52,49 +90,45 @@ python3 sec_ng_nav_extractor_v6.py \
   --strict-quality \
   2>&1 | tee -a "$LOG_FILE"
 
-# Verifier que le CSV a ete produit
-if [ ! -f sec_ng_latest.csv ] || [ $(wc -l < sec_ng_latest.csv) -lt 2 ]; then
-  echo "[ERREUR] CSV non produit ou vide. Arret." | tee -a "$LOG_FILE"
-  exit 1
+# Verifier que le CSV a ete produit — si absent, continuer avec recalculs seuls
+if [ ! -f sec_ng_latest.csv ] || [ "$(wc -l < sec_ng_latest.csv)" -lt 2 ]; then
+  log "[1/7] ATTENTION : CSV non produit ou vide. Import saute, recalculs continuent."
+  ERRORS=$((ERRORS + 1))
+else
+  log "[1/7] OK"
+
+  run_step "2/7" "Import VL Nigeria dans MySQL" \
+    node scripts/import/import_vl_nigeria_sec.js sec_ng_latest.csv
 fi
 
-# 2. Import dans MySQL
-echo "" | tee -a "$LOG_FILE"
-echo "[2/7] Import VL Nigeria dans MySQL..." | tee -a "$LOG_FILE"
-node scripts/import/import_vl_nigeria_sec.js sec_ng_latest.csv 2>&1 | tee -a "$LOG_FILE"
+run_step "3/7" "Recalcul EUR/USD taux quotidiens" \
+  node scripts/recalc/recalc_eur_usd_daily_rate.js
 
-# 3. Recalcul taux EUR/USD quotidiens
-echo "" | tee -a "$LOG_FILE"
-echo "[3/7] Recalcul EUR/USD taux quotidiens..." | tee -a "$LOG_FILE"
-node scripts/recalc/recalc_eur_usd_daily_rate.js 2>&1 | tee -a "$LOG_FILE"
+run_step "4/7" "Recalcul VL Ajuste (tous fonds actifs)" \
+  node scripts/recalc/recalc_vl_ajuste.js
 
-# 4. Recalcul VL Ajuste
-echo "" | tee -a "$LOG_FILE"
-echo "[4/7] Recalcul VL Ajuste (tous fonds actifs)..." | tee -a "$LOG_FILE"
-node scripts/recalc/recalc_vl_ajuste.js 2>&1 | tee -a "$LOG_FILE"
+run_curl "5a/7" "Recalcul performances locale (fonds 1-600)" \
+  "http://localhost:3005/api/saveperfdatemysql/1/600"
 
-# 5. Recalcul performances (locale)
-echo "" | tee -a "$LOG_FILE"
-echo "[5/7] Recalcul performances locale (fonds 1-600)..." | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdatemysql/1/600 2>&1 | tee -a "$LOG_FILE"
-echo "" | tee -a "$LOG_FILE"
-echo "[5b/7] Recalcul performances locale (fonds 601-1200)..." | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdatemysql/601/1200 2>&1 | tee -a "$LOG_FILE"
+run_curl "5b/7" "Recalcul performances locale (fonds 601-1200)" \
+  "http://localhost:3005/api/saveperfdatemysql/601/1200"
 
-# 6. Recalcul performances EUR
-echo "" | tee -a "$LOG_FILE"
-echo "[6/7] Recalcul performances EUR..." | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdateeur/1/600 2>&1 | tee -a "$LOG_FILE"
-echo "" | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdateeur/601/1200 2>&1 | tee -a "$LOG_FILE"
+run_curl "6a/7" "Recalcul performances EUR (fonds 1-600)" \
+  "http://localhost:3005/api/saveperfdateeur/1/600"
 
-# 7. Recalcul performances USD
-echo "" | tee -a "$LOG_FILE"
-echo "[7/7] Recalcul performances USD..." | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdateusd/1/600 2>&1 | tee -a "$LOG_FILE"
-echo "" | tee -a "$LOG_FILE"
-curl -s http://localhost:3005/api/saveperfdateusd/601/1200 2>&1 | tee -a "$LOG_FILE"
+run_curl "6b/7" "Recalcul performances EUR (fonds 601-1200)" \
+  "http://localhost:3005/api/saveperfdateeur/601/1200"
 
-echo "" | tee -a "$LOG_FILE"
-echo "=== NIGERIA WEEKLY UPDATE TERMINE $(date) ===" | tee -a "$LOG_FILE"
-echo "========================================" | tee -a "$LOG_FILE"
+run_curl "7a/7" "Recalcul performances USD (fonds 1-600)" \
+  "http://localhost:3005/api/saveperfdateusd/1/600"
+
+run_curl "7b/7" "Recalcul performances USD (fonds 601-1200)" \
+  "http://localhost:3005/api/saveperfdateusd/601/1200"
+
+log ""
+if [ "$ERRORS" -eq 0 ]; then
+  log "=== NIGERIA WEEKLY UPDATE TERMINE SANS ERREUR $(date) ==="
+else
+  log "=== NIGERIA WEEKLY UPDATE TERMINE AVEC $ERRORS ERREUR(S) $(date) ==="
+fi
+log "========================================"
