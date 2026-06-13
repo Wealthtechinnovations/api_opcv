@@ -230,7 +230,12 @@ async function releaseStaleJobs() {
 // --- Job handlers ---
 
 async function executeVlAjuste(job) {
-  const fondFilter = job.fond_id ? `AND fund_id = ${parseInt(job.fond_id)}` : '';
+  const params = [job.date_from];
+  let fondFilter = '';
+  if (job.fond_id) {
+    fondFilter = 'AND fund_id = ?';
+    params.push(parseInt(job.fond_id));
+  }
   const [result] = await pool.query(`
     UPDATE valorisations v
     JOIN (
@@ -244,7 +249,7 @@ async function executeVlAjuste(job) {
     ) calc ON v.id = calc.id
     SET v.vl_ajuste = calc.new_vl_ajuste
     WHERE v.vl_ajuste != calc.new_vl_ajuste OR v.vl_ajuste IS NULL
-  `, [job.date_from]);
+  `, params);
   return { rowsAffected: result.affectedRows, detail: `vl_ajuste depuis ${job.date_from}` };
 }
 
