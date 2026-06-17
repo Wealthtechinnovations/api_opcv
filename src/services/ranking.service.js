@@ -43,11 +43,16 @@ function buildRankResult(fundsWithPerformance, fundId, category, periods) {
     var953an: 'var95', betabaissier3an: 'betabaissier', omega3an: 'omega', dsr3an: 'dsr',
   };
 
+  const totalNames = {
+    perf3mm: '3Moistotalm', perf6mm: '6Moistotalm', perf1anm: '1Antotalm',
+    perf3ansm: '3Anstotalm', perf5ansm: '5Anstotalm', ytdm: '1erJanviertotalm',
+  };
+
   for (const period of periods) {
     const [rank, total] = rankFundInList(fundsWithPerformance, fundId, period);
     const name = names[period] || period;
     data[`rank${name}`] = rank;
-    data[`rank${name}total`] = total;
+    data[`rank${totalNames[period] || (name + 'total')}`] = total;
   }
   return data;
 }
