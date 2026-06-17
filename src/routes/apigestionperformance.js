@@ -2232,47 +2232,54 @@ GROUP BY
 };
 
 const getPerformancesByCategorynow = async (categorie, datedebut) => {
-
-
-  // Convertir datefin au format YYYY-MM-DD
+  // Le parametre datedebut est conserve pour compatibilite de signature mais
+  // n'est plus utilise. L'ancien filtre `date = :datedebut` excluait la
+  // quasi-totalite des pairs (derniere VL a des dates differentes), laissant
+  // les moyennes de categorie vides ("- %"). On prend desormais la derniere
+  // performance de chaque fond via MAX(date) par fond_id.
   const performancesCategorie = await sequelize.query(`
  SELECT
-    categorie_nationale,
-    AVG(CASE WHEN ytd IS NOT NULL AND ytd != '-' THEN CAST(ytd AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_ytd,
-    AVG(CASE WHEN perfveille IS NOT NULL AND perfveille != '-' THEN CAST(perfveille AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfveille,
-    AVG(CASE WHEN perf1an IS NOT NULL AND perf1an != '-' THEN CAST(perf1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf1an,
-    AVG(CASE WHEN perf3ans IS NOT NULL AND perf3ans != '-' THEN CAST(perf3ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf3ans,
-    AVG(CASE WHEN perf5ans IS NOT NULL AND perf5ans != '-' THEN CAST(perf5ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf5ans,
-    AVG(CASE WHEN perf8ans IS NOT NULL AND perf8ans != '-' THEN CAST(perf8ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf8ans,
-    AVG(CASE WHEN perf10ans IS NOT NULL AND perf10ans != '-' THEN CAST(perf10ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf10ans,
-    AVG(CASE WHEN perf4s IS NOT NULL AND perf4s != '-' THEN CAST(perf4s AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf4s,
-    AVG(CASE WHEN perf3m IS NOT NULL AND perf3m != '-' THEN CAST(perf3m AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf3m,
-    AVG(CASE WHEN perf6m IS NOT NULL AND perf6m != '-' THEN CAST(perf6m AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf6m,
-    AVG(CASE WHEN perfannu1an IS NOT NULL AND perfannu1an != '-' THEN CAST(perfannu1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu1an,
-    AVG(CASE WHEN perfannu3an IS NOT NULL AND perfannu3an != '-' THEN CAST(perfannu3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu3an,
-    AVG(CASE WHEN perfannu5an IS NOT NULL AND perfannu5an != '-' THEN CAST(perfannu5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu5an,
-    AVG(CASE WHEN volatility1an IS NOT NULL AND volatility1an != '-' THEN CAST(volatility1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility1an,
-    AVG(CASE WHEN volatility3an IS NOT NULL AND volatility3an != '-' THEN CAST(volatility3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility3an,
-    AVG(CASE WHEN volatility5an IS NOT NULL AND volatility5an != '-' THEN CAST(volatility5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility5an,
-    AVG(CASE WHEN ratiosharpe3an IS NOT NULL AND ratiosharpe3an != '-' THEN CAST(ratiosharpe3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_ratiosharpe3an,
-    AVG(CASE WHEN pertemax1an IS NOT NULL AND pertemax1an != '-' THEN CAST(pertemax1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax1an,
-    AVG(CASE WHEN pertemax3an IS NOT NULL AND pertemax3an != '-' THEN CAST(pertemax3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax3an,
-    AVG(CASE WHEN pertemax5an IS NOT NULL AND pertemax5an != '-' THEN CAST(pertemax5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax5an,
-    AVG(CASE WHEN sortino3an IS NOT NULL AND sortino3an != '-' THEN CAST(sortino3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_sortino3an,
-    AVG(CASE WHEN info3an IS NOT NULL AND info3an != '-' THEN CAST(info3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_info3an,
-    AVG(CASE WHEN calamar3an IS NOT NULL AND calamar3an != '-' THEN CAST(calamar3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_calamar3an,
-    AVG(CASE WHEN var993an IS NOT NULL AND var993an != '-' THEN CAST(var993an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_var993an,
-    AVG(CASE WHEN var953an IS NOT NULL AND var953an != '-' THEN CAST(var953an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_var953an
-FROM 
-    performences
+    p.categorie_nationale,
+    AVG(CASE WHEN p.ytd IS NOT NULL AND p.ytd != '-' THEN CAST(p.ytd AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_ytd,
+    AVG(CASE WHEN p.perfveille IS NOT NULL AND p.perfveille != '-' THEN CAST(p.perfveille AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfveille,
+    AVG(CASE WHEN p.perf1an IS NOT NULL AND p.perf1an != '-' THEN CAST(p.perf1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf1an,
+    AVG(CASE WHEN p.perf3ans IS NOT NULL AND p.perf3ans != '-' THEN CAST(p.perf3ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf3ans,
+    AVG(CASE WHEN p.perf5ans IS NOT NULL AND p.perf5ans != '-' THEN CAST(p.perf5ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf5ans,
+    AVG(CASE WHEN p.perf8ans IS NOT NULL AND p.perf8ans != '-' THEN CAST(p.perf8ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf8ans,
+    AVG(CASE WHEN p.perf10ans IS NOT NULL AND p.perf10ans != '-' THEN CAST(p.perf10ans AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf10ans,
+    AVG(CASE WHEN p.perf4s IS NOT NULL AND p.perf4s != '-' THEN CAST(p.perf4s AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf4s,
+    AVG(CASE WHEN p.perf3m IS NOT NULL AND p.perf3m != '-' THEN CAST(p.perf3m AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf3m,
+    AVG(CASE WHEN p.perf6m IS NOT NULL AND p.perf6m != '-' THEN CAST(p.perf6m AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perf6m,
+    AVG(CASE WHEN p.perfannu1an IS NOT NULL AND p.perfannu1an != '-' THEN CAST(p.perfannu1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu1an,
+    AVG(CASE WHEN p.perfannu3an IS NOT NULL AND p.perfannu3an != '-' THEN CAST(p.perfannu3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu3an,
+    AVG(CASE WHEN p.perfannu5an IS NOT NULL AND p.perfannu5an != '-' THEN CAST(p.perfannu5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_perfannu5an,
+    AVG(CASE WHEN p.volatility1an IS NOT NULL AND p.volatility1an != '-' THEN CAST(p.volatility1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility1an,
+    AVG(CASE WHEN p.volatility3an IS NOT NULL AND p.volatility3an != '-' THEN CAST(p.volatility3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility3an,
+    AVG(CASE WHEN p.volatility5an IS NOT NULL AND p.volatility5an != '-' THEN CAST(p.volatility5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_volatility5an,
+    AVG(CASE WHEN p.ratiosharpe3an IS NOT NULL AND p.ratiosharpe3an != '-' THEN CAST(p.ratiosharpe3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_ratiosharpe3an,
+    AVG(CASE WHEN p.pertemax1an IS NOT NULL AND p.pertemax1an != '-' THEN CAST(p.pertemax1an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax1an,
+    AVG(CASE WHEN p.pertemax3an IS NOT NULL AND p.pertemax3an != '-' THEN CAST(p.pertemax3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax3an,
+    AVG(CASE WHEN p.pertemax5an IS NOT NULL AND p.pertemax5an != '-' THEN CAST(p.pertemax5an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_pertemax5an,
+    AVG(CASE WHEN p.sortino3an IS NOT NULL AND p.sortino3an != '-' THEN CAST(p.sortino3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_sortino3an,
+    AVG(CASE WHEN p.info3an IS NOT NULL AND p.info3an != '-' THEN CAST(p.info3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_info3an,
+    AVG(CASE WHEN p.calamar3an IS NOT NULL AND p.calamar3an != '-' THEN CAST(p.calamar3an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_calamar3an,
+    AVG(CASE WHEN p.var993an IS NOT NULL AND p.var993an != '-' THEN CAST(p.var993an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_var993an,
+    AVG(CASE WHEN p.var953an IS NOT NULL AND p.var953an != '-' THEN CAST(p.var953an AS DECIMAL(10,2)) ELSE NULL END) AS moyenne_var953an
+FROM
+    performences p
+    INNER JOIN (
+      SELECT fond_id, MAX(date) AS max_date
+      FROM performences
+      WHERE categorie_nationale = :categorie
+      GROUP BY fond_id
+    ) latest ON p.fond_id = latest.fond_id AND p.date = latest.max_date
 WHERE
-    categorie_nationale = :categorie
-    AND date = :datedebut
+    p.categorie_nationale = :categorie
 GROUP BY
-    categorie_nationale;
+    p.categorie_nationale;
 
   `, {
-    replacements: { categorie: categorie, datedebut: datedebut },
+    replacements: { categorie: categorie },
     type: sequelize.QueryTypes.SELECT,
   });
   return performancesCategorie;
