@@ -4,6 +4,8 @@
 > Ce fichier liste les points specifiques backend et renvoie a l'audit complet.
 
 ## Corrige recemment (cote API)
+- #52 ClickHouse resilience (incident saturation disque serveur) → flag CLICKHOUSE_ENABLED,
+  coupe-circuit sync (N echecs), request_timeout 30s, lecture VL paginee keyset (`b815153`)
 - #29 Classement national local vide → MAX(date)/fond (`6644682`)
 - #30 Totaux EUR/USD gonfles → keepLatestPerFund() (`6644682`)
 - #25 routes_vl.js .catch() (`5b70838`)
