@@ -646,14 +646,17 @@ router.get('/api/classementclickhouse', async (req, res) => {
         // Vérifiez si le fond existe dans la table classementfond
         const existingRanking = await classementfonds.findOne({
           where: { fond_id: fundId, type_classement: 1 },
+          transaction,
         });
 
         const existingRankingregional = await classementfonds.findOne({
           where: { fond_id: fundId, type_classement: 2 },
+          transaction,
         });
 
         const existingRankingGlobal = await classementfonds.findOne({
           where: { fond_id: fundId, type_classement: 3 },
+          transaction,
         });
 
         // Calculez le classement en fonction de la catégorie
@@ -662,7 +665,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
         const rankingDataGlobal = await calculateRankGlobalmysql(categorie_fundafrica_globale, fundId);
 
 
-        if (existingRanking) {
+        if (existingRanking && rankingData && rankingData.code == 200) {
           // Le fond existe, mettez à jour son classement en fonction de la catégorie
           existingRanking.rank3Mois = rankingData.data.rank3Mois;
           existingRanking.rank6Mois = rankingData.data.rank6Mois;
@@ -711,7 +714,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRanking.rankinfototal = rankingData.data.rankinfototal;
           existingRanking.rankpertemaxtotal = rankingData.data.rankpertemaxtotal;
           existingRanking.type_classement = 1;
-          await existingRanking.save();
+          await existingRanking.save({ transaction });
         } else {
           // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond
           if (rankingData && rankingData.code == 200)
@@ -769,10 +772,10 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rankbetabaissiertotal: rankingData.data.rankbetabaissiertotal,
               rankinfototal: rankingData.data.rankinfototal,
               rankpertemaxtotal: rankingData.data.rankpertemaxtotal
-            });
+            }, { transaction });
         }
 
-        if (existingRankingregional) {
+        if (existingRankingregional && rankingDataregional && rankingDataregional.code == 200) {
           // Le fond existe, mettez à jour son classement en fonction de la catégorie
           existingRankingregional.rank3Mois = rankingDataregional.data.rank3Mois;
           existingRankingregional.rank6Mois = rankingDataregional.data.rank6Mois;
@@ -788,11 +791,11 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingregional.rank5Anstotal = rankingDataregional.data.rank5Anstotal;
           existingRankingregional.rank1erJanviertotal = rankingDataregional.data.rank1erJanviertotal;
           existingRankingregional.type_classement = 2;
-          await existingRankingregional.save();
+          await existingRankingregional.save({ transaction });
         } else {
 
           // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond
-          if (rankingDataregional.code == 200)
+          if (rankingDataregional && rankingDataregional.code == 200)
             await classementfonds.create({
               fond_id: fundId,
               categorie_nationale: category,
@@ -813,10 +816,10 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rank3Anstotal: rankingDataregional.data.rank3Anstotal,
               rank5Anstotal: rankingDataregional.data.rank5Anstotal,
               rank1erJanviertotal: rankingDataregional.data.rank1erJanviertotal,
-            });
+            }, { transaction });
         }
 
-        if (existingRankingGlobal) {
+        if (existingRankingGlobal && rankingDataGlobal && rankingDataGlobal.code == 200) {
           existingRankingGlobal.rank3Mois = rankingDataGlobal.data.rank3Mois;
           existingRankingGlobal.rank6Mois = rankingDataGlobal.data.rank6Mois;
           existingRankingGlobal.rank1An = rankingDataGlobal.data.rank1An;
@@ -830,7 +833,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingGlobal.rank5Anstotal = rankingDataGlobal.data.rank5Anstotal;
           existingRankingGlobal.rank1erJanviertotal = rankingDataGlobal.data.rank1erJanviertotal;
           existingRankingGlobal.type_classement = 3;
-          await existingRankingGlobal.save();
+          await existingRankingGlobal.save({ transaction });
         } else {
           if (rankingDataGlobal && rankingDataGlobal.code == 200)
             await classementfonds.create({
@@ -853,7 +856,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rank3Anstotal: rankingDataGlobal.data.rank3Anstotal,
               rank5Anstotal: rankingDataGlobal.data.rank5Anstotal,
               rank1erJanviertotal: rankingDataGlobal.data.rank1erJanviertotal,
-            });
+            }, { transaction });
         }
       }
       await transaction.commit();
@@ -881,14 +884,17 @@ router.get('/api/classementclickhouse', async (req, res) => {
         // Vérifiez si le fond existe dans la table classementfond
         const existingRanking = await classementfonds_eurs.findOne({
           where: { fond_id: fundId, type_classement: 1 },
+          transaction,
         });
 
         const existingRankingregional = await classementfonds_eurs.findOne({
           where: { fond_id: fundId, type_classement: 2 },
+          transaction,
         });
 
         const existingRankingGlobal = await classementfonds_eurs.findOne({
           where: { fond_id: fundId, type_classement: 3 },
+          transaction,
         });
 
         // Calculez le classement en fonction de la catégorie
@@ -897,7 +903,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
         const rankingDataGlobal = await calculateRankGlobaldev(categorie_fundafrica_globale, fundId, "EUR");
 
 
-        if (existingRanking) {
+        if (existingRanking && rankingData && rankingData.code == 200) {
           // Le fond existe, mettez à jour son classement en fonction de la catégorie
           existingRanking.rank3Mois = rankingData.data.rank3Mois;
           existingRanking.rank6Mois = rankingData.data.rank6Mois;
@@ -913,10 +919,10 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRanking.rank5Anstotal = rankingData.data.rank5Anstotal;
           existingRanking.rank1erJanviertotal = rankingData.data.rank1erJanviertotal;
           existingRanking.type_classement = 1;
-          await existingRanking.save();
+          await existingRanking.save({ transaction });
         } else {
           // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond EUR
-          if (rankingData.code == 200)
+          if (rankingData && rankingData.code == 200)
             await classementfonds_eurs.create({
               fond_id: fundId,
               categorie_nationale: category,
@@ -937,10 +943,10 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rank3Anstotal: rankingData.data.rank3Anstotal,
               rank5Anstotal: rankingData.data.rank5Anstotal,
               rank1erJanviertotal: rankingData.data.rank1erJanviertotal,
-            });
+            }, { transaction });
         }
 
-        if (existingRankingregional) {
+        if (existingRankingregional && rankingDataregional && rankingDataregional.code == 200) {
           existingRankingregional.rank3Mois = rankingDataregional.data.rank3Mois;
           existingRankingregional.rank6Mois = rankingDataregional.data.rank6Mois;
           existingRankingregional.rank1An = rankingDataregional.data.rank1An;
@@ -954,9 +960,9 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingregional.rank5Anstotal = rankingDataregional.data.rank5Anstotal;
           existingRankingregional.rank1erJanviertotal = rankingDataregional.data.rank1erJanviertotal;
           existingRankingregional.type_classement = 2;
-          await existingRankingregional.save();
+          await existingRankingregional.save({ transaction });
         } else {
-          if (rankingDataregional.code == 200)
+          if (rankingDataregional && rankingDataregional.code == 200)
             await classementfonds_eurs.create({
               fond_id: fundId,
               categorie_nationale: category,
@@ -977,12 +983,12 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rank3Anstotal: rankingDataregional.data.rank3Anstotal,
               rank5Anstotal: rankingDataregional.data.rank5Anstotal,
               rank1erJanviertotal: rankingDataregional.data.rank1erJanviertotal,
-            });
+            }, { transaction });
         }
 
         // Type 3 : Classement Afrique (par categorie_fundafrica_globale)
         if (categorie_fundafrica_globale) {
-          if (existingRankingGlobal) {
+          if (existingRankingGlobal && rankingDataGlobal && rankingDataGlobal.code == 200) {
             existingRankingGlobal.rank3Mois = rankingDataGlobal.data.rank3Mois;
             existingRankingGlobal.rank6Mois = rankingDataGlobal.data.rank6Mois;
             existingRankingGlobal.rank1An = rankingDataGlobal.data.rank1An;
@@ -996,7 +1002,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
             existingRankingGlobal.rank5Anstotal = rankingDataGlobal.data.rank5Anstotal;
             existingRankingGlobal.rank1erJanviertotal = rankingDataGlobal.data.rank1erJanviertotal;
             existingRankingGlobal.type_classement = 3;
-            await existingRankingGlobal.save();
+            await existingRankingGlobal.save({ transaction });
           } else {
             if (rankingDataGlobal && rankingDataGlobal.code == 200)
               await classementfonds_eurs.create({
@@ -1019,7 +1025,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
                 rank3Anstotal: rankingDataGlobal.data.rank3Anstotal,
                 rank5Anstotal: rankingDataGlobal.data.rank5Anstotal,
                 rank1erJanviertotal: rankingDataGlobal.data.rank1erJanviertotal,
-              });
+              }, { transaction });
           }
         }
       }
@@ -1047,21 +1053,24 @@ router.get('/api/classementclickhouse', async (req, res) => {
 
         const existingRanking = await classementfonds_usds.findOne({
           where: { fond_id: fundId, type_classement: 1 },
+          transaction,
         });
 
         const existingRankingregional = await classementfonds_usds.findOne({
           where: { fond_id: fundId, type_classement: 2 },
+          transaction,
         });
 
         const existingRankingGlobal = await classementfonds_usds.findOne({
           where: { fond_id: fundId, type_classement: 3 },
+          transaction,
         });
 
         const rankingData = await calculateRankdev(category, fundId, "USD");
         const rankingDataregional = await calculateRankregionaldev(categorie_fundafrica_regionale, fundId, "USD");
         const rankingDataGlobal = await calculateRankGlobaldev(categorie_fundafrica_globale, fundId, "USD");
 
-        if (existingRanking) {
+        if (existingRanking && rankingData && rankingData.code == 200) {
           existingRanking.rank3Mois = rankingData.data.rank3Mois;
           existingRanking.rank6Mois = rankingData.data.rank6Mois;
           existingRanking.rank1An = rankingData.data.rank1An;
@@ -1075,9 +1084,9 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRanking.rank5Anstotal = rankingData.data.rank5Anstotal;
           existingRanking.rank1erJanviertotal = rankingData.data.rank1erJanviertotal;
           existingRanking.type_classement = 1;
-          await existingRanking.save();
+          await existingRanking.save({ transaction });
         } else {
-          if (rankingData.code == 200)
+          if (rankingData && rankingData.code == 200)
             await classementfonds_usds.create({
               fond_id: fundId,
               categorie_nationale: category,
@@ -1098,10 +1107,10 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rank3Anstotal: rankingData.data.rank3Anstotal,
               rank5Anstotal: rankingData.data.rank5Anstotal,
               rank1erJanviertotal: rankingData.data.rank1erJanviertotal,
-            });
+            }, { transaction });
         }
 
-        if (existingRankingregional) {
+        if (existingRankingregional && rankingDataregional && rankingDataregional.code == 200) {
           existingRankingregional.rank3Mois = rankingDataregional.data.rank3Mois;
           existingRankingregional.rank6Mois = rankingDataregional.data.rank6Mois;
           existingRankingregional.rank1An = rankingDataregional.data.rank1An;
@@ -1115,9 +1124,9 @@ router.get('/api/classementclickhouse', async (req, res) => {
           existingRankingregional.rank5Anstotal = rankingDataregional.data.rank5Anstotal;
           existingRankingregional.rank1erJanviertotal = rankingDataregional.data.rank1erJanviertotal;
           existingRankingregional.type_classement = 2;
-          await existingRankingregional.save();
+          await existingRankingregional.save({ transaction });
         } else {
-          if (rankingDataregional.code == 200)
+          if (rankingDataregional && rankingDataregional.code == 200)
             await classementfonds_usds.create({
               fond_id: fundId,
               categorie_nationale: category,
@@ -1138,12 +1147,12 @@ router.get('/api/classementclickhouse', async (req, res) => {
               rank3Anstotal: rankingDataregional.data.rank3Anstotal,
               rank5Anstotal: rankingDataregional.data.rank5Anstotal,
               rank1erJanviertotal: rankingDataregional.data.rank1erJanviertotal,
-            });
+            }, { transaction });
         }
 
         // Type 3 : Classement Afrique (par categorie_fundafrica_globale)
         if (categorie_fundafrica_globale) {
-          if (existingRankingGlobal) {
+          if (existingRankingGlobal && rankingDataGlobal && rankingDataGlobal.code == 200) {
             existingRankingGlobal.rank3Mois = rankingDataGlobal.data.rank3Mois;
             existingRankingGlobal.rank6Mois = rankingDataGlobal.data.rank6Mois;
             existingRankingGlobal.rank1An = rankingDataGlobal.data.rank1An;
@@ -1157,7 +1166,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
             existingRankingGlobal.rank5Anstotal = rankingDataGlobal.data.rank5Anstotal;
             existingRankingGlobal.rank1erJanviertotal = rankingDataGlobal.data.rank1erJanviertotal;
             existingRankingGlobal.type_classement = 3;
-            await existingRankingGlobal.save();
+            await existingRankingGlobal.save({ transaction });
           } else {
             if (rankingDataGlobal && rankingDataGlobal.code == 200)
               await classementfonds_usds.create({
@@ -1180,7 +1189,7 @@ router.get('/api/classementclickhouse', async (req, res) => {
                 rank3Anstotal: rankingDataGlobal.data.rank3Anstotal,
                 rank5Anstotal: rankingDataGlobal.data.rank5Anstotal,
                 rank1erJanviertotal: rankingDataGlobal.data.rank1erJanviertotal,
-              });
+              }, { transaction });
           }
         }
       }
