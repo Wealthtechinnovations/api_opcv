@@ -1,10 +1,19 @@
 const { createClient } = require('@clickhouse/client');
 
+// Interrupteur propre : permet de desactiver totalement ClickHouse via .env
+// (ex: CLICKHOUSE_ENABLED=false) sans toucher au code — utile suite a l'incident
+// de saturation disque. Defaut: active, pour preserver le comportement existant.
+const CLICKHOUSE_ENABLED = !['false', '0', 'no', 'off'].includes(
+  String(process.env.CLICKHOUSE_ENABLED ?? 'true').toLowerCase()
+);
+
 const clickhouse = createClient({
   url: process.env.CLICKHOUSE_URL || 'http://localhost:8123',
   username: process.env.CLICKHOUSE_USERNAME || 'default',
   password: process.env.CLICKHOUSE_PASSWORD || '',
   database: process.env.CLICKHOUSE_DATABASE || 'fund_analytics',
+  // Evite les requetes suspendues indefiniment (defaut 30s, configurable)
+  request_timeout: parseInt(process.env.CLICKHOUSE_REQUEST_TIMEOUT_MS, 10) || 30000,
 });
 
 let clickhouseAvailable = false;
@@ -65,6 +74,11 @@ async function createTables() {
 }
 
 async function initClickHouse() {
+  if (!CLICKHOUSE_ENABLED) {
+    console.warn('ClickHouse desactive via CLICKHOUSE_ENABLED=false — fonctionnalites analytics desactivees');
+    clickhouseAvailable = false;
+    return false;
+  }
   try {
     const result = await clickhouse.query({ query: 'SELECT 1', format: 'JSONEachRow' });
     await result.json();
@@ -83,4 +97,20 @@ function isClickHouseAvailable() {
   return clickhouseAvailable;
 }
 
-module.exports = { clickhouse, initClickHouse, isClickHouseAvailable };
+// Permet au coupe-circuit de la sync de marquer ClickHouse indisponible
+// apres trop d'echecs consecutifs, pour cesser de le marteler.
+function setClickHouseUnavailable() {
+  clickhouseAvailable = false;
+}
+
+function isClickHouseEnabled() {
+  return CLICKHOUSE_ENABLED;
+}
+
+module.exports = {
+  clickhouse,
+  initClickHouse,
+  isClickHouseAvailable,
+  setClickHouseUnavailable,
+  isClickHouseEnabled,
+};
