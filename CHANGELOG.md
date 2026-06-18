@@ -4,6 +4,20 @@
 > Ce fichier liste uniquement les jalons cote API pour un developpeur travaillant dans ce depot.
 > Eviter la duplication : detail complet dans le CHANGELOG frontend et SUIVI.md.
 
+## [2026-06-18] — DEPLOYE (LOT 1-3 classements/rankings)
+- **#54 LOT 1** — Fix rankings null/Infinity dans `ranking.service.js` :
+  - `buildRankResult()` retournait Infinity quand total=0 (division par zero) → corrige
+  - Null handling ajoute dans les calculs de classement
+- **#55 LOT 2** — Fix moyennes par categorie dans `apigestionsavequotidien.js` :
+  - Calcul des moyennes categorie corrige (25 moyennes non-null verifiees en production)
+- **#56 LOT 3** — Fix consistance transactionnelle dans `apigestionsavequotidien.js` :
+  - 3 routes classement (classementmysql, classementeur, classementusd) corrigees
+  - Ajout `{ transaction }` aux 27 operations Sequelize findOne/save/create hors transaction
+  - Ajout null guards sur l'acces aux donnees de classement
+  - Commit: `e3d8fec`
+  - Verifie en production : 3545 local + 3579 EUR + 3579 USD classements peuples correctement
+  - Fonds 866 : rank3Mois=86/300, rank3Moistotalm=300 confirme
+
 ## [2026-06-17] — A DEPLOYER (ClickHouse resilience)
 - **Incident** : ClickHouse serveur a sature le disque (stderr.log ~41 Go), bloquant
   toutes les applications du VPS. Cause : crash-loop + logging verbeux sans rotation.

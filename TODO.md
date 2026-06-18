@@ -11,6 +11,9 @@
 - [x] T35 : module BRVM BOC + cron_brvm_daily.sh — 2026-06-12
 - [x] AUDIT-C : ClickHouse 410 + multer path traversal — 2026-06-13
 - [x] AUDIT-D : worker SQL injection fix — 2026-06-13
+- [x] LOT 1 (#54) : rankings null/Infinity fix — 2026-06-17
+- [x] LOT 2 (#55) : category averages fix (25 moyennes non-null) — 2026-06-17
+- [x] LOT 3 (#56) : transaction consistency fix (3545+3579+3579 classements OK) — 2026-06-18
 
 ## Actions crons (sans risque de regression)
 - [ ] **#49** cron_daily_update.sh : remplacer `set -e` par gardes par etape
@@ -18,6 +21,7 @@
 - [ ] **#40** Supprimer ghost cron fix-brvm-nginx.py
 
 ## Dette technique (cf ../front_end_opcvm/CODE_REVIEW.md)
+- [ ] #53 — ClickHouse dead code cleanup
 - [ ] #46 — .catch() promise chains apigestionperformance.js
 - [ ] #45 — CSV formula injection sanitisation
 - [ ] #44 — authenticate middleware sur POST routes (attente Eric)

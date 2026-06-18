@@ -6,6 +6,9 @@
 Les lots (LOT Tx) sont traces dans `../front_end_opcvm/TASKS.md` et detailles dans `../front_end_opcvm/SUIVI.md`.
 
 Derniers lots API :
+- LOT 3 (#56) — transaction consistency fix (3545+3579+3579 classements OK) — commit `e3d8fec` — DEPLOYE 2026-06-18
+- LOT 2 (#55) — category averages fix (25 moyennes non-null) — DEPLOYE 2026-06-17
+- LOT 1 (#54) — rankings null/Infinity fix — DEPLOYE 2026-06-17
 - AUDIT-D — worker SQL injection fix (#48) — DEPLOYE 2026-06-13
 - AUDIT-C (`e5dddb6`) — ClickHouse dead route 410 + multer path traversal — DEPLOYE 2026-06-13
 - T35 (`8a3a707`) — module BRVM BOC + 4406 VL UEMOA + cron_brvm_daily.sh — DEPLOYE 2026-06-12
