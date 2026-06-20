@@ -148,7 +148,7 @@ async function calculateRankNationalDev(category, fundId, devise) {
   const model = devise === 'EUR' ? performences_eurs : performences_usds;
   const rows = await model.findAll({
     where: { categorie_nationale: category },
-    attributes: ['fond_id', 'date', ...PERF_PERIODS],
+    attributes: ['fond_id', 'date', ...PERF_PERIODS_FULL],
     limit: 10000,
   });
   const fundsWithPerformance = keepLatestPerFund(rows);
@@ -156,7 +156,7 @@ async function calculateRankNationalDev(category, fundId, devise) {
   const selectedFund = fundsWithPerformance.find((f) => f.fond_id === fundId);
   if (!selectedFund) return { error: 'Fond non trouvé.' };
 
-  return { code: 200, data: buildRankResult(fundsWithPerformance, fundId, category, PERF_PERIODS) };
+  return { code: 200, data: buildRankResult(fundsWithPerformance, fundId, category, PERF_PERIODS_FULL) };
 }
 
 async function calculateRankRegionalDev(category, fundId, devise) {

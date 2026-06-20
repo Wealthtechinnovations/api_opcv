@@ -636,17 +636,47 @@ router.get('/api/updatewithdividende', async (req, res) => {
           existingRanking.rank3Ans = rankingData.data.rank3Ans;
           existingRanking.rank5Ans = rankingData.data.rank5Ans;
           existingRanking.rank1erJanvier = rankingData.data.rank1erJanvier;
-          existingRanking.rank1erJanvier = rankingData.data.rank1erJanvier;
           existingRanking.rank3Moistotal = rankingData.data.rank3Moistotal;
           existingRanking.rank6Moistotal = rankingData.data.rank6Moistotal;
           existingRanking.rank1Antotal = rankingData.data.rank1Antotal;
           existingRanking.rank3Anstotal = rankingData.data.rank3Anstotal;
           existingRanking.rank5Anstotal = rankingData.data.rank5Anstotal;
           existingRanking.rank1erJanviertotal = rankingData.data.rank1erJanviertotal;
+          existingRanking.rank3Moism = rankingData.data.rank3Moism;
+          existingRanking.rank3Moistotalm = rankingData.data.rank3Moistotalm;
+          existingRanking.rank6Moism = rankingData.data.rank6Moism;
+          existingRanking.rank6Moistotalm = rankingData.data.rank6Moistotalm;
+          existingRanking.rank1Anm = rankingData.data.rank1Anm;
+          existingRanking.rank1Antotalm = rankingData.data.rank1Antotalm;
+          existingRanking.rank3Ansm = rankingData.data.rank3Ansm;
+          existingRanking.rank3Anstotalm = rankingData.data.rank3Anstotalm;
+          existingRanking.rank5Ansm = rankingData.data.rank5Ansm;
+          existingRanking.rank5Anstotalm = rankingData.data.rank5Anstotalm;
+          existingRanking.rank1erJanvierm = rankingData.data.rank1erJanvierm;
+          existingRanking.rank1erJanviertotalm = rankingData.data.rank1erJanviertotalm;
+          existingRanking.ranksharpe = rankingData.data.ranksharpe;
+          existingRanking.ranksharpetotal = rankingData.data.ranksharpetotal;
+          existingRanking.rankvolatilite = rankingData.data.rankvolatilite;
+          existingRanking.rankvolatilitetotal = rankingData.data.rankvolatilitetotal;
+          existingRanking.rankdsr = rankingData.data.rankdsr;
+          existingRanking.rankdsrtotal = rankingData.data.rankdsrtotal;
+          existingRanking.rankpertemax = rankingData.data.rankpertemax;
+          existingRanking.rankpertemaxtotal = rankingData.data.rankpertemaxtotal;
+          existingRanking.rankinfo = rankingData.data.rankinfo;
+          existingRanking.rankinfototal = rankingData.data.rankinfototal;
+          existingRanking.ranksortino = rankingData.data.ranksortino;
+          existingRanking.ranksortinototal = rankingData.data.ranksortinototal;
+          existingRanking.rankbetabaissier = rankingData.data.rankbetabaissier;
+          existingRanking.rankbetabaissiertotal = rankingData.data.rankbetabaissiertotal;
+          existingRanking.rankomega = rankingData.data.rankomega;
+          existingRanking.rankomegatotal = rankingData.data.rankomegatotal;
+          existingRanking.rankvar95 = rankingData.data.rankvar95;
+          existingRanking.rankvar95total = rankingData.data.rankvar95total;
+          existingRanking.rankcalamar = rankingData.data.rankcalamar;
+          existingRanking.rankcalamartotal = rankingData.data.rankcalamartotal;
           existingRanking.type_classement = 1;
           await existingRanking.save({ transaction });
         } else {
-          // Le fond n'existe pas, créez une nouvelle entrée dans la table classementfond EUR
           if (rankingData && rankingData.code == 200)
             await classementfonds_eurs.create({
               fond_id: fundId,
@@ -668,6 +698,38 @@ router.get('/api/updatewithdividende', async (req, res) => {
               rank3Anstotal: rankingData.data.rank3Anstotal,
               rank5Anstotal: rankingData.data.rank5Anstotal,
               rank1erJanviertotal: rankingData.data.rank1erJanviertotal,
+              rank3Moism: rankingData.data.rank3Moism,
+              rank3Moistotalm: rankingData.data.rank3Moistotalm,
+              rank6Moism: rankingData.data.rank6Moism,
+              rank6Moistotalm: rankingData.data.rank6Moistotalm,
+              rank1Anm: rankingData.data.rank1Anm,
+              rank1Antotalm: rankingData.data.rank1Antotalm,
+              rank3Ansm: rankingData.data.rank3Ansm,
+              rank3Anstotalm: rankingData.data.rank3Anstotalm,
+              rank5Ansm: rankingData.data.rank5Ansm,
+              rank5Anstotalm: rankingData.data.rank5Anstotalm,
+              rank1erJanvierm: rankingData.data.rank1erJanvierm,
+              rank1erJanviertotalm: rankingData.data.rank1erJanviertotalm,
+              ranksharpe: rankingData.data.ranksharpe,
+              ranksharpetotal: rankingData.data.ranksharpetotal,
+              rankvolatilite: rankingData.data.rankvolatilite,
+              rankvolatilitetotal: rankingData.data.rankvolatilitetotal,
+              rankdsr: rankingData.data.rankdsr,
+              rankdsrtotal: rankingData.data.rankdsrtotal,
+              rankpertemax: rankingData.data.rankpertemax,
+              rankpertemaxtotal: rankingData.data.rankpertemaxtotal,
+              rankinfo: rankingData.data.rankinfo,
+              rankinfototal: rankingData.data.rankinfototal,
+              ranksortino: rankingData.data.ranksortino,
+              ranksortinototal: rankingData.data.ranksortinototal,
+              rankbetabaissier: rankingData.data.rankbetabaissier,
+              rankbetabaissiertotal: rankingData.data.rankbetabaissiertotal,
+              rankomega: rankingData.data.rankomega,
+              rankomegatotal: rankingData.data.rankomegatotal,
+              rankvar95: rankingData.data.rankvar95,
+              rankvar95total: rankingData.data.rankvar95total,
+              rankcalamar: rankingData.data.rankcalamar,
+              rankcalamartotal: rankingData.data.rankcalamartotal,
             }, { transaction });
         }
 
@@ -808,6 +870,38 @@ router.get('/api/updatewithdividende', async (req, res) => {
           existingRanking.rank3Anstotal = rankingData.data.rank3Anstotal;
           existingRanking.rank5Anstotal = rankingData.data.rank5Anstotal;
           existingRanking.rank1erJanviertotal = rankingData.data.rank1erJanviertotal;
+          existingRanking.rank3Moism = rankingData.data.rank3Moism;
+          existingRanking.rank3Moistotalm = rankingData.data.rank3Moistotalm;
+          existingRanking.rank6Moism = rankingData.data.rank6Moism;
+          existingRanking.rank6Moistotalm = rankingData.data.rank6Moistotalm;
+          existingRanking.rank1Anm = rankingData.data.rank1Anm;
+          existingRanking.rank1Antotalm = rankingData.data.rank1Antotalm;
+          existingRanking.rank3Ansm = rankingData.data.rank3Ansm;
+          existingRanking.rank3Anstotalm = rankingData.data.rank3Anstotalm;
+          existingRanking.rank5Ansm = rankingData.data.rank5Ansm;
+          existingRanking.rank5Anstotalm = rankingData.data.rank5Anstotalm;
+          existingRanking.rank1erJanvierm = rankingData.data.rank1erJanvierm;
+          existingRanking.rank1erJanviertotalm = rankingData.data.rank1erJanviertotalm;
+          existingRanking.ranksharpe = rankingData.data.ranksharpe;
+          existingRanking.ranksharpetotal = rankingData.data.ranksharpetotal;
+          existingRanking.rankvolatilite = rankingData.data.rankvolatilite;
+          existingRanking.rankvolatilitetotal = rankingData.data.rankvolatilitetotal;
+          existingRanking.rankdsr = rankingData.data.rankdsr;
+          existingRanking.rankdsrtotal = rankingData.data.rankdsrtotal;
+          existingRanking.rankpertemax = rankingData.data.rankpertemax;
+          existingRanking.rankpertemaxtotal = rankingData.data.rankpertemaxtotal;
+          existingRanking.rankinfo = rankingData.data.rankinfo;
+          existingRanking.rankinfototal = rankingData.data.rankinfototal;
+          existingRanking.ranksortino = rankingData.data.ranksortino;
+          existingRanking.ranksortinototal = rankingData.data.ranksortinototal;
+          existingRanking.rankbetabaissier = rankingData.data.rankbetabaissier;
+          existingRanking.rankbetabaissiertotal = rankingData.data.rankbetabaissiertotal;
+          existingRanking.rankomega = rankingData.data.rankomega;
+          existingRanking.rankomegatotal = rankingData.data.rankomegatotal;
+          existingRanking.rankvar95 = rankingData.data.rankvar95;
+          existingRanking.rankvar95total = rankingData.data.rankvar95total;
+          existingRanking.rankcalamar = rankingData.data.rankcalamar;
+          existingRanking.rankcalamartotal = rankingData.data.rankcalamartotal;
           existingRanking.type_classement = 1;
           await existingRanking.save({ transaction });
         } else {
@@ -832,6 +926,38 @@ router.get('/api/updatewithdividende', async (req, res) => {
               rank3Anstotal: rankingData.data.rank3Anstotal,
               rank5Anstotal: rankingData.data.rank5Anstotal,
               rank1erJanviertotal: rankingData.data.rank1erJanviertotal,
+              rank3Moism: rankingData.data.rank3Moism,
+              rank3Moistotalm: rankingData.data.rank3Moistotalm,
+              rank6Moism: rankingData.data.rank6Moism,
+              rank6Moistotalm: rankingData.data.rank6Moistotalm,
+              rank1Anm: rankingData.data.rank1Anm,
+              rank1Antotalm: rankingData.data.rank1Antotalm,
+              rank3Ansm: rankingData.data.rank3Ansm,
+              rank3Anstotalm: rankingData.data.rank3Anstotalm,
+              rank5Ansm: rankingData.data.rank5Ansm,
+              rank5Anstotalm: rankingData.data.rank5Anstotalm,
+              rank1erJanvierm: rankingData.data.rank1erJanvierm,
+              rank1erJanviertotalm: rankingData.data.rank1erJanviertotalm,
+              ranksharpe: rankingData.data.ranksharpe,
+              ranksharpetotal: rankingData.data.ranksharpetotal,
+              rankvolatilite: rankingData.data.rankvolatilite,
+              rankvolatilitetotal: rankingData.data.rankvolatilitetotal,
+              rankdsr: rankingData.data.rankdsr,
+              rankdsrtotal: rankingData.data.rankdsrtotal,
+              rankpertemax: rankingData.data.rankpertemax,
+              rankpertemaxtotal: rankingData.data.rankpertemaxtotal,
+              rankinfo: rankingData.data.rankinfo,
+              rankinfototal: rankingData.data.rankinfototal,
+              ranksortino: rankingData.data.ranksortino,
+              ranksortinototal: rankingData.data.ranksortinototal,
+              rankbetabaissier: rankingData.data.rankbetabaissier,
+              rankbetabaissiertotal: rankingData.data.rankbetabaissiertotal,
+              rankomega: rankingData.data.rankomega,
+              rankomegatotal: rankingData.data.rankomegatotal,
+              rankvar95: rankingData.data.rankvar95,
+              rankvar95total: rankingData.data.rankvar95total,
+              rankcalamar: rankingData.data.rankcalamar,
+              rankcalamartotal: rankingData.data.rankcalamartotal,
             }, { transaction });
         }
 
