@@ -789,7 +789,7 @@ const {
               //tauxensemainefilte = donneestauxPeriodesemaine;
 
             }
-            //   if(rendementsTableau['3_an'].length>0){
+            if(rendementsTableau['3_ans'] && rendementsTableau['3_ans'].length > 0){
             const yDate = findNearestDateAnnualized(dates, 3, lastPreviousDate)
             const CAGR = calculerCAGR(values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], lastValue, 3)
             const portfolioReturns = rendementsTableau['3_ans']
@@ -967,42 +967,9 @@ const {
                 // delaiRecouvrementInd
               }
             })
-            /*   }else{
-                 res.json({
-                   code: 200,
-                   data: {
-                     volatility: '-',
-                     volatilityInd: '-',
-                     beta:'-',
-                     perfAnnualisee: '-',
-                     perfAnnualiseeInd: '-',
-                     info:'-',
-                     r2:'-',
-                     // skewness,
-                     correlation:'-',
-                     omega:'-',
-                     sortino:'-',
-                     calmar:'-',
-                     // volatilityInd,
-                     maxDrawdown: '-',
-                     maxDrawdownInd: '-',
-                     dsr:'-',
-                     ratioSharpe:'-',
-                     // kurtosis,
-                     // betaHaussier,
-                     // betaBaiss,
-                     VAR95: '-',
-                     trackingError: '-',
-                     VAR99: '-',
-                 
-                  
-                     betaBaiss:'-',
-                  
-                     // dd: (perfAnnualisee - perfAnnualiseeInd)
-                     // delaiRecouvrementInd
-                   }
-                 })
-               }*/
+            } else {
+              res.json({ code: 200, data: null })
+            }
           } else if (req.params.year === "5") {
             // Récupérer la dernière date dans la base de données
             const derniereDate = await tsr.max('date', { where: { pays: paysFond } });
@@ -1105,7 +1072,7 @@ const {
               //tauxensemainefilte = donneestauxPeriodesemaine;
 
             }
-            //     if(rendementsTableau['5_an'].length>0){
+            if(rendementsTableau['5_ans'] && rendementsTableau['5_ans'].length > 0){
             const yDate = findNearestDateAnnualized(dates, 5, lastPreviousDate)
 
             const portfolioReturns = rendementsTableau['5_ans']
@@ -1282,41 +1249,9 @@ const {
                 // delaiRecouvrementInd
               }
             })
-            /*  }else{
-                res.json({
-                  code: 200,
-                  data: {
-                    volatility: '-',
-                    volatilityInd: '-',
-                    beta:'-',
-                    perfAnnualisee: '-',
-                    perfAnnualiseeInd: '-',
-                    info:'-',
-                    r2:'-',
-                    // skewness,
-                    correlation:'-',
-                    omega:'-',
-                    sortino:'-',
-                    calmar:'-',
-                    // volatilityInd,
-                    maxDrawdown: '-',
-                    maxDrawdownInd: '-',
-                    dsr:'-',
-                    ratioSharpe:'-',
-                    // kurtosis,
-                    // betaHaussier,
-                    // betaBaiss,
-                    VAR95: '-',
-                    trackingError: '-',
-                    VAR99: '-',
-               
-                    betaBaiss:'-',
-                  
-                    // dd: (perfAnnualisee - perfAnnualiseeInd)
-                    // delaiRecouvrementInd
-                  }
-                })
-              }*/
+            } else {
+              res.json({ code: 200, data: null })
+            }
           } else if (req.params.year === "8") {
             // Récupérer la dernière date dans la base de données
             const derniereDate = await tsr.max('date', { where: { pays: paysFond } });
@@ -2017,13 +1952,15 @@ const {
       res.status(500).json({ message: 'Erreur serveur' });
     }
   })
-  //revoir
   router.get('/api/ratiosnewithdate/:year/:id/:date', async (req, res) => {
     try {
-      // Récupérer les taux_sans_risques en fonction des valeurs de la table fond
+      const fonds = await fond.findOne({ where: { id: req.params.id } });
+      if (!fonds) return res.status(404).json({ message: "Fond non trouvé" });
+      const paysFond = fonds.pays;
+
       const tauxSansRisques = await tsr.findAll({
         attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
-        where: { pays: "Nigeria" },
+        where: { pays: paysFond },
         limit: 10000,
       });
 
@@ -2276,13 +2213,13 @@ const {
   ////////////////////////////////////////////////////
   router.get('/api/ratiosnewithdate1/:year/:id/:date', async (req, res) => {
     try {
-      // Récupérer les taux_sans_risques en fonction des valeurs de la table fond
+      const fonds = await fond.findOne({ where: { id: req.params.id } });
+      if (!fonds) return res.status(404).json({ message: "Fond non trouvé" });
+      const paysFond = fonds.pays;
+
       const tauxSansRisques = await tsr.findAll({
         attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
-        where: {
-          // Ajoutez les conditions spécifiques en fonction de votre logique
-          pays: "Nigeria",
-        },
+        where: { pays: paysFond },
         limit: 10000,
       });
 
@@ -2742,7 +2679,7 @@ const {
               //tauxensemainefilte = donneestauxPeriodesemaine;
 
             }
-            //   if(rendementsTableau['3_an'].length>0){
+            if(rendementsTableau['3_ans'] && rendementsTableau['3_ans'].length > 0){
             const yDate = findNearestDateAnnualized(dates, 3, lastPreviousDate)
             const CAGR = calculerCAGR(values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], lastValue, 3)
             const portfolioReturns = rendementsTableau['3_ans']
@@ -2955,42 +2892,9 @@ const {
                 // delaiRecouvrementInd
               }
             })
-            /*   }else{
-                 res.json({
-                   code: 200,
-                   data: {
-                     volatility: '-',
-                     volatilityInd: '-',
-                     beta:'-',
-                     perfAnnualisee: '-',
-                     perfAnnualiseeInd: '-',
-                     info:'-',
-                     r2:'-',
-                     // skewness,
-                     correlation:'-',
-                     omega:'-',
-                     sortino:'-',
-                     calmar:'-',
-                     // volatilityInd,
-                     maxDrawdown: '-',
-                     maxDrawdownInd: '-',
-                     dsr:'-',
-                     ratioSharpe:'-',
-                     // kurtosis,
-                     // betaHaussier,
-                     // betaBaiss,
-                     VAR95: '-',
-                     trackingError: '-',
-                     VAR99: '-',
-                 
-                  
-                     betaBaiss:'-',
-                  
-                     // dd: (perfAnnualisee - perfAnnualiseeInd)
-                     // delaiRecouvrementInd
-                   }
-                 })
-               }*/
+            } else {
+              res.json({ code: 200, data: null })
+            }
           } else if (req.params.year === "5") {
             let donneesGroupéesSS = grouperParSemaine(donneesarray);
             let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
@@ -3074,7 +2978,7 @@ const {
               //tauxensemainefilte = donneestauxPeriodesemaine;
 
             }
-            //     if(rendementsTableau['5_an'].length>0){
+            if(rendementsTableau['5_ans'] && rendementsTableau['5_ans'].length > 0){
             const yDate = findNearestDateAnnualized(dates, 5, lastPreviousDate)
 
             const portfolioReturns = rendementsTableau['5_ans']
@@ -3251,41 +3155,9 @@ const {
                 // delaiRecouvrementInd
               }
             })
-            /*  }else{
-                res.json({
-                  code: 200,
-                  data: {
-                    volatility: '-',
-                    volatilityInd: '-',
-                    beta:'-',
-                    perfAnnualisee: '-',
-                    perfAnnualiseeInd: '-',
-                    info:'-',
-                    r2:'-',
-                    // skewness,
-                    correlation:'-',
-                    omega:'-',
-                    sortino:'-',
-                    calmar:'-',
-                    // volatilityInd,
-                    maxDrawdown: '-',
-                    maxDrawdownInd: '-',
-                    dsr:'-',
-                    ratioSharpe:'-',
-                    // kurtosis,
-                    // betaHaussier,
-                    // betaBaiss,
-                    VAR95: '-',
-                    trackingError: '-',
-                    VAR99: '-',
-               
-                    betaBaiss:'-',
-                  
-                    // dd: (perfAnnualisee - perfAnnualiseeInd)
-                    // delaiRecouvrementInd
-                  }
-                })
-              }*/
+            } else {
+              res.json({ code: 200, data: null })
+            }
           } else if (req.params.year === "8") {
             let donneesGroupéesSS = grouperParSemaine(donneesarray);
             let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
@@ -4425,7 +4297,7 @@ const {
               //tauxensemainefilte = donneestauxPeriodesemaine;
 
             }
-            //   if(rendementsTableau['3_an'].length>0){
+            if(rendementsTableau['3_ans'] && rendementsTableau['3_ans'].length > 0){
             const yDate = findNearestDateAnnualized(dates, 3, lastPreviousDate)
             const CAGR = calculerCAGR(values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], lastValue, 3)
             const portfolioReturns = rendementsTableau['3_ans']
@@ -4638,42 +4510,9 @@ const {
                 // delaiRecouvrementInd
               }
             })
-            /*   }else{
-                 res.json({
-                   code: 200,
-                   data: {
-                     volatility: '-',
-                     volatilityInd: '-',
-                     beta:'-',
-                     perfAnnualisee: '-',
-                     perfAnnualiseeInd: '-',
-                     info:'-',
-                     r2:'-',
-                     // skewness,
-                     correlation:'-',
-                     omega:'-',
-                     sortino:'-',
-                     calmar:'-',
-                     // volatilityInd,
-                     maxDrawdown: '-',
-                     maxDrawdownInd: '-',
-                     dsr:'-',
-                     ratioSharpe:'-',
-                     // kurtosis,
-                     // betaHaussier,
-                     // betaBaiss,
-                     VAR95: '-',
-                     trackingError: '-',
-                     VAR99: '-',
-                 
-                  
-                     betaBaiss:'-',
-                  
-                     // dd: (perfAnnualisee - perfAnnualiseeInd)
-                     // delaiRecouvrementInd
-                   }
-                 })
-               }*/
+            } else {
+              res.json({ code: 200, data: null })
+            }
           } else if (req.params.year === "5") {
             let donneesGroupéesSS = grouperParSemaine(donneesarray);
             let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
@@ -4757,7 +4596,7 @@ const {
               //tauxensemainefilte = donneestauxPeriodesemaine;
 
             }
-            //     if(rendementsTableau['5_an'].length>0){
+            if(rendementsTableau['5_ans'] && rendementsTableau['5_ans'].length > 0){
             const yDate = findNearestDateAnnualized(dates, 5, lastPreviousDate)
 
             const portfolioReturns = rendementsTableau['5_ans']
@@ -4934,41 +4773,9 @@ const {
                 // delaiRecouvrementInd
               }
             })
-            /*  }else{
-                res.json({
-                  code: 200,
-                  data: {
-                    volatility: '-',
-                    volatilityInd: '-',
-                    beta:'-',
-                    perfAnnualisee: '-',
-                    perfAnnualiseeInd: '-',
-                    info:'-',
-                    r2:'-',
-                    // skewness,
-                    correlation:'-',
-                    omega:'-',
-                    sortino:'-',
-                    calmar:'-',
-                    // volatilityInd,
-                    maxDrawdown: '-',
-                    maxDrawdownInd: '-',
-                    dsr:'-',
-                    ratioSharpe:'-',
-                    // kurtosis,
-                    // betaHaussier,
-                    // betaBaiss,
-                    VAR95: '-',
-                    trackingError: '-',
-                    VAR99: '-',
-               
-                    betaBaiss:'-',
-                  
-                    // dd: (perfAnnualisee - perfAnnualiseeInd)
-                    // delaiRecouvrementInd
-                  }
-                })
-              }*/
+            } else {
+              res.json({ code: 200, data: null })
+            }
           } else if (req.params.year === "8") {
             let donneesGroupéesSS = grouperParSemaine(donneesarray);
             let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
@@ -6103,7 +5910,7 @@ const {
               //tauxensemainefilte = donneestauxPeriodesemaine;
 
             }
-            //   if(rendementsTableau['3_an'].length>0){
+            if(rendementsTableau['3_ans'] && rendementsTableau['3_ans'].length > 0){
             const yDate = findNearestDateAnnualized(dates, 3, lastPreviousDate)
             const CAGR = calculerCAGR(values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], lastValue, 3)
             const portfolioReturns = rendementsTableau['3_ans']
@@ -6316,42 +6123,9 @@ const {
                 // delaiRecouvrementInd
               }
             })
-            /*   }else{
-                 res.json({
-                   code: 200,
-                   data: {
-                     volatility: '-',
-                     volatilityInd: '-',
-                     beta:'-',
-                     perfAnnualisee: '-',
-                     perfAnnualiseeInd: '-',
-                     info:'-',
-                     r2:'-',
-                     // skewness,
-                     correlation:'-',
-                     omega:'-',
-                     sortino:'-',
-                     calmar:'-',
-                     // volatilityInd,
-                     maxDrawdown: '-',
-                     maxDrawdownInd: '-',
-                     dsr:'-',
-                     ratioSharpe:'-',
-                     // kurtosis,
-                     // betaHaussier,
-                     // betaBaiss,
-                     VAR95: '-',
-                     trackingError: '-',
-                     VAR99: '-',
-                 
-                  
-                     betaBaiss:'-',
-                  
-                     // dd: (perfAnnualisee - perfAnnualiseeInd)
-                     // delaiRecouvrementInd
-                   }
-                 })
-               }*/
+            } else {
+              res.json({ code: 200, data: null })
+            }
           } else if (req.params.year === "5") {
             let donneesGroupéesSS = grouperParSemaine(donneesarray);
             let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
@@ -6435,7 +6209,7 @@ const {
               //tauxensemainefilte = donneestauxPeriodesemaine;
 
             }
-            //     if(rendementsTableau['5_an'].length>0){
+            if(rendementsTableau['5_ans'] && rendementsTableau['5_ans'].length > 0){
             const yDate = findNearestDateAnnualized(dates, 5, lastPreviousDate)
 
             const portfolioReturns = rendementsTableau['5_ans']
@@ -6612,41 +6386,9 @@ const {
                 // delaiRecouvrementInd
               }
             })
-            /*  }else{
-                res.json({
-                  code: 200,
-                  data: {
-                    volatility: '-',
-                    volatilityInd: '-',
-                    beta:'-',
-                    perfAnnualisee: '-',
-                    perfAnnualiseeInd: '-',
-                    info:'-',
-                    r2:'-',
-                    // skewness,
-                    correlation:'-',
-                    omega:'-',
-                    sortino:'-',
-                    calmar:'-',
-                    // volatilityInd,
-                    maxDrawdown: '-',
-                    maxDrawdownInd: '-',
-                    dsr:'-',
-                    ratioSharpe:'-',
-                    // kurtosis,
-                    // betaHaussier,
-                    // betaBaiss,
-                    VAR95: '-',
-                    trackingError: '-',
-                    VAR99: '-',
-               
-                    betaBaiss:'-',
-                  
-                    // dd: (perfAnnualisee - perfAnnualiseeInd)
-                    // delaiRecouvrementInd
-                  }
-                })
-              }*/
+            } else {
+              res.json({ code: 200, data: null })
+            }
           } else if (req.params.year === "8") {
             let donneesGroupéesSS = grouperParSemaine(donneesarray);
             let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
