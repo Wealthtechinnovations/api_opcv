@@ -14,6 +14,13 @@ const PERF_PERIODS_FULL = [
   'info3an', 'calamar3an', 'var953an', 'betabaissier3an', 'omega3an', 'dsr3an',
 ];
 
+const PERF_PERIODS_FULL_DEV = [
+  ...PERF_PERIODS,
+  'perfveille',
+  'volatility3an', 'ratiosharpe3an', 'pertemax3an', 'sortino3an',
+  'info3an', 'calamar3an', 'var953an', 'betabaissier3an', 'omega3an', 'dsr3an',
+];
+
 function rankFundInList(fundsWithPerformance, fundId, period) {
   const validPerformances = fundsWithPerformance.filter(
     (f) => f[period] != null && f[period] != '-'
@@ -148,7 +155,7 @@ async function calculateRankNationalDev(category, fundId, devise) {
   const model = devise === 'EUR' ? performences_eurs : performences_usds;
   const rows = await model.findAll({
     where: { categorie_nationale: category },
-    attributes: ['fond_id', 'date', ...PERF_PERIODS_FULL],
+    attributes: ['fond_id', 'date', ...PERF_PERIODS_FULL_DEV],
     limit: 10000,
   });
   const fundsWithPerformance = keepLatestPerFund(rows);
@@ -156,7 +163,7 @@ async function calculateRankNationalDev(category, fundId, devise) {
   const selectedFund = fundsWithPerformance.find((f) => f.fond_id === fundId);
   if (!selectedFund) return { error: 'Fond non trouvé.' };
 
-  return { code: 200, data: buildRankResult(fundsWithPerformance, fundId, category, PERF_PERIODS_FULL) };
+  return { code: 200, data: buildRankResult(fundsWithPerformance, fundId, category, PERF_PERIODS_FULL_DEV) };
 }
 
 async function calculateRankRegionalDev(category, fundId, devise) {
@@ -202,5 +209,6 @@ module.exports = {
   calculateRankGlobalDev,
   PERF_PERIODS,
   PERF_PERIODS_FULL,
+  PERF_PERIODS_FULL_DEV,
   LOWER_IS_BETTER,
 };
