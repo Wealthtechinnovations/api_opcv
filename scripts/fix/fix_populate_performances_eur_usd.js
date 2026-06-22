@@ -11,6 +11,59 @@
 
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 const mysql = require('mysql2/promise');
+const http = require('http');
+
+const API_PORT = process.env.PORT || 3005;
+
+// Convertit une valeur de ratio renvoyee par l'API en nombre exploitable.
+// '-', null, undefined ou valeurs non finies => null (jamais la chaine '-').
+function ratioNum(v) {
+  if (v === null || v === undefined || v === '-') return null;
+  const n = typeof v === 'number' ? v : parseFloat(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+// Appelle l'endpoint EUR/USD valide pour recuperer les ratios 3 ans.
+// year=3 => branche req.params.year === "3" => periode '3_ans' (ratios 3 ans).
+// En cas d'echec (API down, 404, data null, JSON invalide) => resout avec
+// les 10 champs a null pour preserver le comportement existant (zero regression).
+function fetchRatios3ans(fondId, devise, dateStr) {
+  const nullRatios = {
+    volatility3an: null, ratiosharpe3an: null, pertemax3an: null,
+    sortino3an: null, info3an: null, calamar3an: null,
+    var953an: null, betabaissier3an: null, omega3an: null, dsr3an: null,
+  };
+  return new Promise((resolve) => {
+    const path = `/api/ratiosnewdevwithdate/3/${fondId}/${devise}/${dateStr}`;
+    const req = http.get({ host: 'localhost', port: API_PORT, path, timeout: 30000 }, (resp) => {
+      let body = '';
+      resp.on('data', (chunk) => { body += chunk; });
+      resp.on('end', () => {
+        try {
+          const json = JSON.parse(body);
+          const d = json && json.data;
+          if (!d) { resolve({ ...nullRatios }); return; }
+          resolve({
+            volatility3an: ratioNum(d.volatility),
+            ratiosharpe3an: ratioNum(d.ratioSharpe),
+            pertemax3an: ratioNum(d.maxDrawdown),
+            sortino3an: ratioNum(d.sortino),
+            info3an: ratioNum(d.info),
+            calamar3an: ratioNum(d.calmar),
+            var953an: ratioNum(d.VAR95),
+            betabaissier3an: ratioNum(d.betaBaiss),
+            omega3an: ratioNum(d.omega),
+            dsr3an: ratioNum(d.dsr),
+          });
+        } catch (e) {
+          resolve({ ...nullRatios });
+        }
+      });
+    });
+    req.on('error', () => resolve({ ...nullRatios }));
+    req.on('timeout', () => { req.destroy(); resolve({ ...nullRatios }); });
+  });
+}
 
 const DB_CONFIG = {
   host: process.env.DB_HOST || '127.0.0.1',
@@ -190,6 +243,10 @@ async function processDevise(conn, fonds, devise, opts) {
         [f.id, latestDateStr]
       );
 
+      // Ratios 3 ans via l'endpoint EUR/USD valide (REUSE, jamais reimplemente).
+      // En cas d'echec, ratios3ans contient les 10 champs a null (zero regression).
+      const ratios3ans = await fetchRatios3ans(f.id, devise, latestDateStr);
+
       const perfValues = {
         fond_id: f.id,
         fond: String(f.id),
@@ -204,6 +261,8 @@ async function processDevise(conn, fonds, devise, opts) {
         ytd, perfveille: perfVeille,
         perf1an, perf3ans, perf5ans, perf8ans, perf10ans,
         perf4s, perf3m, perf6m,
+        // Ratios 3 ans (additif) — issus de l'endpoint EUR/USD valide
+        ...ratios3ans,
       };
 
       if (existingPerf.length > 0) {
