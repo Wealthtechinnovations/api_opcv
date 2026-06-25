@@ -132,7 +132,7 @@ async function authMASI() {
 
 const INDICES = {
   NSE: { label: 'NSE All Share (Nigeria)', auth: authNSE, fullHistory: true },
-  TUNINDEX: { label: 'Tunindex (Tunisie)', auth: authTunindex, fullHistory: false }, // BVMT ~3 mois
+  TUNINDEX: { label: 'Tunindex (Tunisie)', auth: authTunindex, fullHistory: false, dbId: 'Tunindex' }, // BVMT ~3 mois
   MASI: { label: 'MASI (Maroc)', auth: authMASI, fullHistory: true },
 };
 
@@ -163,11 +163,12 @@ async function diagnoseOne(conn, key, opts) {
   const authDates = [...authMap.keys()].sort();
   console.log(`  Source autoritative: ${authMap.size} points (${authDates[0]} -> ${authDates[authDates.length - 1]})`);
 
+  const dbId = cfg.dbId || key;
   const [rows] = await conn.execute(
     `SELECT date, valeur FROM indice_references
      WHERE id_indice = ? AND date >= ? AND valeur IS NOT NULL
      ORDER BY date ASC`,
-    [key, opts.since]
+    [dbId, opts.since]
   );
   if (!rows.length) { console.log(`  Aucune ligne BDD depuis ${opts.since}.`); return; }
 

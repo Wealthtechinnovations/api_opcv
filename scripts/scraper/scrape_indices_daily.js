@@ -80,7 +80,7 @@ const INDEX_CONFIG = [
     scrape: scrapeMASI,
   },
   {
-    id_indice: 'TUNINDEX',
+    id_indice: 'Tunindex',
     nom_indice: 'Tunindex',
     type_indice_id: 1,
     pays: ['Tunisie'],

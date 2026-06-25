@@ -113,9 +113,9 @@ async function authMASI() {
 }
 
 const INDICES = {
-  NSE: { nom: 'NSE All Share', type_indice_id: 1, min: 1000, auth: authNSE },
-  TUNINDEX: { nom: 'Tunindex', type_indice_id: 1, min: 1000, auth: authTunindex },
-  MASI: { nom: 'MASI', type_indice_id: 1, min: 1000, auth: authMASI },
+  NSE: { nom: 'NSE All Share', type_indice_id: 1, min: 1000, auth: authNSE, dbId: 'NSE' },
+  TUNINDEX: { nom: 'Tunindex', type_indice_id: 1, min: 1000, auth: authTunindex, dbId: 'Tunindex' },
+  MASI: { nom: 'MASI', type_indice_id: 1, min: 1000, auth: authMASI, dbId: 'MASI' },
 };
 
 // --------------------------------------------------------------------------
@@ -139,10 +139,11 @@ async function fixOne(conn, key, opts) {
   if (!inWindow.length) { console.log('  Aucune seance autoritative dans la fenetre.'); return { updated: 0, inserted: 0 }; }
   console.log(`  Seances autoritatives dans [${opts.since} -> ${opts.until}]: ${inWindow.length}`);
 
+  const dbId = cfg.dbId || key;
   // Etat BDD existant sur la fenetre
   const [rows] = await conn.execute(
     `SELECT id, date, valeur FROM indice_references WHERE id_indice = ? AND date >= ? AND date <= ?`,
-    [key, opts.since, opts.until]
+    [dbId, opts.since, opts.until]
   );
   const dbByDate = new Map();
   for (const r of rows) {
@@ -167,7 +168,7 @@ async function fixOne(conn, key, opts) {
       if (opts.execute) {
         await conn.execute(
           `INSERT INTO indice_references (type_indice_id, id_indice, nom_indice, valeur, date) VALUES (?, ?, ?, ?, ?)`,
-          [cfg.type_indice_id, key, cfg.nom, authVal, date]
+          [cfg.type_indice_id, dbId, cfg.nom, authVal, date]
         );
       }
       inserted++;
