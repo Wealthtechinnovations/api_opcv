@@ -281,10 +281,13 @@ function execFileText(cmd, args, opts = {}) {
  */
 function curlGetText(url, extraHeaders = []) {
   const args = [
-    '-s', '-L', '--compressed', '--max-time', '30',
+    '-s', '-f', '-L', '--compressed', '--max-time', '30',
     '-H', `User-Agent: ${USER_AGENT}`,
     '-H', 'Accept-Language: fr-FR,fr;q=0.9,en;q=0.8',
-    '-H', 'Accept: */*',
+    '-H', 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    '-H', 'Sec-Fetch-Dest: document',
+    '-H', 'Sec-Fetch-Mode: navigate',
+    '-H', 'Sec-Fetch-Site: same-origin',
     ...extraHeaders,
     url,
   ];
@@ -466,19 +469,27 @@ async function scrapeNSE(targetDate, verbose) {
  * MONIA est un taux (%), non propage aux fonds (pays: [] dans INDEX_CONFIG).
  */
 async function scrapeMONIA(targetDate, verbose) {
-  const page = 'https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average';
+  const pages = [
+    'https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average',
+    'https://www.bkam.ma/Marche-monetaire/Taux-du-marche-interbancaire-MONIA',
+  ];
   const csvFallback = 'https://www.bkam.ma/en/export/blockcsv/566622/30551c1667f5f2004fb0019220d41795/06f7b466ca91da0596a810776852ee51?block=06f7b466ca91da0596a810776852ee51';
   try {
-    // Auto-reparation : retrouver le lien CSV courant depuis la page (si le hash change)
     let csvUrl = csvFallback;
-    try {
-      const html = await curlGetText(page, ['-H', `Referer: ${page}`]);
-      const m = html.match(/\/(?:en\/)?export\/blockcsv\/[^"'?\s]+\?block=[a-f0-9]+/i);
-      if (m) csvUrl = new URL(m[0], 'https://www.bkam.ma').href;
-    } catch (_) { /* on garde le fallback */ }
+    for (const page of pages) {
+      try {
+        const html = await curlGetText(page, ['-H', `Referer: ${page}`]);
+        const m = html.match(/\/(?:en\/)?export\/blockcsv\/[^"'?\s]+\?block=[a-f0-9]+/i);
+        if (m) { csvUrl = new URL(m[0], 'https://www.bkam.ma').href; break; }
+      } catch (_) { /* try next page or use fallback */ }
+    }
 
-    const csv = await curlGetText(csvUrl, ['-H', `Referer: ${page}`]);
+    const csv = await curlGetText(csvUrl, ['-H', `Referer: ${pages[0]}`]);
+    if (!csv.includes('MONIA') && !csv.includes('Reference date') && !csv.includes('Date de r')) {
+      throw new Error(`BKAM CSV non valide (${csv.length} octets, probable bloc WAF)`);
+    }
     const lines = csv.split(/\r?\n/).filter(l => /%/.test(l) && /\d{2}\/\d{2}\/\d{4}/.test(l));
+    if (verbose) console.log(`    [MONIA] ${lines.length} lignes de donnees dans le CSV`);
     for (const line of lines) {
       const cells = line.split(';').map(c => c.replace(/^"|"$/g, '').trim());
       const rate = cells[0];

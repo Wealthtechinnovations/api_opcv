@@ -1,5 +1,12 @@
 # T13 — Diagnostic liaison Indices ↔ Fonds (couverture indRef EUR/USD)
 
+> **MAJ 2026-06-25 — Continuite des series d'indices** : l'audit a etabli que les valeurs DB
+> NSE / Tunindex / MASI au 2026-05-15 etaient FAUSSES (queue gelee par l'ancien scraper HTML
+> depuis ~jan 2025), et non un rebase. Sources autoritatives 2026 rebranchees (commit `5314fe0`).
+> Outils ajoutes : `scripts/scraper/diagnose_index_history.js` (read-only) et `fix_index_tail.js`
+> (correction queue gelee). Ordre d'execution et verdict detailles dans
+> `../front_end_opcvm/SUIVI.md` → POINT DE REPRISE COURANT.
+
 > Revue de CODE uniquement. La DB de production n'est PAS accessible depuis l'environnement de revue.
 > Source de vérité utilisée : `PRODUCTION_STATE.json` (généré le 2026-06-03T05:00:01Z par `sync_production.sh`).
 > AUCUNE modification de code ni de DB n'a été effectuée. Ce fichier est purement documentaire.

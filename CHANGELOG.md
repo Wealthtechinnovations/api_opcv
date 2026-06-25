@@ -4,6 +4,23 @@
 > Ce fichier liste uniquement les jalons cote API pour un developpeur travaillant dans ce depot.
 > Eviter la duplication : detail complet dans le CHANGELOG frontend et SUIVI.md.
 
+## [2026-06-25] — A DEPLOYER (Indices : rebranchement sources + fix MONIA + continuite)
+- **Scraper indices rebranche sur sources officielles 2026** (`scripts/scraper/scrape_indices_daily.js`, commit `5314fe0`) :
+  BRVM→BOC PDF (helper Python pdfplumber), MASI→API medias24, Tunindex→API REST BVMT,
+  NSE→NGX doclib JSON, MONIA→CSV BKAM via curl. Insertion DB et propagation indRef INCHANGEES (additif).
+- **Fix MONIA** : `curlGetText` durci (`-f` → echec sur HTTP 4xx/5xx, entetes Sec-Fetch) et
+  `scrapeMONIA` (double URL EN/FR + validation contenu CSV) pour eviter l'echec silencieux sur VPS
+  (WAF bkam.ma renvoyait une page de blocage 200 prise pour le CSV).
+- **Analyse de continuite (NON destructive, diagnostic)** : les valeurs DB NSE/Tunindex/MASI au
+  2026-05-15 etaient FAUSSES (queue gelee par l'ancien scraper HTML depuis ~jan 2025). Le scraper
+  neuf renvoie les vraies valeurs (confirme multi-sources). Aucun rebase d'indice.
+- **Nouveaux scripts** (zero ecriture par defaut) :
+  - `scripts/scraper/diagnose_index_history.js` — READ-ONLY : compare DB vs source autoritative,
+    detecte la date de gel et le verdict.
+  - `scripts/scraper/fix_index_tail.js` — corrige le segment gele (UPDATE+INSERT vraies valeurs),
+    DRY-RUN par defaut, `--since` obligatoire, idempotent, scope `indice_references`.
+- Detail operationnel + ordre d'execution : `../front_end_opcvm/SUIVI.md` (POINT DE REPRISE COURANT).
+
 ## [2026-06-18] — DEPLOYE (LOT 1-3 classements/rankings)
 - **#54 LOT 1** — Fix rankings null/Infinity dans `ranking.service.js` :
   - `buildRankResult()` retournait Infinity quand total=0 (division par zero) → corrige
