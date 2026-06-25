@@ -38,6 +38,7 @@ const https = require('https');
 const http = require('http');
 const mysql = require('mysql2/promise');
 const path = require('path');
+const { execFile } = require('child_process');
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -244,335 +245,261 @@ function findInHtml(html, pattern) {
 }
 
 // ---------------------------------------------------------------------------
+// JSON / external-process helpers (additif — sources officielles 2026)
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch JSON via native https (with retry). Throws on non-200 or invalid JSON.
+ */
+async function httpGetJson(url, extraHeaders = {}) {
+  const resp = await httpGetWithRetry(url, {
+    headers: { 'Accept': 'application/json, text/plain, */*', ...extraHeaders },
+  });
+  if (resp.status !== 200) throw new Error(`HTTP ${resp.status} for ${url}`);
+  return JSON.parse(resp.body);
+}
+
+/**
+ * Run an external command and resolve its stdout (string).
+ * Used for `curl` (TLS-fingerprint WAF bypass) and `python3` (BOC PDF parsing).
+ */
+function execFileText(cmd, args, opts = {}) {
+  return new Promise((resolve, reject) => {
+    execFile(cmd, args, { maxBuffer: 25 * 1024 * 1024, timeout: 60000, ...opts }, (err, stdout, stderr) => {
+      if (err) {
+        err.message = `${cmd} failed: ${err.message}${stderr ? ` | ${String(stderr).slice(0, 300)}` : ''}`;
+        return reject(err);
+      }
+      resolve(stdout);
+    });
+  });
+}
+
+/**
+ * Fetch text via `curl` — required for hosts that block Node's TLS fingerprint
+ * (e.g. bkam.ma returns 403 to Node https/fetch but 200 to curl).
+ */
+function curlGetText(url, extraHeaders = []) {
+  const args = [
+    '-s', '-L', '--compressed', '--max-time', '30',
+    '-H', `User-Agent: ${USER_AGENT}`,
+    '-H', 'Accept-Language: fr-FR,fr;q=0.9,en;q=0.8',
+    '-H', 'Accept: */*',
+    ...extraHeaders,
+    url,
+  ];
+  return execFileText('curl', args);
+}
+
+/** Epoch milliseconds (UTC midnight) -> 'YYYY-MM-DD'. */
+function epochMsToISO(ms) {
+  return new Date(Number(ms)).toISOString().slice(0, 10);
+}
+
+const FR_MONTHS = {
+  'janv.': 1, 'janvier': 1, 'févr.': 2, 'fév.': 2, 'fevr.': 2, 'février': 2, 'fevrier': 2,
+  'mars': 3, 'avr.': 4, 'avril': 4, 'mai': 5, 'juin': 6, 'juil.': 7, 'juillet': 7,
+  'août': 8, 'aout': 8, 'sept.': 9, 'septembre': 9, 'oct.': 10, 'octobre': 10,
+  'nov.': 11, 'novembre': 11, 'déc.': 12, 'dec.': 12, 'décembre': 12, 'decembre': 12,
+};
+
+/** French long date "16 mai 2026" / "24 juin 2026" -> "2026-05-16". */
+function frLongDateToISO(s) {
+  if (!s || typeof s !== 'string') return null;
+  const parts = s.trim().toLowerCase().split(/\s+/);
+  if (parts.length < 3) return null;
+  const d = parseInt(parts[0], 10);
+  const m = FR_MONTHS[parts[1]];
+  const y = parseInt(parts[2], 10);
+  if (!d || !m || !y) return null;
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+/** Smallest medias24 `periode` window that still covers targetDate. */
+function periodeForDate(targetDate) {
+  const days = (Date.now() - new Date(targetDate).getTime()) / 86400000;
+  if (days <= 25) return '1m';
+  if (days <= 85) return '3m';
+  if (days <= 180) return '6m';
+  if (days <= 360) return '1y';
+  return '10y';
+}
+
+// ---------------------------------------------------------------------------
 // Index Scrapers
 // ---------------------------------------------------------------------------
 
 /**
- * BRVM Composite — from bfin.brvm.org
+ * BRVM Composite — depuis le Bulletin Officiel de la Cote (BOC) PDF du jour.
  *
- * The BRVM financial portal publishes daily index values.
- * We try multiple source URLs and parsing strategies.
+ * Source officielle (CREPMF) : https://bfin.brvm.org/boc/BOC_JOUR/BOC_YYYYMMDD.pdf
+ * La date est encodee dans le nom de fichier. L'extraction de la page 1 du PDF
+ * est deleguee au helper Python `scrape_brvm_index.py` (reutilise pdfplumber,
+ * deja installe pour le parseur de VL BRVM). 404 = jour non ouvre (week-end/ferie).
  */
 async function scrapeBRVM(targetDate, verbose) {
-  const sources = [
-    {
-      name: 'BRVM Market Summary API',
-      url: 'https://www.brvm.org/en/cours-indices/0',
-      parse: (body) => {
-        // The BRVM website lists indices in a table; look for "BRVM Composite"
-        // Pattern: BRVM Composite followed by a numeric value
-        const patterns = [
-          /BRVM[\s\-_]*Composite[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /Composite[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 50) return val; // BRVM Composite is typically > 100
-          }
-        }
-        return null;
-      },
-    },
-    {
-      name: 'BRVM bfin indices page',
-      url: 'https://bfin.brvm.org/indices',
-      parse: (body) => {
-        const patterns = [
-          /BRVM[\s\-_]*Composite[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /Composite[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 50) return val;
-          }
-        }
-        return null;
-      },
-    },
-    {
-      name: 'BRVM main indices page (French)',
-      url: 'https://www.brvm.org/fr/cours-indices/0',
-      parse: (body) => {
-        const patterns = [
-          /BRVM[\s\-_]*Composite[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 50) return val;
-          }
-        }
-        return null;
-      },
-    },
-  ];
-
-  return tryMultipleSources('BRVM', sources, verbose);
+  const helper = path.resolve(__dirname, 'scrape_brvm_index.py');
+  const url = `https://bfin.brvm.org/boc/BOC_JOUR/BOC_${targetDate.replace(/-/g, '')}.pdf`;
+  try {
+    const out = await execFileText('python3', [helper, '--date', targetDate]);
+    const json = JSON.parse(out.trim().split('\n').pop());
+    if (json.status === 'ok' && json.brvm_composite != null) {
+      const val = Number(json.brvm_composite);
+      if (isFinite(val) && val > 50) {
+        console.log(`    [BRVM] SUCCESS via BOC PDF (bfin): ${val}`);
+        return { value: val, source: 'BRVM BOC PDF (bfin.brvm.org)', url: json.source || url };
+      }
+    } else if (json.status === 'no_session') {
+      if (verbose) console.log(`    [BRVM] pas de seance le ${targetDate} (week-end/ferie)`);
+    } else if (verbose) {
+      console.log(`    [BRVM] ${json.status}${json.error ? ': ' + json.error : ''}`);
+    }
+  } catch (err) {
+    if (verbose) console.log(`    [BRVM] ERROR ${err.message}`);
+  }
+  return null;
 }
 
 /**
- * MASI — from Bourse de Casablanca (casablanca-bourse.com)
+ * MASI — via l'API content de medias24 (meme backend que l'app mobile de la
+ * Bourse de Casablanca). Le site officiel casablanca-bourse.com est derriere un
+ * WAF Imperva (503 cote serveur) et n'est pas exploitable.
  *
- * The Casablanca Stock Exchange publishes daily index summaries.
+ * getMasiHistory renvoie { result: { labels:[ts UTC minuit], prices:[cloture] } }.
+ * On selectionne la fenetre via `periode` puis on filtre par date.
  */
 async function scrapeMASI(targetDate, verbose) {
-  const sources = [
-    {
-      name: 'Bourse de Casablanca main page',
-      url: 'https://www.casablanca-bourse.com/bourseweb/index.aspx',
-      parse: (body) => {
-        // Look for MASI value in the page — typically displayed prominently
-        const patterns = [
-          /MASI[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /id="?[^"]*masi[^"]*"?[^>]*>[^<]*?([0-9][0-9\s.,]+)/i,
-          /masi[^<]*?([0-9]{4,}[.,]\d+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 1000) return val; // MASI is typically > 5000
-          }
+  const periode = periodeForDate(targetDate);
+  const url = `https://medias24.com/content/api?method=getMasiHistory&periode=${periode}&format=json`;
+  try {
+    const json = await httpGetJson(url, { 'User-Agent': USER_AGENT });
+    const labels = json?.result?.labels || [];
+    const prices = json?.result?.prices || [];
+    for (let i = 0; i < labels.length; i++) {
+      if (epochMsToISO(labels[i] * 1000) === targetDate) {
+        const val = Number(prices[i]);
+        if (isFinite(val) && val > 1000) {
+          console.log(`    [MASI] SUCCESS via medias24 getMasiHistory (${periode}): ${val}`);
+          return { value: val, source: 'medias24 getMasiHistory', url };
         }
-        return null;
-      },
-    },
-    {
-      name: 'Bourse de Casablanca market data',
-      url: 'https://www.casablanca-bourse.com/bourseweb/en/index.aspx',
-      parse: (body) => {
-        const patterns = [
-          /MASI[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 1000) return val;
-          }
-        }
-        return null;
-      },
-    },
-    {
-      name: 'Bourse de Casablanca indices page',
-      url: 'https://www.casablanca-bourse.com/bourseweb/Cours-Indices.aspx',
-      parse: (body) => {
-        const patterns = [
-          /MASI[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 1000) return val;
-          }
-        }
-        return null;
-      },
-    },
-  ];
-
-  return tryMultipleSources('MASI', sources, verbose);
+      }
+    }
+    if (verbose) console.log(`    [MASI] pas de valeur pour ${targetDate} (jour non ouvre ?)`);
+  } catch (err) {
+    if (verbose) console.log(`    [MASI] ERROR ${err.message}`);
+  }
+  return null;
 }
 
 /**
- * Tunindex — from BVMT (Bourse des Valeurs Mobilieres de Tunis)
+ * Tunindex — via l'API REST officielle de la BVMT (le site est un SPA AngularJS
+ * qui charge les valeurs via cette API cachee, d'ou l'echec du scraping HTML).
+ *
+ * /rest_api/rest/history/{ISIN} renvoie ~60 seances : [{ sEANCE, lAST }].
+ * ISIN Tunindex = TN0009050014 (ticker PX1).
  */
 async function scrapeTunindex(targetDate, verbose) {
-  const sources = [
-    {
-      name: 'BVMT main page',
-      url: 'https://www.bvmt.com.tn/',
-      parse: (body) => {
-        const patterns = [
-          /TUNINDEX[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /tunindex[^<]*?([0-9]{4,}[.,]\d+)/i,
-          /id="?[^"]*tunindex[^"]*"?[^>]*>[^<]*?([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 1000) return val; // Tunindex is typically > 5000
-          }
+  const TUNINDEX_ISIN = 'TN0009050014';
+  const url = `https://www.bvmt.com.tn/rest_api/rest/history/${TUNINDEX_ISIN}`;
+  try {
+    const json = await httpGetJson(url, { 'User-Agent': USER_AGENT });
+    const hist = json?.indexHistorys || json?.data?.indexHistorys || [];
+    for (const row of hist) {
+      const iso = frLongDateToISO(row.sEANCE || row.seance || row.SEANCE || '');
+      if (iso === targetDate) {
+        const val = Number(row.lAST != null ? row.lAST : row.last);
+        if (isFinite(val) && val > 1000) {
+          console.log(`    [Tunindex] SUCCESS via BVMT REST history: ${val}`);
+          return { value: val, source: 'BVMT REST /history', url };
         }
-        return null;
-      },
-    },
-    {
-      name: 'BVMT indices page',
-      url: 'https://www.bvmt.com.tn/fr/marche/indices',
-      parse: (body) => {
-        const patterns = [
-          /TUNINDEX[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 1000) return val;
-          }
-        }
-        return null;
-      },
-    },
-    {
-      name: 'BVMT resume page',
-      url: 'https://www.bvmt.com.tn/fr/marche/resume',
-      parse: (body) => {
-        const patterns = [
-          /TUNINDEX[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 1000) return val;
-          }
-        }
-        return null;
-      },
-    },
-  ];
-
-  return tryMultipleSources('Tunindex', sources, verbose);
+      }
+    }
+    if (verbose) console.log(`    [Tunindex] pas de valeur pour ${targetDate} (hors fenetre ~60 seances ?)`);
+  } catch (err) {
+    if (verbose) console.log(`    [Tunindex] ERROR ${err.message}`);
+  }
+  return null;
 }
 
 /**
- * NSE All Share Index — from Nigerian Exchange Group (ngxgroup.com)
+ * NSE All Share Index (NGX ASI) — via l'endpoint JSON officiel doclib de NGX
+ * (le meme que la page indices de ngxgroup.com appelle). Un seul appel renvoie
+ * tout l'historique quotidien : { currentPrice, currentDateTime, IndiciesData:[[ts_ms, val]] }.
+ * Les anciens hosts (ngxgroup.com/exchange/trade/market-data = 404, nse.com.ng = mort)
+ * sont remplaces par celui-ci.
  */
 async function scrapeNSE(targetDate, verbose) {
-  const sources = [
-    {
-      name: 'NGX Group main page',
-      url: 'https://ngxgroup.com/',
-      parse: (body) => {
-        const patterns = [
-          /All[\s-]*Share[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /ASI[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /NGX[\s-]*ASI[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 10000) return val; // NSE ASI is typically > 30000
-          }
+  const url = 'https://doclib.ngxgroup.com/REST/api/chartdata/ASI';
+  try {
+    const json = await httpGetJson(url, { 'User-Agent': USER_AGENT });
+    // Chemin rapide : valeur courante
+    if (json?.currentDateTime && String(json.currentDateTime).slice(0, 10) === targetDate) {
+      const val = Number(json.currentPrice);
+      if (isFinite(val) && val > 1000) {
+        console.log(`    [NSE] SUCCESS via NGX chartdata/ASI (current): ${val}`);
+        return { value: val, source: 'NGX doclib chartdata/ASI', url };
+      }
+    }
+    const data = json?.IndiciesData || [];
+    for (const pair of data) {
+      if (Array.isArray(pair) && pair.length >= 2 && epochMsToISO(pair[0]) === targetDate) {
+        const val = Number(pair[1]);
+        if (isFinite(val) && val > 1000) {
+          console.log(`    [NSE] SUCCESS via NGX chartdata/ASI: ${val}`);
+          return { value: val, source: 'NGX doclib chartdata/ASI', url };
         }
-        return null;
-      },
-    },
-    {
-      name: 'NGX Exchange market data',
-      url: 'https://ngxgroup.com/exchange/trade/market-data/',
-      parse: (body) => {
-        const patterns = [
-          /All[\s-]*Share[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /ASI[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 10000) return val;
-          }
-        }
-        return null;
-      },
-    },
-    {
-      name: 'NSE legacy site',
-      url: 'https://www.nse.com.ng/',
-      parse: (body) => {
-        const patterns = [
-          /All[\s-]*Share[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /ASI[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val && val > 10000) return val;
-          }
-        }
-        return null;
-      },
-    },
-  ];
-
-  return tryMultipleSources('NSE', sources, verbose);
+      }
+    }
+    if (verbose) console.log(`    [NSE] pas de valeur pour ${targetDate} (jour non ouvre ?)`);
+  } catch (err) {
+    if (verbose) console.log(`    [NSE] ERROR ${err.message}`);
+  }
+  return null;
 }
 
 /**
- * MONIA — from Bank Al-Maghrib (bkam.ma)
- *
- * MONIA (Moroccan Overnight Index Average) is a monetary market rate index
- * published by Bank Al-Maghrib.
+ * MONIA (Moroccan Overnight Index Average) — taux monetaire publie par Bank
+ * Al-Maghrib. bkam.ma bloque le fingerprint TLS de Node (403) mais repond a
+ * curl (200) : on passe donc par curl. La donnee est un CSV (export blockcsv)
+ * contenant tout l'historique. Colonnes : "MONIA index";"Overnight volume";
+ * "Reference date";"Date of publication". On stocke la DATE DE REFERENCE.
+ * MONIA est un taux (%), non propage aux fonds (pays: [] dans INDEX_CONFIG).
  */
 async function scrapeMONIA(targetDate, verbose) {
-  const sources = [
-    {
-      name: 'Bank Al-Maghrib market rates',
-      url: 'https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-interbancaire/Taux-d-interet-interbancaire',
-      parse: (body) => {
-        const patterns = [
-          /MONIA[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-          /monia[^<]*?([0-9]+[.,]\d+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            // MONIA is a rate, typically between 0 and 10 (percent)
-            if (val !== null && val >= 0 && val < 100) return val;
-          }
-        }
-        return null;
-      },
-    },
-    {
-      name: 'Bank Al-Maghrib main page',
-      url: 'https://www.bkam.ma/',
-      parse: (body) => {
-        const patterns = [
-          /MONIA[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val !== null && val >= 0 && val < 100) return val;
-          }
-        }
-        return null;
-      },
-    },
-    {
-      name: 'Bank Al-Maghrib interbank indicators',
-      url: 'https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-interbancaire',
-      parse: (body) => {
-        const patterns = [
-          /MONIA[^<]*?(?:<[^>]+>[\s]*)*([0-9][0-9\s.,]+)/i,
-        ];
-        for (const pat of patterns) {
-          const m = body.match(pat);
-          if (m) {
-            const val = parseNumber(m[1]);
-            if (val !== null && val >= 0 && val < 100) return val;
-          }
-        }
-        return null;
-      },
-    },
-  ];
+  const page = 'https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average';
+  const csvFallback = 'https://www.bkam.ma/en/export/blockcsv/566622/30551c1667f5f2004fb0019220d41795/06f7b466ca91da0596a810776852ee51?block=06f7b466ca91da0596a810776852ee51';
+  try {
+    // Auto-reparation : retrouver le lien CSV courant depuis la page (si le hash change)
+    let csvUrl = csvFallback;
+    try {
+      const html = await curlGetText(page, ['-H', `Referer: ${page}`]);
+      const m = html.match(/\/(?:en\/)?export\/blockcsv\/[^"'?\s]+\?block=[a-f0-9]+/i);
+      if (m) csvUrl = new URL(m[0], 'https://www.bkam.ma').href;
+    } catch (_) { /* on garde le fallback */ }
 
-  return tryMultipleSources('MONIA', sources, verbose);
+    const csv = await curlGetText(csvUrl, ['-H', `Referer: ${page}`]);
+    const lines = csv.split(/\r?\n/).filter(l => /%/.test(l) && /\d{2}\/\d{2}\/\d{4}/.test(l));
+    for (const line of lines) {
+      const cells = line.split(';').map(c => c.replace(/^"|"$/g, '').trim());
+      const rate = cells[0];
+      const ref = cells[2]; // Reference date = date de marche
+      if (!ref) continue;
+      const dm = ref.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+      if (!dm) continue;
+      const iso = `${dm[3]}-${dm[2]}-${dm[1]}`;
+      if (iso === targetDate) {
+        const val = parseFloat(String(rate).replace('%', '').replace(',', '.').trim());
+        if (isFinite(val) && val >= 0 && val < 100) {
+          console.log(`    [MONIA] SUCCESS via BKAM blockcsv (curl): ${val}`);
+          return { value: val, source: 'BKAM blockcsv MONIA', url: csvUrl };
+        }
+      }
+    }
+    if (verbose) console.log(`    [MONIA] pas de valeur pour ${targetDate} (jour non ouvre ?)`);
+  } catch (err) {
+    if (verbose) console.log(`    [MONIA] ERROR ${err.message}`);
+  }
+  return null;
 }
 
 /**
