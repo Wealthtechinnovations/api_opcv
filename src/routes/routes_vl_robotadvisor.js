@@ -269,6 +269,10 @@ module.exports = (app) => {
         }));
         res.json({ code: 200, data: { simulations } })
       })
+      .catch(err => {
+        console.error('Erreur getsimulationportefeuillebyuser:', err);
+        if (!res.headersSent) res.status(500).json({ code: 500, message: 'Erreur serveur' });
+      })
   })
 
   app.post('/api/postsimulation', async (req, res) => {
@@ -296,6 +300,10 @@ module.exports = (app) => {
         }));
         res.json({ code: 200, data: { simulations } })
       })
+      .catch(err => {
+        console.error('Erreur getsimulationbyuser:', err);
+        if (!res.headersSent) res.status(500).json({ code: 500, message: 'Erreur serveur' });
+      })
   })
 
   app.get('/api/getportefeuillebysimulation/:id', async (req, res) => {
@@ -312,6 +320,10 @@ module.exports = (app) => {
           portefeuille_id: data.portefeuille_id,
         }));
         res.json({ code: 200, data: { simulations } })
+      })
+      .catch(err => {
+        console.error('Erreur getportefeuillebysimulation:', err);
+        if (!res.headersSent) res.status(500).json({ code: 500, message: 'Erreur serveur' });
       })
   })
 

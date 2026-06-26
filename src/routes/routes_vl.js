@@ -433,42 +433,43 @@ module.exports = (app) => {
   app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
 
-    // Vérifiez si l'utilisateur existe
-    const user = await users.findOne({ where: { email: email } });
-    if (!user) {
-      return res.status(404).send('Utilisateur non trouvé');
-    }
-
-    // Créer un jeton de réinitialisation
-    const resetToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // Lien de réinitialisation
-    const resetUrl = `${process.env.FRONTEND_URL}/panel/management/login/reset-password?token=${resetToken}`;
-
-    // Configurer nodemailer pour envoyer l'email
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT),
-      secure: process.env.EMAIL_SECURE === 'true',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: 'Réinitialisation de mot de passe - Fundafrique',
-      html: `<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p>
-             <a href="${resetUrl}">Réinitialiser le mot de passe</a>`,
-    };
-
     try {
+      // Vérifiez si l'utilisateur existe
+      const user = await users.findOne({ where: { email: email } });
+      if (!user) {
+        return res.status(404).send('Utilisateur non trouvé');
+      }
+
+      // Créer un jeton de réinitialisation
+      const resetToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+      // Lien de réinitialisation
+      const resetUrl = `${process.env.FRONTEND_URL}/panel/management/login/reset-password?token=${resetToken}`;
+
+      // Configurer nodemailer pour envoyer l'email
+      const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT),
+        secure: process.env.EMAIL_SECURE === 'true',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Réinitialisation de mot de passe - Fundafrique',
+        html: `<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p>
+             <a href="${resetUrl}">Réinitialiser le mot de passe</a>`,
+      };
+
       await transporter.sendMail(mailOptions);
       res.status(200).send('Email de réinitialisation envoyé');
     } catch (error) {
-      res.status(500).send('Erreur lors de l\'envoi de l\'email');
+      console.error('Erreur forgot-password:', error);
+      if (!res.headersSent) res.status(500).send('Erreur lors de l\'envoi de l\'email');
     }
   });
 
@@ -1498,10 +1499,13 @@ GROUP BY f.societe_gestion;
   //fonction avoir date vl manquante
   app.get('/dates-manquantes/:fundId', async (req, res) => {
     const fundId = req.params.fundId;
-    const fund = await fond.findOne({ where: { id: fundId } });
-    const periodicite = fund.periodicite; // Récupérer la périodicité depuis la requête si nécessaire
 
     try {
+      const fund = await fond.findOne({ where: { id: fundId } });
+      if (!fund) {
+        return res.status(404).json({ error: 'Fonds introuvable' });
+      }
+      const periodicite = fund.periodicite; // Récupérer la périodicité depuis la requête si nécessaire
       const firstVlDate = await vl.min('date', { where: { fund_id: fundId } });
       const increment = periodicite === 'journaliere' ? 'days' : 'weeks';
       const missingDates = [];
@@ -3505,18 +3509,18 @@ GROUP BY f.societe_gestion;
 
     const valuesArray = selectedValues ? selectedValues.split(',') : [''];
 
-    // Fetch funds based on criteria
-    const funds = await fetchFundsByValorisationfirst(valuesArray, selectedCategorie, selectedSociete, selectedDevise, frequence, selectedcategorieregionale, selectedcategorienationale);
-
-    if (!funds.length) {
-      res.status(404).json({ error: 'No funds found.' });
-      return;
-    }
-
-    // Use batch processing to fetch fund data and performance data
-    const fundIds = funds.map(fund => fund.id);
-
     try {
+      // Fetch funds based on criteria
+      const funds = await fetchFundsByValorisationfirst(valuesArray, selectedCategorie, selectedSociete, selectedDevise, frequence, selectedcategorieregionale, selectedcategorienationale);
+
+      if (!funds.length) {
+        res.status(404).json({ error: 'No funds found.' });
+        return;
+      }
+
+      // Use batch processing to fetch fund data and performance data
+      const fundIds = funds.map(fund => fund.id);
+
       // Fetch all fund data in one batch
       const fundDataResults = await fond.findAll({
         where: { id: fundIds },
