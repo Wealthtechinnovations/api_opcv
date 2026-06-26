@@ -128,15 +128,28 @@ async function main() {
          AND valeur IS NOT NULL AND valeur > 0`,
       [...ids, loadStartISO, opts.until]
     );
+    // La table indice_references peut contenir DEUX casses pour un meme indice
+    // (ex: ancien 'TUNINDEX' fige + nouveau 'Tunindex' corrige). On fusionne par
+    // casse (cle en minuscules) en PRIORISANT la casse canonique (celle de
+    // INDEX_CONFIG, ecrite par fix_index_tail/scraper = valeurs corrigees) sur
+    // les autres casses, pour ne jamais reintroduire une valeur figee.
+    const canonical = new Set(activeConfigs.map(c => c.id_indice)); // casse exacte canonique
     const indexDataByIndice = {};
+    const setByCanonical = {};
     for (const r of refRows) {
+      const key = String(r.id_indice).toLowerCase();
       const d = toISO(r.date);
-      if (!indexDataByIndice[r.id_indice]) indexDataByIndice[r.id_indice] = new Map();
-      indexDataByIndice[r.id_indice].set(d, parseFloat(r.valeur));
+      if (!indexDataByIndice[key]) { indexDataByIndice[key] = new Map(); setByCanonical[key] = new Set(); }
+      if (canonical.has(r.id_indice)) {
+        indexDataByIndice[key].set(d, parseFloat(r.valeur)); // canonique = prioritaire
+        setByCanonical[key].add(d);
+      } else if (!setByCanonical[key].has(d) && !indexDataByIndice[key].has(d)) {
+        indexDataByIndice[key].set(d, parseFloat(r.valeur)); // comblement si canonique absente
+      }
     }
     for (const cfg of activeConfigs) {
-      const n = indexDataByIndice[cfg.id_indice] ? indexDataByIndice[cfg.id_indice].size : 0;
-      console.log(`  Reference ${cfg.id_indice}: ${n} points dans la fenetre.`);
+      const m = indexDataByIndice[cfg.id_indice.toLowerCase()];
+      console.log(`  Reference ${cfg.id_indice}: ${m ? m.size : 0} points dans la fenetre.`);
     }
 
     // Liste des fonds (filtre pays / fond optionnel)
@@ -157,7 +170,7 @@ async function main() {
         cfg.pays.some(p => p.toLowerCase() === (fund.pays || '').toLowerCase())
       );
       if (!matchingCfg) continue;
-      const indexData = indexDataByIndice[matchingCfg.id_indice];
+      const indexData = indexDataByIndice[matchingCfg.id_indice.toLowerCase()];
       if (!indexData || indexData.size === 0) continue;
 
       const [vls] = await conn.execute(

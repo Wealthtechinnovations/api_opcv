@@ -376,7 +376,7 @@ router.get('/api/searchFunds', async (req, res) => {
          bases_100:data.base_100, // Remplacez avec la propriété correcte de l'objet
          bases_100_InRef:data.base_100_InRef,
      }));*/
-      const hasIndRef = response.some(data => data.indRef !== null);
+      const hasIndRef = response.some(data => data.indRef != null && data.indRef > 0);
 
       const graphs = response.map(data => {
         if (data.value === null) return null;
@@ -384,7 +384,7 @@ router.get('/api/searchFunds', async (req, res) => {
           dates: moment(data.date).format('YYYY-MM-DD'),
           values: hasIndRef ? (data.vl_ajuste ?? data.value) : data.value,
         };
-        if (hasIndRef && data.indRef != null) {
+        if (hasIndRef && data.indRef != null && data.indRef > 0) {
           point.valuesInd = data.indRef;
         }
         return point;
