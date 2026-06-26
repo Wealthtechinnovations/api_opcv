@@ -6787,7 +6787,7 @@ GROUP BY f.societe_gestion;
         });
 
         // Utilisez Promise.all pour attendre que toutes les requêtes à la deuxième API se terminent
-        Promise.all(promessesAPI2)
+        return Promise.all(promessesAPI2)
           .then((results2) => {
             // Combinez les données de l'API externe initiale avec les données de la deuxième API
             const fundsWithSecondData = fundsWithGraphData.map((fund, index) => ({
@@ -6809,7 +6809,7 @@ GROUP BY f.societe_gestion;
             });
 
             // Utilisez Promise.all pour attendre que toutes les requêtes à la troisième API se terminent
-            Promise.all(promessesAPI3)
+            return Promise.all(promessesAPI3)
               .then((results3) => {
                 // Combinez les données des API précédentes avec les données de la troisième API
                 const fundsWithThirdData = fundsWithSecondData.map((fund, index) => ({
@@ -6831,7 +6831,7 @@ GROUP BY f.societe_gestion;
                 });
 
                 // Utilisez Promise.all pour attendre que toutes les requêtes à la quatrième API se terminent
-                Promise.all(promessesAPI4)
+                return Promise.all(promessesAPI4)
                   .then((results4) => {
                     // Combinez les données des API précédentes avec les données de la quatrième API
                     const fundsWithFourthData = fundsWithThirdData.map((fund, index) => ({
