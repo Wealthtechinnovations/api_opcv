@@ -14,7 +14,18 @@
 - **Fix `/api/comparaison` inner Promise.all** (commit `2d04a86`) : 3 `Promise.all(promessesAPI2/3/4)`
   n'etaient pas `return`es dans la chaine `.then` externe → rejections avalees, requete hang.
   Ajout de `return` pour remonter au `.catch` existant. Additif, chemin erreur uniquement.
-- Detail : `../front_end_opcvm/CODE_REVIEW.md` items #57-#60 + SUIVI.md.
+- **Nouveau script `propagate_indref_range.js`** (commit `d4a237d`) : propagation indRef sur une
+  PLAGE complete `[since,until]` depuis `indice_references` (DB corrigee) vers `valorisations.indRef`.
+  Comble le trou : `fix_index_tail` corrige `indice_references` mais les pages fonds lisent
+  `valorisations.indRef` (copie par-fond, propagee separement). La propagation native du scraper
+  ne couvre que +/-7j autour d'une date → insuffisant pour un indice fige plusieurs mois.
+  `import_indices_excel --step 2` ne convient PAS (il lit l'Excel fige, pas la DB). Reprend la
+  logique validee de `propagateIndRef` (mapping pays->indice, match exact ou +/-7j). DRY-RUN par
+  defaut, `--since` obligatoire, idempotent. EUR/USD recalcule ensuite par `recalc_eur_usd_daily_rate.js`.
+- **Verif source NGX en direct** : `doclib.ngxgroup.com/REST/api/chartdata/ASI` → `currentPrice`
+  233580.83 au 2026-06-25 (7535 points depuis 1996, serie lisse). Confirme : DB figee ~103k = FAUSSE,
+  rallye nominal nigerian reel. Correction legitime (donnee officielle, "ne jamais inventer" respecte).
+- Detail : `../front_end_opcvm/CODE_REVIEW.md` items #57-#61 + SUIVI.md (POINT DE REPRISE).
 
 ## [2026-06-25] — A DEPLOYER (Indices : rebranchement sources + fix MONIA + continuite)
 - **Scraper indices rebranche sur sources officielles 2026** (`scripts/scraper/scrape_indices_daily.js`, commit `5314fe0`) :

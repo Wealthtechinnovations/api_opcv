@@ -1,5 +1,15 @@
 # T13 — Diagnostic liaison Indices ↔ Fonds (couverture indRef EUR/USD)
 
+> **MAJ 2026-06-26 — Dry-run + verif source + outillage propagation** :
+> Dry-run `fix_index_tail --since 2000-01-01 --seuil 3` execute en prod : 6637 valeurs a corriger,
+> 78 seances a inserer (NSE 5585+26, TUNINDEX 34+27, MASI 1018+25). Source NGX verifiee en direct
+> (`doclib.ngxgroup.com/REST/api/chartdata/ASI` → currentPrice 233580.83 au 2026-06-25, 7535 pts depuis 1996,
+> correspondance exacte) → la DB figee ~103k est bien FAUSSE, correction legitime. Constat majeur :
+> corriger `indice_references` ne suffit pas — les pages fonds lisent `valorisations.indRef` (copie par-fond).
+> Nouveau script `scripts/scraper/propagate_indref_range.js` (commit `d4a237d`) pour propager sur une
+> fenetre complete depuis la DB corrigee. Sequence SSH reversible (avec sauvegarde) dans
+> `../front_end_opcvm/SUIVI.md` → POINT DE REPRISE COURANT.
+
 > **MAJ 2026-06-25 — Continuite des series d'indices** : l'audit a etabli que les valeurs DB
 > NSE / Tunindex / MASI au 2026-05-15 etaient FAUSSES (queue gelee par l'ancien scraper HTML
 > depuis ~jan 2025), et non un rebase. Sources autoritatives 2026 rebranchees (commit `5314fe0`).
