@@ -4,13 +4,16 @@
 > Ce fichier liste uniquement les jalons cote API pour un developpeur travaillant dans ce depot.
 > Eviter la duplication : detail complet dans le CHANGELOG frontend et SUIVI.md.
 
-## [2026-06-26] — A DEPLOYER (fix Tunindex case + audit hang routes)
+## [2026-06-26] — A DEPLOYER (fix Tunindex case + audit hang routes + comparaison Promise.all)
 - **Fix Tunindex id_indice** (commit `8a8520b`) : `'TUNINDEX'` → `'Tunindex'` (la DB stocke `Tunindex`).
   JS case-sensitive → `propagateIndRef` sautait tous les fonds tunisiens ; un `--execute` aurait
   dedouble la serie. Fix dans les 3 scripts (scraper + diagnostic + correction) via champ `dbId`.
 - **Fix routes qui hangent sur erreur** (commit `95febbb`) : 5 routes async ne renvoyaient jamais de
   reponse en cas d'erreur DB. robotadvisor (3 routes `.then` sans `.catch`) + routes_vl
   (forgot-password, dates-manquantes, rechercheravance-fonds : `await` hors try). Additif, chemin erreur.
+- **Fix `/api/comparaison` inner Promise.all** (commit `2d04a86`) : 3 `Promise.all(promessesAPI2/3/4)`
+  n'etaient pas `return`es dans la chaine `.then` externe → rejections avalees, requete hang.
+  Ajout de `return` pour remonter au `.catch` existant. Additif, chemin erreur uniquement.
 - Detail : `../front_end_opcvm/CODE_REVIEW.md` items #57-#60 + SUIVI.md.
 
 ## [2026-06-25] — A DEPLOYER (Indices : rebranchement sources + fix MONIA + continuite)
