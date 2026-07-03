@@ -1,12 +1,27 @@
-// Polyfill Object.hasOwn : disponible depuis Node 16.9 seulement, or la prod
-// tourne en Node v14.16. helmet@8 (node_modules) l'utilise et faisait crasher
-// api-monolith au demarrage (TypeError: Object.hasOwn is not a function).
-// Additif, sans effet sur Node >= 16.9.
+// ============================================================================
+// COMPAT NODE 14.16 (la prod tourne en Node v14.16 ; des dependances de
+// node_modules ciblent Node 16/18). Shims additifs, sans effet sur Node >= 16.
+// ============================================================================
+// 1) Prefixe 'node:' pour les modules builtin (supporte a partir de Node 14.18).
+//    ethers -> @noble/hashes fait require('node:crypto') -> MODULE_NOT_FOUND en 14.16.
+const _Module = require('module');
+const _origResolve = _Module._resolveFilename;
+_Module._resolveFilename = function (request, ...rest) {
+  if (typeof request === 'string' && request.startsWith('node:')) {
+    request = request.slice(5);
+  }
+  return _origResolve.call(this, request, ...rest);
+};
+// 2) Object.hasOwn (Node 16.9+) — utilise par helmet@8.
 if (typeof Object.hasOwn !== 'function') {
   Object.defineProperty(Object, 'hasOwn', {
     value: (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop),
     configurable: true, writable: true,
   });
+}
+// 3) structuredClone (Node 17+) — filet de securite pour dependances recentes.
+if (typeof globalThis.structuredClone !== 'function') {
+  globalThis.structuredClone = (v) => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
 }
 
 require('dotenv').config();
