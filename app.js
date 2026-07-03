@@ -1,3 +1,14 @@
+// Polyfill Object.hasOwn : disponible depuis Node 16.9 seulement, or la prod
+// tourne en Node v14.16. helmet@8 (node_modules) l'utilise et faisait crasher
+// api-monolith au demarrage (TypeError: Object.hasOwn is not a function).
+// Additif, sans effet sur Node >= 16.9.
+if (typeof Object.hasOwn !== 'function') {
+  Object.defineProperty(Object, 'hasOwn', {
+    value: (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop),
+    configurable: true, writable: true,
+  });
+}
+
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
