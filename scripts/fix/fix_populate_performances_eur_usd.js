@@ -74,7 +74,12 @@ const DB_CONFIG = {
 };
 
 function parseArgs() {
-  const args = process.argv.slice(2);
+  // Accepte '--flag valeur' ET '--flag=valeur' (compat bridge scoped-write MCP)
+  const args = [];
+  for (const tok of process.argv.slice(2)) {
+    const m = /^(--[a-zA-Z]+)=(.*)$/.exec(tok);
+    if (m) { args.push(m[1], m[2]); } else { args.push(tok); }
+  }
   const opts = { pays: null, fondId: null, force: false, devise: 'BOTH' };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--pays' && args[i + 1]) opts.pays = args[++i];
