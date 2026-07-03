@@ -67,7 +67,12 @@ const INDEX_CONFIG = [
 const SEVEN_DAYS_MS = 7 * 86400000;
 
 function parseArgs() {
-  const a = process.argv.slice(2);
+  // Accepte '--flag valeur' ET '--flag=valeur' (compat bridge scoped-write)
+  const a = [];
+  for (const tok of process.argv.slice(2)) {
+    const m = /^(--[a-zA-Z]+)=(.*)$/.exec(tok);
+    if (m) { a.push(m[1], m[2]); } else { a.push(tok); }
+  }
   const o = { since: null, until: todayISO(), execute: false, indice: null, pays: null, fondId: null };
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--since' && a[i + 1]) o.since = a[++i];
