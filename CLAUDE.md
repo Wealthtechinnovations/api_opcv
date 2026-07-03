@@ -411,3 +411,13 @@ A chaque reprise de session ou nouvelle tache, Claude doit :
 5. identifier le dernier etat stable ;
 6. reprendre uniquement a partir de la prochaine action recommandee ;
 7. ne pas supposer que la memoire de conversation est complete.
+
+---
+
+## Mémoire MCP persistante
+
+Avant toute intervention, Claude doit lire et respecter :
+
+- MCP_AUTONOMY.md
+
+Ce fichier contient les règles d'autonomie MCP, les limites projet, les règles Git, les règles de déploiement et les obligations de documentation.
