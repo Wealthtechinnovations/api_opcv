@@ -130,9 +130,19 @@ async function run() {
     if (opts.execute) {
       const setClause = Object.keys(updates).map(c => `${c} = ?`).join(', ');
       const vals = Object.values(updates);
-      await conn.execute(`UPDATE fond_investissements SET ${setClause} WHERE id = ?`, [...vals, f.id]);
-      for (const table of ['performences', 'performences_eurs', 'performences_usds']) {
-        await conn.execute(`UPDATE ${table} SET ${setClause} WHERE fond_id = ?`, [...vals, f.id]);
+      // Transaction par fond : la source (fond_investissements) et ses copies
+      // (performences/_eurs/_usds) doivent rester coherentes. Un crash a mi-chemin
+      // ne doit pas laisser la source corrigee et les copies inchangees.
+      await conn.beginTransaction();
+      try {
+        await conn.execute(`UPDATE fond_investissements SET ${setClause} WHERE id = ?`, [...vals, f.id]);
+        for (const table of ['performences', 'performences_eurs', 'performences_usds']) {
+          await conn.execute(`UPDATE ${table} SET ${setClause} WHERE fond_id = ?`, [...vals, f.id]);
+        }
+        await conn.commit();
+      } catch (e) {
+        await conn.rollback();
+        throw e;
       }
     }
     fixed++;
