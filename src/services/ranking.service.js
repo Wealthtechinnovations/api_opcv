@@ -152,6 +152,10 @@ async function calculateRankGlobal(category, fundId) {
 }
 
 async function calculateRankNationalDev(category, fundId, devise) {
+  // Sans garde, category=null devient WHERE categorie_nationale IS NULL (Sequelize)
+  // et le fond serait classe parmi le groupe des fonds SANS categorie — classement absurde.
+  if (!category) return { error: 'Pas de categorie nationale.' };
+
   const model = devise === 'EUR' ? performences_eurs : performences_usds;
   const rows = await model.findAll({
     where: { categorie_nationale: category },
@@ -167,6 +171,11 @@ async function calculateRankNationalDev(category, fundId, devise) {
 }
 
 async function calculateRankRegionalDev(category, fundId, devise) {
+  // Meme garde que calculateRankGlobalDev : category=null deviendrait IS NULL et
+  // classerait le fond parmi les fonds sans categorie regionale (ex bug fonds 2863-2881
+  // affiches "6/18" au lieu d'un classement regional reel).
+  if (!category) return { error: 'Pas de categorie regionale FundAfrica.' };
+
   const model = devise === 'EUR' ? performences_eurs : performences_usds;
   const rows = await model.findAll({
     where: { categorie_fundafrica_regionale: category },
