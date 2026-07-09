@@ -34,7 +34,11 @@ echo "========================================" >> "$LOG_FILE"
 echo "$(date) — Starting daily index scraper" | tee -a "$LOG_FILE"
 echo "========================================" >> "$LOG_FILE"
 
-node "$SCRAPER" --execute 2>&1 | tee -a "$LOG_FILE"
+# --backfill-days 7 : fenetre glissante auto-reparatrice. A 18h30 UTC certains
+# marches (MASI/NSE/Tunindex) n'ont pas encore publie la cloture du jour ; sans
+# rattrapage le trou devient permanent (gel observe 2026-06-25 -> 07-09). Le
+# re-scrape des 7 derniers jours est idempotent (INSERT IGNORE) et comble ces trous.
+node "$SCRAPER" --execute --backfill-days 7 2>&1 | tee -a "$LOG_FILE"
 
 EXIT_CODE=${PIPESTATUS[0]}
 

@@ -116,6 +116,7 @@ function parseArgs() {
     date: todayISO(),
     skipIndref: false,
     verbose: false,
+    backfillDays: 0,
   };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--execute') opts.mode = 'execute';
@@ -123,12 +124,28 @@ function parseArgs() {
     else if (args[i] === '--date' && args[i + 1]) opts.date = args[++i];
     else if (args[i] === '--skip-indref') opts.skipIndref = true;
     else if (args[i] === '--verbose') opts.verbose = true;
+    else if (args[i] === '--backfill-days' && args[i + 1]) opts.backfillDays = Math.max(0, parseInt(args[++i], 10) || 0);
     else if (args[i] === '--help' || args[i] === '-h') {
-      console.log('Usage: node scrape_indices_daily.js [--execute|--dry-run] [--date YYYY-MM-DD] [--skip-indref] [--verbose]');
+      console.log('Usage: node scrape_indices_daily.js [--execute|--dry-run] [--date YYYY-MM-DD] [--backfill-days N] [--skip-indref] [--verbose]');
       process.exit(0);
     }
   }
   return opts;
+}
+
+// Fenetre glissante de dates a traiter (de la plus ancienne a aujourd'hui).
+// --backfill-days N => [today-N .. today] ; sinon => [--date] seul.
+// Objectif : rattraper automatiquement les publications decalees (le marche
+// cloture APRES le passage du cron a 18h30). INSERT idempotent => aucun doublon.
+function datesToProcess(opts) {
+  if (!opts.backfillDays || opts.backfillDays <= 0) return [opts.date];
+  const dates = [];
+  const end = new Date(opts.date + 'T00:00:00Z');
+  for (let i = opts.backfillDays; i >= 0; i--) {
+    const d = new Date(end.getTime() - i * 86400000);
+    dates.push(d.toISOString().slice(0, 10));
+  }
+  return dates;
 }
 
 function todayISO() {
@@ -693,10 +710,7 @@ async function propagateIndRef(conn, indexConfigs, targetDate, opts) {
 // Main
 // ---------------------------------------------------------------------------
 
-async function main() {
-  const opts = parseArgs();
-  const targetDate = opts.date;
-
+async function runForDate(targetDate, opts) {
   console.log('============================================================');
   console.log('SCRAPE INDICES QUOTIDIENS — Africafunds');
   console.log(`Mode: ${opts.mode.toUpperCase()}`);
@@ -742,8 +756,8 @@ async function main() {
   console.log(`\n  Resume scraping: ${fetchedCount} indices recuperes, ${errorCount} echecs\n`);
 
   if (fetchedCount === 0) {
-    console.log('  Aucun indice recupere. Fin du script.');
-    process.exit(errorCount > 0 ? 1 : 0);
+    console.log('  Aucun indice recupere pour cette date.');
+    return { fetchedCount: 0, insertedCount: 0, skippedCount: 0, errorCount };
   }
 
   // Phase 2: Insert into database
@@ -756,14 +770,15 @@ async function main() {
   } catch (err) {
     console.error(`  ERREUR connexion MySQL: ${err.message}`);
     if (opts.mode === 'execute') {
-      process.exit(1);
+      // Erreur fatale : on abandonne tout le run (y compris le reste de la fenetre backfill).
+      throw new Error(`Connexion MySQL impossible: ${err.message}`);
     } else {
       console.log('  (dry-run: affichage des resultats sans base)\n');
       for (const [id, r] of Object.entries(results)) {
         console.log(`  ${id}: ${r.value} (source: ${r.source})`);
       }
       console.log('\n  MODE DRY-RUN: aucune modification effectuee.');
-      process.exit(0);
+      return { fetchedCount, insertedCount: 0, skippedCount: 0, errorCount };
     }
   }
 
@@ -812,9 +827,9 @@ async function main() {
     if (conn) await conn.end();
   }
 
-  // Final summary
+  // Resume de la date
   console.log('\n============================================================');
-  console.log('RESUME FINAL');
+  console.log(`RESUME ${targetDate}`);
   console.log('============================================================');
   console.log(`  Indices scrapes avec succes: ${fetchedCount}/${INDEX_CONFIG.length}`);
   console.log(`  Indices inseres en base: ${insertedCount}`);
@@ -827,18 +842,43 @@ async function main() {
 
   if (opts.mode !== 'execute') {
     console.log('\n  >>> MODE DRY-RUN: aucune modification effectuee <<<');
-    console.log('  >>> Pour executer: node scrape_indices_daily.js --execute <<<');
   } else {
     console.log('\n  >>> MODIFICATIONS APPLIQUEES <<<');
   }
-
   console.log('============================================================');
 
-  // Exit with error if we failed to get any indices
-  process.exit(errorCount > 0 && fetchedCount === 0 ? 1 : 0);
+  return { fetchedCount, insertedCount, skippedCount, errorCount };
+}
+
+async function main() {
+  const opts = parseArgs();
+  const dates = datesToProcess(opts);
+  if (dates.length > 1) {
+    console.log(`### FENETRE BACKFILL: ${dates.length} dates (${dates[0]} -> ${dates[dates.length - 1]}) — INSERT idempotent ###\n`);
+  }
+
+  const totals = { fetchedCount: 0, insertedCount: 0, skippedCount: 0, errorCount: 0 };
+  for (const d of dates) {
+    const r = await runForDate(d, opts);
+    totals.fetchedCount += r.fetchedCount;
+    totals.insertedCount += r.insertedCount;
+    totals.skippedCount += r.skippedCount;
+    totals.errorCount += r.errorCount;
+    if (dates.length > 1) console.log('');
+  }
+
+  if (dates.length > 1) {
+    console.log('============================================================');
+    console.log(`RESUME GLOBAL BACKFILL (${dates.length} dates)`);
+    console.log(`  Inseres: ${totals.insertedCount} | Ignores: ${totals.skippedCount} | Echecs scraping: ${totals.errorCount}`);
+    console.log('============================================================');
+  }
+
+  // Code de sortie : succes si au moins un indice a ete recupere sur la fenetre.
+  process.exit(totals.fetchedCount === 0 && totals.errorCount > 0 ? 1 : 0);
 }
 
 main().catch(err => {
-  console.error('ERREUR FATALE:', err);
+  console.error('ERREUR FATALE:', err.message || err);
   process.exit(1);
 });
