@@ -48,7 +48,8 @@ async function run() {
   const conn = await mysql.createConnection(DB_CONFIG);
   const out = { generated: null, sections: {} };
 
-  const [{ today }] = await q(conn, 'SELECT CURDATE() AS today');
+  const [{ today }] = await q(conn, "SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d') AS today");
+  const staleCutoff = new Date(Date.parse(today) - opts.stale * 864e5).toISOString().slice(0, 10);
   out.generated = String(today);
   console.log('==================================================================');
   console.log(`  AUDIT FRAICHEUR DONNEES — ${today} — seuil perime: ${opts.stale}j`);
@@ -59,7 +60,7 @@ async function run() {
     SELECT
       (SELECT COUNT(*) FROM fond_investissements WHERE active=1) AS fonds_actifs,
       (SELECT COUNT(*) FROM valorisations) AS vl_total,
-      (SELECT MAX(date) FROM valorisations) AS vl_derniere,
+      (SELECT DATE_FORMAT(MAX(date), '%Y-%m-%d') FROM valorisations) AS vl_derniere,
       (SELECT COUNT(DISTINCT fund_id) FROM valorisations
         WHERE date > DATE_SUB(CURDATE(), INTERVAL ${opts.stale} DAY)) AS fonds_vl_recente
   `))[0];
@@ -75,7 +76,7 @@ async function run() {
     SELECT f.pays,
       COUNT(*) AS fonds_actifs,
       SUM(CASE WHEN lv.last_vl IS NOT NULL THEN 1 ELSE 0 END) AS fonds_avec_vl,
-      MAX(lv.last_vl) AS vl_pays_max,
+      DATE_FORMAT(MAX(lv.last_vl), '%Y-%m-%d') AS vl_pays_max,
       SUM(CASE WHEN lv.last_vl > DATE_SUB(CURDATE(), INTERVAL ${opts.stale} DAY) THEN 1 ELSE 0 END) AS fonds_frais,
       SUM(CASE WHEN lv.last_vl IS NULL THEN 1 ELSE 0 END) AS fonds_sans_vl
     FROM fond_investissements f
@@ -83,13 +84,13 @@ async function run() {
       ON lv.fund_id = f.id
     WHERE f.active = 1
     GROUP BY f.pays
-    ORDER BY vl_pays_max IS NULL, vl_pays_max ASC
+    ORDER BY MAX(lv.last_vl) IS NULL DESC, MAX(lv.last_vl) ASC
   `);
   out.sections.pays = pays;
   console.log('\n### 2) PAR PAYS (tri: plus fige en haut)');
   console.log(`  ${pad('PAYS', 26)}${padl('actifs', 7)}${padl('avecVL', 7)}${padl('frais', 7)}${padl('sansVL', 7)}  derniere VL`);
   for (const p of pays) {
-    const flag = (p.vl_pays_max == null || p.vl_pays_max < new Date(Date.parse(today) - opts.stale * 864e5).toISOString().slice(0, 10)) ? ' <== FIGE/PERIME' : '';
+    const flag = (p.vl_pays_max == null || p.vl_pays_max < staleCutoff) ? ' <== FIGE/PERIME' : '';
     console.log(`  ${pad(p.pays, 26)}${padl(p.fonds_actifs, 7)}${padl(p.fonds_avec_vl, 7)}${padl(p.fonds_frais, 7)}${padl(p.fonds_sans_vl, 7)}  ${pad(p.vl_pays_max, 12)}${flag}`);
   }
 
@@ -108,7 +109,7 @@ async function run() {
 
   // ---------- 4) FONDS PERIMES (derniere VL > seuil) ----------
   const stale = await q(conn, `
-    SELECT f.id, f.nom_fond, f.pays, lv.last_vl, DATEDIFF(CURDATE(), lv.last_vl) AS age_j
+    SELECT f.id, f.nom_fond, f.pays, DATE_FORMAT(lv.last_vl, '%Y-%m-%d') AS last_vl, DATEDIFF(CURDATE(), lv.last_vl) AS age_j
     FROM fond_investissements f
     JOIN (SELECT fund_id, MAX(date) AS last_vl FROM valorisations GROUP BY fund_id) lv ON lv.fund_id = f.id
     WHERE f.active = 1 AND lv.last_vl <= DATE_SUB(CURDATE(), INTERVAL ${opts.stale} DAY)
@@ -123,12 +124,12 @@ async function run() {
   const indices = await q(conn, `
     SELECT nom_indice,
       COUNT(*) AS points,
-      MAX(date) AS derniere,
+      DATE_FORMAT(MAX(date), '%Y-%m-%d') AS derniere,
       DATEDIFF(CURDATE(), MAX(date)) AS age_j,
-      MIN(date) AS premiere
+      DATE_FORMAT(MIN(date), '%Y-%m-%d') AS premiere
     FROM indice_references
     GROUP BY nom_indice
-    ORDER BY derniere ASC
+    ORDER BY MAX(date) ASC
   `);
   out.sections.indices = indices;
   console.log(`\n### 5) INDICES (indice_references) — ${indices.length} indices`);
@@ -142,12 +143,12 @@ async function run() {
   const devises = await q(conn, `
     SELECT paire,
       COUNT(*) AS points,
-      MAX(date) AS derniere,
+      DATE_FORMAT(MAX(date), '%Y-%m-%d') AS derniere,
       DATEDIFF(CURDATE(), MAX(date)) AS age_j,
-      MIN(date) AS premiere
+      DATE_FORMAT(MIN(date), '%Y-%m-%d') AS premiere
     FROM devisedechanges
     GROUP BY paire
-    ORDER BY derniere ASC
+    ORDER BY MAX(date) ASC
   `);
   out.sections.devises = devises;
   console.log(`\n### 6) PAIRES DE DEVISES (devisedechanges) — ${devises.length} paires`);
