@@ -485,12 +485,56 @@ async function scrapeNSE(targetDate, verbose) {
  * "Reference date";"Date of publication". On stocke la DATE DE REFERENCE.
  * MONIA est un taux (%), non propage aux fonds (pays: [] dans INDEX_CONFIG).
  */
+/**
+ * Extrait la valeur MONIA d'une date donnee depuis le TABLEAU HTML de la page
+ * bkam (colonnes verifiees le 2026-07-11 : "MONIA index" | "Overnight volume" |
+ * "Reference date" | "Date of publication"). La page ne montre que ~10 seances,
+ * suffisant pour le cron quotidien + fenetre --backfill-days. On stocke la
+ * REFERENCE DATE (1re date de la ligne), pas la date de publication.
+ */
+function parseMoniaHtml(html, targetDate) {
+  const rows = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || [];
+  for (const row of rows) {
+    if (!row.includes('%')) continue;
+    const cells = (row.match(/<td[^>]*>[\s\S]*?<\/td>/gi) || [])
+      .map(c => c.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim());
+    if (cells.length < 3) continue;
+    const rateCell = cells.find(c => c.includes('%'));
+    const dateCells = cells.filter(c => /^\d{2}\/\d{2}\/\d{4}$/.test(c));
+    if (!rateCell || dateCells.length === 0) continue;
+    const dm = dateCells[0].match(/(\d{2})\/(\d{2})\/(\d{4})/); // 1re date = Reference date
+    const iso = `${dm[3]}-${dm[2]}-${dm[1]}`;
+    if (iso !== targetDate) continue;
+    const val = parseFloat(rateCell.replace('%', '').replace(',', '.').trim());
+    if (isFinite(val) && val >= 0 && val < 100) return val;
+  }
+  return null;
+}
+
 async function scrapeMONIA(targetDate, verbose) {
   const pages = [
     'https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average',
     'https://www.bkam.ma/Marche-monetaire/Taux-du-marche-interbancaire-MONIA',
   ];
   const csvFallback = 'https://www.bkam.ma/en/export/blockcsv/566622/30551c1667f5f2004fb0019220d41795/06f7b466ca91da0596a810776852ee51?block=06f7b466ca91da0596a810776852ee51';
+
+  // 1) VOIE PRINCIPALE : tableau HTML de la page (server-side, verifie 2026-07-11).
+  //    L'export blockcsv renvoie un corps VIDE en acces automatise (diag F2) : il
+  //    ne sert plus que de fallback historique.
+  for (const page of pages) {
+    try {
+      const html = await curlGetText(page, ['-H', `Referer: ${page}`]);
+      const val = parseMoniaHtml(html, targetDate);
+      if (val !== null) {
+        console.log(`    [MONIA] SUCCESS via tableau HTML bkam: ${val}`);
+        return { value: val, source: 'BKAM page HTML MONIA', url: page };
+      }
+      if (verbose) console.log(`    [MONIA] page OK mais pas de ligne pour ${targetDate} (fenetre ~10 seances)`);
+    } catch (e) {
+      if (verbose) console.log(`    [MONIA] page HTML KO (${e.message.slice(0, 80)}), essai suivant`);
+    }
+  }
+
   try {
     let csvUrl = csvFallback;
     for (const page of pages) {
@@ -878,7 +922,11 @@ async function main() {
   process.exit(totals.fetchedCount === 0 && totals.errorCount > 0 ? 1 : 0);
 }
 
-main().catch(err => {
-  console.error('ERREUR FATALE:', err.message || err);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    console.error('ERREUR FATALE:', err.message || err);
+    process.exit(1);
+  });
+}
+
+module.exports = { parseMoniaHtml, datesToProcess };
