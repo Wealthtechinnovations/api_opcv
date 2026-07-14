@@ -148,8 +148,57 @@ Definis par plusieurs lignes `benchmark_mapping` (meme scope, `is_composite=1`, 
 ## 5. Decisions requises avant F4 (implementation)
 
 1. **Couche Afrique** : proxy synthetique maison (recommande, sans licence) OU souscription licence S&P DJI ? 
-2. **CEMAC** : source des VL (bloque tout le pays) ?
+2. **CEMAC** : source des VL (bloque tout le pays) ? (indice BVMAC deja identifie, cf CODE_REVIEW #70 — seule la VL des 34 fonds manque)
 3. **337 fonds dormants** : diagnostic + desactivation validee, ou laisser ?
 4. **Priorite de livraison F4** : par PAYS (Maroc complet d'abord) ou par COUCHE (couche 1 tous pays, puis 2, puis 3) ? Reco : **couche 1 consolidee (RFR + Sortino fix + obligataire/monetaire) pays par pays**, puis couche 2 (converti, TUNINDEX-devise en pilote), puis couche 3 (proxy Afrique).
+5. **Build+restart frontend** : autoriser le deploiement des fixes UI en attente depuis le 13/06 (quartile EUR/USD, barres ratios dynamiques) ?
+
+---
+
+## 6. Addendum — precisions du document 2026-07-14 (« benchmarks_afrique_prompt_claude.md »)
+
+> Document uploade le 14/07, verifie IDENTIQUE au rapport deep-research deja exploite en F1/F2 pour son contenu narratif ; seules les sections ci-dessous apportent des elements NOUVEAUX, absorbes ici de facon additive (aucun impact sur le schema ni sur une decision deja actee).
+
+### 6.1 Statuts structures — liste etendue (17 au lieu de 12)
+A la liste deja retenue en F3 §2.1 (`status` de `benchmark_series`), ajouter ces 5 valeurs precisees par le document du 14/07 (distinction plus fine source-officielle-indisponible vs page-dynamique vs sous-licence) :
+```
+SOURCE_OFFICIAL_UNREACHABLE_TRY_FALLBACK   -- source officielle identifiee mais injoignable (ex Casablanca-Bourse WAF) -> tenter le fallback documente avant d'echouer
+SOURCE_DYNAMIC_NEEDS_BROWSER               -- distinct de NO_VALUE_DYNAMIC_PAGE_NEEDS_BROWSER : la page EXISTE et repond, mais le contenu est charge en JS (ex Bourse de Tunis market-watch)
+SOURCE_UNDER_LICENSE                       -- la source existe et est documentee mais son usage est sous licence payante (S&P DJI, NGX historique EOD)
+BACKFILL_NOT_AUTHORIZED                    -- backfill techniquement possible mais non autorise (attente validation utilisateur, cf §5.8 du protocole)
+MIGRATION_PENDING_VALIDATION               -- mapping/serie pret cote code mais migration DB non executee (etat exact actuel de F3 -> F4)
+```
+Ces 5 statuts se distinguent des equivalents deja retenus par un niveau de granularite supplementaire (raison precise de l'echec, pas juste "echec"). A adopter tel quel dans l'adapter-layer (F4/M2).
+
+### 6.2 Sources Maroc — precisions actionnables
+- **Fallback MASI PDF confirme avec URLs reelles** : `https://media.casablanca-bourse.com/sites/default/files/AAAA-MM/flash_quotidien_YYYYMMDD.pdf` (Flash Quotidien quotidien, contient l'historique MASI) — utilisable si la voie API medias24 tombe en panne (aujourd'hui c'est elle qui marche, cf F2).
+- **AMMC — fiches signaletiques et prospectus reels identifies** pour sourcer les poids MBI+MASI par fonds (au lieu d'un mapping generique) :
+  `ammc.ma/sites/default/files/FS%20Maroc%20opportunit%C3%A9.pdf`, `FS%20SG%20TRESOR%20PLUS.pdf`, `FS_MAJVINI-1.pdf`, `FicheSignal%C3%A9tique%20BMCI%20TRESO%20PLUS%202011.pdf`, `Prospectus_ARADEI_031_2024.pdf`, `Prospectus_LEMO_038_2025.pdf`. A utiliser en F4/M2 pour peupler `benchmark_mapping.source_prospectus` fonds par fonds (diversifies Maroc), au lieu du mapping provisoire generique — respecte la regle "aucun benchmark invente".
+- Confirme : distinction **MASI Price Return / Rentabilite Brute / Rentabilite Nette** a verifier par prospectus (`MASI_TR_VARIANT` optionnel deja prevu au schema implicitement via `return_type`).
+
+### 6.3 Nigeria — circulaire FMAN pour fonds diversifies
+Reference precise pour la gouvernance des benchmarks des Money Market/Balanced/Ethical Funds nigerians :
+`https://sec.gov.ng/for-investors/keep-track-of-circulars/new-rules-on-collective-investment-schemes/`
+Tant que la circulaire operationnelle FMAN du millesime en cours n'est pas recuperee, les fonds diversifies Nigeria restent `HOUSE_COMPOSITE_EXPLICIT` (deja la position F3 — confirmee, pas de changement).
+
+### 6.4 BCE — endpoints precis (deja identifies F2, reconfirmes)
+```
+https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml    -- quotidien
+https://data.ecb.europa.eu/data/datasets/EXR/EXR.D.USD.EUR.SP00.A -- dataset structure (alternative a eurofxref-hist.zip deja documente F2)
+```
+Aucun changement de recommandation : BCE reste niveau 4 (integrable cron), pont EUR/USD.
+
+### 6.5 Regle de tolerance de date — confirmation chiffree (deja F3, desormais explicite)
+```
+Indices actions       : tolerance 3 a 5 jours calendaires
+Taux monetaires       : tolerance 3 a 7 jours
+Courbes obligataires  : tolerance 3 a 5 jours ouvres
+TMM Tunisie           : dernier mois disponible <= mois cible
+FX                    : dernier fixing disponible <= date cible
+```
+A coder explicitement dans l'adapter-layer F4/M2 (remplace le `date==today` strict deja corrige pour les indices via `--backfill-days`, cf `ebf1305` — mais l'adapter-layer benchmarks generique n'existe pas encore, F4 non demarre).
+
+### 6.6 Conclusion de l'addendum
+Aucune de ces precisions ne remet en cause le schema (`benchmark_series`/`benchmark_mapping`), le plan de migration M1-M6, ni les 5 decisions en attente (§5). Elles enrichissent uniquement F4/M2 (adapters) quand celui-ci demarrera. **Rien n'a ete installe suite a cet addendum — additif documentaire uniquement, zero risque.**
 
 > Rien n'est implemente a ce stade. F4 ne demarre qu'apres validation de ces points.
