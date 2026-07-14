@@ -40,6 +40,11 @@ efficient_frontier.png
 /data/brvm_boc/reports/
 /data/brvm_boc/logs/
 
+# BVMAC BOC scraper data (PDF, rapports, logs) — CEMAC
+/data/bvmac_boc/pdf/
+/data/bvmac_boc/reports/
+/data/bvmac_boc/logs/
+
 # OS files
 .DS_Store
 Thumbs.db
