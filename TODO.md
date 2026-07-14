@@ -16,14 +16,15 @@
 - [x] LOT 3 (#56) : transaction consistency fix (3545+3579+3579 classements OK) — 2026-06-18
 
 ## Actions crons (sans risque de regression)
-- [ ] **#49** cron_daily_update.sh : remplacer `set -e` par gardes par etape
-- [ ] **#50** Ajouter validation HTTP status aux curl
+- [x] **#49** cron_daily_update.sh : `set -e` remplace par gardes par etape — commit `26d1f93` (verifie 06-26)
+- [x] **#50** validation HTTP status aux curl — commit `26d1f93` (verifie 06-26)
+- [x] **Cron indices auto-reparant** `--backfill-days 7` (`ebf1305`) + fix MONIA v2 HTML (`bfd1a64`) — deployes 07-14
 - [ ] **#40** Supprimer ghost cron fix-brvm-nginx.py
 
 ## Dette technique (cf ../front_end_opcvm/CODE_REVIEW.md)
 - [ ] #53 — ClickHouse dead code cleanup
-- [ ] #46 — .catch() promise chains apigestionperformance.js
-- [ ] #45 — CSV formula injection sanitisation
+- [x] #46 — .catch() promise chains apigestionperformance.js — commit `89cabd4` (verifie 06-26)
+- [x] #45 — CSV formula injection sanitisation — commit `277ae47` (verifie 06-26)
 - [ ] #44 — authenticate middleware sur POST routes (attente Eric)
 - [ ] #2 — Index UNIQUE valorisations(fund_id, date) (attente Eric)
 - [ ] #15 — Parametrer INSERT ClickHouse batch
@@ -31,5 +32,5 @@
 
 ## Donnees en attente
 - [ ] TUNISIE EUR/USD gap 24% (attente fichier dividendes)
-- [ ] CEMAC 0% couverture (decision metier sourcer indice BVMAC)
+- [ ] CEMAC : indice = BVMAC ALL SHARE identifie (referentiel_fundafrica.json, bvm-ac.org/indices) ; **VL fonds = source COSUMAF a fournir par l'utilisateur** (cf front CODE_REVIEW #70 MAJ 07-14)
 - [ ] UEMOA Excel (attente fichiers + script Python Eric)
