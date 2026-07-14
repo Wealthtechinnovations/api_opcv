@@ -145,13 +145,13 @@ Definis par plusieurs lignes `benchmark_mapping` (meme scope, `is_composite=1`, 
 
 ---
 
-## 5. Decisions requises avant F4 (implementation)
+## 5. Decisions (mises a jour 2026-07-14 — reponses utilisateur)
 
-1. **Couche Afrique** : proxy synthetique maison (recommande, sans licence) OU souscription licence S&P DJI ? 
-2. **CEMAC** : source des VL (bloque tout le pays) ? (indice BVMAC deja identifie, cf CODE_REVIEW #70 — seule la VL des 34 fonds manque)
-3. **337 fonds dormants** : diagnostic + desactivation validee, ou laisser ?
-4. **Priorite de livraison F4** : par PAYS (Maroc complet d'abord) ou par COUCHE (couche 1 tous pays, puis 2, puis 3) ? Reco : **couche 1 consolidee (RFR + Sortino fix + obligataire/monetaire) pays par pays**, puis couche 2 (converti, TUNINDEX-devise en pilote), puis couche 3 (proxy Afrique).
-5. **Build+restart frontend** : autoriser le deploiement des fixes UI en attente depuis le 13/06 (quartile EUR/USD, barres ratios dynamiques) ?
+1. **Couche Afrique = DECIDE** : proxy synthetique maison, sans licence S&P DJI. `is_synthetic=true` obligatoire sur toutes les series Afrique (composite pondere a partir des indices pays deja disponibles : NGX, BRVM, MASI, TUNINDEX). Aucune migration lancee pour l'instant (F4 non demarre).
+2. **CEMAC (VL des 34 fonds) = BLOQUE, info manquante** : l'utilisateur indique avoir transmis des liens/exemples "BOC" (Bulletin Officiel de la Cote, analogue au module BRVM deja en prod) pour extraire les VL CEMAC. Recherche exhaustive de la transcription de session : AUCUNE URL/exemple CEMAC-BOC retrouve (seuls des BOC BRVM/UEMOA existent, module different). **A RE-TRANSMETTRE par l'utilisateur avant toute action** — ne jamais fabriquer une URL. Des que recu : construire `scripts/scraper/bvmac_boc_daily.py` calque sur `brvm_boc_daily.py` (pattern deja valide en prod).
+3. **337 fonds dormants = DECIDE : diagnostic + mise a jour (pas de desactivation aveugle)**. Diagnostic lecture seule livre : `scripts/diag/check_dormant_funds_coverage.js` (commit `a2b0458`) — distingue par pays : UEMOA/NIGERIA (pipeline cron continu, fonds absents = tres probablement dissous, candidats desactivation APRES verification) vs MAROC/TUNISIE/CEMAC (import periodique par fichier, pas de cron continu -> dormants tant qu'un nouvel export ASFIM/CMF/COSUMAF n'est pas fourni). Executer ce script (SELECT uniquement) des que le MCP repond, puis decider fonds par fonds.
+4. **Priorite F4 = DECIDE : par COUCHE.** Ordre retenu : couche 1 (national local, tous pays — RFR + fix Sortino + obligataire/monetaire) -> couche 2 (converti EUR/USD, TUNINDEX-devise officiel en pilote) -> couche 3 (proxy Afrique synthetique, decision 1).
+5. **Build+restart frontend = DECIDE : OUI.** Deploiement des fixes UI en attente depuis le 13/06 (quartile EUR/USD AUDIT-D `8a60083`, barres ratios dynamiques `cf6dba2`) autorise. A executer via `deploy_project_s2 project=front_end_opcvm` des que le MCP repond (build + restart PM2 fundafrique-frontend).
 
 ---
 
