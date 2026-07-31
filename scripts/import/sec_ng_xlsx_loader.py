@@ -382,6 +382,79 @@ def classify(obs, prod_row):
     return "ECART_VALEUR", None
 
 
+def shift_analysis(conn, rows, sample_limit=25):
+    """Teste l'hypothese du decalage d'une periode, SANS RIEN MODIFIER.
+
+    Pour chaque ligne de production (fonds, date D) on cherche si `value`
+    correspond a une mesure publiee :
+      - a la date D              -> MATCH_DATE_COURANTE (pas de decalage)
+      - a la date SEC precedente -> MATCH_DATE_PRECEDENTE (decalage confirme)
+      - nulle part               -> AUCUNE_CORRESPONDANCE
+    Le rapport est ventile par annee, categorie et devise afin de satisfaire
+    l'exigence de demonstration sur plusieurs annees/structures/categories
+    avant toute correction de masse. AUCUNE ecriture.
+    """
+    by_fund = {}
+    for r in rows:
+        if r.get("matched_fund_id"):
+            by_fund.setdefault(r["matched_fund_id"], {})[r["valuation_date"]] = r
+
+    def measures(o):
+        return {"unit_price_ngn": o["unit_price_ngn"], "bid_price_ngn": o["bid_price_ngn"],
+                "offer_price_ngn": o["offer_price_ngn"], "bid_price_usd": o["bid_price_usd"],
+                "offer_price_usd": o["offer_price_usd"]}
+
+    def find(o, val):
+        if o is None:
+            return None
+        for lbl, v in measures(o).items():
+            if v is not None and abs(float(val) - float(v)) < 0.0001:
+                return lbl
+        return None
+
+    stats, by_year, by_cat, by_cur, samples = {}, {}, {}, {}, []
+    with conn.cursor() as cur:
+        for fund_id, obs_by_date in by_fund.items():
+            dates_sorted = sorted(obs_by_date)
+            cur.execute("SELECT date, value FROM valorisations WHERE fund_id=%s AND value IS NOT NULL",
+                        (fund_id,))
+            for prod in cur.fetchall():
+                pdate = prod["date"].strftime("%Y-%m-%d") if hasattr(prod["date"], "strftime") else str(prod["date"])
+                pval = prod["value"]
+                cur_obs = obs_by_date.get(pdate)
+                prev_date = None
+                for dd in reversed(dates_sorted):          # derniere date SEC < pdate
+                    if dd < pdate:
+                        prev_date = dd
+                        break
+                prev_obs = obs_by_date.get(prev_date) if prev_date else None
+
+                hit_cur, hit_prev = find(cur_obs, pval), find(prev_obs, pval)
+                if hit_cur:
+                    verdict, lbl, src = "MATCH_DATE_COURANTE", hit_cur, pdate
+                elif hit_prev:
+                    verdict, lbl, src = "MATCH_DATE_PRECEDENTE", hit_prev, prev_date
+                else:
+                    verdict, lbl, src = "AUCUNE_CORRESPONDANCE", None, None
+
+                stats[verdict] = stats.get(verdict, 0) + 1
+                ref = cur_obs or prev_obs
+                yr = pdate[:4]
+                by_year.setdefault(yr, {})[verdict] = by_year.setdefault(yr, {}).get(verdict, 0) + 1
+                if ref:
+                    cat = (ref.get("category_sec") or "?")[:38]
+                    by_cat.setdefault(cat, {})[verdict] = by_cat.setdefault(cat, {}).get(verdict, 0) + 1
+                if lbl:
+                    cur_code = "USD" if lbl.endswith("_usd") else "NGN"
+                    by_cur.setdefault(cur_code, {})[verdict] = by_cur.setdefault(cur_code, {}).get(verdict, 0) + 1
+                if verdict == "MATCH_DATE_PRECEDENTE" and len(samples) < sample_limit and ref:
+                    samples.append({"fund_id": fund_id, "fonds": ref["fund_name_raw"],
+                                    "date_en_base": pdate, "valeur_en_base": float(pval),
+                                    "correspond_a": lbl, "date_sec_reelle": src,
+                                    "categorie": ref.get("category_sec")})
+    return stats, by_year, by_cat, by_cur, samples
+
+
 def build_report(conn, rows, batch):
     """Rapport de comparaison ligne a ligne. LECTURE SEULE sur valorisations."""
     stats = {"total": 0, "sans_fonds": 0}
@@ -447,6 +520,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="simulation (defaut)")
     ap.add_argument("--execute", action="store_true", help="ecrit dans les tables sec_ng_* (STAGING uniquement)")
     ap.add_argument("--report", action="store_true", help="rapport de comparaison avec la production (lecture seule)")
+    ap.add_argument("--shift-analysis", action="store_true", help="teste l'hypothese du decalage de date (lecture seule)")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
 
@@ -512,6 +586,36 @@ def main():
                 for k, v in sorted(detail.items(), key=lambda x: -x[1]):
                     log.info("    %-18s : %d", k, v)
 
+        shift_out = None
+        if args.shift_analysis:
+            log.info("--- Analyse du decalage de date (LECTURE SEULE) ---")
+            st, by_year, by_cat, by_cur, samples = shift_analysis(conn, rows)
+            tot = sum(st.values()) or 1
+            for k, v in sorted(st.items(), key=lambda x: -x[1]):
+                log.info("  %-24s : %6d  (%5.1f%%)", k, v, 100.0*v/tot)
+            log.info("  --- par annee ---")
+            for yr in sorted(by_year):
+                d = by_year[yr]
+                log.info("    %s : courante=%-5d precedente=%-5d aucune=%-5d", yr,
+                         d.get("MATCH_DATE_COURANTE",0), d.get("MATCH_DATE_PRECEDENTE",0),
+                         d.get("AUCUNE_CORRESPONDANCE",0))
+            log.info("  --- par categorie SEC (top 10) ---")
+            for cat, d in sorted(by_cat.items(), key=lambda x: -sum(x[1].values()))[:10]:
+                log.info("    %-40s courante=%-5d precedente=%-5d aucune=%-5d", cat,
+                         d.get("MATCH_DATE_COURANTE",0), d.get("MATCH_DATE_PRECEDENTE",0),
+                         d.get("AUCUNE_CORRESPONDANCE",0))
+            log.info("  --- par devise ---")
+            for c, d in sorted(by_cur.items()):
+                log.info("    %-4s courante=%-5d precedente=%-5d", c,
+                         d.get("MATCH_DATE_COURANTE",0), d.get("MATCH_DATE_PRECEDENTE",0))
+            log.info("  --- echantillons de decalage confirme ---")
+            for smp in samples[:12]:
+                log.info("    [%s] %s : base %s=%s -> reellement %s du %s",
+                         smp["fund_id"], smp["fonds"][:34], smp["date_en_base"],
+                         smp["valeur_en_base"], smp["correspond_a"], smp["date_sec_reelle"])
+            shift_out = {"stats": st, "par_annee": by_year, "par_categorie": by_cat,
+                         "par_devise": by_cur, "echantillons": samples}
+
         if args.execute:
             ensure_tables(conn)
             ins = skip = 0
@@ -573,6 +677,7 @@ def main():
             "match_stats_cles": {k: len(v) for k, v in keys_by_status.items()},
             "cles_ambigues": sorted(keys_by_status.get("AMBIGUOUS", [])),
             "cles_non_resolues": sorted(keys_by_status.get("UNMATCHED", [])),
+            "analyse_decalage": shift_out,
         }, indent=2, ensure_ascii=False, default=str))
         log.info("Rapport : %s", rp)
     finally:
