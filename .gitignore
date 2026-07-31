@@ -45,6 +45,11 @@ efficient_frontier.png
 /data/bvmac_boc/reports/
 /data/bvmac_boc/logs/
 
+# SEC Nigeria XLSX loader — rapports/logs seulement (le classeur source EST versionne :
+# c'est la source de verite officielle 2011-2026 dont le serveur a besoin)
+/data/sec_ng_xlsx/reports/
+/data/sec_ng_xlsx/logs/
+
 # OS files
 .DS_Store
 Thumbs.db
