@@ -221,6 +221,9 @@ def main():
     ap.add_argument("--confirm", action="store_true", help="obligatoire avec --execute")
     ap.add_argument("--rollback", metavar="BATCH", help="annule un batch de corrections")
     ap.add_argument("--limit-funds", type=int, default=0, help="limiter a N fonds (test)")
+    ap.add_argument("--fix-unknown", action="store_true",
+                    help="corriger AUSSI les lignes dont la valeur en base est inexpliquee "
+                         "(par defaut elles sont mises en quarantaine, pas corrigees)")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
 
@@ -336,8 +339,9 @@ def main():
             if r.get("matched_fund_id"):
                 by_fund.setdefault(r["matched_fund_id"], {})[r["valuation_date"]] = r
 
-        st = {"FILL_MEASURES": 0, "CORRECTED_VALUE": 0, "INSERTED": 0,
-              "QUARANTINE": 0, "UNCHANGED": 0, "SKIPPED_NO_MEASURE": 0}
+        st = {"FILL_MEASURES": 0, "CORRECTED_SHIFT": 0, "CORRECTED_UNKNOWN": 0,
+              "INSERTED": 0, "QUARANTINE": 0, "QUARANTINE_UNKNOWN": 0,
+              "UNCHANGED": 0, "SKIPPED_NO_MEASURE": 0}
         fund_ids = list(by_fund)
         if args.limit_funds:
             fund_ids = fund_ids[:args.limit_funds]
@@ -388,27 +392,56 @@ def main():
 
                     # ligne existante : la valeur correspond-elle a une mesure de CETTE date ?
                     hit = matches_any(o, p["value"])
-                    if hit is None and newval is not None:
-                        # valeur non justifiee par la source a cette date -> correction prouvee
-                        st["CORRECTED_VALUE"] += 1
+                    if hit is not None:
+                        st["UNCHANGED"] += 1        # deja juste : on ne touche PAS a value
+                    elif newval is None:
+                        # la source ne publie aucune mesure exploitable -> on ne touche a rien
+                        st["QUARANTINE"] += 1
+                        if args.execute:
+                            cur.execute("UPDATE valorisations SET data_quality='QUARANTINE' "
+                                        "WHERE fund_id=%s AND date=%s", (fid, vdate))
+                        continue
+                    else:
+                        # La valeur en base n'est justifiee par aucune mesure de CETTE date.
+                        # On distingue deux cas TRES differents, avec des motifs d'audit distincts :
+                        #   * DECALAGE PROUVE : la valeur correspond exactement a une mesure
+                        #     publiee a la date SEC PRECEDENTE du meme fonds -> cause identifiee.
+                        #   * ORIGINE INCONNUE : elle ne correspond a rien de publie -> on ne
+                        #     sait pas d'ou elle vient. Corrigee seulement si --fix-unknown.
+                        prev_date = None
+                        for dd in sorted(obs_by_date):
+                            if dd < vdate:
+                                prev_date = dd
+                            else:
+                                break
+                        prev_hit = matches_any(obs_by_date.get(prev_date), p["value"]) if prev_date else None
+
+                        if prev_hit:
+                            st["CORRECTED_SHIFT"] += 1
+                            reason = (f"decalage prouve : la valeur en base correspond a "
+                                      f"{prev_hit} du {prev_date} (date SEC precedente) ; "
+                                      f"remplacee par la mesure officielle du bloc du {vdate}")
+                        elif args.fix_unknown:
+                            st["CORRECTED_UNKNOWN"] += 1
+                            reason = ("origine inconnue : la valeur en base ne correspond a "
+                                      "aucune mesure publiee ni a cette date ni a la precedente ; "
+                                      "remplacee par la mesure officielle du bloc de cette date")
+                        else:
+                            # Par defaut on NE corrige PAS ce qu'on n'explique pas.
+                            st["QUARANTINE_UNKNOWN"] += 1
+                            if args.execute:
+                                cur.execute("UPDATE valorisations SET data_quality='QUARANTINE' "
+                                            "WHERE fund_id=%s AND date=%s", (fid, vdate))
+                            continue
+
                         if args.execute:
                             cur.execute("UPDATE valorisations SET value=%s, price_type=%s, "
                                         "currency_code=%s, correction_batch=%s "
                                         "WHERE fund_id=%s AND date=%s",
                                         (newval, ptype, curr, batch, fid, vdate))
                             audit(cur, batch, fid, vdate, "UPDATE_VALUE", "value",
-                                  p["value"], newval,
-                                  "valeur absente des mesures publiees a cette date ; "
-                                  "remplacee par la mesure officielle du bloc de cette date",
+                                  p["value"], newval, reason,
                                   o["sec_document_id"], o["source_url"], p["id"])
-                    elif hit is not None:
-                        st["UNCHANGED"] += 1        # deja juste : on ne touche pas a value
-                    else:
-                        st["QUARANTINE"] += 1
-                        if args.execute:
-                            cur.execute("UPDATE valorisations SET data_quality='QUARANTINE' "
-                                        "WHERE fund_id=%s AND date=%s", (fid, vdate))
-                        continue
 
                     # dans tous les cas : renseigner les mesures explicites + provenance
                     st["FILL_MEASURES"] += 1
