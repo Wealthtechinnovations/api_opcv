@@ -25,6 +25,7 @@
  *   node recalc_eur_usd_daily_rate.js              # tous les fonds actifs
  *   node recalc_eur_usd_daily_rate.js 42            # un seul fond
  *   node recalc_eur_usd_daily_rate.js 1 100         # fonds 1 a 100
+ *   node recalc_eur_usd_daily_rate.js --pays NIGERIA # un seul pays (fonds actifs)
  *   node recalc_eur_usd_daily_rate.js --dry-run     # simulation sans ecriture
  *
  * NON-DESTRUCTIF sur value/dividende (ne modifie que les colonnes _EUR/_USD)
@@ -70,7 +71,16 @@ function getRate(index, date) {
 async function run() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
-  const numArgs = args.filter(a => !a.startsWith('--'));
+  // Ajout ADDITIF : --pays <PAYS>. Sans ce flag, comportement inchange.
+  // La valeur qui suit --pays est exclue des arguments positionnels pour ne
+  // jamais etre interpretee comme un identifiant de fonds.
+  const paysIdx = args.indexOf('--pays');
+  const pays = paysIdx !== -1 ? args[paysIdx + 1] || null : null;
+  // `paysIdx !== -1` indispensable : sinon indexOf = -1 exclurait l'indice 0
+  // et casserait l'usage positionnel historique (`... 42` ou `... 1 100`).
+  const numArgs = args.filter(
+    (a, i) => !a.startsWith('--') && !(paysIdx !== -1 && i === paysIdx + 1)
+  );
 
   const conn = await mysql.createConnection(DB_CONFIG);
   console.log('Connecte a la base fund_opcvm');
@@ -103,14 +113,21 @@ async function run() {
 
   // 2. Charger les fonds
   let whereClause = 'WHERE active = 1';
+  const whereParams = [];
   if (numArgs.length === 2) {
     whereClause = `WHERE id BETWEEN ${parseInt(numArgs[0])} AND ${parseInt(numArgs[1])}`;
   } else if (numArgs.length === 1) {
     whereClause = `WHERE id = ${parseInt(numArgs[0])}`;
   }
+  if (pays) {
+    whereClause += ' AND LOWER(pays) = LOWER(?)';
+    whereParams.push(pays);
+    console.log(`Perimetre restreint au pays : ${pays}`);
+  }
 
   const [fonds] = await conn.execute(
-    `SELECT id, nom_fond, dev_libelle FROM fond_investissements ${whereClause}`
+    `SELECT id, nom_fond, dev_libelle FROM fond_investissements ${whereClause}`,
+    whereParams
   );
   console.log(`\n${fonds.length} fonds a traiter\n`);
 

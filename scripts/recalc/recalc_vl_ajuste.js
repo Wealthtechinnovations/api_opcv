@@ -15,6 +15,7 @@
  *   node recalc_vl_ajuste.js              # tous les fonds actifs
  *   node recalc_vl_ajuste.js 42           # un seul fond (id=42)
  *   node recalc_vl_ajuste.js 1 100        # fonds id 1 a 100
+ *   node recalc_vl_ajuste.js --pays NIGERIA   # un seul pays (fonds actifs)
  *
  * NON-DESTRUCTIF sur value/dividende (ne modifie que vl_ajuste, vl_ajuste_EUR, vl_ajuste_USD)
  */
@@ -34,19 +35,40 @@ async function run() {
   const conn = await mysql.createConnection(DB_CONFIG);
   console.log('Connecte a la base fund_opcvm');
 
-  // Determiner quels fonds traiter
+  // Determiner quels fonds traiter.
+  // Ajout ADDITIF : --pays <PAYS> restreint le perimetre a un pays. L'usage
+  // positionnel historique (id seul, ou plage id1 id2, ou rien) est strictement
+  // inchange : sans --pays le comportement est bit-a-bit identique a avant.
+  const rawArgs = process.argv.slice(2);
+  const paysIdx = rawArgs.indexOf('--pays');
+  const pays = paysIdx !== -1 ? rawArgs[paysIdx + 1] || null : null;
+  // On retire les flags ET la valeur qui suit --pays pour ne pas la confondre
+  // avec un identifiant de fonds. Le test `paysIdx !== -1` est indispensable :
+  // sans lui, indexOf = -1 ferait exclure l'argument d'indice 0 et casserait
+  // l'usage positionnel historique (`recalc_vl_ajuste.js 42`).
+  const numArgs = rawArgs.filter(
+    (a, i) => !a.startsWith('--') && !(paysIdx !== -1 && i === paysIdx + 1)
+  );
+
   let whereClause = 'WHERE active = 1';
-  const arg1 = process.argv[2];
-  const arg2 = process.argv[3];
+  const whereParams = [];
+  const arg1 = numArgs[0];
+  const arg2 = numArgs[1];
 
   if (arg1 && arg2) {
     whereClause = `WHERE id BETWEEN ${parseInt(arg1)} AND ${parseInt(arg2)}`;
   } else if (arg1 && !isNaN(parseInt(arg1))) {
     whereClause = `WHERE id = ${parseInt(arg1)}`;
   }
+  if (pays) {
+    whereClause += ' AND LOWER(pays) = LOWER(?)';
+    whereParams.push(pays);
+    console.log(`Perimetre restreint au pays : ${pays}`);
+  }
 
   const [fonds] = await conn.execute(
-    `SELECT id, nom_fond, dev_libelle FROM fond_investissements ${whereClause}`
+    `SELECT id, nom_fond, dev_libelle FROM fond_investissements ${whereClause}`,
+    whereParams
   );
   console.log(`${fonds.length} fonds a traiter\n`);
 
