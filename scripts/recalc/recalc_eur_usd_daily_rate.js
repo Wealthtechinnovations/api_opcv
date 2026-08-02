@@ -112,15 +112,25 @@ async function run() {
   console.log(`  EUR/USD: ${eurUsdIndex.dates.length} dates (${eurUsdIndex.dates[0]} -> ${eurUsdIndex.dates[eurUsdIndex.dates.length - 1]})`);
 
   // 2. Charger les fonds
+  // Deux formes du meme filtre : `whereClause` sans alias pour la requete
+  // mono-table historique, `whereQualifie` prefixe `f.` pour la verification
+  // finale qui joint valorisations et fond_investissements — sans quoi `id`
+  // serait ambigu (les deux tables ont une colonne `id`).
   let whereClause = 'WHERE active = 1';
+  let whereQualifie = 'WHERE f.active = 1';
   const whereParams = [];
   if (numArgs.length === 2) {
-    whereClause = `WHERE id BETWEEN ${parseInt(numArgs[0])} AND ${parseInt(numArgs[1])}`;
+    const a = parseInt(numArgs[0]), b = parseInt(numArgs[1]);
+    whereClause = `WHERE id BETWEEN ${a} AND ${b}`;
+    whereQualifie = `WHERE f.id BETWEEN ${a} AND ${b}`;
   } else if (numArgs.length === 1) {
-    whereClause = `WHERE id = ${parseInt(numArgs[0])}`;
+    const a = parseInt(numArgs[0]);
+    whereClause = `WHERE id = ${a}`;
+    whereQualifie = `WHERE f.id = ${a}`;
   }
   if (pays) {
     whereClause += ' AND LOWER(pays) = LOWER(?)';
+    whereQualifie += ' AND LOWER(f.pays) = LOWER(?)';
     whereParams.push(pays);
     console.log(`Perimetre restreint au pays : ${pays}`);
   }
@@ -404,23 +414,41 @@ async function run() {
     report.errors.slice(0, 10).forEach(e => console.log(`  - ${e}`));
   }
 
-  // Verification: comparer 2 VL du meme fonds MAD a 1 an d'ecart
+  // Verification: le taux implicite (value / value_EUR) doit egaler le taux
+  // reel du jour. IMPORTANT : elle porte sur LE PERIMETRE REELLEMENT TRAITE.
+  // L'ancienne version filtrait en dur `dev_libelle = 'MAD'` sans tenir compte
+  // du perimetre : lancee avec --pays NIGERIA, elle affichait des lignes
+  // marocaines et donnait l'illusion de valider un travail qu'elle n'avait pas
+  // examine. Une verification hors perimetre est pire qu'aucune verification.
   if (!dryRun) {
-    console.log('\nVerification: variation taux de change reflétée dans les VL?');
+    console.log('\nVerification (sur le perimetre traite) : le taux implicite');
+    console.log('value / value_EUR correspond-il au taux reel du jour ?');
     const [checkRows] = await conn.execute(`
-      SELECT v.date, v.value, v.value_EUR, v.value_USD,
-             d.value as eur_mad_rate
+      SELECT v.date, v.value, v.value_EUR, f.dev_libelle, f.nom_fond,
+             (SELECT d.value FROM devisedechanges d
+               WHERE d.paire = CONCAT('EUR/', f.dev_libelle) AND d.date = v.date
+               LIMIT 1) AS taux_reel
       FROM valorisations v
-      LEFT JOIN devisedechanges d ON d.paire = 'EUR/MAD'
-        AND d.date = v.date
       JOIN fond_investissements f ON f.id = v.fund_id
-      WHERE f.dev_libelle = 'MAD' AND v.value > 0 AND v.value_EUR > 0
+      ${whereQualifie} AND v.value > 0 AND v.value_EUR > 0
       ORDER BY v.date DESC LIMIT 5
-    `);
+    `, whereParams);
+    if (checkRows.length === 0) {
+      console.log('  (aucune ligne exploitable dans le perimetre)');
+    }
     for (const r of checkRows) {
-      const dateStr = r.date instanceof Date ? r.date.toISOString().split('T')[0] : String(r.date);
-      const impliedRate = r.value / r.value_EUR;
-      console.log(`  ${dateStr}: ${r.value} MAD / ${r.value_EUR?.toFixed(4)} EUR = taux implicite ${impliedRate.toFixed(4)} (reel: ${r.eur_mad_rate || 'N/A'})`);
+      const p = (n) => String(n).padStart(2, '0');
+      const dt = r.date instanceof Date
+        ? `${r.date.getFullYear()}-${p(r.date.getMonth() + 1)}-${p(r.date.getDate())}`
+        : String(r.date).slice(0, 10);
+      const implicite = r.value / r.value_EUR;
+      const reel = r.taux_reel;
+      // Un ecart > 0,5 % signale une conversion incoherente avec le taux du jour.
+      const verdict = reel
+        ? (Math.abs(implicite - reel) / reel < 0.005 ? 'OK' : 'ECART')
+        : 'pas de taux ce jour';
+      console.log(`  ${dt} ${r.dev_libelle}: ${r.value} / ${Number(r.value_EUR).toFixed(4)} EUR`
+        + ` = ${implicite.toFixed(4)} (reel: ${reel ? Number(reel).toFixed(4) : 'N/A'}) ${verdict}`);
     }
   }
 
