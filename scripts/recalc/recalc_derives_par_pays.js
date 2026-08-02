@@ -170,8 +170,26 @@ async function snapshot(conn, pays, tous) {
   return { fonds: fonds.n, vl, perf, decalesN: decalesN.n, decales, parPays };
 }
 
+/**
+ * Formate une date SQL en AAAA-MM-JJ.
+ * mysql2 renvoie les colonnes DATE en objets Date : `String(d).slice(0,10)`
+ * donnait « Thu Jul 30 », sans l'annee — un rapport de fraicheur illisible.
+ * On lit les composantes LOCALES (getFullYear/getMonth/getDate) et non
+ * toISOString(), qui convertit en UTC et reculerait la date d'un jour pour
+ * tout fuseau a decalage positif.
+ */
+function fmtDate(x) {
+  if (!x) return 'aucune';
+  if (x instanceof Date) {
+    if (Number.isNaN(x.getTime())) return 'invalide';
+    const p = (n) => String(n).padStart(2, '0');
+    return `${x.getFullYear()}-${p(x.getMonth() + 1)}-${p(x.getDate())}`;
+  }
+  return String(x).slice(0, 10);
+}
+
 function printSnapshot(label, s, pays) {
-  const d = (x) => (x ? String(x).slice(0, 10) : 'aucune');
+  const d = fmtDate;
   console.log(`\n--- ETAT ${label} (${pays}) ---`);
   console.log(`  Fonds actifs           : ${s.fonds}`);
   console.log(`  Valorisations          : ${s.vl.n} (derniere : ${d(s.vl.derniere_date)})`);
