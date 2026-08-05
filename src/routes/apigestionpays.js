@@ -688,7 +688,10 @@ router.post('/api/listeproduitpayssociete/:id', async (req, res) => {
     where: {
       [Op.and]: conditions
     },
-    limit: 500
+    // Le Maroc compte 644 fonds actifs (2026-08) : un plafond de 500 tronquait
+    // la liste et la colonne Date de la page pays. Filtree par pays (ou par ids
+    // selectionnes), 5000 borne largement sans charger toute la base.
+    limit: 5000
   });
 
   const fundIds = funds.map(f => f.id);

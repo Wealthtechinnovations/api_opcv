@@ -329,7 +329,10 @@ module.exports = (app) => {
     fond.findAll({
       where: sequelize.where(sequelize.fn('LOWER', sequelize.col('pays')), req.params.id.toLowerCase()),
       order: [['id', 'DESC']],
-      limit: 500,
+      // Le Maroc compte 644 fonds actifs (2026-08) : un plafond de 500 en
+      // masquait 144 sur la page pays. La requete restant filtree par pays,
+      // 5000 borne largement le plus gros pays sans jamais charger toute la base.
+      limit: 5000,
     })
       .then(response => {
         const funds = response.map(data => ({
