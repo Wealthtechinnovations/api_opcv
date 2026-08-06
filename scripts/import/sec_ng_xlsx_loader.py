@@ -541,6 +541,52 @@ def coverage_report(conn, rows):
             "unmatched": unmatched, "stale_no_source": stale_no_source}
 
 
+def ambiguity_candidates(conn, rows, funds, top_n=4):
+    """Pour chaque cle AMBIGUOUS/UNMATCHED du classeur, liste les fonds candidats
+    en base (score de similarite, id, actif, derniere VL, societe). LECTURE SEULE.
+    Sert d'aide a l'ARBITRAGE HUMAIN : le script ne decide jamais seul d'un
+    rattachement douteux (classe de parts, renommage, serie a echeance)."""
+    if fuzz is None:
+        log.warning("rapidfuzz/thefuzz indisponible : candidats non calculables.")
+        return []
+
+    # date max par fonds, en une seule requete (evite N appels)
+    last_vl = {}
+    active = {}
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT f.id, f.active, MAX(v.date) AS m "
+            "FROM fond_investissements f LEFT JOIN valorisations v ON v.fund_id=f.id "
+            "WHERE f.pays=%s GROUP BY f.id, f.active", (PAYS,))
+        for r in cur.fetchall():
+            m = r["m"]
+            last_vl[r["id"]] = m.strftime("%Y-%m-%d") if hasattr(m, "strftime") else (str(m)[:10] if m else None)
+            active[r["id"]] = r["active"]
+
+    # une observation representative (statut + nom brut + date max classeur) par cle
+    keys = {}
+    for r in rows:
+        st = r.get("match_status")
+        if st in ("AMBIGUOUS", "UNMATCHED"):
+            k = r["fund_key"]
+            e = keys.setdefault(k, {"raw": r["fund_name_raw"], "status": st, "xlsx_max": r["valuation_date"]})
+            if r["valuation_date"] > e["xlsx_max"]:
+                e["xlsx_max"] = r["valuation_date"]
+
+    out = []
+    for key, meta in sorted(keys.items()):
+        scored = sorted(
+            ((fuzz.token_sort_ratio(key, normalize_name(f["nom_fond"])), f) for f in funds),
+            key=lambda x: -x[0])
+        cands = [{"id": f["id"], "nom": f["nom_fond"], "score": round(sc, 1),
+                  "active": active.get(f["id"]), "last_vl": last_vl.get(f["id"]),
+                  "societe": f.get("societe_gestion")}
+                 for sc, f in scored[:top_n]]
+        out.append({"key": key, "raw": meta["raw"], "status": meta["status"],
+                    "xlsx_max": meta["xlsx_max"], "candidats": cands})
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Selftest
 # ---------------------------------------------------------------------------
@@ -586,6 +632,7 @@ def main():
     ap.add_argument("--execute", action="store_true", help="ecrit dans les tables sec_ng_* (STAGING uniquement)")
     ap.add_argument("--report", action="store_true", help="rapport de comparaison avec la production (lecture seule)")
     ap.add_argument("--coverage", action="store_true", help="ecart de couverture par fonds : Excel vs base (lecture seule)")
+    ap.add_argument("--ambiguities", action="store_true", help="candidats en base pour chaque cle ambigue (lecture seule, aide arbitrage)")
     ap.add_argument("--shift-analysis", action="store_true", help="teste l'hypothese du decalage de date (lecture seule)")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
@@ -673,6 +720,17 @@ def main():
                 log.info("  >>> CLES %s (instrument du classeur non rattache) : %d", st, len(keys))
                 for k, nm in list(keys.items())[:15]:
                     log.info("    [%s] %s", st, nm[:60])
+
+        if args.ambiguities:
+            log.info("--- Candidats en base pour chaque cle ambigue (LECTURE SEULE) ---")
+            amb = ambiguity_candidates(conn, rows, funds)
+            log.info("  %d cles a arbitrer :", len(amb))
+            for a in amb:
+                log.info("  [%s] « %s »  (classeur jusqu'au %s)", a["status"], a["raw"], a["xlsx_max"])
+                for c in a["candidats"]:
+                    log.info("      -> id=%-5s score=%-5s actif=%s  derniereVL=%s  %s | %s",
+                             c["id"], c["score"], c["active"], c["last_vl"],
+                             (c["nom"] or "")[:44], (c["societe"] or "")[:24])
 
         shift_out = None
         if args.shift_analysis:
