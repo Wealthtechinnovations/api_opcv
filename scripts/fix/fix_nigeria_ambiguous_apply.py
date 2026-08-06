@@ -155,17 +155,28 @@ def create_fund(cur, row, batch, first_date, doc, url):
     return new_id
 
 
-def do_rollback(conn, batch):
+def do_rollback(conn, batch, only_fund=None):
+    """Annule un batch. Si only_fund est fourni, n'annule QUE les entrees de ce
+    fonds (rollback chirurgical) : les autres decisions du batch restent en
+    place. Utile quand une seule des decisions s'avere problematique."""
     with conn.cursor() as cur:
-        cur.execute("SELECT valorisation_id, action, fund_id FROM sec_ng_corrections_audit "
-                    "WHERE batch=%s AND reverted=0 ORDER BY id DESC", (batch,))
+        sql = ("SELECT id, valorisation_id, action, fund_id FROM sec_ng_corrections_audit "
+               "WHERE batch=%s AND reverted=0")
+        params = [batch]
+        if only_fund is not None:
+            sql += " AND fund_id=%s"
+            params.append(only_fund)
+        sql += " ORDER BY id DESC"
+        cur.execute(sql, params)
         entries = cur.fetchall()
         if not entries:
-            log.error("Aucune entree active pour le batch %s", batch)
+            log.error("Aucune entree active pour le batch %s%s", batch,
+                      f" / fonds {only_fund}" if only_fund else "")
             return 1
         rows_del = sum(1 for e in entries if e["action"] == "INSERT_ROW")
         funds_del = [e["fund_id"] for e in entries if e["action"] == "CREATE_FUND"]
-        log.info("Rollback : %d VL inserees + %d fonds crees", rows_del, len(funds_del))
+        log.info("Rollback%s : %d VL inserees + %d fonds crees",
+                 f" (fonds {only_fund})" if only_fund else "", rows_del, len(funds_del))
         for e in entries:
             if e["action"] == "INSERT_ROW" and e["valorisation_id"]:
                 cur.execute("DELETE FROM valorisations WHERE id=%s AND correction_batch=%s",
@@ -177,9 +188,14 @@ def do_rollback(conn, batch):
                 cur.execute("DELETE FROM fond_investissements WHERE id=%s", (fid,))
             else:
                 log.warning("Fonds %s conserve (des VL subsistent hors batch)", fid)
-        cur.execute("UPDATE sec_ng_corrections_audit SET reverted=1 WHERE batch=%s", (batch,))
+        # ne marquer reverted QUE les entrees reellement annulees
+        ids = [e["id"] for e in entries]
+        fmt = ",".join(["%s"] * len(ids))
+        cur.execute(f"UPDATE sec_ng_corrections_audit SET reverted=1 WHERE id IN ({fmt})", ids)
     conn.commit()
     log.info("Rollback termine.")
+    if rows_del and only_fund:
+        log.info("Penser a relancer le recalcul cible du fonds %s.", only_fund)
     return 0
 
 
@@ -189,13 +205,15 @@ def main():
     ap.add_argument("--execute", action="store_true")
     ap.add_argument("--confirm", action="store_true")
     ap.add_argument("--rollback", metavar="BATCH")
+    ap.add_argument("--only-fund", type=int, metavar="FUND_ID",
+                    help="rollback chirurgical : n'annule que ce fonds du batch")
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 
     conn = L.db_connect()
 
     if args.rollback:
-        code = do_rollback(conn, args.rollback)
+        code = do_rollback(conn, args.rollback, args.only_fund)
         conn.close()
         return code
 
