@@ -476,6 +476,71 @@ def build_report(conn, rows, batch):
     return stats, detail
 
 
+def coverage_report(conn, rows):
+    """Ecart de couverture par fonds. LECTURE SEULE. Repond a la question :
+    « le classeur permet-il de mettre a jour chaque fonds, et lesquels restent
+    en retard ? » Croise les DEUX directions pour ne rien manquer :
+
+      cote Excel  : pour chaque fonds MATCHE, date max du classeur vs date max en
+                    base -> EN_RETARD_FIXABLE (le classeur va plus loin : un import
+                    suffit) / A_JOUR / PROD_PLUS_RECENT.
+      cote prod   : fonds Nigeria ACTIFS dont la derniere VL est anterieure au
+                    dernier point SEC ET qui ne recoivent AUCUNE donnee du classeur
+                    -> STALE_SANS_SOURCE. C'est le cas GDL (donnees recentes tombees
+                    sur un doublon/alias) ou un fonds reellement clos.
+      cles non resolues : UNMATCHED/AMBIGUOUS = instruments du classeur non
+                    rattaches a un fonds (fonds absent ou homonymie a arbitrer).
+    """
+    last_sec = max((r["valuation_date"] for r in rows), default=None)
+
+    excel_max = {}
+    unmatched = {}
+    for r in rows:
+        fid = r.get("matched_fund_id")
+        if not fid:
+            st = r.get("match_status") or "UNMATCHED"
+            unmatched.setdefault(st, {}).setdefault(r["fund_key"], r["fund_name_raw"])
+            continue
+        d = r["valuation_date"]
+        if fid not in excel_max or d > excel_max[fid]:
+            excel_max[fid] = d
+
+    def dstr(x):
+        return x.strftime("%Y-%m-%d") if hasattr(x, "strftime") else (str(x)[:10] if x else None)
+
+    buckets = {"EN_RETARD_FIXABLE": [], "A_JOUR": [], "PROD_PLUS_RECENT": [], "SANS_VL_PROD": []}
+    with conn.cursor() as cur:
+        for fid, emax in excel_max.items():
+            cur.execute("SELECT nom_fond, active FROM fond_investissements WHERE id=%s", (fid,))
+            f = cur.fetchone() or {}
+            cur.execute("SELECT MAX(date) AS m FROM valorisations WHERE fund_id=%s", (fid,))
+            pmax = dstr((cur.fetchone() or {}).get("m"))
+            rec = {"fund_id": fid, "nom": f.get("nom_fond", "?"), "active": f.get("active"),
+                   "excel_max": emax, "prod_max": pmax}
+            if pmax is None:
+                buckets["SANS_VL_PROD"].append(rec)
+            elif pmax < emax:
+                buckets["EN_RETARD_FIXABLE"].append(rec)
+            elif pmax > emax:
+                buckets["PROD_PLUS_RECENT"].append(rec)
+            else:
+                buckets["A_JOUR"].append(rec)
+
+        # Cote production : fonds actifs en retard SANS aucune donnee du classeur.
+        cur.execute(
+            "SELECT f.id, f.nom_fond, MAX(v.date) AS pmax "
+            "FROM fond_investissements f JOIN valorisations v ON v.fund_id=f.id "
+            "WHERE f.active=1 AND f.pays=%s GROUP BY f.id, f.nom_fond", (PAYS,))
+        stale_no_source = []
+        for row in cur.fetchall():
+            pmax = dstr(row["pmax"])
+            if row["id"] not in excel_max and last_sec and pmax and pmax < last_sec:
+                stale_no_source.append({"fund_id": row["id"], "nom": row["nom_fond"], "prod_max": pmax})
+
+    return {"last_sec": last_sec, "buckets": buckets,
+            "unmatched": unmatched, "stale_no_source": stale_no_source}
+
+
 # ---------------------------------------------------------------------------
 # Selftest
 # ---------------------------------------------------------------------------
@@ -520,6 +585,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true", help="simulation (defaut)")
     ap.add_argument("--execute", action="store_true", help="ecrit dans les tables sec_ng_* (STAGING uniquement)")
     ap.add_argument("--report", action="store_true", help="rapport de comparaison avec la production (lecture seule)")
+    ap.add_argument("--coverage", action="store_true", help="ecart de couverture par fonds : Excel vs base (lecture seule)")
     ap.add_argument("--shift-analysis", action="store_true", help="teste l'hypothese du decalage de date (lecture seule)")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
@@ -585,6 +651,28 @@ def main():
                 log.info("  Mesure reellement stockee dans valorisations.value :")
                 for k, v in sorted(detail.items(), key=lambda x: -x[1]):
                     log.info("    %-18s : %d", k, v)
+
+        if args.coverage:
+            log.info("--- Couverture par fonds : Excel vs base (LECTURE SEULE) ---")
+            cov = coverage_report(conn, rows)
+            log.info("  Dernier point SEC du classeur : %s", cov["last_sec"])
+            b = cov["buckets"]
+            log.info("  Fonds matches — A_JOUR=%d  EN_RETARD_FIXABLE=%d  PROD_PLUS_RECENT=%d  SANS_VL_PROD=%d",
+                     len(b["A_JOUR"]), len(b["EN_RETARD_FIXABLE"]),
+                     len(b["PROD_PLUS_RECENT"]), len(b["SANS_VL_PROD"]))
+            fixables = sorted(b["EN_RETARD_FIXABLE"], key=lambda x: (x["prod_max"] or ""))
+            log.info("  >>> EN RETARD MAIS DONNEE DISPO DANS LE CLASSEUR (import = mise a jour) : %d", len(fixables))
+            for r in fixables[:40]:
+                log.info("    [%s] %-42s base %s -> classeur %s (actif=%s)",
+                         r["fund_id"], r["nom"][:42], r["prod_max"], r["excel_max"], r["active"])
+            sns = sorted(cov["stale_no_source"], key=lambda x: (x["prod_max"] or ""))
+            log.info("  >>> ACTIFS EN RETARD SANS AUCUNE DONNEE DU CLASSEUR (cas GDL/doublon ou fonds clos) : %d", len(sns))
+            for r in sns[:40]:
+                log.info("    [%s] %-42s derniere VL base %s", r["fund_id"], r["nom"][:42], r["prod_max"])
+            for st, keys in cov["unmatched"].items():
+                log.info("  >>> CLES %s (instrument du classeur non rattache) : %d", st, len(keys))
+                for k, nm in list(keys.items())[:15]:
+                    log.info("    [%s] %s", st, nm[:60])
 
         shift_out = None
         if args.shift_analysis:
