@@ -44,11 +44,34 @@ const DB_CONFIG = {
   charset: 'utf8mb4',
 };
 
-// Cadence attendue par pays, en jours. Au-dela, la fraicheur est anormale.
-// CEMAC est volontairement large : import par fichier, pas de cron continu.
-const FRESHNESS_BUDGET_DAYS = {
-  MAROC: 5, TUNISIE: 5, UEMOA: 5, NIGERIA: 10, CEMAC: 400,
+/**
+ * Budget de fraicheur par pays, en jours calendaires, et gravite associee.
+ *
+ * CALIBRE SUR LES CADENCES REELLEMENT OBSERVEES le 2026-08-13, pas sur un ideal.
+ * Le premier passage du script avec des budgets theoriques (5 j partout, 10 j
+ * Nigeria) a produit 2 faux positifs sur 3 echecs : une alerte quotidienne
+ * injustifiee finit ignoree, ce qui recree exactement la cecite que ce script
+ * doit supprimer. Un seuil doit donc tolerer le week-end et le rythme reel de
+ * publication de la source.
+ *
+ *   MAROC   ASFIM quotidien lun-ven  -> observe 2 j  -> 6 j (week-end + jour ferie)
+ *   UEMOA   BRVM BOC quotidien       -> observe 1 j  -> 6 j
+ *   TUNISIE CMF quotidien lun-ven    -> observe 6 j  -> 9 j (publication irreguliere)
+ *   NIGERIA SEC, publication espacee -> observe 20 j -> 45 j, et AVERTISSEMENT :
+ *           un retard vient de la source, pas de la plateforme.
+ *   CEMAC   import par fichier, aucun cron -> AVERTISSEMENT permanent tant que
+ *           bvmac_boc_daily.py n'est pas en production.
+ *
+ * Revoir ces valeurs si la cadence d'une source change — pas l'inverse.
+ */
+const FRESHNESS = {
+  MAROC:   { days: 6,   level: 'CRITIQUE' },
+  UEMOA:   { days: 6,   level: 'CRITIQUE' },
+  TUNISIE: { days: 9,   level: 'CRITIQUE' },
+  NIGERIA: { days: 45,  level: 'AVERTISSEMENT' },
+  CEMAC:   { days: 400, level: 'AVERTISSEMENT' },
 };
+const FRESHNESS_DEFAULT = { days: 30, level: 'AVERTISSEMENT' };
 
 // Au-dela, une performance est physiquement invraisemblable pour un OPCVM et
 // signale presque toujours un melange d'echelles ou un historique troue.
@@ -114,10 +137,10 @@ async function main() {
         FROM fond_investissements f JOIN valorisations v ON v.fund_id = f.id
        GROUP BY f.pays`);
     for (const r of fresh) {
-      const budget = FRESHNESS_BUDGET_DAYS[r.pays] ?? 30;
-      record(`C4.${r.pays}`, r.pays === 'CEMAC' ? 'AVERTISSEMENT' : 'CRITIQUE',
-        `Fraicheur VL ${r.pays} (budget ${budget} j)`,
-        Number(r.age) <= budget,
+      const { days, level } = FRESHNESS[r.pays] ?? FRESHNESS_DEFAULT;
+      record(`C4.${r.pays}`, level,
+        `Fraicheur VL ${r.pays} (budget ${days} j)`,
+        Number(r.age) <= days,
         `derniere VL ${String(r.derniere).slice(0, 10)}, soit ${r.age} j`);
     }
 
