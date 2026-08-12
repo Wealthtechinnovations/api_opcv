@@ -199,6 +199,9 @@ FX                    : dernier fixing disponible <= date cible
 A coder explicitement dans l'adapter-layer F4/M2 (remplace le `date==today` strict deja corrige pour les indices via `--backfill-days`, cf `ebf1305` — mais l'adapter-layer benchmarks generique n'existe pas encore, F4 non demarre).
 
 ### 6.6 Conclusion de l'addendum
-Aucune de ces precisions ne remet en cause le schema (`benchmark_series`/`benchmark_mapping`), le plan de migration M1-M6, ni les 5 decisions en attente (§5). Elles enrichissent uniquement F4/M2 (adapters) quand celui-ci demarrera. **Rien n'a ete installe suite a cet addendum — additif documentaire uniquement, zero risque.**
+Aucune de ces precisions ne remet en cause le schema (`benchmark_series`/`benchmark_mapping`), le plan de migration M1-M6, ni les 5 decisions du §5 (**corrige le 2026-08-12 : cet addendum les qualifiait encore d'« en attente »
+alors que le §5 ci-dessus les enregistre comme DECIDE/DEBLOQUE le 2026-07-14 — le document se
+contredisait, ce qui les a fait reposer plusieurs fois a l'utilisateur. Elles sont TRANCHEES ;
+il reste seulement a les EXECUTER**). Elles enrichissent uniquement F4/M2 (adapters) quand celui-ci demarrera. **Rien n'a ete installe suite a cet addendum — additif documentaire uniquement, zero risque.**
 
 > Rien n'est implemente a ce stade. F4 ne demarre qu'apres validation de ces points.

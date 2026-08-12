@@ -1,5 +1,15 @@
 # Diagnostic architecture hybride, workers, ttyd-agent, ClickHouse et moteur de recalcul historique
 
+> ## DIAGNOSTIC DU 2026-05-21 — JAMAIS REVISE DEPUIS
+> Document de reference pour la **reflexion d'architecture**, pas pour l'etat courant.
+> Plusieurs chantiers qu'il liste « a faire » ont ete realises depuis (verifie sur disque le
+> 2026-08-12) : couche `src/services/` creee, `scripts/` reorganise, tests API en place (12 suites),
+> workers presents, `agenda.js` supprime, monitoring cron cree. Les backlogs J (phases) et K (K01-K22)
+> **font double emploi** et devraient etre dedupliques avant toute reactivation.
+> La Phase 5 (ClickHouse) est en tension avec #52 : ClickHouse a ete desactive en production.
+> **Etat courant : `../front_end_opcvm/SUIVI.md` > BACKLOG CONSOLIDE UNIQUE.**
+
+
 > Date du diagnostic : 2026-05-21
 > Auteur : Claude Code (expert OPCVM + dev full-stack)
 > Statut : DIAGNOSTIC EN LECTURE SEULE — aucun code modifie, aucune table modifiee, aucune route modifiee

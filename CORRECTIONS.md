@@ -1,4 +1,16 @@
 # AFRICAFUNDS — CORRECTIONS & AMÉLIORATIONS
+
+> ## DOCUMENT HISTORIQUE — NE PAS UTILISER COMME ETAT COURANT
+> **Etat des lieux du 2026-04-30.** Plusieurs statuts sont contredits par la suite :
+> ClickHouse y est dit « non installe » alors qu'il a ete installe puis desactive apres
+> l'incident de saturation disque (#52) ; Google OAuth y est « a faire » alors que
+> TODO_DEPLOY Q25 le donne fait ; l'orientation « retirer authenticate des routes publiques »
+> (2.2) est en tension directe avec #44/#65 qui demandent d'AJOUTER de l'auth en ecriture
+> (perimetres differents : lecture publique vs ecriture — a arbitrer explicitement).
+> **Etat courant : `../front_end_opcvm/SUIVI.md` > BACKLOG CONSOLIDE UNIQUE.**
+> **Alerte securite** : ce fichier contient en clair une commande MySQL avec le mot de passe
+> de production (cf. #64, secrets suivis par git).
+
 > Fichier de suivi généré le 30 avril 2026  
 > Serveur : 217.160.249.254 | Domaine : africafunds.chainsolutions.fr
 

@@ -1,5 +1,14 @@
 # TODO DEPLOY - OPCVM Platform (Ionos)
 
+> ## DOCUMENT PERIME — NE PAS UTILISER COMME ETAT COURANT
+> Ce fichier decrit une bascule vers une architecture microservices (gateway, 8 process PM2).
+> **La production tourne en monolithe** (`api-monolith`, `ecosystem.production.config.js`) ;
+> `ecosystem.config.js` et `start.sh` ne sont pas utilises. Les 7 services `services/*/routes.js`
+> sont des stubs, et #9 tranche : documenter comme roadmap, **ne pas activer**.
+> Non coches et encore valables : D10 (variables d'env production), D12 (verifier la connexion BDD).
+> **Etat courant : `../front_end_opcvm/SUIVI.md` > BACKLOG CONSOLIDE UNIQUE.**
+
+
 > Fichier de suivi persistant. Après chaque tâche, cocher [x], commit et push.
 > Pour reprendre : lire ce fichier, attaquer la première tâche non cochée.
 
