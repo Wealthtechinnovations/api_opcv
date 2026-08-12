@@ -97,33 +97,46 @@ if [ ! -f sec_ng_latest.csv ] || [ "$(wc -l < sec_ng_latest.csv)" -lt 2 ]; then
 else
   log "[1/7] OK"
 
-  run_step "2/7" "Import VL Nigeria dans MySQL" \
+  run_step "2/8" "Import VL Nigeria dans MySQL" \
     node scripts/import/import_vl_nigeria_sec.js sec_ng_latest.csv
 fi
 
-run_step "3/7" "Recalcul EUR/USD taux quotidiens" \
+run_step "3/8" "Recalcul EUR/USD taux quotidiens" \
   node scripts/recalc/recalc_eur_usd_daily_rate.js
 
-run_step "4/7" "Recalcul VL Ajuste (tous fonds actifs)" \
+run_step "4/8" "Recalcul VL Ajuste (tous fonds actifs)" \
   node scripts/recalc/recalc_vl_ajuste.js
 
-run_curl "5a/7" "Recalcul performances locale (fonds 1-600)" \
+run_curl "5a/8" "Recalcul performances locale (fonds 1-600)" \
   "http://localhost:3005/api/saveperfdatemysql/1/600"
 
-run_curl "5b/7" "Recalcul performances locale (fonds 601-1200)" \
+run_curl "5b/8" "Recalcul performances locale (fonds 601-1200)" \
   "http://localhost:3005/api/saveperfdatemysql/601/1200"
 
-run_curl "6a/7" "Recalcul performances EUR (fonds 1-600)" \
+run_curl "6a/8" "Recalcul performances EUR (fonds 1-600)" \
   "http://localhost:3005/api/saveperfdateeur/1/600"
 
-run_curl "6b/7" "Recalcul performances EUR (fonds 601-1200)" \
+run_curl "6b/8" "Recalcul performances EUR (fonds 601-1200)" \
   "http://localhost:3005/api/saveperfdateeur/601/1200"
 
-run_curl "7a/7" "Recalcul performances USD (fonds 1-600)" \
+run_curl "7a/8" "Recalcul performances USD (fonds 1-600)" \
   "http://localhost:3005/api/saveperfdateusd/1/600"
 
-run_curl "7b/7" "Recalcul performances USD (fonds 601-1200)" \
+run_curl "7b/8" "Recalcul performances USD (fonds 601-1200)" \
   "http://localhost:3005/api/saveperfdateusd/601/1200"
+
+# Etape 8 — resynchroniser le cache d'affichage `datejour`.
+#
+# `fond_investissements.datejour` alimente la colonne "Date" des pages pays
+# (/api/getfondbypays, /api/listeproduitpayssociete). L'import SEC ecrit dans
+# `valorisations` sans la rafraichir : au 2026-08-12, 218 des 325 fonds Nigeria
+# portaient un `datejour` desynchronise de leur derniere VL reelle.
+#
+# Le script ne touche QUE cette colonne, est idempotent et prend un snapshot
+# avant ecriture. Un echec ici n'invalide pas l'import : les VL sont en base,
+# seul l'affichage resterait a rattraper (run_step compte l'erreur sans abandonner).
+run_step "8/8" "Resynchronisation datejour (Nigeria)" \
+  node scripts/fix/fix_datejour_sync.js --pays NIGERIA --execute
 
 log ""
 if [ "$ERRORS" -eq 0 ]; then
