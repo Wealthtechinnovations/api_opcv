@@ -35,6 +35,25 @@ EXIT_CODE=${PIPESTATUS[0]}
 
 if [ $EXIT_CODE -eq 0 ]; then
     echo "$(date) — BRVM BOC import completed successfully" | tee -a "$LOG_FILE"
+
+    # Etape 2 — resynchroniser le cache d'affichage `datejour`.
+    #
+    # L'import ci-dessus ecrit dans `valorisations` mais pas dans
+    # `fond_investissements.datejour`, colonne denormalisee qui alimente la
+    # colonne "Date" des pages pays (/api/getfondbypays, /api/listeproduitpayssociete).
+    # Sans cette etape, les fonds UEMOA affichaient une date perimee de plusieurs
+    # mois alors que leurs VL etaient a jour (constate en prod le 2026-08-12 :
+    # VL au 2026-08-11, page pays au 2025-10-15).
+    #
+    # Le script ne touche QUE `datejour`, est idempotent et prend un snapshot
+    # avant ecriture. Son echec ne doit pas faire echouer l'import lui-meme :
+    # les VL sont deja en base, seul l'affichage resterait a rattraper.
+    echo "$(date) — Resynchronisation datejour UEMOA" | tee -a "$LOG_FILE"
+    node "$API_DIR/scripts/fix/fix_datejour_sync.js" --pays UEMOA --execute 2>&1 | tee -a "$LOG_FILE"
+    SYNC_CODE=${PIPESTATUS[0]}
+    if [ $SYNC_CODE -ne 0 ]; then
+        echo "$(date) — ATTENTION : resynchronisation datejour en echec (code $SYNC_CODE). VL importees, affichage pages pays potentiellement perime." | tee -a "$LOG_FILE"
+    fi
 else
     echo "$(date) — BRVM BOC import FAILED (exit code: $EXIT_CODE)" | tee -a "$LOG_FILE"
 fi

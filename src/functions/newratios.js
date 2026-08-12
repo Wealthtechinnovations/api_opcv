@@ -70,7 +70,12 @@ const calculateVAR95 = (rendements, confidenceLevel, periodYears) => {
  if (rendements.length === 0) {
   return NaN;
 }
-const sortedReturns = rendements.sort((a, b) => a - b);
+// Copie avant tri : Array.prototype.sort() trie EN PLACE et reordonnait le
+// tableau de l'appelant. La VAR restait juste, mais toute metrique calculee
+// ensuite sur le meme tableau et dependante de l'ordre (drawdown, series
+// chronologiques) travaillait sur des rendements melanges. Valeur de VAR
+// inchangee par ce correctif.
+const sortedReturns = [...rendements].sort((a, b) => a - b);
 const index = Math.floor(sortedReturns.length * (1 - confidenceLevel));
 return sortedReturns[index];
 };
@@ -80,7 +85,8 @@ const calculateVAR99 = (rendements, confidenceLevel, periodYears) => {
   if (rendements.length === 0) {
     return NaN;
   }
-  const sortedReturns = rendements.sort((a, b) => a - b);
+  // Copie avant tri — meme raison que calculateVAR95 ci-dessus.
+  const sortedReturns = [...rendements].sort((a, b) => a - b);
   const index = Math.floor(sortedReturns.length * (1 - confidenceLevel));
   return sortedReturns[index];
 };

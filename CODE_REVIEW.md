@@ -34,7 +34,10 @@
 - ~~#42~~ CORRIGE: Route ClickHouse /api/classementquartile/:id crash ReferenceError → 410 Gone
 - ~~#43~~ CORRIGE: Path traversal multer filename → path.basename()
 - #44 Routes POST sans authenticate (ajoutVL, uploadsfilevl, postfond, updatefond) — a corriger apres validation Eric
-- #45 CSV formula injection (uploadsfilevl/indice) — sanitisation a ajouter
-- #46 Promise chains sans .catch() (apigestionperformance.js)
+- ~~#45~~ CORRIGE: CSV formula injection (uploadsfilevl/indice) — sanitizeCellValue/Row, commit `277ae47`
+      (statut redresse le 2026-08-12 : ce fichier le listait encore comme ouvert alors que le doc
+       canonique le donne corrige depuis le 2026-06-26)
+- ~~#46~~ CORRIGE: Promise chains sans .catch() + guard headersSent, 11 routes apigestionperformance.js,
+      commit `89cabd4` (meme redressement de statut le 2026-08-12)
 
 Voir l'audit complet et l'historique dans `../front_end_opcvm/CODE_REVIEW.md`.
