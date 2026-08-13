@@ -194,6 +194,31 @@ Apres chaque intervention, documenter dans SUIVI.md :
 8. Ne pas disperser la meme information dans plusieurs fichiers.
 9. Toute mise a jour d'un fichier documentaire complementaire doit etre mentionnee brievement dans SUIVI.md.
 
+## Regle obligatoire — La mesure prime sur la prose
+
+**Source de verite n°1 : `api_opcv/docs/ETAT_PRODUCTION_VERIFIE.md`.**
+
+Ce fichier est genere automatiquement par le workflow `.github/workflows/doc-drift.yml`
+(quotidien, 06h00 UTC), qui execute `scripts/diag/check_doc_drift.js` contre la production.
+Il contient l'etat **mesure**, pas l'etat **affirme**.
+
+A chaque reprise de session, dans cet ordre :
+1. lire `docs/ETAT_PRODUCTION_VERIFIE.md` — 14 lignes qui donnent la verite du jour ;
+2. puis seulement `SUIVI.md` > BACKLOG CONSOLIDE UNIQUE et POINT DE REPRISE COURANT.
+
+**En cas de contradiction entre ce fichier et n'importe quel autre .md, c'est lui qui gagne.**
+Les autres documents decrivent ce qu'on croyait vrai a leur date de redaction. Cette regle
+existe parce que l'inverse a coute des mois : `CODE_REVIEW #34` a affirme pendant deux mois
+« UEMOA stale 233 jours, pas de scraper BRVM » — faux sur les deux points — et chaque reprise
+repartait de ce constat errone.
+
+**Quand un controle passe en ECHEC** : corriger la production OU corriger le document, puis
+consigner dans `SUIVI.md`. Ne jamais desactiver un controle pour faire taire l'alerte.
+
+**Quand un controle se revele mal calibre** : le corriger et documenter pourquoi dans le script.
+C'est arrive deux fois (seuils de fraicheur C4, perimetre C2 qui comptait 50 150 faux positifs).
+Un invariant non confronte aux donnees reelles n'est qu'une affirmation de plus.
+
 ## Regle obligatoire — Lecture du snapshot production avant toute action
 
 Le fichier `PRODUCTION_STATE.json` est genere automatiquement par `sync_production.sh` (cron horaire).

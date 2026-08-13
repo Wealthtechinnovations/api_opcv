@@ -168,6 +168,39 @@ async function main() {
     }
     record('C5', 'AVERTISSEMENT', 'Snapshot PRODUCTION_STATE.json frais (< 6 h)', snapOk, snapDetail);
 
+    // C7 — series de VL contaminees par deux echelles de devise.
+    //
+    // Classe de defaut identifiee le 2026-08-13, recurrente et non ponctuelle :
+    //   fonds 1141 AFRINVEST DOLLAR FUND — 13 ruptures d'echelle depuis 2022-03,
+    //     300 points en NGN (10^4-10^5) et 13 points isolés en USD (10^1-10^2).
+    //     Base YTD tombee sur un point contamine (114,68) contre 165 207 en NGN
+    //     -> YTD servi de 143 958 %.
+    //   fonds 1196 EMERGING AFRICA EUROBOND — trois echelles (115 / 1 655 / 159 000).
+    //   fonds 1224 Vantage (lot T) — meme signature, ~90x.
+    //
+    // Un OPCVM ne varie pas d'un facteur 20 en douze mois. Un tel rapport signale
+    // un melange d'unites (prix unitaire vs encours total, ou devise locale vs
+    // devise du fonds), jamais une performance reelle.
+    //
+    // Volontairement sans fonction de fenetrage (LAG) : MAX/MIN sur 400 jours
+    // glissants suffit et reste portable sur MySQL comme sur MariaDB.
+    const [scale] = await conn.execute(`
+      SELECT v.fund_id, f.nom_fond, f.pays, f.dev_libelle,
+             MIN(v.value) AS vmin, MAX(v.value) AS vmax,
+             MAX(v.value) / MIN(v.value) AS ratio
+        FROM valorisations v
+        JOIN fond_investissements f ON f.id = v.fund_id
+       WHERE v.value > 0
+         AND v.date >= DATE_SUB(CURDATE(), INTERVAL 400 DAY)
+       GROUP BY v.fund_id, f.nom_fond, f.pays, f.dev_libelle
+      HAVING ratio > 20
+       ORDER BY ratio DESC
+       LIMIT 15`);
+    record('C7', 'CRITIQUE', 'Aucune serie de VL melangeant deux echelles (12 mois)',
+      scale.length === 0,
+      scale.length === 0 ? 'aucune'
+        : scale.map(r => `[${r.fund_id}] ${String(r.nom_fond).slice(0, 30)} (${r.pays}/${r.dev_libelle}) ${Number(r.ratio).toFixed(0)}x [${Number(r.vmin).toFixed(2)} .. ${Number(r.vmax).toFixed(0)}]`).join(' | '));
+
     // C6 — couverture benchmark : un fonds sans indRef n'est comparable a rien.
     const [cov] = await conn.execute(`
       SELECT f.pays, COUNT(*) AS total, SUM(CASE WHEN v.indRef IS NULL THEN 1 ELSE 0 END) AS sans
