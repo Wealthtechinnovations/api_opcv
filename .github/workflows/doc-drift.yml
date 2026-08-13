@@ -33,9 +33,11 @@ on:
       - 'scripts/diag/check_doc_drift.js'
       - '.github/workflows/doc-drift.yml'
 
-# Lecture seule : le job n'a besoin d'aucun droit d'ecriture sur le depot.
+# Ecriture necessaire : le job consigne son rapport dans
+# docs/ETAT_PRODUCTION_VERIFIE.md. Le controle lui-meme reste en lecture seule
+# cote base de donnees — seul le depot est ecrit.
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: doc-drift
@@ -48,6 +50,11 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
       - name: Verifier que les secrets sont configures
         env:
           HOST: ${{ secrets.S2_HOST }}
@@ -121,6 +128,55 @@ jobs:
             echo "Un ECHEC signifie que la production contredit ce que la documentation affirme."
             echo "Corriger l'un ou l'autre, puis consigner dans SUIVI.md > POINT DE REPRISE COURANT."
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Consigner le rapport dans le depot
+        if: always()
+        run: |
+          # Ce fichier est la memoire machine du projet : l'etat de la
+          # production tel que verifie, et non tel qu'un document l'affirme.
+          # Toute session future peut le lire sans connecteur ni copier-coller.
+          mkdir -p docs
+          {
+            echo "# Etat de production verifie automatiquement"
+            echo
+            echo "> **Fichier genere par le workflow \`doc-drift.yml\`. Ne pas modifier a la main.**"
+            echo "> Il contient l'etat de la production **mesure**, pas l'etat **affirme** par la"
+            echo "> documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui"
+            echo "> fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction."
+            echo
+            echo "Derniere verification : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo
+            echo '```'
+            cat rapport.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+            echo
+            echo "## Comment lire ce rapport"
+            echo
+            echo "- \`OK\` : l'invariant tient."
+            echo "- \`ECHEC\` : contradiction **critique** entre la production et ce qui est documente."
+            echo "  Corriger l'un ou l'autre, puis consigner dans \`SUIVI.md\` > POINT DE REPRISE COURANT."
+            echo "- \`ALERTE\` : ecart connu et tolere (CEMAC sans pipeline, Nigeria tributaire du"
+            echo "  rythme de publication de la SEC). A surveiller, pas a corriger dans l'urgence."
+            echo
+            echo "Detail des controles et seuils : \`scripts/diag/check_doc_drift.js\`."
+          } > docs/ETAT_PRODUCTION_VERIFIE.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/ETAT_PRODUCTION_VERIFIE.md
+
+          # Rien a faire si le rapport est inchange : evite un commit par jour
+          # sans contenu nouveau.
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(diag): etat de production verifie $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : le workflow ne doit jamais ecraser un commit
+            # pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Rapport consigne dans le depot."
+          fi
 
       - name: Effacer la cle SSH
         if: always()
