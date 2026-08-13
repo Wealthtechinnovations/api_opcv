@@ -4,116 +4,99 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-13 07:29 UTC**
+Derniere execution : **2026-08-13 07:48 UTC**
 
 ```
-########## scripts/diag/ondemand/diag_perimetre_et_couverture_usd.js ##########
+########## scripts/diag/ondemand/diag_staging_et_cas_particuliers.js ##########
 
 ============================================================
- PERIMETRE #73 ET FAISABILITE DE LA RE-PROMOTION USD
- Regle actee : la devise du fonds fait foi.
- Genere le 2026-08-13T07:29:40.992Z — LECTURE SEULE
+ STAGING REEL, SOURCES SEC ET CAS HORS TAUX DE CHANGE
+ Genere le 2026-08-13T07:48:15.081Z — LECTURE SEULE
 ============================================================
 
-## A. Tous les fonds a echelle melangee (ratio > 20x sur 400 jours)
+## A. Tables de staging / alias / audit reellement presentes
 
-   TOTAL : 44 fonds touches
+   TABLE_NAME                TABLE_ROWS  mb    CREATE_TIME                             
+   ------------------------  ----------  ----  ----------------------------------------
+   brvm_boc_navs_raw         111994      37.6  Fri Jun 12 2026 17:06:37 GMT+0000 (Coord
+   brvm_boc_sources          1103        0.3   Fri Jun 12 2026 17:06:37 GMT+0000 (Coord
+   brvm_fund_aliases         102         0.0   Fri Jun 12 2026 17:06:37 GMT+0000 (Coord
+   brvm_import_logs          45          0.1   Fri Jun 12 2026 17:06:37 GMT+0000 (Coord
+   brvm_missing_navs         2           0.0   Fri Jun 12 2026 17:06:37 GMT+0000 (Coord
+   cmf_extreme_variations    0           0.0   Tue Jun 02 2026 18:01:38 GMT+0000 (Coord
+   cmf_import_audit          29          0.0   Tue Jun 02 2026 18:01:38 GMT+0000 (Coord
+   cmf_new_funds_queue       0           0.0   Tue Jun 02 2026 18:01:38 GMT+0000 (Coord
+   recalc_audit              0           0.0   Thu May 21 2026 21:04:43 GMT+0000 (Coord
+   sec_ng_corrections_audit  48980       15.5  Sat Aug 01 2026 12:29:51 GMT+0000 (Coord
 
-   fund_id  nom                                 pays     dev_libelle  n_vl  v_min    v_max        ratio
-   -------  ----------------------------------  -------  -----------  ----  -------  -----------  -----
-   2592     FCP BRIDGE EQUILIBRE                UEMOA    XOF          31    8775.53  44467985.22  5067 
-   2866     United Capital Nigerian Eurobond F  NIGERIA  NGN          55    120.96   187995.09    1554 
-   1274     UNITED CAPITAL GLOBAL FIXED INCOME  NIGERIA  NGN          55    1.2      1862.57      1548 
-   2774     MERISTEM DOLLAR FUND                NIGERIA  USD          55    10.84    16671.8      1538 
-   1239     NOVA DOLLAR FIXED INCOME FUND       NIGERIA  NGN          55    1.26     1934.88      1536 
-   2809     MYRTLE DOLLAR SHIELD FUND           NIGERIA  USD          16    1        1534.91      1535 
-   1154     ARM EUROBOND FUND                   NIGERIA  NGN          55    1.2      1835.75      1535 
-   2768     FSL EUROBOND FUND                   NIGERIA  NGN          55    1        1535.04      1535 
-   2773     GUARANTY TRUST DOLLAR FUND          NIGERIA  USD          55    100      153355       1534 
-   2766     COMERCIO PARTNERS DOLLAR FUND       NIGERIA  USD          55    1.1      1685.77      1533 
-   1175     CORDROS DOLLAR FUND                 NIGERIA  NGN          55    116.08   177672.8     1531 
-   1170     NORRENBERGER DOLLAR FUND            NIGERIA  NGN          55    105.14   160518.91    1527 
-   2771     CORONATION DOLLAR FUND              NIGERIA  USD          55    1.03     1567.58      1524 
-   1160     AXA MANSARD DOLLAR BOND FUND        NIGERIA  NGN          55    139.18   211978.8     1523 
-   1141     AFRINVEST DOLLAR FUND               NIGERIA  NGN          55    114.47   173958.05    1520 
-   1168     NIGERIA DOLLAR INCOME FUND          NIGERIA  NGN          55    1.09     1654.1       1518 
-   2856     LEAD DOLLAR FIXED INCOME FUND       NIGERIA  NGN          55    1.15     1734.23      1508 
-   1196     EMERGING AFRICA EUROBOND FUND       NIGERIA  NGN          55    115.08   173193.26    1505 
-   2772     GREENWICH FIXED INCOME DOLLAR FUND  NIGERIA  USD          50    1.05     1565.74      1498 
-   1257     STANBIC IBTC DOLLAR FUND            NIGERIA  NGN          55    1.71     2527.9       1482 
-   2861     ARM SHORT-TERM EUROBOND FUND        NIGERIA  NGN          55    1.07     1586.31      1482 
-   1158     AVA GAM FIXED INCOME DOLLAR FUND    NIGERIA  NGN          55    119.12   176149.75    1479 
-   1189     EDC DOLLAR FUND                     NIGERIA  NGN          55    111.67   164694.22    1475 
-   2858     ARM SPECIALIZED DOLLAR FUND         NIGERIA  NGN          55    1.06     1557.45      1471 
-   2775     PARTHIAN DOLLAR FIXED INCOME FUND   NIGERIA  USD          55    1.09     1592.79      1465 
-   1213     FSDH DOLLAR FUND                    NIGERIA  NGN          55    1.39     2021.7       1453 
-   2770     CFG AM FIXED INCOME DOLLAR FUND     NIGERIA  USD          50    105.95   153503.79    1449 
-   2764     AIICO EUROBOND FUND                 NIGERIA  NGN          55    107.15   153503.79    1433 
-   2777     VETIVA USD FIXED INCOME FUND        NIGERIA  USD          55    1.18     1684.17      1427 
-   2857     RMBN DOLLAR FIXED INCOME FUND       NIGERIA  NGN          55    115.54   164832.37    1427 
-   2778     ZEDCREST DOLLAR FUND                NIGERIA  USD          55    1.53     2182.1       1426 
-   1244     PACAM EUROBOND FUND                 NIGERIA  NGN          55    169.49   240333.67    1418 
-   1214     FUTUREVIEW DOLLAR FUND              NIGERIA  NGN          55    145.04   203121.33    1400 
-   2878     FCMBAM USD Bond Fund                Nigeria  USD          14    1.52     2124.61      1398 
-   2776     STL DOLLAR FUND                     NIGERIA  USD          55    117.98   164931.7     1398 
-   2880     ValuAlliance Specialized Dollar Fu  Nigeria  USD          13    9.86     13711.08     1391 
-   2767     COWRY EUROBOND FUND                 NIGERIA  NGN          55    1.51     2101.99      1389 
-   2879     First Asset Blended Dollar Fund     Nigeria  USD          14    112.5    155940.58    1386 
-   2769     ALPHA10 DOLLAR FUND                 NIGERIA  USD          20    1.01     1394.6       1382 
-   2877     First Asset Specialized Dollar Fun  Nigeria  USD          14    129.85   179342.9     1381 
-   2876     First Asset Dollar Fund (Retail)    Nigeria  USD          14    133      183694.88    1381 
-   2765     CARDINALSTONE DOLLAR FUND           NIGERIA  USD          55    1.3      1799.02      1380 
-   2796     FSDH HALAL FUND                     NIGERIA  NGN          53    138.21   13988.38     101  
-   1251     SIAML ETF 40                        NIGERIA  NGN          53    320      14414.73     45   
+   Attendu par les scripts, mais ABSENT de la base :
 
-   Repartition par pays et devise declaree :
+     sec_ng_observations
+     sec_ng_fund_aliases
+     sec_ng_load_logs
+     bvmac_boc_navs_raw
+     bvmac_boc_sources
+     bvmac_fund_aliases
+     bvmac_import_logs
+     bvmac_missing_navs
 
-     NIGERIA / NGN          25 fonds
-     NIGERIA / USD          13 fonds
-     Nigeria / USD          5 fonds
-     UEMOA / XOF            1 fonds
+## B. Fichiers sources SEC sur le serveur
 
-## B. Fonds dont le NOM indique une devise etrangere mais dev_libelle dit autre chose
+   sec_ng_downloads     553 fichiers, 106.6 Mo
+                        types : .xls:108 .xlsx:445
+                        modifies du 2026-05-17 au 2026-08-10
+   data/sec_ng          ABSENT
+   data/brvm_boc        1339 fichiers, 3674.8 Mo
+                        types : .log:122 .pdf:1141 .json:76
+                        modifies du 2026-06-12 au 2026-08-12
+   data/bvmac_boc       ABSENT
 
-   (dev_libelle designe desormais la devise canonique : ces lignes doivent etre
-    tranchees sur preuve prospectus ou SEC avant toute correction automatique)
+## C. Fonds 1196 — les trois echelles, avec provenance
 
-   29 fonds a arbitrer
+   ordre  currency_code  price_type  data_quality  n    v_min      v_max      d_min                                     d_max                                     docs  na_ngn_moy  parts_implicites
+   -----  -------------  ----------  ------------  ---  ---------  ---------  ----------------------------------------  ----------------------------------------  ----  ----------  ----------------
+   2      NULL           NULL        NULL          2    115.08     115.22     Fri Jul 17 2026 00:00:00 GMT+0000 (Coord  Fri Jul 24 2026 00:00:00 GMT+0000 (Coord  0     NULL        NULL            
+   3      NGN            BID         OK            21   1607.21    1704.45    Fri Nov 28 2025 00:00:00 GMT+0000 (Coord  Fri Apr 17 2026 00:00:00 GMT+0000 (Coord  21    4885187540  2960624         
+   3      NGN            BID         REVIEW        2    1654.6     1664.54    Fri Apr 24 2026 00:00:00 GMT+0000 (Coord  Fri May 08 2026 00:00:00 GMT+0000 (Coord  2     4920835656  2965120         
+   4      NULL           NULL        QUARANTINE    22   41920.23   45424.79   Fri May 14 2021 00:00:00 GMT+0000 (Coord  Fri Nov 04 2022 00:00:00 GMT+0000 (Coord  0     NULL        NULL            
+   4      NGN            BID         OK            106  42190.63   98324.9    Fri Dec 03 2021 00:00:00 GMT+0000 (Coord  Fri Jan 26 2024 00:00:00 GMT+0000 (Coord  104   1186239483  20918           
+   4      NGN            BID         REVIEW        1    45607.49   45607.49   Fri Oct 28 2022 00:00:00 GMT+0000 (Coord  Fri Oct 28 2022 00:00:00 GMT+0000 (Coord  1     909194645   19935           
+   4      NGN            UNIT_PRICE  OK            8    41920.23   42894.74   Fri Jun 04 2021 00:00:00 GMT+0000 (Coord  Fri Nov 26 2021 00:00:00 GMT+0000 (Coord  8     679356386   15997           
+   5      NGN            BID         OK            109  101962.04  184236.11  Fri Nov 10 2023 00:00:00 GMT+0000 (Coord  Fri Jul 10 2026 00:00:00 GMT+0000 (Coord  109   4655078370  28108           
+   5      NGN            OFFER       OK            1    165401.48  165401.48  Fri Oct 31 2025 00:00:00 GMT+0000 (Coord  Fri Oct 31 2025 00:00:00 GMT+0000 (Coord  1     4691023420  28361           
 
-   id    nom                                 pays     dev_libelle  active
-   ----  ----------------------------------  -------  -----------  ------
-   1141  AFRINVEST DOLLAR FUND               NIGERIA  NGN          1     
-   2764  AIICO EUROBOND FUND                 NIGERIA  NGN          1     
-   1154  ARM EUROBOND FUND                   NIGERIA  NGN          1     
-   2861  ARM SHORT-TERM EUROBOND FUND        NIGERIA  NGN          1     
-   2858  ARM SPECIALIZED DOLLAR FUND         NIGERIA  NGN          1     
-   1158  AVA GAM FIXED INCOME DOLLAR FUND    NIGERIA  NGN          1     
-   1160  AXA MANSARD DOLLAR BOND FUND        NIGERIA  NGN          1     
-   1175  CORDROS DOLLAR FUND                 NIGERIA  NGN          1     
-   2767  COWRY EUROBOND FUND                 NIGERIA  NGN          1     
-   1189  EDC DOLLAR FUND                     NIGERIA  NGN          1     
-   1196  EMERGING AFRICA EUROBOND FUND       NIGERIA  NGN          1     
-   1199  FBN DOLLAR FUND (RETAIL)            NIGERIA  NGN          1     
-   2899  FBN Nigeria Eurobond USD Fund       NIGERIA  NGN          1     
-   1204  FBN SPECIALIZED DOLLAR FUND         NIGERIA  NGN          1     
-   1213  FSDH DOLLAR FUND                    NIGERIA  NGN          1     
-   2768  FSL EUROBOND FUND                   NIGERIA  NGN          1     
-   1214  FUTUREVIEW DOLLAR FUND              NIGERIA  NGN          1     
-   2856  LEAD DOLLAR FIXED INCOME FUND       NIGERIA  NGN          1     
-   1208  LEGACY USD BOND FUND                NIGERIA  NGN          1     
-   1168  NIGERIA DOLLAR INCOME FUND          NIGERIA  NGN          1     
-   2812  NIGERIAN EUROBOND FUND              NIGERIA  NGN          1     
-   1170  NORRENBERGER DOLLAR FUND            NIGERIA  NGN          1     
-   1239  NOVA DOLLAR FIXED INCOME FUND       NIGERIA  NGN          1     
-   1244  PACAM EUROBOND FUND                 NIGERIA  NGN          1     
-   2857  RMBN DOLLAR FIXED INCOME FUND       NIGERIA  NGN          1     
-   1257  STANBIC IBTC DOLLAR FUND            NIGERIA  NGN          1     
-   1272  UNITED CAPITAL EUROBOND FUND        NIGERIA  NGN          1     
-   2866  United Capital Nigerian Eurobond F  NIGERIA  NGN          1     
-   1224  VANTAGE DOLLAR FUND                 NIGERIA  NGN          1     
-
-## C. Couverture USD dans sec_ng_observations pour les fonds touches
+   Lecture : si `parts_implicites` (actif net / valeur) est stable entre deux
+   ordres de grandeur, la valeur est la meme mesure dans deux unites. S il varie
+   d un facteur equivalent, ce sont deux mesures differentes.
 
 
-Erreur fatale : Table 'fund_opcvm.sec_ng_observations' doesn't exist
+## D. Fonds hors taux de change : 2592, 2796, 1251
+
+   fund_id  nom                   pays     dev_libelle  ordre  n    v_min        v_max        d_min                                     d_max                                     a_devise
+   -------  --------------------  -------  -----------  -----  ---  -----------  -----------  ----------------------------------------  ----------------------------------------  --------
+   1251     SIAML ETF 40          NIGERIA  NGN          1      73   49           98           Fri Jan 14 2022 00:00:00 GMT+0000 (Coord  Fri Aug 11 2023 00:00:00 GMT+0000 (Coord  73      
+   1251     SIAML ETF 40          NIGERIA  NGN          2      369  100          950.4        Fri Feb 03 2017 00:00:00 GMT+0000 (Coord  Fri Dec 12 2025 00:00:00 GMT+0000 (Coord  366     
+   1251     SIAML ETF 40          NIGERIA  NGN          3      45   1010         9349.99      Fri Feb 02 2024 00:00:00 GMT+0000 (Coord  Fri Jul 10 2026 00:00:00 GMT+0000 (Coord  45      
+   1251     SIAML ETF 40          NIGERIA  NGN          4      6    10350        14414.73     Fri Feb 06 2026 00:00:00 GMT+0000 (Coord  Fri Apr 17 2026 00:00:00 GMT+0000 (Coord  6       
+   2592     FCP BRIDGE EQUILIBRE  UEMOA    XOF          3      23   5184         8963.3       Fri Oct 15 2021 00:00:00 GMT+0000 (Coord  Fri May 15 2026 00:00:00 GMT+0000 (Coord  0       
+   2592     FCP BRIDGE EQUILIBRE  UEMOA    XOF          7      104  29487443.46  44467985.22  Mon Jun 26 2023 00:00:00 GMT+0000 (Coord  Fri Mar 13 2026 00:00:00 GMT+0000 (Coord  0       
+   2796     FSDH HALAL FUND       NIGERIA  NGN          2      1    138.21       138.21       Fri May 15 2026 00:00:00 GMT+0000 (Coord  Fri May 15 2026 00:00:00 GMT+0000 (Coord  1       
+   2796     FSDH HALAL FUND       NIGERIA  NGN          3      134  1021.66      1411.78      Fri Dec 08 2023 00:00:00 GMT+0000 (Coord  Fri Jul 10 2026 00:00:00 GMT+0000 (Coord  134     
+   2796     FSDH HALAL FUND       NIGERIA  NGN          4      1    13988.38     13988.38     Thu Jun 11 2026 00:00:00 GMT+0000 (Coord  Thu Jun 11 2026 00:00:00 GMT+0000 (Coord  1       
+
+## E. Incoherence de casse sur le champ pays
+
+   pays     nb_fonds
+   -------  --------
+   CEMAC    34      
+   MAROC    644     
+   NIGERIA  326     
+   TUNISIE  131     
+   UEMOA    118     
+
+============================================================
+ FIN — aucune ecriture effectuee.
+============================================================
+
+
 ```
