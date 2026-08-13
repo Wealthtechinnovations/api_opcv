@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-08-13 00:56 UTC**
+Derniere verification : **2026-08-13 00:58 UTC**
 
 ```
 
@@ -13,8 +13,8 @@ Derniere verification : **2026-08-13 00:56 UTC**
 
 [OK   ] C1           Cache datejour synchronise avec la derniere VL
              aucun ecart
-[ECHEC] C2           Aucune performance orpheline
-             performences:50150, performences_eurs:235, performences_usds:395 — servies par l'API alors que la VL n'existe plus. Correctif : scripts/fix/fix_orphan_performances.js
+[ECHEC] C2           Aucune performance orpheline en tete de serie
+             performences:13 fonds dont la perf la plus recente porte une date sans VL — c'est elle que l'API sert. Instruire fonds par fonds AVANT toute suppression.
 [ECHEC] C3           Aucune performance recente au-dela de 500 %
              [1141] AFRINVEST DOLLAR FUND (NIGERIA) YTD 143958 % au Fri Jul 10 | [1196] EMERGING AFRICA EUROBOND FUND (NIGERIA) YTD 9339 % au Fri Jul 10 | [2743] APEL WEALTH MONEY MARKET FUND (NIGERIA) YTD 809 % au Fri Jul 10
 [ALERTE] C4.CEMAC     Fraicheur VL CEMAC (budget 400 j)
@@ -28,7 +28,7 @@ Derniere verification : **2026-08-13 00:56 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Wed Aug 12, soit 1 j
 [OK   ] C5           Snapshot PRODUCTION_STATE.json frais (< 6 h)
-             genere le 2026-08-13T00:00, soit 0.9 h
+             genere le 2026-08-13T00:00, soit 1.0 h
 [ALERTE] C6.CEMAC     Couverture indRef CEMAC
              0.0 % (2134 VL sans benchmark sur 2134)
 [OK   ] C6.MAROC     Couverture indRef MAROC
