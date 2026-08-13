@@ -21,6 +21,17 @@
 #   S2_HOST     adresse du serveur de production
 #   S2_SSH_KEY  cle privee SSH (contenu complet, en-tetes inclus)
 #   S2_USER     optionnel — utilisateur SSH, "root" par defaut
+#
+# PREREQUIS DE PERMISSION (verifie a la dure le 2026-08-13)
+# ---------------------------------------------------------
+# L'etape qui consigne le rapport a besoin d'ecrire dans le depot. Le bloc
+# `permissions: contents: write` ci-dessous ne PEUT PAS elever les droits
+# au-dela du reglage du depot : si Settings > Actions > General >
+# "Workflow permissions" est sur lecture seule, le push final echoue en 403
+# alors meme que le controle s'est parfaitement execute.
+# Le reglage requis est "Read and write permissions".
+# Symptome caracteristique : le job passe le controle mais echoue a la
+# derniere etape, et docs/ETAT_PRODUCTION_VERIFIE.md n'apparait jamais.
 
 name: Controle derive prod/doc
 
