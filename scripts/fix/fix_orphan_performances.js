@@ -20,6 +20,21 @@
  * PORTEE : les 3 tables de performances (locale, EUR, USD).
  * Les VL, ratios et classements ne sont pas touches.
  *
+ * AVERTISSEMENT MAJEUR — LIRE AVANT TOUT --execute GLOBAL
+ * ------------------------------------------------------
+ * Mesure du 2026-08-13 en production : **50 150 lignes** de `performences`
+ * portent une date sans VL correspondante, soit 74 % de la table. Ce ne sont
+ * PAS 50 150 anomalies. Toutes les performances ne sont pas produites a une
+ * date de VL : `fix_populate_performances` ecrit a la derniere VL du fonds,
+ * mais les routes batch `saveperfdatemysql` historisent a d'autres dates.
+ *
+ * Un `--execute` sans perimetre detruirait donc massivement des donnees
+ * legitimes. N'utiliser ce script que **cible** (`--fond <id>`), apres avoir
+ * instruit le cas, et prioritairement quand l'orpheline est la ligne LA PLUS
+ * RECENTE du fonds — c'est ce cas-la que l'API sert et qui a produit le bug
+ * Vantage (YTD 15 655 %). Le controle C2 de `scripts/diag/check_doc_drift.js`
+ * ne signale plus que ce sous-ensemble.
+ *
  * SECURITE
  * --------
  *   - dry-run par defaut : n'ecrit rien sans --execute

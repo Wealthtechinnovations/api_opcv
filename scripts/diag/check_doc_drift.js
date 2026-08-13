@@ -102,21 +102,33 @@ async function main() {
       driftTotal === 0 ? 'aucun ecart'
         : `${driftTotal} fonds desynchronises (${drift.map(r => `${r.pays}:${r.n}`).join(', ')}) — les pages pays affichent des dates fausses. Correctif : scripts/fix/fix_datejour_sync.js`);
 
-    // C2 — performances orphelines (date sans VL correspondante).
-    // Toujours fausses : elles decrivent une date ou le fonds n'a pas de valeur.
-    const orphanCounts = [];
+    // C2 — performance orpheline EN TETE de serie (date sans VL correspondante,
+    // et plus recente ligne du fonds).
+    //
+    // Le premier passage reel (2026-08-13) a compte 50 150 orphelines sur ~67 600
+    // lignes, soit 74 % de la table : l'invariant initial etait trop large. Toutes
+    // les perfs ne sont pas produites a une date de VL — `fix_populate_performances`
+    // ecrit bien a la derniere VL du fonds, mais les routes batch
+    // `saveperfdatemysql` historisent a d'autres dates. Ces lignes sont donc
+    // normales, et les supprimer aurait ete une perte massive de donnees.
+    //
+    // Le sous-ensemble reellement nuisible est celui qui a cause le bug Vantage :
+    // une orpheline qui est la LIGNE LA PLUS RECENTE du fonds, donc celle que
+    // l'API sert. C'est ce que ce controle mesure desormais.
+    const orphanHead = [];
     for (const t of ['performences', 'performences_eurs', 'performences_usds']) {
       const [[row]] = await conn.execute(`
         SELECT COUNT(*) AS n FROM ${t} p
-         WHERE NOT EXISTS (SELECT 1 FROM valorisations v
+         WHERE p.date = (SELECT MAX(date) FROM ${t} WHERE fond_id = p.fond_id)
+           AND NOT EXISTS (SELECT 1 FROM valorisations v
                             WHERE v.fund_id = p.fond_id AND DATE(v.date) = DATE(p.date))
            AND EXISTS (SELECT 1 FROM valorisations v2 WHERE v2.fund_id = p.fond_id)`);
-      if (Number(row.n) > 0) orphanCounts.push(`${t}:${row.n}`);
+      if (Number(row.n) > 0) orphanHead.push(`${t}:${row.n}`);
     }
-    record('C2', 'CRITIQUE', 'Aucune performance orpheline',
-      orphanCounts.length === 0,
-      orphanCounts.length === 0 ? 'aucune'
-        : `${orphanCounts.join(', ')} — servies par l'API alors que la VL n'existe plus. Correctif : scripts/fix/fix_orphan_performances.js`);
+    record('C2', 'CRITIQUE', 'Aucune performance orpheline en tete de serie',
+      orphanHead.length === 0,
+      orphanHead.length === 0 ? 'aucune'
+        : `${orphanHead.join(', ')} fonds dont la perf la plus recente porte une date sans VL — c'est elle que l'API sert. Instruire fonds par fonds AVANT toute suppression.`);
 
     // C3 — performances physiquement invraisemblables.
     // Aurait attrape Vantage 1224 (15 655 %) et attrape encore Zenith 2825 (239 %).
