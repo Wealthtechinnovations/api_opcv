@@ -42,6 +42,7 @@ on:
   push:
     paths:
       - 'scripts/diag/check_doc_drift.js'
+      - 'scripts/diag/ondemand/**'
       - '.github/workflows/doc-drift.yml'
 
 # Ecriture necessaire : le job consigne son rapport dans
@@ -124,6 +125,38 @@ jobs:
             node scripts/diag/check_doc_drift.js --verbose
           REMOTE
 
+      - name: Executer les diagnostics a la demande
+        if: always()
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          # Canal de diagnostic sans MCP : tout script depose dans
+          # scripts/diag/ondemand/ est execute en production, et sa sortie
+          # revient dans le depot par commit. Ces scripts sont en LECTURE SEULE
+          # par convention (SELECT uniquement) — ils ne doivent jamais ecrire.
+          #
+          # Un echec ici ne doit pas faire echouer le job : le controle
+          # d invariants qui precede reste la mission principale.
+          SSH_USER="${USER_SSH:-root}"
+          set +e
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" bash -s <<'REMOTE' > diag.txt 2>&1
+            set -u
+            cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api || exit 3
+            shopt -s nullglob
+            found=0
+            for f in scripts/diag/ondemand/*.js; do
+              found=1
+              echo "########## $f ##########"
+              node "$f"
+              echo ""
+            done
+            [ "$found" = "0" ] && echo "(aucun script dans scripts/diag/ondemand/)"
+            exit 0
+          REMOTE
+          echo "Diagnostics termines (code $?)."
+          set -e
+
       - name: Publier le rapport
         if: always()
         run: |
@@ -172,9 +205,25 @@ jobs:
             echo "Detail des controles et seuils : \`scripts/diag/check_doc_drift.js\`."
           } > docs/ETAT_PRODUCTION_VERIFIE.md
 
+          # Sortie des diagnostics a la demande, consignee separement du rapport
+          # d invariants pour que chacun garde son cycle de vie propre.
+          {
+            echo "# Diagnostics a la demande — sortie de production"
+            echo
+            echo "> Genere par \`doc-drift.yml\` a partir des scripts presents dans"
+            echo "> \`scripts/diag/ondemand/\`. **Lecture seule** : ces scripts n executent que des SELECT."
+            echo "> Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo
+            echo '```'
+            cat diag.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+          } > docs/DIAG_ONDEMAND.md
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/ETAT_PRODUCTION_VERIFIE.md
+          git add docs/ETAT_PRODUCTION_VERIFIE.md docs/DIAG_ONDEMAND.md
 
           # Rien a faire si le rapport est inchange : evite un commit par jour
           # sans contenu nouveau.
