@@ -24,6 +24,10 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env'
 const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
+// Contrat d ecriture des valorisations (etape 1 du correctif #73).
+// Ce chargeur est le premier branche : il ecrivait sans aucune qualification
+// et a produit les lignes non tracees des 17 et 24 juillet 2026.
+const contrat = require('../../src/lib/vl_contract');
 
 const DB_CONFIG = {
   host: process.env.DB_HOST || '127.0.0.1',
@@ -36,6 +40,15 @@ const DB_CONFIG = {
 const PAYS = 'Nigeria';
 const DEVISE = 'NGN';
 const REGULATEUR = 'SEC Nigeria';
+
+// Contrat d ecriture (#73). Mode `warn` par defaut : seule une devise
+// contredisant celle du fonds bloque l insertion. Les autres manquements sont
+// consignes dans `data_quality` sans interrompre l import, pour une mise en
+// service sans regression. `--contrat-strict` durcit la regle une fois le
+// mode `warn` observe en production.
+const CONTRAT_MODE = process.argv.includes('--contrat-strict') ? 'strict' : 'warn';
+// Identifiant de lot : rend tout import reversible ligne par ligne.
+const BATCH_ID = contrat.makeBatchId('SECNG');
 
 const CLASSIFICATION_MAP = {
   'ACTIONS':        { classification: 'ACTIONS',      categorie_globale: 'ACTIONS',      categorie_national: 'ACTIONS Nigeria',      categorie_regional: 'ACTIONS Nigeria' },
@@ -260,7 +273,13 @@ async function run() {
         fund_manager_clean: row.fund_manager_clean || '',
         fund_manager_key: managerKey,
         category_fr: row.fund_category_fr || '',
-        currency_code: row.currency_code || 'NGN',
+        // Pas de repli silencieux vers NGN : c etait le point d entree de #73.
+        // Une source muette sur la devise laisse le champ nul, et la mesure
+        // sera marquee UNQUALIFIED par le contrat plutot que faussement
+        // rattachee au naira. Les conversions en aval traitent deja toute
+        // devise autre que USD/EUR comme du naira : le comportement de calcul
+        // est donc inchange.
+        currency_code: row.currency_code || null,
         vls: new Map(),
       });
     }
@@ -279,7 +298,7 @@ async function run() {
         date,
         vl: vlPrice,
         nav: navValue,
-        currency: row.currency_code || 'NGN',
+        currency: row.currency_code || null, // meme regle : aucun defaut invente
         isCurrent,
       });
     }
@@ -382,6 +401,10 @@ async function run() {
     vlNoForex: 0,
     errors: [],
     fuzzyMatches: [],
+    // Contrat d ecriture (#73)
+    deviseParDefaut: [],   // fonds dont la source ne declare aucune devise
+    contratRefuse: 0,      // mesures rejetees : devise contredisant le fonds
+    contratQualite: {},    // repartition par statut de qualite
   };
 
   const BATCH_SIZE = 100;
@@ -397,7 +420,15 @@ async function run() {
 
       const classif = getClassification(fondData.category_fr);
       const fundNameKey = normalizeNameForMatch(fondData.fund_name_clean);
-      const currency = fondData.currency_code || 'NGN';
+      // `currency` sert a la creation du fonds et aux conversions. Le repli
+      // vers NGN est CONSERVE ici pour ne pas changer le comportement existant
+      // (un fonds cree sans devise casserait l affichage), mais il est
+      // desormais TRACE : c est ce repli, applique a des fonds dollar, qui a
+      // produit les 23 fonds mal libelles du referentiel.
+      const currency = fondData.currency_code || DEVISE;
+      if (!fondData.currency_code) {
+        report.deviseParDefaut.push(fondData.fund_name_clean);
+      }
 
       // --------------------------------------------------------
       // MATCHING: chercher le fonds en base
@@ -594,12 +625,49 @@ async function run() {
       }
 
       // --------------------------------------------------------
+      // Contrat d ecriture : confronter chaque mesure a la devise du fonds
+      // telle qu elle est EN BASE, et non a celle supposee par le CSV.
+      // C est cette confrontation qui aurait empeche #73 : une mesure en NGN
+      // sur un fonds USD est refusee au lieu d entrer dans la serie.
+      // --------------------------------------------------------
+      const [[fondEnBase]] = await conn.execute(
+        'SELECT id, dev_libelle FROM fond_investissements WHERE id = ?', [fondId]
+      );
+
+      const retenues = [];
+      for (const item of toInsert) {
+        const mesure = {
+          currency_code: item.currency,
+          // Le CSV du chargeur SEC ne porte ni type de prix ni provenance.
+          // On l ecrit tel quel — nul — plutot que de deviner : la mesure sera
+          // marquee UNQUALIFIED, ce qui est la verite.
+          price_type: item.price_type || null,
+          source_url: item.source_url || null,
+          sec_document_id: item.sec_document_id || null,
+          report_date: item.report_date || null,
+        };
+        const verdict = contrat.validate(mesure, fondEnBase, { mode: CONTRAT_MODE });
+        report.contratQualite[verdict.quality] = (report.contratQualite[verdict.quality] || 0) + 1;
+
+        if (!verdict.accepted) {
+          report.contratRefuse++;
+          if (report.errors.length < 40) {
+            report.errors.push(
+              `CONTRAT ${fondData.fund_name_clean} ${item.date} : ${verdict.reasons.join(' ; ')}`
+            );
+          }
+          continue;
+        }
+        retenues.push({ ...item, _mesure: mesure, _quality: verdict.quality });
+      }
+
+      // --------------------------------------------------------
       // Insertion par batch
       // --------------------------------------------------------
-      for (let i = 0; i < toInsert.length; i += BATCH_SIZE) {
-        const batch = toInsert.slice(i, i + BATCH_SIZE);
+      for (let i = 0; i < retenues.length; i += BATCH_SIZE) {
+        const batch = retenues.slice(i, i + BATCH_SIZE);
         const placeholders = batch.map(() =>
-          '(?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, ?, ?, ?, \'\', 0, 0, 0, 0, 0, 0, 0, 0, ?, 0, \'\', 0, ?)'
+          '(?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, ?, ?, ?, \'\', 0, 0, 0, 0, 0, 0, 0, 0, ?, 0, \'\', 0, ?, ?, ?, ?, ?, ?, ?, ?)'
         ).join(',\n');
         const values = [];
 
@@ -608,7 +676,8 @@ async function run() {
             fondId, fondData.fund_name_clean, item.vl, item.valueEUR, item.valueUSD,
             item.nav, item.navEUR, item.navUSD,
             item.vl, item.valueEUR, item.valueUSD,
-            fondData.fund_name_clean, item.date
+            fondData.fund_name_clean, item.date,
+            ...contrat.contractValues(item._mesure, item._quality, BATCH_ID)
           );
         }
 
@@ -621,7 +690,9 @@ async function run() {
               vl_ajuste, vl_ajuste_EUR, vl_ajuste_USD,
               indice_name, base_100, base_100_InRef, tsr, tra,
               indRef, indRef_EUR, indRef_USD,
-              indice_comparaison, libelle_fond, souscription, ID_indice, rachat, date)
+              indice_comparaison, libelle_fond, souscription, ID_indice, rachat, date,
+              currency_code, price_type, data_quality, correction_batch,
+              source_url, sec_document_id, report_date)
              VALUES ${placeholders}`,
             values
           );
@@ -638,12 +709,15 @@ async function run() {
                   vl_ajuste, vl_ajuste_EUR, vl_ajuste_USD,
                   indice_name, base_100, base_100_InRef, tsr, tra,
                   indRef, indRef_EUR, indRef_USD,
-                  indice_comparaison, libelle_fond, souscription, ID_indice, rachat, date)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, ?, ?, ?, '', 0, 0, 0, 0, 0, 0, 0, 0, ?, 0, '', 0, ?)`,
+                  indice_comparaison, libelle_fond, souscription, ID_indice, rachat, date,
+              currency_code, price_type, data_quality, correction_batch,
+              source_url, sec_document_id, report_date)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, ?, ?, ?, '', 0, 0, 0, 0, 0, 0, 0, 0, ?, 0, '', 0, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [fondId, fondData.fund_name_clean, item.vl, item.valueEUR, item.valueUSD,
                  item.nav, item.navEUR, item.navUSD,
                  item.vl, item.valueEUR, item.valueUSD,
-                 fondData.fund_name_clean, item.date]
+                 fondData.fund_name_clean, item.date,
+                 ...contrat.contractValues(item._mesure, item._quality, BATCH_ID)]
               );
               report.vlInserted++;
             } catch (e2) {
@@ -654,8 +728,10 @@ async function run() {
       }
 
       // Detecter les variations extremes entre VL consecutives (>50%)
-      if (toInsert.length >= 2) {
-        const sorted = [...toInsert].sort((a, b) => a.date.localeCompare(b.date));
+      // Porte sur les mesures REELLEMENT inserees : une mesure refusee par le
+      // contrat ne doit pas declencher une fausse alerte de variation.
+      if (retenues.length >= 2) {
+        const sorted = [...retenues].sort((a, b) => a.date.localeCompare(b.date));
         for (let i = 1; i < sorted.length; i++) {
           const prev = sorted[i - 1].vl;
           const curr = sorted[i].vl;
@@ -671,7 +747,8 @@ async function run() {
       }
 
       // Mettre a jour datejour, date_premiere_vl, montant_premier_vl + activer le fonds
-      if (toInsert.length > 0) {
+      // Uniquement si des mesures ont ete effectivement inserees.
+      if (retenues.length > 0) {
         await conn.execute(`
           UPDATE fond_investissements SET
             active = 1,
@@ -702,6 +779,20 @@ async function run() {
     console.log(`VL deja existantes (gardees):  ${report.vlAlreadyExist}`);
     console.log(`VL sans taux forex:            ${report.vlNoForex}`);
     console.log(`Erreurs:                       ${report.errors.length}`);
+
+    // --- Contrat d ecriture (#73) ---
+    console.log('');
+    console.log(`Contrat d ecriture:            mode ${CONTRAT_MODE}, lot ${BATCH_ID}`);
+    const qual = Object.entries(report.contratQualite).sort((a, b) => b[1] - a[1]);
+    console.log(`  Qualite des mesures:         ${qual.length ? qual.map(([q, n]) => `${q}=${n}`).join('  ') : '(aucune)'}`);
+    console.log(`  Mesures refusees:            ${report.contratRefuse}` +
+                (report.contratRefuse ? '  <-- devise contredisant celle du fonds' : ''));
+    if (report.deviseParDefaut.length) {
+      console.log(`  Fonds sans devise source:    ${report.deviseParDefaut.length} (crees en ${DEVISE} par defaut — A ARBITRER)`);
+      for (const n of report.deviseParDefaut.slice(0, 10)) console.log(`     - ${n}`);
+      if (report.deviseParDefaut.length > 10) console.log(`     ... et ${report.deviseParDefaut.length - 10} autres`);
+    }
+    console.log(`  Rollback de ce lot:          DELETE FROM valorisations WHERE correction_batch = '${BATCH_ID}'`);
 
     if (report.fuzzyMatches.length > 0) {
       console.log('\nMatches fuzzy (a verifier):');
