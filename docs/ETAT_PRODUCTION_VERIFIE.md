@@ -5,9 +5,10 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-08-16 07:59 UTC**
+Derniere verification : **2026-08-16 08:06 UTC**
 
 ```
+AVERTISSEMENT: mise a jour du code impossible, controle lance sur la version presente.
 
 === BOUCLE DE CONTROLE — DERIVE DOCUMENTATION / PRODUCTION ===
 
@@ -28,7 +29,7 @@ Derniere verification : **2026-08-16 07:59 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Fri Aug 14, soit 2 j
 [OK   ] C5           Snapshot PRODUCTION_STATE.json frais (< 6 h)
-             genere le 2026-08-16T07:00, soit 1.0 h
+             genere le 2026-08-16T08:00, soit 0.1 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [2866] United Capital Nigerian Eurobo (NIGERIA/NGN) 1554x [120.96 .. 187995] | [1274] UNITED CAPITAL GLOBAL FIXED IN (NIGERIA/NGN) 1548x [1.20 .. 1863] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1538x [10.84 .. 16672] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1535x [1.00 .. 1535] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [1154] ARM EUROBOND FUND (NIGERIA/NGN) 1535x [1.20 .. 1836] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1534x [100.00 .. 153355] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1533x [1.10 .. 1686] | [1175] CORDROS DOLLAR FUND (NIGERIA/NGN) 1531x [116.08 .. 177673] | [1170] NORRENBERGER DOLLAR FUND (NIGERIA/NGN) 1527x [105.14 .. 160519] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1524x [1.03 .. 1568] | [1160] AXA MANSARD DOLLAR BOND FUND (NIGERIA/NGN) 1523x [139.18 .. 211979] | [1168] NIGERIA DOLLAR INCOME FUND (NIGERIA/NGN) 1518x [1.09 .. 1654]
 [ALERTE] C6.CEMAC     Couverture indRef CEMAC

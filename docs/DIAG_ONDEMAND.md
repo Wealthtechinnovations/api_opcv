@@ -4,14 +4,134 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-16 07:59 UTC**
+Derniere execution : **2026-08-16 08:06 UTC**
 
 ```
+########## scripts/diag/ondemand/diag_frontend_logs.js ##########
+
+============================================================
+ INCIDENT FRONTEND — LOGS PM2
+ Genere le 2026-08-16T08:06:00.221Z — LECTURE SEULE
+============================================================
+
+
+## fundafrique-frontend-error.log  (32317.4 Ko, modifie 2026-08-16T08:04:21.114Z)
+
+   ReferenceError: document is not defined
+       at /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/.next/server/app/funds/summary-eur/[fondId]/page.js:1:4341
+       at v (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/.next/server/app/funds/summary-eur/[fondId]/page.js:1:5287)
+       at nj (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+       at nM (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+       at nM (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+       at nN (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+       at nB (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+       at nD (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+       at nN (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+       at nB (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538) {
+     digest: '1313471132'
+   }
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+   You are using Node.js 14.16.0. For Next.js, Node.js version >= v18.17.0 is required.
+
+## fundafrique-frontend-out.log  (12.5 Ko, modifie 2026-08-16T08:04:21.054Z)
+
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+   > demo-app@0.1.0 start
+   > next start
+
+## Etat du repertoire de build .next
+
+   BUILD_ID                   present  21 octets  2026-08-16T08:04:03.286Z
+   build-manifest.json        present  969 octets  2026-08-16T08:03:55.598Z
+   prerender-manifest.json    present  65803 octets  2026-08-16T08:04:12.338Z
+   routes-manifest.json       present  41376 octets  2026-08-16T08:03:36.542Z
+   server                     present  (repertoire)  2026-08-16T08:04:03.270Z
+   static                     present  (repertoire)  2026-08-16T08:03:55.694Z
+
+   BUILD_ID : RtXg6Kf1b86V2m5XduBFx
+
+============================================================
+ FIN — aucune ecriture.
+============================================================
+
+
 ########## scripts/diag/ondemand/diag_node_runtimes.js ##########
 
 ============================================================
  RUNTIMES NODE.JS DISPONIBLES SUR LE SERVEUR
- Genere le 2026-08-16T07:59:50.731Z — LECTURE SEULE
+ Genere le 2026-08-16T08:06:00.404Z — LECTURE SEULE
 ============================================================
 
 ## A. Runtime qui execute ce script
@@ -59,9 +179,9 @@ Derniere execution : **2026-08-16 07:59 UTC**
 ## F. Contrainte declaree par le frontend
 
    name           : demo-app@0.1.0
-   engines        : {}
+   engines        : {"node":">=18.17.0"}
    next           : ^14.2.3
-   script build   : next build
+   script build   : bash ./scripts/build.sh
 
 ============================================================
  FIN — aucune ecriture, aucune modification de configuration.
@@ -72,7 +192,7 @@ Derniere execution : **2026-08-16 07:59 UTC**
 
 ============================================================
  INTERPRETEURS REELS DES PROCESS PM2
- Genere le 2026-08-16T07:59:50.869Z — LECTURE SEULE
+ Genere le 2026-08-16T08:06:00.609Z — LECTURE SEULE
 ============================================================
 
 ## A. Definition enregistree (dump PM2)
@@ -111,12 +231,6 @@ Derniere execution : **2026-08-16 07:59 UTC**
 
    (lecture de /proc/<pid>/exe — la verite du systeme, pas une declaration)
 
-   pid 1189348  exe : /usr/bin/dash
-                cmd : sh -c next start
-
-   pid 1189349  exe : /root/.nvm/versions/node/v18.20.8/bin/node -> Node 18.20.8
-                cmd : next-server (v14.2.3)
-
    pid 2100145  exe : /usr/local/bin/node
                 cmd : next-server (v
 
@@ -134,7 +248,7 @@ Derniere execution : **2026-08-16 07:59 UTC**
    ecosystem.config.js              interpreter=(non precise)
    ecosystem.production.config.js   absent
    .nvmrc                           absent
-   package.json                     engines={}  start=next start
+   package.json                     engines={"node":">=18.17.0"}  start=next start
 
 ============================================================
  FIN — aucune ecriture, aucun redemarrage.
