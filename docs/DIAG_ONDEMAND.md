@@ -4,14 +4,14 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-16 07:57 UTC**
+Derniere execution : **2026-08-16 07:59 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_node_runtimes.js ##########
 
 ============================================================
  RUNTIMES NODE.JS DISPONIBLES SUR LE SERVEUR
- Genere le 2026-08-16T07:57:32.580Z — LECTURE SEULE
+ Genere le 2026-08-16T07:59:50.731Z — LECTURE SEULE
 ============================================================
 
 ## A. Runtime qui execute ce script
@@ -65,6 +65,79 @@ Derniere execution : **2026-08-16 07:57 UTC**
 
 ============================================================
  FIN — aucune ecriture, aucune modification de configuration.
+============================================================
+
+
+########## scripts/diag/ondemand/diag_pm2_interpreters.js ##########
+
+============================================================
+ INTERPRETEURS REELS DES PROCESS PM2
+ Genere le 2026-08-16T07:59:50.869Z — LECTURE SEULE
+============================================================
+
+## A. Definition enregistree (dump PM2)
+
+   source : /root/.pm2/dump.pm2
+
+   api-monolith            
+      script           : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
+      cwd              : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+      interpreter      : /root/.nvm/versions/node/v18.20.8/bin/node
+      node_args        : []
+      PATH (node)      : /root/.nvm/versions/node/v18.20.8/bin
+
+   fundafrique-frontend    
+      script           : /root/.nvm/versions/node/v18.20.8/bin/npm
+      cwd              : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend
+      interpreter      : /root/.nvm/versions/node/v18.20.8/bin/node
+      node_args        : []
+      PATH (node)      : /root/.nvm/versions/node/v18.20.8/bin
+
+   worker-recalculation    
+      script           : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/worker-recalculation.js
+      cwd              : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+      interpreter      : node
+      node_args        : []
+      PATH (node)      : /root/.nvm/versions/node/v18.20.8/bin
+
+   worker-data-import      
+      script           : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/worker-data-import.js
+      cwd              : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+      interpreter      : node
+      node_args        : []
+      PATH (node)      : /root/.nvm/versions/node/v18.20.8/bin
+
+## B. Binaire reellement execute par les process vivants
+
+   (lecture de /proc/<pid>/exe — la verite du systeme, pas une declaration)
+
+   pid 1189348  exe : /usr/bin/dash
+                cmd : sh -c next start
+
+   pid 1189349  exe : /root/.nvm/versions/node/v18.20.8/bin/node -> Node 18.20.8
+                cmd : next-server (v14.2.3)
+
+   pid 2100145  exe : /usr/local/bin/node
+                cmd : next-server (v
+
+   pid 2707730  exe : /root/.nvm/versions/node/v18.20.8/bin/node -> Node 18.20.8
+                cmd : node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+
+   pid 2707737  exe : /root/.nvm/versions/node/v18.20.8/bin/node -> Node 18.20.8
+                cmd : node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+
+   pid 856050   exe : /root/.nvm/versions/node/v18.20.8/bin/node -> Node 18.20.8
+                cmd : node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
+
+## C. Configuration PM2 cote frontend
+
+   ecosystem.config.js              interpreter=(non precise)
+   ecosystem.production.config.js   absent
+   .nvmrc                           absent
+   package.json                     engines={}  start=next start
+
+============================================================
+ FIN — aucune ecriture, aucun redemarrage.
 ============================================================
 
 
