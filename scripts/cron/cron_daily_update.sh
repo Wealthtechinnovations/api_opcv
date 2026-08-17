@@ -36,10 +36,18 @@ run_step() {
 
   log ""
   log "[$step_num] $step_desc..."
-  if "$@" 2>&1 | tee -a "$LOG_FILE"; then
+  # Le statut doit etre celui de la COMMANDE, pas celui de `tee`.
+  # `if "$@" | tee ...` renvoyait le code de `tee`, toujours 0 tant que le log
+  # est ecrivable : toutes les etapes node etaient donc rapportees OK, meme
+  # apres un process.exit(1). C est ce qui rendait CODE_REVIEW #49 inoperant
+  # alors qu il etait coche comme fait. `PIPESTATUS` est l idiome deja utilise
+  # par les crons BRVM, Tunisie et indices de ce meme projet.
+  "$@" 2>&1 | tee -a "$LOG_FILE"
+  local rc=${PIPESTATUS[0]}
+  if [ "$rc" -eq 0 ]; then
     log "[$step_num] OK"
   else
-    log "[$step_num] ERREUR (exit code $?)"
+    log "[$step_num] ERREUR (exit code $rc)"
     ERRORS=$((ERRORS + 1))
   fi
 }
@@ -52,14 +60,21 @@ run_curl() {
 
   log ""
   log "[$step_num] $step_desc..."
-  local http_code
-  http_code=$(curl -s -o >(tee -a "$LOG_FILE") -w '%{http_code}' "$url" --max-time "$max_time" 2>&1)
-  if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ] 2>/dev/null; then
-    log ""
+  # Le corps de la reponse va dans un fichier temporaire, jamais dans le flux
+  # capture par $( ). La substitution de processus precedente
+  # (`-o >(tee -a "$LOG_FILE")`) ecrivait le corps dans le MEME pipe que le code
+  # HTTP : les deux se melangeaient dans un ordre non deterministe, le test
+  # numerique echouait sur une valeur non numerique, et une reponse HTTP 200
+  # pouvait etre comptee en ERREUR — ou l inverse, d un jour a l autre.
+  local http_code body
+  body=$(mktemp)
+  http_code=$(curl -s -o "$body" -w '%{http_code}' "$url" --max-time "$max_time")
+  cat "$body" >> "$LOG_FILE" 2>/dev/null
+  rm -f "$body"
+  if [ "$http_code" -ge 200 ] 2>/dev/null && [ "$http_code" -lt 300 ] 2>/dev/null; then
     log "[$step_num] OK (HTTP $http_code)"
   else
-    log ""
-    log "[$step_num] ERREUR (HTTP $http_code)"
+    log "[$step_num] ERREUR (HTTP ${http_code:-aucun})"
     ERRORS=$((ERRORS + 1))
   fi
 }
@@ -114,3 +129,9 @@ else
   log "=== MISE A JOUR TERMINEE AVEC $ERRORS ERREUR(S) $(date) ==="
 fi
 log "========================================"
+
+# Propager le resultat : sans code de sortie non nul, aucun superviseur — cron
+# MAILTO, monitoring, alerting — ne peut detecter un echec. Le script sortait
+# systematiquement 0, quel que soit le nombre d erreurs comptees.
+exit $(( ERRORS > 0 ? 1 : 0 ))
+

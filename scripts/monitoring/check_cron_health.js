@@ -142,6 +142,15 @@ async function run() {
     ok.forEach(o => console.log(`  [OK] ${o}`));
   }
   console.log('');
+
+  // Propager le resultat par le code de sortie.
+  //
+  // Ce controle etait le filet de securite cense rattraper les echecs
+  // silencieux de tous les autres crons — et il etait lui-meme silencieux :
+  // il imprimait « N PROBLEME(S) DETECTE(S) » puis sortait 0. Aucun mail,
+  // aucun webhook, aucun monitoring ne pouvait s en apercevoir. La detection
+  // n existait donc que si un humain lisait le fichier de log a la main.
+  process.exitCode = issues.length > 0 ? 1 : 0;
 }
 
 run().catch(e => { console.error('ERREUR:', e.message); process.exit(1); });

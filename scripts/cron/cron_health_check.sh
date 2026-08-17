@@ -20,8 +20,14 @@ echo "========================================" | tee -a "$LOG_FILE"
 
 cd "$API_DIR" || exit 1
 
+# Le statut doit etre celui du controle, pas celui de `tee`.
 node scripts/monitoring/check_cron_health.js 2>&1 | tee -a "$LOG_FILE"
+RC_HEALTH=${PIPESTATUS[0]}
 
 echo "" | tee -a "$LOG_FILE"
 echo "=== HEALTH CHECK TERMINE $(date) ===" | tee -a "$LOG_FILE"
 echo "========================================" | tee -a "$LOG_FILE"
+
+# Sortir non nul si des problemes ont ete detectes : c est ce qui permet enfin
+# a un superviseur (MAILTO cron, monitoring) de reagir sans lecture manuelle.
+exit "${RC_HEALTH:-0}"

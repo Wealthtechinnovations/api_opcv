@@ -20,10 +20,14 @@ cd "$API_DIR" || exit 1
 
 # 1. Recalcul performances EUR + USD (seulement les fonds pas a jour)
 echo "--- [1/3] Performances EUR + USD ---"
-if node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH 2>&1 | tail -15; then
+# Le statut doit etre celui de node, pas celui de `tail` : `if node ... | tail`
+# renvoyait toujours 0, donc un crash du recalcul EUR/USD etait invisible.
+node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH 2>&1 | tail -15
+RC_ETAPE1=${PIPESTATUS[0]}
+if [ "$RC_ETAPE1" -eq 0 ]; then
   echo "[1/3] OK"
 else
-  echo "[1/3] ERREUR"
+  echo "[1/3] ERREUR (exit code $RC_ETAPE1)"
   ERRORS=$((ERRORS + 1))
 fi
 
@@ -75,3 +79,8 @@ if [ "$ERRORS" -eq 0 ]; then
 else
   echo "CRON EUR/USD TERMINE AVEC $ERRORS ERREUR(S) — $(date '+%Y-%m-%d %H:%M:%S')"
 fi
+
+# Propager le resultat : sans code de sortie non nul, aucun superviseur ne peut
+# detecter un echec. Le script sortait systematiquement 0.
+exit $(( ERRORS > 0 ? 1 : 0 ))
+
