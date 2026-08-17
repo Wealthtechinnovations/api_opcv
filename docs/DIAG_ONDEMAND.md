@@ -4,14 +4,14 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-16 08:27 UTC**
+Derniere execution : **2026-08-17 18:27 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_preflight_contrat.js ##########
 
 ============================================================
  PRE-VOL DU CONTRAT D ECRITURE (avant le cron Nigeria)
- Genere le 2026-08-16T08:27:36.997Z — LECTURE SEULE
+ Genere le 2026-08-17T18:27:55.141Z — LECTURE SEULE
 ============================================================
 
 ## Contexte
