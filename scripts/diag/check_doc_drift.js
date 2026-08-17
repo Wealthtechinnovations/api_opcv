@@ -201,6 +201,43 @@ async function main() {
       scale.length === 0 ? 'aucune'
         : scale.map(r => `[${r.fund_id}] ${String(r.nom_fond).slice(0, 30)} (${r.pays}/${r.dev_libelle}) ${Number(r.ratio).toFixed(0)}x [${Number(r.vmin).toFixed(2)} .. ${Number(r.vmax).toFixed(0)}]`).join(' | '));
 
+    // C8 — les performances suivent-elles les VL ?
+    //
+    // Decouvert le 2026-08-17 : le Maroc avait 9 fonds sur 644 dont la
+    // performance etait a jour, avec un retard moyen de 78,5 jours ; la Tunisie
+    // 6 sur 131, 80,1 jours. Les VL etaient fraiches, mais les performances
+    // affichees dataient de fin mai. Trois mois sans que rien ne le signale.
+    //
+    // Une VL fraiche avec une performance perimee est pire qu une donnee
+    // absente : la page affiche un chiffre plausible et faux. Le controle C4
+    // ne voyait rien, puisqu il ne regarde que la fraicheur des VL.
+    //
+    // Seuil : moins de 50 % des fonds a jour, ou un retard moyen superieur a
+    // 15 jours, sur un pays dont les VL ont moins de 15 jours. Un pays dont les
+    // VL sont elles-memes figees (CEMAC) est exclu : sa performance figee est
+    // coherente, ce n est pas le meme defaut.
+    const [lag] = await conn.execute(`
+      SELECT f.pays,
+             COUNT(*)                                                          AS fonds,
+             SUM(CASE WHEN p.dp = v.dv THEN 1 ELSE 0 END)                      AS a_jour,
+             ROUND(100 * SUM(CASE WHEN p.dp = v.dv THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct,
+             ROUND(AVG(DATEDIFF(v.dv, p.dp)), 1)                               AS retard_j,
+             DATEDIFF(CURDATE(), MAX(v.dv))                                    AS vl_age
+        FROM fond_investissements f
+        JOIN (SELECT fund_id, MAX(date) AS dv FROM valorisations GROUP BY fund_id) v
+          ON v.fund_id = f.id
+        LEFT JOIN (SELECT fond_id, MAX(date) AS dp FROM performences GROUP BY fond_id) p
+          ON p.fond_id = f.id
+       WHERE f.active = 1
+       GROUP BY f.pays
+      HAVING vl_age <= 15 AND (pct < 50 OR retard_j > 15)
+       ORDER BY pct`);
+    record('C8', 'CRITIQUE', 'Les performances suivent les VL',
+      lag.length === 0,
+      lag.length === 0 ? 'tous les pays a jour'
+        : lag.map(r => `${r.pays} : ${r.a_jour}/${r.fonds} a jour (${r.pct} %), retard moyen ${r.retard_j} j`).join(' | ')
+          + ' — VL fraiches mais performances perimees : le site affiche des chiffres plausibles et faux');
+
     // C6 — couverture benchmark : un fonds sans indRef n'est comparable a rien.
     const [cov] = await conn.execute(`
       SELECT f.pays, COUNT(*) AS total, SUM(CASE WHEN v.indRef IS NULL THEN 1 ELSE 0 END) AS sans
