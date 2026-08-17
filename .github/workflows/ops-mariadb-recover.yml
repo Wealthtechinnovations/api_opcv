@@ -1,0 +1,168 @@
+# OPERATION — diagnostic et redemarrage de MariaDB apres une panne.
+#
+# POURQUOI CE WORKFLOW EXISTE, SEPAREMENT DU RESTE
+# ------------------------------------------------
+# Incident du 2026-08-17 : `Can't connect to local server through socket
+# /run/mysqld/mysqld.sock`. Toutes les routes API renvoient HTTP 500. Le disque
+# est sain (71 %, 44 Go libres), les process PM2 sont en ligne — ils ne plantent
+# pas, ils n atteignent simplement plus la base.
+#
+# Aucun outil MCP gouverne ne couvre le redemarrage d un service : le bridge
+# n expose que des redemarrages Passenger pour le projet legacy et le conteneur
+# MCP de S1. Le canal SSH de la CI est donc le seul chemin disponible.
+#
+# Il est isole dans son propre fichier, et NON ajoute au workflow de controle
+# `doc-drift.yml`, pour trois raisons : ce dernier est en lecture seule par
+# convention et doit le rester ; une operation qui redemarre un service doit
+# etre declenchee sciemment, jamais en effet de bord d un controle quotidien ;
+# et sa trace doit rester distincte dans l historique des executions.
+#
+# PRINCIPE : diagnostiquer AVANT d agir. Un redemarrage aveugle effacerait la
+# cause. Le job releve donc l etat, le journal systeme et la memoire, PUIS
+# demarre le service, PUIS verifie que la base repond.
+#
+# Ne s execute jamais tout seul : aucun `schedule`.
+
+name: OPS — recuperation MariaDB
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ops-mariadb-recover.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ops-mariadb
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    name: Diagnostiquer puis redemarrer MariaDB
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Diagnostic, redemarrage, verification
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" bash -s <<'REMOTE' 2>&1 | tee rapport-db.txt
+            set -u
+
+            echo "=============================================="
+            echo " 1. ETAT AVANT INTERVENTION"
+            echo "=============================================="
+            SERVICE=""
+            for s in mariadb mysql mysqld; do
+              if systemctl list-unit-files 2>/dev/null | grep -q "^${s}\.service"; then SERVICE="$s"; break; fi
+            done
+            echo "Service detecte : ${SERVICE:-AUCUN}"
+            [ -n "$SERVICE" ] && systemctl status "$SERVICE" --no-pager -l 2>&1 | head -25
+
+            echo ""
+            echo "Socket attendu par le client :"
+            ls -l /run/mysqld/mysqld.sock 2>&1 || echo "  absent"
+
+            echo ""
+            echo "=============================================="
+            echo " 2. POURQUOI IL S EST ARRETE"
+            echo "=============================================="
+            echo "--- journal du service (30 dernieres lignes) ---"
+            [ -n "$SERVICE" ] && journalctl -u "$SERVICE" -n 30 --no-pager 2>&1 | tail -30 || echo "  journalctl indisponible"
+            echo ""
+            echo "--- traces de tuerie memoire (OOM) ---"
+            journalctl -k --since "24 hours ago" --no-pager 2>/dev/null | grep -iE "out of memory|oom-kill|killed process" | tail -10 || echo "  aucune trace OOM sur 24 h"
+            echo ""
+            echo "--- memoire disponible ---"
+            free -m 2>&1 || true
+
+            echo ""
+            echo "=============================================="
+            echo " 3. REDEMARRAGE"
+            echo "=============================================="
+            if [ -z "$SERVICE" ]; then
+              echo "ABANDON : aucun service mariadb/mysql identifie."
+              exit 3
+            fi
+            if systemctl is-active --quiet "$SERVICE"; then
+              echo "Le service est deja actif — aucun redemarrage necessaire."
+            else
+              echo "Demarrage de $SERVICE ..."
+              systemctl start "$SERVICE" 2>&1 || echo "ECHEC du demarrage (detail ci-dessous)"
+              sleep 8
+            fi
+            echo "Etat : $(systemctl is-active "$SERVICE" 2>&1)"
+
+            echo ""
+            echo "=============================================="
+            echo " 4. VERIFICATION — la base repond-elle ?"
+            echo "=============================================="
+            ls -l /run/mysqld/mysqld.sock 2>&1 || echo "  socket toujours absent"
+            cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api 2>/dev/null || true
+            # Les identifiants sont lus depuis .env, jamais affiches.
+            if [ -f .env ]; then
+              DBU=$(grep -E '^DB_USER=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+              DBN=$(grep -E '^DB_NAME=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+              DBP=$(grep -E '^DB_PASSWORD=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+              if [ -n "${DBU:-}" ]; then
+                MYSQL_PWD="$DBP" mysql -N -B -u "$DBU" "${DBN:-fund_opcvm}" \
+                  -e "SELECT COUNT(*) AS fonds FROM fond_investissements; SELECT MAX(date) AS derniere_vl FROM valorisations;" 2>&1 \
+                  || echo "  la base ne repond toujours pas"
+              fi
+            fi
+
+            echo ""
+            echo "--- l API repond-elle de nouveau ? ---"
+            curl -s -o /dev/null -w "  /api/getfondbypays/MAROC : HTTP %{http_code}\n" --max-time 20 \
+              http://localhost:3005/api/getfondbypays/MAROC 2>&1 || echo "  API injoignable en local"
+            echo ""
+            echo "=============================================="
+            echo " FIN"
+            echo "=============================================="
+          REMOTE
+
+      - name: Publier le rapport
+        if: always()
+        run: |
+          {
+            echo "## Recuperation MariaDB"
+            echo
+            echo "Execute le $(date -u '+%Y-%m-%d %H:%M UTC')."
+            echo
+            echo '```'
+            cat rapport-db.txt 2>/dev/null || echo "(aucune sortie — connexion SSH impossible)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
