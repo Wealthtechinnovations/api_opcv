@@ -4,21 +4,21 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-19 16:49 UTC**
+Derniere execution : **2026-08-19 16:51 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_csv_devise_sec.js ##########
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T16:49:38.399Z — LECTURE SEULE
+ Genere le 2026-08-19T16:51:44.355Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 4.89 Mo
-   modifie   : 2026-08-17T10:00:22.276Z (il y a 54.8 h)
+   modifie   : 2026-08-17T10:00:22.276Z (il y a 54.9 h)
    lignes    : 4221
    colonnes  : 53
 
@@ -87,11 +87,51 @@ Derniere execution : **2026-08-19 16:49 UTC**
    1175  CORDROS DOLLAR FUND               NGN        
    ... et 28 autres
 
-## E. Ce que cela implique pour l etape 0
+## E. L etiquette de devise correspond-elle a l echelle ?
 
-   L extracteur emet majoritairement USD (915/1155).
-   -> Corriger dev_libelle en USD ALIGNERAIT le referentiel sur la source :
-      le contrat accepterait ces mesures, aucun gel. L etape 0 est gratuite.
+   Repartition croisee etiquette x ordre de grandeur :
+      NGN / 10^0         48 lignes
+      NGN / 10^2         48 lignes
+      NGN / 10^3         85 lignes
+      NGN / 10^5         51 lignes
+      USD / 10^0         202 lignes
+      USD / 10^1         12 lignes
+      USD / 10^2         168 lignes
+      USD / 10^3         246 lignes
+      USD / 10^4         17 lignes
+      USD / 10^5         238 lignes
+
+   Lignes etiquetees USD avec un prix > 10 000 (incoherent pour un prix unitaire en dollars) :
+
+   fonds                             devise  prix              date      
+   --------------------------------  ------  ----------------  ----------
+   Afrinvest Dollar Fund             USD     160284.80000672   2026-04-10
+   EDC Dollar Fund                   USD     149816.170700000  2026-04-10
+   FBN Dollar Fund (Retail)          USD     179907.816000000  2026-04-10
+   FBN Specialized Dollar Fund       USD     175627.584        2026-04-10
+   Futureview Dollar Fund            USD     190908.74417142   2026-04-10
+   Norrenberger Dollar Fund          USD     144182.530364     2026-04-10
+   AVA GAM Fixed Income Dollar Fund  USD     170845.666366000  2026-04-10
+   AXA Mansard Dollar Bond Fund      USD     189652.08337      2026-04-10
+   CFG AM Fixed Income Dollar Fund   USD     138079.42         2026-04-10
+   Cordros Dollar Fund               USD     166840.1          2026-04-10
+   Guaranty Trust Dollar Fund        USD     138672            2026-04-10
+   Meristem Dollar Fund              USD     14733.0741140000  2026-04-10
+
+## F. Ce que cela implique pour l etape 0
+
+   L etiquette NE PREDIT PAS l echelle : USD couvre 6 ordres de grandeur,
+   NGN en couvre 4. Une meme etiquette recouvre donc des unites differentes.
+
+   -> Corriger dev_libelle en USD serait DANGEREUX : le contrat accepterait des
+      valeurs en naira portant une etiquette USD, c est-a-dire de la donnee fausse
+      avec un label rassurant. Pire que le blocage.
+
+   -> Le defaut est en amont, dans l extracteur : `choose_vl_price` retient
+      `offer_price` en priorite sans savoir de quelle colonne devise il provient,
+      tandis que `infer_currency` deduit la devise du contexte. Les deux peuvent
+      donc se contredire. C est la reparation a mener AVANT toute etape 0,
+      ce qui confirme l arbitrage B.
 
 ============================================================
  FIN — aucune ecriture.
