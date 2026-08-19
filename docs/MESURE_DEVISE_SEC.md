@@ -4,7 +4,7 @@
 > Extraction de TEST, bornee, ecrivant dans `sec_ng_devise_test.csv`.
 > Ni `sec_ng_latest.csv` ni la base ne sont touches.
 
-Derniere execution : **2026-08-19 17:46 UTC**
+Derniere execution : **2026-08-19 17:54 UTC**
 
 ## Reference AVANT correctif (lot AE)
 
@@ -15,7 +15,7 @@ Etiquette USD repartie sur six ordres de grandeur, dont **238 lignes a 10^5**
 ==============================================
  1. RECUPERER LE CORRECTIF
 ==============================================
-Commit courant : f64546c6 chore: snapshot production state 2026-08-19 17:00
+Commit courant : 3b88e277 chore: snapshot production state 2026-08-19 17:00
 
 Le correctif est-il bien present ?
 8
@@ -76,9 +76,47 @@ Taille  : 137 Ko
       c16  Bid Price ($)            = 120.1259
       c17  Bid Price (N)            = 163621.87870294
       c18  Offer Price ($)          = 120.1259
-      c19  Offer Price (N)          = 163621.87870294
-      c23  NAV (%)                  = -0.014456752037929576
-      c24  Unit Price (%)           = -0.011405156554423026
+
+--- Fichier du 10 avril 2026 : le SEUL encore incoherent ---
+Apres correctif, toutes les lignes fautives restantes portent cette date.
+Sa structure differe donc des quatre autres fichiers, qui sont propres.
+
+Fichier : Net_Asset_Value_and_Unit_Price_as_at_10th_April_2026.xlsx
+Taille  : 125 Ko
+
+=== Feuille « Weekly Valuation » — 14 premieres lignes, 28 colonnes ===
+
+   ligne | c3   | c5   | c6   | c10  | c12  | c13  | c17  | c18 
+   ------+------+------+------+------+------+------+------+-----
+       1 | NAV, Unit Price and Yield  |                            |                            | NAV, Unit Price and Yield  |                            |                            | % Change (Current from Pre |                           
+       2 | NAV (N)                    | Bid Price (N)              | Offer Price (N)            | NAV (N)                    | Bid Price (N)              | Offer Price (N)            | NAV (%)                    | Unit Price (%)            
+       5 | 10196027074.07             | 790.647                    | 794.1546                   | 10385460485.78             | 802.1324                   | 805.7062                   | 0.01857913973097993        | 0.014545782395518465      
+       6 | 1794091931.85              | 532.7479                   | 539.6337                   | 1807192968.54              | 536.9699                   | 543.9225                   | 0.007302321836145131       | 0.007947613353280267      
+       7 | 13390572116.61             | 67.1674                    | 69.1925                    | 14089650102.39             | 68.4121                    | 70.4748                    | 0.052206730204816636       | 0.018532355385338102      
+       8 | 2299920059.65              | 316.0827                   | 316.0827                   | 2439502334.13              | 322.7073                   | 322.7073                   | 0.060690054810531774       | 0.02095843904142804       
+       9 | 6556404938.68              | 2.4489                     | 2.4788                     | 7060077309.34              | 2.5212                     | 2.5543                     | 0.0768214250600275         | 0.030458286267548772      
+      10 | 575754146.9                | 286.0856                   | 288.4676                   | 590258688.9                | 294.6197                   | 297.0934                   | 0.02519224929268156        | 0.02990214498959318       
+      11 | 5144896219.59              | 555.4                      | 563.8                      | 5308402755.85              | 567.26                     | 575.84                     | 0.031780337111062304       | 0.02135509045760922       
+      12 | 552242451.58               | 275.83                     | 288.08                     | 613362440.67               | 306.38                     | 320.02                     | 0.11067600637207774        | 0.11087198000555401       
+      13 | 123196265.4739             | 427.7364                   | 441.9325                   | 125792078.0914             | 436.5425                   | 451.0928                   | 0.02107054631497684        | 0.02072782608203743       
+
+   Cellules fusionnees (25 premieres) : B77:V77, A213:V213, B140:V140, A5:V5, B253:V253, A254:V254, A141:V141, A206:V206, B119:V119, A121:V121, A28:V28, U2:V2, B205:V205, A249:V249, B172:V172, A173:V173, B240:U240, B211:V211, R2:T2, A1:V1, A241:V241, B216:V216, D2:J2, A78:V78, B163:V163
+
+   === Fonds en devise etrangere : valeur par colonne ===
+
+   --- DOLLAR FUNDS ---
+
+   --- EUROBONDS ---
+
+   --- Afrinvest Dollar Fund ---
+      c3   NAV, Unit Price and Yiel = 3731322306.89101
+      c5   Bid Price (N)            = 160284.80000672
+      c6   Offer Price (N)          = 160284.80000672
+      c10  NAV, Unit Price and Yiel = 3641997287.177214
+      c12  Bid Price (N)            = 158457.86222195998
+      c13  Offer Price (N)          = 158457.86222195998
+      c17  NAV (%)                  = -0.023939239863795772
+      c18  Unit Price (%)           = -0.01139807258507002
 
 
 ==============================================
@@ -111,14 +149,14 @@ Code de sortie extraction : 0
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T17:46:56.537Z — LECTURE SEULE
+ Genere le 2026-08-19T17:54:01.939Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : sec_ng_devise_test.csv
    taille    : 1.35 Mo
-   modifie   : 2026-08-19T17:46:56.379Z (il y a 0.0 h)
+   modifie   : 2026-08-19T17:54:01.621Z (il y a 0.0 h)
    lignes    : 1102
    colonnes  : 55
 
