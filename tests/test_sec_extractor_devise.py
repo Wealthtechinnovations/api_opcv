@@ -33,7 +33,7 @@ import ast
 import re
 import sys
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -56,7 +56,11 @@ def charger_noyau() -> Dict[str, Any]:
         return "\n".join(lignes[debut - 1:node.end_lineno])
 
     ns: Dict[str, Any] = {
-        "dataclass": dataclass, "Any": Any, "Optional": Optional, "List": List,
+        # `field` est indispensable : ColumnBlock declare un default_factory.
+        # Sans lui, la dataclass echouait a se charger EN SILENCE et les
+        # verifications de champs passaient a cote.
+        "dataclass": dataclass, "field": field,
+        "Any": Any, "Optional": Optional, "List": List,
         "Tuple": Tuple, "Dict": Dict, "re": re, "unicodedata": unicodedata,
         "math": __import__("math"), "datetime": __import__("datetime"),
     }
@@ -124,6 +128,64 @@ def main() -> int:
     verifier("l en-tete « Offer Price (NGN) » dit NGN, et prime desormais",
              detect_currency("Offer Price (NGN)")[0] == "NGN" and deduit[0] == "USD")
 
+    print("\n--- Devise dans un en-tete de colonne SEC reel ---")
+    # Structure mesuree le 2026-08-19 sur le fichier du 24 juillet 2026 :
+    #   c6 « Bid Price ($) » = 119,9184   c7 « Bid Price (N) » = 165 509,54
+    # Les deux devises occupent des colonnes separees ; « N » entre parentheses
+    # designe le naira, ce qui est univoque dans un en-tete de prix alors que
+    # « N » seul serait bien trop generique.
+    dcch = ns["detect_currency_in_column_header"]
+    for entete, attendu in [
+        ("Bid Price ($)", "USD"),
+        ("Bid Price (N)", "NGN"),
+        ("Offer Price ($)", "USD"),
+        ("Offer Price (N)", "NGN"),
+        ("NAV ($)", "USD"),
+        ("NAV (N)", "NGN"),
+        ("Unit Price (USD)", "USD"),
+        ("Unit Price (NGN)", "NGN"),
+        ("Offer Price", ""),
+    ]:
+        verifier(f"en-tete « {entete} » -> {attendu or 'vide'}", dcch(entete) == attendu)
+
+    print("\n--- Choix de la colonne : le cas Afrinvest, en entier ---")
+    choose_col = ns["choose_price_column"]
+    # Le bloc reel : six colonnes de prix, deux devises.
+    colonnes = [
+        ("bid_price", 6, "USD"), ("bid_price", 7, "NGN"),
+        ("offer_price", 8, "USD"), ("offer_price", 9, "NGN"),
+    ]
+    valeurs = {6: 119.9184, 7: 165509.54092848, 8: 119.9184, 9: 165509.54092848}
+
+    prix, src, dev, prov = choose_col(valeurs, colonnes, "USD")
+    verifier("fonds USD -> retient la colonne dollar (119,92)", prix == 119.9184)
+    verifier("  et l etiquette est USD", dev == "USD")
+    verifier("  provenance : en-tete correspondant au fonds", prov == "column_header_matched_fund")
+
+    prix_n, _, dev_n, _ = choose_col(valeurs, colonnes, "NGN")
+    verifier("fonds NGN -> retient la colonne naira (165 509)", prix_n == 165509.54092848)
+    verifier("  et l etiquette est NGN", dev_n == "NGN")
+
+    # Un prix unitaire explicite doit primer sur Bid et Offer, meme en 2e position.
+    colonnes_unit = colonnes + [("unit_price", 12, "USD")]
+    valeurs_unit = dict(valeurs); valeurs_unit[12] = 118.5
+    prix_u, src_u, _, _ = choose_col(valeurs_unit, colonnes_unit, "USD")
+    verifier("le prix unitaire prime sur offer et bid", prix_u == 118.5 and src_u == "unit_price")
+
+    # Devise du fonds inconnue : on prend une colonne exploitable, mais on
+    # l etiquette avec SA devise, jamais avec celle supposee du fonds.
+    prix_x, _, dev_x, prov_x = choose_col(valeurs, colonnes, "")
+    verifier("devise du fonds inconnue -> etiquetee par la colonne",
+             dev_x in ("USD", "NGN") and prov_x == "column_header")
+
+    # La colonne demandee est vide (N/A) : repli sur une autre, honnetement etiquetee.
+    valeurs_na = {7: 165509.54, 9: 165509.54}
+    prix_na, _, dev_na, prov_na = choose_col(valeurs_na, colonnes, "USD")
+    verifier("colonne dollar absente -> repli naira etiquete NGN",
+             prix_na == 165509.54 and dev_na == "NGN" and prov_na == "column_header")
+
+    verifier("aucune colonne exploitable -> vide", choose_col({}, colonnes, "USD")[0] is None)
+
     print("\n--- Champs de tracabilite exposes ---")
     for classe, champ in (
         ("ColumnBlock", "bid_price_header"),
@@ -131,6 +193,7 @@ def main() -> int:
         ("ColumnBlock", "unit_price_header"),
         ("NavRecord", "vl_currency_source"),
         ("NavRecord", "vl_currency_confidence"),
+        ("ColumnBlock", "price_columns"),
     ):
         champs = getattr(ns.get(classe), "__dataclass_fields__", {})
         verifier(f"{classe}.{champ}", champ in champs)

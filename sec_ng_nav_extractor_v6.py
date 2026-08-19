@@ -88,7 +88,7 @@ import tempfile
 import time
 import unicodedata
 from collections import defaultdict
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from datetime import date, datetime, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -259,6 +259,12 @@ class ColumnBlock:
     bid_price_header: str = ""
     offer_price_header: str = ""
     unit_price_header: str = ""
+
+    # Toutes les colonnes de prix du bloc, sous la forme (type, index, devise).
+    # Un bloc porte typiquement SIX colonnes de prix — Bid, Offer et Unit, en
+    # dollar et en naira. N en retenir qu une par type revenait a choisir la
+    # devise au hasard de l ordre des colonnes : c est l origine de #73.
+    price_columns: List[Tuple[str, int, str]] = field(default_factory=list)
 
 
 @dataclass
@@ -604,6 +610,29 @@ def detect_currency_from_text(text: str) -> Tuple[str, str, int]:
                 return code, name_fr, 95
 
     return "", "", 0
+
+
+def detect_currency_in_column_header(header: str) -> str:
+    """Devise portee par l en-tete d une colonne de prix.
+
+    Les fichiers SEC ecrivent « Offer Price ($) » et « Offer Price (N) » : la
+    devise tient dans un seul caractere entre parentheses, et les deux devises
+    occupent des colonnes SEPAREES (mesure du lot AH sur le fichier du
+    2026-07-24 : Bid Price ($) = 119,92 et Bid Price (N) = 165 509,54 pour le
+    meme fonds).
+
+    « N » est trop generique pour figurer dans CURRENCY_RULES, ou il
+    provoquerait des faux positifs sur n importe quel texte. Entre parentheses
+    et dans un en-tete de prix, il est en revanche univoque — d ou ce detecteur
+    dedie, applique aux seuls en-tetes de colonnes.
+    """
+    h = upper_no_accent(header or "")
+    if re.search(r"\(\s*(?:N|NGN|NAIRA)\s*\)", h):
+        return "NGN"
+    if re.search(r"\(\s*(?:\$|USD|US\$)\s*\)", h):
+        return "USD"
+    code, _, _ = detect_currency_from_text(header or "")
+    return code
 
 
 def infer_currency(
@@ -1309,9 +1338,19 @@ def detect_standard_blocks(
         end = next_nav - 1
 
         pct_col = bid_col = offer_col = unit_col = unitholders_col = y_wtd_col = y_ytd_col = None
+        # Toutes les colonnes de prix du bloc, avec la devise lue dans leur
+        # en-tete. Les variables *_col ci-dessus ne retiennent que la PREMIERE
+        # de chaque type et sont conservees pour compatibilite.
+        prix_cols: List[Tuple[str, int, str]] = []
 
         for c in range(start, next_nav):
             h = headers[c]
+            if is_unit_price_header(h):
+                prix_cols.append(("unit_price", c, detect_currency_in_column_header(h)))
+            elif is_offer_header(h):
+                prix_cols.append(("offer_price", c, detect_currency_in_column_header(h)))
+            elif is_bid_header(h):
+                prix_cols.append(("bid_price", c, detect_currency_in_column_header(h)))
             if c != nav_col and is_pct_total_header(h) and pct_col is None:
                 pct_col = c
             if is_bid_header(h) and bid_col is None:
@@ -1359,6 +1398,7 @@ def detect_standard_blocks(
                 "bid_price_header": headers[bid_col] if bid_col is not None else "",
                 "offer_price_header": headers[offer_col] if offer_col is not None else "",
                 "unit_price_header": headers[unit_col] if unit_col is not None else "",
+                "price_columns": prix_cols,
                 "unitholders_col": unitholders_col,
                 "yield_wtd_col": y_wtd_col,
                 "yield_ytd_col": y_ytd_col,
@@ -1419,6 +1459,7 @@ def detect_standard_blocks(
                 bid_price_header=bm.get("bid_price_header", ""),
                 offer_price_header=bm.get("offer_price_header", ""),
                 unit_price_header=bm.get("unit_price_header", ""),
+                price_columns=bm.get("price_columns", []),
                 unitholders_col=bm["unitholders_col"],
                 yield_wtd_col=bm["yield_wtd_col"],
                 yield_ytd_col=bm["yield_ytd_col"],
@@ -1553,6 +1594,51 @@ def choose_vl_price(offer_price: Any, unit_price: Any, bid_price: Any) -> Tuple[
     if safe_float(bid_price) is not None:
         return bid_price, "bid_price_fallback"
     return None, ""
+
+
+def choose_price_column(
+    valeurs: Dict[int, Any],
+    price_columns: List[Tuple[str, int, str]],
+    devise_du_fonds: str,
+) -> Tuple[Any, str, str, str]:
+    """Retient la mesure la plus juste parmi les colonnes de prix du bloc.
+
+    Chaque signal est utilise pour ce qu il sait faire : le NOM du fonds dit sa
+    devise de libelle, l EN-TETE dit la devise de chaque colonne. Il suffit donc
+    de prendre la colonne dont la devise correspond au fonds.
+
+    Mesure du lot AH, fichier du 2026-07-24, Afrinvest Dollar Fund :
+        Bid Price ($) = 119,9184      Bid Price (N) = 165 509,54
+    La source est propre et publie les deux. L extracteur retenait la colonne
+    naira puis l etiquetait USD d apres le nom du fonds — d ou les series
+    melangeant deux echelles de #73.
+
+    Retourne (valeur, source_du_prix, devise, provenance_de_la_devise).
+    """
+    rang = {"unit_price": 0, "offer_price": 1, "bid_price": 2}
+    candidats = sorted(price_columns, key=lambda x: rang.get(x[0], 9))
+
+    def _nom_source(kind: str) -> str:
+        # Un prix unitaire EST la VL ; Bid et Offer sont des replis, nommes
+        # comme tels pour que l aval puisse les refuser sciemment.
+        return kind if kind == "unit_price" else f"{kind}_fallback"
+
+    # 1. La colonne dont la devise est celle du fonds.
+    if devise_du_fonds:
+        for kind, col, devise in candidats:
+            if devise and devise == devise_du_fonds:
+                v = valeurs.get(col)
+                if safe_float(v) is not None:
+                    return v, _nom_source(kind), devise, "column_header_matched_fund"
+
+    # 2. A defaut, toute colonne exploitable — etiquetee par SA propre devise,
+    #    jamais par celle du fonds.
+    for kind, col, devise in candidats:
+        v = valeurs.get(col)
+        if safe_float(v) is not None:
+            return v, _nom_source(kind), devise, "column_header" if devise else "unknown_column_currency"
+
+    return None, "", "", ""
 
 
 def make_observation_key(record_like: Dict[str, Any]) -> str:
@@ -1708,15 +1794,14 @@ def parse_sheet_records(
             y_wtd = get_cell(row, block.yield_wtd_col)
             y_ytd = get_cell(row, block.yield_ytd_col)
 
-            vl_price, vl_source = choose_vl_price(offer_price, unit_price, bid_price)
-
             if not block.valuation_date:
-                continue
-            if safe_float(vl_price) is None:
                 continue
 
             year, month, iso_week = date_parts(block.valuation_date)
 
+            # 1. Devise de LIBELLE du fonds, deduite de son nom et de sa
+            #    categorie. C est ce que l inference sait faire de fiable :
+            #    « Afrinvest Dollar Fund » est bien un fonds en dollars.
             block_context = header_context_text(matrix, header_idx, block.start_col, block.end_col)
             currency_code, currency_name_fr, currency_source, currency_conf = infer_currency(
                 category_raw=current_category_raw,
@@ -1732,36 +1817,39 @@ def parse_sheet_records(
                 currency_source = block.block_currency_source
                 currency_conf = block.block_currency_confidence
 
-            nav_currency_code = "NGN" if safe_float(nav_value) is not None else ""
-
-            # --- Devise de la VL : lue dans l en-tete de la colonne utilisee ---
-            #
-            # `infer_currency` deduit la devise du contexte — categorie, nom du
-            # fonds, nom du gerant. Pour « Afrinvest Dollar Fund », elle renvoie
-            # donc USD quelle que soit la colonne d ou vient le prix. Mesure du
-            # lot AE : sous l etiquette USD, les valeurs couvraient six ordres de
-            # grandeur, dont 238 lignes a 10^5 — des nairas etiquetes dollars.
-            #
-            # La SEC publie les paires « Offer Price (NGN) » / « Offer Price (USD) » :
-            # l en-tete de la colonne porte la devise de la mesure. C est la seule
-            # source fiable, et elle prime desormais sur l inference.
-            _entete_prix = {
-                "unit_price": block.unit_price_header,
-                "offer_price_fallback": block.offer_price_header,
-                "bid_price_fallback": block.bid_price_header,
-            }.get(vl_source, "")
-
-            _dev_col, _, _conf_col = detect_currency_from_text(_entete_prix)
-            if _dev_col:
-                vl_currency_code = _dev_col
-                vl_currency_source = "column_header"
-                vl_currency_confidence = _conf_col
+            # 2. Choisir la colonne de prix DONT LA DEVISE est celle du fonds.
+            #    Le bloc porte typiquement six colonnes de prix — Bid, Offer et
+            #    Unit, en dollar et en naira. Retenir la premiere venue revenait
+            #    a tirer la devise au sort : pour Afrinvest, l extracteur prenait
+            #    « Offer Price (N) » = 165 509,54 et l etiquetait USD, alors que
+            #    « Offer Price ($) » = 119,92 etait disponible juste a cote.
+            if block.price_columns:
+                _valeurs = {col: get_cell(row, col) for _, col, _ in block.price_columns}
+                vl_price, vl_source, _dev_col, _prov = choose_price_column(
+                    _valeurs, block.price_columns, currency_code
+                )
+                if _dev_col:
+                    vl_currency_code = _dev_col
+                    vl_currency_source = _prov
+                    vl_currency_confidence = 100 if _prov.startswith("column_header") else 50
+                else:
+                    # Aucune colonne ne declare sa devise : on retombe sur
+                    # l inference, mais en le disant.
+                    vl_currency_code = currency_code
+                    vl_currency_source = "inferred_" + currency_source
+                    vl_currency_confidence = min(currency_conf, 50)
             else:
-                # L en-tete ne porte aucun marqueur de devise : on retombe sur
-                # l inference de contexte, mais en le disant.
+                # Bloc sans colonnes de prix qualifiees (chemin de repli des
+                # matrices date/prix) : comportement historique conserve.
+                vl_price, vl_source = choose_vl_price(offer_price, unit_price, bid_price)
                 vl_currency_code = currency_code
                 vl_currency_source = "inferred_" + currency_source
                 vl_currency_confidence = min(currency_conf, 50)
+
+            if safe_float(vl_price) is None:
+                continue
+
+            nav_currency_code = "NGN" if safe_float(nav_value) is not None else ""
 
             rec_dict = {
                 "valuation_date": block.valuation_date,
