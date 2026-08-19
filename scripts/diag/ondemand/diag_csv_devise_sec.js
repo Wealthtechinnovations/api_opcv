@@ -204,31 +204,48 @@ async function main() {
   console.log('   Repartition croisee etiquette x ordre de grandeur :');
   for (const [k, n] of Object.entries(parDevOrdre).sort()) console.log(`      ${k.padEnd(18)} ${n} lignes`);
 
-  const usdOrdres = Object.keys(parDevOrdre).filter(k => k.startsWith('USD')).length;
-  const ngnOrdres = Object.keys(parDevOrdre).filter(k => k.startsWith('NGN')).length;
-
-  if (suspects.length) {
-    console.log('\n   Lignes etiquetees USD avec un prix > 10 000 (incoherent pour un prix unitaire en dollars) :\n');
-    console.log(tableau(suspects, 12));
-  }
+  // Le bon critere est le CHEVAUCHEMENT, pas le nombre d ordres de grandeur.
+  //
+  // Une premiere version comptait les ordres et concluait a l echec des qu une
+  // devise en couvrait plusieurs. C etait faux : un prix unitaire en dollars
+  // couvre legitimement 1 a 999, et un prix en naira 1 000 a 999 999. Ce qui
+  // trahit un melange, c est que les DEUX devises occupent les MEMES ordres de
+  // grandeur — un naira etiquete dollar se trahit en apparaissant a 10^5 sous
+  // une etiquette USD, la ou aucun vrai prix en dollars ne se trouve.
+  const ordresDe = (dev) => new Set(
+    Object.keys(parDevOrdre)
+      .filter(k => k.startsWith(dev + ' '))
+      .map(k => Number(k.split('10^')[1]))
+  );
+  const oUSD = ordresDe('USD');
+  const oNGN = ordresDe('NGN');
+  const commun = [...oUSD].filter(x => oNGN.has(x)).sort((a, b) => a - b);
+  const maxUSD = oUSD.size ? Math.max(...oUSD) : null;
+  const minNGN = oNGN.size ? Math.min(...oNGN) : null;
 
   console.log('\n## F. Ce que cela implique pour l etape 0\n');
-  if (usdOrdres > 1 || ngnOrdres > 1) {
-    console.log(`   L etiquette NE PREDIT PAS l echelle : USD couvre ${usdOrdres} ordres de grandeur,`);
-    console.log(`   NGN en couvre ${ngnOrdres}. Une meme etiquette recouvre donc des unites differentes.`);
+  console.log(`   USD occupe les ordres [${[...oUSD].sort((a,b)=>a-b).join(', ')}]`);
+  console.log(`   NGN occupe les ordres [${[...oNGN].sort((a,b)=>a-b).join(', ')}]`);
+  console.log(`   Ordres partages : ${commun.length ? commun.join(', ') : 'AUCUN'}\n`);
+
+  if (commun.length === 0 && maxUSD !== null && minNGN !== null && maxUSD < minNGN) {
+    console.log('   SEPARATION NETTE. Les deux devises n occupent aucun ordre de grandeur');
+    console.log(`   commun : USD s arrete a 10^${maxUSD}, NGN commence a 10^${minNGN}. L ecart`);
+    console.log('   correspond au taux de change. Chaque valeur est donc etiquetee dans son');
+    console.log('   unite reelle.');
     console.log('');
-    console.log('   -> Corriger dev_libelle en USD serait DANGEREUX : le contrat accepterait des');
-    console.log('      valeurs en naira portant une etiquette USD, c est-a-dire de la donnee fausse');
-    console.log('      avec un label rassurant. Pire que le blocage.');
-    console.log('');
-    console.log('   -> Le defaut est en amont, dans l extracteur : `choose_vl_price` retient');
-    console.log('      `offer_price` en priorite sans savoir de quelle colonne devise il provient,');
-    console.log('      tandis que `infer_currency` deduit la devise du contexte. Les deux peuvent');
-    console.log('      donc se contredire. C est la reparation a mener AVANT toute etape 0,');
-    console.log('      ce qui confirme l arbitrage B.');
+    console.log('   -> L extraction est FIABLE sur ce lot. L etape 0 devient sure : corriger');
+    console.log('      dev_libelle alignera le referentiel sans faire accepter de naira');
+    console.log('      etiquete dollar, puisqu il n en existe plus.');
+  } else if (suspects.length) {
+    console.log(`   MELANGE PERSISTANT : ${suspects.length} lignes etiquetees USD portent un prix`);
+    console.log('   superieur a 10 000, incoherent pour un prix unitaire en dollars.');
+    console.log('   -> Ne pas engager l etape 0 : le contrat accepterait de la donnee fausse');
+    console.log('      sous un label rassurant.');
   } else {
-    console.log('   Chaque etiquette correspond a un seul ordre de grandeur : le marquage est');
-    console.log('   coherent. Corriger dev_libelle alignerait le referentiel sans risque.');
+    console.log(`   Ordres de grandeur partages entre devises : ${commun.join(', ')}.`);
+    console.log('   A instruire avant l etape 0 — une meme echelle sous deux devises peut');
+    console.log('   etre legitime (classes de parts) ou trahir un melange.');
   }
 
   console.log('\n============================================================');
