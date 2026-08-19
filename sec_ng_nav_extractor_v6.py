@@ -177,6 +177,13 @@ CURRENCY_RULES: List[Tuple[str, str, str]] = [
     ("EUR", "EUR", "EURO"),
     ("GBP", "GBP", "LIVRE STERLING"),
     ("POUND", "GBP", "LIVRE STERLING"),
+    # Place en DERNIER, apres « US$ » : les en-tetes SEC ecrivent parfois la
+    # devise sous forme de symbole seul (« NAV ($) », « Offer Price ($) »).
+    # Sans cette regle, ces colonnes retombaient sur l inference par le nom du
+    # fonds. Le naira s ecrivant ₦ ou N dans ces memes fichiers, « $ » est
+    # univoque ici — contrairement a « N », volontairement absent de cette liste
+    # car bien trop generique.
+    ("$", "USD", "DOLLAR AMERICAIN"),
 ]
 
 
@@ -244,6 +251,15 @@ class ColumnBlock:
     block_currency_source: str
     block_currency_confidence: int
 
+    # En-tetes bruts des colonnes de prix. La SEC publie les paires
+    # « Offer Price (NGN) » / « Offer Price (USD) » : la devise d une mesure est
+    # donc portee par l en-tete de la colonne d ou elle vient, et nulle part
+    # ailleurs. Sans cette information la devise etait deduite du NOM DU FONDS,
+    # d ou 238 lignes en naira etiquetees USD (mesure du lot AE).
+    bid_price_header: str = ""
+    offer_price_header: str = ""
+    unit_price_header: str = ""
+
 
 @dataclass
 class NavRecord:
@@ -309,6 +325,12 @@ class NavRecord:
     vl_price: Any
     vl_price_source: str
     vl_currency_code: str
+    # D ou vient la devise de la VL : « column_header » quand elle est lue dans
+    # l en-tete de la colonne utilisee (fiable), « inferred_* » quand elle est
+    # seulement deduite du contexte (nom du fonds, categorie) — auquel cas elle
+    # ne doit pas etre traitee comme une preuve en aval.
+    vl_currency_source: str
+    vl_currency_confidence: int
     unitholders: Any
     yield_wtd: Any
     yield_ytd: Any
@@ -561,7 +583,16 @@ def detect_currency_from_text(text: str) -> Tuple[str, str, int]:
     if not text:
         return "", "", 0
 
-    blob = " " + upper_no_accent(text).replace("₦", " ₦ ") + " "
+    # La ponctuation doit devenir des separateurs AVANT la recherche.
+    # Les marqueurs sont compares entoures d espaces (" USD "), si bien qu un
+    # en-tete « Offer Price (USD) » ne correspondait a rien : les parentheses
+    # collaient au code devise. Or c est exactement le format des fichiers SEC
+    # (« Offer Price (NGN) » / « Offer Price (USD) »), donc la devise portee par
+    # l en-tete de colonne etait systematiquement manquee — et l extraction
+    # retombait sur l inference par le nom du fonds, a l origine de #73.
+    # `$` et `₦` sont conserves : ils font partie des marqueurs (« US$ »).
+    _texte = upper_no_accent(text).replace("₦", " ₦ ")
+    blob = " " + re.sub(r"[^A-Z0-9$₦]+", " ", _texte).strip() + " "
 
     for marker, code, name_fr in CURRENCY_RULES:
         if marker == "₦":
@@ -1325,6 +1356,9 @@ def detect_standard_blocks(
                 "bid_price_col": bid_col,
                 "offer_price_col": offer_col,
                 "unit_price_col": unit_col,
+                "bid_price_header": headers[bid_col] if bid_col is not None else "",
+                "offer_price_header": headers[offer_col] if offer_col is not None else "",
+                "unit_price_header": headers[unit_col] if unit_col is not None else "",
                 "unitholders_col": unitholders_col,
                 "yield_wtd_col": y_wtd_col,
                 "yield_ytd_col": y_ytd_col,
@@ -1382,6 +1416,9 @@ def detect_standard_blocks(
                 bid_price_col=bm["bid_price_col"],
                 offer_price_col=bm["offer_price_col"],
                 unit_price_col=bm["unit_price_col"],
+                bid_price_header=bm.get("bid_price_header", ""),
+                offer_price_header=bm.get("offer_price_header", ""),
+                unit_price_header=bm.get("unit_price_header", ""),
                 unitholders_col=bm["unitholders_col"],
                 yield_wtd_col=bm["yield_wtd_col"],
                 yield_ytd_col=bm["yield_ytd_col"],
@@ -1495,10 +1532,24 @@ def is_stop_label(text: str) -> bool:
 
 
 def choose_vl_price(offer_price: Any, unit_price: Any, bid_price: Any) -> Tuple[Any, str]:
-    if safe_float(offer_price) is not None:
-        return offer_price, "offer_price"
+    """Retient la mesure la plus proche d une valeur liquidative.
+
+    Le prix unitaire EST la VL ; le Bid est un prix de rachat et l Offer un prix
+    de souscription — ni l un ni l autre n est une VL. La priorite retenait
+    pourtant `offer_price` en premier, si bien que 100 % des lignes mesurees au
+    lot AE portaient `vl_price_source = offer_price`, y compris quand un prix
+    unitaire explicite existait dans le meme bloc.
+
+    La BIBLE Nigeria l interdit : « Ne choisis pas silencieusement Bid ou Offer
+    comme VL. » On ne peut pas laisser la valeur nulle ici sans vider l export,
+    mais on peut cesser de preferer l Offer au prix unitaire, et surtout nommer
+    explicitement le repli pour que l aval puisse le refuser en connaissance de
+    cause.
+    """
     if safe_float(unit_price) is not None:
         return unit_price, "unit_price"
+    if safe_float(offer_price) is not None:
+        return offer_price, "offer_price_fallback"
     if safe_float(bid_price) is not None:
         return bid_price, "bid_price_fallback"
     return None, ""
@@ -1533,6 +1584,24 @@ def validate_record_quality(record: NavRecord) -> str:
         flags.append("DATE_FROM_SOURCE_FALLBACK")
     if record.vl_price_source == "bid_price_fallback":
         flags.append("BID_PRICE_USED_AS_FALLBACK")
+    if record.vl_price_source == "offer_price_fallback":
+        # Un prix de souscription n est pas une VL. La ligne reste exportee,
+        # mais l aval doit pouvoir la refuser en connaissance de cause.
+        flags.append("OFFER_PRICE_USED_AS_FALLBACK")
+    if record.vl_currency_source and record.vl_currency_source.startswith("inferred_"):
+        # La devise n a pas pu etre lue dans l en-tete de colonne : elle est
+        # deduite du contexte et ne constitue pas une preuve.
+        flags.append("CURRENCY_INFERRED_NOT_FROM_COLUMN")
+    if (
+        record.vl_currency_code
+        and record.currency_code
+        and record.vl_currency_code != record.currency_code
+    ):
+        # L en-tete de colonne contredit l inference de contexte. C est
+        # exactement le defaut mesure au lot AE : « Afrinvest Dollar Fund »
+        # etait etiquete USD par son nom alors que la valeur venait d une
+        # colonne en naira.
+        flags.append("CURRENCY_COLUMN_DIFFERS_FROM_CONTEXT")
     if not record.fund_category_fr or record.fund_category_fr in {"NON CLASSE", "AUTRE"}:
         flags.append("CATEGORY_TO_REVIEW")
     if not record.currency_code:
@@ -1664,7 +1733,35 @@ def parse_sheet_records(
                 currency_conf = block.block_currency_confidence
 
             nav_currency_code = "NGN" if safe_float(nav_value) is not None else ""
-            vl_currency_code = currency_code
+
+            # --- Devise de la VL : lue dans l en-tete de la colonne utilisee ---
+            #
+            # `infer_currency` deduit la devise du contexte — categorie, nom du
+            # fonds, nom du gerant. Pour « Afrinvest Dollar Fund », elle renvoie
+            # donc USD quelle que soit la colonne d ou vient le prix. Mesure du
+            # lot AE : sous l etiquette USD, les valeurs couvraient six ordres de
+            # grandeur, dont 238 lignes a 10^5 — des nairas etiquetes dollars.
+            #
+            # La SEC publie les paires « Offer Price (NGN) » / « Offer Price (USD) » :
+            # l en-tete de la colonne porte la devise de la mesure. C est la seule
+            # source fiable, et elle prime desormais sur l inference.
+            _entete_prix = {
+                "unit_price": block.unit_price_header,
+                "offer_price_fallback": block.offer_price_header,
+                "bid_price_fallback": block.bid_price_header,
+            }.get(vl_source, "")
+
+            _dev_col, _, _conf_col = detect_currency_from_text(_entete_prix)
+            if _dev_col:
+                vl_currency_code = _dev_col
+                vl_currency_source = "column_header"
+                vl_currency_confidence = _conf_col
+            else:
+                # L en-tete ne porte aucun marqueur de devise : on retombe sur
+                # l inference de contexte, mais en le disant.
+                vl_currency_code = currency_code
+                vl_currency_source = "inferred_" + currency_source
+                vl_currency_confidence = min(currency_conf, 50)
 
             rec_dict = {
                 "valuation_date": block.valuation_date,
@@ -1730,6 +1827,8 @@ def parse_sheet_records(
                 vl_price=vl_price,
                 vl_price_source=vl_source,
                 vl_currency_code=vl_currency_code,
+                vl_currency_source=vl_currency_source,
+                vl_currency_confidence=vl_currency_confidence,
                 unitholders=unitholders,
                 yield_wtd=y_wtd,
                 yield_ytd=y_ytd,
