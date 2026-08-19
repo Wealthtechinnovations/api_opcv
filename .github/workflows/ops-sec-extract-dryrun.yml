@@ -120,7 +120,18 @@ jobs:
             echo "=============================================="
             echo "La mesure du lot AG montre que la devise n est PAS lisible dans"
             echo "l en-tete de colonne. On regarde donc ou elle se trouve vraiment."
-            python3 scripts/diag/dump_sec_header_structure.py 2>&1 | head -45
+            python3 scripts/diag/dump_sec_header_structure.py 2>&1 | head -40
+
+            echo ""
+            echo "--- Fichier du 10 avril 2026 : le SEUL encore incoherent ---"
+            echo "Apres correctif, toutes les lignes fautives restantes portent cette date."
+            echo "Sa structure differe donc des quatre autres fichiers, qui sont propres."
+            AVRIL=$(find sec_ng_downloads -name '*10th_April_2026*.xlsx' 2>/dev/null | head -1)
+            if [ -n "$AVRIL" ]; then
+              python3 scripts/diag/dump_sec_header_structure.py "$AVRIL" 2>&1 | head -40
+            else
+              echo "  (fichier d avril introuvable dans le cache)"
+            fi
 
             echo ""
             echo "=============================================="
