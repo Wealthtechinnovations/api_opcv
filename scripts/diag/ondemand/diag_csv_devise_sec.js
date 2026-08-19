@@ -153,25 +153,63 @@ async function main() {
     await conn.end();
   }
 
-  // --- E. Verdict ---
-  console.log('\n## E. Ce que cela implique pour l etape 0\n');
-  const devUSD = compte.devise['USD'] || 0;
-  const devNGN = compte.devise['NGN'] || 0;
-  const devVide = compte.devise['(VIDE)'] || compte.devise['(vide)'] || 0;
-  const total = Object.values(compte.devise).reduce((a, b) => a + b, 0);
-  if (total === 0) {
-    console.log('   Aucune ligne de fonds en devise etrangere dans ce CSV — mesure non concluante.');
-    console.log('   (le CSV peut ne couvrir que l annee courante, ou la SEC n a rien publie)');
-  } else if (devUSD > devNGN && devUSD > devVide) {
-    console.log(`   L extracteur emet majoritairement USD (${devUSD}/${total}).`);
-    console.log('   -> Corriger dev_libelle en USD ALIGNERAIT le referentiel sur la source :');
-    console.log('      le contrat accepterait ces mesures, aucun gel. L etape 0 est gratuite.');
+  // --- E. L etiquette de devise correspond-elle a l echelle de la valeur ? ---
+  //
+  // Correction du 2026-08-19 : la premiere version de ce script comptait les
+  // etiquettes `currency_code` en les prenant pour des faits. C etait naif.
+  // Une valeur de 160 284 etiquetee USD sur Afrinvest Dollar Fund est une
+  // valeur en naira mal etiquetee — le prix USD reel de ce fonds est 117-119
+  // (mesure en base au lot AA). L etiquette seule ne prouve donc rien : il
+  // faut confronter l etiquette a l ORDRE DE GRANDEur de la valeur.
+  console.log('\n## E. L etiquette de devise correspond-elle a l echelle ?\n');
+
+  const parDevOrdre = {};
+  const suspects = [];
+  for (let i = 1; i < brut.length; i++) {
+    const c = decoupe(brut[i]);
+    const nom = c[iNom] || '';
+    if (!nom || !estDevise(nom)) continue;
+    const dev = (c[iDev] || '(vide)').toUpperCase();
+    const v = parseFloat(c[iPrix]);
+    if (!isFinite(v) || v <= 0) continue;
+    const ordre = Math.floor(Math.log10(v));
+    const cle = dev + ' / 10^' + ordre;
+    parDevOrdre[cle] = (parDevOrdre[cle] || 0) + 1;
+    // Un prix unitaire en dollars depasse rarement 10 000. Au-dela, sous une
+    // etiquette USD, la valeur est presque surement en naira.
+    if (dev === 'USD' && v > 10000 && suspects.length < 12) {
+      suspects.push({ fonds: nom.slice(0, 32), devise: dev, prix: c[iPrix].slice(0, 16), date: iDate >= 0 ? c[iDate] : '' });
+    }
+  }
+
+  console.log('   Repartition croisee etiquette x ordre de grandeur :');
+  for (const [k, n] of Object.entries(parDevOrdre).sort()) console.log(`      ${k.padEnd(18)} ${n} lignes`);
+
+  const usdOrdres = Object.keys(parDevOrdre).filter(k => k.startsWith('USD')).length;
+  const ngnOrdres = Object.keys(parDevOrdre).filter(k => k.startsWith('NGN')).length;
+
+  if (suspects.length) {
+    console.log('\n   Lignes etiquetees USD avec un prix > 10 000 (incoherent pour un prix unitaire en dollars) :\n');
+    console.log(tableau(suspects, 12));
+  }
+
+  console.log('\n## F. Ce que cela implique pour l etape 0\n');
+  if (usdOrdres > 1 || ngnOrdres > 1) {
+    console.log(`   L etiquette NE PREDIT PAS l echelle : USD couvre ${usdOrdres} ordres de grandeur,`);
+    console.log(`   NGN en couvre ${ngnOrdres}. Une meme etiquette recouvre donc des unites differentes.`);
+    console.log('');
+    console.log('   -> Corriger dev_libelle en USD serait DANGEREUX : le contrat accepterait des');
+    console.log('      valeurs en naira portant une etiquette USD, c est-a-dire de la donnee fausse');
+    console.log('      avec un label rassurant. Pire que le blocage.');
+    console.log('');
+    console.log('   -> Le defaut est en amont, dans l extracteur : `choose_vl_price` retient');
+    console.log('      `offer_price` en priorite sans savoir de quelle colonne devise il provient,');
+    console.log('      tandis que `infer_currency` deduit la devise du contexte. Les deux peuvent');
+    console.log('      donc se contredire. C est la reparation a mener AVANT toute etape 0,');
+    console.log('      ce qui confirme l arbitrage B.');
   } else {
-    console.log(`   L extracteur n emet PAS USD (USD=${devUSD}, NGN=${devNGN}, vide=${devVide}, total=${total}).`);
-    console.log('   -> Corriger dev_libelle en USD ferait REFUSER ces mesures par le contrat.');
-    console.log('      Il faut d abord corriger `choose_vl_price` et `infer_currency` dans');
-    console.log('      sec_ng_nav_extractor_v6.py pour selectionner la colonne USD des fonds dollar.');
-    console.log('      C est exactement le chemin B retenu a l arbitrage.');
+    console.log('   Chaque etiquette correspond a un seul ordre de grandeur : le marquage est');
+    console.log('   coherent. Corriger dev_libelle alignerait le referentiel sans risque.');
   }
 
   console.log('\n============================================================');
