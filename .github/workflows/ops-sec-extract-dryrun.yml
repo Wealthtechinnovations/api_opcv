@@ -32,6 +32,11 @@ on:
   push:
     paths:
       - '.github/workflows/ops-sec-extract-dryrun.yml'
+      # Une modification du diagnostic ou du correctif doit relancer la mesure :
+      # c est elle qui dit si le correctif fonctionne sur des donnees reelles.
+      - 'scripts/diag/dump_sec_header_structure.py'
+      - 'scripts/diag/ondemand/diag_csv_devise_sec.js'
+      - 'sec_ng_nav_extractor_v6.py'
 
 permissions:
   contents: write
