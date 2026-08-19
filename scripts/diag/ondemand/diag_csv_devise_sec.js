@@ -24,7 +24,10 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 const mysql = require('mysql2/promise');
 
 const RACINE = path.resolve(__dirname, '../../..');
-const CSV = path.join(RACINE, 'sec_ng_latest.csv');
+// Chemin du CSV a mesurer. Par defaut celui de production, mais un test de
+// rejeu doit pouvoir mesurer sa propre sortie sans ecraser ni lire celle du
+// cron : passer le chemin en argument ou via CSV_PATH.
+const CSV = process.argv[2] || process.env.CSV_PATH || path.join(RACINE, 'sec_ng_latest.csv');
 
 const DB = {
   host: process.env.DB_HOST || '127.0.0.1',
@@ -115,12 +118,15 @@ async function main() {
     const cible = estDevise(nom) ? 'devise' : 'autres';
     compte[cible][dev] = (compte[cible][dev] || 0) + 1;
     if (cible === 'devise' && echantillon.length < 25) {
+      const iDevSrc = entetes.indexOf('vl_currency_source');
       echantillon.push({
-        fonds: nom.slice(0, 34),
+        fonds: nom.slice(0, 30),
         devise: dev,
         prix: iPrix >= 0 ? c[iPrix] : '',
-        source: iSrc >= 0 ? c[iSrc] : '',
-        date: iDate >= 0 ? c[iDate] : '',
+        source_prix: iSrc >= 0 ? c[iSrc] : '',
+        // Renseigne par le correctif du lot AF : dit si la devise a ete LUE
+        // dans l en-tete de colonne ou seulement deduite du contexte.
+        source_devise: iDevSrc >= 0 ? c[iDevSrc] : '(absent)',
       });
     }
   }

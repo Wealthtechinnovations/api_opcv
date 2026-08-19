@@ -1,0 +1,178 @@
+# OPERATION — rejeu d extraction SEC en test, pour valider le correctif de devise.
+#
+# POURQUOI
+# --------
+# Le lot AF corrige la cause racine de #73 cote extraction : la devise d une
+# mesure est desormais lue dans l en-tete de la colonne utilisee, et non plus
+# deduite du nom du fonds. Le correctif est valide sur son noyau logique
+# (21 tests, tests/test_sec_extractor_devise.py) mais **n a jamais tourne sur
+# un fichier SEC reel**.
+#
+# Ce workflow rejoue une extraction BORNEE et mesure sa sortie. Avant correctif,
+# la mesure du lot AE donnait : etiquette USD couvrant six ordres de grandeur,
+# dont 238 lignes a 10^5 — des nairas etiquetes dollars. Le correctif est valide
+# si cette dispersion disparait.
+#
+# GARANTIES DE NON-REGRESSION
+#   - ecrit dans `sec_ng_devise_test.csv`, JAMAIS dans `sec_ng_latest.csv` que
+#     le cron du lundi utilise ;
+#   - n ecrit RIEN en base : l extracteur ne produit que des CSV, l import est
+#     une etape distincte qui n est pas appelee ici ;
+#   - borne a 5 fichiers de l annee courante, en reutilisant le cache local
+#     (553 fichiers deja telecharges) ;
+#   - aucun `schedule` : ne part jamais seul.
+#
+# Le rapport est consigne dans docs/MESURE_DEVISE_SEC.md pour etre lisible sans
+# naviguer dans l onglet Actions.
+
+name: OPS — rejeu extraction SEC (test devise)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ops-sec-extract-dryrun.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ops-sec-extract
+  cancel-in-progress: false
+
+jobs:
+  extraire-et-mesurer:
+    name: Rejouer une extraction bornee et mesurer la devise
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Rejouer l extraction et mesurer
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" bash -s <<'REMOTE' 2>&1 | tee mesure.txt
+            set -u
+            cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api || exit 3
+
+            echo "=============================================="
+            echo " 1. RECUPERER LE CORRECTIF"
+            echo "=============================================="
+            STASHED=0
+            if ! git diff --quiet || ! git diff --cached --quiet; then
+              git stash push -m "ci-sec-extract-$(date +%Y%m%d_%H%M%S)" >/dev/null && STASHED=1
+            fi
+            git pull --rebase origin claude/code-review-improvements-ikvuj >/dev/null 2>&1 \
+              || echo "AVERTISSEMENT: mise a jour impossible, mesure sur la version presente."
+            [ "$STASHED" = "1" ] && git stash pop >/dev/null 2>&1
+            echo "Commit courant : $(git log -1 --oneline)"
+
+            echo ""
+            echo "Le correctif est-il bien present ?"
+            grep -c "column_header" sec_ng_nav_extractor_v6.py 2>/dev/null \
+              && echo "  -> correctif de devise present" \
+              || echo "  -> ATTENTION : correctif ABSENT, la mesure ne vaudrait rien"
+
+            echo ""
+            echo "=============================================="
+            echo " 2. TESTS DU NOYAU (sans reseau)"
+            echo "=============================================="
+            python3 tests/test_sec_extractor_devise.py 2>&1 | tail -6
+
+            echo ""
+            echo "=============================================="
+            echo " 3. EXTRACTION BORNEE — sortie de TEST isolee"
+            echo "=============================================="
+            echo "Sortie : sec_ng_devise_test.csv (sec_ng_latest.csv n est PAS touche)"
+            timeout 600 python3 sec_ng_nav_extractor_v6.py \
+              --years "$(date +%Y)" \
+              --cache-dir sec_ng_downloads \
+              --out sec_ng_devise_test.csv \
+              --max-files-per-year 5 \
+              --strict-quality 2>&1 | tail -25
+            echo "Code de sortie extraction : ${PIPESTATUS[0]}"
+
+            echo ""
+            echo "=============================================="
+            echo " 4. MESURE DE LA SORTIE"
+            echo "=============================================="
+            if [ -f sec_ng_devise_test.csv ]; then
+              node scripts/diag/ondemand/diag_csv_devise_sec.js sec_ng_devise_test.csv 2>&1
+            else
+              echo "sec_ng_devise_test.csv absent — l extraction n a rien produit."
+            fi
+
+            echo ""
+            echo "Verification finale : sec_ng_latest.csv intact ?"
+            ls -l sec_ng_latest.csv 2>&1 || echo "  (absent — normal si le cron l a efface)"
+          REMOTE
+          echo "Termine (code $?)."
+
+      - name: Consigner la mesure dans le depot
+        if: always()
+        run: |
+          mkdir -p docs
+          {
+            echo "# Mesure de la devise apres correctif d extraction"
+            echo
+            echo "> Genere par \`ops-sec-extract-dryrun.yml\`. Ne pas modifier a la main."
+            echo "> Extraction de TEST, bornee, ecrivant dans \`sec_ng_devise_test.csv\`."
+            echo "> Ni \`sec_ng_latest.csv\` ni la base ne sont touches."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo
+            echo "## Reference AVANT correctif (lot AE)"
+            echo
+            echo "Etiquette USD repartie sur six ordres de grandeur, dont **238 lignes a 10^5**"
+            echo "— des nairas etiquetes dollars. Le correctif est valide si cette dispersion disparait."
+            echo
+            echo '```'
+            cat mesure.txt 2>/dev/null || echo "(aucune sortie — connexion SSH impossible)"
+            echo '```'
+          } > docs/MESURE_DEVISE_SEC.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/MESURE_DEVISE_SEC.md
+          if git diff --cached --quiet; then
+            echo "Mesure inchangee, aucun commit."
+          else
+            git commit -m "chore(diag): mesure devise SEC apres correctif $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Mesure consignee."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
