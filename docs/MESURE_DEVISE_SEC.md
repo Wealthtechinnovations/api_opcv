@@ -4,7 +4,7 @@
 > Extraction de TEST, bornee, ecrivant dans `sec_ng_devise_test.csv`.
 > Ni `sec_ng_latest.csv` ni la base ne sont touches.
 
-Derniere execution : **2026-08-19 17:41 UTC**
+Derniere execution : **2026-08-19 17:46 UTC**
 
 ## Reference AVANT correctif (lot AE)
 
@@ -15,20 +15,20 @@ Etiquette USD repartie sur six ordres de grandeur, dont **238 lignes a 10^5**
 ==============================================
  1. RECUPERER LE CORRECTIF
 ==============================================
-Commit courant : 40b84dda chore: snapshot production state 2026-08-19 17:00
+Commit courant : f64546c6 chore: snapshot production state 2026-08-19 17:00
 
 Le correctif est-il bien present ?
-2
+8
   -> correctif de devise present
 
 ==============================================
  2. TESTS DU NOYAU (sans reseau)
 ==============================================
-  OK    ColumnBlock.unit_price_header
   OK    NavRecord.vl_currency_source
   OK    NavRecord.vl_currency_confidence
+  OK    ColumnBlock.price_columns
 
-  21 verifications OK, 0 echec(s)
+  40 verifications OK, 0 echec(s)
 
 
 ==============================================
@@ -86,18 +86,18 @@ Taille  : 137 Ko
 ==============================================
 Sortie : sec_ng_devise_test.csv (sec_ng_latest.csv n est PAS touche)
 [OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_10th_April_2026.xlsx | rows=222 | dates=2026-04-10
-[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_10th_July_2026.xlsx | rows=41 | dates=2026-07-10
-[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_11th_June_2026.xlsx | rows=41 | dates=2026-06-11
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_10th_July_2026.xlsx | rows=223 | dates=2026-07-10
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_11th_June_2026.xlsx | rows=222 | dates=2026-06-11
 [OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_13th_February_2026.xlsx | rows=216 | dates=2026-02-13
 [OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_13th_March_2026.xlsx | rows=219 | dates=2026-03-13
 
 Extraction terminée.
-Lignes extraites avant filtre qualité : 739
-Lignes écrites : 739
+Lignes extraites avant filtre qualité : 1102
+Lignes écrites : 1102
 Fichiers / feuilles audités : 5
 Lignes de cohérence inter-fichiers : 0
 Lignes de couverture annuelle : 1
-Suggestions fuzzy naming : 1
+Suggestions fuzzy naming : 2
 CSV données : sec_ng_devise_test.csv
 CSV audit : sec_ng_nav_audit_v6.csv
 CSV cohérence : sec_ng_nav_coherence_v6.csv
@@ -111,15 +111,15 @@ Code de sortie extraction : 0
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T17:41:33.752Z — LECTURE SEULE
+ Genere le 2026-08-19T17:46:56.537Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : sec_ng_devise_test.csv
-   taille    : 0.93 Mo
-   modifie   : 2026-08-19T17:41:33.526Z (il y a 0.0 h)
-   lignes    : 739
+   taille    : 1.35 Mo
+   modifie   : 2026-08-19T17:46:56.379Z (il y a 0.0 h)
+   lignes    : 1102
    colonnes  : 55
 
    En-tetes pertinents :
@@ -135,37 +135,37 @@ Code de sortie extraction : 0
 ## B. Devise emise, fonds en devise etrangere contre les autres
 
    Fonds DOLLAR / EUROBOND / USD : USD=170  NGN=24
-   Tous les autres fonds         : NGN=543  USD=2
+   Tous les autres fonds         : NGN=543  USD=365
 
 ## C. Echantillon des lignes de fonds en devise etrangere
 
-   fonds                           devise  prix                source_prix           source_devise                   
-   ------------------------------  ------  ------------------  --------------------  --------------------------------
-   Afrinvest Dollar Fund           USD     160284.80000672     offer_price_fallback  inferred_fund_name              
-   AIICO Eurobond Fund             NGN     144168.722422       offer_price_fallback  inferred_default_nigeria_context
-   ARM Eurobond Fund               NGN     1684.0166063200002  offer_price_fallback  inferred_default_nigeria_context
-   ARM Short-Term Eurobond Fund    NGN     1458.67099288       offer_price_fallback  inferred_default_nigeria_context
-   CardinalStone Dollar Fund       USD     1731.23976796       offer_price_fallback  inferred_fund_name              
-   Comercio Partners Dollar Fund   USD     1532.6815620000002  offer_price_fallback  inferred_fund_name              
-   Cowry Eurobond Fund             NGN     1996.4903337800001  offer_price_fallback  inferred_default_nigeria_context
-   EDC Dollar Fund                 USD     149816.17070000002  offer_price_fallback  inferred_fund_name              
-   Emerging Africa Eurobond Fund   NGN     1637.43726          offer_price_fallback  inferred_default_nigeria_context
-   FBN Dollar Fund (Retail)        USD     179907.81600000002  offer_price_fallback  inferred_fund_name              
-   FBN Specialized Dollar Fund     USD     175627.584          offer_price_fallback  inferred_fund_name              
-   FSL Eurobond Fund               NGN     1380.7942           offer_price_fallback  inferred_default_nigeria_context
-   Futureview Dollar Fund          USD     190908.74417142     offer_price_fallback  inferred_fund_name              
-   Legacy USD Bond Fund            USD     2071.1913           offer_price_fallback  inferred_fund_name              
-   Myrtle Dollar Shield Fund       USD     0                   offer_price_fallback  inferred_fund_name              
-   Norrenberger Dollar Fund        USD     144182.530364       offer_price_fallback  inferred_fund_name              
-   PACAM Eurobond Fund             NGN     231669.650876       offer_price_fallback  inferred_default_nigeria_context
-   United Capital Nigerian Eurobo  NGN     174755.8394487312   offer_price_fallback  inferred_default_nigeria_context
-   Alpha10 Dollar Fund             USD     1394.602142         offer_price_fallback  inferred_fund_name              
-   AVA GAM Fixed Income Dollar Fu  USD     170845.66636600002  offer_price_fallback  inferred_fund_name              
-   AXA Mansard Dollar Bond Fund    USD     189652.08337        offer_price_fallback  inferred_fund_name              
-   CFG AM Fixed Income Dollar Fun  USD     138079.42           offer_price_fallback  inferred_fund_name              
-   Cordros Dollar Fund             USD     166840.1            offer_price_fallback  inferred_fund_name              
-   Coronation Dollar Fund          USD     1453.9762925999999  offer_price_fallback  inferred_fund_name              
-   FSDH Dollar Fund                USD     1881.62586953479    offer_price_fallback  inferred_fund_name              
+   fonds                           devise  prix                source_prix           source_devise             
+   ------------------------------  ------  ------------------  --------------------  --------------------------
+   Afrinvest Dollar Fund           USD     160284.80000672     offer_price_fallback  column_header             
+   AIICO Eurobond Fund             NGN     144168.722422       offer_price_fallback  column_header_matched_fund
+   ARM Eurobond Fund               NGN     1684.0166063200002  offer_price_fallback  column_header_matched_fund
+   ARM Short-Term Eurobond Fund    NGN     1458.67099288       offer_price_fallback  column_header_matched_fund
+   CardinalStone Dollar Fund       USD     1731.23976796       offer_price_fallback  column_header             
+   Comercio Partners Dollar Fund   USD     1532.6815620000002  offer_price_fallback  column_header             
+   Cowry Eurobond Fund             NGN     1996.4903337800001  offer_price_fallback  column_header_matched_fund
+   EDC Dollar Fund                 USD     149816.17070000002  offer_price_fallback  column_header             
+   Emerging Africa Eurobond Fund   NGN     1637.43726          offer_price_fallback  column_header_matched_fund
+   FBN Dollar Fund (Retail)        USD     179907.81600000002  offer_price_fallback  column_header             
+   FBN Specialized Dollar Fund     USD     175627.584          offer_price_fallback  column_header             
+   FSL Eurobond Fund               NGN     1380.7942           offer_price_fallback  column_header_matched_fund
+   Futureview Dollar Fund          USD     190908.74417142     offer_price_fallback  column_header             
+   Legacy USD Bond Fund            USD     2071.1913           offer_price_fallback  column_header             
+   Myrtle Dollar Shield Fund       USD     0                   offer_price_fallback  column_header             
+   Norrenberger Dollar Fund        USD     144182.530364       offer_price_fallback  column_header             
+   PACAM Eurobond Fund             NGN     231669.650876       offer_price_fallback  column_header_matched_fund
+   United Capital Nigerian Eurobo  NGN     174755.8394487312   offer_price_fallback  column_header_matched_fund
+   Alpha10 Dollar Fund             USD     1394.602142         offer_price_fallback  column_header             
+   AVA GAM Fixed Income Dollar Fu  USD     170845.66636600002  offer_price_fallback  column_header             
+   AXA Mansard Dollar Bond Fund    USD     189652.08337        offer_price_fallback  column_header             
+   CFG AM Fixed Income Dollar Fun  USD     138079.42           offer_price_fallback  column_header             
+   Cordros Dollar Fund             USD     166840.1            offer_price_fallback  column_header             
+   Coronation Dollar Fund          USD     1453.9762925999999  offer_price_fallback  column_header             
+   FSDH Dollar Fund                USD     1881.62586953479    offer_price_fallback  column_header             
 
 ## D. Confrontation au referentiel (dev_libelle en base)
 
