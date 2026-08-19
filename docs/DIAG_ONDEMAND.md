@@ -4,21 +4,21 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-19 16:51 UTC**
+Derniere execution : **2026-08-19 17:36 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_csv_devise_sec.js ##########
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T16:51:44.355Z — LECTURE SEULE
+ Genere le 2026-08-19T17:36:13.225Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 4.89 Mo
-   modifie   : 2026-08-17T10:00:22.276Z (il y a 54.9 h)
+   modifie   : 2026-08-17T10:00:22.276Z (il y a 55.6 h)
    lignes    : 4221
    colonnes  : 53
 
@@ -39,33 +39,33 @@ Derniere execution : **2026-08-19 16:51 UTC**
 
 ## C. Echantillon des lignes de fonds en devise etrangere
 
-   fonds                               devise  prix                source       date      
-   ----------------------------------  ------  ------------------  -----------  ----------
-   Afrinvest Dollar Fund               USD     160284.80000672     offer_price  2026-04-10
-   AIICO Eurobond Fund                 NGN     144168.722422       offer_price  2026-04-10
-   ARM Eurobond Fund                   NGN     1684.0166063200002  offer_price  2026-04-10
-   ARM Short-Term Eurobond Fund        NGN     1458.67099288       offer_price  2026-04-10
-   CardinalStone Dollar Fund           USD     1731.23976796       offer_price  2026-04-10
-   Comercio Partners Dollar Fund       USD     1532.6815620000002  offer_price  2026-04-10
-   Cowry Eurobond Fund                 NGN     1996.4903337800001  offer_price  2026-04-10
-   EDC Dollar Fund                     USD     149816.17070000002  offer_price  2026-04-10
-   Emerging Africa Eurobond Fund       NGN     1637.43726          offer_price  2026-04-10
-   FBN Dollar Fund (Retail)            USD     179907.81600000002  offer_price  2026-04-10
-   FBN Specialized Dollar Fund         USD     175627.584          offer_price  2026-04-10
-   FSL Eurobond Fund                   NGN     1380.7942           offer_price  2026-04-10
-   Futureview Dollar Fund              USD     190908.74417142     offer_price  2026-04-10
-   Legacy USD Bond Fund                USD     2071.1913           offer_price  2026-04-10
-   Myrtle Dollar Shield Fund           USD     0                   offer_price  2026-04-10
-   Norrenberger Dollar Fund            USD     144182.530364       offer_price  2026-04-10
-   PACAM Eurobond Fund                 NGN     231669.650876       offer_price  2026-04-10
-   United Capital Nigerian Eurobond F  NGN     174755.8394487312   offer_price  2026-04-10
-   Alpha10 Dollar Fund                 USD     1394.602142         offer_price  2026-04-10
-   AVA GAM Fixed Income Dollar Fund    USD     170845.66636600002  offer_price  2026-04-10
-   AXA Mansard Dollar Bond Fund        USD     189652.08337        offer_price  2026-04-10
-   CFG AM Fixed Income Dollar Fund     USD     138079.42           offer_price  2026-04-10
-   Cordros Dollar Fund                 USD     166840.1            offer_price  2026-04-10
-   Coronation Dollar Fund              USD     1453.9762925999999  offer_price  2026-04-10
-   FSDH Dollar Fund                    USD     1881.62586953479    offer_price  2026-04-10
+   fonds                           devise  prix                source_prix  source_devise
+   ------------------------------  ------  ------------------  -----------  -------------
+   Afrinvest Dollar Fund           USD     160284.80000672     offer_price  (absent)     
+   AIICO Eurobond Fund             NGN     144168.722422       offer_price  (absent)     
+   ARM Eurobond Fund               NGN     1684.0166063200002  offer_price  (absent)     
+   ARM Short-Term Eurobond Fund    NGN     1458.67099288       offer_price  (absent)     
+   CardinalStone Dollar Fund       USD     1731.23976796       offer_price  (absent)     
+   Comercio Partners Dollar Fund   USD     1532.6815620000002  offer_price  (absent)     
+   Cowry Eurobond Fund             NGN     1996.4903337800001  offer_price  (absent)     
+   EDC Dollar Fund                 USD     149816.17070000002  offer_price  (absent)     
+   Emerging Africa Eurobond Fund   NGN     1637.43726          offer_price  (absent)     
+   FBN Dollar Fund (Retail)        USD     179907.81600000002  offer_price  (absent)     
+   FBN Specialized Dollar Fund     USD     175627.584          offer_price  (absent)     
+   FSL Eurobond Fund               NGN     1380.7942           offer_price  (absent)     
+   Futureview Dollar Fund          USD     190908.74417142     offer_price  (absent)     
+   Legacy USD Bond Fund            USD     2071.1913           offer_price  (absent)     
+   Myrtle Dollar Shield Fund       USD     0                   offer_price  (absent)     
+   Norrenberger Dollar Fund        USD     144182.530364       offer_price  (absent)     
+   PACAM Eurobond Fund             NGN     231669.650876       offer_price  (absent)     
+   United Capital Nigerian Eurobo  NGN     174755.8394487312   offer_price  (absent)     
+   Alpha10 Dollar Fund             USD     1394.602142         offer_price  (absent)     
+   AVA GAM Fixed Income Dollar Fu  USD     170845.66636600002  offer_price  (absent)     
+   AXA Mansard Dollar Bond Fund    USD     189652.08337        offer_price  (absent)     
+   CFG AM Fixed Income Dollar Fun  USD     138079.42           offer_price  (absent)     
+   Cordros Dollar Fund             USD     166840.1            offer_price  (absent)     
+   Coronation Dollar Fund          USD     1453.9762925999999  offer_price  (absent)     
+   FSDH Dollar Fund                USD     1881.62586953479    offer_price  (absent)     
 
 ## D. Confrontation au referentiel (dev_libelle en base)
 
