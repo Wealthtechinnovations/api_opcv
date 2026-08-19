@@ -98,6 +98,41 @@ def main() -> int:
             print(f"   Cellules fusionnees ({len(fusions)} premieres) : {', '.join(fusions) if fusions else 'aucune'}\n")
         except Exception as e:
             print(f"   (fusions illisibles : {e})\n")
+        # --- Lignes d un fonds en devise etrangere ---
+        #
+        # Les lignes ci-dessus sont des fonds en naira (colonnes ($) a N/A).
+        # Pour trancher #73 il faut voir un fonds DOLLAR : quelle colonne porte
+        # reellement la valeur que l extracteur retient ?
+        print("   === Fonds en devise etrangere : valeur par colonne ===\n")
+        entetes = {}
+        for r, l in enumerate(lignes[:6]):
+            for c, v in enumerate(l):
+                t = texte(v)
+                if t and any(k in t.upper() for k in ("PRICE", "NAV")):
+                    entetes.setdefault(c, t)
+
+        trouves = 0
+        for row in ws.iter_rows(max_row=400, values_only=True):
+            nom = ""
+            for v in list(row)[:6]:
+                t = texte(v)
+                if t and any(k in t.upper() for k in ("DOLLAR", "EUROBOND")):
+                    nom = t
+                    break
+            if not nom:
+                continue
+            trouves += 1
+            if trouves > 3:
+                break
+            print(f"   --- {nom} ---")
+            for c in sorted(entetes):
+                val = texte(row[c]) if c < len(row) else ""
+                if val and val.upper() not in ("N/A", "NA", "-"):
+                    print(f"      c{c:<3} {entetes[c][:24]:<24} = {val}")
+            print()
+        if not trouves:
+            print("   (aucun fonds dollar/eurobond dans les 400 premieres lignes)\n")
+
         break  # une feuille suffit a comprendre la structure
     return 0
 
