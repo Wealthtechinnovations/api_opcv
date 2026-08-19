@@ -111,6 +111,14 @@ jobs:
 
             echo ""
             echo "=============================================="
+            echo " 2bis. STRUCTURE REELLE DES EN-TETES"
+            echo "=============================================="
+            echo "La mesure du lot AG montre que la devise n est PAS lisible dans"
+            echo "l en-tete de colonne. On regarde donc ou elle se trouve vraiment."
+            python3 scripts/diag/dump_sec_header_structure.py 2>&1 | head -45
+
+            echo ""
+            echo "=============================================="
             echo " 3. EXTRACTION BORNEE — sortie de TEST isolee"
             echo "=============================================="
             echo "Sortie : sec_ng_devise_test.csv (sec_ng_latest.csv n est PAS touche)"
