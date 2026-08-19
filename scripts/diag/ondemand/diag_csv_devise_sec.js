@@ -88,13 +88,25 @@ async function main() {
   console.log(`   lignes    : ${brut.length - 1}`);
   console.log(`   colonnes  : ${entetes.length}\n`);
   console.log('   En-tetes pertinents :');
-  for (const c of ['fund_name_clean', 'currency_code', 'vl_price', 'vl_price_source',
-                   'nav_value', 'nav_ngn', 'valuation_date', 'block_type']) {
+  for (const c of ['fund_name_clean', 'currency_code', 'vl_currency_code', 'vl_currency_source',
+                   'vl_price', 'vl_price_source', 'nav_value', 'valuation_date']) {
     console.log(`      ${c.padEnd(20)} ${entetes.includes(c) ? 'present (col ' + entetes.indexOf(c) + ')' : 'ABSENT'}`);
   }
 
   const iNom = entetes.indexOf('fund_name_clean');
-  const iDev = entetes.indexOf('currency_code');
+  // ATTENTION — deux colonnes de devise, qui ne disent PAS la meme chose :
+  //   `currency_code`    = devise de LIBELLE du fonds (USD pour un fonds dollar),
+  //                        deduite du nom. Elle est juste, et ne change jamais.
+  //   `vl_currency_code` = devise de LA MESURE, lue dans l en-tete de la colonne
+  //                        de prix reellement utilisee. C est celle du correctif.
+  // Mesurer la premiere revenait a evaluer le correctif sur un champ qu il ne
+  // touche pas : le fichier du 10 avril ne publie AUCUNE colonne en dollars, la
+  // valeur y est donc en naira et correctement etiquetee NGN par vl_currency_code,
+  // alors que currency_code dit USD — a juste titre, puisque le FONDS est en dollars.
+  const iDevFonds = entetes.indexOf('currency_code');
+  const iDev = entetes.indexOf('vl_currency_code') >= 0
+    ? entetes.indexOf('vl_currency_code')
+    : iDevFonds;
   const iPrix = entetes.indexOf('vl_price');
   const iSrc = entetes.indexOf('vl_price_source');
   const iDate = entetes.indexOf('valuation_date');
@@ -120,8 +132,9 @@ async function main() {
     if (cible === 'devise' && echantillon.length < 25) {
       const iDevSrc = entetes.indexOf('vl_currency_source');
       echantillon.push({
-        fonds: nom.slice(0, 30),
-        devise: dev,
+        fonds: nom.slice(0, 28),
+        dev_fonds: iDevFonds >= 0 ? (c[iDevFonds] || '') : '',
+        dev_mesure: dev,
         prix: iPrix >= 0 ? c[iPrix] : '',
         source_prix: iSrc >= 0 ? c[iSrc] : '',
         // Renseigne par le correctif du lot AF : dit si la devise a ete LUE
@@ -132,7 +145,7 @@ async function main() {
   }
 
   const fmt = o => Object.entries(o).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k}=${v}`).join('  ') || '(aucun)';
-  console.log(`   Fonds DOLLAR / EUROBOND / USD : ${fmt(compte.devise)}`);
+  console.log(`   [devise de la MESURE] fonds DOLLAR/EUROBOND : ${fmt(compte.devise)}`);
   console.log(`   Tous les autres fonds         : ${fmt(compte.autres)}`);
 
   console.log('\n## C. Echantillon des lignes de fonds en devise etrangere\n');
