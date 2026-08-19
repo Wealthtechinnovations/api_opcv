@@ -4,7 +4,7 @@
 > Extraction de TEST, bornee, ecrivant dans `sec_ng_devise_test.csv`.
 > Ni `sec_ng_latest.csv` ni la base ne sont touches.
 
-Derniere execution : **2026-08-19 17:36 UTC**
+Derniere execution : **2026-08-19 17:38 UTC**
 
 ## Reference AVANT correctif (lot AE)
 
@@ -15,7 +15,7 @@ Etiquette USD repartie sur six ordres de grandeur, dont **238 lignes a 10^5**
 ==============================================
  1. RECUPERER LE CORRECTIF
 ==============================================
-Commit courant : ee4c6d85 chore: snapshot production state 2026-08-19 17:00
+Commit courant : ae8259ad chore: snapshot production state 2026-08-19 17:00
 
 Le correctif est-il bien present ?
 2
@@ -29,6 +29,34 @@ Le correctif est-il bien present ?
   OK    NavRecord.vl_currency_confidence
 
   21 verifications OK, 0 echec(s)
+
+
+==============================================
+ 2bis. STRUCTURE REELLE DES EN-TETES
+==============================================
+La mesure du lot AG montre que la devise n est PAS lisible dans
+l en-tete de colonne. On regarde donc ou elle se trouve vraiment.
+
+Fichier : Net_Asset_Value_and_Unit_Price_as_at_24th_July_2026.xlsx
+Taille  : 137 Ko
+
+=== Feuille « Weekly Valuation » — 14 premieres lignes, 111 colonnes ===
+
+   ligne | c3   | c4   | c6   | c7   | c8   | c9   | c13  | c14  | c16  | c17  | c18  | c19  | c23  | c24 
+   ------+------+------+------+------+------+------+------+------+------+------+------+------+------+-----
+       1 | NAV, Unit Price and Yield  |                            |                            |                            |                            |                            | NAV, Unit Price and Yield  |                            |                            |                            |                            |                            | % Change (Current from Pre |                           
+       2 | NAV ($)                    | NAV (N)                    | Bid Price ($)              | Bid Price (N)              | Offer Price ($)            | Offer Price (N)            | NAV ($)                    | NAV (N)                    | Bid Price ($)              | Bid Price (N)              | Offer Price ($)            | Offer Price (N)            | NAV (%)                    | Unit Price (%)            
+       5 | N/A                        | 12077755584.47             | N/A                        | 875.9587                   | N/A                        | 886.3596                   | N/A                        | 12543114635.32             | N/A                        | 895.8178                   | N/A                        | 906.3944                   | 0.03853025900345055        | 0.022603467035275545      
+       6 | N/A                        | 2252336266.07              | N/A                        | 596.1191                   | N/A                        | 604.7703                   | N/A                        | 2291570453.31              | N/A                        | 602.6626                   | N/A                        | 611.1302                   | 0.017419329356383243       | 0.010516224093676434      
+       7 | N/A                        | 18134971347.59             | N/A                        | 72.6423                    | N/A                        | 74.80884392                | N/A                        | 18486159883.82             | N/A                        | 73.61                      | N/A                        | 75.8                       | 0.019365265568873913       | 0.013249183225715007      
+       8 | N/A                        | 3307340527.22              | N/A                        | 367.1195                   | N/A                        | 367.1195                   | N/A                        | 3587813322.23              | N/A                        | 372.0329                   | N/A                        | 372.0329                   | 0.0848031198183735         | 0.013383653006718432      
+       9 | N/A                        | 12751119005.43             | N/A                        | 2.8906                     | N/A                        | 2.9272                     | N/A                        | 13055068874.2              | N/A                        | 2.9338                     | N/A                        | 2.9734                     | 0.02383711332633355        | 0.015783000819896077      
+      10 | N/A                        | 788877643.9                | N/A                        | 0.9747                     | N/A                        | 1.0011                     | N/A                        | 881078035.11               | N/A                        | 0.994                      | N/A                        | 1.023                      | 0.11687540130328193        | 0.021875936469882937      
+      11 | N/A                        | 604418419.91               | N/A                        | 328.2217                   | N/A                        | 331.1232                   | N/A                        | 759602522.13               | N/A                        | 348.1193                   | N/A                        | 350.6057                   | 0.2567494588320248         | 0.058837616935328046      
+      12 | N/A                        | 4242086855.58              | N/A                        | 8.1                        | N/A                        | 8.28                       | N/A                        | 4279099263.41              | N/A                        | 8.2                        | N/A                        | 8.37                       | 0.008725047150157749       | 0.010869565217391288      
+      13 | N/A                        | 6944335234.81              | N/A                        | 612.14                     | N/A                        | 620.27                     | N/A                        | 6904064184.06              | N/A                        | 611.07                     | N/A                        | 620.41                     | -0.005799122506087054      | 0.00022570815934993852    
+
+   Cellules fusionnees (25 premieres) : B214:AB214, B219:AB219, B235:AB235, B242:AA242, B120:AB120, B29:AB29, B243:AB243, B234:AB234, B174:AB174, B28:AB28, B257:AB257, B164:AB164, A1:AB1, B142:AB142, B256:AB256, B5:AB5, B80:AB80, B207:AB207, B213:AB213, D2:M2, B79:AB79, N2:W2, B4:AB4, X2:Z2, B173:AB173
 
 
 ==============================================
@@ -61,14 +89,14 @@ Code de sortie extraction : 0
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T17:36:00.526Z — LECTURE SEULE
+ Genere le 2026-08-19T17:38:34.226Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : sec_ng_devise_test.csv
    taille    : 0.93 Mo
-   modifie   : 2026-08-19T17:36:00.361Z (il y a 0.0 h)
+   modifie   : 2026-08-19T17:38:34.048Z (il y a 0.0 h)
    lignes    : 739
    colonnes  : 55
 
