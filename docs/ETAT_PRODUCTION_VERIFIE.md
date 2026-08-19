@@ -5,10 +5,9 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-08-19 19:54 UTC**
+Derniere verification : **2026-08-19 19:57 UTC**
 
 ```
-AVERTISSEMENT: mise a jour du code impossible, controle lance sur la version presente.
 
 === BOUCLE DE CONTROLE — DERIVE DOCUMENTATION / PRODUCTION ===
 
