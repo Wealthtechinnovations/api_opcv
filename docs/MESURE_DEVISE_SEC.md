@@ -4,7 +4,7 @@
 > Extraction de TEST, bornee, ecrivant dans `sec_ng_devise_test.csv`.
 > Ni `sec_ng_latest.csv` ni la base ne sont touches.
 
-Derniere execution : **2026-08-19 19:54 UTC**
+Derniere execution : **2026-08-19 19:56 UTC**
 
 ## Reference AVANT correctif (lot AE)
 
@@ -15,7 +15,8 @@ Etiquette USD repartie sur six ordres de grandeur, dont **238 lignes a 10^5**
 ==============================================
  1. RECUPERER LE CORRECTIF
 ==============================================
-Commit courant : 96483152 chore: snapshot production state 2026-08-19 19:00
+AVERTISSEMENT: mise a jour impossible, mesure sur la version presente.
+Commit courant : 807bb750 chore: snapshot production state 2026-08-04 12:00
 
 Le correctif est-il bien present ?
 8
@@ -149,14 +150,14 @@ Code de sortie extraction : 0
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T19:54:13.020Z — LECTURE SEULE
+ Genere le 2026-08-19T19:56:54.982Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : sec_ng_devise_test.csv
    taille    : 1.35 Mo
-   modifie   : 2026-08-19T19:54:12.849Z (il y a 0.0 h)
+   modifie   : 2026-08-19T19:56:54.820Z (il y a 0.0 h)
    lignes    : 1102
    colonnes  : 55
 
@@ -237,18 +238,18 @@ Code de sortie extraction : 0
 
 ## F. Ce que cela implique pour l etape 0
 
-   L etiquette NE PREDIT PAS l echelle : USD couvre 3 ordres de grandeur,
-   NGN en couvre 3. Une meme etiquette recouvre donc des unites differentes.
+   USD occupe les ordres [0, 1, 2]
+   NGN occupe les ordres [3, 4, 5]
+   Ordres partages : AUCUN
 
-   -> Corriger dev_libelle en USD serait DANGEREUX : le contrat accepterait des
-      valeurs en naira portant une etiquette USD, c est-a-dire de la donnee fausse
-      avec un label rassurant. Pire que le blocage.
+   SEPARATION NETTE. Les deux devises n occupent aucun ordre de grandeur
+   commun : USD s arrete a 10^2, NGN commence a 10^3. L ecart
+   correspond au taux de change. Chaque valeur est donc etiquetee dans son
+   unite reelle.
 
-   -> Le defaut est en amont, dans l extracteur : `choose_vl_price` retient
-      `offer_price` en priorite sans savoir de quelle colonne devise il provient,
-      tandis que `infer_currency` deduit la devise du contexte. Les deux peuvent
-      donc se contredire. C est la reparation a mener AVANT toute etape 0,
-      ce qui confirme l arbitrage B.
+   -> L extraction est FIABLE sur ce lot. L etape 0 devient sure : corriger
+      dev_libelle alignera le referentiel sans faire accepter de naira
+      etiquete dollar, puisqu il n en existe plus.
 
 ============================================================
  FIN — aucune ecriture.
