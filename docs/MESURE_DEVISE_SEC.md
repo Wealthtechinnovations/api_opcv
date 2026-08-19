@@ -4,7 +4,7 @@
 > Extraction de TEST, bornee, ecrivant dans `sec_ng_devise_test.csv`.
 > Ni `sec_ng_latest.csv` ni la base ne sont touches.
 
-Derniere execution : **2026-08-19 17:38 UTC**
+Derniere execution : **2026-08-19 17:41 UTC**
 
 ## Reference AVANT correctif (lot AE)
 
@@ -15,7 +15,7 @@ Etiquette USD repartie sur six ordres de grandeur, dont **238 lignes a 10^5**
 ==============================================
  1. RECUPERER LE CORRECTIF
 ==============================================
-Commit courant : ae8259ad chore: snapshot production state 2026-08-19 17:00
+Commit courant : 40b84dda chore: snapshot production state 2026-08-19 17:00
 
 Le correctif est-il bien present ?
 2
@@ -58,6 +58,28 @@ Taille  : 137 Ko
 
    Cellules fusionnees (25 premieres) : B214:AB214, B219:AB219, B235:AB235, B242:AA242, B120:AB120, B29:AB29, B243:AB243, B234:AB234, B174:AB174, B28:AB28, B257:AB257, B164:AB164, A1:AB1, B142:AB142, B256:AB256, B5:AB5, B80:AB80, B207:AB207, B213:AB213, D2:M2, B79:AB79, N2:W2, B4:AB4, X2:Z2, B173:AB173
 
+   === Fonds en devise etrangere : valeur par colonne ===
+
+   --- DOLLAR FUNDS ---
+
+   --- EUROBONDS ---
+
+   --- Afrinvest Dollar Fund ---
+      c3   NAV, Unit Price and Yiel = 3317083.12
+      c4   NAV (N)                  = 4578187370.852264
+      c6   Bid Price ($)            = 119.9184
+      c7   Bid Price (N)            = 165509.54092848
+      c8   Offer Price ($)          = 119.9184
+      c9   Offer Price (N)          = 165509.54092848
+      c13  NAV, Unit Price and Yiel = 3312565.92
+      c14  NAV (N)                  = 4512001651.2486725
+      c16  Bid Price ($)            = 120.1259
+      c17  Bid Price (N)            = 163621.87870294
+      c18  Offer Price ($)          = 120.1259
+      c19  Offer Price (N)          = 163621.87870294
+      c23  NAV (%)                  = -0.014456752037929576
+      c24  Unit Price (%)           = -0.011405156554423026
+
 
 ==============================================
  3. EXTRACTION BORNEE — sortie de TEST isolee
@@ -89,14 +111,14 @@ Code de sortie extraction : 0
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T17:38:34.226Z — LECTURE SEULE
+ Genere le 2026-08-19T17:41:33.752Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : sec_ng_devise_test.csv
    taille    : 0.93 Mo
-   modifie   : 2026-08-19T17:38:34.048Z (il y a 0.0 h)
+   modifie   : 2026-08-19T17:41:33.526Z (il y a 0.0 h)
    lignes    : 739
    colonnes  : 55
 
