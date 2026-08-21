@@ -4,14 +4,14 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-21 22:47 UTC**
+Derniere execution : **2026-08-21 22:48 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_csv_devise_sec.js ##########
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-21T22:47:01.490Z — LECTURE SEULE
+ Genere le 2026-08-21T22:48:18.124Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
@@ -208,10 +208,10 @@ Derniere execution : **2026-08-21 22:47 UTC**
   present libreoffice (conversion .xls -> .xlsx)
 
 [7] Version des scripts cron reellement deployee sur le serveur
-  cron_daily_update.sh       PIPESTATUS:oui  curl-temp:oui  exit-code:oui
-  cron_nigeria_weekly.sh     PIPESTATUS:oui  curl-temp:oui  exit-code:oui
-  cron_daily_eur_usd.sh      PIPESTATUS:oui  curl-temp:NON  exit-code:oui
-  cron_health_check.sh       PIPESTATUS:oui  curl-temp:NON  exit-code:NON
+  cron_daily_update.sh       statut-commande:oui  curl-non-melange:NON  sortie-non-nulle:oui
+  cron_nigeria_weekly.sh     statut-commande:oui  curl-non-melange:NON  sortie-non-nulle:oui
+  cron_daily_eur_usd.sh      statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
+  cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
