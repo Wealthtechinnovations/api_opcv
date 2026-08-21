@@ -103,4 +103,35 @@ try {
   console.log('  present libreoffice (conversion .xls -> .xlsx)');
 } catch { console.log('  ABSENT  libreoffice  <- les .xls anciens ne seront pas lus'); }
 
+
+console.log('\n[7] Version des scripts cron reellement deployee sur le serveur');
+// Le journal du 2026-08-17 montre « [5a/8] ERREUR (HTTP {json}500) » : le corps de
+// la reponse et le code HTTP melanges, signature de l ancien run_curl a substitution
+// de processus. Et « [4/8] OK » juste apres une erreur fatale, signature de l ancien
+// run_step qui lisait le code de `tee`. Ce controle verifie que les versions corrigees
+// au lot AD sont bien celles que cron executera lundi prochain.
+const crons = ['cron_daily_update.sh', 'cron_nigeria_weekly.sh', 'cron_daily_eur_usd.sh', 'cron_health_check.sh'];
+for (const c of crons) {
+  const p = path.join(API_DIR, 'scripts/cron', c);
+  try {
+    const src = fs.readFileSync(p, 'utf8');
+    const pipestatus = src.includes('PIPESTATUS[0]');
+    const curlTemp = src.includes('body=$(mktemp)');
+    const exitCode = /exit \$\(\(\s*ERRORS/.test(src);
+    console.log(`  ${c.padEnd(26)} PIPESTATUS:${pipestatus ? 'oui' : 'NON'}  curl-temp:${curlTemp ? 'oui' : 'NON'}  exit-code:${exitCode ? 'oui' : 'NON'}`);
+  } catch (e) {
+    console.log(`  ${c.padEnd(26)} illisible : ${e.message}`);
+  }
+}
+
+console.log('\n[8] Entrees crontab actives');
+try {
+  const out = execFileSync('crontab', ['-l'], { encoding: 'utf8' });
+  for (const l of out.split('\n')) {
+    if (l.trim() && !l.trim().startsWith('#')) console.log(`  ${l}`);
+  }
+} catch (e) {
+  console.log(`  crontab illisible : ${e.message}`);
+}
+
 console.log('');
