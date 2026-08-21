@@ -4,21 +4,21 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-19 19:57 UTC**
+Derniere execution : **2026-08-21 22:46 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_csv_devise_sec.js ##########
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T19:57:10.215Z — LECTURE SEULE
+ Genere le 2026-08-21T22:46:00.634Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 4.89 Mo
-   modifie   : 2026-08-17T10:00:22.276Z (il y a 57.9 h)
+   modifie   : 2026-08-17T10:00:22.276Z (il y a 108.8 h)
    lignes    : 4221
    colonnes  : 53
 
@@ -115,6 +115,97 @@ Derniere execution : **2026-08-19 19:57 UTC**
 ============================================================
  FIN — aucune ecriture.
 ============================================================
+
+
+########## scripts/diag/ondemand/diag_import_nigeria.js ##########
+
+=== IMPORT NIGERIA — POURQUOI PLUS AUCUNE VL DEPUIS LE 2026-08-10 ===
+
+[1] Journaux du cron hebdomadaire (/var/log/africafunds_nigeria_*.log)
+  africafunds_nigeria_20260713.log  (9150 o, modifie le 2026-07-13 10:01:18)
+  africafunds_nigeria_20260720.log  (11633 o, modifie le 2026-07-20 10:08:12)
+  africafunds_nigeria_20260727.log  (11721 o, modifie le 2026-07-27 10:08:34)
+  africafunds_nigeria_20260803.log  (11726 o, modifie le 2026-08-03 10:08:17)
+  africafunds_nigeria_20260810.log  (11878 o, modifie le 2026-08-10 10:08:38)
+  africafunds_nigeria_20260817.log  (11463 o, modifie le 2026-08-17 10:02:23)
+
+[2] Fin du dernier journal — /var/log/africafunds_nigeria_20260817.log
+  |   [400/1245] CAPITAL TRUST RENDEMENT: 386 VL
+  |   [450/1245] BMCI PREMIUM LONG TERM BOND: 405 VL
+  |   [500/1245] ATLAS OBLIGBANCAIRES: 1810 VL
+  | Erreur fatale: Error: Can't add new command when connection is in closed state
+  |     at PromiseConnection.execute (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/node_modules/mysql2/promise.js:112:22)
+  |     at run (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/recalc/recalc_vl_ajuste.js:88:33) {
+  |   code: undefined,
+  |   errno: undefined,
+  |   sql: undefined,
+  |   sqlState: undefined,
+  |   sqlMessage: undefined
+  | }
+  | [4/8] OK
+  | 
+  | [5a/8] Recalcul performances locale (fonds 1-600)...
+  | {"error":"Une erreur s'est produite lors du traitement."}
+  | [5a/8] ERREUR (HTTP {"error":"Une erreur s'est produite lors du traitement."}500)
+  | 
+  | [5b/8] Recalcul performances locale (fonds 601-1200)...
+  | {"error":"Une erreur s'est produite lors du traitement."}
+  | [5b/8] ERREUR (HTTP {"error":"Une erreur s'est produite lors du traitement."}500)
+  | 
+  | [6a/8] Recalcul performances EUR (fonds 1-600)...
+  | {"error":"connect ECONNREFUSED 127.0.0.1:3306"}
+  | [6a/8] ERREUR (HTTP {"error":"connect ECONNREFUSED 127.0.0.1:3306"}500)
+  | 
+  | [6b/8] Recalcul performances EUR (fonds 601-1200)...
+  | {"error":"connect ECONNREFUSED 127.0.0.1:3306"}
+  | [6b/8] ERREUR (HTTP {"error":"connect ECONNREFUSED 127.0.0.1:3306"}500)
+  | 
+  | [7a/8] Recalcul performances USD (fonds 1-600)...
+  | {"error":"connect ECONNREFUSED 127.0.0.1:3306"}
+  | [7a/8] ERREUR (HTTP {"error":"connect ECONNREFUSED 127.0.0.1:3306"}500)
+  | 
+  | [7b/8] Recalcul performances USD (fonds 601-1200)...
+  | {"error":"connect ECONNREFUSED 127.0.0.1:3306"}
+  | [7b/8] ERREUR (HTTP {"error":"connect ECONNREFUSED 127.0.0.1:3306"}500)
+  | 
+  | [8/8] Resynchronisation datejour (Nigeria)...
+  | Erreur fatale : connect ECONNREFUSED 127.0.0.1:3306
+  | [8/8] OK
+  | 
+  | === NIGERIA WEEKLY UPDATE TERMINE AVEC 6 ERREUR(S) Mon Aug 17 10:02:23 AM UTC 2026 ===
+  | ========================================
+  | 
+
+[3] Artefacts d extraction attendus a la racine du depot
+  present sec_ng_latest.csv                5125964 o, modifie le 2026-08-17 10:00:22 — 4222 lignes
+  present sec_ng_audit_latest.csv          22954 o, modifie le 2026-08-17 10:00:22 — 31 lignes
+  present sec_ng_coherence_latest.csv      5 o, modifie le 2026-08-17 10:00:22 — 1 lignes
+  present sec_ng_coverage_latest.csv       672 o, modifie le 2026-08-17 10:00:22 — 2 lignes
+  present sec_ng_fuzzy_latest.csv          285 o, modifie le 2026-08-17 10:00:22 — 2 lignes
+  present sec_ng_nav_extractor_v6.py       86886 o, modifie le 2026-08-19 17:46:50
+
+[4] Cache de telechargement sec_ng_downloads/
+  9 fichiers. Les plus recents :
+    2026-08-10  2026
+    2026-05-17  2018
+    2026-05-17  2019
+    2026-05-17  2020
+    2026-05-17  2021
+    2026-05-17  2022
+    2026-05-17  2023
+    2026-05-17  2024
+
+[5] Le contrat d ecriture est-il cable dans l importeur ?
+  require(vl_contract) : OUI
+  ecrit currency_code  : OUI
+
+[6] Dependances Python de l extracteur
+  present requests
+  present bs4
+  present openpyxl
+  present dateutil
+  python3 : Python 3.10.12
+  present libreoffice (conversion .xls -> .xlsx)
 
 
 ```
