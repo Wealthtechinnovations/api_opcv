@@ -131,11 +131,21 @@ fix_tsr_per_country.js        — TSR par pays (Nigeria, Tunisie, UEMOA, CEMAC)
 ```
 
 ### Crons actifs en production
+
+Liste relevee sur `crontab -l` du serveur S2 le 2026-08-21. Les quatre dernieres
+lignes manquaient a ce document : trois crons d import (Tunisie, BRVM, indices)
+tournaient sans etre documentes ici. Reverifier par `diag_import_nigeria.js`
+plutot que par ce tableau — la mesure prime sur la prose.
+
 ```
+0 10 * * 1    cron_nigeria_weekly.sh   — SEC Nigeria import + recalc (8 etapes)
 0 20 * * 1-5  cron_daily_update.sh     — 9 etapes : ASFIM+forex+rates+vl_ajuste+perf+classements
 30 21 * * *   cron_daily_eur_usd.sh    — Perf EUR/USD + classements EUR/USD
-0 10 * * 1    cron_nigeria_weekly.sh   — SEC Nigeria import + recalc
-0 * * * *     sync_production.sh       — Snapshot horaire
+0 19 * * 1-5  cron_tunisie_daily.sh    — Import CMF Tunisie
+30 19 * * 1-5 cron_brvm_daily.sh       — Import BRVM / UEMOA
+30 18 * * 1-5 cron_indices_daily.sh    — Import indices de reference
+0 22 * * *    cron_health_check.sh     — Controle de sante, sortie non nulle si probleme
+0 * * * *     sync_production.sh       — Snapshot horaire (PRODUCTION_STATE.json)
 */5 * * * *   fix-brvm-nginx.py        — Fix Nginx BRVM
 ```
 

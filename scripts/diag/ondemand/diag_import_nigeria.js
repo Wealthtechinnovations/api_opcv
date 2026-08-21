@@ -115,10 +115,26 @@ for (const c of crons) {
   const p = path.join(API_DIR, 'scripts/cron', c);
   try {
     const src = fs.readFileSync(p, 'utf8');
-    const pipestatus = src.includes('PIPESTATUS[0]');
-    const curlTemp = src.includes('body=$(mktemp)');
-    const exitCode = /exit \$\(\(\s*ERRORS/.test(src);
-    console.log(`  ${c.padEnd(26)} PIPESTATUS:${pipestatus ? 'oui' : 'NON'}  curl-temp:${curlTemp ? 'oui' : 'NON'}  exit-code:${exitCode ? 'oui' : 'NON'}`);
+    // Trois invariants, testes sur ce qu ils garantissent et non sur un idiome
+    // precis. Une premiere version de ce controle cherchait litteralement
+    // `body=$(mktemp)` et `exit $((ERRORS`, et signalait en defaut deux scripts
+    // sains : cron_daily_eur_usd.sh separe le code HTTP par `tail -1`, et
+    // cron_health_check.sh propage `exit "${RC_HEALTH:-0}"`. Un controle cale
+    // sur une seule ecriture mesure la ressemblance, pas la propriete.
+    const pipestatus = !/\|\s*tee\b/.test(src) || src.includes('PIPESTATUS[0]');
+    // Le corps de la reponse ne doit jamais se melanger au code HTTP dans le
+    // meme flux capture : soit un fichier temporaire, soit une separation par
+    // ligne. `-o >(tee ...)` melange les deux dans un ordre non deterministe.
+    const utiliseCurl = /curl\s/.test(src);
+    const curlSain = !utiliseCurl || src.includes('body=$(mktemp)') || /tail -1/.test(src);
+    const curlDangereux = /-o\s+>\(/.test(src);
+    // Une sortie non nulle doit etre possible : sinon aucun superviseur ne voit rien.
+    const exitCode = /^\s*exit\s+[^0\s]/m.test(src);
+    console.log(
+      `  ${c.padEnd(26)} statut-commande:${pipestatus ? 'oui' : 'NON'}  ` +
+      `curl-non-melange:${curlDangereux ? 'NON' : (curlSain ? 'oui' : 'NON')}  ` +
+      `sortie-non-nulle:${exitCode ? 'oui' : 'NON'}`
+    );
   } catch (e) {
     console.log(`  ${c.padEnd(26)} illisible : ${e.message}`);
   }
