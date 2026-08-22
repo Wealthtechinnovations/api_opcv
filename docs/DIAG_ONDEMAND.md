@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-22 04:17 UTC**
+Derniere execution : **2026-08-22 04:19 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-22 04:17:16 UTC — LECTURE SEULE
+Mesure le 2026-08-22 04:19:32 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -33,14 +33,11 @@ Mesure le 2026-08-22 04:17:16 UTC — LECTURE SEULE
 
 ## C. Le classement suit-il les performances actuelles ?
 
-  OBLIGATIONS                           0/473  rangs identiques (0.0 %)  DIVERGE — classement PERIME
-                                     effectif stocke 19 vs 473 fonds notes aujourd hui — l assiette a change
-  DIVERSIFIE                            1/312  rangs identiques (0.3 %)  DIVERGE — classement PERIME
-                                     effectif stocke 4 vs 312 fonds notes aujourd hui — l assiette a change
-  ACTIONS                               8/179  rangs identiques (4.5 %)  DIVERGE — classement PERIME
-                                     effectif stocke 2 vs 179 fonds notes aujourd hui — l assiette a change
-  MONETAIRE                             2/131  rangs identiques (1.5 %)  DIVERGE — classement PERIME
-                                     effectif stocke 9 vs 131 fonds notes aujourd hui — l assiette a change
+  OBLIGATIONS MAROC                 110/300  rangs identiques (36.7 %)  DIVERGE — classement PERIME
+  DIVERSIFIE MAROC                   18/141  rangs identiques (12.8 %)  DIVERGE — classement PERIME
+  ACTIONS MAROC                       6/122  rangs identiques (4.9 %)  DIVERGE — classement PERIME
+  OBLIGATIONS NIGERIA                12/87   rangs identiques (13.8 %)  DIVERGE — classement PERIME
+  DIVERSIFIE TUNISIE                  3/70   rangs identiques (4.3 %)  DIVERGE — classement PERIME
 
 
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
@@ -134,7 +131,7 @@ Mesure le 2026-08-22 04:17:16 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-22T04:17:19.493Z — LECTURE SEULE
+ Genere le 2026-08-22T04:19:36.066Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
