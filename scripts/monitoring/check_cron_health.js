@@ -10,6 +10,7 @@
  */
 
 const mysql = require('mysql2/promise');
+const { budgetPour } = require('../../src/lib/freshness_budgets');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
@@ -46,9 +47,16 @@ async function run() {
   for (const row of lastVlByCountry) {
     const d = row.last_vl instanceof Date ? row.last_vl.toISOString().split('T')[0] : row.last_vl;
     const ageJours = Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
-    const status = ageJours <= 7 ? 'OK' : ageJours <= 30 ? 'ATTENTION' : 'ALERTE';
-    console.log(`  ${(row.pays || '?').padEnd(12)} derniere VL: ${d} (${ageJours}j) — ${row.fonds_actifs} fonds — ${status}`);
-    if (status === 'ALERTE') issues.push(`${row.pays}: derniere VL il y a ${ageJours} jours`);
+    // Seuils partages avec check_doc_drift.js — voir src/lib/freshness_budgets.js.
+    // Un 7 j / 30 j uniforme ignorait la cadence propre a chaque chaine : le
+    // Nigeria, hebdomadaire, arrete depuis 29 jours, tombait en « ATTENTION ».
+    const budget = budgetPour(row.pays);
+    const status = ageJours <= budget.days ? 'OK' : 'ALERTE';
+    console.log(`  ${(row.pays || '?').padEnd(12)} derniere VL: ${d} (${ageJours}j / budget ${budget.days}j) — ${row.fonds_actifs} fonds — ${status}`);
+    // Le `else` precedent rangeait « ATTENTION » avec les OK : un pays a 29 jours
+    // de retard etait publie « VL a jour ». Un statut intermediaire range du
+    // cote rassurant ne sert a rien — il ne reste que sain ou en retard.
+    if (status === 'ALERTE') issues.push(`${row.pays}: derniere VL il y a ${ageJours} jours (budget ${budget.days}j)`);
     else ok.push(`${row.pays}: VL a jour`);
   }
 
@@ -72,9 +80,42 @@ async function run() {
   if (perfDate) {
     const d = perfDate instanceof Date ? perfDate.toISOString().split('T')[0] : perfDate;
     const ageJ = Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
-    console.log(`  Derniere date performances (proxy fraicheur classement): ${d} (${ageJ}j)`);
-    if (ageJ > 7) issues.push(`Performances/classements pas recalcules depuis ${ageJ}j`);
-    else ok.push('Performances/classements recents');
+    console.log(`  Derniere date performances (MAX brut, tous fonds confondus): ${d} (${ageJ}j)`);
+    // Ce MAX ne dit rien de l etat du catalogue : UN seul fonds recalcule suffit
+    // a le rendre frais. Le 2026-08-21 il valait moins de 7 jours et publiait
+    // « Performances/classements recents » — dans le meme rapport ou le controle
+    // du dessous relevait « seulement 4 fonds avec perf recente », et ou le
+    // controle C8 mesurait 86 jours de retard moyen au Maroc et en Tunisie.
+    // La seule mesure honnete est la PROPORTION de fonds dont la performance
+    // suit sa derniere VL.
+    if (ageJ > 7) issues.push(`Aucune performance ecrite depuis ${ageJ}j`);
+  }
+
+  // Proportion de fonds actifs dont la performance la plus recente atteint leur
+  // derniere VL. C est ce que voit l utilisateur : une VL fraiche accompagnee
+  // d une performance perimee donne un chiffre plausible et faux.
+  const [suivi] = await conn.query(`
+    SELECT COUNT(*) AS fonds,
+           SUM(p.derniere_perf >= v.derniere_vl) AS a_jour,
+           ROUND(AVG(DATEDIFF(v.derniere_vl, p.derniere_perf)), 1) AS retard_moyen
+      FROM fond_investissements f
+      JOIN (SELECT fund_id, MAX(date) AS derniere_vl
+              FROM valorisations GROUP BY fund_id) v ON v.fund_id = f.id
+      JOIN (SELECT fond_id, MAX(date) AS derniere_perf
+              FROM performences GROUP BY fond_id) p ON p.fond_id = f.id
+     WHERE f.active = 1
+  `);
+  {
+    const t = suivi[0];
+    const total = parseInt(t.fonds, 10) || 0;
+    const aJour = parseInt(t.a_jour, 10) || 0;
+    const pct = total ? (aJour / total) * 100 : 0;
+    console.log(`  Performances qui suivent la VL: ${aJour}/${total} (${pct.toFixed(1)} %), retard moyen ${t.retard_moyen} j`);
+    // 80 % est une premiere calibration : un fonds suspendu ou sans VL recente
+    // peut legitimement trainer. En dessous, c est la chaine de recalcul qui est
+    // en cause, pas les fonds. A confronter aux valeurs reelles sur quelques nuits.
+    if (pct < 80) issues.push(`Performances en retard sur les VL: ${aJour}/${total} a jour (${pct.toFixed(1)} %), retard moyen ${t.retard_moyen} j`);
+    else ok.push(`Performances a jour sur ${pct.toFixed(1)} % des fonds`);
   }
 
   // 3. Verifier forex recent

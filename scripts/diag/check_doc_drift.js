@@ -64,21 +64,10 @@ const DB_CONFIG = {
  *
  * Revoir ces valeurs si la cadence d'une source change — pas l'inverse.
  */
-const FRESHNESS = {
-  MAROC:   { days: 6,   level: 'CRITIQUE' },
-  UEMOA:   { days: 6,   level: 'CRITIQUE' },
-  TUNISIE: { days: 9,   level: 'CRITIQUE' },
-  // 45 jours etait cale sur la cadence de PUBLICATION observee en 2026-05, quand la
-  // SEC accumulait plusieurs semaines avant de deposer. La chaine est en realite
-  // hebdomadaire — publication le vendredi, import le lundi — donc un retard sain
-  // ne depasse jamais ~11 jours. Mesure du 2026-08-21 : l import etait arrete
-  // depuis 28 jours (panne MariaDB du 2026-08-17) et ce controle le declarait sain ;
-  // il ne se serait reveille qu a la mi-septembre. Un seuil cale sur l accident
-  // passe au lieu de la cadence nominale ne mesure plus rien.
-  NIGERIA: { days: 14,  level: 'CRITIQUE' },
-  CEMAC:   { days: 400, level: 'AVERTISSEMENT' },
-};
-const FRESHNESS_DEFAULT = { days: 30, level: 'AVERTISSEMENT' };
+// Budgets de fraicheur : source unique dans src/lib/freshness_budgets.js.
+// Ils vivaient ici ET dans scripts/monitoring/check_cron_health.js sous une
+// autre forme, et les deux repondaient differemment a la meme question.
+const { budgetPour } = require('../../src/lib/freshness_budgets');
 
 // Au-dela, une performance est physiquement invraisemblable pour un OPCVM et
 // signale presque toujours un melange d'echelles ou un historique troue.
@@ -156,7 +145,10 @@ async function main() {
         FROM fond_investissements f JOIN valorisations v ON v.fund_id = f.id
        GROUP BY f.pays`);
     for (const r of fresh) {
-      const { days, level } = FRESHNESS[r.pays] ?? FRESHNESS_DEFAULT;
+      // `budgetPour` normalise la casse. L acces direct par cle laissait passer
+      // les 18 fonds enregistres « Nigeria » au lieu de « NIGERIA » : ils
+      // tombaient sur le budget par defaut de 30 jours en simple AVERTISSEMENT.
+      const { days, level } = budgetPour(r.pays);
       record(`C4.${r.pays}`, level,
         `Fraicheur VL ${r.pays} (budget ${days} j)`,
         Number(r.age) <= days,
