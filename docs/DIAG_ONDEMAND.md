@@ -4,21 +4,21 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-21 22:48 UTC**
+Derniere execution : **2026-08-22 00:08 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_csv_devise_sec.js ##########
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-21T22:48:18.124Z — LECTURE SEULE
+ Genere le 2026-08-22T00:08:45.183Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 4.89 Mo
-   modifie   : 2026-08-17T10:00:22.276Z (il y a 108.8 h)
+   modifie   : 2026-08-17T10:00:22.276Z (il y a 110.1 h)
    lignes    : 4221
    colonnes  : 53
 
