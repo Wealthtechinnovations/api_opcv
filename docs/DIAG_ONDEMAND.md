@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-22 04:13 UTC**
+Derniere execution : **2026-08-22 04:17 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-22 04:13:48 UTC — LECTURE SEULE
+Mesure le 2026-08-22 04:17:16 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -31,11 +31,16 @@ Mesure le 2026-08-22 04:13:48 UTC — LECTURE SEULE
   NIGERIA       320     274 85.6 %        5.9 j       665 j
   CEMAC          34      34 100.0 %        0.0 j         0 j
 
-## C. Le classement a-t-il ete recalcule malgre le HTTP 000 ?
+## C. Le classement suit-il les performances actuelles ?
 
-  classementfonds        pas de colonne de date — indecidable
-  classementfonds_eurs   pas de colonne de date — indecidable
-  classementfonds_usds   pas de colonne de date — indecidable
+  OBLIGATIONS                           0/473  rangs identiques (0.0 %)  DIVERGE — classement PERIME
+                                     effectif stocke 19 vs 473 fonds notes aujourd hui — l assiette a change
+  DIVERSIFIE                            1/312  rangs identiques (0.3 %)  DIVERGE — classement PERIME
+                                     effectif stocke 4 vs 312 fonds notes aujourd hui — l assiette a change
+  ACTIONS                               8/179  rangs identiques (4.5 %)  DIVERGE — classement PERIME
+                                     effectif stocke 2 vs 179 fonds notes aujourd hui — l assiette a change
+  MONETAIRE                             2/131  rangs identiques (1.5 %)  DIVERGE — classement PERIME
+                                     effectif stocke 9 vs 131 fonds notes aujourd hui — l assiette a change
 
 
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
@@ -45,13 +50,13 @@ Mesure le 2026-08-22 04:13:48 UTC — LECTURE SEULE
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260817.log      4.8 j  ECHEC — 6 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260821.log        7.3 h  ECHEC — 5 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.2 h  OK
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      9.2 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         8.7 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                9.7 h  OK  (reserve : Echecs scraping: 23)
-  cron_health_check      tous les j 22:00     africafunds_health_20260821.log       6.2 h  ECHEC — 2 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   0.2 h  aucun marqueur de fin
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260821.log        7.4 h  ECHEC — 5 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.3 h  OK
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      9.3 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         8.8 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                9.8 h  OK  (reserve : Echecs scraping: 23)
+  cron_health_check      tous les j 22:00     africafunds_health_20260821.log       6.3 h  ECHEC — 2 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.3 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -129,14 +134,14 @@ Mesure le 2026-08-22 04:13:48 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-22T04:13:49.850Z — LECTURE SEULE
+ Genere le 2026-08-22T04:17:19.493Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 4.89 Mo
-   modifie   : 2026-08-17T10:00:22.276Z (il y a 114.2 h)
+   modifie   : 2026-08-17T10:00:22.276Z (il y a 114.3 h)
    lignes    : 4221
    colonnes  : 53
 
