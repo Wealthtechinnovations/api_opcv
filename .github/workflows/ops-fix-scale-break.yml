@@ -71,7 +71,11 @@ on:
       - '.github/workflows/ops-fix-scale-break.yml'
 
 permissions:
-  contents: read
+  # `write` parce que le rapport est consigne dans le depot (voir la derniere
+  # etape). Le resume GitHub ne suffit pas : il n est lisible que dans l onglet
+  # Actions, donc invisible a toute session qui n a pas d acces API — et une
+  # operation destructrice doit laisser une trace lisible la ou vit le projet.
+  contents: write
 
 concurrency:
   group: ops-fix-scale-break
@@ -105,6 +109,15 @@ jobs:
           fi
           echo "Mode : EXECUTE — validation reconnue."
           echo "mode=execute" >> "$GITHUB_OUTPUT"
+
+      # Sans checkout, la derniere etape n a aucun depot ou ecrire son rapport :
+      # `git add` echouerait hors d un arbre de travail. Meme `ref` explicite que
+      # doc-drift.yml — un workflow_dispatch peut etre lance depuis n importe
+      # quelle branche, et le rapport doit toujours atterrir sur celle-ci.
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
 
       - name: Verifier les secrets
         env:
@@ -193,3 +206,44 @@ jobs:
             cat rapport-fix.txt 2>/dev/null || echo "(aucun rapport)"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # Le resume GitHub n est lisible que dans l onglet Actions. Une operation
+      # qui touche la production doit laisser sa trace la ou vit le projet, et
+      # lisible par une session sans acces a l API GitHub. Meme mecanique que
+      # doc-drift.yml : ecrire, commiter avec [skip ci], rebaser avant de pousser.
+      - name: Consigner le rapport dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          {
+            echo "# Ruptures d echelle #73 — journal des operations"
+            echo
+            echo "> Genere par \`ops-fix-scale-break.yml\`. Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo "Mode : **${{ steps.mode.outputs.mode }}**"
+            echo "Declencheur : \`${{ github.event_name }}\` — par \`${{ github.actor }}\`"
+            echo
+            echo '```'
+            cat rapport-fix.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+          } > docs/OPS_FIX_SCALE_BREAK.md
+
+          git add docs/OPS_FIX_SCALE_BREAK.md
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(ops): rupture d echelle #73 — ${{ steps.mode.outputs.mode }} $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : ne jamais ecraser un commit pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Rapport consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
