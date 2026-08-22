@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-22 04:11 UTC**
+Derniere execution : **2026-08-22 04:13 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-22 04:11:11 UTC — LECTURE SEULE
+Mesure le 2026-08-22 04:13:48 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -129,7 +129,7 @@ Mesure le 2026-08-22 04:11:11 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-22T04:11:12.366Z — LECTURE SEULE
+ Genere le 2026-08-22T04:13:49.850Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
