@@ -1,0 +1,190 @@
+# OPERATION — deployer l API sur S2 et redemarrer `api-monolith`.
+#
+# POURQUOI CE WORKFLOW EXISTE
+# ---------------------------
+# Le bridge MCP est le chemin nominal du deploiement (`deploy_project_s2`). Quand
+# son jeton expire, une session non interactive ne peut pas le reautoriser : le
+# code corrige reste pousse mais jamais actif. Le canal SSH de la CI, deja utilise
+# par `doc-drift.yml` et `ops-mariadb-recover.yml`, est alors le seul chemin.
+#
+# Il est isole dans son propre fichier, comme la recuperation MariaDB, pour les
+# memes raisons : `doc-drift.yml` est en lecture seule par convention et doit le
+# rester ; un redemarrage de service se declenche sciemment, jamais en effet de
+# bord d un controle quotidien ; sa trace doit rester distincte.
+#
+# CE QU IL FAIT — et RIEN d autre :
+#   1. releve l etat avant (HEAD, PM2, reponse de l API) ;
+#   2. `git stash` + `git pull --rebase` + `git stash pop` — meme sequence que le
+#      bridge et que doc-drift.yml, qui reconcilie les commits horaires de
+#      sync_production.sh sans en perdre aucun ;
+#   3. `pm2 restart api-monolith` ;
+#   4. verifie que l API repond, avec plusieurs tentatives.
+#
+# CE QU IL NE FAIT PAS : aucune ecriture en base, aucune migration, aucun script
+# de correction, aucun `git reset`, aucun `git clean`. Le deploiement d un code
+# additif et le changement d une donnee sont deux decisions distinctes et ne
+# doivent jamais voyager ensemble.
+#
+# PRECAUTION SUR LE REDEMARRAGE — `--update-env` est volontairement ABSENT.
+# Le 2026-08-16, un `pm2 restart --update-env` a relance le frontend sous Node 14
+# au lieu de Node 18 et coupe le service six minutes : recharger l environnement
+# depuis le shell courant remplace celui, correct, avec lequel le process avait
+# ete lance. Un redemarrage simple preserve interpreteur et environnement.
+#
+# SI LA VERIFICATION ECHOUE : le job sort en erreur et affiche le HEAD d avant.
+# Le retour arriere n est PAS automatique — l historique du serveur porte des
+# centaines de commits de snapshot, et un rollback aveugle en perdrait.
+#
+# Ne s execute jamais tout seul : aucun `schedule`.
+
+name: OPS — deployer API et redemarrer PM2
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ops-deploy-api.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ops-deploy-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deployer puis verifier
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Etat avant, deploiement, verification
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" bash -s <<'REMOTE' 2>&1 | tee rapport-deploy.txt
+            set -u
+            API_DIR=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+            BRANCHE=claude/code-review-improvements-ikvuj
+            # Route legere et deterministe : elle lit une seule ligne de
+            # performances. Une route de classement ou de liste par pays mettrait
+            # plusieurs secondes et rendrait le controle bruyant.
+            SONDE="http://localhost:3005/api/performancesdev/fond/1141/USD"
+
+            cd "$API_DIR" || exit 3
+
+            echo "=============================================="
+            echo " 1. ETAT AVANT"
+            echo "=============================================="
+            HEAD_AVANT=$(git rev-parse HEAD)
+            echo "HEAD avant       : $HEAD_AVANT"
+            echo "Branche          : $(git branch --show-current)"
+            echo "API avant (HTTP) : $(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$SONDE")"
+            pm2 describe api-monolith 2>/dev/null | grep -E "status|restarts|exec interpreter|script path" || echo "  api-monolith introuvable dans PM2"
+
+            echo ""
+            echo "=============================================="
+            echo " 2. MISE A JOUR DU CODE"
+            echo "=============================================="
+            STASHED=0
+            if ! git diff --quiet || ! git diff --cached --quiet; then
+              git stash push -m "ci-deploy-autostash-$(date +%Y%m%d_%H%M%S)" >/dev/null && STASHED=1
+              echo "Modifications locales mises de cote."
+            fi
+
+            if ! git pull --rebase origin "$BRANCHE"; then
+              echo "::error::git pull --rebase a echoue. Aucun redemarrage effectue."
+              [ "$STASHED" = "1" ] && git stash pop >/dev/null 2>&1
+              exit 4
+            fi
+
+            if [ "$STASHED" = "1" ] && ! git stash pop; then
+              echo "AVERTISSEMENT : conflit au stash pop. Le stash est conserve."
+            fi
+
+            HEAD_APRES=$(git rev-parse HEAD)
+            echo "HEAD apres       : $HEAD_APRES"
+            if [ "$HEAD_AVANT" = "$HEAD_APRES" ]; then
+              echo "Aucun nouveau commit — le redemarrage reste utile si le code a change sans commit."
+            else
+              echo "Commits appliques :"
+              git log --oneline "$HEAD_AVANT".."$HEAD_APRES" 2>/dev/null | head -20 || true
+            fi
+
+            echo ""
+            echo "=============================================="
+            echo " 3. REDEMARRAGE DE api-monolith"
+            echo "=============================================="
+            # Sans --update-env : voir l en-tete du workflow.
+            pm2 restart api-monolith 2>&1 || { echo "::error::pm2 restart a echoue."; exit 5; }
+
+            echo ""
+            echo "=============================================="
+            echo " 4. VERIFICATION"
+            echo "=============================================="
+            # Plusieurs tentatives : le process met quelques secondes a ouvrir
+            # son port, et un unique appel juste apres le restart renverrait 000
+            # sans que rien ne soit casse.
+            CODE=000
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              sleep 3
+              CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$SONDE")
+              echo "  tentative $i : HTTP $CODE"
+              case "$CODE" in 2*) break;; esac
+            done
+
+            pm2 describe api-monolith 2>/dev/null | grep -E "status|restarts" || true
+
+            case "$CODE" in
+              2*)
+                echo ""
+                echo "OK — l API repond (HTTP $CODE). Deploiement termine."
+                ;;
+              *)
+                echo ""
+                echo "::error::L API ne repond pas apres redemarrage (HTTP $CODE)."
+                echo "HEAD d avant le deploiement : $HEAD_AVANT"
+                echo "Journal PM2 :"
+                pm2 logs api-monolith --lines 40 --nostream 2>&1 | tail -40 || true
+                exit 6
+                ;;
+            esac
+          REMOTE
+
+      - name: Publier le rapport
+        if: always()
+        run: |
+          {
+            echo "## Deploiement API — S2"
+            echo ""
+            echo '```'
+            cat rapport-deploy.txt 2>/dev/null || echo "(aucun rapport)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
