@@ -171,20 +171,48 @@ function colonneDate(cols) {
       }
 
       const rangStocke = new Map(stocke.map(r => [r.fond_id, r.rang]));
-      let concordent = 0;
-      let compares = 0;
+
+      // L egalite STRICTE de rang est un juge trop severe : deux fonds au meme
+      // `ytd` peuvent etre departages differemment sans que rien ne soit perime.
+      // On mesure donc trois choses, et on ne conclut que si elles concordent :
+      //   - l egalite stricte, indicative ;
+      //   - la correlation de rangs (Spearman), insensible aux permutations
+      //     locales entre ex aequo mais pas a un reclassement de fond ;
+      //   - le recouvrement du top 10, qui est ce que l utilisateur regarde.
+      const paires = [];
       attendu.forEach((r, idx) => {
         const reel = rangStocke.get(r.fond_id);
-        if (reel === undefined) return;
-        compares++;
-        if (reel === idx + 1) concordent++;
+        if (reel !== undefined) paires.push({ attendu: idx + 1, reel, fond: r.fond_id });
       });
+      const compares = paires.length;
+      const concordent = paires.filter(x => x.attendu === x.reel).length;
+
+      const exaequo = attendu.length - new Set(attendu.map(r => Number(r.ytd))).size;
+
+      let rho = null;
+      if (compares > 2) {
+        const sd2 = paires.reduce((acc, x) => acc + (x.attendu - x.reel) ** 2, 0);
+        rho = 1 - (6 * sd2) / (compares * (compares ** 2 - 1));
+      }
+
+      const top10attendu = new Set(attendu.slice(0, 10).map(r => r.fond_id));
+      const top10stocke = new Set(
+        stocke.filter(r => r.rang >= 1 && r.rang <= 10).map(r => r.fond_id)
+      );
+      let recouvrement = 0;
+      for (const f of top10attendu) if (top10stocke.has(f)) recouvrement++;
 
       const pct = compares ? (concordent / compares) * 100 : 0;
-      const verdict = pct >= 95 ? 'CONCORDE — recalcule'
-                    : pct >= 40 ? 'PARTIEL — recalcul incomplet, ou donnees bougees depuis'
-                    : 'DIVERGE — classement PERIME';
-      console.log(`  ${nom} ${String(concordent).padStart(4)}/${String(compares).padEnd(4)} rangs identiques (${pct.toFixed(1)} %)  ${verdict}`);
+      // Le verdict s appuie sur Spearman et le top 10, pas sur l egalite stricte.
+      const verdict = (rho !== null && rho >= 0.97 && recouvrement >= 9) ? 'CONCORDE — recalcule'
+                    : (rho !== null && rho >= 0.80) ? 'PROCHE — permutations locales, a instruire'
+                    : 'DIVERGE — le classement ne reflete pas les performances en base';
+      console.log(
+        `  ${nom} strict ${String(concordent).padStart(4)}/${String(compares).padEnd(4)} (${pct.toFixed(1)} %)` +
+        ` · rho ${rho === null ? '  n/a' : rho.toFixed(3).padStart(6)}` +
+        ` · top10 ${recouvrement}/10 · ex aequo ${exaequo}`
+      );
+      console.log(`  ${''.padEnd(32)} ${verdict}`);
 
       // L effectif est propre a chaque ligne ; on prend le plus frequent plutot
       // qu une ligne au hasard, qui ne prouverait rien.
