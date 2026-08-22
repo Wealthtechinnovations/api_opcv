@@ -4,9 +4,40 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-22 04:08 UTC**
+Derniere execution : **2026-08-22 04:11 UTC**
 
 ```
+########## scripts/diag/ondemand/diag_classements.js ##########
+
+=== FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
+Mesure le 2026-08-22 04:11:11 UTC — LECTURE SEULE
+
+## A. Tables de classement
+
+  classementfonds             3619 lignes — aucune colonne de date
+  classementfonds_eurs        3632 lignes — aucune colonne de date
+  classementfonds_usds        3632 lignes — aucune colonne de date
+  performences               71488 lignes — updated_at max = aucune (?)
+  performences_eurs          27383 lignes — date max = Fri Aug 21 2026 00: (1.2 j)
+  performences_usds          27616 lignes — date max = Fri Aug 21 2026 00: (1.2 j)
+
+## B. Retard des performances par pays
+
+  pays        fonds  a jour      %  retard moy.  retard max
+  ---------- ------ ------- ------ ------------ -----------
+  TUNISIE       131       5  3.8 %       86.2 j        95 j
+  MAROC         640      20  3.1 %       86.0 j        95 j
+  UEMOA         109      43 39.4 %       15.3 j        91 j
+  NIGERIA       320     274 85.6 %        5.9 j       665 j
+  CEMAC          34      34 100.0 %        0.0 j         0 j
+
+## C. Le classement a-t-il ete recalcule malgre le HTTP 000 ?
+
+  classementfonds        pas de colonne de date — indecidable
+  classementfonds_eurs   pas de colonne de date — indecidable
+  classementfonds_usds   pas de colonne de date — indecidable
+
+
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
 
 === VERDICT DE LA DERNIERE EXECUTION DE CHAQUE CRON ===
@@ -14,13 +45,13 @@ Derniere execution : **2026-08-22 04:08 UTC**
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260817.log      4.8 j  ECHEC — 6 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260821.log        7.2 h  ECHEC — 5 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.1 h  OK
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      9.1 h  aucun marqueur de fin
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         8.6 h  aucun marqueur de fin
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                9.6 h  aucun marqueur de fin
-  cron_health_check      tous les j 22:00     africafunds_health_20260821.log       6.1 h  aucun marqueur de fin
-  sync_production        toutes les heures    sync_production.log                   0.1 h  aucun marqueur de fin
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260821.log        7.3 h  ECHEC — 5 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.2 h  OK
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      9.2 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         8.7 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                9.7 h  OK  (reserve : Echecs scraping: 23)
+  cron_health_check      tous les j 22:00     africafunds_health_20260821.log       6.2 h  ECHEC — 2 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.2 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -57,55 +88,7 @@ Derniere execution : **2026-08-22 04:08 UTC**
   | === MISE A JOUR TERMINEE AVEC 5 ERREUR(S) Fri Aug 21 08:53:27 PM UTC 2026 ===
   | ========================================
 
---- cron_tunisie_daily (aucun marqueur de fin) — /var/log/cron_tunisie.log
-  |   "duplicates": 2,
-  |   "new_funds": 0,
-  |   "dividends": 69,
-  |   "errors": 0,
-  |   "inserted": 126,
-  |   "extreme_logged": 0,
-  |   "new_funds_queued": 0,
-  |   "metadata_updated": 126,
-  |   "dates_imported": [
-  |     "2026-08-21"
-  |   ],
-  |   "report_path": "/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/data/tunisie_cmf/staging/cmf_tunisie_report_20260821_190016.json"
-  | }
-  | Fri Aug 21 07:00:16 PM UTC 2026 — CMF Tunisie import completed successfully
-
---- cron_brvm_daily (aucun marqueur de fin) — /var/log/cron_brvm.log
-  |   [ 2569] FCP ASSUR SENEGAL                        2026-08-19 -> 2026-08-20  (775 VL, actif=1)
-  |   [ 2571] FCP POSTEFINANCES HORIZON                2026-08-19 -> 2026-08-20  (775 VL, actif=1)
-  |   [ 2572] FCP LIQUIDITE-OPTIMUM                    2026-08-19 -> 2026-08-20  (775 VL, actif=1)
-  |   [ 2573] FCP BNDE VALEURS                         2026-08-19 -> 2026-08-20  (774 VL, actif=1)
-  |   [ 2575] NSIA FONDS DIVERSIFIE                    2026-08-19 -> 2026-08-20  (850 VL, actif=1)
-  |   [ 2576] NSIA ASSURANCES OPTIMUM                  2026-08-19 -> 2026-08-20  (741 VL, actif=1)
-  |   [ 2581] FCP SOAGA EPARGNE ACTIVE                 2026-08-19 -> 2026-08-20  (951 VL, actif=0)
-  |   [ 2582] SICAV ABDOU DIOUF                        2026-08-19 -> 2026-08-20  (950 VL, actif=0)
-  |   [ 2586] FCP NYESIGUI                             2026-08-12 -> 2026-08-20  (224 VL, actif=1)
-  |   [ 2596] FCPCR SONATEL                            2026-08-14 -> 2026-08-21  (210 VL, actif=1)
-  |   ... et 11 autres
-  | Snapshot ecrit : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/data/datejour_snapshots/DATEJOUR_20260821193018.json
-  | OK — 31 fonds resynchronises (transaction unique).
-  | Rollback : node ../var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/fix/fix_datejour_sync.js --rollback /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/da
-
---- cron_indices_daily (aucun marqueur de fin) — /var/log/cron_indices_daily.log
-  |   >>> MODIFICATIONS APPLIQUEES <<<
-  | ============================================================
-  | ============================================================
-  | ============================================================
-  | ============================================================
-  | RESUME GLOBAL BACKFILL (8 dates)
-  | RESUME GLOBAL BACKFILL (8 dates)
-  |   Inseres: 3 | Ignores: 14 | Echecs scraping: 23
-  |   Inseres: 3 | Ignores: 14 | Echecs scraping: 23
-  | ============================================================
-  | ============================================================
-  | Fri Aug 21 06:31:20 PM UTC 2026 — Daily index scraper completed successfully
-  | Fri Aug 21 06:31:20 PM UTC 2026 — Daily index scraper completed successfully
-  | ========================================
-
---- cron_health_check (aucun marqueur de fin) — /var/log/africafunds_health_20260821.log
+--- cron_health_check (ECHEC — 2 probleme(s)) — /var/log/africafunds_health_20260821.log
   |   nigeria      pas attendu aujourd'hui (pas lundi)
   | === RESUME ===
   | STATUT: 2 PROBLEME(S) DETECTE(S)
@@ -137,7 +120,7 @@ Derniere execution : **2026-08-22 04:08 UTC**
   | Claude Code peut maintenant lire PRODUCTION_STATE.json
   | pour connaitre l'etat exact de la production.
 
-=== RESUME : 1 OK · 2 en echec · 5 non verifiable(s) ===
+=== RESUME : 4 OK · 3 en echec · 1 non verifiable(s) ===
   « non verifiable » ne veut pas dire « sain » : journal absent, illisible,
   ou sans marqueur de fin. A instruire avant de conclure quoi que ce soit.
 
@@ -146,14 +129,14 @@ Derniere execution : **2026-08-22 04:08 UTC**
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-22T04:08:05.525Z — LECTURE SEULE
+ Genere le 2026-08-22T04:11:12.366Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 4.89 Mo
-   modifie   : 2026-08-17T10:00:22.276Z (il y a 114.1 h)
+   modifie   : 2026-08-17T10:00:22.276Z (il y a 114.2 h)
    lignes    : 4221
    colonnes  : 53
 
