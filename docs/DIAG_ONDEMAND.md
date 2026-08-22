@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-22 04:23 UTC**
+Derniere execution : **2026-08-22 09:09 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-22 04:22:58 UTC — LECTURE SEULE
+Mesure le 2026-08-22 09:09:21 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -18,8 +18,8 @@ Mesure le 2026-08-22 04:22:58 UTC — LECTURE SEULE
   classementfonds_eurs        3632 lignes — aucune colonne de date
   classementfonds_usds        3632 lignes — aucune colonne de date
   performences               71488 lignes — updated_at max = aucune (?)
-  performences_eurs          27383 lignes — date max = Fri Aug 21 2026 00: (1.2 j)
-  performences_usds          27616 lignes — date max = Fri Aug 21 2026 00: (1.2 j)
+  performences_eurs          27383 lignes — date max = Fri Aug 21 2026 00: (1.4 j)
+  performences_usds          27616 lignes — date max = Fri Aug 21 2026 00: (1.4 j)
 
 ## B. Retard des performances par pays
 
@@ -51,14 +51,14 @@ Mesure le 2026-08-22 04:22:58 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260817.log      4.8 j  ECHEC — 6 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260821.log        7.5 h  ECHEC — 5 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.4 h  OK
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      9.4 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         8.9 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                9.9 h  OK  (reserve : Echecs scraping: 23)
-  cron_health_check      tous les j 22:00     africafunds_health_20260821.log       6.4 h  ECHEC — 2 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   0.4 h  aucun marqueur de fin
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260817.log      5.0 j  ECHEC — 6 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260821.log       12.3 h  ECHEC — 5 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     11.1 h  OK
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     14.2 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        13.7 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               14.6 h  OK  (reserve : Echecs scraping: 23)
+  cron_health_check      tous les j 22:00     africafunds_health_20260821.log      11.2 h  ECHEC — 2 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.2 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -112,17 +112,17 @@ Mesure le 2026-08-22 04:22:58 UTC — LECTURE SEULE
   | ========================================
 
 --- sync_production (aucun marqueur de fin) — /var/log/sync_production.log
-  | ============================================
-  | SYNC PRODUCTION — 2026-08-22 04:00:01
+  | SYNC PRODUCTION — 2026-08-22 09:00:01
   | ============================================
   | --- Generation du snapshot base de donnees ---
-  |   -> PRODUCTION_STATE.json genere (44780 octets)
-  | [claude/code-review-improvements-ikvuj ba68fe8f] chore: snapshot production state 2026-08-22 04:00
-  |  1 file changed, 3 insertions(+), 3 deletions(-)
+  |   -> PRODUCTION_STATE.json genere (44765 octets)
+  | [claude/code-review-improvements-ikvuj 317242aa] chore: snapshot production state 2026-08-22 09:00
+  |  1 file changed, 364 insertions(+), 364 deletions(-)
+  |  rewrite PRODUCTION_STATE.json (60%)
   | fatal: could not read Username for 'https://github.com': No such device or address
   |   -> Push ECHEC
   | ============================================
-  | SYNC TERMINE — 2026-08-22 04:00:15
+  | SYNC TERMINE — 2026-08-22 09:00:14
   | ============================================
   | Claude Code peut maintenant lire PRODUCTION_STATE.json
   | pour connaitre l'etat exact de la production.
@@ -136,14 +136,14 @@ Mesure le 2026-08-22 04:22:58 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-22T04:23:02.724Z — LECTURE SEULE
+ Genere le 2026-08-22T09:09:24.834Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 4.89 Mo
-   modifie   : 2026-08-17T10:00:22.276Z (il y a 114.4 h)
+   modifie   : 2026-08-17T10:00:22.276Z (il y a 119.2 h)
    lignes    : 4221
    colonnes  : 53
 
@@ -337,6 +337,16 @@ Mesure le 2026-08-22 04:22:58 UTC — LECTURE SEULE
   cron_nigeria_weekly.sh     statut-commande:oui  curl-non-melange:NON  sortie-non-nulle:oui
   cron_daily_eur_usd.sh      statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
+
+[7bis] Version du code REELLEMENT deployee
+  HEAD : b5d4ed37 — chore: snapshot production state 2026-08-22 09:00
+  present          correctif C8 (lots de performances non menteurs)
+  present          budgets de fraicheur en source unique
+  present          health check corrige
+  present          correctif #73 (present, NON execute)
+
+  Process PM2 :
+    pm2 jlist illisible : Unexpected token > in JSON at position 1
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
