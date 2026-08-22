@@ -168,7 +168,13 @@ for (const [rel, motif, libelle] of marqueurs) {
 // PM2 : un redemarrage reussi se lit au compteur de restarts et a l uptime.
 console.log('\n  Process PM2 :');
 try {
-  const out = execFileSync('pm2', ['jlist'], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  const brut = execFileSync('pm2', ['jlist'], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  // PM2 prefixe parfois sa sortie JSON d un avertissement en clair
+  // (« >>>> In-memory PM2 is out-of-date, do: pm2 update »). JSON.parse echouait
+  // alors sur « Unexpected token > » et le releve disparaissait en silence, au
+  // moment precis ou il servait a prouver qu un redemarrage avait eu lieu.
+  const debut = brut.indexOf('[');
+  const out = debut >= 0 ? brut.slice(debut) : brut;
   for (const p of JSON.parse(out)) {
     const up = p.pm2_env && p.pm2_env.pm_uptime ? ((Date.now() - p.pm2_env.pm_uptime) / 3600000).toFixed(1) + ' h' : '?';
     console.log(`    ${String(p.name).padEnd(24)} ${String(p.pm2_env && p.pm2_env.status).padEnd(10)} redemarrages ${String(p.pm2_env && p.pm2_env.restart_time).padStart(4)}  depuis ${up}`);
