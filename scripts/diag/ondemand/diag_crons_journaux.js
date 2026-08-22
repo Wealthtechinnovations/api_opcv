@@ -31,10 +31,29 @@ const CRONS = [
   { nom: 'sync_production',      cadence: 'toutes les heures',motifs: [/^sync_production\.log$/] },
 ];
 
+// Les scripts de ce projet n ont pas tous la meme langue de sortie : les crons
+// ecrits en bash francais posent « TERMINE AVEC N ERREUR(S) », ceux qui
+// enveloppent un scraper Python posent « completed successfully ». La premiere
+// version de ce controle ne connaissait que les marqueurs francais et rangeait
+// Tunisie, BRVM et indices en « non verifiable » alors qu ils aboutissent tous
+// les trois. Un controle qui ne connait qu une convention mesure la convention,
+// pas le resultat.
 const MARQUEURS = [
-  { re: /TERMIN[EÉ]E?\s+AVEC\s+(\d+)\s+ERREUR/i, verdict: m => `ECHEC — ${m[1]} erreur(s)` },
-  { re: /TERMIN[EÉ]E?\s+SANS\s+ERREUR/i,          verdict: () => 'OK' },
-  { re: /TERMIN[EÉ]E?\s+AVEC\s+SUCC[EÈ]S/i,       verdict: () => 'OK' },
+  { re: /TERMIN[EÉ]E?\s+AVEC\s+(\d+)\s+ERREUR/i,     verdict: m => `ECHEC — ${m[1]} erreur(s)` },
+  { re: /(\d+)\s+PROBLEME\(S\)\s+DETECTE/i,          verdict: m => `ECHEC — ${m[1]} probleme(s)` },
+  { re: /TERMIN[EÉ]E?\s+SANS\s+ERREUR/i,              verdict: () => 'OK' },
+  { re: /TERMIN[EÉ]E?\s+AVEC\s+SUCC[EÈ]S/i,           verdict: () => 'OK' },
+  { re: /completed\s+successfully/i,                   verdict: () => 'OK' },
+];
+
+// Un « completed successfully » peut couvrir un lot majoritairement rate : le
+// scraper d indices du 2026-08-21 annonce « Echecs scraping: 23 » pour 3 lignes
+// inserees, puis sort en succes. Ces motifs sont releves separement et affiches
+// a cote du verdict, sans le contredire — le script ne decide pas a la place du
+// cron, il montre ce que le cron a tu.
+const RESERVES = [
+  /Echecs?\s+scraping\s*:\s*([1-9]\d*)/i,
+  /(\d+)\s+erreur\(s\)\s+de\s+scraping/i,
 ];
 
 let fichiers = [];
@@ -102,7 +121,16 @@ for (const cron of CRONS) {
     if (trouve) break;
   }
 
-  console.log(`  ${cron.nom.padEnd(22)} ${cron.cadence.padEnd(20)} ${recent.f.padEnd(34)} ${age(recent.m).padStart(8)}  ${verdict}`);
+  let reserve = '';
+  for (let i = lignes.length - 1; i >= 0 && i > lignes.length - 400; i--) {
+    for (const re of RESERVES) {
+      const m = re.exec(lignes[i]);
+      if (m) { reserve = `  (reserve : ${m[0].trim()})`; break; }
+    }
+    if (reserve) break;
+  }
+
+  console.log(`  ${cron.nom.padEnd(22)} ${cron.cadence.padEnd(20)} ${recent.f.padEnd(34)} ${age(recent.m).padStart(8)}  ${verdict}${reserve}`);
 
   if (verdict === 'OK') compte.ok++;
   else if (verdict.startsWith('ECHEC')) compte.echec++;
