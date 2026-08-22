@@ -68,7 +68,14 @@ const FRESHNESS = {
   MAROC:   { days: 6,   level: 'CRITIQUE' },
   UEMOA:   { days: 6,   level: 'CRITIQUE' },
   TUNISIE: { days: 9,   level: 'CRITIQUE' },
-  NIGERIA: { days: 45,  level: 'AVERTISSEMENT' },
+  // 45 jours etait cale sur la cadence de PUBLICATION observee en 2026-05, quand la
+  // SEC accumulait plusieurs semaines avant de deposer. La chaine est en realite
+  // hebdomadaire — publication le vendredi, import le lundi — donc un retard sain
+  // ne depasse jamais ~11 jours. Mesure du 2026-08-21 : l import etait arrete
+  // depuis 28 jours (panne MariaDB du 2026-08-17) et ce controle le declarait sain ;
+  // il ne se serait reveille qu a la mi-septembre. Un seuil cale sur l accident
+  // passe au lieu de la cadence nominale ne mesure plus rien.
+  NIGERIA: { days: 14,  level: 'CRITIQUE' },
   CEMAC:   { days: 400, level: 'AVERTISSEMENT' },
 };
 const FRESHNESS_DEFAULT = { days: 30, level: 'AVERTISSEMENT' };
