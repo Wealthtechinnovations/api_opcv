@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-22 04:21 UTC**
+Derniere execution : **2026-08-22 04:23 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-22 04:21:31 UTC — LECTURE SEULE
+Mesure le 2026-08-22 04:22:58 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -40,9 +40,9 @@ Mesure le 2026-08-22 04:21:31 UTC — LECTURE SEULE
   ACTIONS MAROC                    strict    6/122  (4.9 %) · rho  0.462 · top10 7/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
   OBLIGATIONS NIGERIA              strict   12/87   (13.8 %) · rho  0.827 · top10 4/10 · ex aequo 1
-                                   PROCHE — permutations locales, a instruire
-  MONETAIRE MAROC                  strict   44/70   (62.9 %) · rho  0.978 · top10 8/10 · ex aequo 0
-                                   PROCHE — permutations locales, a instruire
+                                   DIVERGE — le classement ne reflete pas les performances en base
+  DIVERSIFIE TUNISIE               strict    3/70   (4.3 %) · rho  0.421 · top10 2/10 · ex aequo 0
+                                   DIVERGE — le classement ne reflete pas les performances en base
 
 
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
@@ -53,10 +53,10 @@ Mesure le 2026-08-22 04:21:31 UTC — LECTURE SEULE
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260817.log      4.8 j  ECHEC — 6 erreur(s)
   cron_daily_update      lun-ven 20:00        africafunds_daily_20260821.log        7.5 h  ECHEC — 5 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.3 h  OK
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.4 h  OK
   cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      9.4 h  OK
   cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         8.9 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                9.8 h  OK  (reserve : Echecs scraping: 23)
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                9.9 h  OK  (reserve : Echecs scraping: 23)
   cron_health_check      tous les j 22:00     africafunds_health_20260821.log       6.4 h  ECHEC — 2 probleme(s)
   sync_production        toutes les heures    sync_production.log                   0.4 h  aucun marqueur de fin
 
@@ -136,7 +136,7 @@ Mesure le 2026-08-22 04:21:31 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-22T04:21:34.599Z — LECTURE SEULE
+ Genere le 2026-08-22T04:23:02.724Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
