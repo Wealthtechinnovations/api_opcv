@@ -104,21 +104,73 @@ function colonneDate(cols) {
       console.log(`  ${String(r.pays).padEnd(10)} ${String(r.fonds).padStart(6)} ${String(r.a_jour).padStart(7)} ${(pct + ' %').padStart(6)} ${(r.retard_moyen_j + ' j').padStart(12)} ${(r.retard_max_j + ' j').padStart(11)}`);
     }
 
-    console.log('\n## C. Le classement a-t-il ete recalcule malgre le HTTP 000 ?\n');
-    // Si le serveur a poursuivi apres l abandon de curl, les lignes de
-    // classement portent une date posterieure au 2026-08-21 20:00. Sinon elles
-    // s arretent avant, et les trois etapes 9a/9b/9c n ont rien produit.
-    for (const t of TABLES_CLASSEMENT) {
-      const cols = await colonnes(conn, t);
-      const cd = colonneDate(cols);
-      if (!cd) { console.log(`  ${t.padEnd(22)} pas de colonne de date — indecidable`); continue; }
-      const [[r]] = await conn.query(
-        `SELECT COUNT(*) AS n FROM \`${t}\` WHERE \`${cd}\` >= '2026-08-21 20:00:00'`
-      );
-      const verdict = r.n > 0
-        ? `${r.n} ligne(s) ecrite(s) apres 20:00 — le serveur a POURSUIVI malgre l abandon de curl`
-        : 'AUCUNE ligne apres 20:00 — le recalcul n a rien produit';
-      console.log(`  ${t.padEnd(22)} ${verdict}`);
+    console.log('\n## C. Le classement suit-il les performances actuelles ?\n');
+    // Les trois tables de classement n ont AUCUNE colonne temporelle
+    // (`timestamps: false` dans le modele). Leur fraicheur est donc
+    // structurellement immesurable — c est precisement pourquoi
+    // `check_cron_health.js` en etait reduit a un proxy, et pourquoi ce proxy
+    // mentait. A defaut de date, on juge sur le CONTENU : le classement stocke
+    // doit reproduire l ordre qu impliquent les performances actuellement en
+    // base. S il ne le reproduit pas, il est perime — quelle qu en soit la date.
+    const [categories] = await conn.query(`
+      SELECT categorie, COUNT(*) AS n
+        FROM classementfonds
+       WHERE categorie IS NOT NULL AND categorie <> ''
+       GROUP BY categorie
+       ORDER BY n DESC
+       LIMIT 4
+    `);
+
+    for (const cat of categories) {
+      // Ordre implique par les performances actuelles : derniere ligne de
+      // `performences` de chaque fonds de la categorie, triee par YTD decroissant.
+      // Appariement verifie sur les modeles : la performance annuelle s appelle
+      // `ytd` dans `performences` et son rang `rank1erJanvier` dans
+      // `classementfonds`. Ecrire `perf1erJanvier` des deux cotes — le nom que
+      // porte l API — aurait fait echouer la requete sans rien mesurer.
+      const [attendu] = await conn.query(`
+        SELECT p.fond_id, p.ytd
+          FROM performences p
+          JOIN (SELECT fond_id, MAX(date) AS d FROM performences GROUP BY fond_id) m
+            ON m.fond_id = p.fond_id AND m.d = p.date
+          JOIN classementfonds c ON c.fond_id = p.fond_id AND c.categorie = ?
+         WHERE p.ytd IS NOT NULL
+         GROUP BY p.fond_id, p.ytd
+         ORDER BY p.ytd DESC
+      `, [cat.categorie]);
+
+      const [stocke] = await conn.query(`
+        SELECT fond_id, CAST(rank1erJanvier AS UNSIGNED) AS rang, rank1erJanviertotal AS total
+          FROM classementfonds
+         WHERE categorie = ? AND rank1erJanvier IS NOT NULL
+         ORDER BY rang ASC
+      `, [cat.categorie]);
+
+      if (!attendu.length || !stocke.length) {
+        console.log(`  ${String(cat.categorie).slice(0, 34).padEnd(34)} donnees insuffisantes (${attendu.length} perf / ${stocke.length} rangs)`);
+        continue;
+      }
+
+      const rangStocke = new Map(stocke.map(r => [r.fond_id, r.rang]));
+      let concordent = 0;
+      let compares = 0;
+      attendu.forEach((r, i) => {
+        const attenduRang = i + 1;
+        const reel = rangStocke.get(r.fond_id);
+        if (reel === undefined) return;
+        compares++;
+        if (reel === attenduRang) concordent++;
+      });
+
+      const pct = compares ? (concordent / compares) * 100 : 0;
+      const verdict = pct >= 95 ? 'CONCORDE — recalcule'
+                    : pct >= 40 ? 'PARTIEL — recalcul incomplet ou donnees bougees depuis'
+                    : 'DIVERGE — classement PERIME';
+      console.log(`  ${String(cat.categorie).slice(0, 34).padEnd(34)} ${String(concordent).padStart(4)}/${String(compares).padEnd(4)} rangs identiques (${pct.toFixed(1)} %)  ${verdict}`);
+      const totalStocke = stocke[0] && stocke[0].total;
+      if (totalStocke != null && Number(totalStocke) !== attendu.length) {
+        console.log(`  ${''.padEnd(34)} effectif stocke ${totalStocke} vs ${attendu.length} fonds notes aujourd hui — l assiette a change`);
+      }
     }
 
     console.log('');
