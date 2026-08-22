@@ -140,6 +140,43 @@ for (const c of crons) {
   }
 }
 
+console.log('\n[7bis] Version du code REELLEMENT deployee');
+// Une CI verte prouve que le job s est termine, pas que le serveur execute le
+// commit attendu : un `git pull --rebase` peut echouer et le job poursuivre, ou
+// PM2 redemarrer un process dont le code n a pas bouge. On lit donc le HEAD du
+// depot et on cherche les marqueurs des correctifs dans les fichiers servis.
+try {
+  const head = execFileSync('git', ['-C', API_DIR, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim();
+  const sujet = execFileSync('git', ['-C', API_DIR, 'log', '-1', '--format=%s'], { encoding: 'utf8' }).trim();
+  console.log(`  HEAD : ${head} — ${sujet}`);
+} catch (e) {
+  console.log(`  git illisible : ${e.message}`);
+}
+const marqueurs = [
+  ['src/routes/apigestionsavequotidien.js', 'repondreLot',        'correctif C8 (lots de performances non menteurs)'],
+  ['src/lib/freshness_budgets.js',          'budgetPour',         'budgets de fraicheur en source unique'],
+  ['scripts/monitoring/check_cron_health.js','Performances qui suivent la VL', 'health check corrige'],
+  ['scripts/fix/fix_scale_break_sec.js',    'SCALEBREAK_',        'correctif #73 (present, NON execute)'],
+];
+for (const [rel, motif, libelle] of marqueurs) {
+  const abs = path.join(API_DIR, rel);
+  let etat = 'FICHIER ABSENT';
+  try { etat = fs.readFileSync(abs, 'utf8').includes(motif) ? 'present' : 'ABSENT du fichier'; } catch {}
+  console.log(`  ${etat.padEnd(16)} ${libelle}`);
+}
+
+// PM2 : un redemarrage reussi se lit au compteur de restarts et a l uptime.
+console.log('\n  Process PM2 :');
+try {
+  const out = execFileSync('pm2', ['jlist'], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  for (const p of JSON.parse(out)) {
+    const up = p.pm2_env && p.pm2_env.pm_uptime ? ((Date.now() - p.pm2_env.pm_uptime) / 3600000).toFixed(1) + ' h' : '?';
+    console.log(`    ${String(p.name).padEnd(24)} ${String(p.pm2_env && p.pm2_env.status).padEnd(10)} redemarrages ${String(p.pm2_env && p.pm2_env.restart_time).padStart(4)}  depuis ${up}`);
+  }
+} catch (e) {
+  console.log(`    pm2 jlist illisible : ${e.message}`);
+}
+
 console.log('\n[8] Entrees crontab actives');
 try {
   const out = execFileSync('crontab', ['-l'], { encoding: 'utf8' });
