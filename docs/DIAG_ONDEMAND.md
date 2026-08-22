@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-22 09:09 UTC**
+Derniere execution : **2026-08-22 09:10 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-22 09:09:21 UTC — LECTURE SEULE
+Mesure le 2026-08-22 09:10:48 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -41,8 +41,8 @@ Mesure le 2026-08-22 09:09:21 UTC — LECTURE SEULE
                                    DIVERGE — le classement ne reflete pas les performances en base
   OBLIGATIONS NIGERIA              strict   12/87   (13.8 %) · rho  0.827 · top10 4/10 · ex aequo 1
                                    DIVERGE — le classement ne reflete pas les performances en base
-  DIVERSIFIE TUNISIE               strict    3/70   (4.3 %) · rho  0.421 · top10 2/10 · ex aequo 0
-                                   DIVERGE — le classement ne reflete pas les performances en base
+  MONETAIRE MAROC                  strict   44/70   (62.9 %) · rho  0.978 · top10 8/10 · ex aequo 0
+                                   PROCHE — permutations locales, a instruire
 
 
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
@@ -53,10 +53,10 @@ Mesure le 2026-08-22 09:09:21 UTC — LECTURE SEULE
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260817.log      5.0 j  ECHEC — 6 erreur(s)
   cron_daily_update      lun-ven 20:00        africafunds_daily_20260821.log       12.3 h  ECHEC — 5 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     11.1 h  OK
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     11.2 h  OK
   cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     14.2 h  OK
   cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        13.7 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               14.6 h  OK  (reserve : Echecs scraping: 23)
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               14.7 h  OK  (reserve : Echecs scraping: 23)
   cron_health_check      tous les j 22:00     africafunds_health_20260821.log      11.2 h  ECHEC — 2 probleme(s)
   sync_production        toutes les heures    sync_production.log                   0.2 h  aucun marqueur de fin
 
@@ -136,7 +136,7 @@ Mesure le 2026-08-22 09:09:21 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-22T09:09:24.834Z — LECTURE SEULE
+ Genere le 2026-08-22T09:10:51.941Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
@@ -339,14 +339,17 @@ Mesure le 2026-08-22 09:09:21 UTC — LECTURE SEULE
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : b5d4ed37 — chore: snapshot production state 2026-08-22 09:00
+  HEAD : c3b22bd3 — chore: snapshot production state 2026-08-22 09:00
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    pm2 jlist illisible : Unexpected token > in JSON at position 1
+    api-monolith             online     redemarrages  161  depuis 0.1 h
+    fundafrique-frontend     online     redemarrages   48  depuis 145.0 h
+    worker-recalculation     online     redemarrages    1  depuis 2071.4 h
+    worker-data-import       online     redemarrages    1  depuis 2071.4 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1

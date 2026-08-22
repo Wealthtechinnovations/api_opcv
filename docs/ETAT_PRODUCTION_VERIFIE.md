@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-08-22 09:09 UTC**
+Derniere verification : **2026-08-22 09:10 UTC**
 
 ```
 
