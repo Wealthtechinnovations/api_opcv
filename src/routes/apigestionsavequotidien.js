@@ -1056,6 +1056,38 @@ router.get('/api/updatewithdividende', async (req, res) => {
   // ====================================================================
   // BATCH: Peupler performences_eurs depuis performancesdev EUR
   // ====================================================================
+  // ====================================================================
+  // Verdict d'un traitement par lot.
+  //
+  // POURQUOI. Les trois routes `saveperfdate*` sont appelees par cron. Elles
+  // attrapent l'erreur de CHAQUE fonds pour ne pas interrompre le lot — ce qui
+  // est juste — mais renvoyaient ensuite 200 quel que soit le nombre d'echecs.
+  // Un lot ou les 600 fonds echouent repondait « Traitement termine avec
+  // succes », le cron notait OK, et personne ne voyait rien. C'est le meme
+  // mensonge que le `tee` des scripts cron, un etage plus haut : le controle
+  // du 2026-08-22 mesure 86 jours de retard moyen sur les performances Maroc
+  // et Tunisie, avec 1,6 % et 3,8 % des fonds a jour, sans qu'aucune alerte
+  // n'ait jamais ete levee.
+  //
+  // Un echec isole ne doit pas rougir tout le lot — sinon un seul fonds coince
+  // rend le cron rouge chaque nuit et l'alerte cesse d'etre lue. Un echec
+  // systemique, lui, doit sortir non nul. D'ou le seuil.
+  //
+  // SEUIL : 10 %, premiere calibration. A confronter aux taux d'echec reels
+  // une fois quelques nuits observees — un invariant jamais confronte aux
+  // donnees n'est qu'une affirmation de plus.
+  const SEUIL_ECHEC_LOT = 0.1;
+
+  function repondreLot(res, libelle, total, traites, erreurs) {
+    const message = `${libelle}: ${traites}/${total} fonds traites, ${erreurs} erreur(s)`;
+    const systemique = total > 0 && (traites === 0 || erreurs > total * SEUIL_ECHEC_LOT);
+    if (systemique) {
+      console.error(`[LOT EN ECHEC] ${message}`);
+      return res.status(500).json({ error: message, total, traites, erreurs });
+    }
+    return res.json({ message, total, traites, erreurs });
+  }
+
   router.get('/api/saveperfdateeur/:fond1/:fond2', async (req, res) => {
     try {
       const allFunds = await fetchFundsByValorisation1([], 'undefined', 'undefined', 'undefined', 'undefined', parseInt(req.params.fond1), parseInt(req.params.fond2));
@@ -1070,7 +1102,7 @@ router.get('/api/updatewithdividende', async (req, res) => {
           console.error(`Error processing fund EUR ${fund.id}:`, error.message);
         }
       }
-      res.json({ message: `EUR performances: ${processed} fonds traites, ${errors} erreurs` });
+      return repondreLot(res, 'EUR performances', allFunds.length, processed, errors);
     } catch (error) {
       console.error('Erreur saveperfdateeur:', error);
       res.status(500).json({ error: error.message });
@@ -1094,7 +1126,7 @@ router.get('/api/updatewithdividende', async (req, res) => {
           console.error(`Error processing fund USD ${fund.id}:`, error.message);
         }
       }
-      res.json({ message: `USD performances: ${processed} fonds traites, ${errors} erreurs` });
+      return repondreLot(res, 'USD performances', allFunds.length, processed, errors);
     } catch (error) {
       console.error('Erreur saveperfdateusd:', error);
       res.status(500).json({ error: error.message });
@@ -1200,11 +1232,15 @@ router.get('/api/updatewithdividende', async (req, res) => {
       const allFunds = await fetchFundsByValorisation1([], 'undefined', 'undefined', 'undefined', 'undefined', parseInt(req.params.fond1), parseInt(req.params.fond2));
 
       // Sequential processing using for loop with await
+      let processed = 0;
+      let errors = 0;
       for (const fund of allFunds) {
         try {
           await processFundmysql(fund);
+          processed++;
         } catch (error) {
-          console.error('Error processing fund:', fund, error);
+          errors++;
+          console.error(`Error processing fund ${fund && fund.id}:`, error && error.message);
         }
       }
       // Ajouter les fonds à la file d'attente pour traitement
@@ -1239,7 +1275,7 @@ router.get('/api/updatewithdividende', async (req, res) => {
 
 
 
-      res.json("Traitement des fonds terminé avec succès");
+      return repondreLot(res, 'Performances locales', allFunds.length, processed, errors);
     } catch (error) {
       console.error('Une erreur s\'est produite :', error);
       res.status(500).json({ error: 'Une erreur s\'est produite lors du traitement.' });
