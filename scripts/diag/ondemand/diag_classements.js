@@ -106,70 +106,93 @@ function colonneDate(cols) {
 
     console.log('\n## C. Le classement suit-il les performances actuelles ?\n');
     // Les trois tables de classement n ont AUCUNE colonne temporelle
-    // (`timestamps: false` dans le modele). Leur fraicheur est donc
-    // structurellement immesurable — c est precisement pourquoi
-    // `check_cron_health.js` en etait reduit a un proxy, et pourquoi ce proxy
-    // mentait. A defaut de date, on juge sur le CONTENU : le classement stocke
-    // doit reproduire l ordre qu impliquent les performances actuellement en
-    // base. S il ne le reproduit pas, il est perime — quelle qu en soit la date.
-    const [categories] = await conn.query(`
-      SELECT categorie, COUNT(*) AS n
+    // (`timestamps: false` dans les modeles) et `performences.updated_at` est
+    // entierement NULL : la fraicheur d un classement est structurellement
+    // immesurable. C est precisement pourquoi `check_cron_health.js` en etait
+    // reduit a un proxy, et pourquoi ce proxy mentait. A defaut de date, on juge
+    // sur le CONTENU : le rang stocke doit reproduire l ordre qu impliquent les
+    // performances actuellement en base.
+    //
+    // PERIMETRE — la premiere version de ce controle a rendu un verdict FAUX
+    // (« 0/473 rangs identiques, classement perime ») en groupant par
+    // `categorie`. `/api/classementmysql` ecrit en realite TROIS lignes par
+    // fonds, distinguees par `type_classement` : 1 = rang dans la categorie
+    // NATIONALE, 2 = regionale, 3 = globale. Comparer un ordre global a des
+    // rangs nationaux ne pouvait que diverger. On ne compare donc que le
+    // type 1, au sein de `categorie_nationale`, qui est l assiette que la route
+    // utilise reellement pour ce rang.
+    const [assiettes] = await conn.query(`
+      SELECT categorie_nationale AS cat, COUNT(*) AS n
         FROM classementfonds
-       WHERE categorie IS NOT NULL AND categorie <> ''
-       GROUP BY categorie
+       WHERE type_classement = 1
+         AND categorie_nationale IS NOT NULL AND categorie_nationale <> ''
+       GROUP BY categorie_nationale
+      HAVING n >= 10
        ORDER BY n DESC
-       LIMIT 4
+       LIMIT 5
     `);
 
-    for (const cat of categories) {
-      // Ordre implique par les performances actuelles : derniere ligne de
-      // `performences` de chaque fonds de la categorie, triee par YTD decroissant.
+    if (!assiettes.length) {
+      console.log('  aucune assiette nationale d au moins 10 fonds — rien de comparable');
+    }
+
+    for (const a of assiettes) {
+      // Ordre implique par les performances actuelles, dans la MEME assiette.
       // Appariement verifie sur les modeles : la performance annuelle s appelle
-      // `ytd` dans `performences` et son rang `rank1erJanvier` dans
+      // `ytd` dans `performences`, son rang `rank1erJanvier` dans
       // `classementfonds`. Ecrire `perf1erJanvier` des deux cotes — le nom que
       // porte l API — aurait fait echouer la requete sans rien mesurer.
       const [attendu] = await conn.query(`
-        SELECT p.fond_id, p.ytd
-          FROM performences p
+        SELECT c.fond_id, p.ytd
+          FROM classementfonds c
+          JOIN performences p ON p.fond_id = c.fond_id
           JOIN (SELECT fond_id, MAX(date) AS d FROM performences GROUP BY fond_id) m
             ON m.fond_id = p.fond_id AND m.d = p.date
-          JOIN classementfonds c ON c.fond_id = p.fond_id AND c.categorie = ?
-         WHERE p.ytd IS NOT NULL
-         GROUP BY p.fond_id, p.ytd
+         WHERE c.type_classement = 1
+           AND c.categorie_nationale = ?
+           AND p.ytd IS NOT NULL
+         GROUP BY c.fond_id, p.ytd
          ORDER BY p.ytd DESC
-      `, [cat.categorie]);
+      `, [a.cat]);
 
       const [stocke] = await conn.query(`
-        SELECT fond_id, CAST(rank1erJanvier AS UNSIGNED) AS rang, rank1erJanviertotal AS total
+        SELECT fond_id, CAST(rank1erJanvier AS UNSIGNED) AS rang,
+               CAST(rank1erJanviertotal AS UNSIGNED) AS total
           FROM classementfonds
-         WHERE categorie = ? AND rank1erJanvier IS NOT NULL
-         ORDER BY rang ASC
-      `, [cat.categorie]);
+         WHERE type_classement = 1
+           AND categorie_nationale = ?
+           AND rank1erJanvier IS NOT NULL
+      `, [a.cat]);
 
-      if (!attendu.length || !stocke.length) {
-        console.log(`  ${String(cat.categorie).slice(0, 34).padEnd(34)} donnees insuffisantes (${attendu.length} perf / ${stocke.length} rangs)`);
+      const nom = String(a.cat).slice(0, 32).padEnd(32);
+      if (attendu.length < 5 || stocke.length < 5) {
+        console.log(`  ${nom} donnees insuffisantes (${attendu.length} perf / ${stocke.length} rangs)`);
         continue;
       }
 
       const rangStocke = new Map(stocke.map(r => [r.fond_id, r.rang]));
       let concordent = 0;
       let compares = 0;
-      attendu.forEach((r, i) => {
-        const attenduRang = i + 1;
+      attendu.forEach((r, idx) => {
         const reel = rangStocke.get(r.fond_id);
         if (reel === undefined) return;
         compares++;
-        if (reel === attenduRang) concordent++;
+        if (reel === idx + 1) concordent++;
       });
 
       const pct = compares ? (concordent / compares) * 100 : 0;
       const verdict = pct >= 95 ? 'CONCORDE — recalcule'
-                    : pct >= 40 ? 'PARTIEL — recalcul incomplet ou donnees bougees depuis'
+                    : pct >= 40 ? 'PARTIEL — recalcul incomplet, ou donnees bougees depuis'
                     : 'DIVERGE — classement PERIME';
-      console.log(`  ${String(cat.categorie).slice(0, 34).padEnd(34)} ${String(concordent).padStart(4)}/${String(compares).padEnd(4)} rangs identiques (${pct.toFixed(1)} %)  ${verdict}`);
-      const totalStocke = stocke[0] && stocke[0].total;
-      if (totalStocke != null && Number(totalStocke) !== attendu.length) {
-        console.log(`  ${''.padEnd(34)} effectif stocke ${totalStocke} vs ${attendu.length} fonds notes aujourd hui — l assiette a change`);
+      console.log(`  ${nom} ${String(concordent).padStart(4)}/${String(compares).padEnd(4)} rangs identiques (${pct.toFixed(1)} %)  ${verdict}`);
+
+      // L effectif est propre a chaque ligne ; on prend le plus frequent plutot
+      // qu une ligne au hasard, qui ne prouverait rien.
+      const freq = new Map();
+      for (const r of stocke) if (r.total != null) freq.set(r.total, (freq.get(r.total) || 0) + 1);
+      const totalDominant = [...freq.entries()].sort((x, y) => y[1] - x[1])[0];
+      if (totalDominant && Number(totalDominant[0]) !== attendu.length) {
+        console.log(`  ${''.padEnd(32)} effectif stocke ${totalDominant[0]} (sur ${totalDominant[1]} lignes) vs ${attendu.length} fonds notes aujourd hui`);
       }
     }
 
