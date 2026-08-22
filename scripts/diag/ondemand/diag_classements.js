@@ -203,9 +203,14 @@ function colonneDate(cols) {
       for (const f of top10attendu) if (top10stocke.has(f)) recouvrement++;
 
       const pct = compares ? (concordent / compares) * 100 : 0;
-      // Le verdict s appuie sur Spearman et le top 10, pas sur l egalite stricte.
+      // Le verdict exige que Spearman ET le top 10 concordent. Une premiere
+      // calibration accordait « PROCHE » sur le seul rho >= 0,80 : OBLIGATIONS
+      // NIGERIA passait ainsi pour proche avec rho 0,827 alors que 6 de ses 10
+      // premiers fonds etaient faux. Une correlation d ensemble honorable peut
+      // masquer une tete de classement entierement fausse — et la tete est
+      // precisement ce que l utilisateur regarde.
       const verdict = (rho !== null && rho >= 0.97 && recouvrement >= 9) ? 'CONCORDE — recalcule'
-                    : (rho !== null && rho >= 0.80) ? 'PROCHE — permutations locales, a instruire'
+                    : (rho !== null && rho >= 0.80 && recouvrement >= 7) ? 'PROCHE — permutations locales, a instruire'
                     : 'DIVERGE — le classement ne reflete pas les performances en base';
       console.log(
         `  ${nom} strict ${String(concordent).padStart(4)}/${String(compares).padEnd(4)} (${pct.toFixed(1)} %)` +
