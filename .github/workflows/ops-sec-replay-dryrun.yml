@@ -1,0 +1,183 @@
+# OPS — etape 2, phase seche : rejouer l extraction SEC et mesurer l ecart avec la base.
+#
+# POURQUOI
+# --------
+# La mesure du 2026-08-28 recense **233 lignes en rupture d echelle sur 84 fonds**,
+# dont **208 portent une source SEC identifiable**. Elles ne se suppriment donc
+# pas : elles se corrigent a la source. Le defaut est celui que le lot AI a
+# corrige dans l extracteur — la devise etait deduite du NOM du fonds au lieu
+# d etre lue dans l en-tete de colonne — mais l historique deja charge en porte
+# encore la trace, semaine par semaine, depuis des annees.
+#
+# Ce workflow ne corrige RIEN. Il repond a une seule question, et par la mesure :
+# **si l on rejouait l extraction avec l extracteur corrige, que changerait-elle ?**
+#
+# Deux etapes, toutes deux sans ecriture en base :
+#   1. `sec_ng_nav_extractor_v6.py` rejoue le parsing des fichiers SEC deja
+#      presents sur le serveur (aucun telechargement necessaire, ils y sont) ;
+#   2. `import_vl_nigeria_sec.js --dry-run` confronte ce resultat a la base et
+#      annonce ce qu il modifierait. Le mode dry-run est deja implemente dans
+#      l importeur (ligne 215) : il parcourt tout et n ecrit rien.
+#
+# BORNE VOLONTAIRE : 2022-2026. Les 233 ruptures relevees s y concentrent, et une
+# extraction complete depuis 2018 depasserait le temps de job — les anciens .xls
+# passent par LibreOffice, lent. La borne est un parametre, pas une limite du
+# procede : elle s elargira quand la phase seche aura ete jugee.
+#
+# CE QU IL FAUT LIRE DANS LE RAPPORT : le nombre de VL que l import corrigerait,
+# et surtout combien de mesures il REFUSERAIT pour cause de devise incoherente.
+# Un refus n est pas un echec : le contrat d ecriture prefere ne rien ecrire
+# plutot qu ecrire un naira etiquete dollar.
+#
+# Declenchement : bouton Actions, ou push sur ce fichier. Aucun `schedule`.
+
+name: OPS — rejeu SEC etape 2 (phase seche)
+
+on:
+  workflow_dispatch:
+    inputs:
+      annees:
+        description: "Annees a rejouer, separees par des espaces"
+        required: false
+        default: "2026 2025 2024 2023 2022"
+        type: string
+  push:
+    paths:
+      - '.github/workflows/ops-sec-replay-dryrun.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ops-sec-replay
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    name: Rejouer l extraction puis simuler l import
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Rejouer puis simuler
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+          ANNEES: ${{ github.event_name == 'workflow_dispatch' && inputs.annees || '2026 2025 2024 2023 2022' }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" \
+            "ANNEES='$ANNEES' bash -s" <<'REMOTE' 2>&1 | tee rapport-replay.txt
+            set -u
+            API_DIR=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+            cd "$API_DIR" || exit 3
+
+            echo "=============================================="
+            echo " 0. VERSION DU CODE"
+            echo "=============================================="
+            git log -1 --format='%h %s' 2>/dev/null || true
+            echo "extracteur : $(stat -c '%y' sec_ng_nav_extractor_v6.py 2>/dev/null | cut -d. -f1)"
+            echo "annees rejouees : ${ANNEES}"
+
+            echo ""
+            echo "=============================================="
+            echo " 1. REJEU DE L EXTRACTION"
+            echo "=============================================="
+            # Sortie dans un fichier DEDIE : sec_ng_latest.csv est le fichier de
+            # travail du cron hebdomadaire, l ecraser fausserait le lundi suivant.
+            rm -f sec_ng_replay.csv
+            timeout 2400 python3 sec_ng_nav_extractor_v6.py \
+              --years ${ANNEES} \
+              --cache-dir sec_ng_downloads \
+              --out sec_ng_replay.csv \
+              --audit sec_ng_replay_audit.csv \
+              --coherence sec_ng_replay_coherence.csv \
+              2>&1 | tail -40
+            RC=${PIPESTATUS[0]}
+            echo "code de sortie extraction : $RC"
+
+            if [ ! -s sec_ng_replay.csv ]; then
+              echo "::error::CSV de rejeu absent ou vide. Simulation impossible."
+              exit 4
+            fi
+            echo "lignes extraites : $(wc -l < sec_ng_replay.csv)"
+
+            echo ""
+            echo "=============================================="
+            echo " 2. SIMULATION DE L IMPORT (aucune ecriture)"
+            echo "=============================================="
+            # --dry-run est implemente dans l importeur : il parcourt tout,
+            # applique le contrat d ecriture, et n ecrit rien.
+            node scripts/import/import_vl_nigeria_sec.js sec_ng_replay.csv --dry-run 2>&1 | tail -80
+
+            echo ""
+            echo "=============================================="
+            echo " 3. RUPTURES ENCORE PRESENTES EN BASE"
+            echo "=============================================="
+            # Rappel du point de depart : ce que la simulation doit faire reculer.
+            node scripts/diag/ondemand/diag_ruptures_restantes.js 2>&1 | head -20
+          REMOTE
+
+      - name: Consigner la mesure dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          {
+            echo "# Rejeu SEC — etape 2, phase seche"
+            echo
+            echo "> Genere par \`ops-sec-replay-dryrun.yml\`. Ne pas modifier a la main."
+            echo "> **Aucune ecriture en base** : extraction dans un fichier dedie, import en dry-run."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo
+            echo '```'
+            cat rapport-replay.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+          } > docs/REJEU_SEC_ETAPE2.md
+
+          git add docs/REJEU_SEC_ETAPE2.md
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(ops): rejeu SEC etape 2 — phase seche $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Rapport consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
