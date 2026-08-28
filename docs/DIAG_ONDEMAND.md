@@ -4,29 +4,97 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-28 20:36 UTC**
+Derniere execution : **2026-08-28 20:48 UTC**
 
 ```
+########## scripts/diag/ondemand/diag_cas_isoles.js ##########
+
+=== CAS ISOLES — ruptures hors defaut de devise SEC ===
+Mesure le 2026-08-28 20:46:52 UTC — LECTURE SEULE
+
+## A. Fonds dont la rupture n est pas un taux de change
+
+  [1169] NIGERIA ENERGY SECTOR FUND — NIGERIA / NGN — actif=1
+    date                    value            actif_net        parts   parts impl. devise insere     src
+    Fri Aug 08           552.2000           1082899568            -       1961064 NGN    Sun Aug 02 oui
+    Fri Aug 15           552.2000           1040200887            -       1883739 NGN    Sun Aug 02 oui
+    Fri Aug 22           552.2000           1042267749            -       1887482 NGN    Sun Aug 02 oui
+    Fri Aug 29    1046071210.6800           1046071211            -             1 NGN    Sun Aug 02 oui
+    Fri Sep 05           552.2000           1040672550            -       1884594 NGN    Sun Aug 02 oui
+    Fri Sep 12           552.2000           1047216961            -       1896445 NGN    Sun Aug 02 oui
+    Fri Sep 19           552.2000           1047216961            -       1896445 NGN    Sun Aug 02 oui
+    Fri Sep 26           552.2000           1046004581            -       1894250 NGN    Sun Aug 02 oui
+
+  [790] UPLINE BONDS — MAROC / MAD — actif=1
+    date                    value            actif_net        parts   parts impl. devise insere     src
+    Fri Dec 04           107.0300              1070287            -         10000 -      Thu Apr 30 non
+    Fri Dec 11           107.0500              1070450            -         10000 -      Thu Apr 30 non
+    Fri Dec 25           105.3800             99497149            -        944175 -      Thu Apr 30 non
+    Fri Jan 08           103.7200             97924115            -        944120 -      Thu Apr 30 non
+    Fri Nov 13           106.8900              1068905            -         10000 -      Thu Apr 30 non
+    Fri Nov 20           106.9300              1069308            -         10000 -      Thu Apr 30 non
+    Fri Nov 27           106.9000              1068966            -         10000 -      Thu Apr 30 non
+    Mon Dec 21           105.8600             99946579            -        944139 -      Thu Apr 30 non
+
+  [2592] FCP BRIDGE EQUILIBRE — UEMOA / XOF — actif=1
+    date                    value            actif_net        parts   parts impl. devise insere     src
+    Fri Feb 13      43150544.6800                    0            -             - -      Fri Jun 12 non
+    Fri Feb 20      43701153.3300                    0            -             - -      Fri Jun 12 non
+    Fri Feb 27      44467382.2100                    0            -             - -      Fri Jun 12 non
+    Fri Mar 06      44235240.9500                    0            -             - -      Fri Jun 12 non
+    Fri Mar 13      44420101.2700                    0            -             - -      Fri Jun 12 non
+    Fri Mar 27          8781.7800                    0            -             - -      Fri Jun 12 non
+    Sat Feb 28      44467985.2200                    0            -             - -      Fri Jun 12 non
+    Sat Jan 31      42490028.5600                    0            -             - -      Fri Jun 12 non
+
+## B. Les 25 lignes sans provenance, en detail
+
+  9 ligne(s)
+
+  fonds pays     dev  date                 valeur       precedente     fact. insere     nom
+    790 MAROC    MAD  Fri Jun 08           0.4600          11.2700      24.5 Thu Apr 30 UPLINE BONDS
+   1223 NIGERIA  NGN  Fri Dec 08           1.0000         100.0000       100 Sun May 17 GUARANTY TRUST MONEY MARKET FUND
+   1223 NIGERIA  NGN  Fri Jul 05         100.0000           1.0000       100 Sun May 17 GUARANTY TRUST MONEY MARKET FUND
+   2450 TUNISIE  TND  Wed Jan 02          20.3190         212.9880      10.5 Fri May 22 MAC EPARGNE ACTIONS FCP
+   2505 TUNISIE  TND  Mon Nov 09         100.0000       10485.6600     104.9 Fri May 22 MAC HORIZON 2032 FCP
+   2505 TUNISIE  TND  Mon Jan 16       10000.0000         106.2630      94.1 Thu Apr 30 MAC HORIZON 2032 FCP
+   2592 UEMOA    XOF  Mon Jun 26    29487443.4600        5674.0000    5196.9 Fri Jun 12 FCP BRIDGE EQUILIBRE
+   2592 UEMOA    XOF  Fri Mar 27        8781.7800    44420101.2700    5058.2 Fri Jun 12 FCP BRIDGE EQUILIBRE
+   2642 UEMOA    XOF  Wed Apr 13       20048.0000    21841493.0000    1089.5 Thu Apr 30 FCP ECOBANK UEMOA OBLIGATAIRE
+
+## C. Ruptures hors Nigeria — quelles chaines d import ?
+
+  7 ligne(s) sur 5 fonds
+
+  MAROC    [ 790] UPLINE BONDS                   Fri Jun 08 : 0.4600 apres 11.2700 (x24.5) — insere Thu Apr 30, devise -, source non
+  TUNISIE  [2450] MAC EPARGNE ACTIONS FCP        Wed Jan 02 : 20.3190 apres 212.9880 (x10.5) — insere Fri May 22, devise -, source non
+  TUNISIE  [2505] MAC HORIZON 2032 FCP           Mon Nov 09 : 100.0000 apres 10485.6600 (x104.9) — insere Fri May 22, devise -, source non
+  TUNISIE  [2505] MAC HORIZON 2032 FCP           Mon Jan 16 : 10000.0000 apres 106.2630 (x94.1) — insere Thu Apr 30, devise -, source non
+  UEMOA    [2592] FCP BRIDGE EQUILIBRE           Mon Jun 26 : 29487443.4600 apres 5674.0000 (x5196.9) — insere Fri Jun 12, devise -, source non
+  UEMOA    [2592] FCP BRIDGE EQUILIBRE           Fri Mar 27 : 8781.7800 apres 44420101.2700 (x5058.2) — insere Fri Jun 12, devise -, source non
+  UEMOA    [2642] FCP ECOBANK UEMOA OBLIGATAIRE  Wed Apr 13 : 20048.0000 apres 21841493.0000 (x1089.5) — insere Thu Apr 30, devise -, source non
+
+
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
+Mesure le 2026-08-28 20:47:56 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
   classementfonds             3619 lignes — aucune colonne de date
   classementfonds_eurs        3635 lignes — aucune colonne de date
   classementfonds_usds        3635 lignes — aucune colonne de date
-  performences               72135 lignes — updated_at max = aucune (?)
+  performences               72169 lignes — updated_at max = aucune (?)
   performences_eurs          28654 lignes — date max = Fri Aug 28 2026 00: (0.9 j)
-  performences_usds          28649 lignes — date max =  hu Aug 27 2026 00: (1.9 j)
+  performences_usds          28887 lignes — date max = Fri Aug 28 2026 00: (0.9 j)
 
 ## B. Retard des performances par pays
 
   pays        fonds  a jour      %  retard moy.  retard max
   ---------- ------ ------- ------ ------------ -----------
   MAROC         640      18  2.8 %       93.6 j       104 j
-  TUNISIE       131       5  3.8 %       91.4 j       102 j
+  TUNISIE       131       6  4.6 %       91.3 j       102 j
   UEMOA         109      44 40.4 %       17.6 j        98 j
   NIGERIA       320     297 92.8 %        5.7 j       665 j
   CEMAC          34      34 100.0 %        0.0 j         0 j
@@ -39,7 +107,7 @@ Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
                                    DIVERGE — le classement ne reflete pas les performances en base
   ACTIONS MAROC                    strict    6/122  (4.9 %) · rho  0.462 · top10 7/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
-  OBLIGATIONS NIGERIA              strict   12/87   (13.8 %) · rho  0.827 · top10 4/10 · ex aequo 1
+  OBLIGATIONS NIGERIA              strict   14/87   (16.1 %) · rho  0.827 · top10 4/10 · ex aequo 1
                                    DIVERGE — le classement ne reflete pas les performances en base
   MONETAIRE MAROC                  strict   44/70   (62.9 %) · rho  0.978 · top10 8/10 · ex aequo 0
                                    PROCHE — permutations locales, a instruire
@@ -52,13 +120,13 @@ Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260824.log      4.4 j  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log        0.0 h  aucun marqueur de fin
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     22.9 h  ECHEC — 3 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      1.6 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         1.1 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                2.1 h  OK  (reserve : Echecs scraping: 27)
-  cron_health_check      tous les j 22:00     africafunds_health_20260827.log      22.6 h  aucun marqueur de fin
-  sync_production        toutes les heures    sync_production.log                   0.6 h  aucun marqueur de fin
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log        0.1 h  aucun marqueur de fin
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     23.1 h  ECHEC — 3 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      1.8 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         1.3 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                2.3 h  OK  (reserve : Echecs scraping: 27)
+  cron_health_check      tous les j 22:00     africafunds_health_20260827.log      22.8 h  aucun marqueur de fin
+  sync_production        toutes les heures    sync_production.log                   0.8 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -80,20 +148,20 @@ Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
   | ========================================
 
 --- cron_daily_update (aucun marqueur de fin) — /var/log/africafunds_daily_20260828.log
-  |   MAROC: 644 fonds
-  |   NIGERIA: 315 fonds
   |   TUNISIE: 131 fonds
   |   UEMOA: 108 fonds
   |   CEMAC: 34 fonds
   |   Nigeria: 8 fonds
   | ============================================================
-  | === USD — table: performences_usds ===
+  | === VERIFICATION FINALE ===
   | ============================================================
-  |   [100/1247] SG NOVA (MAROC) USD date=2026-08-27
-  |   [200/1247] FCP OBLIG OPPORTUNITES (MAROC) USD date=2026-08-27
-  |   [300/1247] FCP ALPHA MONETAIRE PROTECTION (MAROC) USD date=2026-08-27
-  |   [400/1247] CDG-ACTIONS (MAROC) USD date=2026-08-24
-  |   [500/1247] AVENIR RENDEMENT (MAROC) USD date=2024-04-15
+  | performences_eurs: 28654 lignes, 1241 fonds
+  | performences_usds: 28887 lignes, 1241 fonds
+  | Termine.
+  | [8/9] OK
+  | [9a/9] Classement local...
+  | [9a/9] ERREUR (HTTP 000)
+  | [9b/9] Classement EUR...
 
 --- cron_daily_eur_usd (ECHEC — 3 erreur(s)) — /var/log/cron_eur_usd.log
   | (node:1154855) UnhandledPromiseRejectionWarning: Error: connect ECONNREFUSED 127.0.0.1:3306
@@ -146,14 +214,14 @@ Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-28T20:35:51.146Z — LECTURE SEULE
+ Genere le 2026-08-28T20:48:01.568Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 8.58 Mo
-   modifie   : 2026-08-24T10:00:27.368Z (il y a 106.6 h)
+   modifie   : 2026-08-24T10:00:27.368Z (il y a 106.8 h)
    lignes    : 7033
    colonnes  : 55
 
@@ -322,7 +390,7 @@ Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
 
 [4] Cache de telechargement sec_ng_downloads/
   9 fichiers. Les plus recents :
-    2026-08-24  2026
+    2026-08-28  2026
     2026-05-17  2018
     2026-05-17  2019
     2026-05-17  2020
@@ -350,17 +418,17 @@ Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : 0f8a412b — chore: snapshot production state 2026-08-28 20:00
+  HEAD : ee8460dd — chore: snapshot production state 2026-08-28 20:00
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  161  depuis 155.5 h
-    fundafrique-frontend     online     redemarrages   48  depuis 300.5 h
-    worker-recalculation     online     redemarrages    1  depuis 2226.8 h
-    worker-data-import       online     redemarrages    1  depuis 2226.8 h
+    api-monolith             online     redemarrages  161  depuis 155.7 h
+    fundafrique-frontend     online     redemarrages   48  depuis 300.7 h
+    worker-recalculation     online     redemarrages    1  depuis 2227.1 h
+    worker-data-import       online     redemarrages    1  depuis 2227.1 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -377,7 +445,7 @@ Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-08-28 20:35:52 UTC — LECTURE SEULE
+Mesure le 2026-08-28 20:48:03 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 233 ligne(s) sur 84 fonds
