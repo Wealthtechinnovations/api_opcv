@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-28 20:56 UTC**
+Derniere execution : **2026-08-28 23:55 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-08-28 20:54:38 UTC — LECTURE SEULE
+Mesure le 2026-08-28 23:53:50 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -78,23 +78,23 @@ Mesure le 2026-08-28 20:54:38 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-28 20:55:52 UTC — LECTURE SEULE
+Mesure le 2026-08-28 23:54:43 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
   classementfonds             3619 lignes — aucune colonne de date
   classementfonds_eurs        3635 lignes — aucune colonne de date
   classementfonds_usds        3635 lignes — aucune colonne de date
-  performences               72169 lignes — updated_at max = aucune (?)
-  performences_eurs          28654 lignes — date max = Fri Aug 28 2026 00: (0.9 j)
-  performences_usds          28887 lignes — date max = Fri Aug 28 2026 00: (0.9 j)
+  performences               72278 lignes — updated_at max = aucune (?)
+  performences_eurs          28654 lignes — date max = Fri Aug 28 2026 00: (1.0 j)
+  performences_usds          28887 lignes — date max = Fri Aug 28 2026 00: (1.0 j)
 
 ## B. Retard des performances par pays
 
   pays        fonds  a jour      %  retard moy.  retard max
   ---------- ------ ------- ------ ------------ -----------
   MAROC         640      18  2.8 %       93.6 j       104 j
-  TUNISIE       131       6  4.6 %       91.3 j       102 j
+  TUNISIE       131       7  5.3 %       90.5 j       102 j
   UEMOA         109      44 40.4 %       17.6 j        98 j
   NIGERIA       320     297 92.8 %        5.7 j       665 j
   CEMAC          34      34 100.0 %        0.0 j         0 j
@@ -119,13 +119,13 @@ Mesure le 2026-08-28 20:55:52 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260824.log      4.4 j  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log        0.0 h  ECHEC — 5 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     23.3 h  ECHEC — 3 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      1.9 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         1.4 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                2.4 h  OK  (reserve : Echecs scraping: 27)
-  cron_health_check      tous les j 22:00     africafunds_health_20260827.log      22.9 h  aucun marqueur de fin
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260824.log      4.6 j  ECHEC — 1 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log        3.0 h  ECHEC — 5 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      1.9 h  ECHEC — 2 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      4.9 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         4.4 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                5.4 h  OK  (reserve : Echecs scraping: 27)
+  cron_health_check      tous les j 22:00     africafunds_health_20260828.log       1.9 h  ECHEC — 4 probleme(s)
   sync_production        toutes les heures    sync_production.log                   0.9 h  aucun marqueur de fin
 
 
@@ -163,49 +163,55 @@ Mesure le 2026-08-28 20:55:52 UTC — LECTURE SEULE
   | === MISE A JOUR TERMINEE AVEC 5 ERREUR(S) Fri Aug 28 08:55:01 PM UTC 2026 ===
   | ========================================
 
---- cron_daily_eur_usd (ECHEC — 3 erreur(s)) — /var/log/cron_eur_usd.log
-  | (node:1154855) UnhandledPromiseRejectionWarning: Error: connect ECONNREFUSED 127.0.0.1:3306
-  |     at Object.createConnection (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/node_modules/mysql2/promise.js:253:31)
-  |     at [eval]:5:25
-  |     at [eval]:11:3
-  |     at Script.runInThisContext (vm.js:133:18)
-  |     at Object.runInThisContext (vm.js:310:38)
-  |     at internal/process/execution.js:77:19
-  |     at [eval]-wrapper:6:22
-  |     at evalScript (internal/process/execution.js:76:60)
-  |     at internal/main/eval_string.js:23:3
-  | (Use `node --trace-warnings ...` to show where the warning was created)
-  | (node:1154855) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise whic
-  | (node:1154855) [DEP0018] DeprecationWarning: Unhandled promise rejections are deprecated. In the future, promise rejections that are not handled will terminate the Node.js process with a non-zero exit
-  | CRON EUR/USD TERMINE AVEC 3 ERREUR(S) — 2026-08-27 21:40:01
+--- cron_daily_eur_usd (ECHEC — 2 erreur(s)) — /var/log/cron_eur_usd.log
+  | Termine.
+  | [1/3] OK
+  | --- [2/3] Classements EUR ---
+  | 000
+  | [2a/3] ERREUR (HTTP 000)
+  | --- Classements USD ---
+  | 000
+  | [2b/3] ERREUR (HTTP 000)
+  | --- [3/3] Verification ---
+  |   performences_eurs        28654 lignes / 1241 fonds
+  |   performences_usds        28887 lignes / 1241 fonds
+  |   classementfonds_eurs     3635 lignes / 1235 fonds
+  |   classementfonds_usds     3635 lignes / 1235 fonds
+  | CRON EUR/USD TERMINE AVEC 2 ERREUR(S) — 2026-08-28 22:03:06
 
---- cron_health_check (aucun marqueur de fin) — /var/log/africafunds_health_20260827.log
-  | ========================================
-  | === AFRICAFUNDS HEALTH CHECK ===
-  | === Thu Aug 27 10:00:01 PM UTC 2026 ===
-  | ========================================
-  | === AFRICAFUNDS CRON HEALTH CHECK — 2026-08-27 ===
-  | ERREUR: connect ECONNREFUSED 127.0.0.1:3306
-  | === HEALTH CHECK TERMINE Thu Aug 27 10:00:01 PM UTC 2026 ===
+--- cron_health_check (ECHEC — 4 probleme(s)) — /var/log/africafunds_health_20260828.log
+  |   nigeria      pas attendu aujourd'hui (pas lundi)
+  | === RESUME ===
+  | STATUT: 4 PROBLEME(S) DETECTE(S)
+  |   [!] NIGERIA: derniere VL il y a 21 jours (budget 14j)
+  |   [!] CEMAC: derniere VL il y a 624 jours (budget 400j)
+  |   [!] Performances en retard sur les VL: 400/1234 a jour (32.4 %), retard moyen 61.2 j
+  |   [!] Seulement 5 fonds avec perf recente
+  |   [OK] TUNISIE: VL a jour
+  |   [OK] MAROC: VL a jour
+  |   [OK] UEMOA: VL a jour
+  |   [OK] Classement local peuple
+  |   [OK] Forex a jour
+  | === HEALTH CHECK TERMINE Fri Aug 28 10:00:03 PM UTC 2026 ===
   | ========================================
 
 --- sync_production (aucun marqueur de fin) — /var/log/sync_production.log
-  | ============================================
-  | SYNC PRODUCTION — 2026-08-28 20:00:01
+  | SYNC PRODUCTION — 2026-08-28 23:00:01
   | ============================================
   | --- Generation du snapshot base de donnees ---
-  |   -> PRODUCTION_STATE.json genere (44764 octets)
-  | [claude/code-review-improvements-ikvuj 89868443] chore: snapshot production state 2026-08-28 20:00
-  |  1 file changed, 10 insertions(+), 10 deletions(-)
+  |   -> PRODUCTION_STATE.json genere (44768 octets)
+  | [claude/code-review-improvements-ikvuj 5a24c59b] chore: snapshot production state 2026-08-28 23:00
+  |  1 file changed, 364 insertions(+), 364 deletions(-)
+  |  rewrite PRODUCTION_STATE.json (75%)
   | fatal: could not read Username for 'https://github.com': No such device or address
   |   -> Push ECHEC
   | ============================================
-  | SYNC TERMINE — 2026-08-28 20:00:14
+  | SYNC TERMINE — 2026-08-28 23:00:15
   | ============================================
   | Claude Code peut maintenant lire PRODUCTION_STATE.json
   | pour connaitre l'etat exact de la production.
 
-=== RESUME : 3 OK · 3 en echec · 2 non verifiable(s) ===
+=== RESUME : 3 OK · 4 en echec · 1 non verifiable(s) ===
   « non verifiable » ne veut pas dire « sain » : journal absent, illisible,
   ou sans marqueur de fin. A instruire avant de conclure quoi que ce soit.
 
@@ -214,14 +220,14 @@ Mesure le 2026-08-28 20:55:52 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-28T20:56:01.711Z — LECTURE SEULE
+ Genere le 2026-08-28T23:54:47.255Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 8.58 Mo
-   modifie   : 2026-08-24T10:00:27.368Z (il y a 106.9 h)
+   modifie   : 2026-08-24T10:00:27.368Z (il y a 109.9 h)
    lignes    : 7033
    colonnes  : 55
 
@@ -323,8 +329,100 @@ Mesure le 2026-08-28 20:55:52 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
-CSV de rejeu introuvable : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
-Lancer d abord le workflow « OPS — rejeu SEC etape 2 (phase seche) ».
+=== ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
+Mesure le 2026-08-28 23:54:47 UTC — LECTURE SEULE
+CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
+
+Lignes CSV : 41626
+Fonds Nigeria en base : 329
+VL Nigeria en base : 77315
+
+## A. Appariement
+
+    40826 ligne(s) CSV appariees a un fonds en base
+      646 ligne(s) sans fonds correspondant (nom inconnu)
+     1085 ligne(s) dont la date n est pas en base — un import les AJOUTERAIT
+    27077 ligne(s) identiques a moins de 1 %
+    12664 ligne(s) EN ECART
+
+## B. Nature des ecarts
+
+      378 changement(s) d ECHELLE (facteur >= 10) — les ruptures visees
+    12286 ecart(s) mineur(s) (1 % a 10x) — a instruire separement, ne pas corriger en masse
+
+## C. Changements d echelle — ce qu une correction ecrirait
+
+  fonds dev  date                en base    relu dans SEC     fact. dev.relue nom
+  ----- ---- ---------- ---------------- ---------------- --------- --------- ---
+   1141 NGN  2026-07-10      165207.2996         119.2832    1385.0 USD       AFRINVEST DOLLAR FUND
+   2764 NGN  2026-07-10      147826.2937         107.0000    1381.6 USD       AIICO EUROBOND FUND
+   1154 NGN  2026-07-10        1708.3601           1.2368    1381.3 USD       ARM EUROBOND FUND
+   2861 NGN  2026-07-10        1475.9698           1.0694    1380.2 USD       ARM SHORT-TERM EUROBOND FUND
+   2765 USD  2026-07-10        1799.0246           1.2988    1385.1 USD       CARDINALSTONE DOLLAR FUND
+   2766 USD  2026-07-10        1391.3469           1.0900    1276.5 USD       COMERCIO PARTNERS DOLLAR FUND
+   2767 NGN  2026-07-10        2101.9892           1.5209    1382.1 USD       COWRY EUROBOND FUND
+   1196 NGN  2026-07-10      159006.0360         114.9100    1383.7 USD       EMERGING AFRICA EUROBOND FUND
+   2878 USD  2026-07-10        2124.6150           1.5300    1388.6 USD       FCMBAM USD Bond Fund
+   2876 USD  2026-07-10      183694.8768         132.7800    1383.5 USD       First Asset Dollar Fund (Retai
+   2877 USD  2026-07-10      179342.8998         129.6400    1383.4 USD       First Asset Specialized Dollar
+   1214 NGN  2026-07-10      203121.3294         147.0575    1381.2 USD       FUTUREVIEW DOLLAR FUND
+   1170 NGN  2026-07-10      145053.2573         104.9000    1382.8 USD       NORRENBERGER DOLLAR FUND
+   1244 NGN  2026-07-10      224767.7067         168.8500    1331.2 USD       PACAM EUROBOND FUND
+   2866 NGN  2026-07-10      167122.1339         120.7800    1383.7 USD       United Capital Nigerian Eurobo
+   1158 NGN  2026-07-10      165085.3412         119.2600    1384.2 USD       AVA GAM FIXED INCOME DOLLAR FU
+   1160 NGN  2026-07-10      192015.5255         139.0600    1380.8 USD       AXA MANSARD DOLLAR BOND FUND
+   2770 USD  2026-07-10      146170.7496         105.8100    1381.4 USD       CFG AM FIXED INCOME DOLLAR FUN
+   1175 NGN  2026-07-10      161556.6000         116.9400    1381.5 USD       CORDROS DOLLAR FUND
+   2771 USD  2026-07-10        1419.3532           1.0248    1385.0 USD       CORONATION DOLLAR FUND
+   1213 NGN  2026-07-10        1920.0700           1.3890    1382.3 USD       FSDH DOLLAR FUND
+   2774 USD  2026-07-10       15065.4515          10.8800    1384.7 USD       MERISTEM DOLLAR FUND
+   1168 NGN  2026-07-10        1503.7859           1.0845    1386.6 USD       NIGERIA DOLLAR INCOME FUND
+   2775 USD  2026-07-10        1499.9230           1.0842    1383.4 USD       PARTHIAN DOLLAR FIXED INCOME F
+   1257 NGN  2026-07-10        2355.8702           1.7040    1382.6 USD       STANBIC IBTC DOLLAR FUND
+   2776 USD  2026-07-10      162767.5794         117.8200    1381.5 USD       STL DOLLAR FUND
+   1274 NGN  2026-07-10        1662.7315           1.2023    1382.9 USD       UNITED CAPITAL GLOBAL FIXED IN
+   2857 NGN  2026-07-10      159627.7500         116.2000    1373.7 USD       RMBN DOLLAR FIXED INCOME FUND
+   2777 USD  2026-07-10        1641.7479           1.1800    1391.3 USD       VETIVA USD FIXED INCOME FUND
+   2858 NGN  2026-07-10        1462.0144           1.0591    1380.4 USD       ARM SPECIALIZED DOLLAR FUND
+   2879 USD  2026-07-10      155731.6976         112.3000    1386.7 USD       First Asset Blended Dollar Fun
+   2880 USD  2026-07-10       13711.0784           9.9228    1381.8 USD       ValuAlliance Specialized Dolla
+   1141 NGN  2026-06-11      162039.7306         118.7592    1364.4 USD       AFRINVEST DOLLAR FUND
+   2764 NGN  2026-06-11      145315.5537         106.6300    1362.8 USD       AIICO EUROBOND FUND
+   1154 NGN  2026-06-11        1681.9916           1.2352    1361.7 USD       ARM EUROBOND FUND
+   2861 NGN  2026-06-11        1452.2827           1.0662    1362.1 USD       ARM SHORT-TERM EUROBOND FUND
+   2765 USD  2026-06-11        1766.5625           1.3005    1358.4 USD       CARDINALSTONE DOLLAR FUND
+   2767 NGN  2026-06-11        2063.7400           1.5246    1353.6 USD       COWRY EUROBOND FUND
+   1189 NGN  2026-06-11      151466.4045         111.6600    1356.5 USD       EDC DOLLAR FUND
+   1196 NGN  2026-06-11      156278.8500         114.3909    1366.2 USD       EMERGING AFRICA EUROBOND FUND
+   2876 USD  2026-06-11      179937.4508         131.9600    1363.6 USD       First Asset Dollar Fund (Retai
+   2877 USD  2026-06-11      175673.0136         128.8400    1363.5 USD       First Asset Specialized Dollar
+   1214 NGN  2026-06-11      199875.7820         146.3042    1366.2 USD       FUTUREVIEW DOLLAR FUND
+   2809 USD  2026-06-11        1533.6744           1.0060    1524.5 USD       MYRTLE DOLLAR SHIELD FUND
+   1170 NGN  2026-06-11      147047.6115         107.8700    1363.2 USD       NORRENBERGER DOLLAR FUND
+   1244 NGN  2026-06-11      222603.5165         169.7200    1311.6 USD       PACAM EUROBOND FUND
+   2866 NGN  2026-06-11      174368.2666         127.6365    1366.1 USD       United Capital Nigerian Eurobo
+   1158 NGN  2026-06-11      162622.4930         119.1200    1365.2 USD       AVA GAM FIXED INCOME DOLLAR FU
+   1160 NGN  2026-06-11      189176.1657         138.5800    1365.1 USD       AXA MANSARD DOLLAR BOND FUND
+   2770 USD  2026-06-11      143760.7932         105.3200    1365.0 USD       CFG AM FIXED INCOME DOLLAR FUN
+   1175 NGN  2026-06-11      158680.4600         116.3100    1364.3 USD       CORDROS DOLLAR FUND
+   2771 USD  2026-06-11        1432.9709           1.0529    1361.0 USD       CORONATION DOLLAR FUND
+   1213 NGN  2026-06-11        1883.2300           1.3799    1364.8 USD       FSDH DOLLAR FUND
+   2774 USD  2026-06-11       14811.1395          10.8400    1366.3 USD       MERISTEM DOLLAR FUND
+   1168 NGN  2026-06-11        1530.7572           1.1265    1358.9 USD       NIGERIA DOLLAR INCOME FUND
+   2775 USD  2026-06-11        1480.9776           1.0874    1361.9 USD       PARTHIAN DOLLAR FIXED INCOME F
+   1257 NGN  2026-06-11        2316.4710           1.6989    1363.5 USD       STANBIC IBTC DOLLAR FUND
+   2776 USD  2026-06-11      159840.2900         117.0400    1365.7 USD       STL DOLLAR FUND
+   1274 NGN  2026-06-11        1743.8939           1.2756    1367.1 USD       UNITED CAPITAL GLOBAL FIXED IN
+   2857 NGN  2026-06-11      158351.2300         116.3300    1361.2 USD       RMBN DOLLAR FIXED INCOME FUND
+  ... et 318 autre(s)
+
+  Sens : 339 correction(s) vers une valeur PLUS PETITE, 39 vers une PLUS GRANDE
+
+## D. Devise que l extracteur corrige attribue a ces mesures
+
+     306 ligne(s)   USD (source : column_header_matched_fund)
+      43 ligne(s)   NGN (source : column_header_matched_fund)
+      29 ligne(s)   NGN (source : column_header)
 
 
 ########## scripts/diag/ondemand/diag_import_nigeria.js ##########
@@ -424,17 +522,17 @@ Lancer d abord le workflow « OPS — rejeu SEC etape 2 (phase seche) ».
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : bdacd278 — chore: snapshot production state 2026-08-28 20:00
+  HEAD : f4c59179 — chore: snapshot production state 2026-08-28 23:00
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  161  depuis 155.8 h
-    fundafrique-frontend     online     redemarrages   48  depuis 300.8 h
-    worker-recalculation     online     redemarrages    1  depuis 2227.2 h
-    worker-data-import       online     redemarrages    1  depuis 2227.2 h
+    api-monolith             online     redemarrages  161  depuis 158.8 h
+    fundafrique-frontend     online     redemarrages   48  depuis 303.8 h
+    worker-recalculation     online     redemarrages    1  depuis 2230.2 h
+    worker-data-import       online     redemarrages    1  depuis 2230.2 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -451,7 +549,7 @@ Lancer d abord le workflow « OPS — rejeu SEC etape 2 (phase seche) ».
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-08-28 20:56:03 UTC — LECTURE SEULE
+Mesure le 2026-08-28 23:54:53 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 233 ligne(s) sur 84 fonds
