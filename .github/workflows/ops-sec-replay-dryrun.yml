@@ -124,8 +124,18 @@ jobs:
             cd "$API_DIR" || exit 3
 
             echo "=============================================="
-            echo " 0. VERSION DU CODE"
+            echo " 0. MISE A JOUR ET VERSION DU CODE"
             echo "=============================================="
+            # Ce workflow ne mettait PAS le serveur a jour, contrairement a
+            # doc-drift.yml. Il executait donc le code present sur la machine, pas
+            # celui qu on venait de pousser : le correctif de la cle de date a ete
+            # publie a 21:15 et la mesure de 23:53 a reproduit a l identique le
+            # defaut corrige — 40 826 dates « absentes » sur 40 826 — sans que le
+            # garde-fou ajoute au meme moment ne se declenche. Il n existait pas
+            # sur le serveur.
+            git checkout -- logs.txt 2>/dev/null || true
+            git pull --rebase origin claude/code-review-improvements-ikvuj 2>&1 | tail -3 \
+              || echo "AVERTISSEMENT: mise a jour impossible, mesure lancee sur la version presente."
             git log -1 --format='%h %s' 2>/dev/null || true
             echo "extracteur : $(stat -c '%y' sec_ng_nav_extractor_v6.py 2>/dev/null | cut -d. -f1)"
             echo "annees rejouees : ${ANNEES}"
