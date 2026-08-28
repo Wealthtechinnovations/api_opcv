@@ -4,22 +4,22 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-28 20:20 UTC**
+Derniere execution : **2026-08-28 20:36 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-28 20:20:34 UTC — LECTURE SEULE
+Mesure le 2026-08-28 20:35:45 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
   classementfonds             3619 lignes — aucune colonne de date
   classementfonds_eurs        3635 lignes — aucune colonne de date
   classementfonds_usds        3635 lignes — aucune colonne de date
-  performences               72085 lignes — updated_at max = aucune (?)
-  performences_eurs          28260 lignes — date max =  hu Aug 27 2026 00: (1.8 j)
-  performences_usds          28121 lignes — date max = Mon Aug 24 2026 00: (4.8 j)
+  performences               72135 lignes — updated_at max = aucune (?)
+  performences_eurs          28654 lignes — date max = Fri Aug 28 2026 00: (0.9 j)
+  performences_usds          28649 lignes — date max =  hu Aug 27 2026 00: (1.9 j)
 
 ## B. Retard des performances par pays
 
@@ -39,10 +39,10 @@ Mesure le 2026-08-28 20:20:34 UTC — LECTURE SEULE
                                    DIVERGE — le classement ne reflete pas les performances en base
   ACTIONS MAROC                    strict    6/122  (4.9 %) · rho  0.462 · top10 7/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
-  OBLIGATIONS NIGERIA              strict   14/87   (16.1 %) · rho  0.827 · top10 4/10 · ex aequo 1
+  OBLIGATIONS NIGERIA              strict   12/87   (13.8 %) · rho  0.827 · top10 4/10 · ex aequo 1
                                    DIVERGE — le classement ne reflete pas les performances en base
-  DIVERSIFIE TUNISIE               strict    3/70   (4.3 %) · rho  0.421 · top10 2/10 · ex aequo 0
-                                   DIVERGE — le classement ne reflete pas les performances en base
+  MONETAIRE MAROC                  strict   44/70   (62.9 %) · rho  0.978 · top10 8/10 · ex aequo 0
+                                   PROCHE — permutations locales, a instruire
 
 
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
@@ -53,12 +53,12 @@ Mesure le 2026-08-28 20:20:34 UTC — LECTURE SEULE
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260824.log      4.4 j  ECHEC — 1 erreur(s)
   cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log        0.0 h  aucun marqueur de fin
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     22.7 h  ECHEC — 3 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      1.3 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         0.8 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                1.8 h  OK  (reserve : Echecs scraping: 27)
-  cron_health_check      tous les j 22:00     africafunds_health_20260827.log      22.3 h  aucun marqueur de fin
-  sync_production        toutes les heures    sync_production.log                   0.3 h  aucun marqueur de fin
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     22.9 h  ECHEC — 3 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      1.6 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         1.1 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                2.1 h  OK  (reserve : Echecs scraping: 27)
+  cron_health_check      tous les j 22:00     africafunds_health_20260827.log      22.6 h  aucun marqueur de fin
+  sync_production        toutes les heures    sync_production.log                   0.6 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -80,20 +80,20 @@ Mesure le 2026-08-28 20:20:34 UTC — LECTURE SEULE
   | ========================================
 
 --- cron_daily_update (aucun marqueur de fin) — /var/log/africafunds_daily_20260828.log
-  | [6/9] ERREUR (HTTP 000)
-  | [7/9] Recalcul performances locale (fonds 1201-3000)...
-  | [7/9] ERREUR (HTTP 000)
-  | [8/9] Recalcul performances EUR/USD...
-  | Connecte a la base fund_opcvm
-  | Options: devise=BOTH, pays=TOUS, force=false
-  | 1247 fonds actifs a traiter
+  |   MAROC: 644 fonds
+  |   NIGERIA: 315 fonds
+  |   TUNISIE: 131 fonds
+  |   UEMOA: 108 fonds
+  |   CEMAC: 34 fonds
+  |   Nigeria: 8 fonds
   | ============================================================
-  | === EUR — table: performences_eurs ===
+  | === USD — table: performences_usds ===
   | ============================================================
-  |   [100/1247] SG NOVA (MAROC) EUR date=2026-08-27
-  |   [200/1247] FCP OBLIG OPPORTUNITES (MAROC) EUR date=2026-08-27
-  |   [300/1247] FCP ALPHA MONETAIRE PROTECTION (MAROC) EUR date=2026-08-27
-  |   [400/1247] CDG-ACTIONS (MAROC) EUR date=2026-08-24
+  |   [100/1247] SG NOVA (MAROC) USD date=2026-08-27
+  |   [200/1247] FCP OBLIG OPPORTUNITES (MAROC) USD date=2026-08-27
+  |   [300/1247] FCP ALPHA MONETAIRE PROTECTION (MAROC) USD date=2026-08-27
+  |   [400/1247] CDG-ACTIONS (MAROC) USD date=2026-08-24
+  |   [500/1247] AVENIR RENDEMENT (MAROC) USD date=2024-04-15
 
 --- cron_daily_eur_usd (ECHEC — 3 erreur(s)) — /var/log/cron_eur_usd.log
   | (node:1154855) UnhandledPromiseRejectionWarning: Error: connect ECONNREFUSED 127.0.0.1:3306
@@ -146,14 +146,14 @@ Mesure le 2026-08-28 20:20:34 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-28T20:20:38.317Z — LECTURE SEULE
+ Genere le 2026-08-28T20:35:51.146Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 8.58 Mo
-   modifie   : 2026-08-24T10:00:27.368Z (il y a 106.3 h)
+   modifie   : 2026-08-24T10:00:27.368Z (il y a 106.6 h)
    lignes    : 7033
    colonnes  : 55
 
@@ -350,17 +350,17 @@ Mesure le 2026-08-28 20:20:34 UTC — LECTURE SEULE
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : 89868443 — chore: snapshot production state 2026-08-28 20:00
+  HEAD : 0f8a412b — chore: snapshot production state 2026-08-28 20:00
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  161  depuis 155.2 h
-    fundafrique-frontend     online     redemarrages   48  depuis 300.2 h
-    worker-recalculation     online     redemarrages    1  depuis 2226.6 h
-    worker-data-import       online     redemarrages    1  depuis 2226.6 h
+    api-monolith             online     redemarrages  161  depuis 155.5 h
+    fundafrique-frontend     online     redemarrages   48  depuis 300.5 h
+    worker-recalculation     online     redemarrages    1  depuis 2226.8 h
+    worker-data-import       online     redemarrages    1  depuis 2226.8 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -372,6 +372,110 @@ Mesure le 2026-08-28 20:20:34 UTC — LECTURE SEULE
   0 22 * * *    cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api && bash scripts/cron/cron_health_check.sh >> /var/log/africafunds_health.log 2>&1
   30 19 * * 1-5 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_brvm_daily.sh >> /var/log/cron_brvm.log 2>&1
   30 18 * * 1-5 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_indices_daily.sh >> /var/log/cron_indices_daily.log 2>&1
+
+
+########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
+
+=== RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
+Mesure le 2026-08-28 20:35:52 UTC — LECTURE SEULE
+Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
+
+TOTAL : 233 ligne(s) sur 84 fonds
+
+## Repartition par pays et lot d insertion
+
+     91 ligne(s)   NIGERIA | insere le Sun Aug 02
+     54 ligne(s)   NIGERIA | insere le Sun May 17
+     16 ligne(s)   NIGERIA | insere le Mon Jun 22
+     16 ligne(s)   NIGERIA | insere le Thu Jun 04
+      9 ligne(s)   NIGERIA | insere le Mon Aug 24
+      7 ligne(s)   NIGERIA | insere le Mon Jul 06
+      7 ligne(s)   NIGERIA | insere le Mon Jun 08
+      7 ligne(s)   NIGERIA | insere le Mon Jun 01
+      5 ligne(s)   Nigeria | insere le Mon Aug 24
+      4 ligne(s)   NIGERIA | insere le Mon Jun 29
+      3 ligne(s)   NIGERIA | insere le Mon Jul 27
+      3 ligne(s)   NIGERIA | insere le Mon Jul 13
+      2 ligne(s)   TUNISIE | insere le Fri May 22
+      2 ligne(s)   UEMOA | insere le Fri Jun 12
+      1 ligne(s)   MAROC | insere le Thu Apr 30
+      1 ligne(s)   Nigeria | insere le Mon Jun 01
+      1 ligne(s)   Nigeria | insere le Mon Jul 27
+      1 ligne(s)   Nigeria | insere le Thu Jun 04
+      1 ligne(s)   Nigeria | insere le Mon Jun 08
+      1 ligne(s)   TUNISIE | insere le Thu Apr 30
+      1 ligne(s)   UEMOA | insere le Thu Apr 30
+
+## Detail (60 premieres)
+
+  fonds dev  date               valeur     precedente   fact. insere     devise src  nom
+  ----- ---- ---------- -------------- -------------- ------- ---------- ------ ---  ---
+    790 MAD  Fri Jun 08         0.4600        11.2700    24.5 Thu Apr 30 -      non  UPLINE BONDS
+   1141 NGN  Fri Mar 18        94.9343     39043.5368   411.3 Sun May 17 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Apr 01     39441.4650        92.1946   427.8 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Aug 05       104.8954     43556.5716   415.2 Sun May 17 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Aug 12     43766.6883       104.8954   417.2 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Sep 08       108.2513     80066.7401   739.6 Sun May 17 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Sep 15     79948.2399       108.2513   738.5 Sun May 17 -      non  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Dec 08       109.8529    104587.4659   952.1 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Dec 22    114459.8322       109.8529  1041.9 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Mar 01       108.9403    163810.9357  1503.7 Sun May 17 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Mar 08    167631.1240       108.9403  1538.7 Sun May 17 -      non  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Dec 05       114.4800    165682.9307  1447.3 Sun May 17 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Jan 02    165297.5204       114.6808  1441.4 Sun May 17 -      non  AFRINVEST DOLLAR FUND
+   1142 NGN  Fri Jul 18      1990.0300       172.0100    11.6 Sun Aug 02 NGN    oui  AFRINVEST EQUITY FUND
+   1142 NGN  Fri Jul 25       170.3400      1990.0300    11.7 Sun Aug 02 NGN    oui  AFRINVEST EQUITY FUND
+   1146 NGN  Fri Dec 12         1.0000       100.0000     100 Sun Aug 02 NGN    oui  AIICO MONEY MARKET FUND
+   1146 NGN  Fri Dec 19       100.0000         1.0000     100 Sun Aug 02 NGN    oui  AIICO MONEY MARKET FUND
+   1153 NGN  Fri Apr 19       523.4007        23.3802    22.4 Sun Aug 02 NGN    oui  ARM ETHICAL FUND
+   1153 NGN  Fri Apr 26        23.3905       523.4007    22.4 Sun Aug 02 NGN    oui  ARM ETHICAL FUND
+   1153 NGN  Fri Aug 25       633.5456        49.1683    12.9 Sun May 17 NGN    oui  ARM ETHICAL FUND
+   1153 NGN  Fri Sep 01        51.4624       633.5456    12.3 Sun May 17 -      non  ARM ETHICAL FUND
+   1154 NGN  Fri Aug 29         1.1962      1835.7518  1534.7 Sun May 17 NGN    oui  ARM EUROBOND FUND
+   1154 NGN  Thu Sep 04      1832.0644         1.1962  1531.6 Sun May 17 -      non  ARM EUROBOND FUND
+   1154 NGN  Fri Jun 19         1.2360      1681.9916  1360.8 Mon Jun 29 NGN    oui  ARM EUROBOND FUND
+   1154 NGN  Fri Jun 26      1703.7064         1.2360  1378.4 Mon Jul 06 NGN    oui  ARM EUROBOND FUND
+   1155 NGN  Fri Dec 13       812.0000         1.2204   665.4 Sun May 17 NGN    oui  ARM FIXED INCOME FUND
+   1155 NGN  Fri Dec 20         1.2218       812.0000   664.6 Sun May 17 NGN    oui  ARM FIXED INCOME FUND
+   1156 NGN  Fri Jul 25       339.7568         1.0000   339.8 Sun Aug 02 NGN    oui  ARM MONEY MARKET FUND
+   1156 NGN  Fri Aug 01         1.0000       339.7568   339.8 Sun Aug 02 NGN    oui  ARM MONEY MARKET FUND
+   1156 NGN  Fri Dec 12       100.0000         1.0000     100 Sun Aug 02 NGN    oui  ARM MONEY MARKET FUND
+   1156 NGN  Fri Dec 19         1.0000       100.0000     100 Sun Aug 02 NGN    oui  ARM MONEY MARKET FUND
+   1157 NGN  Fri Dec 13       201.0000         1.1087   181.3 Sun May 17 NGN    oui  ARM SHORT TERM BOND FUND
+   1157 NGN  Fri Dec 20         1.1137       201.0000   180.5 Sun May 17 NGN    oui  ARM SHORT TERM BOND FUND
+   1158 NGN  Fri Nov 05       107.1500     49755.0000   464.3 Sun Aug 02 NGN    oui  AVA GAM FIXED INCOME DOLLAR FU
+   1158 NGN  Fri Nov 12     49931.7000       107.1500     466 Sun May 17 -      non  AVA GAM FIXED INCOME DOLLAR FU
+   1158 NGN  Fri Aug 05      1081.2400     42186.2600      39 Sun May 17 NGN    oui  AVA GAM FIXED INCOME DOLLAR FU
+   1158 NGN  Fri Aug 12     37665.2600      1081.2400    34.8 Sun May 17 -      non  AVA GAM FIXED INCOME DOLLAR FU
+   1158 NGN  Fri Jun 05       119.1200    163582.0760  1373.3 Mon Jun 22 NGN    oui  AVA GAM FIXED INCOME DOLLAR FU
+   1158 NGN  Thu Jun 11    162622.4930       119.1200  1365.2 Mon Jun 22 NGN    oui  AVA GAM FIXED INCOME DOLLAR FU
+   1159 NGN  Fri Aug 05     39822.0700      1090.8200    36.5 Sun May 17 NGN    oui  AVA GAM FIXED INCOME FUND
+   1159 NGN  Fri Aug 12      1093.1800     39822.0700    36.4 Sun May 17 -      non  AVA GAM FIXED INCOME FUND
+   1168 NGN  Fri Nov 26       415.7564         1.0100   411.6 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri Mar 18         1.0244       424.8504   414.7 Sun May 17 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri Apr 01       427.1666         1.0259   416.4 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri May 06         1.0317       428.3685   415.2 Sun May 17 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri May 13       428.3849         1.0317   415.2 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri May 27         1.0353       429.7513   415.1 Sun May 17 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri Jun 03       430.7589         1.0353   416.1 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri Aug 05         1.0168       422.1230   415.1 Sun May 17 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri Aug 12       424.9919         1.0168     418 Sun May 17 -      non  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri Dec 20         1.0689      1628.9460  1523.9 Sun May 17 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri Dec 27      1644.5124         1.0689  1538.5 Sun May 17 -      non  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri May 15         1.1200      1524.7624  1361.4 Thu Jun 04 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri May 22      1526.7584         1.1200  1363.2 Thu Jun 04 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1169 NGN  Fri Aug 29 1046071210.6800       552.2000 1894370.2 Sun Aug 02 NGN    oui  NIGERIA ENERGY SECTOR FUND
+   1169 NGN  Fri Sep 05       552.2000 1046071210.6800 1894370.2 Sun Aug 02 NGN    oui  NIGERIA ENERGY SECTOR FUND
+   1171 NGN  Fri Oct 21       988.8300         1.2200   810.5 Sun Aug 02 NGN    oui  SFS FIXED INCOME FUND
+   1171 NGN  Fri Oct 28         1.2200       988.8300   810.5 Sun Aug 02 NGN    oui  SFS FIXED INCOME FUND
+   1175 NGN  Fri May 22       116.0800    159261.7600    1372 Thu Jun 04 NGN    oui  CORDROS DOLLAR FUND
+   1175 NGN  Fri May 29    159747.5000       116.0800  1376.2 Mon Jun 08 NGN    oui  CORDROS DOLLAR FUND
+  ... et 173 autre(s)
+
+## Provenance
+
+  25 ligne(s) SANS provenance — meme signature que les 82 deja retirees
+  208 ligne(s) AVEC provenance — a corriger a la source, jamais par suppression aveugle
 
 
 ```
