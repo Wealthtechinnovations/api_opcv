@@ -113,14 +113,28 @@ run_curl "7/9" "Recalcul performances locale (fonds 1201-3000)" \
 run_step "8/9" "Recalcul performances EUR/USD" \
   node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH
 
+# Delai porte a 1800 s. Les trois classements sortaient en HTTP 000 chaque soir —
+# curl abandonnait a 300 s. Le journal du 2026-08-28 le montre encore : l etape
+# 8/9 se termine normalement (28 654 lignes de performances EUR sur 1 241 fonds)
+# puis « [9a/9] Classement local... ERREUR (HTTP 000) ».
+#
+# HTTP 000 ne dit PAS que le serveur a echoue : il dit que le client a cesse
+# d attendre. La route `classementmysql` vide la table puis la reconstruit fonds
+# par fonds, en trois portees (nationale, regionale, globale) — plusieurs
+# milliers d ecritures. Elle depasse simplement cinq minutes.
+#
+# Allonger le delai ne change rien a ce que fait le serveur ; cela change le fait
+# qu on entende sa reponse. Sans cela, le cron rapporte trois erreurs chaque nuit
+# sans qu on sache si le classement a ete recalcule ou non — et une alerte qui se
+# declenche toujours cesse d etre lue.
 run_curl "9a/9" "Classement local" \
-  "http://localhost:3005/api/classementmysql"
+  "http://localhost:3005/api/classementmysql" 1800
 
 run_curl "9b/9" "Classement EUR" \
-  "http://localhost:3005/api/classementeur"
+  "http://localhost:3005/api/classementeur" 1800
 
 run_curl "9c/9" "Classement USD" \
-  "http://localhost:3005/api/classementusd"
+  "http://localhost:3005/api/classementusd" 1800
 
 log ""
 if [ "$ERRORS" -eq 0 ]; then
