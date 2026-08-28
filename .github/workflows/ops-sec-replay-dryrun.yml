@@ -41,6 +41,11 @@ on:
         required: false
         default: "2026 2025 2024 2023 2022"
         type: string
+      reextraire:
+        description: "auto = reutiliser le CSV s il date de moins de 24 h · oui = forcer · non = interdire"
+        required: false
+        default: "auto"
+        type: string
   push:
     paths:
       - '.github/workflows/ops-sec-replay-dryrun.yml'
@@ -99,11 +104,21 @@ jobs:
           HOST: ${{ secrets.S2_HOST }}
           USER_SSH: ${{ secrets.S2_USER }}
           ANNEES: ${{ github.event_name == 'workflow_dispatch' && inputs.annees || '2026 2025 2024 2023 2022' }}
+          REEXTRAIRE: ${{ github.event_name == 'workflow_dispatch' && inputs.reextraire || 'auto' }}
         run: |
           set -o pipefail
           SSH_USER="${USER_SSH:-root}"
-          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" \
-            "ANNEES='$ANNEES' bash -s" <<'REMOTE' 2>&1 | tee rapport-replay.txt
+          # ServerAliveInterval : l extraction dure ~8 minutes et sa sortie est
+          # filtree par `tail`, donc RIEN ne transite pendant tout ce temps. Une
+          # session SSH muette est une session inactive : l execution du
+          # 2026-08-28 20:58 est tombee en « client_loop: send disconnect: Broken
+          # pipe » a cette etape precise, la precedente etant passee de justesse.
+          # Les paquets de maintien tiennent la connexion ouverte sans rien
+          # changer au travail distant.
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes \
+              -o ServerAliveInterval=30 -o ServerAliveCountMax=60 -o TCPKeepAlive=yes \
+              "$SSH_USER@$HOST" \
+            "ANNEES='$ANNEES' REEXTRAIRE='$REEXTRAIRE' bash -s" <<'REMOTE' 2>&1 | tee rapport-replay.txt
             set -u
             API_DIR=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
             cd "$API_DIR" || exit 3
@@ -121,6 +136,19 @@ jobs:
             echo "=============================================="
             # Sortie dans un fichier DEDIE : sec_ng_latest.csv est le fichier de
             # travail du cron hebdomadaire, l ecraser fausserait le lundi suivant.
+            # Reutiliser un CSV recent quand il existe. L extraction est l etape
+            # longue et la seule fragile ; la refaire pour comparer deux fois le
+            # meme resultat n apporte rien et rejoue le risque de coupure.
+            REUTILISE=0
+            if [ "${REEXTRAIRE:-auto}" != "oui" ] && [ -s sec_ng_replay.csv ]; then
+              AGE_H=$(( ( $(date +%s) - $(stat -c %Y sec_ng_replay.csv) ) / 3600 ))
+              if [ "$AGE_H" -lt 24 ] || [ "${REEXTRAIRE:-auto}" = "non" ]; then
+                echo "CSV de rejeu existant, ${AGE_H} h — reutilise sans reextraction."
+                REUTILISE=1
+              fi
+            fi
+
+            if [ "$REUTILISE" = "0" ]; then
             rm -f sec_ng_replay.csv
             timeout 2400 python3 sec_ng_nav_extractor_v6.py \
               --years ${ANNEES} \
@@ -131,6 +159,7 @@ jobs:
               2>&1 | tail -40
             RC=${PIPESTATUS[0]}
             echo "code de sortie extraction : $RC"
+            fi
 
             if [ ! -s sec_ng_replay.csv ]; then
               echo "::error::CSV de rejeu absent ou vide. Simulation impossible."
@@ -148,7 +177,16 @@ jobs:
 
             echo ""
             echo "=============================================="
-            echo " 3. RUPTURES ENCORE PRESENTES EN BASE"
+            echo " 3. ECART ENTRE LE FICHIER RELU ET LA BASE"
+            echo "=============================================="
+            # La vraie mesure : l import n ecrit rien sur des dates existantes,
+            # donc c est la comparaison valeur par valeur qui dit ce qu une
+            # correction redresserait.
+            node scripts/diag/ondemand/diag_ecart_csv_base.js sec_ng_replay.csv 2>&1 | head -120
+
+            echo ""
+            echo "=============================================="
+            echo " 4. RUPTURES ENCORE PRESENTES EN BASE"
             echo "=============================================="
             # Rappel du point de depart : ce que la simulation doit faire reculer.
             node scripts/diag/ondemand/diag_ruptures_restantes.js 2>&1 | head -20
