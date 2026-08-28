@@ -49,7 +49,23 @@ const ECART_SIGNIFICATIF = 0.01;
 const ECART_ECHELLE = 10;
 
 const n = (x, d = 4) => (x === null || x === undefined || Number.isNaN(x) ? '-' : Number(x).toFixed(d));
-const j = x => (x ? String(x).slice(0, 10) : '?');
+// Une date arrive ici sous deux formes : chaine ISO depuis le CSV, objet Date
+// depuis mysql2. `String(new Date(...))` produit « Fri Aug 29 2026 ... », dont
+// les dix premiers caracteres donnent « Fri Aug 2 » — une cle qui ne peut
+// correspondre a aucune autre. La premiere version de ce comparateur a ainsi
+// declare que 40 826 lignes sur 40 826 avaient une date absente de la base,
+// alors que la base en contient 77 315. Un resultat a 100 % n est pas une
+// mesure, c est une panne d instrument.
+const j = x => {
+  if (!x) return '?';
+  if (x instanceof Date) {
+    // Composantes locales, pas toISOString() : la conversion UTC decale d un
+    // jour toute date lue dans un fuseau a l est de Greenwich.
+    const p = k => String(k).padStart(2, '0');
+    return `${x.getFullYear()}-${p(x.getMonth() + 1)}-${p(x.getDate())}`;
+  }
+  return String(x).slice(0, 10);
+};
 
 (async () => {
   if (!fs.existsSync(CSV)) {
@@ -78,7 +94,7 @@ const j = x => (x ? String(x).slice(0, 10) : '?');
 
     // Valeurs stockees, indexees par fonds+date.
     const [vls] = await conn.query(`
-      SELECT v.fund_id, v.date, v.value, v.currency_code, v.correction_batch,
+      SELECT v.fund_id, DATE_FORMAT(v.date, '%Y-%m-%d') AS date, v.value, v.currency_code, v.correction_batch,
              CASE WHEN v.source_url IS NULL THEN 'non' ELSE 'oui' END AS src
         FROM valorisations v
         JOIN fond_investissements f ON f.id = v.fund_id
@@ -128,6 +144,16 @@ const j = x => (x ? String(x).slice(0, 10) : '?');
     console.log(`  ${String(dateAbsente).padStart(7)} ligne(s) dont la date n est pas en base — un import les AJOUTERAIT`);
     console.log(`  ${String(identiques).padStart(7)} ligne(s) identiques a moins de 1 %`);
     console.log(`  ${String(ecarts.length).padStart(7)} ligne(s) EN ECART`);
+
+    // Garde-fou : un resultat extreme denonce presque toujours l instrument, pas
+    // les donnees. Si AUCUNE date appariee n existe en base alors que la base en
+    // contient des dizaines de milliers, c est la cle de rapprochement qui est
+    // fausse — et le silence serait pris pour un verdict.
+    if (apparies > 100 && dateAbsente === apparies) {
+      console.log('\n  *** ALERTE INSTRUMENT : 100 % des dates apparaissent absentes.');
+      console.log('      Avec ' + vls.length + ' VL en base, c est la cle de rapprochement');
+      console.log('      (fonds + date) qui est fausse, pas la production. Ne rien conclure.');
+    }
 
     if (!ecarts.length) {
       console.log('\nAucun ecart : le fichier relu confirme la base. Rien a corriger par cette voie.\n');
