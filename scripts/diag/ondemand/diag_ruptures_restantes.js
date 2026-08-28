@@ -43,31 +43,47 @@ const FACTEUR = 10;
     // Comparaison a la ligne PRECEDENTE, pas au maximum de la serie : un maximum
     // pollue rendrait suspecte toute la serie saine autour de lui. Le saut entre
     // deux points consecutifs designe la ligne fautive, pas ses voisines.
+    // UNE SEULE PASSE. La premiere version correlait une sous-requete
+    // `SELECT MAX(date) ... WHERE date < v.date` a CHAQUE ligne : sur plus d un
+    // million de VL, cela relance une recherche par ligne et ne se termine pas
+    // en temps raisonnable. Lancee en production, elle est restee bloquee.
+    // `LAG()` fait le meme travail en un seul tri : chaque ligne recoit la
+    // valeur precedente de son propre fonds, sans relire la table.
     const [ruptures] = await conn.query(`
-      SELECT v.fund_id,
+      WITH serie AS (
+        SELECT v.fund_id,
+               v.date,
+               v.value,
+               v.created_at,
+               v.currency_code,
+               v.correction_batch,
+               v.source_url,
+               LAG(v.value) OVER (PARTITION BY v.fund_id ORDER BY v.date) AS valeur_precedente,
+               LAG(v.date)  OVER (PARTITION BY v.fund_id ORDER BY v.date) AS date_precedente
+          FROM valorisations v
+          JOIN fond_investissements f ON f.id = v.fund_id AND f.active = 1
+         WHERE v.value > 0
+      )
+      SELECT s.fund_id,
              f.nom_fond,
              f.pays,
              f.dev_libelle,
-             v.date,
-             v.value,
-             p.value                                   AS valeur_precedente,
-             p.date                                    AS date_precedente,
-             ROUND(GREATEST(v.value / p.value, p.value / v.value), 1) AS facteur,
-             DATE(v.created_at)                        AS insere_le,
-             v.currency_code,
-             v.correction_batch,
-             CASE WHEN v.source_url IS NULL THEN 'non' ELSE 'oui' END AS a_une_source
-        FROM valorisations v
-        JOIN fond_investissements f ON f.id = v.fund_id
-        JOIN valorisations p
-          ON p.fund_id = v.fund_id
-         AND p.date = (SELECT MAX(q.date) FROM valorisations q
-                        WHERE q.fund_id = v.fund_id AND q.date < v.date AND q.value > 0)
-       WHERE v.value > 0
-         AND p.value > 0
-         AND f.active = 1
-         AND (v.value / p.value >= ${FACTEUR} OR p.value / v.value >= ${FACTEUR})
-       ORDER BY f.pays, v.fund_id, v.date
+             s.date,
+             s.value,
+             s.valeur_precedente,
+             s.date_precedente,
+             ROUND(GREATEST(s.value / s.valeur_precedente,
+                            s.valeur_precedente / s.value), 1) AS facteur,
+             DATE(s.created_at)                                 AS insere_le,
+             s.currency_code,
+             s.correction_batch,
+             CASE WHEN s.source_url IS NULL THEN 'non' ELSE 'oui' END AS a_une_source
+        FROM serie s
+        JOIN fond_investissements f ON f.id = s.fund_id
+       WHERE s.valeur_precedente > 0
+         AND (s.value / s.valeur_precedente >= ${FACTEUR}
+           OR s.valeur_precedente / s.value >= ${FACTEUR})
+       ORDER BY f.pays, s.fund_id, s.date
     `);
 
     if (!ruptures.length) {
