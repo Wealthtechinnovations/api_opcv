@@ -28,6 +28,12 @@ const path = require('path');
 // Ce chargeur est le premier branche : il ecrivait sans aucune qualification
 // et a produit les lignes non tracees des 17 et 24 juillet 2026.
 const contrat = require('../../src/lib/vl_contract');
+// Appariement des noms et lecture du CSV : source unique, partagee avec les
+// diagnostics. Ces deux fonctions vivaient ici sans etre exportees ; tout outil
+// devant relire le meme CSV devait les reecrire, et deux implementations de la
+// meme regle finissent par diverger. Un comparateur qui n apparie pas les noms
+// EXACTEMENT comme cet importeur ne compare rien d utile.
+const { parseCSVLine, normalizeNameForMatch } = require('../../src/lib/sec_csv');
 
 const DB_CONFIG = {
   host: process.env.DB_HOST || '127.0.0.1',
@@ -77,19 +83,6 @@ function getClassification(categoryFr) {
   return CLASSIFICATION_MAP[key] || DEFAULT_CLASSIFICATION;
 }
 
-function normalizeNameForMatch(name) {
-  return (name || '')
-    .toUpperCase()
-    .replace(/&/g, ' AND ')
-    .replace(/[''`]/g, '')
-    .replace(/\bLIMITED\b/g, 'LTD')
-    .replace(/\bPUBLIC LIMITED COMPANY\b/g, 'PLC')
-    .replace(/\bP L C\b/g, 'PLC')
-    .replace(/\bL T D\b/g, 'LTD')
-    .replace(/[^A-Z0-9]+/g, ' ')
-    .trim()
-    .replace(/\s+/g, ' ');
-}
 
 function detectStructure(name) {
   const upper = (name || '').toUpperCase();
@@ -128,38 +121,6 @@ function getRate(index, date) {
 // ============================================================
 // CSV PARSER (sans dependance externe)
 // ============================================================
-function parseCSVLine(line) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (inQuotes) {
-      if (ch === '"') {
-        if (i + 1 < line.length && line[i + 1] === '"') {
-          current += '"';
-          i++;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        current += ch;
-      }
-    } else {
-      if (ch === '"') {
-        inQuotes = true;
-      } else if (ch === ',') {
-        result.push(current);
-        current = '';
-      } else {
-        current += ch;
-      }
-    }
-  }
-  result.push(current);
-  return result;
-}
 
 function readCSV(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');

@@ -44,6 +44,13 @@ on:
   push:
     paths:
       - '.github/workflows/ops-sec-replay-dryrun.yml'
+      # Une modification de l importeur, du module partage ou du comparateur doit
+      # relancer la mesure : c est elle qui prouve qu ils fonctionnent encore.
+      # L importeur tourne chaque lundi ; une regression silencieuse y serait
+      # decouverte par l absence de VL, une semaine trop tard.
+      - 'scripts/import/import_vl_nigeria_sec.js'
+      - 'scripts/diag/ondemand/diag_ecart_csv_base.js'
+      - 'src/lib/sec_csv.js'
 
 permissions:
   contents: write
