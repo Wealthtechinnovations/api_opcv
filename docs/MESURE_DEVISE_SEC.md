@@ -4,7 +4,7 @@
 > Extraction de TEST, bornee, ecrivant dans `sec_ng_devise_test.csv`.
 > Ni `sec_ng_latest.csv` ni la base ne sont touches.
 
-Derniere execution : **2026-08-19 19:56 UTC**
+Derniere execution : **2026-08-29 14:45 UTC**
 
 ## Reference AVANT correctif (lot AE)
 
@@ -15,8 +15,7 @@ Etiquette USD repartie sur six ordres de grandeur, dont **238 lignes a 10^5**
 ==============================================
  1. RECUPERER LE CORRECTIF
 ==============================================
-AVERTISSEMENT: mise a jour impossible, mesure sur la version presente.
-Commit courant : 807bb750 chore: snapshot production state 2026-08-04 12:00
+Commit courant : bea2e9c6 chore: snapshot production state 2026-08-29 14:00
 
 Le correctif est-il bien present ?
 8
@@ -150,16 +149,16 @@ Code de sortie extraction : 0
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-19T19:56:54.982Z — LECTURE SEULE
+ Genere le 2026-08-29T14:45:22.285Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : sec_ng_devise_test.csv
-   taille    : 1.35 Mo
-   modifie   : 2026-08-19T19:56:54.820Z (il y a 0.0 h)
+   taille    : 1.38 Mo
+   modifie   : 2026-08-29T14:45:22.128Z (il y a 0.0 h)
    lignes    : 1102
-   colonnes  : 55
+   colonnes  : 59
 
    En-tetes pertinents :
       fund_name_clean      present (col 24)
@@ -257,5 +256,5 @@ Code de sortie extraction : 0
 
 
 Verification finale : sec_ng_latest.csv intact ?
--rw-r--r-- 1 root root 5125964 Aug 17 10:00 sec_ng_latest.csv
+-rw-r--r-- 1 root root 8999633 Aug 24 10:00 sec_ng_latest.csv
 ```
