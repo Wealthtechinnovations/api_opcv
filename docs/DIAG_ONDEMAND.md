@@ -4,19 +4,18 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-29 00:15 UTC**
+Derniere execution : **2026-08-29 00:18 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-08-29 00:13:48 UTC — LECTURE SEULE
+Mesure le 2026-08-29 00:17:02 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
   [1169] NIGERIA ENERGY SECTOR FUND — NIGERIA / NGN — actif=1
     date                    value            actif_net        parts   parts impl. devise insere     src
-    Fri Aug 01           552.2000           1043231027            -       1889227 NGN    Sun Aug 02 oui
     Fri Aug 08           552.2000           1082899568            -       1961064 NGN    Sun Aug 02 oui
     Fri Aug 15           552.2000           1040200887            -       1883739 NGN    Sun Aug 02 oui
     Fri Aug 22           552.2000           1042267749            -       1887482 NGN    Sun Aug 02 oui
@@ -24,6 +23,7 @@ Mesure le 2026-08-29 00:13:48 UTC — LECTURE SEULE
     Fri Sep 05           552.2000           1040672550            -       1884594 NGN    Sun Aug 02 oui
     Fri Sep 12           552.2000           1047216961            -       1896445 NGN    Sun Aug 02 oui
     Fri Sep 19           552.2000           1047216961            -       1896445 NGN    Sun Aug 02 oui
+    Fri Sep 26           552.2000           1046004581            -       1894250 NGN    Sun Aug 02 oui
 
   [790] UPLINE BONDS — MAROC / MAD — actif=1
     date                    value            actif_net        parts   parts impl. devise insere     src
@@ -78,7 +78,7 @@ Mesure le 2026-08-29 00:13:48 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-29 00:14:41 UTC — LECTURE SEULE
+Mesure le 2026-08-29 00:17:56 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -120,13 +120,13 @@ Mesure le 2026-08-29 00:14:41 UTC — LECTURE SEULE
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260824.log      4.6 j  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log        3.3 h  ECHEC — 5 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log        3.4 h  ECHEC — 5 erreur(s)
   cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      2.2 h  ECHEC — 2 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      5.2 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         4.7 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                5.7 h  OK  (reserve : Echecs scraping: 27)
-  cron_health_check      tous les j 22:00     africafunds_health_20260828.log       2.2 h  ECHEC — 4 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   0.2 h  aucun marqueur de fin
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      5.3 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         4.8 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                5.8 h  OK  (reserve : Echecs scraping: 27)
+  cron_health_check      tous les j 22:00     africafunds_health_20260828.log       2.3 h  ECHEC — 4 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.3 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -220,14 +220,14 @@ Mesure le 2026-08-29 00:14:41 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-29T00:14:45.040Z — LECTURE SEULE
+ Genere le 2026-08-29T00:18:00.204Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 8.58 Mo
-   modifie   : 2026-08-24T10:00:27.368Z (il y a 110.2 h)
+   modifie   : 2026-08-24T10:00:27.368Z (il y a 110.3 h)
    lignes    : 7033
    colonnes  : 55
 
@@ -330,7 +330,7 @@ Mesure le 2026-08-29 00:14:41 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-08-29 00:14:45 UTC — LECTURE SEULE
+Mesure le 2026-08-29 00:18:00 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -522,17 +522,17 @@ VL Nigeria en base : 77315
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : 2ee34e75 — chore: snapshot production state 2026-08-29 00:00
+  HEAD : d39e92ce — chore: snapshot production state 2026-08-29 00:00
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  161  depuis 159.1 h
-    fundafrique-frontend     online     redemarrages   48  depuis 304.1 h
-    worker-recalculation     online     redemarrages    1  depuis 2230.5 h
-    worker-data-import       online     redemarrages    1  depuis 2230.5 h
+    api-monolith             online     redemarrages  161  depuis 159.2 h
+    fundafrique-frontend     online     redemarrages   48  depuis 304.2 h
+    worker-recalculation     online     redemarrages    1  depuis 2230.6 h
+    worker-data-import       online     redemarrages    1  depuis 2230.6 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -549,9 +549,18 @@ VL Nigeria en base : 77315
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-08-29 00:14:50 UTC — LECTURE SEULE
+Mesure le 2026-08-29 00:18:06 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
+
+## Devise emise par l extracteur, par annee (fonds concernes seulement)
+
+  annee      USD     NGN    vide   autre   part USD
+  2022         0     554       0       0   0.0 %
+  2023         0     777       0       0   0.0 %
+  2024         0    1141       0       0   0.0 %
+  2025         0    1587       0       0   0.0 %
+  2026       613     589       0       0   51.0 %
 
 Periode couverte par le rejeu : 2022-01-07 -> 2026-08-14
 Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre pas.
@@ -609,7 +618,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-08-29 00:14:54 UTC — LECTURE SEULE
+Mesure le 2026-08-29 00:18:10 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 233 ligne(s) sur 84 fonds
