@@ -94,7 +94,16 @@ const j = x => {
       naira.set(`${f.id}|${date}`, { prix, source: l.vl_price_ngn_source || '' });
       lignesAvecNaira++;
     }
-    console.log(`Lignes CSV portant un prix naira explicite : ${lignesAvecNaira} sur ${lignes.length}\n`);
+    console.log(`Lignes CSV portant un prix naira explicite : ${lignesAvecNaira} sur ${lignes.length}`);
+
+    // Bornes REELLES du rejeu. Sans elles, une date de 2014 ressort « sans prix
+    // naira dans la source » — ce qui confond une absence de DONNEE avec une
+    // absence de MESURE. Le rejeu ne couvre que les annees demandees ; hors de
+    // cette fenetre, on ne sait rien, et on doit le dire.
+    const datesCsv = [...naira.keys()].map(k => k.split('|')[1]).sort();
+    const dmin = datesCsv[0] || '9999-99-99';
+    const dmax = datesCsv[datesCsv.length - 1] || '0000-00-00';
+    console.log(`Fenetre couverte par le rejeu : ${dmin} -> ${dmax}\n`);
 
     // Les ruptures encore en base, avec leurs DEUX voisins : le precedent sert a
     // les detecter, le suivant a juger si la valeur de remplacement retombe dans
@@ -122,20 +131,72 @@ const j = x => {
     console.log(`Ruptures d echelle Nigeria encore en base : ${ruptures.length}\n`);
     if (!ruptures.length) { console.log('Aucune. Rien a corriger.\n'); return; }
 
-    let avecNaira = 0, sansNaira = 0, resolues = 0, nonResolues = 0, dejaJuste = 0;
+    // Les dates rompues, par fonds : un voisin qui figure dans cet ensemble est
+    // lui-meme casse et ne peut servir de reference.
+    const rompues = new Set(ruptures.map(r => `${r.fund_id}|${r.date}`));
+
+    // La serie complete de chaque fonds concerne, pour aller chercher le voisin
+    // SAIN le plus proche plutot que le voisin immediat.
+    const idsRompus = [...new Set(ruptures.map(r => r.fund_id))];
+    const [seriesBrutes] = await conn.query(`
+      SELECT fund_id, DATE_FORMAT(date, '%Y-%m-%d') AS date, value
+        FROM valorisations
+       WHERE fund_id IN (?) AND value > 0
+       ORDER BY fund_id, date
+    `, [idsRompus]);
+    const series = new Map();
+    for (const v of seriesBrutes) {
+      if (!series.has(v.fund_id)) series.set(v.fund_id, []);
+      series.get(v.fund_id).push({ date: v.date, value: Number(v.value) });
+    }
+
+    // Le voisin sain le plus proche, avant ou apres. Comparer au voisin
+    // IMMEDIAT donnait un verdict faux des que deux ruptures se suivaient — et
+    // elles vont presque toujours par paires, l aller et le retour d un meme
+    // basculement de devise. Le fonds 1141 au 2022-03-18 en est l exemple :
+    // la source donne exactement la valeur de la semaine precedente, mais la
+    // semaine suivante etant elle-meme rompue, le test declarait « ne resout
+    // pas » une correction manifestement juste.
+    function voisinSain(fundId, date) {
+      const serie = series.get(fundId) || [];
+      const i = serie.findIndex(x => x.date === date);
+      if (i < 0) return null;
+      for (let d = 1; d < serie.length; d++) {
+        for (const k of [i - d, i + d]) {
+          if (k < 0 || k >= serie.length) continue;
+          const cand = serie[k];
+          if (rompues.has(`${fundId}|${cand.date}`)) continue;
+          return cand.value;
+        }
+      }
+      return null;
+    }
+
+    let avecNaira = 0, sansNaira = 0, horsFenetre = 0;
+    let resolues = 0, nonResolues = 0, dejaJuste = 0, indecidables = 0;
     const detail = [];
 
     for (const r of ruptures) {
       const s = naira.get(`${r.fund_id}|${r.date}`);
-      if (!s) { sansNaira++; detail.push({ ...r, statut: 'AUCUNE SOURCE NAIRA' }); continue; }
+      if (!s) {
+        if (r.date < dmin || r.date > dmax) {
+          horsFenetre++;
+          detail.push({ ...r, statut: 'HORS FENETRE DU REJEU' });
+        } else {
+          sansNaira++;
+          detail.push({ ...r, statut: 'AUCUNE SOURCE NAIRA' });
+        }
+        continue;
+      }
       avecNaira++;
 
-      // Le voisinage : la reference contre laquelle juger. On prend le voisin
-      // disponible — au bord de la serie, un seul existe.
-      const voisins = [Number(r.prec), Number(r.suiv)].filter(x => Number.isFinite(x) && x > 0);
-      const refs = voisins.length ? voisins : [Number(r.prec)];
-      const ecarts = refs.map(v => Math.max(s.prix / v, v / s.prix));
-      const pire = Math.max(...ecarts);
+      const ref = voisinSain(r.fund_id, r.date);
+      if (ref === null) {
+        indecidables++;
+        detail.push({ ...r, naira: s.prix, source: s.source, statut: 'AUCUN VOISIN SAIN' });
+        continue;
+      }
+      const pire = Math.max(s.prix / ref, ref / s.prix);
 
       let statut;
       if (Math.max(s.prix / Number(r.value), Number(r.value) / s.prix) - 1 < 0.01) {
@@ -153,11 +214,13 @@ const j = x => {
 
     console.log('## A. Ce que la source permet\n');
     console.log(`  ${String(avecNaira).padStart(5)} rupture(s) avec un prix naira publie`);
-    console.log(`  ${String(sansNaira).padStart(5)} rupture(s) SANS prix naira dans la source — rien a ecrire`);
+    console.log(`  ${String(sansNaira).padStart(5)} rupture(s) dans la fenetre mais SANS naira publie — rien a ecrire`);
+    console.log(`  ${String(horsFenetre).padStart(5)} rupture(s) HORS fenetre du rejeu — non mesurees, pas « sans source »`);
     console.log('\n## B. Et ce que la correction produirait\n');
     console.log(`  ${String(resolues).padStart(5)} RESOLUE(S) — la valeur naira retombe dans la serie`);
     console.log(`  ${String(nonResolues).padStart(5)} NON RESOLUE(S) — la valeur naira reste aberrante, NE PAS ECRIRE`);
     console.log(`  ${String(dejaJuste).padStart(5)} deja conforme(s) — la base porte deja la valeur source`);
+    console.log(`  ${String(indecidables).padStart(5)} sans voisin sain — aucune reference pour juger, ne pas ecrire`);
 
     console.log('\n## C. Detail (50 premieres)\n');
     console.log(`  ${'fonds'.padStart(5)} ${'date'.padEnd(10)} ${'en base'.padStart(15)} ${'naira source'.padStart(15)} ${'precedente'.padStart(15)} ${'statut'.padEnd(20)} nom`);
