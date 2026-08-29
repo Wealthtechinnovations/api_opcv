@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-29 15:03 UTC**
+Derniere execution : **2026-08-29 15:07 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-08-29 15:01:53 UTC — LECTURE SEULE
+Mesure le 2026-08-29 15:05:48 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -78,7 +78,7 @@ Mesure le 2026-08-29 15:01:53 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-29 15:02:47 UTC — LECTURE SEULE
+Mesure le 2026-08-29 15:06:42 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -120,13 +120,13 @@ Mesure le 2026-08-29 15:02:47 UTC — LECTURE SEULE
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260824.log      5.2 j  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log       18.1 h  ECHEC — 5 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     17.0 h  ECHEC — 2 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     20.0 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        19.5 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               20.5 h  OK  (reserve : Echecs scraping: 27)
-  cron_health_check      tous les j 22:00     africafunds_health_20260828.log      17.0 h  ECHEC — 4 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   0.0 h  aucun marqueur de fin
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log       18.2 h  ECHEC — 5 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     17.1 h  ECHEC — 2 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     20.1 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        19.6 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               20.6 h  OK  (reserve : Echecs scraping: 27)
+  cron_health_check      tous les j 22:00     africafunds_health_20260828.log      17.1 h  ECHEC — 4 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.1 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -220,14 +220,14 @@ Mesure le 2026-08-29 15:02:47 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-29T15:02:51.260Z — LECTURE SEULE
+ Genere le 2026-08-29T15:06:46.097Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 8.58 Mo
-   modifie   : 2026-08-24T10:00:27.368Z (il y a 125.0 h)
+   modifie   : 2026-08-24T10:00:27.368Z (il y a 125.1 h)
    lignes    : 7033
    colonnes  : 55
 
@@ -330,7 +330,7 @@ Mesure le 2026-08-29 15:02:47 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-08-29 15:02:51 UTC — LECTURE SEULE
+Mesure le 2026-08-29 15:06:46 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -522,17 +522,17 @@ VL Nigeria en base : 77315
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : 64a60062 — chore: snapshot production state 2026-08-29 15:00
+  HEAD : 8ad9d5c4 — chore: snapshot production state 2026-08-29 15:00
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  161  depuis 173.9 h
-    fundafrique-frontend     online     redemarrages   48  depuis 318.9 h
-    worker-recalculation     online     redemarrages    1  depuis 2245.3 h
-    worker-data-import       online     redemarrages    1  depuis 2245.3 h
+    api-monolith             online     redemarrages  161  depuis 174.0 h
+    fundafrique-frontend     online     redemarrages   48  depuis 319.0 h
+    worker-recalculation     online     redemarrages    1  depuis 2245.4 h
+    worker-data-import       online     redemarrages    1  depuis 2245.4 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -549,7 +549,7 @@ VL Nigeria en base : 77315
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-08-29 15:02:57 UTC — LECTURE SEULE
+Mesure le 2026-08-29 15:06:53 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -618,73 +618,76 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-08-29 15:03:01 UTC — LECTURE SEULE
+Mesure le 2026-08-29 15:06:57 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40865 sur 41626
+Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
 
 Ruptures d echelle Nigeria encore en base : 226
 
 ## A. Ce que la source permet
 
     147 rupture(s) avec un prix naira publie
-     79 rupture(s) SANS prix naira dans la source — rien a ecrire
+      4 rupture(s) dans la fenetre mais SANS naira publie — rien a ecrire
+     75 rupture(s) HORS fenetre du rejeu — non mesurees, pas « sans source »
 
 ## B. Et ce que la correction produirait
 
-     44 RESOLUE(S) — la valeur naira retombe dans la serie
-     64 NON RESOLUE(S) — la valeur naira reste aberrante, NE PAS ECRIRE
+     81 RESOLUE(S) — la valeur naira retombe dans la serie
+     27 NON RESOLUE(S) — la valeur naira reste aberrante, NE PAS ECRIRE
      39 deja conforme(s) — la base porte deja la valeur source
+      0 sans voisin sain — aucune reference pour juger, ne pas ecrire
 
 ## C. Detail (50 premieres)
 
   fonds date               en base    naira source      precedente statut               nom
   ----- ---------- --------------- --------------- --------------- -------------------- ---
-   2815 2017-12-29        100.0000               -          1.0000 AUCUNE SOURCE NAIRA  ABACUS MONEY MARKET FUND
-   2842 2015-12-18       6206.0000               -          0.6447 AUCUNE SOURCE NAIRA  ACAP CANARY GROWTH FUND
-   2842 2015-12-23          0.6202               -       6206.0000 AUCUNE SOURCE NAIRA  ACAP CANARY GROWTH FUND
-   1141 2022-03-18         94.9343      39043.5368      39043.5368 NE RESOUT PAS        AFRINVEST DOLLAR FUND
-   1141 2022-04-01      39441.4650         92.1946         92.1946 NE RESOUT PAS        AFRINVEST DOLLAR FUND
+   2815 2017-12-29        100.0000               -          1.0000 HORS FENETRE DU REJEU ABACUS MONEY MARKET FUND
+   2842 2015-12-18       6206.0000               -          0.6447 HORS FENETRE DU REJEU ACAP CANARY GROWTH FUND
+   2842 2015-12-23          0.6202               -       6206.0000 HORS FENETRE DU REJEU ACAP CANARY GROWTH FUND
+   1141 2022-03-18         94.9343      39043.5368      39043.5368 RESOUT               AFRINVEST DOLLAR FUND
+   1141 2022-04-01      39441.4650         92.1946         92.1946 RESOUT               AFRINVEST DOLLAR FUND
    1141 2022-08-05        104.8954      43556.5716      43556.5716 RESOUT               AFRINVEST DOLLAR FUND
    1141 2022-08-12      43766.6883        104.8954        104.8954 NE RESOUT PAS        AFRINVEST DOLLAR FUND
    1141 2023-09-08        108.2513      80066.7401      80066.7401 RESOUT               AFRINVEST DOLLAR FUND
    1141 2023-09-15      79948.2399      79948.2399        108.2513 DEJA CONFORME        AFRINVEST DOLLAR FUND
-   1141 2023-12-08        109.8529     104587.4659     104587.4659 NE RESOUT PAS        AFRINVEST DOLLAR FUND
+   1141 2023-12-08        109.8529     104587.4659     104587.4659 RESOUT               AFRINVEST DOLLAR FUND
    1141 2023-12-22     114459.8322      94709.8974        109.8529 NE RESOUT PAS        AFRINVEST DOLLAR FUND
    1141 2024-03-01        108.9403     163810.9357     163810.9357 RESOUT               AFRINVEST DOLLAR FUND
    1141 2024-03-08     167631.1240     167631.1240        108.9403 DEJA CONFORME        AFRINVEST DOLLAR FUND
-   1141 2025-12-05        114.4800     165682.9307     165682.9307 NE RESOUT PAS        AFRINVEST DOLLAR FUND
+   1141 2025-12-05        114.4800     165682.9307     165682.9307 RESOUT               AFRINVEST DOLLAR FUND
    1141 2026-01-02     165297.5204     165297.5204        114.6808 DEJA CONFORME        AFRINVEST DOLLAR FUND
-   1142 2014-07-18       1990.0300               -        172.0100 AUCUNE SOURCE NAIRA  AFRINVEST EQUITY FUND
-   1142 2014-07-25        170.3400               -       1990.0300 AUCUNE SOURCE NAIRA  AFRINVEST EQUITY FUND
-   1146 2014-12-12          1.0000               -        100.0000 AUCUNE SOURCE NAIRA  AIICO MONEY MARKET FUND
-   1146 2014-12-19        100.0000               -          1.0000 AUCUNE SOURCE NAIRA  AIICO MONEY MARKET FUND
-   2769 2026-05-15          1.0088       1373.3753       1373.3753 NE RESOUT PAS        ALPHA10 DOLLAR FUND
+   1142 2014-07-18       1990.0300               -        172.0100 HORS FENETRE DU REJEU AFRINVEST EQUITY FUND
+   1142 2014-07-25        170.3400               -       1990.0300 HORS FENETRE DU REJEU AFRINVEST EQUITY FUND
+   1146 2014-12-12          1.0000               -        100.0000 HORS FENETRE DU REJEU AIICO MONEY MARKET FUND
+   1146 2014-12-19        100.0000               -          1.0000 HORS FENETRE DU REJEU AIICO MONEY MARKET FUND
+   2769 2026-05-15          1.0088       1373.3753       1373.3753 RESOUT               ALPHA10 DOLLAR FUND
    2769 2026-06-05       1375.8344       1385.3391          1.0088 DEJA CONFORME        ALPHA10 DOLLAR FUND
    2769 2026-06-11          1.0100       1375.8344       1375.8344 NE RESOUT PAS        ALPHA10 DOLLAR FUND
-   2841 2011-09-30      21487.0000               -        219.6500 AUCUNE SOURCE NAIRA  ARM DISCOVERY FUND
-   2841 2011-10-07        216.7807               -      21487.0000 AUCUNE SOURCE NAIRA  ARM DISCOVERY FUND
-   2841 2014-10-24    3242792.0000               -        320.1792 AUCUNE SOURCE NAIRA  ARM DISCOVERY FUND
-   2841 2014-10-31        317.5450               -    3242792.0000 AUCUNE SOURCE NAIRA  ARM DISCOVERY FUND
-   1153 2013-04-19        523.4007               -         23.3802 AUCUNE SOURCE NAIRA  ARM ETHICAL FUND
-   1153 2013-04-26         23.3905               -        523.4007 AUCUNE SOURCE NAIRA  ARM ETHICAL FUND
+   2841 2011-09-30      21487.0000               -        219.6500 HORS FENETRE DU REJEU ARM DISCOVERY FUND
+   2841 2011-10-07        216.7807               -      21487.0000 HORS FENETRE DU REJEU ARM DISCOVERY FUND
+   2841 2014-10-24    3242792.0000               -        320.1792 HORS FENETRE DU REJEU ARM DISCOVERY FUND
+   2841 2014-10-31        317.5450               -    3242792.0000 HORS FENETRE DU REJEU ARM DISCOVERY FUND
+   1153 2013-04-19        523.4007               -         23.3802 HORS FENETRE DU REJEU ARM ETHICAL FUND
+   1153 2013-04-26         23.3905               -        523.4007 HORS FENETRE DU REJEU ARM ETHICAL FUND
    1153 2023-08-25        633.5456         50.6508         49.1683 RESOUT               ARM ETHICAL FUND
    1153 2023-09-01         51.4624         51.4624        633.5456 DEJA CONFORME        ARM ETHICAL FUND
    1154 2025-08-29          1.1962       1835.7518       1835.7518 RESOUT               ARM EUROBOND FUND
    1154 2025-09-04       1832.0644       1832.0644          1.1962 DEJA CONFORME        ARM EUROBOND FUND
    1154 2026-06-19          1.2360       1681.9916       1681.9916 RESOUT               ARM EUROBOND FUND
-   1154 2026-06-26       1703.7064       1686.4816          1.2360 NE RESOUT PAS        ARM EUROBOND FUND
+   1154 2026-06-26       1703.7064       1686.4816          1.2360 RESOUT               ARM EUROBOND FUND
    1155 2024-12-13        812.0000          1.2204          1.2204 RESOUT               ARM FIXED INCOME FUND
    1155 2024-12-20          1.2218          1.2239        812.0000 DEJA CONFORME        ARM FIXED INCOME FUND
-   1156 2014-07-25        339.7568               -          1.0000 AUCUNE SOURCE NAIRA  ARM MONEY MARKET FUND
-   1156 2014-08-01          1.0000               -        339.7568 AUCUNE SOURCE NAIRA  ARM MONEY MARKET FUND
-   1156 2014-12-12        100.0000               -          1.0000 AUCUNE SOURCE NAIRA  ARM MONEY MARKET FUND
-   1156 2014-12-19          1.0000               -        100.0000 AUCUNE SOURCE NAIRA  ARM MONEY MARKET FUND
+   1156 2014-07-25        339.7568               -          1.0000 HORS FENETRE DU REJEU ARM MONEY MARKET FUND
+   1156 2014-08-01          1.0000               -        339.7568 HORS FENETRE DU REJEU ARM MONEY MARKET FUND
+   1156 2014-12-12        100.0000               -          1.0000 HORS FENETRE DU REJEU ARM MONEY MARKET FUND
+   1156 2014-12-19          1.0000               -        100.0000 HORS FENETRE DU REJEU ARM MONEY MARKET FUND
    1157 2024-12-13        201.0000          1.1087          1.1087 RESOUT               ARM SHORT TERM BOND FUND
    1157 2024-12-20          1.1137          1.1112        201.0000 DEJA CONFORME        ARM SHORT TERM BOND FUND
-   2858 2026-06-26          1.0591       1444.9904       1444.9904 NE RESOUT PAS        ARM SPECIALIZED DOLLAR FUND
+   2858 2026-06-26          1.0591       1444.9904       1444.9904 RESOUT               ARM SPECIALIZED DOLLAR FUND
    2858 2026-07-10       1462.0144       1449.5936          1.0591 DEJA CONFORME        ARM SPECIALIZED DOLLAR FUND
-   1158 2021-11-05        107.1500               -      49755.0000 AUCUNE SOURCE NAIRA  AVA GAM FIXED INCOME DOLLAR 
-   1158 2021-11-12      49931.7000               -        107.1500 AUCUNE SOURCE NAIRA  AVA GAM FIXED INCOME DOLLAR 
+   1158 2021-11-05        107.1500               -      49755.0000 HORS FENETRE DU REJEU AVA GAM FIXED INCOME DOLLAR 
+   1158 2021-11-12      49931.7000               -        107.1500 HORS FENETRE DU REJEU AVA GAM FIXED INCOME DOLLAR 
    1158 2022-08-05       1081.2400      42186.2600      42186.2600 RESOUT               AVA GAM FIXED INCOME DOLLAR 
    1158 2022-08-12      37665.2600      37665.2600       1081.2400 DEJA CONFORME        AVA GAM FIXED INCOME DOLLAR 
    1158 2026-06-05        119.1200     163582.0760     163582.0760 RESOUT               AVA GAM FIXED INCOME DOLLAR 
@@ -693,27 +696,27 @@ Ruptures d echelle Nigeria encore en base : 226
 
 ## D. Ruptures que le naira source NE resout pas
 
-  [1141] 2022-03-18  base 94.9343 -> source 39043.5368  mais voisins a 39043.5368 (ecart x423.5)  AFRINVEST DOLLAR FUND
-  [1141] 2022-04-01  base 39441.4650 -> source 92.1946  mais voisins a 92.1946 (ecart x473.1)  AFRINVEST DOLLAR FUND
   [1141] 2022-08-12  base 43766.6883 -> source 104.8954  mais voisins a 104.8954 (ecart x422.1)  AFRINVEST DOLLAR FUND
-  [1141] 2023-12-08  base 109.8529 -> source 104587.4659  mais voisins a 104587.4659 (ecart x952.1)  AFRINVEST DOLLAR FUND
   [1141] 2023-12-22  base 114459.8322 -> source 94709.8974  mais voisins a 109.8529 (ecart x862.2)  AFRINVEST DOLLAR FUND
-  [1141] 2025-12-05  base 114.4800 -> source 165682.9307  mais voisins a 165682.9307 (ecart x1447.4)  AFRINVEST DOLLAR FUND
-  [2769] 2026-05-15  base 1.0088 -> source 1373.3753  mais voisins a 1373.3753 (ecart x1361.4)  ALPHA10 DOLLAR FUND
   [2769] 2026-06-11  base 1.0100 -> source 1375.8344  mais voisins a 1375.8344 (ecart x1362.2)  ALPHA10 DOLLAR FUND
-  [1154] 2026-06-26  base 1703.7064 -> source 1686.4816  mais voisins a 1.2360 (ecart x1364.5)  ARM EUROBOND FUND
-  [2858] 2026-06-26  base 1.0591 -> source 1444.9904  mais voisins a 1444.9904 (ecart x1364.4)  ARM SPECIALIZED DOLLAR FUN
-  [2765] 2026-07-31  base 1.3023 -> source 1773.8454  mais voisins a 1799.0246 (ecart x1359.4)  CARDINALSTONE DOLLAR FUND
-  [2770] 2026-07-31  base 106.2200 -> source 144680.8387  mais voisins a 146170.7496 (ecart x1360.4)  CFG AM FIXED INCOME DOLLAR
   [2766] 2026-05-29  base 1.1110 -> source 1528.1338  mais voisins a 1517.6804 (ecart x1375.5)  COMERCIO PARTNERS DOLLAR F
-  [2766] 2026-07-03  base 1489.3970 -> source 1546.6448  mais voisins a 1.1200 (ecart x1380.9)  COMERCIO PARTNERS DOLLAR F
-  [2766] 2026-07-31  base 1.1000 -> source 1498.2953  mais voisins a 1391.3469 (ecart x1363.8)  COMERCIO PARTNERS DOLLAR F
-  [2771] 2026-07-31  base 1.0280 -> source 1400.2250  mais voisins a 1419.3532 (ecart x1356.5)  CORONATION DOLLAR FUND
-  [2767] 2026-06-26  base 2097.3609 -> source 2073.7734  mais voisins a 1.5132 (ecart x1370.5)  COWRY EUROBOND FUND
-  [1196] 2025-11-28  base 1657.4200 -> source 169387.5400  mais voisins a 169387.5400 (ecart x101.5)  EMERGING AFRICA EUROBOND F
-  [2878] 2026-05-08  base 1.5200 -> source 2089.9135  mais voisins a 2089.9135 (ecart x1374.9)  FCMBAM USD Bond Fund
+  [2766] 2026-06-26  base 1.1200 -> source 1534.9103  mais voisins a 1519.4241 (ecart x1381.6)  COMERCIO PARTNERS DOLLAR F
+  [1196] 2026-05-08  base 1664.5438 -> source 159101.7117  mais voisins a 159101.7117 (ecart x96.2)  EMERGING AFRICA EUROBOND F
   [2878] 2026-07-10  base 2124.6150 -> source 2096.3913  mais voisins a 1.5300 (ecart x1370.2)  FCMBAM USD Bond Fund
-  ... et 44 autre(s)
+  [2878] 2026-07-31  base 1.5400 -> source 2097.6134  mais voisins a 2124.6150 (ecart x1362.1)  FCMBAM USD Bond Fund
+  [1212] 2026-01-16  base 267.4600 -> source 274.1700  mais voisins a 26.5700 (ecart x10.3)  FRONTIER FUND
+  [2772] 2026-05-29  base 1483.1149 -> source 1437.4912  mais voisins a 1.0451 (ecart x1375.5)  GREENWICH FIXED INCOME DOL
+  [2772] 2026-06-05  base 1.0800 -> source 1483.1149  mais voisins a 1483.1149 (ecart x1373.3)  GREENWICH FIXED INCOME DOL
+  [2772] 2026-07-03  base 1.0700 -> source 1477.5982  mais voisins a 1477.5982 (ecart x1380.9)  GREENWICH FIXED INCOME DOL
+  [2856] 2026-06-11  base 1.1600 -> source 1580.1663  mais voisins a 1580.1663 (ecart x1362.2)  LEAD DOLLAR FIXED INCOME F
+  [1205] 2024-02-16  base 3.6000 -> source 0.0200  mais voisins a 0.0200 (ecart x168.5)  LEGACY DEBT FUND
+  [2758] 2024-06-28  base 103.6200 -> source 10.2880  mais voisins a 10.2880 (ecart x10.2)  MERISTEM FIXED INCOME FUND
+  [1168] 2022-05-13  base 428.3849 -> source 1.0317  mais voisins a 1.0317 (ecart x416.5)  NIGERIA DOLLAR INCOME FUND
+  [1168] 2022-06-03  base 430.7589 -> source 1.0353  mais voisins a 1.0353 (ecart x422.2)  NIGERIA DOLLAR INCOME FUND
+  [1239] 2024-01-12  base 891.9720 -> source 1.0100  mais voisins a 1.0100 (ecart x918.4)  NOVA DOLLAR FIXED INCOME F
+  [1239] 2026-05-22  base 1747.0755 -> source 1715.3514  mais voisins a 1.2600 (ecart x1361.4)  NOVA DOLLAR FIXED INCOME F
+  [1239] 2026-05-29  base 1.2700 -> source 1747.0755  mais voisins a 1747.0755 (ecart x1375.7)  NOVA DOLLAR FIXED INCOME F
+  ... et 7 autre(s)
 
   Ces lignes relevent d une autre cause. A instruire separement.
 
@@ -721,7 +724,7 @@ Ruptures d echelle Nigeria encore en base : 226
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-08-29 15:03:06 UTC — LECTURE SEULE
+Mesure le 2026-08-29 15:07:02 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 233 ligne(s) sur 84 fonds
