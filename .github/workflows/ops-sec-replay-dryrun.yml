@@ -56,6 +56,7 @@ on:
       - 'scripts/import/import_vl_nigeria_sec.js'
       - 'scripts/diag/ondemand/diag_ecart_csv_base.js'
       - 'src/lib/sec_csv.js'
+      - 'scripts/diag/scan_sec_headers.py'
 
 permissions:
   contents: write
@@ -196,6 +197,20 @@ jobs:
               echo "--- $AN : ${F:-aucun fichier .xlsx}"
               [ -n "$F" ] && python3 scripts/diag/dump_sec_header_structure.py "$F" 2>&1 | head -22
             done
+
+            echo ""
+            echo "=============================================="
+            echo " 1ter. BALAYAGE DE TOUS LES FICHIERS SEC"
+            echo "=============================================="
+            # Trois echantillons ne font pas une preuve : les trois fichiers
+            # regardes ci-dessus n ont que des en-tetes (N), mais celui de 2026
+            # est le fichier du 10 avril, deja connu pour n avoir aucune colonne
+            # dollar — l echantillon designait le cas particulier. Ce balayage
+            # ouvre les ~550 fichiers et compte, par annee, combien portent au
+            # moins un en-tete en dollars. Le script vit dans le depot plutot que
+            # dans ce YAML : un heredoc Python imbrique casse le bloc, et un
+            # script versionne se relit, se teste et se corrige.
+            timeout 900 python3 scripts/diag/scan_sec_headers.py sec_ng_downloads 2>&1 | tail -40
 
             echo ""
             echo "=============================================="
