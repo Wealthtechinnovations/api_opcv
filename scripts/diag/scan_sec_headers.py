@@ -24,6 +24,18 @@ Ce script ouvre TOUS les fichiers et compte, par annee, combien portent au moins
 un en-tete en dollars. Il ne juge pas les valeurs : seulement la presence d une
 colonne. C est la source qui repond.
 
+COUVERTURE — corrigee le 2026-08-29. La premiere version ne balayait que
+`*/*.xlsx` et a lu 340 fichiers. Or `PROMPT_NIGERIA_ZERO_REGRESSION_V2_2.md`
+(ligne 61) recense **686 fichiers officiels SEC sur les pages annuelles
+2011-2026**, et le cache du serveur contient aussi des `.xls` anciens
+qu openpyxl ne sait pas ouvrir. Conclure « aucun dollar avant 2026 » sur la
+moitie du corpus, en ayant ecarte precisement les fichiers les plus anciens,
+n etait pas une mesure : c etait un echantillon presente comme un recensement.
+
+Le balayage couvre desormais toutes les extensions et toute profondeur, et
+affiche explicitement ce qu il n a PAS pu lire. Un fichier illisible doit
+apparaitre comme tel, jamais disparaitre du denominateur.
+
 LECTURE SEULE : aucun fichier n est modifie, aucune base n est touchee.
 
 USAGE
@@ -70,22 +82,50 @@ def entetes_du_fichier(chemin):
 
 def main():
     racine = sys.argv[1] if len(sys.argv) > 1 else "sec_ng_downloads"
-    motif = os.path.join(racine, "*", "*.xlsx")
-    fichiers = sorted(glob.glob(motif))
+    # Toute profondeur, toutes extensions de classeur. `*/*.xlsx` ratait a la
+    # fois les .xls anciens et tout fichier range autrement.
+    tous = sorted(
+        c for c in glob.glob(os.path.join(racine, "**", "*"), recursive=True)
+        if os.path.isfile(c) and os.path.splitext(c)[1].lower() in (".xlsx", ".xlsm", ".xls")
+    )
+    fichiers = [c for c in tous if os.path.splitext(c)[1].lower() != ".xls"]
+    anciens_xls = [c for c in tous if os.path.splitext(c)[1].lower() == ".xls"]
 
-    if not fichiers:
-        print(f"Aucun fichier .xlsx sous {motif}")
+    if not tous:
+        print(f"Aucun classeur sous {racine}")
         return
 
-    print(f"\n=== EN-TETES SEC — {len(fichiers)} fichiers sous {racine} ===\n")
+    print(f"\n=== EN-TETES SEC — {len(tous)} classeurs sous {racine} ===\n")
+    print(f"  {len(fichiers)} lisibles directement (.xlsx / .xlsm)")
+    print(f"  {len(anciens_xls)} au format .xls ancien — openpyxl ne les ouvre pas")
+    # Le prompt de reference recense le corpus officiel. L ecart se dit, il ne
+    # se tait pas : une couverture partielle presentee comme complete est
+    # exactement ce qui a coute des mois a ce chantier.
+    ATTENDU = 686
+    manquants = ATTENDU - len(tous)
+    if manquants > 0:
+        print(f"  {manquants} fichier(s) ABSENTS du cache — le prompt V2.2 en recense {ATTENDU} (2011-2026)")
+        print("  Toute conclusion ci-dessous ne vaut donc que pour les fichiers PRESENTS.")
+    print()
 
     stats = collections.defaultdict(lambda: {"total": 0, "usd": 0, "ngn": 0, "erreurs": 0})
     exemples_usd = []
     premiers_usd = {}
 
+    # L annee vient du nom du fichier quand il la porte, sinon du repertoire :
+    # se fier a la position dans le chemin cassait des que l arborescence
+    # changeait de profondeur.
+    def annee_de(chemin):
+        m = re.search(r"(20\d{2})", os.path.basename(chemin))
+        if m:
+            return m.group(1)
+        for partie in chemin.split(os.sep):
+            if re.fullmatch(r"20\d{2}", partie):
+                return partie
+        return "?"
+
     for chemin in fichiers:
-        parties = chemin.split(os.sep)
-        annee = parties[1] if len(parties) > 2 else "?"
+        annee = annee_de(chemin)
         b = stats[annee]
         b["total"] += 1
         try:
@@ -127,7 +167,15 @@ def main():
 
     total = sum(b["total"] for b in stats.values())
     total_usd = sum(b["usd"] for b in stats.values())
-    print(f"\n  Total : {total_usd} fichier(s) sur {total} portent au moins un en-tete en dollars.")
+    print(f"\n  Total : {total_usd} fichier(s) sur {total} lus portent au moins un en-tete en dollars.")
+
+    if anciens_xls:
+        par_annee_xls = collections.Counter(annee_de(c) for c in anciens_xls)
+        print(f"\n  NON LUS — {len(anciens_xls)} fichiers .xls, par annee :")
+        for an in sorted(par_annee_xls):
+            print(f"    {an} : {par_annee_xls[an]}")
+        print("  Ils demandent une conversion LibreOffice, deja utilisee par l extracteur.")
+        print("  Tant qu ils ne sont pas lus, aucune affirmation sur ces annees n est fondee.")
 
     if premiers_usd:
         # Le mois est extrait du nom pour classer chronologiquement ; a defaut on
