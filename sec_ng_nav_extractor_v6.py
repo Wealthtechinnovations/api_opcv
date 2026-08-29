@@ -346,6 +346,19 @@ class NavRecord:
     quality_flags: str
     extraction_status: str
 
+    # Prix par devise, INDEPENDAMMENT de la colonne retenue dans `vl_price`.
+    # Emis pour que l aval puisse corriger vers une devise choisie sans jamais
+    # convertir : une valeur lue, ou rien. Vide quand la SEC ne publie pas cette
+    # devise ce jour-la — l absence est une information, pas un trou a combler.
+    # Defaut vide : ces champs viennent APRES des champs sans defaut, ce qui
+    # n est licite que dans cet ordre. Les placer avant leverait
+    # « non-default argument follows default argument » — erreur qu `ast.parse`
+    # ne detecte pas, comme le lot AI l a appris a ses depens.
+    vl_price_ngn: Any = ""
+    vl_price_ngn_source: str = ""
+    vl_price_usd: Any = ""
+    vl_price_usd_source: str = ""
+
 
 @dataclass
 class AuditRecord:
@@ -1596,6 +1609,52 @@ def choose_vl_price(offer_price: Any, unit_price: Any, bid_price: Any) -> Tuple[
     return None, ""
 
 
+def price_in_currency(
+    valeurs: Dict[int, Any],
+    price_columns: List[Tuple[str, int, str]],
+    devise_voulue: str,
+) -> Tuple[Any, str]:
+    """Le prix publie dans UNE devise donnee, quelle que soit la colonne retenue.
+
+    POURQUOI CETTE FONCTION EXISTE
+    ------------------------------
+    `choose_price_column` retient UNE colonne — celle dont la devise correspond
+    au fonds — et l extracteur n emet que celle-la. Or corriger l historique
+    demande le prix dans une devise PRECISE, choisie en aval et non par
+    l extracteur.
+
+    Mesure du 2026-08-29 : la base contient 233 ruptures d echelle, dont 208 ont
+    une source SEC identifiable. Les corriger vers le naira supposait de disposer
+    du prix naira de chaque semaine — introuvable dans le CSV, qui ne portait que
+    la colonne retenue, parfois le dollar. Sans cette fonction, la seule maniere
+    d obtenir un naira aurait ete de diviser un dollar par un taux : fabriquer
+    une valeur que personne n a publiee. La regle du projet l interdit, et a
+    juste titre.
+
+    L extracteur connait pourtant deja toutes les colonnes et leurs devises : il
+    ne les exposait simplement pas. Cette fonction ne decouvre rien, elle rend
+    lisible ce qui etait deja lu.
+
+    Meme ordre de priorite que `choose_price_column` — le prix unitaire EST la
+    VL, Bid et Offer sont des replis — pour que les deux sorties soient
+    comparables. Une priorite differente rendrait les deux colonnes du CSV
+    incoherentes entre elles sans que rien ne le signale.
+
+    Retourne (valeur, source_du_prix). (None, "") si cette devise n est pas
+    publiee : une absence se dit, elle ne se comble pas.
+    """
+    if not devise_voulue:
+        return None, ""
+    rang = {"unit_price": 0, "offer_price": 1, "bid_price": 2}
+    for kind, col, devise in sorted(price_columns, key=lambda x: rang.get(x[0], 9)):
+        if devise != devise_voulue:
+            continue
+        v = valeurs.get(col)
+        if safe_float(v) is not None:
+            return v, kind if kind == "unit_price" else f"{kind}_fallback"
+    return None, ""
+
+
 def choose_price_column(
     valeurs: Dict[int, Any],
     price_columns: List[Tuple[str, int, str]],
@@ -1828,6 +1887,16 @@ def parse_sheet_records(
                 vl_price, vl_source, _dev_col, _prov = choose_price_column(
                     _valeurs, block.price_columns, currency_code
                 )
+                # Le meme bloc porte typiquement les deux devises. On les emet
+                # toutes les deux, en plus de la colonne retenue : l aval choisit
+                # alors sa devise sans jamais convertir. Vide quand la SEC ne
+                # publie pas cette devise ce jour-la.
+                vl_price_ngn, vl_price_ngn_source = price_in_currency(
+                    _valeurs, block.price_columns, "NGN"
+                )
+                vl_price_usd, vl_price_usd_source = price_in_currency(
+                    _valeurs, block.price_columns, "USD"
+                )
                 if _dev_col:
                     vl_currency_code = _dev_col
                     vl_currency_source = _prov
@@ -1845,6 +1914,13 @@ def parse_sheet_records(
                 vl_currency_code = currency_code
                 vl_currency_source = "inferred_" + currency_source
                 vl_currency_confidence = min(currency_conf, 50)
+                # Chemin de repli : aucune colonne ne declare sa devise, donc
+                # aucun prix ne peut etre attribue a une devise SUR PREUVE.
+                # Les laisser vides est le seul choix honnete — les remplir avec
+                # `vl_price` reviendrait a affirmer une devise deduite du nom du
+                # fonds, c est-a-dire le defaut meme que le lot AI a corrige.
+                vl_price_ngn, vl_price_ngn_source = None, ""
+                vl_price_usd, vl_price_usd_source = None, ""
 
             if safe_float(vl_price) is None:
                 continue
@@ -1914,6 +1990,10 @@ def parse_sheet_records(
                 unit_price=unit_price,
                 vl_price=vl_price,
                 vl_price_source=vl_source,
+                vl_price_ngn=vl_price_ngn if vl_price_ngn is not None else "",
+                vl_price_ngn_source=vl_price_ngn_source,
+                vl_price_usd=vl_price_usd if vl_price_usd is not None else "",
+                vl_price_usd_source=vl_price_usd_source,
                 vl_currency_code=vl_currency_code,
                 vl_currency_source=vl_currency_source,
                 vl_currency_confidence=vl_currency_confidence,
