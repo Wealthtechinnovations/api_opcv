@@ -179,6 +179,26 @@ jobs:
 
             echo ""
             echo "=============================================="
+            echo " 1bis. LA SEC PUBLIAIT-ELLE DES DOLLARS AVANT 2026 ?"
+            echo "=============================================="
+            # QUESTION DECISIVE. La devise emise par l extracteur passe de 0 % de
+            # dollars en 2022-2025 a 51 % en 2026, sans aucun degrade. Deux causes
+            # possibles, et elles n appellent pas le meme remede :
+            #   - la SEC a commence a publier une colonne dollar en 2026 : alors
+            #     l historique ancien n en contient pas, et rien ne peut le rendre
+            #     dollar sans fabriquer des valeurs ;
+            #   - ou l extracteur ne sait lire que le format 2026 : alors la donnee
+            #     existe et l amputer serait detruire du recuperable.
+            # On interroge les fichiers eux-memes plutot que de trancher au flair.
+            for AN in 2024 2025 2026; do
+              F=$(ls -1 sec_ng_downloads/$AN/*.xlsx 2>/dev/null | head -1)
+              echo ""
+              echo "--- $AN : ${F:-aucun fichier .xlsx}"
+              [ -n "$F" ] && python3 scripts/diag/dump_sec_header_structure.py "$F" 2>&1 | head -22
+            done
+
+            echo ""
+            echo "=============================================="
             echo " 2. SIMULATION DE L IMPORT (aucune ecriture)"
             echo "=============================================="
             # --dry-run est implemente dans l importeur : il parcourt tout,
