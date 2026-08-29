@@ -91,6 +91,40 @@ const j = x => {
     }
     console.log(`Fonds pour lesquels la SEC publie au moins une mesure en dollars : ${concernes.length}\n`);
 
+    // REPARTITION PAR ANNEE — indispensable avant de conclure. Un diagnostic
+    // anterieur, sur les fichiers de 2026 seuls, comptait 596 mesures en dollars
+    // contre 643 en nairas : pres de la moitie. Si le total sur 2022-2026 n en
+    // donne qu une dizaine par fonds, les deux ne peuvent pas etre vrais en meme
+    // temps — et la difference dit laquelle des deux causes est en jeu :
+    //   - la SEC ne publiait pas de colonne dollar avant une certaine annee
+    //     (alors l option dollar est reellement impossible sur l historique) ;
+    //   - ou l extracteur ne sait pas lire l en-tete des fichiers anciens
+    //     (alors c est l extracteur qu il faut corriger, pas l historique qu il
+    //     faut amputer).
+    const parAnnee = new Map();
+    for (const [id, dates] of csvParFonds.entries()) {
+      if (!concernes.some(c => c.id === id)) continue;
+      for (const [date, d] of dates.entries()) {
+        const an = date.slice(0, 4);
+        if (!parAnnee.has(an)) parAnnee.set(an, { USD: 0, NGN: 0, autre: 0, vide: 0 });
+        const b = parAnnee.get(an);
+        if (d.devise === 'USD') b.USD++;
+        else if (d.devise === 'NGN') b.NGN++;
+        else if (!d.devise) b.vide++;
+        else b.autre++;
+      }
+    }
+    console.log('## Devise emise par l extracteur, par annee (fonds concernes seulement)\n');
+    console.log(`  ${'annee'.padEnd(6)} ${'USD'.padStart(7)} ${'NGN'.padStart(7)} ${'vide'.padStart(7)} ${'autre'.padStart(7)}   part USD`);
+    for (const an of [...parAnnee.keys()].sort()) {
+      const b = parAnnee.get(an);
+      const tot = b.USD + b.NGN + b.vide + b.autre;
+      const pct = tot ? (b.USD / tot) * 100 : 0;
+      console.log(`  ${an.padEnd(6)} ${String(b.USD).padStart(7)} ${String(b.NGN).padStart(7)} ${String(b.vide).padStart(7)} ${String(b.autre).padStart(7)}   ${pct.toFixed(1)} %`);
+    }
+    console.log('');
+
+
     // Les VL en base pour ces fonds, sur la periode couverte par le CSV.
     const ids = concernes.map(c => c.id);
     if (!ids.length) { console.log('Aucun fonds concerne.\n'); return; }
