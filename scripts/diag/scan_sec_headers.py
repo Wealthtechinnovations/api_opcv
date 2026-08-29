@@ -108,9 +108,12 @@ def main():
 
         if a_usd:
             b["usd"] += 1
-            nom = os.path.basename(chemin)
-            if annee not in premiers_usd:
-                premiers_usd[annee] = nom
+            # Tous les noms, pas le premier rencontre : `sorted(glob)` trie par
+            # ordre ALPHABETIQUE, donc « 10th_July » precede « 15th_May ».
+            # Annoncer « premier fichier a colonne dollar » d apres cet ordre
+            # donnerait une date fausse — et c est la date de bascule qui decide
+            # du perimetre applicable.
+            premiers_usd.setdefault(annee, []).append(os.path.basename(chemin))
         if a_ngn:
             b["ngn"] += 1
 
@@ -127,9 +130,22 @@ def main():
     print(f"\n  Total : {total_usd} fichier(s) sur {total} portent au moins un en-tete en dollars.")
 
     if premiers_usd:
-        print("\n  Premier fichier a colonne dollar, par annee :")
+        # Le mois est extrait du nom pour classer chronologiquement ; a defaut on
+        # affiche la liste brute plutot qu une date qu on ne sait pas ordonner.
+        MOIS = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"]
+        def rang(nom):
+            for i, m in enumerate(MOIS):
+                if m.lower() in nom.lower():
+                    jour = re.search(r"(\d{1,2})(?:st|nd|rd|th)", nom)
+                    return (i, int(jour.group(1)) if jour else 0)
+            return (99, 0)
+        print("\n  Fichiers a colonne dollar, par annee (ordre chronologique) :")
         for annee in sorted(premiers_usd):
-            print(f"    {annee} : {premiers_usd[annee]}")
+            noms = sorted(premiers_usd[annee], key=rang)
+            print(f"    {annee} : {len(noms)} fichier(s), du premier au dernier")
+            print(f"      debut : {noms[0]}")
+            print(f"      fin   : {noms[-1]}")
 
     if exemples_usd:
         print("\n  Exemples d en-tetes en dollars :")
