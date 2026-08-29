@@ -57,6 +57,9 @@ on:
       - 'scripts/diag/ondemand/diag_ecart_csv_base.js'
       - 'src/lib/sec_csv.js'
       - 'scripts/diag/scan_sec_headers.py'
+      # L extracteur lui-meme : c est lui que la mesure met a l epreuve. Sans
+      # cette ligne, le modifier ne relancait rien du tout.
+      - 'sec_ng_nav_extractor_v6.py'
 
 permissions:
   contents: write
@@ -153,8 +156,17 @@ jobs:
             REUTILISE=0
             if [ "${REEXTRAIRE:-auto}" != "oui" ] && [ -s sec_ng_replay.csv ]; then
               AGE_H=$(( ( $(date +%s) - $(stat -c %Y sec_ng_replay.csv) ) / 3600 ))
-              if [ "$AGE_H" -lt 24 ] || [ "${REEXTRAIRE:-auto}" = "non" ]; then
-                echo "CSV de rejeu existant, ${AGE_H} h — reutilise sans reextraction."
+              # Un CSV plus ancien que l extracteur a ete produit par une AUTRE
+              # version : le reutiliser masquerait precisement l effet du
+              # changement qu on veut mesurer. La regle de reutilisation, posee
+              # pour eviter une extraction fragile de huit minutes, se
+              # retournerait alors contre son objet.
+              CSV_TS=$(stat -c %Y sec_ng_replay.csv)
+              EXTR_TS=$(stat -c %Y sec_ng_nav_extractor_v6.py 2>/dev/null || echo 0)
+              if [ "$CSV_TS" -lt "$EXTR_TS" ]; then
+                echo "CSV (${AGE_H} h) anterieur a l extracteur — reextraction imposee."
+              elif [ "$AGE_H" -lt 24 ] || [ "${REEXTRAIRE:-auto}" = "non" ]; then
+                echo "CSV de rejeu existant, ${AGE_H} h, posterieur a l extracteur — reutilise."
                 REUTILISE=1
               fi
             fi
