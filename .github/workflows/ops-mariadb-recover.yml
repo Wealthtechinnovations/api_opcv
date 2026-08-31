@@ -45,7 +45,12 @@ on:
       - '.github/workflows/ops-mariadb-recover.yml'
 
 permissions:
-  contents: read
+  # `write` depuis le 2026-08-31 : le resume GitHub n est lisible que dans
+  # l onglet Actions, donc invisible a toute session sans acces a l API GitHub.
+  # Or c est precisement le releve de ce workflow — journal systemd, traces OOM,
+  # memoire disponible — qui contient la cause des pannes a repetition. Le garder
+  # hors du depot, c est redemarrer quatre fois sans jamais lire le diagnostic.
+  contents: write
 
 concurrency:
   group: ops-mariadb
@@ -58,6 +63,15 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      # Sans checkout, la derniere etape n a aucun arbre de travail ou ecrire
+      # son rapport : `git add` echouerait. Meme `ref` explicite que les autres
+      # workflows d operation — un workflow_dispatch peut partir de n importe
+      # quelle branche, le rapport doit toujours atterrir sur celle-ci.
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
       - name: Verifier les secrets
         env:
           HOST: ${{ secrets.S2_HOST }}
@@ -175,6 +189,52 @@ jobs:
             cat rapport-db.txt 2>/dev/null || echo "(aucune sortie — connexion SSH impossible)"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # Le releve — journal systemd, traces OOM, memoire — est ce qui permettra
+      # d expliquer les pannes a repetition. Il doit rester lisible dans le
+      # depot, pas seulement dans l onglet Actions. Chaque execution AJOUTE au
+      # journal au lieu de l ecraser : c est la SUITE des incidents qui montre
+      # le motif, pas le dernier pris isolement.
+      - name: Consigner le rapport dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          FICHIER=docs/OPS_MARIADB.md
+          if [ ! -f "$FICHIER" ]; then
+            {
+              echo "# MariaDB — journal des pannes et des remises en route"
+              echo
+              echo "> Genere par \`ops-mariadb-recover.yml\`. Ne pas modifier a la main."
+              echo "> Chaque execution ajoute une entree : c est la suite qui montre le motif."
+            } > "$FICHIER"
+          fi
+          {
+            echo
+            echo "---"
+            echo
+            echo "## Execution du $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo
+            echo "Declencheur : \`${{ github.event_name }}\` — par \`${{ github.actor }}\`"
+            echo
+            echo '```'
+            cat rapport-db.txt 2>/dev/null || echo "(aucune sortie — connexion SSH impossible)"
+            echo '```'
+          } >> "$FICHIER"
+
+          git add "$FICHIER"
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(ops): MariaDB — releve du $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : ne jamais ecraser un commit pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Releve consigne dans le depot."
+          fi
 
       - name: Effacer la cle SSH
         if: always()
