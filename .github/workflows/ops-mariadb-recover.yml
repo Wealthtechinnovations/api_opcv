@@ -7,6 +7,19 @@
 # est sain (71 %, 44 Go libres), les process PM2 sont en ligne — ils ne plantent
 # pas, ils n atteignent simplement plus la base.
 #
+# CE N EST PLUS UN INCIDENT, C EST UN MOTIF. Quatre occurrences constatees :
+#   2026-08-17         — premiere observation, a l origine de ce workflow
+#   2026-08-27 21:40   — puis de nouveau a 22:00 le meme soir
+#   2026-08-31 18:33   — en pleine correction de VL, meme message de socket
+#                        (disque sain : 81 %, 30 Go libres)
+#
+# Redemarrer retablit le service mais n explique rien. La section 2 releve
+# journal systemd, traces OOM et memoire disponible precisement pour que la
+# cause finisse par se voir : un service qui tombe quatre fois en quinze jours
+# tombera une cinquieme, et probablement pendant une ecriture. Tant que la cause
+# n est pas etablie, toute correction de donnees doit etre transactionnelle et
+# accompagnee d un snapshot — ce que font les scripts `scripts/fix/*`.
+#
 # Aucun outil MCP gouverne ne couvre le redemarrage d un service : le bridge
 # n expose que des redemarrages Passenger pour le projet legacy et le conteneur
 # MCP de S1. Le canal SSH de la CI est donc le seul chemin disponible.
