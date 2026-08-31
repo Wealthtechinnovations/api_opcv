@@ -247,7 +247,21 @@ async function trouverCorrections(conn, cheminCsv) {
     if (!sains.length) return null;
     sains.sort((a, b) => a - b);
     const m = Math.floor(sains.length / 2);
-    return sains.length % 2 ? sains[m] : (sains[m - 1] + sains[m]) / 2;
+    const mediane = sains.length % 2 ? sains[m] : (sains[m - 1] + sains[m]) / 2;
+
+    // La mediane ne veut rien dire sur une serie BIMODALE. Certains fonds
+    // « DOLLAR » ont une moitie de releves vers 1,1 (dollars) et l autre vers
+    // 1 400 (nairas) : la mediane tombe alors vers 696, un nombre qui n existe
+    // dans aucun fichier et ne ressemble a aucune VL du fonds. Juger une
+    // correction contre un tel repere, c est croire mesurer alors qu on tire au
+    // sort — et c est exactement le genre de faux repere qui a coute trois
+    // lignes ce jour-la.
+    //
+    // Ces series-la ne se reparent pas ligne par ligne : il faut d abord
+    // trancher leur devise (voir diag_devise_declaree_nigeria.js). On le dit,
+    // au lieu d ecrire sur la foi d un repere qui n en est pas un.
+    if (sains[sains.length - 1] / sains[0] >= FACTEUR) return { bimodale: true };
+    return mediane;
   }
 
   const corrections = [];
@@ -263,6 +277,10 @@ async function trouverCorrections(conn, cheminCsv) {
     }
     const ref = referenceSaine(r.fund_id, r.date);
     if (ref === null) { refusees.push({ ...r, naira: s.prix, motif: 'aucune reference saine pour juger' }); continue; }
+    if (ref && ref.bimodale) {
+      refusees.push({ ...r, naira: s.prix, motif: 'serie bimodale — devise a trancher avant toute ecriture' });
+      continue;
+    }
 
     // La ligne est-elle coupable, ou seulement VOISINE d une coupable ?
     //
