@@ -13,7 +13,9 @@
  *   2. le fichier SEC relu publie un prix NAIRA pour ce fonds a cette date —
  *      colonne `vl_price_ngn`, emise explicitement par l extracteur ;
  *   3. cette valeur RESOUT la rupture : elle retombe dans l ordre de grandeur du
- *      voisin SAIN le plus proche.
+ *      voisin SAIN le plus proche ;
+ *   4. la ligne est bien la COUPABLE, pas la voisine d une coupable : sa valeur
+ *      en base s ecarte elle-meme d un facteur >= 10 du voisin sain.
  *
  * La troisieme condition est la plus importante et la plus facile a oublier.
  * Une correction qui remplace une valeur aberrante par une autre valeur
@@ -211,6 +213,25 @@ async function trouverCorrections(conn, cheminCsv) {
     }
     const ref = voisinSain(r.fund_id, r.date);
     if (ref === null) { refusees.push({ ...r, naira: s.prix, motif: 'aucun voisin sain pour juger' }); continue; }
+
+    // La ligne est-elle coupable, ou seulement VOISINE d une coupable ?
+    //
+    // La requete signale une rupture des que deux VL consecutives different d un
+    // facteur 10. Elle en signale donc DEUX : la valeur aberrante, et la valeur
+    // saine qui la precede ou la suit. Sans ce test, le correctif reecrivait les
+    // deux — et sur MYRTLE DOLLAR SHIELD au 2026-06-11 il aurait remplace 1533,67
+    // (voisin sain : 1534,91) par 1370,39, creusant un trou de 10 % dans une
+    // serie qui n en avait aucun. Corriger une ligne saine reste une regression,
+    // meme quand la valeur ecrite vient de la source.
+    //
+    // Si la valeur en base tient deja dans l ordre de grandeur du voisin sain,
+    // ce n est pas elle qu il faut toucher : c est sa voisine, traitee par
+    // ailleurs. Une fois celle-ci corrigee, la rupture disparait d elle-meme.
+    const ecartBase = Math.max(stocke / ref, ref / stocke);
+    if (ecartBase < FACTEUR) {
+      refusees.push({ ...r, naira: s.prix, ecart: ecartBase, motif: 'ligne saine — rupture portee par sa voisine' });
+      continue;
+    }
 
     const ecart = Math.max(s.prix / ref, ref / s.prix);
     if (ecart >= FACTEUR) {
