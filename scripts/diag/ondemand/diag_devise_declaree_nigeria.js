@@ -196,6 +196,38 @@ const proche = (a, b) => {
       console.log('');
     }
 
+    // LES FONDS DECLARES USD, UN PAR UN — la question decisive, sortie du lot.
+    //
+    // Le verdict global s appuie sur un seuil de 80 %, et ce seuil masque le
+    // fait le plus parlant : chez ces fonds le prix DOLLAR de la source ne colle
+    // JAMAIS (0 %), tandis que le naira colle partiellement. Les correspondances
+    // manquantes ne disent rien de la devise — ce sont les ecarts de valeur deja
+    // connus entre la base et la source, un autre chantier.
+    //
+    // Un fonds a « naira 38 %, dollar 0 % » n est pas indetermine quant a sa
+    // DEVISE : aucune de ses VL n est un prix en dollars. Le tableau ci-dessous
+    // montre les deux taux cote a cote pour que la decision se prenne sur la
+    // mesure, fonds par fonds, et non sur un seuil choisi d avance.
+    const declaresUSD = verdicts.filter(v => v.dev_libelle === 'USD');
+    if (declaresUSD.length) {
+      console.log(`## Les ${declaresUSD.length} fonds declares USD — les deux taux, cote a cote\n`);
+      console.log(`  ${'fonds'.padStart(5)} ${'VL'.padStart(5)} ${'couv'.padStart(5)} ${'naira'.padStart(7)} ${'dollar'.padStart(7)}  ${'verdict'.padEnd(12)} nom`);
+      console.log(`  ${'-'.repeat(5)} ${'-'.repeat(5)} ${'-'.repeat(5)} ${'-'.repeat(7)} ${'-'.repeat(7)}  ${'-'.repeat(12)} ---`);
+      let jamaisDollar = 0;
+      for (const v of declaresUSD.sort((a, b) => b.couvert - a.couvert)) {
+        const pN = v.couvert ? (v.ngn / v.couvert) * 100 : 0;
+        const pU = v.couvert ? (v.usd / v.couvert) * 100 : 0;
+        if (v.couvert && pU === 0) jamaisDollar++;
+        console.log(
+          `  ${String(v.id).padStart(5)} ${String(v.total).padStart(5)} ${String(v.couvert).padStart(5)}` +
+          ` ${(pN.toFixed(0) + ' %').padStart(7)} ${(pU.toFixed(0) + ' %').padStart(7)}  ${v.verdict.padEnd(12)} ${String(v.nom_fond).slice(0, 30)}`
+        );
+      }
+      const couverts = declaresUSD.filter(v => v.couvert > 0).length;
+      console.log(`\n  ${jamaisDollar} de ces fonds sur ${couverts} couverts par le rejeu n ont AUCUNE VL`);
+      console.log('  correspondant a un prix en dollars publie par la SEC.\n');
+    }
+
     // L enjeu chiffre : combien de VL sont aujourd hui converties a l envers.
     const aBasculer = desaccords.filter(v => v.dev_libelle === 'USD' && v.verdict === 'NGN');
     if (aBasculer.length) {
