@@ -12,29 +12,33 @@
  *   1. la ligne est en rupture d echelle (facteur >= 10 avec la VL precedente) ;
  *   2. le fichier SEC relu publie un prix NAIRA pour ce fonds a cette date —
  *      colonne `vl_price_ngn`, emise explicitement par l extracteur ;
- *   3. cette valeur RESOUT la rupture : elle retombe dans l ordre de grandeur du
- *      voisin SAIN le plus proche ;
+ *   3. cette valeur RESOUT la rupture : elle retombe dans l ordre de grandeur de
+ *      la REFERENCE SAINE — la mediane des voisins non rompus les plus proches ;
  *   4. la ligne est bien la COUPABLE, pas la voisine d une coupable : sa valeur
- *      en base s ecarte elle-meme d un facteur >= 10 du voisin sain.
+ *      en base s ecarte elle-meme d un facteur >= 10 de cette reference.
  *
  * La troisieme condition est la plus importante et la plus facile a oublier.
  * Une correction qui remplace une valeur aberrante par une autre valeur
  * aberrante n est pas une correction — elle deplace le probleme en donnant
  * l impression de l avoir traite.
  *
- * Le voisin de reference exclut toute date elle-meme en rupture. Ces ruptures
- * vont presque toujours par paires — l aller et le retour d un meme basculement
- * de devise — et comparer au voisin immediat revenait a juger la reparation
- * d une roue en s appuyant sur l autre roue crevee.
+ * La reference exclut toute date elle-meme en rupture, et porte sur PLUSIEURS
+ * voisins, pas un seul. Ces ruptures vont presque toujours par paires — l aller
+ * et le retour d un meme basculement de devise — et comparer au voisin immediat
+ * revenait a juger la reparation d une roue en s appuyant sur l autre roue
+ * crevee. Un seul voisin ne suffisait pas : quand l aberration dure deux
+ * releves, ce voisin EST l autre moitie du plateau aberrant (voir referenceSaine).
  *
  * AUCUNE CONVERSION, JAMAIS. La valeur ecrite est celle que la SEC a publiee.
  * Multiplier un dollar par un taux fabriquerait un chiffre que personne n a
  * jamais publie : la regle du projet l interdit, et c est precisement ce qui a
  * cree le desordre qu on repare ici.
  *
- * MESURE DU 2026-08-29, fenetre de rejeu 2022-2026 :
- *   226 ruptures Nigeria — 81 resolues (ecrites), 27 non resolues (refusees),
- *   39 deja conformes, 4 sans naira publie, 75 hors fenetre du rejeu.
+ * MESURE DU 2026-08-31, fenetre de rejeu 2022-2026, apres les deux garde-fous :
+ *   226 ruptures Nigeria — 75 ecrites, dont 3 reprises ensuite (plateau aberrant,
+ *   corrige par la mediane), 25 ecartees comme lignes saines, 39 deja conformes,
+ *   8 dont la source reste aberrante, 79 hors fenetre ou sans naira publie.
+ *   Ruptures restantes apres ecriture : 146 (71 dans la fenetre, 75 avant 2022).
  *
  * APRES EXECUTION, deux recalculs restent necessaires — le script les rappelle :
  *   1. node scripts/recalc/recalc_vl_ajuste.js
@@ -54,6 +58,7 @@
  *   node fix_naira_depuis_source.js --execute                # applique
  *   node fix_naira_depuis_source.js --csv autre.csv
  *   node fix_naira_depuis_source.js --rollback data/naira_snapshots/<f>.json
+ *   node fix_naira_depuis_source.js --rollback <f>.json --ids 12,34   # ces lignes seules
  */
 
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
@@ -79,11 +84,15 @@ function parseArgs() {
     csv: path.resolve(__dirname, '../../sec_ng_replay.csv'),
     execute: false,
     rollback: null,
+    ids: null,
   };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--csv' && args[i + 1]) opts.csv = args[++i];
     else if (args[i] === '--execute') opts.execute = true;
     else if (args[i] === '--rollback' && args[i + 1]) opts.rollback = args[++i];
+    else if (args[i] === '--ids' && args[i + 1]) {
+      opts.ids = args[++i].split(',').map(s => s.trim()).filter(Boolean);
+    }
   }
   return opts;
 }
@@ -98,17 +107,38 @@ const j = x => {
   return String(x).slice(0, 10);
 };
 
-async function rollback(conn, fichier) {
+async function rollback(conn, fichier, seulement) {
   const snap = JSON.parse(fs.readFileSync(fichier, 'utf8'));
+  // Un lot n est pas juste ou faux en bloc. Le 2026-08-31, 3 lignes sur 75
+  // etaient a reprendre : tout restaurer aurait annule 72 corrections justes
+  // pour en defaire 3. D ou le filtre — restaurer exactement ce qui doit l etre.
+  let rows = snap.rows;
+  if (seulement && seulement.length) {
+    const garder = new Set(seulement.map(Number));
+    rows = rows.filter(r => garder.has(Number(r.id)));
+    const absents = seulement.filter(id => !rows.some(r => Number(r.id) === Number(id)));
+    if (absents.length) {
+      console.error(`\nABANDON : ces id ne figurent pas dans le snapshot : ${absents.join(', ')}`);
+      console.error('Restaurer une ligne absente du snapshot reviendrait a inventer sa valeur d origine.\n');
+      process.exitCode = 1;
+      return;
+    }
+  }
+
   console.log(`\nROLLBACK depuis ${fichier}`);
   console.log(`  batch   : ${snap.batch}`);
   console.log(`  genere  : ${snap.generated_at}`);
-  console.log(`  lignes  : ${snap.rows.length}\n`);
+  console.log(`  lignes  : ${rows.length}${seulement ? ` (sur ${snap.rows.length} du snapshot)` : ''}\n`);
+
+  for (const r of rows) {
+    console.log(`  id ${r.id} — fonds ${r.fund_id} — restaure a ${Number(r.value).toFixed(4)}`);
+  }
+  console.log('');
 
   await conn.beginTransaction();
   try {
     let n = 0;
-    for (const r of snap.rows) {
+    for (const r of rows) {
       await conn.execute(
         `UPDATE valorisations
             SET value = ?, currency_code = ?, correction_batch = ?
@@ -185,19 +215,39 @@ async function trouverCorrections(conn, cheminCsv) {
     series.get(v.fund_id).push({ date: v.date, value: Number(v.value) });
   }
 
-  // Le voisin SAIN le plus proche : toute date elle-meme en rupture est exclue.
-  function voisinSain(fundId, date) {
+  // La REFERENCE SAINE : la mediane des voisins non rompus les plus proches.
+  //
+  // La premiere version renvoyait le voisin sain le plus PROCHE — un point
+  // unique — et cela s est retourne contre elle le 2026-08-31. Quand l aberration
+  // dure deux releves consecutifs, les deux points bas ne different pas entre eux
+  // d un facteur 10 : la rupture n est donc signalee que sur la ligne SAINE qui
+  // suit le plateau, et le seul voisin « sain » disponible de ce cote est l autre
+  // moitie du plateau. Un plateau aberrant se valide alors lui-meme, et le
+  // correctif ecrase la bonne valeur par la mauvaise. Trois lignes y sont passees
+  // — AFRINVEST et NIGERIA DOLLAR INCOME au 2022-04-01, HOUSING SOLUTION au
+  // 2025-04-11 — avant d etre restaurees.
+  //
+  // Une mediane sur plusieurs voisins resiste a cela : il faudrait que la moitie
+  // de la fenetre soit aberrante pour la faire basculer, la ou un seul point
+  // suffisait. La mediane est preferee a la moyenne pour la meme raison — une
+  // valeur extreme deplace une moyenne, elle ne deplace pas une mediane.
+  const VOISINS = 5;
+  function referenceSaine(fundId, date) {
     const serie = series.get(fundId) || [];
     const i = serie.findIndex(x => x.date === date);
     if (i < 0) return null;
-    for (let d = 1; d < serie.length; d++) {
+    const sains = [];
+    for (let d = 1; d < serie.length && sains.length < VOISINS * 2; d++) {
       for (const k of [i - d, i + d]) {
         if (k < 0 || k >= serie.length) continue;
         if (rompues.has(`${fundId}|${serie[k].date}`)) continue;
-        return serie[k].value;
+        sains.push(serie[k].value);
       }
     }
-    return null;
+    if (!sains.length) return null;
+    sains.sort((a, b) => a - b);
+    const m = Math.floor(sains.length / 2);
+    return sains.length % 2 ? sains[m] : (sains[m - 1] + sains[m]) / 2;
   }
 
   const corrections = [];
@@ -211,8 +261,8 @@ async function trouverCorrections(conn, cheminCsv) {
       refusees.push({ ...r, naira: s.prix, motif: 'deja conforme a la source' });
       continue;
     }
-    const ref = voisinSain(r.fund_id, r.date);
-    if (ref === null) { refusees.push({ ...r, naira: s.prix, motif: 'aucun voisin sain pour juger' }); continue; }
+    const ref = referenceSaine(r.fund_id, r.date);
+    if (ref === null) { refusees.push({ ...r, naira: s.prix, motif: 'aucune reference saine pour juger' }); continue; }
 
     // La ligne est-elle coupable, ou seulement VOISINE d une coupable ?
     //
@@ -247,7 +297,7 @@ async function main() {
   const opts = parseArgs();
   const conn = await mysql.createConnection(DB_CONFIG);
   try {
-    if (opts.rollback) { await rollback(conn, opts.rollback); return; }
+    if (opts.rollback) { await rollback(conn, opts.rollback, opts.ids); return; }
 
     if (!fs.existsSync(opts.csv)) {
       console.error(`CSV introuvable : ${opts.csv}`);
