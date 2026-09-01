@@ -6,6 +6,11 @@
 ## Premiere action obligatoire
 
 A chaque reprise de session ou nouvelle tache, Claude doit imperativement :
+0. Lire `DIRECTIVE_TRAVAIL.md` — directive permanente du 2026-09-01 : comprehension
+   globale avant toute action, zero regression, evolution a partir de l existant,
+   expertise financiere / quantitative / data / full-stack / HTML semantique / meta
+   tags / SEO / Schema.org / Atomic Design, et ordre de travail en douze etapes.
+   Elle complete ce fichier sans le remplacer.
 1. Relire `CLAUDE.md` des deux depots (api_opcv et front_end_opcvm)
 2. Relire `SUIVI.md` (dans front_end_opcvm) pour connaitre l'etat courant des taches
 3. Ne commencer aucune modification avant d'avoir fait ces deux lectures
