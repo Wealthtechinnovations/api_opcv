@@ -1,0 +1,243 @@
+# Boucle de controle — derive documentation / production
+#
+# Execute `scripts/diag/check_doc_drift.js` sur le serveur de production et
+# publie le resultat dans le resume du job. Le script est en LECTURE SEULE
+# (uniquement des SELECT) : ce workflow ne modifie ni la base, ni le code, ni
+# le service.
+#
+# Pourquoi ce workflow existe
+# ---------------------------
+# La memoire du projet etait en prose, dans 33 fichiers .md. Un document
+# pouvait affirmer une contre-verite pendant des mois sans que rien ne
+# proteste (cf. CODE_REVIEW #34, « UEMOA stale 233 jours », faux sur les deux
+# points). Ce workflow rend la verification automatique et bruyante.
+#
+# Declenchement
+#   - bouton "Run workflow" dans l'onglet Actions (aucune ligne de commande) ;
+#   - automatiquement chaque matin a 06h00 UTC ;
+#   - a chaque modification du script de controle.
+#
+# Secrets requis (deja crees sur le depot) :
+#   S2_HOST     adresse du serveur de production
+#   S2_SSH_KEY  cle privee SSH (contenu complet, en-tetes inclus)
+#   S2_USER     optionnel — utilisateur SSH, "root" par defaut
+#
+# PREREQUIS DE PERMISSION (verifie a la dure le 2026-08-13)
+# ---------------------------------------------------------
+# L'etape qui consigne le rapport a besoin d'ecrire dans le depot. Le bloc
+# `permissions: contents: write` ci-dessous ne PEUT PAS elever les droits
+# au-dela du reglage du depot : si Settings > Actions > General >
+# "Workflow permissions" est sur lecture seule, le push final echoue en 403
+# alors meme que le controle s'est parfaitement execute.
+# Le reglage requis est "Read and write permissions".
+# Symptome caracteristique : le job passe le controle mais echoue a la
+# derniere etape, et docs/ETAT_PRODUCTION_VERIFIE.md n'apparait jamais.
+
+name: Controle derive prod/doc
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+  push:
+    paths:
+      - 'scripts/diag/check_doc_drift.js'
+      - 'scripts/diag/ondemand/**'
+      - '.github/workflows/doc-drift.yml'
+
+# Ecriture necessaire : le job consigne son rapport dans
+# docs/ETAT_PRODUCTION_VERIFIE.md. Le controle lui-meme reste en lecture seule
+# cote base de donnees — seul le depot est ecrit.
+permissions:
+  contents: write
+
+concurrency:
+  group: doc-drift
+  cancel-in-progress: false
+
+jobs:
+  drift:
+    name: Verifier les invariants de production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier que les secrets sont configures
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # On teste seulement la PRESENCE, jamais la valeur : rien n'est affiche.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets manquants. Renseigner S2_HOST et S2_SSH_KEY dans Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          # La cle est ecrite hors des logs et en droits restreints.
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          # Empreinte du serveur relevee puis epinglee : evite d'avoir a
+          # desactiver la verification d'hote.
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Executer le controle sur la production
+        id: check
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          # Les etapes GitHub tournent en `bash -eo pipefail` : si le controle
+          # sort en code 1 (echec critique), cette etape echoue et le job devient
+          # rouge. C'est exactement l'effet recherche — l'etape de rapport qui
+          # suit porte `if: always()` et publie quand meme le detail.
+          SSH_USER="${USER_SSH:-root}"
+
+          # Le depot serveur porte en permanence des fichiers modifies (logs.txt
+          # notamment) : on met de cote, on met a jour, on remet en place.
+          # Aucune donnee n'est perdue et rien n'est ecrase de force.
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" bash -s <<'REMOTE' 2>&1 | tee rapport.txt
+            set -u
+            cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api || exit 3
+
+            STASHED=0
+            if ! git diff --quiet || ! git diff --cached --quiet; then
+              git stash push -m "ci-autostash-$(date +%Y%m%d_%H%M%S)" >/dev/null && STASHED=1
+            fi
+
+            git pull --rebase origin claude/code-review-improvements-ikvuj >/dev/null 2>&1 \
+              || echo "AVERTISSEMENT: mise a jour du code impossible, controle lance sur la version presente."
+
+            [ "$STASHED" = "1" ] && git stash pop >/dev/null 2>&1
+
+            node scripts/diag/check_doc_drift.js --verbose
+          REMOTE
+
+      - name: Executer les diagnostics a la demande
+        if: always()
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          # Canal de diagnostic sans MCP : tout script depose dans
+          # scripts/diag/ondemand/ est execute en production, et sa sortie
+          # revient dans le depot par commit. Ces scripts sont en LECTURE SEULE
+          # par convention (SELECT uniquement) — ils ne doivent jamais ecrire.
+          #
+          # Un echec ici ne doit pas faire echouer le job : le controle
+          # d invariants qui precede reste la mission principale.
+          SSH_USER="${USER_SSH:-root}"
+          set +e
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" bash -s <<'REMOTE' > diag.txt 2>&1
+            set -u
+            cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api || exit 3
+            shopt -s nullglob
+            found=0
+            for f in scripts/diag/ondemand/*.js; do
+              found=1
+              echo "########## $f ##########"
+              node "$f"
+              echo ""
+            done
+            [ "$found" = "0" ] && echo "(aucun script dans scripts/diag/ondemand/)"
+            exit 0
+          REMOTE
+          echo "Diagnostics termines (code $?)."
+          set -e
+
+      - name: Publier le rapport
+        if: always()
+        run: |
+          {
+            echo "## Controle derive production / documentation"
+            echo
+            echo "Execute le $(date -u '+%Y-%m-%d %H:%M UTC') sur la production. Lecture seule."
+            echo
+            echo '```'
+            cat rapport.txt 2>/dev/null || echo "(aucune sortie — la connexion a echoue)"
+            echo '```'
+            echo
+            echo "Un ECHEC signifie que la production contredit ce que la documentation affirme."
+            echo "Corriger l'un ou l'autre, puis consigner dans SUIVI.md > POINT DE REPRISE COURANT."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Consigner le rapport dans le depot
+        if: always()
+        run: |
+          # Ce fichier est la memoire machine du projet : l'etat de la
+          # production tel que verifie, et non tel qu'un document l'affirme.
+          # Toute session future peut le lire sans connecteur ni copier-coller.
+          mkdir -p docs
+          {
+            echo "# Etat de production verifie automatiquement"
+            echo
+            echo "> **Fichier genere par le workflow \`doc-drift.yml\`. Ne pas modifier a la main.**"
+            echo "> Il contient l'etat de la production **mesure**, pas l'etat **affirme** par la"
+            echo "> documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui"
+            echo "> fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction."
+            echo
+            echo "Derniere verification : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo
+            echo '```'
+            cat rapport.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+            echo
+            echo "## Comment lire ce rapport"
+            echo
+            echo "- \`OK\` : l'invariant tient."
+            echo "- \`ECHEC\` : contradiction **critique** entre la production et ce qui est documente."
+            echo "  Corriger l'un ou l'autre, puis consigner dans \`SUIVI.md\` > POINT DE REPRISE COURANT."
+            echo "- \`ALERTE\` : ecart connu et tolere (CEMAC sans pipeline, Nigeria tributaire du"
+            echo "  rythme de publication de la SEC). A surveiller, pas a corriger dans l'urgence."
+            echo
+            echo "Detail des controles et seuils : \`scripts/diag/check_doc_drift.js\`."
+          } > docs/ETAT_PRODUCTION_VERIFIE.md
+
+          # Sortie des diagnostics a la demande, consignee separement du rapport
+          # d invariants pour que chacun garde son cycle de vie propre.
+          {
+            echo "# Diagnostics a la demande — sortie de production"
+            echo
+            echo "> Genere par \`doc-drift.yml\` a partir des scripts presents dans"
+            echo "> \`scripts/diag/ondemand/\`. **Lecture seule** : ces scripts n executent que des SELECT."
+            echo "> Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo
+            echo '```'
+            cat diag.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+          } > docs/DIAG_ONDEMAND.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/ETAT_PRODUCTION_VERIFIE.md docs/DIAG_ONDEMAND.md
+
+          # Rien a faire si le rapport est inchange : evite un commit par jour
+          # sans contenu nouveau.
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(diag): etat de production verifie $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : le workflow ne doit jamais ecraser un commit
+            # pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Rapport consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

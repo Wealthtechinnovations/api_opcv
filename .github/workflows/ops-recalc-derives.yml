@@ -1,0 +1,264 @@
+# OPERATION — reconstruire ce qui DERIVE des valorisations, pays par pays.
+#
+# POURQUOI CE WORKFLOW EXISTE
+# ---------------------------
+# `vl_ajuste`, `value_EUR`, `value_USD`, les performances et les classements ne
+# sont pas des donnees : ce sont des calculs sur `value`. Des qu une correction
+# touche `value`, ils deviennent faux — et le site affiche alors des VL justes
+# avec des performances calculees sur les anciennes valeurs. L incoherence est
+# invisible dans la base et parfaitement visible sur une fiche fonds.
+#
+# Le pont MCP ne peut pas lancer ce recalcul : sa liste blanche d arguments
+# refuse `--pays`, et sa fenetre de 60 secondes est trop courte — le recalcul
+# Nigeria seul depasse largement cette limite. D ou ce canal.
+#
+# LA LECON DU `Broken pipe` : une etape SSH qui ne parle pas pendant plusieurs
+# minutes est coupee par le pare-feu intermediaire, et la sortie est perdue
+# alors meme que le travail continue sur le serveur. `ServerAliveInterval`
+# maintient le canal ouvert. Ce n est pas un detail de confort : sans lui, on ne
+# sait pas si le recalcul a reussi.
+#
+# DEUX VERROUS
+# 1. Un `push` sur ce fichier ne declenche QUE le dry-run.
+# 2. Le mode `execute` exige la phrase exacte ci-dessous, verifiee AVANT toute
+#    connexion SSH.
+#
+#    Phrase requise : VALIDER RECALCUL DERIVES
+#
+# LES CLASSEMENTS RESTENT OPT-IN, et ce choix est deliberement conserve ici : un
+# classement se calcule PAR CATEGORIE, toutes zones confondues. Le recalculer
+# deplace donc le rang de fonds d AUTRES pays partageant une categorie avec les
+# fonds recalcules. Ce n est pas une regression — c est la consequence
+# arithmetique d une correction de donnees — mais cela sort du perimetre d un
+# seul pays, et cela doit etre demande, jamais subi.
+#
+# Ne s execute jamais tout seul : aucun `schedule`.
+
+name: OPS — recalcul des derives par pays
+
+on:
+  workflow_dispatch:
+    inputs:
+      pays:
+        description: "Pays a recalculer"
+        required: true
+        default: NIGERIA
+        type: choice
+        options:
+          - NIGERIA
+          - MAROC
+          - TUNISIE
+          - UEMOA
+          - CEMAC
+          - TOUS
+      mode:
+        description: "dry-run (aucune ecriture) ou execute"
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - execute
+      only_perf:
+        description: "Performances seules (etapes 3-4) — si les VL n ont PAS ete corrigees"
+        required: false
+        default: false
+        type: boolean
+      with_classements:
+        description: "Inclure les classements (deplace le rang de fonds d autres pays)"
+        required: false
+        default: false
+        type: boolean
+      confirmation:
+        description: "Pour execute uniquement — taper : VALIDER RECALCUL DERIVES"
+        required: false
+        default: ""
+        type: string
+  push:
+    paths:
+      - '.github/workflows/ops-recalc-derives.yml'
+
+permissions:
+  # `write` parce que le rapport est consigne dans le depot : le resume GitHub
+  # n est lisible que dans l onglet Actions, donc invisible a toute session sans
+  # acces API. Une operation qui touche la production laisse sa trace la ou vit
+  # le projet.
+  contents: write
+
+concurrency:
+  # Deux recalculs simultanes sur la meme base se marcheraient dessus : le second
+  # lirait des derives que le premier est en train de reecrire.
+  group: ops-recalc-derives
+  cancel-in-progress: false
+
+jobs:
+  recalc:
+    name: Etat puis, sur validation, recalcul
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Determiner le mode et verifier la validation
+        id: mode
+        env:
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'dry-run' }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -u
+          PHRASE="VALIDER RECALCUL DERIVES"
+          if [ "$MODE" != "execute" ]; then
+            echo "Mode : dry-run (aucune ecriture)."
+            echo "mode=dry-run" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Comparaison stricte, sans normalisation : une phrase approximative
+          # doit echouer, sinon le verrou ne verrouille rien.
+          if [ "$CONFIRMATION" != "$PHRASE" ]; then
+            echo "::error::Mode execute demande sans la phrase exacte. Attendu : $PHRASE"
+            exit 1
+          fi
+          echo "Mode : EXECUTE — validation reconnue."
+          echo "mode=execute" >> "$GITHUB_OUTPUT"
+
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          # Un workflow_dispatch peut etre lance depuis n importe quelle branche ;
+          # le rapport doit toujours atterrir sur celle-ci.
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Recalculer
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+          MODE: ${{ steps.mode.outputs.mode }}
+          PAYS: ${{ github.event_name == 'workflow_dispatch' && inputs.pays || 'NIGERIA' }}
+          ONLY_PERF: ${{ inputs.only_perf }}
+          WITH_CLASSEMENTS: ${{ inputs.with_classements }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          # ServerAliveInterval : le recalcul reste silencieux plusieurs minutes
+          # d affilee. Sans ces deux options, le canal est coupe et la sortie
+          # perdue alors que le travail se poursuit sur le serveur.
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes \
+              -o ServerAliveInterval=30 -o ServerAliveCountMax=120 \
+              "$SSH_USER@$HOST" \
+            "MODE='$MODE' PAYS='$PAYS' ONLY_PERF='$ONLY_PERF' WITH_CLASSEMENTS='$WITH_CLASSEMENTS' bash -s" \
+            <<'REMOTE' 2>&1 | tee rapport-recalc.txt
+            set -u
+            API_DIR=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+            cd "$API_DIR" || exit 3
+
+            # Le serveur doit executer le code POUSSE, pas celui qu il avait.
+            # Un rejeu anterieur a tourne sur une version ancienne du script et
+            # a rendu un resultat qui ne correspondait a aucun code source.
+            echo "Commit courant sur le serveur, avant mise a jour :"
+            git log -1 --oneline
+            git pull --rebase origin claude/code-review-improvements-ikvuj \
+              || echo "AVERTISSEMENT : pull impossible, le code du serveur peut etre en retard."
+            echo "Commit retenu :"
+            git log -1 --oneline
+            echo ""
+
+            OPTS=""
+            [ "${ONLY_PERF:-false}" = "true" ] && OPTS="$OPTS --only-perf"
+            [ "${WITH_CLASSEMENTS:-false}" = "true" ] && OPTS="$OPTS --with-classements"
+
+            echo "=============================================="
+            echo " 1. ETAT AVANT (dry-run) — pays : $PAYS"
+            echo "=============================================="
+            # Toujours execute, y compris avant une ecriture : si le perimetre a
+            # bouge depuis la mesure, on le voit AVANT de recalculer.
+            node scripts/recalc/recalc_derives_par_pays.js --pays "$PAYS" $OPTS || exit 4
+
+            if [ "${MODE:-dry-run}" != "execute" ]; then
+              echo ""
+              echo "Mode dry-run — aucune ecriture. Fin."
+              exit 0
+            fi
+
+            echo ""
+            echo "=============================================="
+            echo " 2. RECALCUL — pays : $PAYS"
+            echo "=============================================="
+            node scripts/recalc/recalc_derives_par_pays.js \
+              --pays "$PAYS" --execute --confirm $OPTS || exit 5
+
+            echo ""
+            echo "=============================================="
+            echo " 3. VERIFICATION"
+            echo "=============================================="
+            node scripts/recalc/recalc_derives_par_pays.js --pays "$PAYS" $OPTS || true
+          REMOTE
+
+      - name: Publier le rapport
+        if: always()
+        run: |
+          {
+            echo "## Recalcul des derives — ${{ inputs.pays }} — mode : ${{ steps.mode.outputs.mode }}"
+            echo ""
+            echo '```'
+            cat rapport-recalc.txt 2>/dev/null || echo "(aucun rapport)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Consigner le rapport dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          {
+            echo "# Recalcul des derives — journal des operations"
+            echo
+            echo "> Genere par \`ops-recalc-derives.yml\`. Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo "Pays : **${{ inputs.pays }}** — Mode : **${{ steps.mode.outputs.mode }}**"
+            echo "Declencheur : \`${{ github.event_name }}\` — par \`${{ github.actor }}\`"
+            echo
+            echo '```'
+            cat rapport-recalc.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+          } > docs/OPS_RECALC_DERIVES.md
+
+          git add docs/OPS_RECALC_DERIVES.md
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(ops): recalcul derives ${{ inputs.pays }} — ${{ steps.mode.outputs.mode }} $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : ne jamais ecraser un commit pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Rapport consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

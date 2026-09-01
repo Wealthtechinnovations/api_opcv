@@ -70,7 +70,12 @@ const calculateVAR95 = (rendements, confidenceLevel, periodYears) => {
  if (rendements.length === 0) {
   return NaN;
 }
-const sortedReturns = rendements.sort((a, b) => a - b);
+// Copie avant tri : Array.prototype.sort() trie EN PLACE et reordonnait le
+// tableau de l'appelant. La VAR restait juste, mais toute metrique calculee
+// ensuite sur le meme tableau et dependante de l'ordre (drawdown, series
+// chronologiques) travaillait sur des rendements melanges. Valeur de VAR
+// inchangee par ce correctif.
+const sortedReturns = [...rendements].sort((a, b) => a - b);
 const index = Math.floor(sortedReturns.length * (1 - confidenceLevel));
 return sortedReturns[index];
 };
@@ -80,7 +85,8 @@ const calculateVAR99 = (rendements, confidenceLevel, periodYears) => {
   if (rendements.length === 0) {
     return NaN;
   }
-  const sortedReturns = rendements.sort((a, b) => a - b);
+  // Copie avant tri — meme raison que calculateVAR95 ci-dessus.
+  const sortedReturns = [...rendements].sort((a, b) => a - b);
   const index = Math.floor(sortedReturns.length * (1 - confidenceLevel));
   return sortedReturns[index];
 };
@@ -373,16 +379,33 @@ function calculateInformationRatiojour(portfolioReturns, filteredBenchmarkReturn
    return activeReturnAnnuel / trackingError;
  }
 
+function calculateInformationRatiomois(portfolioReturns, filteredBenchmarkReturns, periodYears) {
+  const excessReturns = portfolioReturns.map((ret, idx) => ret - filteredBenchmarkReturns[idx]);
+  const trackingError = calculerVolatilitemois(excessReturns);
+
+  const moyenneActiveReturnMois = mean(excessReturns);
+
+  // Annualiser l'Active Return mensuel moyen
+  const activeReturnAnnuel = moyenneActiveReturnMois * 12;
+
+  return activeReturnAnnuel / trackingError;
+}
+
 function calculateTrackingError(portfolioReturns, filteredBenchmarkReturns, periodYears) {
   if (portfolioReturns.length === 0) {
     return NaN;
   }
-  //const portfolioReturns = calculateRendementsForPeriod(valeursLiquidatives, periodYears);
-  //const filteredBenchmarkReturns = selectDataForPeriod(benchmarkReturns, periodYears);
-
   const excessReturns = portfolioReturns.map((ret, idx) => ret - filteredBenchmarkReturns[idx]);
   const trackingError =calculerVolatilite(excessReturns);
   return trackingError;
+}
+
+function calculateTrackingErrormois(portfolioReturns, filteredBenchmarkReturns) {
+  if (portfolioReturns.length === 0) {
+    return NaN;
+  }
+  const excessReturns = portfolioReturns.map((ret, idx) => ret - filteredBenchmarkReturns[idx]);
+  return calculerVolatilitemois(excessReturns);
 }
 
 
@@ -543,12 +566,14 @@ module.exports = {
   calculateVAR95,
   calculerCAGR,
   calculateTrackingError,
+  calculateTrackingErrormois,
  /* calculateVolatilityJour,
   calculateVolatilityMois,*/
   calculateVAR99,
   calculateInformationRatio,
   calculateSortinoRatio,
   calculateInformationRatiojour,
+  calculateInformationRatiomois,
   calculerR2,
   calculerSkewness,
   calculateKurtosis,

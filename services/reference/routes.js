@@ -477,7 +477,6 @@ router.post('/api/listesociete', async (req, res) => {
   if (selectedpays && selectedpays != 'undefined') {
     whereClause.pays = selectedpays;
   } else {
-    console.log("selectedpays n'est pas défini");
   }
 
   const societes = await societe.findAll({
@@ -597,7 +596,6 @@ router.get('/api/tsr/:year', async (req, res) => {
     const valueArray = values.map(record => record.value);
     const annualYield = math.mean(valueArray);
 
-    console.log(`Le taux sans risque à ${req.params.year} ans est de ${annualYield.toFixed(2)}%`);
 
     res.json({
       code: 200,

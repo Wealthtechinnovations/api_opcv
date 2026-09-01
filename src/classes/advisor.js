@@ -109,4 +109,3 @@ const timeHorizon = 5; // Horizon temporel
 
 const advisor = new RobotAdvisor(assets, prices, investmentAmount, goalReturn, goalVolatility, timeHorizon);
 const suggestedAllocation = advisor.suggestAllocation();
-console.log('Allocation suggérée :', suggestedAllocation);

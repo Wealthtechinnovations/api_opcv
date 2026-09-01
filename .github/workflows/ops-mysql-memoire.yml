@@ -1,0 +1,233 @@
+# DIAGNOSTIC — pourquoi mariadbd occupe 13,7 Go alors que son cache est a 128 Mo.
+#
+# CE QU ON SAIT DEJA, PAR LA MESURE
+# --------------------------------
+# Journal du noyau, 2026-08-31 18:33:01 :
+#
+#   node invoked oom-killer
+#   Out of memory: Killed process 2593316 (mariadbd) anon-rss:13763268kB
+#   InnoDB: Initializing buffer pool, total size = 134217728      <- 128 Mo
+#   Mem: 17945 total
+#
+# MariaDB ne s arrete pas : le noyau le TUE. Un `node` reclame de la memoire,
+# l OOM-killer choisit la plus grosse cible, et c est la base. Quatre fois en
+# quinze jours — 17 aout, 27 aout (21:40 puis 22:00), 31 aout — toujours pendant
+# ou juste apres une charge d ecriture. Ce n est pas aleatoire.
+#
+# L ANOMALIE N EST PAS L OOM, C EST LE 13,7 Go. Avec un buffer pool de 128 Mo,
+# le cache de donnees ne peut pas expliquer cette taille. La memoire vient donc
+# d ailleurs, et il n y a que trois familles de suspects :
+#
+#   1. les buffers PAR SESSION (sort_buffer_size, join_buffer_size,
+#      read_buffer_size, tmp_table_size...) : ils sont alloues par connexion, et
+#      se multiplient donc par max_connections. Un `sort_buffer_size` genereux
+#      est inoffensif a 5 connexions et fatal a 300 ;
+#   2. les tables temporaires en memoire, quand une requete lourde en cree ;
+#   3. une fuite de la 10.6.23.
+#
+# CE WORKFLOW NE TRANCHE PAS ENTRE LES TROIS — il releve les chiffres qui
+# permettent de le faire, et calcule le PIRE CAS : ce que MariaDB s autorise a
+# consommer si toutes les connexions autorisees se servent en meme temps. Si ce
+# pire cas depasse la RAM, la cause est trouvee et le reglage suffit ; s il reste
+# modeste, alors c est la piste 3 et il faut regarder ailleurs.
+#
+# STRICTEMENT EN LECTURE SEULE. Aucune variable n est modifiee, aucun service
+# n est redemarre. Changer la configuration d une base de production est une
+# decision qui se prend sur des chiffres, pas dans un workflow declenche par un
+# push.
+#
+# Ne s execute jamais tout seul : aucun `schedule`.
+
+name: DIAG — memoire MySQL (lecture seule)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ops-mysql-memoire.yml'
+
+permissions:
+  # `write` pour consigner le releve dans le depot : le resume GitHub n est
+  # lisible que dans l onglet Actions, donc invisible a une session sans acces
+  # API. C est la lecon de `ops-mariadb-recover.yml`, ou le diagnostic est reste
+  # invisible pendant quatre pannes.
+  contents: write
+
+concurrency:
+  group: ops-mysql-memoire
+  cancel-in-progress: false
+
+jobs:
+  diag:
+    name: Relever les chiffres, calculer le pire cas
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Relever
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes \
+              -o ServerAliveInterval=30 -o ServerAliveCountMax=20 \
+              "$SSH_USER@$HOST" bash -s <<'REMOTE' 2>&1 | tee rapport-mem.txt
+            set -u
+            cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api 2>/dev/null || exit 3
+
+            echo "=============================================="
+            echo " 1. MEMOIRE DE LA MACHINE"
+            echo "=============================================="
+            free -m 2>&1 || true
+            echo ""
+            echo "RSS actuel de mariadbd :"
+            ps -o rss=,etime=,cmd= -C mariadbd 2>/dev/null \
+              | awk '{printf "  %.2f Go — demarre depuis %s\n", $1/1048576, $2}' \
+              || echo "  mariadbd absent"
+
+            echo ""
+            echo "=============================================="
+            echo " 2. CE QUE MARIADB S AUTORISE A CONSOMMER"
+            echo "=============================================="
+            # Les identifiants sont lus depuis .env, jamais affiches.
+            [ -f .env ] || { echo "  .env absent — releve impossible"; exit 4; }
+            DBU=$(grep -E '^DB_USER=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+            DBN=$(grep -E '^DB_NAME=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+            DBP=$(grep -E '^DB_PASSWORD=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+            [ -n "${DBU:-}" ] || { echo "  DB_USER introuvable"; exit 4; }
+            Q() { MYSQL_PWD="$DBP" mysql -N -B -u "$DBU" "${DBN:-fund_opcvm}" -e "$1" 2>&1; }
+
+            echo "--- buffers GLOBAUX (alloues une fois) ---"
+            Q "SHOW VARIABLES WHERE Variable_name IN (
+                 'innodb_buffer_pool_size','innodb_log_buffer_size',
+                 'key_buffer_size','query_cache_size','tmp_table_size',
+                 'max_heap_table_size','innodb_additional_mem_pool_size');"
+
+            echo ""
+            echo "--- buffers PAR SESSION (multiplies par le nombre de connexions) ---"
+            Q "SHOW VARIABLES WHERE Variable_name IN (
+                 'sort_buffer_size','join_buffer_size','read_buffer_size',
+                 'read_rnd_buffer_size','binlog_cache_size','thread_stack',
+                 'net_buffer_length','max_allowed_packet');"
+
+            echo ""
+            echo "--- connexions ---"
+            Q "SHOW VARIABLES WHERE Variable_name IN ('max_connections','thread_cache_size','table_open_cache');"
+            Q "SHOW STATUS WHERE Variable_name IN ('Max_used_connections','Threads_connected','Threads_running','Created_tmp_disk_tables','Created_tmp_tables');"
+
+            echo ""
+            echo "=============================================="
+            echo " 3. LE PIRE CAS, CALCULE"
+            echo "=============================================="
+            # global + (par_session x max_connections). C est ce que le serveur
+            # s autorise, pas ce qu il consomme maintenant : c est justement ce
+            # plafond qui doit tenir dans la RAM, sinon l OOM n est qu une
+            # question de charge.
+            Q "SELECT
+                 ROUND((@@innodb_buffer_pool_size + @@innodb_log_buffer_size
+                      + @@key_buffer_size + @@query_cache_size) / 1073741824, 2) AS global_Go,
+                 ROUND((@@sort_buffer_size + @@join_buffer_size + @@read_buffer_size
+                      + @@read_rnd_buffer_size + @@thread_stack + @@binlog_cache_size)
+                      / 1048576, 2) AS par_session_Mo,
+                 @@max_connections AS max_conn,
+                 ROUND(((@@innodb_buffer_pool_size + @@innodb_log_buffer_size
+                      + @@key_buffer_size + @@query_cache_size)
+                      + (@@sort_buffer_size + @@join_buffer_size + @@read_buffer_size
+                      + @@read_rnd_buffer_size + @@thread_stack + @@binlog_cache_size)
+                      * @@max_connections) / 1073741824, 2) AS pire_cas_Go,
+                 ROUND(@@max_heap_table_size / 1048576, 0) AS heap_table_Mo,
+                 ROUND(@@tmp_table_size / 1048576, 0) AS tmp_table_Mo;"
+            echo ""
+            echo "  Colonnes : global_Go | par_session_Mo | max_conn | pire_cas_Go | heap_Mo | tmp_Mo"
+            echo "  Comparer pire_cas_Go a la RAM totale relevee en section 1."
+            echo "  Rappel : mariadbd a ete tue a 13,7 Go sur 17,9 Go de RAM."
+
+            echo ""
+            echo "=============================================="
+            echo " 4. QUI CONSOMME, MAINTENANT"
+            echo "=============================================="
+            Q "SELECT COUNT(*) AS connexions, LEFT(COALESCE(USER,'?'),24) AS utilisateur
+                 FROM information_schema.PROCESSLIST GROUP BY USER ORDER BY connexions DESC;"
+
+            echo ""
+            echo "=============================================="
+            echo " FIN — aucune variable modifiee, aucun service redemarre"
+            echo "=============================================="
+          REMOTE
+
+      - name: Publier le rapport
+        if: always()
+        run: |
+          {
+            echo "## Memoire MySQL — releve du $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo
+            echo '```'
+            cat rapport-mem.txt 2>/dev/null || echo "(aucun rapport)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Consigner le releve dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          {
+            echo "# Memoire MySQL — releve"
+            echo
+            echo "> Genere par \`ops-mysql-memoire.yml\`. Lecture seule. Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo "Declencheur : \`${{ github.event_name }}\` — par \`${{ github.actor }}\`"
+            echo
+            echo '```'
+            cat rapport-mem.txt 2>/dev/null || echo "(aucune sortie — connexion SSH impossible)"
+            echo '```'
+          } > docs/OPS_MYSQL_MEMOIRE.md
+
+          git add docs/OPS_MYSQL_MEMOIRE.md
+          if git diff --cached --quiet; then
+            echo "Releve inchange, aucun commit."
+          else
+            git commit -m "chore(ops): memoire MySQL — releve du $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : ne jamais ecraser un commit pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Releve consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

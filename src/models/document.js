@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
     fond_id: {
       type: DataTypes.INTEGER,
     },
+    societe_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     fond: {
       type: DataTypes.STRING(255),
     },

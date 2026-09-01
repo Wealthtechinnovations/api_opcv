@@ -1,0 +1,249 @@
+# OPERATION — retirer les 82 VL non qualifiees qui rompent l echelle (#73).
+#
+# CE QUE CE WORKFLOW SUPPRIME, ET POURQUOI
+# ----------------------------------------
+# Mesure du 2026-08-21 : une seule insertion, celle du 2026-08-10 10:00, a ecrit
+# 2 lignes par fonds — dates 2026-07-17 et 2026-07-24 — portant le prix en
+# DOLLARS dans une serie tenue en NAIRA. 82 lignes, 41 fonds Nigeria, facteur
+# 1 380 a 1 725 : le taux NGN/USD, pas une derive de marche.
+#
+# L historique, lui, est sain et qualifie (`currency_code='NGN'`, `source_url`
+# SEC, batch SECNGFIX_20260802). Les 82 lignes fautives n ont NI devise, NI
+# source, NI batch — c est cette signature que le script retient. Une ligne
+# ayant une provenance n est jamais touchee.
+#
+# Le script supprime plutot que convertir : ramener 119,9184 en naira imposerait
+# de multiplier par un taux, donc de fabriquer une valeur jamais publiee. La
+# valeur naira de ces deux semaines est dans les 553 fichiers source presents sur
+# le serveur ; le cron hebdomadaire la reimportera LUE et non calculee.
+#
+# DEUX VERROUS, VOLONTAIREMENT DISTINCTS
+# --------------------------------------
+# 1. Un `push` sur ce fichier ne declenche QUE le dry-run. Il est donc impossible
+#    de supprimer quoi que ce soit en poussant du code — y compris par erreur.
+# 2. La suppression exige un `workflow_dispatch` manuel AVEC la phrase exacte
+#    ci-dessous. Une phrase absente ou approximative fait echouer le job AVANT
+#    toute connexion SSH.
+#
+#    Phrase requise : VALIDER SUPPRESSION 82 LIGNES
+#
+# Ce n est pas un mot de passe : il existe pour qu on ne puisse pas lancer cette
+# operation distraitement depuis un menu.
+#
+# CE QUE FAIT LE MODE `execute`, DANS CET ORDRE
+#   1. dry-run de controle — si le perimetre a bouge depuis, on le voit AVANT ;
+#   2. suppression (le script prend son propre snapshot JSON complet) ;
+#   3. resynchronisation de `datejour` — la derniere VL de ces fonds recule du
+#      2026-07-24 au 2026-07-10, et la colonne Date des pages pays doit suivre ;
+#   4. releve final : ruptures restantes, chemin du snapshot.
+#
+# CE QU IL NE FAIT PAS : recalculer performances et classements. Ces routes
+# repondent actuellement HTTP 000 (delai depasse) et la question n est pas
+# tranchee ; les enchainer ici melangerait deux problemes distincts. Le cron de
+# 20 h s en charge.
+#
+# ROLLBACK : le script ecrit un snapshot de la LIGNE ENTIERE avant suppression.
+#   node scripts/fix/fix_scale_break_sec.js --rollback data/scale_break_snapshots/<fichier>.json
+# Il reinsere sans creer de doublon si une ligne a entre-temps ete reimportee.
+#
+# Ne s execute jamais tout seul : aucun `schedule`.
+
+name: OPS — retirer les VL en rupture d echelle (#73)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run (aucune ecriture) ou execute (supprime)"
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - execute
+      confirmation:
+        description: "Pour execute uniquement — taper : VALIDER SUPPRESSION 82 LIGNES"
+        required: false
+        default: ""
+        type: string
+  push:
+    paths:
+      - '.github/workflows/ops-fix-scale-break.yml'
+
+permissions:
+  # `write` parce que le rapport est consigne dans le depot (voir la derniere
+  # etape). Le resume GitHub ne suffit pas : il n est lisible que dans l onglet
+  # Actions, donc invisible a toute session qui n a pas d acces API — et une
+  # operation destructrice doit laisser une trace lisible la ou vit le projet.
+  contents: write
+
+concurrency:
+  group: ops-fix-scale-break
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    name: Perimetre puis, sur validation, suppression
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Determiner le mode et verifier la validation
+        id: mode
+        env:
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'dry-run' }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -u
+          PHRASE="VALIDER SUPPRESSION 82 LIGNES"
+          if [ "$MODE" != "execute" ]; then
+            echo "Mode : dry-run (aucune ecriture)."
+            echo "mode=dry-run" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Comparaison stricte, sans normalisation : une phrase approximative
+          # doit echouer. C est le seul garde-fou entre un menu et 82 suppressions.
+          if [ "$CONFIRMATION" != "$PHRASE" ]; then
+            echo "::error::Mode execute demande sans la phrase exacte. Attendu : $PHRASE"
+            exit 1
+          fi
+          echo "Mode : EXECUTE — validation reconnue."
+          echo "mode=execute" >> "$GITHUB_OUTPUT"
+
+      # Sans checkout, la derniere etape n a aucun depot ou ecrire son rapport :
+      # `git add` echouerait hors d un arbre de travail. Meme `ref` explicite que
+      # doc-drift.yml — un workflow_dispatch peut etre lance depuis n importe
+      # quelle branche, et le rapport doit toujours atterrir sur celle-ci.
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Executer
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+          MODE: ${{ steps.mode.outputs.mode }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" \
+            "MODE='$MODE' bash -s" <<'REMOTE' 2>&1 | tee rapport-fix.txt
+            set -u
+            API_DIR=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+            cd "$API_DIR" || exit 3
+
+            echo "=============================================="
+            echo " 1. PERIMETRE (dry-run de controle)"
+            echo "=============================================="
+            # Toujours execute, y compris avant une suppression : si le perimetre
+            # a bouge depuis la mesure, on le voit AVANT d ecrire.
+            node scripts/fix/fix_scale_break_sec.js || exit 4
+
+            if [ "${MODE:-dry-run}" != "execute" ]; then
+              echo ""
+              echo "Mode dry-run — aucune ecriture. Fin."
+              exit 0
+            fi
+
+            echo ""
+            echo "=============================================="
+            echo " 2. SUPPRESSION"
+            echo "=============================================="
+            node scripts/fix/fix_scale_break_sec.js --execute || exit 5
+
+            echo ""
+            echo "=============================================="
+            echo " 3. RESYNCHRONISATION datejour (Nigeria)"
+            echo "=============================================="
+            # La derniere VL de ces 41 fonds recule du 2026-07-24 au 2026-07-10.
+            # Sans cette etape la colonne Date des pages pays reste en avance sur
+            # les donnees. Un echec ici n invalide pas la suppression.
+            node scripts/fix/fix_datejour_sync.js --pays NIGERIA --execute \
+              || echo "AVERTISSEMENT : resynchronisation datejour en echec, a relancer."
+
+            echo ""
+            echo "=============================================="
+            echo " 4. VERIFICATION"
+            echo "=============================================="
+            # Le script est idempotent : relance, il ne doit plus rien trouver.
+            node scripts/fix/fix_scale_break_sec.js || true
+            echo ""
+            echo "Snapshots disponibles pour rollback :"
+            ls -1t data/scale_break_snapshots/*.json 2>/dev/null | head -3 || echo "  aucun"
+          REMOTE
+
+      - name: Publier le rapport
+        if: always()
+        run: |
+          {
+            echo "## Ruptures d echelle #73 — mode : ${{ steps.mode.outputs.mode }}"
+            echo ""
+            echo '```'
+            cat rapport-fix.txt 2>/dev/null || echo "(aucun rapport)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Le resume GitHub n est lisible que dans l onglet Actions. Une operation
+      # qui touche la production doit laisser sa trace la ou vit le projet, et
+      # lisible par une session sans acces a l API GitHub. Meme mecanique que
+      # doc-drift.yml : ecrire, commiter avec [skip ci], rebaser avant de pousser.
+      - name: Consigner le rapport dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          {
+            echo "# Ruptures d echelle #73 — journal des operations"
+            echo
+            echo "> Genere par \`ops-fix-scale-break.yml\`. Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo "Mode : **${{ steps.mode.outputs.mode }}**"
+            echo "Declencheur : \`${{ github.event_name }}\` — par \`${{ github.actor }}\`"
+            echo
+            echo '```'
+            cat rapport-fix.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+          } > docs/OPS_FIX_SCALE_BREAK.md
+
+          git add docs/OPS_FIX_SCALE_BREAK.md
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(ops): rupture d echelle #73 — ${{ steps.mode.outputs.mode }} $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : ne jamais ecraser un commit pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Rapport consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

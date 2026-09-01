@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const fs = require('fs');
-const cron = require('node-cron');
 const _ = require('lodash');
 const path = require('path');
 const express = require('express');
@@ -17,7 +16,7 @@ const router = express.Router();
 
 const app = express();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Set your upload directory
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 const PortfolioAnalytics = require('portfolio-analytics');
 const ss = require('simple-statistics')
 const socktrader = require('@socktrader/indicators');
@@ -35,7 +34,7 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 
 
 const {
@@ -119,7 +118,6 @@ const { Fond } = require('../classes/fond')
 const { Indice } = require('../classes/indice')
 const { Op } = require("sequelize");
 const { generateSlug, generateFundSlug, extractIdFromSlug } = require('../functions/slug');
-const { fastifySwaggerUi } = require("@fastify/swagger-ui");
 const { da } = require('date-fns/locale');
 const portefeuille_valorise = require('../models/portefeuille_valorise');
 const { exit } = require('process');
@@ -147,10 +145,13 @@ router.get('/api/getfondbyidmeta/:id', async (req, res) => {
       order: [['id', 'DESC']]
     });
 
+    if (!response) {
+      return res.status(404).json({ message: 'Fonds introuvable' });
+    }
 
     const funds = {
       id: response.id,
-      nom_fond: response.nom_fond.toString(),
+      nom_fond: (response.nom_fond || '').toString(),
       slug: generateFundSlug(response.nom_fond, response.code_ISIN, response.id),
       categorie_libelle: response.categorie_libelle,
       categorie_national: response.categorie_national,
@@ -176,15 +177,18 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
   try {
     const paramId = extractIdFromSlug(req.params.id);
 
+    if (!req.query.funds) {
+      return res.status(400).json({ message: 'Paramètre funds requis' });
+    }
     const distinctFundIdss = req.query.funds.replace(/[^0-9A-Za-z\s,]+/g, '').split(',')
-    const distinctFundIdsParsed = distinctFundIdss.map(id => parseInt(id));
+    const distinctFundIdsParsed = distinctFundIdss.map(id => parseInt(id)).filter(id => !isNaN(id));
 
     const response = await fond.findAll({
       where: {
         id: paramId,
       },
       order: [['id', 'DESC']],
-      limit: 500
+      limit: 10000
     });
 
     const commonDates = await vl.findAll({
@@ -210,7 +214,7 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
       order: [
         ['date', 'ASC']
       ],
-      limit: 500
+      limit: 10000
     });
 
 
@@ -228,8 +232,7 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
       lastValue: lastValue,
       lastValue_EUR: lastValue_EUR,
       lastValue_USD: lastValue_USD,
-      nom_fond: data.nom_fond.toString(),
-      code_ISIN: data.dev_libelle,
+      nom_fond: (data.nom_fond || '').toString(),
       categorie_libelle: data.categorie_libelle,
       categorie_national: data.categorie_national,
       devise: data.dev_libelle,
@@ -261,50 +264,41 @@ router.get('/api/getfondbyid/:id', async (req, res) => {
 
 router.get('/api/searchFunds', async (req, res) => {
   const { minHorizon, maxHorizon, selectedPays, selectedRegion } = req.query;
-  let query = `
-  SELECT DISTINCT f.id, f.nom_fond, f.code_ISIN
-  FROM fond_investissements AS f
-  INNER JOIN valorisations AS v ON f.id = v.fund_id
-`;
+  const conditions = ['f.active = 1'];
+  const replacements = {};
 
   if (minHorizon && maxHorizon) {
-    query += `
-    WHERE v.date >= :minHorizon
-    AND v.date <= :maxHorizon
-  `;
+    conditions.push('v.date >= :minHorizon AND v.date <= :maxHorizon');
+    replacements.minHorizon = minHorizon;
+    replacements.maxHorizon = maxHorizon;
   }
-
   if (selectedPays) {
-    query = ` SELECT DISTINCT f.id, f.nom_fond, f.code_ISIN
-  FROM fond_investissements AS f
-  INNER JOIN valorisations AS v ON f.id = v.fund_id
-WHERE
-         f.pays = :selectedPays
-
-  `;
+    conditions.push('LOWER(f.pays) = LOWER(:selectedPays)');
+    replacements.selectedPays = selectedPays;
   }
-
   if (selectedRegion) {
-    query = ` SELECT DISTINCT f.id, f.nom_fond, f.code_ISIN
-  FROM fond_investissements AS f
-  INNER JOIN valorisations AS v ON f.id = v.fund_id
-WHERE
-     f.region = :selectedRegion
-   
-  `;
+    conditions.push('LOWER(f.region) = LOWER(:selectedRegion)');
+    replacements.selectedRegion = selectedRegion;
   }
+
+  const query = `
+    SELECT DISTINCT f.id, f.nom_fond, f.code_ISIN
+    FROM fond_investissements AS f
+    INNER JOIN valorisations AS v ON f.id = v.fund_id
+    WHERE ${conditions.join(' AND ')}
+  `;
 
   try {
     const fondsDansCategorie = await sequelize.query(query, {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { minHorizon, maxHorizon },
+      replacements,
     });
 
     const funds = fondsDansCategorie.map(data => ({
-      label: `${data.nom_fond.toString()} ${data.code_ISIN}`,
+      label: `${data.nom_fond || ''} ${data.code_ISIN || ''}`.trim(),
       value: data.id,
       slug: generateFundSlug(data.nom_fond, data.code_ISIN, data.id),
-      nom_fond: data.nom_fond.toString(),
+      nom_fond: (data.nom_fond || '').toString(),
       code_ISIN: data.code_ISIN,
     }));
 
@@ -362,7 +356,11 @@ WHERE
    *                       description: The date corresponding to the last value.
    */
   router.get('/api/valLiq/:id', async (req, res) => {
+    try {
     const fundId = extractIdFromSlug(req.params.id);
+    if (!fundId) {
+      return res.status(400).json({ message: 'ID de fond invalide', code: 400 });
+    }
     const response = await vl.findAll({
       where: {
         fund_id: fundId
@@ -370,7 +368,7 @@ WHERE
       order: [
         ['date', 'ASC']
       ],
-      limit: 500
+      limit: 10000
     });
     if (response.length > 0) {
       /* const graphs = response.map(data => ({
@@ -378,25 +376,19 @@ WHERE
          bases_100:data.base_100, // Remplacez avec la propriété correcte de l'objet
          bases_100_InRef:data.base_100_InRef,
      }));*/
-      const hasIndRef = response.some(data => data.indRef !== null);
+      const hasIndRef = response.some(data => data.indRef != null && data.indRef > 0);
 
       const graphs = response.map(data => {
-        if (hasIndRef) {
-          if (data.value !== null && data.indRef !== null) {
-            return {
-              dates: moment(data.date).format('YYYY-MM-DD'), // Remplacez avec la propriété correcte de l'objet
-              values: data.vl_ajuste, //todo Remplacez avec la propriété correcte de l'objet
-              valuesInd: data.indRef, // Inclure indRef seulement si non nul
-            };
-          };
-        } else {
-          return {
-            dates: moment(data.date).format('YYYY-MM-DD'), // Remplacez avec la propriété correcte de l'objet
-            values: data.value, // Remplacez avec la propriété correcte de l'objet
-          };
+        if (data.value === null) return null;
+        const point = {
+          dates: moment(data.date).format('YYYY-MM-DD'),
+          values: hasIndRef ? (data.vl_ajuste ?? data.value) : data.value,
+        };
+        if (hasIndRef && data.indRef != null && data.indRef > 0) {
+          point.valuesInd = data.indRef;
         }
-
-      }).filter(Boolean); // Supprimer les valeurs nulles de l'array
+        return point;
+      }).filter(Boolean);
 
       // Faites ce que vous voulez avec l'array `graphs` ici
 
@@ -415,58 +407,44 @@ WHERE
       const fundname = fundnames[response.length - 1];
       const fundid = fundids[response.length - 1];
       const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-      const baseUrl = urll; // Remplacez par votre URL de base
-      const lastValResponse = await fetch(`${baseUrl}/api/performances/fond/${fundid}?date=${lastDate}`);
-      const libelle_indice = libelle_indices[response.length - 1];
-      const ID_indice = ID_indices[0];
+      const baseUrl = urll;
+      const libelle_indice = libelle_indices.find(v => v) || null;
+      const ID_indice = ID_indices.find(v => v) || null;
       const currentDate = moment();
 
-      // Calculate the number of missing days
       const daysDiff = currentDate.diff(lastDate, 'days');
-
-      // Calculate the number of missing weekends
       const weekends = Array.from({ length: daysDiff }, (_, i) => moment(lastValue).add(i, 'days'))
         .filter(date => date.day() === 0 || date.day() === 6)
         .length;
-
-      // Calculate the number of missing Vl dates
       const missingVl = daysDiff - weekends;
-      if (!lastValResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
 
-      const lastValData = await lastValResponse.json();
+      const safeFetch = async (url) => {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) return {};
+          return await resp.json();
+        } catch (e) {
+          console.error('Erreur fetch interne:', url, e.message);
+          return {};
+        }
+      };
 
-      const last1ansRatiosResponse = await fetch(`${baseUrl}/api/ratiosnew/1/${fundid}`);
-
-      if (!last1ansRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const last1ansRatiosData = await last1ansRatiosResponse.json();
-
-      const lastRatiosResponse = await fetch(`${baseUrl}/api/ratiosnew/3/${fundid}`);
-
-      if (!lastRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const lastRatiosData = await lastRatiosResponse.json();
-
-      const last5ansRatiosResponse = await fetch(`${baseUrl}/api/ratiosnew/5/${fundid}`);
-
-      if (!last5ansRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const last5ansRatiosData = await last5ansRatiosResponse.json();
+      const [lastValData, last1ansRatiosData, lastRatiosData, last5ansRatiosData] = await Promise.all([
+        safeFetch(`${baseUrl}/api/performances/fond/${fundid}?date=${lastDate}`),
+        safeFetch(`${baseUrl}/api/ratiosnew/1/${fundid}`),
+        safeFetch(`${baseUrl}/api/ratiosnew/3/${fundid}`),
+        safeFetch(`${baseUrl}/api/ratiosnew/5/${fundid}`),
+      ]);
 
       const resultat = await fond.findOne({
-        attributes: ['indice_benchmark','indice', 'structure_fond', 'strategie_politique_invest', 'philosophie_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
+        attributes: ['indice_benchmark','indice', 'structure_fond', 'strategie_politique_invest', 'philosophie_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant', 'indice_fundafrica', 'indice_fundafrica_id', 'categorie_fundafrica_locale', 'categorie_fundafrica_regionale', 'categorie_fundafrica_globale'],
         where: {
-          id: parseInt(req.params.id),
+          id: fundId,
         },
       });
+      if (!resultat) {
+        return res.status(404).json({ message: 'Fonds introuvable', code: 404 });
+      }
       const indice_benchmark = resultat.indice_benchmark;
       const indice = resultat.indice;
       const affectation = resultat.affectation;
@@ -496,17 +474,17 @@ WHERE
       const nom_gerant = resultat.nom_gerant;
       const libelle_fond = resultat.nom_fond;
 
-      const pays_regul = await pays_regulateurs.findOne({
+      const pays_regul = pays ? await pays_regulateurs.findOne({
         attributes: ['regulateur', 'sitewebregulateur', 'nomdelabourse', 'URLdelabourse', 'nomdevise', 'symboledevise'],
         where: {
           pays: pays,
         },
-      });
-      const regulateur = pays_regul.regulateur;
-      const sitewebregulateur = pays_regul.sitewebregulateur;
-      const nomdelabourse = pays_regul.nomdelabourse;
-      const URLdelabourse = pays_regul.URLdelabourse;
-      const symboledevise = pays_regul.symboledevise;
+      }) : null;
+      const regulateur = pays_regul ? pays_regul.regulateur : null;
+      const sitewebregulateur = pays_regul ? pays_regul.sitewebregulateur : null;
+      const nomdelabourse = pays_regul ? pays_regul.nomdelabourse : null;
+      const URLdelabourse = pays_regul ? pays_regul.URLdelabourse : null;
+      const symboledevise = pays_regul ? pays_regul.symboledevise : null;
 
       const societegestion = await societe.findOne({
         attributes: ['nom', 'description', 'site_web'],
@@ -595,6 +573,11 @@ WHERE
           fundid,
           libelle_fond,
           libelle_indice,
+          indice_fundafrica: resultat.indice_fundafrica || null,
+          indice_fundafrica_id: resultat.indice_fundafrica_id || null,
+          categorie_fundafrica_locale: resultat.categorie_fundafrica_locale || null,
+          categorie_fundafrica_regionale: resultat.categorie_fundafrica_regionale || null,
+          categorie_fundafrica_globale: resultat.categorie_fundafrica_globale || null,
           lastdatepreviousmonth,
           performances: lastValData,
           ratios3a: lastRatiosData,
@@ -603,17 +586,21 @@ WHERE
         }
       });
     } else {
-      res.status(500).json({ message: 'Erreur lors de la récupération des données' });
+      res.status(404).json({ message: 'Aucune donnée VL trouvée pour ce fonds', code: 404 });
 
     }
-    /* } catch (error) {
-       console.error('Erreur lors de la récupération des données:', error);
+    } catch (error) {
+       console.error('Erreur lors de la récupération des données valLiq:', error);
        res.status(500).json({ message: 'Erreur lors de la récupération des données' });
-     }*/
+    }
   });
 
   router.get('/api/valLiqdev/:id/:devise', async (req, res) => {
+    try {
     const fundId = extractIdFromSlug(req.params.id);
+    if (!fundId) {
+      return res.status(400).json({ message: 'ID de fond invalide', code: 400 });
+    }
     const response = await vl.findAll({
       where: {
         fund_id: fundId
@@ -621,21 +608,40 @@ WHERE
       order: [
         ['date', 'ASC']
       ],
-      limit: 500
+      limit: 10000
     });
     if (response.length > 0) {
 
+      const indRefField = req.params.devise == "USD" ? 'indRef_USD' : 'indRef_EUR';
+      const valueField = req.params.devise == "USD" ? 'vl_ajuste_USD' : 'vl_ajuste_EUR';
+      const rawValueField = req.params.devise == "USD" ? 'value_USD' : 'value_EUR';
+      const hasIndRef = response.some(data => data[indRefField] !== null && data[indRefField] > 0);
+
+      const firstValid = response.find(d => {
+        const v = d[valueField] ?? d[rawValueField];
+        return v && v > 0;
+      });
+      const baseVal = firstValid ? (firstValid[valueField] ?? firstValid[rawValueField]) : 1;
+
+      let baseInd = 1;
+      if (hasIndRef && firstValid) {
+        const startIdx = response.indexOf(firstValid);
+        const firstValidInd = response.slice(startIdx).find(d => d[indRefField] && d[indRefField] > 0);
+        if (firstValidInd) baseInd = firstValidInd[indRefField];
+      }
+
       const graphs = response.map(data => {
-        if (data.value !== null && data.indRef_EUR !== null) {
-          return {
-            dates: moment(data.date).format('YYYY-MM-DD'), // Remplacez avec la propriété correcte de l'objet
-            values: data.value, // Remplacez avec la propriété correcte de l'objet
-            valuesInd: req.params.devise == "USD" ? data.indRef_USD : data.indRef_EUR,
-          };
-        } else {
-          return null; // Ignorer les lignes où la condition n'est pas satisfaite
+        const val = data[valueField] ?? data[rawValueField];
+        if (!val) return null;
+        const point = {
+          dates: moment(data.date).format('YYYY-MM-DD'),
+          values: (val / baseVal) * 100,
+        };
+        if (hasIndRef && data[indRefField] != null && data[indRefField] > 0) {
+          point.valuesInd = (data[indRefField] / baseInd) * 100;
         }
-      }).filter(Boolean); // Supprimer les valeurs nulles de l'array
+        return point;
+      }).filter(Boolean);
       let values;
       if (req.params.devise == "USD") {
         values = response.map((data) => data.value_USD);
@@ -657,58 +663,45 @@ WHERE
       const fundname = fundnames[response.length - 1];
       const fundid = fundids[response.length - 1];
       const lastdatepreviousmonth = findLastDateOfPreviousMonth(dates);
-      const baseUrl = urll; // Remplacez par votre URL de base
-      const lastValResponse = await fetch(`${baseUrl}/api/performancesdev/fond/${fundid}/${req.params.devise}?date=${lastDate}`);
-      const libelle_indice = libelle_indices[response.length - 1];
-      const ID_indice = ID_indices[response.length - 1];
+      const baseUrl = urll;
+      const libelle_indice = libelle_indices.find(v => v) || null;
+      const ID_indice = ID_indices.find(v => v) || null;
       const currentDate = moment();
 
-      // Calculate the number of missing days
       const daysDiff = currentDate.diff(lastDate, 'days');
-
-      // Calculate the number of missing weekends
       const weekends = Array.from({ length: daysDiff }, (_, i) => moment(lastValue).add(i, 'days'))
         .filter(date => date.day() === 0 || date.day() === 6)
         .length;
-
-      // Calculate the number of missing Vl dates
       const missingVl = daysDiff - weekends;
-      if (!lastValResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
 
-      const lastValData = await lastValResponse.json();
+      const safeFetch = async (url) => {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) return {};
+          return await resp.json();
+        } catch (e) {
+          console.error('Erreur fetch interne:', url, e.message);
+          return {};
+        }
+      };
 
-      const last1ansRatiosResponse = await fetch(`${baseUrl}/api/ratiosnewdev/1/${fundid}/${req.params.devise}`);
-
-      if (!last1ansRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const last1ansRatiosData = await last1ansRatiosResponse.json();
-
-      const lastRatiosResponse = await fetch(`${baseUrl}/api/ratiosnewdev/3/${fundid}/${req.params.devise}`);
-
-      if (!lastRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const lastRatiosData = await lastRatiosResponse.json();
-
-      const last5ansRatiosResponse = await fetch(`${baseUrl}/api/ratiosnewdev/5/${fundid}/${req.params.devise}`);
-
-      if (!last5ansRatiosResponse.ok) {
-        return res.status(404).json({ message: 'Fonds introuvable' });
-      }
-
-      const last5ansRatiosData = await last5ansRatiosResponse.json();
+      const [lastValData, last1ansRatiosData, lastRatiosData, last5ansRatiosData] = await Promise.all([
+        safeFetch(`${baseUrl}/api/performancesdev/fond/${fundid}/${req.params.devise}?date=${lastDate}`),
+        safeFetch(`${baseUrl}/api/ratiosnewdev/1/${fundid}/${req.params.devise}`),
+        safeFetch(`${baseUrl}/api/ratiosnewdev/3/${fundid}/${req.params.devise}`),
+        safeFetch(`${baseUrl}/api/ratiosnewdev/5/${fundid}/${req.params.devise}`),
+      ]);
 
       const resultat = await fond.findOne({
-        attributes: ['structure_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant'],
+        attributes: ['indice_benchmark', 'indice', 'structure_fond', 'code_ISIN', 'date_creation', 'periodicite', "affectation", "minimum_investissement", "frais_souscription", "frais_rachat", "frais_gestion", "frais_entree", "frais_sortie", 'categorie_libelle', 'nom_fond', 'categorie_national', 'pays', 'categorie_globale', 'categorie_regional', 'type_investissement', 'classification', 'societe_gestion', 'nom_gerant', 'indice_fundafrica', 'indice_fundafrica_id', 'categorie_fundafrica_locale', 'categorie_fundafrica_regionale', 'categorie_fundafrica_globale'],
         where: {
-          id: req.params.id,
+          id: fundId,
         },
       });
+      if (!resultat) {
+        return res.status(404).json({ message: 'Fonds introuvable', code: 404 });
+      }
+      const indice_benchmark = resultat.indice_benchmark;
       const affectation = resultat.affectation;
       const structure_fond = resultat.structure_fond;
       const code_ISIN = resultat.code_ISIN;
@@ -734,23 +727,24 @@ WHERE
       const nom_gerant = resultat.nom_gerant;
       const libelle_fond = resultat.nom_fond;
 
-      const pays_regul = await pays_regulateurs.findOne({
+      const pays_regul = pays ? await pays_regulateurs.findOne({
         attributes: ['regulateur', 'sitewebregulateur', 'nomdelabourse', 'URLdelabourse', 'nomdevise', 'symboledevise'],
         where: {
           pays: pays,
         },
-      });
-      const regulateur = pays_regul.regulateur;
-      const sitewebregulateur = pays_regul.sitewebregulateur;
-      const nomdelabourse = pays_regul.nomdelabourse;
-      const URLdelabourse = pays_regul.URLdelabourse;
-      const symboledevise = pays_regul.symboledevise;
+      }) : null;
+      const regulateur = pays_regul ? pays_regul.regulateur : null;
+      const sitewebregulateur = pays_regul ? pays_regul.sitewebregulateur : null;
+      const nomdelabourse = pays_regul ? pays_regul.nomdelabourse : null;
+      const URLdelabourse = pays_regul ? pays_regul.URLdelabourse : null;
+      const symboledevise = pays_regul ? pays_regul.symboledevise : null;
 
 
       res.json({
         code: 200,
         data: {
           ID_indice,
+          indice_benchmark,
           affectation,
           frais_souscription,
           frais_rachat,
@@ -784,6 +778,11 @@ WHERE
           fundid,
           libelle_fond,
           libelle_indice,
+          indice_fundafrica: resultat.indice_fundafrica || null,
+          indice_fundafrica_id: resultat.indice_fundafrica_id || null,
+          categorie_fundafrica_locale: resultat.categorie_fundafrica_locale || null,
+          categorie_fundafrica_regionale: resultat.categorie_fundafrica_regionale || null,
+          categorie_fundafrica_globale: resultat.categorie_fundafrica_globale || null,
           lastdatepreviousmonth,
           performances: lastValData,
           ratios3a: lastRatiosData,
@@ -792,17 +791,18 @@ WHERE
         }
       });
     } else {
-      res.status(500).json({ message: 'Erreur lors de la récupération des données' });
+      res.status(404).json({ message: 'Aucune donnée VL trouvée pour ce fonds', code: 404 });
 
     }
-    /* } catch (error) {
-       console.error('Erreur lors de la récupération des données:', error);
+    } catch (error) {
+       console.error('Erreur lors de la récupération des données valLiqdev:', error);
        res.status(500).json({ message: 'Erreur lors de la récupération des données' });
-     }*/
+    }
   });
 
 
   router.post('/api/listeopcvm', async (req, res) => {
+    try {
     const formData = req.body.formData;
     const selectedValues = req.query.query;
     const selectedpays = req.query.selectedpays; // Corrected variable name
@@ -836,7 +836,7 @@ WHERE
       where: whereClause, // Pas besoin d'encapsuler dans Op.and, oùClause est déjà un objet
       group: ['nom_fond'],
       order: [['nom_fond', 'ASC']],
-      limit: 500
+      limit: 10000
     });
 
     // Pour stocker les résultats finaux
@@ -852,6 +852,10 @@ WHERE
       code: 200,
       data: { fonds: fondall }
     });
+    } catch (error) {
+      console.error('Erreur listeopcvm:', error);
+      res.status(500).json({ error: 'Erreur lors de la récupération des fonds.' });
+    }
   });
 
   module.exports = router;

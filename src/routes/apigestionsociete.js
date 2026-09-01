@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const fs = require('fs');
-const cron = require('node-cron');
 const _ = require('lodash');
 const path = require('path');
 const express = require('express');
@@ -17,7 +16,7 @@ const router = express.Router();
 
 const app = express();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Set your upload directory
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 const PortfolioAnalytics = require('portfolio-analytics');
 const ss = require('simple-statistics')
 const socktrader = require('@socktrader/indicators');
@@ -35,27 +34,26 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 const { Op } = require('sequelize'); // Ajout de l'importation de Op
 const findCategoryByFundId = async (fundId) => {
-  // Implémentez ici la logique pour récupérer la catégorie à partir de l'identifiant du fond
-  // Par exemple, vous pouvez exécuter une requête SQL pour obtenir la catégorie à partir de l'identifiant du fond
+  try {
+    const categoryQuery = `
+          SELECT categorie_globale
+          FROM fond_investissements
+          WHERE id = :fundId
+      `;
 
-  // Exemple fictif de requête SQL
-  const categoryQuery = `
-        SELECT categorie_globale
-        FROM fond_investissements
-        WHERE id = :fundId
-    `;
+    const [result] = await sequelize.query(categoryQuery, {
+      replacements: { fundId: fundId },
+      type: sequelize.QueryTypes.SELECT
+    });
 
-  // Exécutez la requête SQL avec le paramètre fundId
-  const [result] = await sequelize.query(categoryQuery, {
-    replacements: { fundId: fundId },
-    type: sequelize.QueryTypes.SELECT
-  });
-
-  // Retournez la catégorie extraite de la requête
-  return result.categorie_globale;
+    return result?.categorie_globale || null;
+  } catch (error) {
+    console.error('Erreur findCategoryByFundId:', error);
+    return null;
+  }
 };
 
 
@@ -153,6 +151,9 @@ router.get('/api/getSocietebyidfisrt/:id', async (req, res) => {
     where: { nom: req.params.id }
   })
     .then(async response => {
+      if (!response) {
+        return res.status(404).json({ code: 404, error: 'Société de gestion non trouvée.' });
+      }
       // Récupération des informations de base de la société
       const societeData = {
         nom: response.nom,
@@ -411,6 +412,9 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
     where: { nom: req.params.id }
   })
     .then(async response => {
+      if (!response) {
+        return res.status(404).json({ code: 404, error: 'Société de gestion non trouvée.' });
+      }
       // Récupération des informations de base de la société
       const societeData = {
         nom: response.nom,
@@ -434,8 +438,8 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
           }
         },
         group: ['categorie_globale'],
-      });
         limit: 500,
+      });
       var sumActifNetByCategory;
       var latestValorisations;
       var performa;
@@ -455,7 +459,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences_eurs.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_eurs GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_EUR
@@ -499,7 +502,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences_usds.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences_usds GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_USD
@@ -543,7 +545,6 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
             date: Sequelize.literal(`(performences.date, fond_id) IN (SELECT MAX(date), fond_id FROM performences GROUP BY fond_id)`)
           },
         });
-          limit: 500,
 
         latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net
@@ -597,6 +598,7 @@ router.get('/api/getSocietebyidstat/:id', async (req, res) => {
     });
 });
 router.post('/api/listeproduitsociete/:id', async (req, res) => {
+  try {
   const formData = req.body.formData;
   const selectedValues = req.query.query;
   const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
@@ -607,26 +609,28 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
     valuesArray = selectedValues.split(',');
   }
 
-  let whereClause = { societe_gestion: req.params.id }; // Utilisation de let au lieu de const
+  let conditions = [];
 
   if (valuesArray) {
-    whereClause = {
+    conditions.push({
       [Op.or]: valuesArray.map(value => ({
-        id: value // Créer une condition pour chaque valeur dans valuesArray
+        id: value
       }))
-    };
+    });
+  } else {
+    conditions.push(sequelize.where(sequelize.fn('LOWER', sequelize.col('societe_gestion')), req.params.id.toLowerCase()));
   }
 
   if (typeof selectedCategorie !== 'undefined' && selectedCategorie !== 'undefined') {
-    whereClause.categorie_globale = selectedCategorie; // Filtrer par la catégorie globale si elle est renseignée
+    conditions.push(sequelize.where(sequelize.fn('LOWER', sequelize.col('categorie_globale')), selectedCategorie.toLowerCase()));
   }
 
   const funds = await fond.findAll({
     where: {
-      [Op.and]: [whereClause] // Utiliser Op.and pour combiner les conditions
+      [Op.and]: conditions
     },
-  });
     limit: 500,
+  });
 
 
   const fundsWithAllData = await Promise.all(funds.map(async (fund) => {
@@ -658,7 +662,7 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
       const fundCombinedData = {
         id: fund.id,
         fundData: fundData.toJSON(),
-        performanceData: performanceResults.toJSON(),
+        performanceData: performanceResults ? performanceResults.toJSON() : null,
       };
 
       return fundCombinedData;
@@ -678,14 +682,18 @@ router.post('/api/listeproduitsociete/:id', async (req, res) => {
     code: 200,
     data: { funds: resultats }
   });
+  } catch (error) {
+    console.error('Erreur listeproduitsociete:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des produits de la société.' });
+  }
 });
 router.get('/api/getsocieterecherche', (req, res) => {
   // Première requête pour récupérer toutes les sociétés de gestion
   societe.findAll({
     group: ['nom'],
     order: [['nom', 'ASC']],
-  }).then(societes => {
     limit: 500,
+  }).then(societes => {
     const societesGestion = societes.map(societe => societe.nom);
 
     // Pour chaque société de gestion, effectuez une deuxième requête pour compter le nombre de fonds associés
@@ -700,10 +708,13 @@ router.get('/api/getsocieterecherche', (req, res) => {
     // Attendez que toutes les promesses soient résolues
     return Promise.all(promises)
       .then(counts => {
-        const societesAvecCounts = societesGestion.map((societeGestion, index) => ({
-          ...societes.find(societe => societe.nom === societeGestion).toJSON(), // Ajouter toutes les colonnes de la société
-          nbre_fonds: counts[index]
-        }));
+        const societesAvecCounts = societesGestion.map((societeGestion, index) => {
+          const found = societes.find(societe => societe.nom === societeGestion);
+          return {
+            ...(found ? found.toJSON() : { nom: societeGestion }),
+            nbre_fonds: counts[index]
+          };
+        });
         return societesAvecCounts;
       });
   })

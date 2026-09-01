@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 
+if (!process.env.JWT_SECRET) {
+  console.warn('WARNING: JWT_SECRET not set in environment variables');
+}
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 /**
@@ -74,6 +77,7 @@ const generateToken = (user, expiresIn = '24h') => {
       id: user.id,
       email: user.email,
       role: user.typeusers || 'investisseur',
+      typeusers_id: user.typeusers_id != null ? Number(user.typeusers_id) : 1,
       societe: user.denomination || null
     },
     JWT_SECRET,

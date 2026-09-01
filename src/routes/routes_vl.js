@@ -1,4 +1,5 @@
 const { Magic } = require('@magic-sdk/admin');
+const { authenticate } = require('../middleware/auth');
 const { Sequelize, DataTypes, where } = require('sequelize');
 const { vl, indice, taux, fond, pays_regulateurs, sequelize, urll, urllsite, portefeuille, portefeuille_vl, portefeuilles_proposes_vls, portefeuilles_proposes, users, societe, classementfonds, performences, transaction, investissement, tsr, cashdb, frais, fiscalite, portefeuille_vl_cumul, devises, portefeuille_base100, favorisfonds, devisedechanges, personnel, documentss, performences_eurs, performences_usds, classementfonds_eurs, classementfonds_usds, actu, tsrhisto, rendement, simulation, simulationportefeuille, date_valorisation, apikeys } = require('../db/sequelize')
 const moment = require('moment');
@@ -10,13 +11,12 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const fs = require('fs');
 const xlsx = require('xlsx');
-const cron = require('node-cron');
 const _ = require('lodash');
 const path = require('path');
 const express = require('express');
 const app = express();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Set your upload directory
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 const PortfolioAnalytics = require('portfolio-analytics');
 const ss = require('simple-statistics')
 const socktrader = require('@socktrader/indicators');
@@ -37,8 +37,18 @@ const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
 const ImageModule = require('docxtemplater-image-module-free');
 
+function sanitizeCellValue(val) {
+  if (typeof val !== 'string') return val;
+  return val.replace(/^[\t\r\n]+/, '').replace(/^[=@]/, "'$&");
+}
 
-
+function sanitizeRow(obj) {
+  const result = {};
+  for (const [k, v] of Object.entries(obj)) {
+    result[k] = sanitizeCellValue(v);
+  }
+  return result;
+}
 
 
 
@@ -52,7 +62,6 @@ async function checkAndUpdateData(filePath, res) {
     fs.createReadStream(filePath)
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
-        console.log('Headers:', headers); // Affiche les en-têtes pour vérifier leur structure
       })
       .on('data', (row) => results.push(row)) // Corrigez `data` en `row`
       .on('end', () => resolve(results))
@@ -162,7 +171,6 @@ async function insertfondfile(filePath) {
     fs.createReadStream(filePath)
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
-        console.log('Headers:', headers); // Affiche les en-têtes pour vérifier leur structure
       })
       .on('data', (row) => results.push(row)) // Corrigez `data` en `row`
       .on('end', () => resolve(results))
@@ -311,7 +319,6 @@ const {
 const { Fond } = require('../classes/fond')
 const { Indice } = require('../classes/indice')
 const { Op } = require("sequelize");
-const { fastifySwaggerUi } = require("@fastify/swagger-ui");
 const { da } = require('date-fns/locale');
 const portefeuille_valorise = require('../models/portefeuille_valorise');
 const { exit } = require('process');
@@ -324,24 +331,19 @@ const apikey = require('../models/apikey');
  * @param {Object} app - Instance de l'application Fastify.
  */
 module.exports = (app) => {
-  /**
-  * Middleware pour autoriser toutes les origines (pour le développement).
-  *
-  * @param {Object} req - Objet de requête.
-  * @param {Object} res - Objet de réponse.
-  * @param {Function} next - Fonction pour passer à la suite.
-  */
+  const recalcEvent = require('../services/recalc-event.service');
+
   // CORS is now handled in app.js via the cors middleware
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
-      cb(null, Date.now() + '-' + file.originalname);
+      cb(null, Date.now() + '-' + path.basename(file.originalname));
     }
   });
 
-  const upload = multer({ storage: storage });
+  const upload = multer({ storage: storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
   function getDateToday() {
     const today = new Date();
@@ -431,40 +433,43 @@ module.exports = (app) => {
   app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
 
-    // Vérifiez si l'utilisateur existe
-    const user = await users.findOne({ where: { email: email } });
-    if (!user) {
-      return res.status(404).send('Utilisateur non trouvé');
-    }
-
-    // Créer un jeton de réinitialisation
-    const resetToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // Lien de réinitialisation
-    const resetUrl = `${process.env.FRONTEND_URL}/panel/societegestionpanel/login/reset-password?token=${resetToken}`;
-
-    // Configurer nodemailer pour envoyer l'email
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Réinitialisation de mot de passe',
-      html: `<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p>
-             <a href="${resetUrl}">Réinitialiser le mot de passe</a>`,
-    };
-
     try {
+      // Vérifiez si l'utilisateur existe
+      const user = await users.findOne({ where: { email: email } });
+      if (!user) {
+        return res.status(404).send('Utilisateur non trouvé');
+      }
+
+      // Créer un jeton de réinitialisation
+      const resetToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+      // Lien de réinitialisation
+      const resetUrl = `${process.env.FRONTEND_URL}/panel/management/login/reset-password?token=${resetToken}`;
+
+      // Configurer nodemailer pour envoyer l'email
+      const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT),
+        secure: process.env.EMAIL_SECURE === 'true',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Réinitialisation de mot de passe - Fundafrique',
+        html: `<p>Cliquez sur ce lien pour réinitialiser votre mot de passe :</p>
+             <a href="${resetUrl}">Réinitialiser le mot de passe</a>`,
+      };
+
       await transporter.sendMail(mailOptions);
       res.status(200).send('Email de réinitialisation envoyé');
     } catch (error) {
-      res.status(500).send('Erreur lors de l\'envoi de l\'email');
+      console.error('Erreur forgot-password:', error);
+      if (!res.headersSent) res.status(500).send('Erreur lors de l\'envoi de l\'email');
     }
   });
 
@@ -626,7 +631,6 @@ module.exports = (app) => {
 
         // console.log("Document envoyé pour téléchargement !");
         // fs.writeFileSync("output.docx", buffer);
-        console.log("Document créé avec succès !");
     } catch (error) {
       console.error('Erreur lors du traitement du template Word :', error);
       res.status(500).json({ error: 'Erreur lors du traitement du template Word.' });
@@ -951,7 +955,6 @@ app.post('/api/reportingmensuelle', async (req, res) => {
   app.get('/api/verifvlimport', async (req, res) => {
     try {
       checkAndUpdateData('fichiers/vl2.csv', res)
-        .then(() => console.log('Data check and update completed.'))
         .catch((error) => console.error('Error during data check and update:', error));
     } catch (error) {
       console.error(error);
@@ -962,7 +965,6 @@ app.post('/api/reportingmensuelle', async (req, res) => {
   app.get('/api/insertfond', async (req, res) => {
     try {
       insertfondfile('fichiers/Updatefondsmaroc.csv')
-        .then(() => console.log('Data check and update completed.'))
         .catch((error) => console.error('Error during data check and update:', error));
     } catch (error) {
       console.error(error);
@@ -972,6 +974,7 @@ app.post('/api/reportingmensuelle', async (req, res) => {
 
   //Taux sans risque
   app.get('/api/tsr/:year', async (req, res) => {
+    try {
     // Récupérer la dernière valeur du mois précédent
     const lastValue = await tsrhisto.findOne({
       where: {
@@ -984,7 +987,7 @@ app.post('/api/reportingmensuelle', async (req, res) => {
     });
 
     if (!lastValue) {
-      throw new Error('No data found for the last month.');
+      return res.status(404).json({ error: 'No data found for the last month.' });
     }
 
     const endDate = lastValue.date;
@@ -1003,10 +1006,12 @@ app.post('/api/reportingmensuelle', async (req, res) => {
     });
     const valueArray = values.map(record => record.value);
     const annualYield = math.mean(valueArray)
-    //  const annualYield = calculateAnnualYield(valueArray);
-    console.log(`Le taux sans risque à ${req.params.year} ans est de ${annualYield.toFixed(2)}%`);
-    console.log(`Le taux sans risque à ${req.params.year} ans est de ${annualYield.toFixed(2)}%`);
 
+    res.json({ code: 200, data: { annualYield } });
+    } catch (error) {
+      console.error('Erreur tsr:', error);
+      res.status(500).json({ error: 'Erreur lors du calcul du TSR.' });
+    }
   });
 
   app.get('/update-indRef/:idDebu/:idFin', async (req, res) => {
@@ -1077,24 +1082,43 @@ app.post('/api/reportingmensuelle', async (req, res) => {
 
 
   app.post('/api/contact', async (req, res) => {
-    const { name, email, description } = req.body;
-
-    let transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    let mailOptions = {
-      from: email,
-      to: process.env.EMAIL_USER,
-      subject: `Nouveau message de ${name}`,
-      text: description,
-    };
-
     try {
+      const { name, email, description } = req.body;
+
+      if (!name || !email || !description) {
+        return res.status(400).json({ success: false, message: 'Tous les champs sont requis.' });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ success: false, message: 'Adresse email invalide.' });
+      }
+
+      const escapeHtml = (str) => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+      const safeName = escapeHtml(name);
+      const safeEmail = escapeHtml(email);
+      const safeDesc = escapeHtml(description);
+
+      const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT),
+        secure: process.env.EMAIL_SECURE === 'true',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+
+      const mailOptions = {
+        from: `"Fundafrique" <${process.env.EMAIL_USER}>`,
+        to: 'contact@chainsolutions.fr',
+        replyTo: email,
+        subject: `[Fundafrique] Nouveau message de ${safeName}`,
+        text: `Nom: ${name}\nEmail: ${email}\n\nMessage:\n${description}`,
+        html: `<h3>Nouveau message depuis Fundafrique</h3><p><strong>Nom:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><hr/><p>${safeDesc.replace(/\n/g, '<br/>')}</p>`,
+      };
+
       await transporter.sendMail(mailOptions);
       res.status(200).json({ success: true, message: 'Email envoyé avec succès' });
     } catch (error) {
@@ -1105,6 +1129,7 @@ app.post('/api/reportingmensuelle', async (req, res) => {
 
   // Route dynamique pour servir des fichiers
   app.get('/doc/:pays/:societe/:opcvm/:nomfichier/:id', async (req, res) => {
+    try {
     const { id } = req.params;
     const document = await documentss.findOne({
       where: {
@@ -1125,6 +1150,10 @@ app.post('/api/reportingmensuelle', async (req, res) => {
         res.status(err.status).end();
       }
     });
+    } catch (error) {
+      console.error('Erreur doc:', error);
+      res.status(500).json({ error: 'Erreur lors de la récupération du document.' });
+    }
   });
   // Définir une route statique pour servir les fichiers depuis le dossier upload
   app.get('/api/upload', async (req, res) => {
@@ -1139,7 +1168,6 @@ app.post('/api/reportingmensuelle', async (req, res) => {
   });
 
   const dateToday = getDateToday();
-  console.log(dateToday);
   // const upload = multer({ storage: storage });
 
   function constructNomFond({ date, mois, annee, objet, typedoc, fond_name }) {
@@ -1471,10 +1499,13 @@ GROUP BY f.societe_gestion;
   //fonction avoir date vl manquante
   app.get('/dates-manquantes/:fundId', async (req, res) => {
     const fundId = req.params.fundId;
-    const fund = await fond.findOne({ where: { id: fundId } });
-    const periodicite = fund.periodicite; // Récupérer la périodicité depuis la requête si nécessaire
 
     try {
+      const fund = await fond.findOne({ where: { id: fundId } });
+      if (!fund) {
+        return res.status(404).json({ error: 'Fonds introuvable' });
+      }
+      const periodicite = fund.periodicite; // Récupérer la périodicité depuis la requête si nécessaire
       const firstVlDate = await vl.min('date', { where: { fund_id: fundId } });
       const increment = periodicite === 'journaliere' ? 'days' : 'weeks';
       const missingDates = [];
@@ -2403,7 +2434,6 @@ GROUP BY f.societe_gestion;
 
 
 
-      console.log('Portefeuille_vls table populated successfully.');
     } catch (error) {
       console.error('Error populating portfolio_vls table:', error);
       throw error;
@@ -2551,15 +2581,12 @@ GROUP BY f.societe_gestion;
 
     for (let index = 0; index < transactionDatas.length; index++) {
       const transaction = transactionDatas[index];
-      console.log("rffffff");
 
       if (index !== 0) {
         if (transaction.type === 'ajoutcash') {
 
           lastValuep += parseFloat(transaction.montant);
-          console.log("lastValue");
 
-          console.log(lastValuep);
 
         }
         if (transaction.type === 'retraitcash') {
@@ -2569,8 +2596,6 @@ GROUP BY f.societe_gestion;
 
 
         const indexe = portefeuilleDatas.findIndex((item) => item.date === transaction.date);
-        console.log("datasgraph[indexe]")
-        console.log(indexe)
 
         for (let i = indexe; i < base100Datas.length; i++) {
           base100Datas[i].base_100 = (portefeuilleDatas[i].valeur_portefeuille / lastValuep) * 100;
@@ -2660,6 +2685,12 @@ GROUP BY f.societe_gestion;
         return res.status(409).json({ message: 'Un compte avec cet email existe déjà' });
       }
 
+      // Valider typeusers_id (0=admin interdit via inscription publique)
+      const allowedTypes = [1, 2, 3, 4, 5, 6];
+      const safeTypeId = allowedTypes.includes(Number(typeusers_id)) ? Number(typeusers_id) : 1;
+
+      const isActiveByDefault = safeTypeId !== 2;
+
       const newUser = await users.create({
         email,
         password: bcrypt.hashSync(password, 10),
@@ -2668,24 +2699,27 @@ GROUP BY f.societe_gestion;
         denomination: denomination || null,
         pays: pays || null,
         typeusers: typeusers || null,
-        typeusers_id: typeusers_id || 0,
-        active: typeusers_id != 1 ? 0 : 1
+        typeusers_id: safeTypeId,
+        active: isActiveByDefault ? 1 : 0
       });
 
       // Générer un token JWT pour l'utilisateur créé
       const { generateToken } = require('../middleware/auth');
       const token = generateToken(newUser);
 
-      res.status(201).json({
-        code: 201,
+      res.status(200).json({
+        code: 200,
         data: {
           token,
-          user: {
+          userId: {
             id: newUser.id,
             email: newUser.email,
             nom: newUser.nom,
             prenoms: newUser.prenoms,
             typeusers: newUser.typeusers,
+            typeusers_id: newUser.typeusers_id,
+            denomination: newUser.denomination,
+            pays: newUser.pays,
             active: newUser.active
           }
         }
@@ -2738,25 +2772,35 @@ GROUP BY f.societe_gestion;
         });
       }
 
+      if (user.active === 0) {
+        return res.status(403).json({
+          code: 403,
+          message: 'Votre compte est en attente de validation par un administrateur'
+        });
+      }
+
       // Générer le token JWT
       const { generateToken } = require('../middleware/auth');
       const token = generateToken(user);
+
+      const userData = {
+        id: user.id,
+        email: user.email,
+        nom: user.nom,
+        prenoms: user.prenoms,
+        denomination: user.denomination,
+        typeusers: user.typeusers,
+        typeusers_id: user.typeusers_id,
+        active: user.active,
+        pays: user.pays
+      };
 
       return res.json({
         code: 200,
         data: {
           token,
-          user: {
-            id: user.id,
-            email: user.email,
-            nom: user.nom,
-            prenoms: user.prenoms,
-            denomination: user.denomination,
-            typeusers: user.typeusers,
-            typeusers_id: user.typeusers_id,
-            active: user.active,
-            pays: user.pays
-          }
+          user: userData,
+          userExists: userData
         }
       });
     } catch (error) {
@@ -2788,21 +2832,24 @@ GROUP BY f.societe_gestion;
       const { generateToken } = require('../middleware/auth');
       const token = generateToken(user);
 
+      const userData = {
+        id: user.id,
+        email: user.email,
+        nom: user.nom,
+        prenoms: user.prenoms,
+        denomination: user.denomination,
+        typeusers: user.typeusers,
+        typeusers_id: user.typeusers_id,
+        active: user.active,
+        pays: user.pays
+      };
+
       return res.json({
         code: 200,
         data: {
           token,
-          user: {
-            id: user.id,
-            email: user.email,
-            nom: user.nom,
-            prenoms: user.prenoms,
-            denomination: user.denomination,
-            typeusers: user.typeusers,
-            typeusers_id: user.typeusers_id,
-            active: user.active,
-            pays: user.pays
-          }
+          user: userData,
+          userExists: userData
         }
       });
     } catch (error) {
@@ -2816,187 +2863,123 @@ GROUP BY f.societe_gestion;
  
 
   app.get('/api/getallfondsvlmanquant', async (req, res) => {
-    const societegestion = req.query.societegestion;
-    const pays = req.query.pays;
+    try {
+      const societegestion = req.query.societegestion;
+      const pays = req.query.pays;
 
+      const fundWhere = { active: 1 };
+      if (societegestion) fundWhere.societe_gestion = societegestion;
+      else if (pays) fundWhere.pays = pays;
 
-    // Requête pour récupérer les fonds avec une anomalie de type "VL MANQUANTE"
-    const highVolatilityFundsVLManquante = await performences.findAll({
-      attributes: ['fond_id'], // Sélectionnez uniquement la colonne fond_id
-      where: {
-
-        anomalie: 'VL MANQUANTE'
-      },
-      raw: true, // Assurez-vous de récupérer les résultats sous forme de tableau brut
-      limit: 500,
-    });
-
-    const dataWithAnomalyTypeVLManquante = highVolatilityFundsVLManquante.map(fundId => ({
-      id: fundId.fond_id,
-      anomalie: 'VL MANQUANTE'
-    }));
-
-    // Combiner les deux ensembles
-    const combinedData = [...dataWithAnomalyTypeVLManquante,];
-
-    // Récupérer les données des fonds à partir des IDs combinés
-    const highVolatilityFundsData = [];
-
-    for (const data of combinedData) {
-      let fundData;
-      if (societegestion) {
-        fundData = await fond.findOne({ where: { id: data.id, societe_gestion: societegestion } });
-      } else if (pays) {
-        fundData = await fond.findOne({ where: { id: data.id, pays: pays } });
-      }
-
-      else {
-        fundData = await fond.findOne({ where: { id: data.id } });
-      }
-      if (fundData) {
-        highVolatilityFundsData.push(fundData);
-      }
-    }
-
-
-    // Associer les données récupérées avec le type d'anomalie correspondant
-    const dataWithAnomalyType = [];
-    const idCounts = {};
-    const seenCombinations = new Set();
-
-    for (const fund of highVolatilityFundsData) {
-      const id = fund.id;
-      /* let anomalyType = 'VL MANQUANTE';
-   
-       if (idCounts[id]) {
-         idCounts[id]++;
-         anomalyType = `ANOMALIE VL`;
-       } else {
-         idCounts[id] = 1;
-       }*/
-
-      const correspondingData = combinedData.filter(data => data.id === id);
-      /*correspondingData.forEach(data => {
-        dataWithAnomalyType.push({
-          ...fund.toJSON(),
-          type_anomalie: data.anomalie,
-          // Vous pouvez également ajouter les autres propriétés de data si nécessaire
-        });
-      });*/
-
-      correspondingData.forEach(data => {
-        const combinationKey = `${fund.id}-${data.anomalie}`; // Assurez-vous que fund.id est une propriété unique pour chaque fund
-
-        if (!seenCombinations.has(combinationKey)) {
-          seenCombinations.add(combinationKey);
-          dataWithAnomalyType.push({
-            ...fund.toJSON(),
-            type_anomalie: data.anomalie,
-            // Ajoutez les autres propriétés de data si nécessaire
-          });
-        }
+      const perfWithMissing = await performences.findAll({
+        attributes: ['fond_id'],
+        where: { anomalie: 'VL MANQUANTE' },
+        raw: true,
+        limit: 500,
       });
+
+      const missingFundIds = new Set(perfWithMissing.map(p => p.fond_id));
+
+      const matchingFunds = await fond.findAll({
+        where: {
+          ...fundWhere,
+          id: { [Op.in]: [...missingFundIds] }
+        },
+        raw: true,
+        limit: 500,
+      });
+
+      const dataWithAnomalyType = matchingFunds.map(f => ({
+        ...f,
+        type_anomalie: 'VL MANQUANTE'
+      }));
+
+      res.json({ code: 200, data: dataWithAnomalyType });
+    } catch (error) {
+      console.error('Erreur getallfondsvlmanquant:', error);
+      res.status(500).json({ code: 500, message: 'Erreur serveur' });
     }
-    console.log(dataWithAnomalyType)
-    res.json({
-      code: 200,
-      data: dataWithAnomalyType
-    });
   });
 
   app.get('/api/getallfondsvlanomalie', async (req, res) => {
-    const societegestion = req.query.societegestion;
-    const pays = req.query.pays;
+    try {
+      const societegestion = req.query.societegestion;
+      const pays = req.query.pays;
 
-    // Requête pour récupérer les fonds avec une autre anomalie que "VL MANQUANTE"
-    const highVolatilityFundsAutreAnomalie = await performences.findAll({
-      attributes: ['fond_id'], // Sélectionnez uniquement la colonne fond_id
-      where: {
-        [Sequelize.Op.or]: [
-          { volatility3an: { [Op.gt]: 50 } },
-          { volatility1an: { [Op.gt]: 50 } },
-          { volatility5an: { [Op.gt]: 50 } },
-          { pertemax1an: { [Op.lt]: -50 } },
-          { pertemax3an: { [Op.lt]: -50 } },
-          { pertemax5an: { [Op.lt]: -50 } }
-        ],
-      },
-      raw: true, // Assurez-vous de récupérer les résultats sous forme de tableau brut
-      limit: 500,
-    });
+      const fundWhere = { active: 1 };
+      if (societegestion) fundWhere.societe_gestion = societegestion;
+      else if (pays) fundWhere.pays = pays;
 
-    // Parcourir fundIdsAutreAnomalie et ajouter les fonds avec l'anomalie "fff"
-    const dataWithAnomalyTypeAutreAnomalie = highVolatilityFundsAutreAnomalie.map(fundId => ({
-      id: fundId.fond_id,
-      anomalie: 'ANOMALIE VL'
-    }));
+      const allFunds = await fond.findAll({ where: fundWhere, raw: true, limit: 1000 });
+      const dataWithAnomalyType = [];
+      const seenCombinations = new Set();
 
-    // Combiner les deux ensembles
-    const combinedData = [ ...dataWithAnomalyTypeAutreAnomalie];
+      const fundIds = allFunds.map(f => f.id);
 
-    // Récupérer les données des fonds à partir des IDs combinés
-    const highVolatilityFundsData = [];
-
-    for (const data of combinedData) {
-      let fundData;
-      if (societegestion) {
-        fundData = await fond.findOne({ where: { id: data.id, societe_gestion: societegestion } });
-      } else if (pays) {
-        fundData = await fond.findOne({ where: { id: data.id, pays: pays } });
-      }
-
-      else {
-        fundData = await fond.findOne({ where: { id: data.id } });
-      }
-      if (fundData) {
-        highVolatilityFundsData.push(fundData);
-      }
-    }
-
-
-    // Associer les données récupérées avec le type d'anomalie correspondant
-    const dataWithAnomalyType = [];
-    const idCounts = {};
-    const seenCombinations = new Set();
-
-    for (const fund of highVolatilityFundsData) {
-      const id = fund.id;
-      /* let anomalyType = 'VL MANQUANTE';
-   
-       if (idCounts[id]) {
-         idCounts[id]++;
-         anomalyType = `ANOMALIE VL`;
-       } else {
-         idCounts[id] = 1;
-       }*/
-
-      const correspondingData = combinedData.filter(data => data.id === id);
-      /*correspondingData.forEach(data => {
-        dataWithAnomalyType.push({
-          ...fund.toJSON(),
-          type_anomalie: data.anomalie,
-          // Vous pouvez également ajouter les autres propriétés de data si nécessaire
-        });
-      });*/
-
-      correspondingData.forEach(data => {
-        const combinationKey = `${fund.id}-${data.anomalie}`; // Assurez-vous que fund.id est une propriété unique pour chaque fund
-
-        if (!seenCombinations.has(combinationKey)) {
-          seenCombinations.add(combinationKey);
-          dataWithAnomalyType.push({
-            ...fund.toJSON(),
-            type_anomalie: data.anomalie,
-            // Ajoutez les autres propriétés de data si nécessaire
-          });
-        }
+      const highVolatilityPerfs = await performences.findAll({
+        attributes: ['fond_id'],
+        where: {
+          fond_id: { [Op.in]: fundIds },
+          [Sequelize.Op.or]: [
+            { volatility3an: { [Op.gt]: 50 } },
+            { volatility1an: { [Op.gt]: 50 } },
+            { volatility5an: { [Op.gt]: 50 } },
+            { pertemax1an: { [Op.lt]: -50 } },
+            { pertemax3an: { [Op.lt]: -50 } },
+            { pertemax5an: { [Op.lt]: -50 } }
+          ],
+        },
+        raw: true,
+        limit: 500,
       });
+
+      const highVolFundIds = new Set(highVolatilityPerfs.map(p => p.fond_id));
+
+      for (const fundData of allFunds) {
+        if (highVolFundIds.has(fundData.id)) {
+          const key = `${fundData.id}-VOLATILITE_EXTREME`;
+          if (!seenCombinations.has(key)) {
+            seenCombinations.add(key);
+            dataWithAnomalyType.push({ ...fundData, type_anomalie: 'VOLATILITE EXTREME' });
+          }
+        }
+
+        const recentVLs = await vl.findAll({
+          where: { fund_id: fundData.id },
+          order: [['date', 'DESC']],
+          limit: 60,
+          raw: true,
+        });
+
+        if (recentVLs.length >= 2) {
+          const sorted = recentVLs.sort((a, b) => new Date(a.date) - new Date(b.date));
+          let hasGapAnomaly = false;
+          for (let i = 1; i < sorted.length; i++) {
+            const prev = sorted[i - 1].value;
+            const curr = sorted[i].value;
+            if (prev && curr && prev > 0) {
+              const pctChange = Math.abs((curr - prev) / prev) * 100;
+              if (pctChange >= 10) {
+                hasGapAnomaly = true;
+                break;
+              }
+            }
+          }
+          if (hasGapAnomaly) {
+            const key = `${fundData.id}-ECART_VL`;
+            if (!seenCombinations.has(key)) {
+              seenCombinations.add(key);
+              dataWithAnomalyType.push({ ...fundData, type_anomalie: 'ECART VL SUSPECT' });
+            }
+          }
+        }
+      }
+
+      res.json({ code: 200, data: dataWithAnomalyType });
+    } catch (error) {
+      console.error('Erreur getallfondsvlanomalie:', error);
+      res.status(500).json({ code: 500, message: 'Erreur serveur' });
     }
-    console.log(dataWithAnomalyType)
-    res.json({
-      code: 200,
-      data: dataWithAnomalyType
-    });
   });
   app.get('/api/vlspresui/:id/:value/:date', async (req, res) => {
     try {
@@ -3065,8 +3048,8 @@ GROUP BY f.societe_gestion;
         await vl.update({
           date: date,
           value: parseFloat(val),
-          value_EUR: exchangeRatesEUR ? parseFloat(val) * exchangeRatesEUR.value : null,
-          value_USD: exchangeRatesUSD ? parseFloat(val) * exchangeRatesUSD.value : null
+          value_EUR: exchangeRatesEUR ? parseFloat(val) / exchangeRatesEUR.value : null,
+          value_USD: exchangeRatesUSD ? parseFloat(val) / exchangeRatesUSD.value : null
         }, { where: { fund_id: parseInt(req.params.id), date: date } });
       }
 
@@ -3076,10 +3059,13 @@ GROUP BY f.societe_gestion;
         await vl.update({
           date: date,
           value: parseFloat(val),
-          value_EUR: exchangeRatesEUR ? parseFloat(val) * exchangeRatesEUR.value : null,
-          value_USD: exchangeRatesUSD ? parseFloat(val) * exchangeRatesUSD.value : null
+          value_EUR: exchangeRatesEUR ? parseFloat(val) / exchangeRatesEUR.value : null,
+          value_USD: exchangeRatesUSD ? parseFloat(val) / exchangeRatesUSD.value : null
         }, { where: { fund_id: parseInt(req.params.id), date: date } });
       }
+
+      const earliestDate = nupdatedDataList[0]?.date || pupdatedDataList[0]?.date || new Date().toISOString().split('T')[0];
+      recalcEvent.emitAndPropagate('VL_UPDATE', parseInt(req.params.id), earliestDate, 'api_updateValues').catch(() => {});
 
       res.status(200).json({ message: 'Valorisations updated successfully' });
     } catch (error) {
@@ -3198,8 +3184,13 @@ GROUP BY f.societe_gestion;
         })
 
       })
+      .catch(err => {
+        console.error('[getportefeuillebyuser] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation portefeuilles' });
+      })
   })
   app.get('/api/getportefeuille/:id', async (req, res) => {
+    try {
     const resultat = await portefeuille_vl_cumul.findAll({
       attributes: ['date', 'valeur_portefeuille'],
       where: {
@@ -3275,6 +3266,14 @@ GROUP BY f.societe_gestion;
         })
 
       })
+      .catch(err => {
+        console.error('[getportefeuille] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation portefeuille' });
+      })
+    } catch (error) {
+      console.error('Erreur getportefeuille:', error);
+      res.status(500).json({ code: 500, message: 'Erreur recuperation portefeuille' });
+    }
   })
   app.post('/api/postportefeuille', async (req, res) => {
     try {
@@ -3372,47 +3371,63 @@ GROUP BY f.societe_gestion;
     }
   });
 
-
+  app.post('/api/deleteportefeuille/:id', async (req, res) => {
+    try {
+      const portfolioId = req.params.id;
+      const existing = await portefeuille.findOne({ where: { id: portfolioId } });
+      if (!existing) {
+        return res.status(404).json({ error: 'Portefeuille non trouvé' });
+      }
+      await portefeuille_vl.destroy({ where: { portefeuille_id: portfolioId } });
+      await portefeuille.destroy({ where: { id: portfolioId } });
+      res.json({ code: 200, message: 'Portefeuille supprimé avec succès' });
+    } catch (error) {
+      console.error('Erreur lors de la suppression du portefeuille:', error);
+      res.status(500).json({ error: 'Erreur lors de la suppression' });
+    }
+  });
 
 
   app.post('/api/reconstitution', async (req, res) => {
     try {
-      // const { entries } = req.body;
-
       const valorisations = [];
       let montantInvestissement = 0;
+      let portfolioId = null;
+
       for (const entry of req.body) {
         const { date, montantInvesti, fondId, portefeuilleselect } = entry;
-        montantInvestissement += montantInvesti
-        // Rechercher la valeur du fond pour la date spécifiée
+        montantInvestissement += montantInvesti;
+        if (!portfolioId) portfolioId = portefeuilleselect;
+
         let vls = await vl.findAll({
           where: {
             fund_id: fondId, date: {
-              [Op.gte]: date // Remplacez 'votreDate' par la date que vous souhaitez comparer.
+              [Op.gte]: date
             }
           },
           limit: 500,
         });
+
+        if (!vls || vls.length === 0) {
+          return res.status(400).json({ error: `Aucune VL trouvée pour le fonds ${fondId} à partir du ${date}` });
+        }
+
         const quantite = montantInvesti / vls[0].value;
 
         for (const dateRow of vls) {
-
           const valorisation = quantite * dateRow.value;
           valorisations.push({ date: dateRow.date, value: valorisation, fund_id: fondId, portefeuille_id: portefeuilleselect });
-
         }
-        // Insérer les nouvelles valorisations dans la table vl_portefeuille
-        await portefeuille_vl.bulkCreate(valorisations);
       }
 
-      const updatedData = {
-        montant_invest: montantInvestissement
-      };
+      await portefeuille_vl.bulkCreate(valorisations);
 
-      // Assuming 'portefeuille' is your model for updating data in your database
-      await portefeuille.update(updatedData, {
-        where: { id: portefeuille },
-      });
+      if (portfolioId) {
+        await portefeuille.update(
+          { montant_invest: montantInvestissement },
+          { where: { id: portfolioId } }
+        );
+      }
 
       return res.json({ code: 200, data: "succes" });
     } catch (error) {
@@ -3442,50 +3457,26 @@ GROUP BY f.societe_gestion;
       }
 
       if (selectedcategorie != 'undefined') {
-        query += `
-   
-        AND f.categorie_globale = :selectedcategorie
-    
-  `;
+        query += ` AND LOWER(f.categorie_globale) = LOWER(:selectedcategorie)`;
       }
 
       if (selectedDevise != 'undefined') {
-        query += `
-   
-        AND f.dev_libelle = :selectedDevise
-    
-  `;
+        query += ` AND LOWER(f.dev_libelle) = LOWER(:selectedDevise)`;
       }
 
       if (frequence != 'undefined' && frequence.length >= 1) {
-        query += `
-   
-        AND f.periodicite = :frequence
-    
-  `;
+        query += ` AND LOWER(f.periodicite) = LOWER(:frequence)`;
       }
 
       if (selectedsociete != 'undefined') {
-        query += `
-   
-        AND f.societe_gestion = :selectedsociete
-    
-  `;
+        query += ` AND LOWER(f.societe_gestion) = LOWER(:selectedsociete)`;
       }
 
       if (selectedcategorienationale != 'undefined') {
-        query += `
-   
-        AND f.categorie_national = :selectedcategorienationale
-    
-  `;
+        query += ` AND LOWER(f.categorie_national) = LOWER(:selectedcategorienationale)`;
       }
       if (selectedcategorieregionale != 'undefined') {
-        query += `
-   
-        AND f.categorie_regional = :selectedcategorieregionale
-    
-  `;
+        query += ` AND LOWER(f.categorie_regional) = LOWER(:selectedcategorieregionale)`;
       }
 
       const fondsDansCategorie = await sequelize.query(query, {
@@ -3509,28 +3500,27 @@ GROUP BY f.societe_gestion;
   app.post('/api/rechercheravance-fonds', async (req, res) => {
     const formData = req.body.formData;
     const selectedValues = req.query.query;
-    const selectedcategorieregionale = req.query.selectedcategorieregionale;
-    const selectedcategorienationale = req.query.selectedcategorienationale;
-    const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
-    const selectedDevise = req.query.selecteddevise; // Corrected variable name
-    const selectedSociete = req.query.selectedsociete; // Corrected variable name
-    const frequence = req.query.frequence; // Corrected variable name
+    const selectedcategorieregionale = req.query.selectedcategorieregionale || 'undefined';
+    const selectedcategorienationale = req.query.selectedcategorienationale || 'undefined';
+    const selectedCategorie = req.query.selectedcategorie || 'undefined';
+    const selectedDevise = req.query.selecteddevise || 'undefined';
+    const selectedSociete = req.query.selectedsociete || 'undefined';
+    const frequence = req.query.frequence || 'undefined';
 
-    console.log(frequence.length);
-    const valuesArray = selectedValues.split(',');
-
-    // Fetch funds based on criteria
-    const funds = await fetchFundsByValorisationfirst(valuesArray, selectedCategorie, selectedSociete, selectedDevise, frequence, selectedcategorieregionale, selectedcategorienationale);
-
-    if (!funds.length) {
-      res.status(404).json({ error: 'No funds found.' });
-      return;
-    }
-
-    // Use batch processing to fetch fund data and performance data
-    const fundIds = funds.map(fund => fund.id);
+    const valuesArray = selectedValues ? selectedValues.split(',') : [''];
 
     try {
+      // Fetch funds based on criteria
+      const funds = await fetchFundsByValorisationfirst(valuesArray, selectedCategorie, selectedSociete, selectedDevise, frequence, selectedcategorieregionale, selectedcategorienationale);
+
+      if (!funds.length) {
+        res.status(404).json({ error: 'No funds found.' });
+        return;
+      }
+
+      // Use batch processing to fetch fund data and performance data
+      const fundIds = funds.map(fund => fund.id);
+
       // Fetch all fund data in one batch
       const fundDataResults = await fond.findAll({
         where: { id: fundIds },
@@ -3590,9 +3580,9 @@ GROUP BY f.societe_gestion;
                   if (Ratioinf !== '-' && Ratioinf !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Ratioinf} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Ratioinf) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Ratioinf} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Ratioinf) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3604,9 +3594,9 @@ GROUP BY f.societe_gestion;
                   if (Var95 !== '-' && Var95 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var95} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var95) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var95} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var95) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3618,9 +3608,9 @@ GROUP BY f.societe_gestion;
                   if (Var99 !== '-' && Var99 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var99} < ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var99) < parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var99} > ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var99) > parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3632,9 +3622,9 @@ GROUP BY f.societe_gestion;
                   if (Calamar !== '-' && Calamar !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Calamar} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Calamar) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Calamar} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Calamar) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3646,9 +3636,9 @@ GROUP BY f.societe_gestion;
                   if (PerfAnnu !== '-' && PerfAnnu !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfAnnu} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfAnnu) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfAnnu} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfAnnu) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3660,9 +3650,9 @@ GROUP BY f.societe_gestion;
                   if (Sharpe !== '-' && Sharpe !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sharpe} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sharpe) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sharpe} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sharpe) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3674,9 +3664,9 @@ GROUP BY f.societe_gestion;
                   if (Pertemax !== '-' && Pertemax !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Pertemax} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Pertemax) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Pertemax} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Pertemax) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3688,9 +3678,9 @@ GROUP BY f.societe_gestion;
                   if (Volatilite !== '-' && Volatilite !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Volatilite} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Volatilite) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Volatilite} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Volatilite) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3702,9 +3692,9 @@ GROUP BY f.societe_gestion;
                   if (Trakingerror !== '-' && Trakingerror !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Trakingerror} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Trakingerror) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Trakingerror} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Trakingerror) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3716,9 +3706,9 @@ GROUP BY f.societe_gestion;
                   if (Sortino !== '-' && Sortino !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sortino} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sortino) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sortino} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sortino) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3730,9 +3720,9 @@ GROUP BY f.societe_gestion;
                   if (Omega !== '-' && Omega !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Omega} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Omega) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Omega} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Omega) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3744,9 +3734,9 @@ GROUP BY f.societe_gestion;
                   if (Dsr !== '-' && Dsr !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Dsr} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Dsr) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Dsr} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Dsr) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3758,9 +3748,9 @@ GROUP BY f.societe_gestion;
                   if (Betahaussier !== '-' && Betahaussier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betahaussier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betahaussier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betahaussier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betahaussier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3772,9 +3762,9 @@ GROUP BY f.societe_gestion;
                   if (Betabaissier !== '-' && Betabaissier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betabaissier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betabaissier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betabaissier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betabaissier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3786,9 +3776,9 @@ GROUP BY f.societe_gestion;
                   if (Downcapture !== '-' && Downcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Downcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Downcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Downcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Downcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3800,9 +3790,9 @@ GROUP BY f.societe_gestion;
                   if (Upcapture !== '-' && Upcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Upcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Upcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Upcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Upcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3814,9 +3804,9 @@ GROUP BY f.societe_gestion;
                   if (Skewness !== '-' && Skewness !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Skewness} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Skewness) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Skewness} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Skewness) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3828,9 +3818,9 @@ GROUP BY f.societe_gestion;
                   if (Kurtosis !== '-' && Kurtosis !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Kurtosis} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Kurtosis) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Kurtosis} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Kurtosis) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3842,9 +3832,9 @@ GROUP BY f.societe_gestion;
                   if (Beta !== '-' && Beta !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Beta} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Beta) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Beta} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Beta) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3857,9 +3847,9 @@ GROUP BY f.societe_gestion;
                   if (Ratioinf !== '-' && Ratioinf !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Ratioinf} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Ratioinf) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Ratioinf} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Ratioinf) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3871,9 +3861,9 @@ GROUP BY f.societe_gestion;
                   if (Var95 !== '-' && Var95 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var95} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var95) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var95} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var95) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3885,9 +3875,9 @@ GROUP BY f.societe_gestion;
                   if (Var99 !== '-' && Var99 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var99} < ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var99) < parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var99} > ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var99) > parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3899,9 +3889,9 @@ GROUP BY f.societe_gestion;
                   if (Calamar !== '-' && Calamar !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Calamar} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Calamar) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Calamar} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Calamar) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3913,9 +3903,9 @@ GROUP BY f.societe_gestion;
                   if (PerfAnnu !== '-' && PerfAnnu !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfAnnu} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfAnnu) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfAnnu} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfAnnu) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3927,9 +3917,9 @@ GROUP BY f.societe_gestion;
                   if (Sharpe !== '-' && Sharpe !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sharpe} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sharpe) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sharpe} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sharpe) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3941,9 +3931,9 @@ GROUP BY f.societe_gestion;
                   if (Pertemax !== '-' && Pertemax !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Pertemax} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Pertemax) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Pertemax} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Pertemax) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3955,9 +3945,9 @@ GROUP BY f.societe_gestion;
                   if (Volatilite !== '-' && Volatilite !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Volatilite} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Volatilite) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Volatilite} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Volatilite) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3969,9 +3959,9 @@ GROUP BY f.societe_gestion;
                   if (Trakingerror !== '-' && Trakingerror !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Trakingerror} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Trakingerror) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Trakingerror} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Trakingerror) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3983,9 +3973,9 @@ GROUP BY f.societe_gestion;
                   if (Sortino !== '-' && Sortino !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sortino} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sortino) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sortino} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sortino) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -3997,9 +3987,9 @@ GROUP BY f.societe_gestion;
                   if (Omega !== '-' && Omega !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Omega} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Omega) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Omega} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Omega) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4011,9 +4001,9 @@ GROUP BY f.societe_gestion;
                   if (Dsr !== '-' && Dsr !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Dsr} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Dsr) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Dsr} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Dsr) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4025,9 +4015,9 @@ GROUP BY f.societe_gestion;
                   if (Betahaussier !== '-' && Betahaussier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betahaussier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betahaussier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betahaussier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betahaussier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4039,9 +4029,9 @@ GROUP BY f.societe_gestion;
                   if (Betabaissier !== '-' && Betabaissier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betabaissier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betabaissier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betabaissier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betabaissier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4053,9 +4043,9 @@ GROUP BY f.societe_gestion;
                   if (Downcapture !== '-' && Downcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Downcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Downcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Downcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Downcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4067,9 +4057,9 @@ GROUP BY f.societe_gestion;
                   if (Upcapture !== '-' && Upcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Upcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Upcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Upcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Upcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4081,9 +4071,9 @@ GROUP BY f.societe_gestion;
                   if (Skewness !== '-' && Skewness !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Skewness} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Skewness) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Skewness} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Skewness) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4095,9 +4085,9 @@ GROUP BY f.societe_gestion;
                   if (Kurtosis !== '-' && Kurtosis !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Kurtosis} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Kurtosis) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Kurtosis} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Kurtosis) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4109,9 +4099,9 @@ GROUP BY f.societe_gestion;
                   if (Beta !== '-' && Beta !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Beta} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Beta) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Beta} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Beta) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4124,9 +4114,9 @@ GROUP BY f.societe_gestion;
                   if (Ratioinf !== '-' && Ratioinf !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Ratioinf} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Ratioinf) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Ratioinf} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Ratioinf) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4138,9 +4128,9 @@ GROUP BY f.societe_gestion;
                   if (Var95 !== '-' && Var95 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var95} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var95) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var95} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var95) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4152,9 +4142,9 @@ GROUP BY f.societe_gestion;
                   if (Var99 !== '-' && Var99 !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Var99} < ${value}`)) {
+                    if (operation === "<=" && parseFloat(Var99) < parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Var99} > ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Var99) > parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4165,9 +4155,9 @@ GROUP BY f.societe_gestion;
                   // Ajoutez d'autres propriétés si nécessaire
                   if (Calamar !== '-' && Calamar !== null) {
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Calamar} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Calamar) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Calamar} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Calamar) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4179,9 +4169,9 @@ GROUP BY f.societe_gestion;
                   if (PerfAnnu !== '-' && PerfAnnu !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfAnnu} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfAnnu) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfAnnu} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfAnnu) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4192,9 +4182,9 @@ GROUP BY f.societe_gestion;
                   // Ajoutez d'autres propriétés si nécessaire
                   if (Sharpe !== '-' && Sharpe !== null) {
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sharpe} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sharpe) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sharpe} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sharpe) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4206,9 +4196,9 @@ GROUP BY f.societe_gestion;
                   if (Pertemax !== '-' && Pertemax !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Pertemax} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Pertemax) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Pertemax} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Pertemax) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4220,9 +4210,9 @@ GROUP BY f.societe_gestion;
                   if (Volatilite !== '-' && Volatilite !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Volatilite} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Volatilite) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Volatilite} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Volatilite) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4234,9 +4224,9 @@ GROUP BY f.societe_gestion;
                   if (Trakingerror !== '-' && Trakingerror !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Trakingerror} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Trakingerror) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Trakingerror} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Trakingerror) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4248,9 +4238,9 @@ GROUP BY f.societe_gestion;
                   if (Sortino !== '-' && Sortino !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Sortino} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Sortino) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Sortino} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Sortino) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4262,9 +4252,9 @@ GROUP BY f.societe_gestion;
                   if (Omega !== '-' && Omega !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Omega} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Omega) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Omega} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Omega) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4276,9 +4266,9 @@ GROUP BY f.societe_gestion;
                   if (Dsr !== '-' && Dsr !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Dsr} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Dsr) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Dsr} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Dsr) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4290,9 +4280,9 @@ GROUP BY f.societe_gestion;
                   if (Betahaussier !== '-' && Betahaussier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betahaussier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betahaussier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betahaussier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betahaussier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4304,9 +4294,9 @@ GROUP BY f.societe_gestion;
                   if (Betabaissier !== '-' && Betabaissier !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Betabaissier} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Betabaissier) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Betabaissier} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Betabaissier) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4318,9 +4308,9 @@ GROUP BY f.societe_gestion;
                   if (Downcapture !== '-' && Downcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Downcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Downcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Downcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Downcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4332,9 +4322,9 @@ GROUP BY f.societe_gestion;
                   if (Upcapture !== '-' && Upcapture !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Upcapture} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Upcapture) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Upcapture} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Upcapture) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4346,9 +4336,9 @@ GROUP BY f.societe_gestion;
                   if (Skewness !== '-' && Skewness !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Skewness} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Skewness) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Skewness} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Skewness) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4360,9 +4350,9 @@ GROUP BY f.societe_gestion;
                   if (Kurtosis !== '-' && Kurtosis !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Kurtosis} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Kurtosis) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Kurtosis} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Kurtosis) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4374,9 +4364,9 @@ GROUP BY f.societe_gestion;
                   if (Beta !== '-' && Beta !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${Beta} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(Beta) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${Beta} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(Beta) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4388,9 +4378,9 @@ GROUP BY f.societe_gestion;
                   // Ajoutez d'autres propriétés si nécessaire
                   if (PerfCummul !== '-' && PerfCummul !== null) {
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4404,9 +4394,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4420,9 +4410,9 @@ GROUP BY f.societe_gestion;
 
                   // Comparez les valeurs avec les critères
                   if (PerfCummul !== '-' && PerfCummul !== null) {
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
 
@@ -4437,9 +4427,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                     // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4452,9 +4442,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4468,9 +4458,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4483,9 +4473,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4499,9 +4489,9 @@ GROUP BY f.societe_gestion;
                   if (PerfCummul !== '-' && PerfCummul !== null) {
 
                     // Comparez les valeurs avec les critères
-                    if (operation === "<=" && eval(`${PerfCummul} <= ${value}`)) {
+                    if (operation === "<=" && parseFloat(PerfCummul) <= parseFloat(value)) {
                       correspondances++;
-                    } else if (operation === ">=" && eval(`${PerfCummul} >= ${value}`)) {
+                    } else if (operation === ">=" && parseFloat(PerfCummul) >= parseFloat(value)) {
                       correspondances++;
                     }
                   }
@@ -4515,9 +4505,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Fraissous} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Fraissous) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Fraissous} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Fraissous) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4526,9 +4516,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Fraisgestion} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Fraisgestion) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Fraisgestion} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Fraisgestion) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4537,9 +4527,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Fraisrachat} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Fraisrachat) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Fraisrachat} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Fraisrachat) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4548,9 +4538,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Fraiscourant} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Fraiscourant) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Fraiscourant} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Fraiscourant) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4560,9 +4550,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Mininvest} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Mininvest) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Mininvest} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Mininvest) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4571,9 +4561,9 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (operation === "<=" && eval(`${Actifnet} <= ${value}`)) {
+                if (operation === "<=" && parseFloat(Actifnet) <= parseFloat(value)) {
                   correspondances++;
-                } else if (operation === ">=" && eval(`${Actifnet} >= ${value}`)) {
+                } else if (operation === ">=" && parseFloat(Actifnet) >= parseFloat(value)) {
                   correspondances++;
                 }
                 // Ajoutez d'autres conditions pour les autres propriétés si nécessaire
@@ -4585,7 +4575,7 @@ GROUP BY f.societe_gestion;
                 // Ajoutez d'autres propriétés si nécessaire
 
                 // Comparez les valeurs avec les critères
-                if (eval(`${Typeinvest} == ${value}`)) {
+                if (String(Typeinvest) === String(value)) {
                   correspondances++;
                 }
               }
@@ -4637,8 +4627,13 @@ GROUP BY f.societe_gestion;
           }
         })
       })
+      .catch(err => {
+        console.error('[getDevises] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation devises' });
+      })
   })
   app.post('/api/assignportefeuille', async (req, res) => {
+    try {
     const { portfolioId, indices, categories, tsr, tacc } = req.body;
 
     // Appeler l'endpoint pour récupérer les performances
@@ -4655,6 +4650,10 @@ GROUP BY f.societe_gestion;
         performanceData
       }
     });
+    } catch (error) {
+      console.error('Erreur assignportefeuille:', error);
+      res.status(500).json({ error: 'Erreur lors de l\'assignation du portefeuille.' });
+    }
   });
 
   app.get('/api/getIndice', async (req, res) => {
@@ -4681,37 +4680,40 @@ GROUP BY f.societe_gestion;
 
   app.get('/api/getCategories', async (req, res) => {
     try {
-      const categoriesRegion = await fond.findAll({
-        attributes: [
-          [sequelize.fn('DISTINCT', sequelize.col('categorie_regional')), 'categorie_regional']
-        ],
-        limit: 500,
-      });
+      const [categoriesGlobal, categoriesRegion, categoriesNational] = await Promise.all([
+        fond.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('categorie_globale')), 'categorie_globale']],
+          where: { active: 1 },
+          limit: 500,
+        }),
+        fond.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('categorie_regional')), 'categorie_regional']],
+          where: { active: 1 },
+          limit: 500,
+        }),
+        fond.findAll({
+          attributes: [[sequelize.fn('DISTINCT', sequelize.col('categorie_national')), 'categorie_national']],
+          where: { active: 1 },
+          limit: 500,
+        }),
+      ]);
 
-      const categoriesNational = await fond.findAll({
-        attributes: [
-          [sequelize.fn('DISTINCT', sequelize.col('categorie_national')), 'categorie_national']
-        ],
-        limit: 500,
-      });
-
-      // Filtrer les valeurs vides
-      const filteredCategoriesRegion = categoriesRegion
+      const filteredGlobal = categoriesGlobal
+        .map(item => item.get('categorie_globale'))
+        .filter(c => c !== null && c !== '');
+      const filteredRegion = categoriesRegion
         .map(item => item.get('categorie_regional'))
-        .filter(categorie => categorie !== null && categorie !== '');
-
-      const filteredCategoriesNational = categoriesNational
+        .filter(c => c !== null && c !== '');
+      const filteredNational = categoriesNational
         .map(item => item.get('categorie_national'))
-        .filter(categorie => categorie !== null && categorie !== '');
-
-      const distinctCategorieregional = filteredCategoriesRegion.map(category => category);
-      const distinctNationalCategories = filteredCategoriesNational.map(category => category);
+        .filter(c => c !== null && c !== '');
 
       res.json({
         code: 200,
         data: {
-          categoriesRegional: distinctCategorieregional,
-          categoriesNational: distinctNationalCategories
+          categoriesGlobal: filteredGlobal,
+          categoriesRegional: filteredRegion,
+          categoriesNational: filteredNational
         }
       });
     } catch (error) {
@@ -4720,7 +4722,7 @@ GROUP BY f.societe_gestion;
   });
 
   app.get('/api/valLiqportefeuillewithindice/:id/:indice/:tsr/:categorie', async (req, res) => {
-
+    try {
     const portefeuilleId = parseInt(req.params.id)
     const response = await portefeuille_vl_cumul.findAll({
       where: {
@@ -4812,15 +4814,15 @@ GROUP BY f.societe_gestion;
       res.status(500).json({ message: 'Erreur lors de la récupération des données' });
 
     }
-    /* } catch (error) {
-       console.error('Erreur lors de la récupération des données:', error);
-       res.status(500).json({ message: 'Erreur lors de la récupération des données' });
-     }*/
+    } catch (error) {
+      console.error('Erreur valLiqportefeuillewithindice:', error);
+      res.status(500).json({ message: 'Erreur lors de la récupération des données' });
+    }
   });
 
   app.get('/api/performancesportefeuillewithindice/fond/:id/:categorie/:date', async (req, res) => {
-
-    performancesCategorie = await getPerformancesByCategorynow(req.params.categorie, "2024-03-22");
+    try {
+    performancesCategorie = await getPerformancesByCategorynow(req.params.categorie, req.params.date);
 
 
     portefeuille_vl_cumul.findAll({
@@ -4886,7 +4888,6 @@ GROUP BY f.societe_gestion;
         const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
         const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
-        console.log(findLastDateOfPreviousMonth(dates))
         //Performances annualizées fin de mois
         const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
         const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
@@ -4933,7 +4934,6 @@ GROUP BY f.societe_gestion;
         });
 
 
-        console.log(multipliedValues);
         res.json({
           code: 200,
           data: {
@@ -4996,6 +4996,14 @@ GROUP BY f.societe_gestion;
         })
 
       })
+      .catch(err => {
+        console.error('[performancesportefeuillewithindice] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur calcul performances portefeuille' });
+      })
+    } catch (error) {
+      console.error('Erreur performancesportefeuillewithindice:', error);
+      res.status(500).json({ code: 500, message: 'Erreur calcul performances portefeuille' });
+    }
   })
 
   app.get('/api/ratiosportfeuillewithindice/:year/:id/:tsr/:indice', async (req, res) => {
@@ -5096,6 +5104,7 @@ GROUP BY f.societe_gestion;
   }
 
   app.post('/api/calculatePerformance', async (req, res) => {
+    try {
     const { selectedIndex, selectedCategory } = req.body;
 
     // Implémentez ici votre logique pour calculer les performances
@@ -5105,6 +5114,10 @@ GROUP BY f.societe_gestion;
       code: 200,
       data: performances
     });
+    } catch (error) {
+      console.error('Erreur calculatePerformance:', error);
+      res.status(500).json({ error: 'Erreur lors du calcul des performances.' });
+    }
   });
 
   app.get('/api/getSocietes', async (req, res) => {
@@ -5129,6 +5142,10 @@ GROUP BY f.societe_gestion;
             societes
           }
         })
+      })
+      .catch(err => {
+        console.error('[getSocietes] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation societes' });
       })
   })
   app.get('/api/getSocietesbypays/:pays', async (req, res) => {
@@ -5155,6 +5172,10 @@ GROUP BY f.societe_gestion;
           }
         })
       })
+      .catch(err => {
+        console.error('[getSocietesbypays] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation societes par pays' });
+      })
   })
   app.get('/api/getPays', (req, res) => {
     // Récupérez la liste des pays depuis la base de données
@@ -5177,6 +5198,10 @@ GROUP BY f.societe_gestion;
             paysOptions
           }
         })
+      })
+      .catch(err => {
+        console.error('[getPays] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation pays' });
       })
   });
 
@@ -5207,8 +5232,8 @@ GROUP BY f.societe_gestion;
       const countriesWithCompanies = countries.map(country => ({
         pays: country.pays,
         slug: generateSlug(country.pays),
-        companyCount: companiesPerCountry.find(c => c.pays === country.pays)?.companyCount ?? 0,
-        fondscount: fondsPerCountry.find(c => c.pays === country.pays)?.fondsCount ?? 0
+        companyCount: companiesPerCountry.find(c => c.pays?.toLowerCase() === country.pays?.toLowerCase())?.companyCount ?? 0,
+        fondscount: fondsPerCountry.find(c => c.pays?.toLowerCase() === country.pays?.toLowerCase())?.fondsCount ?? 0
       }));
 
       // Prepare data for table display
@@ -5474,11 +5499,26 @@ GROUP BY f.societe_gestion;
   app.post('/api/recherchefonds', async (req, res) => {
     try {
       const selectedValues = req.query.query;
-      const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
-      const selectedSociete = req.query.selectedsociete; // Corrected variable name
-      const selectedcategorieregionale = req.query.selectedcategorieregionale;
-      const selectedcategorienationale = req.query.selectedcategorienationale;
-      const valuesArray = selectedValues.split(',');
+      const selectedCategorie = req.query.selectedcategorie || 'undefined';
+      const selectedSociete = req.query.selectedsociete || 'undefined';
+      const selectedcategorieregionale = req.query.selectedcategorieregionale || 'undefined';
+      const selectedcategorienationale = req.query.selectedcategorienationale || 'undefined';
+
+      const hasFilters = (selectedCategorie !== 'undefined') || (selectedSociete !== 'undefined') || (selectedcategorieregionale !== 'undefined') || (selectedcategorienationale !== 'undefined');
+
+      if (!selectedValues && !hasFilters) {
+        const allFunds = await fond.findAll({ limit: 500 });
+        return res.json({
+          code: 200,
+          data: allFunds.map(f => ({
+            id: f.id,
+            nom_fond: f.nom_fond,
+            isin: f.code_ISIN,
+          })),
+        });
+      }
+
+      const valuesArray = selectedValues ? selectedValues.split(',') : [''];
 
       // Fetch funds based on criteria
       const funds = await fetchFundsByValorisationfirst(valuesArray, selectedCategorie, selectedSociete, 'undefined', '',selectedcategorieregionale,selectedcategorienationale);
@@ -5540,6 +5580,7 @@ GROUP BY f.societe_gestion;
 
 
   app.get('/api/searchFundsreconstitution', async (req, res) => {
+    try {
     const { categorie, univers, universsous, selectedPays, selectedRegion } = req.query;
 
     const categories = categorie.split(',');
@@ -5650,6 +5691,10 @@ GROUP BY f.societe_gestion;
         fundsByNationalCategorie,
       },
     });
+    } catch (error) {
+      console.error('Erreur searchFundsreconstitution:', error);
+      res.status(500).json({ error: 'Erreur lors de la recherche des fonds.' });
+    }
   });
   app.post('/api/updatefond/:id', async (req, res) => {
     try {
@@ -5680,456 +5725,8 @@ GROUP BY f.societe_gestion;
   });
 
 
-  //Users adamin valide
-  app.get('/api/getusersbyadmin', (req, res) => {
-    ///  const searchTerm = req.query.query;
-
-    // Vérifiez si searchTerm existe
-    /*if (!searchTerm) {
-        return res.status(400).json({ error: 'Le paramètre query est manquant.' });
-    }*/
-
-    users.findAll({
-      where: {
-      },
-      order: [
-        ['id', 'DESC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const userss = response.map(data => ({
-          id: data.id,
-          email: data.email, // Remplacez avec la propriété correcte de l'objet
-          nom: data.nom, // Remplacez avec la propriété correcte de l'objet
-          prenoms: data.prenoms,
-          active: data.active
-
-        }));
-        res.json({
-          code: 200,
-          data: {
-            userss
-          }
-        })
-
-      })
-  })
-
-  app.post('/api/activate-user/:id', (req, res) => {
-    const userId = req.params.id;
-
-    // Trouver l'utilisateur avec l'ID
-    users.findOne({
-      where: {
-        id: userId
-      }
-    })
-      .then(user => {
-        if (!user) {
-          return res.status(404).json({ error: 'Utilisateur non trouvé' });
-        }
-
-        // Mettre à jour l'utilisateur pour l'activer
-        return user.update({ active: 1 });
-      })
-      .then(updatedUser => {
-        // Répondre avec une confirmation de l'activation
-        res.json({
-          code: 200,
-          message: "L'utilisateur a été activé avec succès",
-          data: {
-            id: updatedUser.id,
-            nom: updatedUser.nom,
-            active: updatedUser.active,
-          }
-        });
-      })
-      .catch(error => {
-        console.error('Erreur lors de l\'activation de l\'utilisateur:', error);
-        res.status(500).json({ error: 'Erreur interne du serveur' });
-      });
-  });
-
-  //Frais
-  app.get('/api/getfraisbyadmin', (req, res) => {
-    ///  const searchTerm = req.query.query;
-
-    // Vérifiez si searchTerm existe
-    /*if (!searchTerm) {
-        return res.status(400).json({ error: 'Le paramètre query est manquant.' });
-    }*/
-
-    frais.findAll({
-      where: {
-      },
-      order: [
-        ['id', 'DESC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const frais = response.map(data => ({
-          id: data.id,
-          fond_id: data.fond_id, // Remplacez avec la propriété correcte de l'objet
-          fond: data.fond, // Remplacez avec la propriété correcte de l'objet
-          frais_transa_achat: data.frais_transa_achat,
-          frais_transa_vente: data.frais_transa_vente
-
-        }));
-        res.json({
-          code: 200,
-          data: {
-            frais
-          }
-        })
-
-      })
-  })
-  app.get('/api/getfraisbyadminid/:id', (req, res) => {
-    frais.findOne({
-      where: {
-        fond_id: req.params.id
-      },
-      order: [
-        ['id', 'DESC']
-      ]
-    })
-      .then(data => {
-        if (data) {
-          res.json({
-            code: 200,
-            data: {
-              id: data.id,
-              fond_id: data.fond_id,
-              fond: data.fond,
-              frais_transa_achat: data.frais_transa_achat,
-              frais_transa_vente: data.frais_transa_vente
-            }
-          });
-        } else {
-          res.status(404).json({ error: 'Data not found' });
-        }
-      })
-      .catch(error => {
-        res.status(500).json({ error: 'Internal Server Error' });
-      });
-  });
-  app.post('/api/createfrais', async (req, res) => {
-    try {
-      const { fond_id, frais_transa_achat, frais_transa_vente } = req.body;
-
-      // Vérifiez si le fond existe
-      const fondExists = await fond.findOne({ where: { id: parseInt(fond_id) } });
-
-      if (!fondExists) {
-        return res.status(404).json({ error: 'Fond non trouvé.' });
-      }
-
-      // Vérifiez si les frais existent déjà pour ce fond
-      const fraisExists = await frais.findOne({ where: { fond_id: parseInt(fond_id) } });
-
-      if (fraisExists) {
-        // Mettez à jour les frais existants
-        const updatedFrais = await frais.update(
-          { frais_transa_achat, frais_transa_vente },
-          { where: { fond_id: parseInt(fond_id) } }
-        );
-        return res.json({
-          code: 200,
-          message: 'Frais mis à jour avec succès.',
-          data: updatedFrais,
-        });
-      }
-
-      // Créez les frais de transaction
-      const newFrais = await frais.create({
-        fond: fondExists.nom_fond,
-        fond_id: parseInt(fond_id),
-        frais_transa_achat,
-        frais_transa_vente,
-      });
-
-      res.json({
-        code: 200,
-        message: 'Frais créés avec succès.',
-        data: newFrais,
-      });
-    } catch (err) {
-      res.status(500).json({ error: 'Erreur lors de la création ou de la mise à jour des frais.' });
-    }
-  });
-  app.post('/api/updatefraisbyadminid/:id', async (req, res) => {
-    try {
-      const fondId = req.params.id;
-      const { frais_transa_achat, frais_transa_vente } = req.body;
-
-      // Trouver le fond en question
-      const fonds = await frais.findOne({ where: { fond_id: parseInt(fondId) } });
-
-      if (!fonds) {
-        return res.status(404).json({ error: 'Fond non trouvé.' });
-      }
-
-      // Mettre à jour les frais de transaction
-      const updatedFond = await frais.update(
-        { frais_transa_achat, frais_transa_vente },
-        {
-          where: {
-            fond_id: parseInt(fondId)
-          }
-        }
-      );
-
-      res.json({
-        code: 200,
-        message: 'Frais mis à jour avec succès.',
-        data: updatedFond
-      });
-    } catch (err) {
-      res.status(500).json({ error: 'Erreur lors de la mise à jour des frais.' });
-    }
-  });
-  app.get('/api/getfondbyadmin', (req, res) => {
-    ///  const searchTerm = req.query.query;
-
-    // Vérifiez si searchTerm existe
-    /*if (!searchTerm) {
-        return res.status(400).json({ error: 'Le paramètre query est manquant.' });
-    }*/
-
-    fond.findAll({
-      where: {
-
-        /* id: {
-           //  [Sequelize.Op.like]: `%${searchTerm}%`
-         }*/
-      },
-      order: [
-        ['id', 'DESC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const funds = response.map(data => ({
-          id: data.id,
-          nom_fond: data.nom_fond.toString(), // Remplacez avec la propriété correcte de l'objet
-          code_ISIN: data.dev_libelle,
-          categorie_libelle: data.categorie_libelle,
-          categorie_national: data.categorie_national,
-          datejour: data.datejour,
-          active: data.active,
-          code_ISIN: data.code_ISIN, // Remplacez avec la propriété correcte de l'objet
-        }));
-        res.json({
-          code: 200,
-          data: {
-            funds
-
-
-          }
-        })
-
-      })
-  })
-  app.get('/api/getfondbyuser/:id', (req, res) => {
-    const societeGestionId = req.params.id;
-    const pays = req.query.pays;
-
-    // Définir la clause where de base
-    let whereClause = {
-      active: 0
-    };
-
-    if (pays) {
-      whereClause.pays = pays;
-    } else {
-      whereClause.societe_gestion = societeGestionId;
-    }
-
-
-    fond.findAll({
-      where: whereClause,
-      order: [
-        ['id', 'DESC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const funds = response.map(data => ({
-          id: data.id,
-          nom_fond: data.nom_fond.toString(), // Remplacez avec la propriété correcte de l'objet
-          dev_libelle: data.dev_libelle,
-          categorie_libelle: data.categorie_libelle,
-          categorie_national: data.categorie_national,
-          datejour: data.datejour,
-          active: data.active,
-
-          code_ISIN: data.code_ISIN, // Remplacez avec la propriété correcte de l'objet
-        }));
-        res.json({
-          code: 200,
-          data: {
-            funds
-
-
-          }
-        })
-
-      })
-  })
-  app.get('/api/getfondbyuservalide/:id', (req, res) => {
-    const societeGestionId = req.params.id;
-    const pays = req.query.pays;
-
-    // Définir la clause where de base
-    let whereClause = {
-      active: 1
-    };
-
-    if (pays) {
-      whereClause.pays = pays;
-    } else {
-      whereClause.societe_gestion = societeGestionId;
-    }
-
-
-    fond.findAll({
-      where: whereClause,
-      order: [
-        ['id', 'DESC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const funds = response.map(data => ({
-          id: data.id,
-          nom_fond: data.nom_fond.toString(), // Remplacez avec la propriété correcte de l'objet
-          categorie_libelle: data.categorie_libelle,
-          categorie_national: data.categorie_national,
-          datejour: data.datejour,
-          dev_libelle: data.dev_libelle,
-          active: data.active,
-
-          code_ISIN: data.code_ISIN, // Remplacez avec la propriété correcte de l'objet
-        }));
-        res.json({
-          code: 200,
-          data: {
-            funds
-
-
-          }
-        })
-
-      })
-  })
-  app.get('/api/getfondbysociete/:id', (req, res) => {
-    ///  const searchTerm = req.query.query;
-
-    // Vérifiez si searchTerm existe
-    /*if (!searchTerm) {
-        return res.status(400).json({ error: 'Le paramètre query est manquant.' });
-    }*/
-
-    fond.findAll({
-      where: {
-        societe_gestion: req.params.id,
-        /* id: {
-           //  [Sequelize.Op.like]: `%${searchTerm}%`
-         }*/
-      },
-      order: [
-        ['id', 'DESC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const funds = response.map(data => ({
-          id: data.id,
-          nom_fond: data.nom_fond.toString(), // Remplacez avec la propriété correcte de l'objet
-          test: data.nom_fond.toString() + " " + data.code_ISIN,
-          categorie_libelle: data.categorie_libelle,
-          categorie_national: data.categorie_national,
-          datejour: data.datejour,
-          active: data.active,
-
-          code_ISIN: data.code_ISIN, // Remplacez avec la propriété correcte de l'objet
-        }));
-        res.json({
-          code: 200,
-          data: {
-            funds
-
-
-          }
-        })
-
-      })
-  })
-
-  app.get('/api/getfondbypays/:id', (req, res) => {
-    ///  const searchTerm = req.query.query;
-
-    // Vérifiez si searchTerm existe
-    /*if (!searchTerm) {
-        return res.status(400).json({ error: 'Le paramètre query est manquant.' });
-    }*/
-
-    fond.findAll({
-      where: {
-        pays: req.params.id,
-        /* id: {
-           //  [Sequelize.Op.like]: `%${searchTerm}%`
-         }*/
-      },
-      order: [
-        ['id', 'DESC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const funds = response.map(data => ({
-          id: data.id,
-          nom_fond: data.nom_fond.toString(), // Remplacez avec la propriété correcte de l'objet
-          test: data.nom_fond.toString() + " " + data.code_ISIN,
-          categorie_libelle: data.categorie_libelle,
-          categorie_national: data.categorie_national,
-          datejour: data.datejour,
-          active: data.active,
-
-          code_ISIN: data.code_ISIN, // Remplacez avec la propriété correcte de l'objet
-        }));
-        res.json({
-          code: 200,
-          data: {
-            funds
-          }
-
-
-
-        })
-
-      })
-  })
-
-
-
-
+  // --- Admin, users, fees, fund lists, PUT endpoints ---
+  require('./routes_vl_admin')(app);
 
   app.get('/api/getData', (req, res) => {
     pays_regulateurs.findAll({
@@ -6157,6 +5754,10 @@ GROUP BY f.societe_gestion;
           }
         })
 
+      })
+      .catch(err => {
+        console.error('[getData] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur recuperation donnees' });
       })
   })
   app.get('/api/fondscharge/:id', async (req, res) => {
@@ -6421,8 +6022,7 @@ GROUP BY f.societe_gestion;
         // Si le fond existe déjà, mettez à jour ses informations
         const updatedValues = {};
 
-        Object.keys(existingFond.toJSON()).forEach(key => {
-          if (key in {
+        const fieldValues = {
             nom_fond, pays, periodicite, structure_fond, code_ISIN, date_creation, dev_libelle,
             societe_gestion, categorie_libelle, classification, type_investissement, nom_gerant,
             categorie_globale, frais_gestion, frais_souscription,
@@ -6431,12 +6031,11 @@ GROUP BY f.societe_gestion;
             depositaire, teneur_registre, valorisateur, centralisateur, agent_transfert, agent_payeur,
             numero_agrement, montant_premier_vl, montant_actif_net, duree_investissement_recommande,
             date_cloture, heure_cutt_off, delai_reglement, souscripteur, datejour, horizonplacement, IBAN,
-            RIB,
-            banque,
-            nombre_part,
-            indice_benchmark, regulateur
-          }) {
-            const value = eval(key);
+            RIB, banque, nombre_part, indice_benchmark, regulateur
+        };
+        Object.keys(existingFond.toJSON()).forEach(key => {
+          if (key in fieldValues) {
+            const value = fieldValues[key];
             if (value !== '' && value !== undefined) {
               updatedValues[key] = value;
             }
@@ -6504,17 +6103,17 @@ GROUP BY f.societe_gestion;
           fund_id: vlEntry.fund_id,
           date: vlEntry.date,
           value: parseFloat(vlEntry.value),
-          value_EUR: exchangeRatesEUR ? parseFloat(vlEntry.value) * exchangeRatesEUR.value : null,
-          value_USD: exchangeRatesUSD ? parseFloat(vlEntry.value) * exchangeRatesUSD.value : null,
+          value_EUR: exchangeRatesEUR ? parseFloat(vlEntry.value) / exchangeRatesEUR.value : null,
+          value_USD: exchangeRatesUSD ? parseFloat(vlEntry.value) / exchangeRatesUSD.value : null,
           dividende:vlEntry.dividende? parseFloat(vlEntry.dividende):0,
-          dividende_EUR: vlEntry.dividende ? parseFloat(vlEntry.dividende) * exchangeRatesEUR.value : null,
-          dividende_USD: vlEntry.dividende  ? parseFloat(vlEntry.dividende) * exchangeRatesUSD.value : null,
+          dividende_EUR: vlEntry.dividende ? parseFloat(vlEntry.dividende) / exchangeRatesEUR.value : null,
+          dividende_USD: vlEntry.dividende  ? parseFloat(vlEntry.dividende) / exchangeRatesUSD.value : null,
           actif_net: parseFloat(vlEntry.actif_net),
-          actif_net_EUR: exchangeRatesEUR ? parseFloat(vlEntry.actif_net) * exchangeRatesEUR.value : null,
-          actif_net_USD: exchangeRatesUSD ? parseFloat(vlEntry.actif_net) * exchangeRatesUSD.value : null,
+          actif_net_EUR: exchangeRatesEUR ? parseFloat(vlEntry.actif_net) / exchangeRatesEUR.value : null,
+          actif_net_USD: exchangeRatesUSD ? parseFloat(vlEntry.actif_net) / exchangeRatesUSD.value : null,
           indRef: vlEntry.indRef != undefined ? parseFloat(vlEntry.indRef) : null,
-          indRef_EUR: vlEntry.indRef != undefined ? parseFloat(vlEntry.indRef) * exchangeRatesEUR.value : null,
-          indRef_USD: vlEntry.indRef != undefined ? parseFloat(vlEntry.indRef) * exchangeRatesUSD.value : null
+          indRef_EUR: vlEntry.indRef != undefined && exchangeRatesEUR ? parseFloat(vlEntry.indRef) / exchangeRatesEUR.value : null,
+          indRef_USD: vlEntry.indRef != undefined && exchangeRatesUSD ? parseFloat(vlEntry.indRef) / exchangeRatesUSD.value : null
         };
         const existingEntry = await vl.findOne({
           where: {
@@ -6546,9 +6145,8 @@ GROUP BY f.societe_gestion;
     where: { id:parseInt(req.params.id) },
     include: [{
       model: vl,
-      order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
+      order: [['date', 'ASC']]
     }],
-    limit: 500,
   });
 
   // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
@@ -6589,10 +6187,10 @@ GROUP BY f.societe_gestion;
   }
 
 
-      // Respond with a success message or appropriate response
+      recalcEvent.emitAndPropagate('VL_INSERT', parseInt(req.params.id), vlEntries[0]?.date || new Date().toISOString().split('T')[0], 'api_ajoutVL').catch(() => {});
+
       res.status(200).json({ message: 'Data inserted successfully' });
     } catch (error) {
-      // Handle errors here
       console.error('Error inserting data into the database:', error);
       res.status(500).json({ message: 'Error inserting data into the database' });
     }
@@ -6636,8 +6234,8 @@ GROUP BY f.societe_gestion;
           fund_id: vlEntry.fund_id,
           date: vlEntry.date,
           indRef: vlEntry.value != undefined ? parseFloat(vlEntry.value) : null,
-          indRef_EUR: vlEntry.value != undefined ? parseFloat(vlEntry.value) * exchangeRatesEUR.value : null,
-          indRef_USD: vlEntry.value != undefined ? parseFloat(vlEntry.value) * exchangeRatesUSD.value : null
+          indRef_EUR: vlEntry.value != undefined && exchangeRatesEUR ? parseFloat(vlEntry.value) / exchangeRatesEUR.value : null,
+          indRef_USD: vlEntry.value != undefined && exchangeRatesUSD ? parseFloat(vlEntry.value) / exchangeRatesUSD.value : null
         };
         const indiceEntryNEW = {
           date: vlEntry.date,
@@ -6695,7 +6293,7 @@ GROUP BY f.societe_gestion;
       // if (indiceEntriesNEW.length > 0)
       //   await indice.bulkCreate(indiceEntriesNEW);
 
-
+      recalcEvent.emitAndPropagate('INDEX_UPDATE', parseInt(req.params.id), vlEntries[0]?.date || new Date().toISOString().split('T')[0], 'api_ajoutIndice').catch(() => {});
 
       // Respond with a success message or appropriate response
       res.status(200).json({ message: 'Data inserted successfully' });
@@ -6724,11 +6322,10 @@ GROUP BY f.societe_gestion;
     fs.createReadStream(req.file.path)
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
-        console.log('Headers:', headers); // Affiche les en-têtes pour vérifier leur structure
       })
-      .on('data', (row) => {
+      .on('data', (rawRow) => {
+        const row = sanitizeRow(rawRow);
         const promise = (async () => {
-          console.log('Row:', row); // Affichez chaque ligne pour le débogage
 
           let fonds = await fond.findOne({
             where: {
@@ -6783,29 +6380,28 @@ GROUP BY f.societe_gestion;
 
           if ('value' in row && exchangeRatesEUR && exchangeRatesUSD) {
             vlEntry.value = parseFloat(row.value);
-            vlEntry.value_EUR = parseFloat(row.value) * exchangeRatesEUR.value;
-            vlEntry.value_USD = parseFloat(row.value) * exchangeRatesUSD.value;
+            vlEntry.value_EUR = parseFloat(row.value) / exchangeRatesEUR.value;
+            vlEntry.value_USD = parseFloat(row.value) / exchangeRatesUSD.value;
           }
 
           if ('actif_net' in row && exchangeRatesEUR && exchangeRatesUSD) {
             vlEntry.actif_net = parseFloat(row.actif_net);
-            vlEntry.actif_net_EUR = parseFloat(row.actif_net) * exchangeRatesEUR.value;
-            vlEntry.actif_net_USD = parseFloat(row.actif_net) * exchangeRatesUSD.value;
+            vlEntry.actif_net_EUR = parseFloat(row.actif_net) / exchangeRatesEUR.value;
+            vlEntry.actif_net_USD = parseFloat(row.actif_net) / exchangeRatesUSD.value;
           }
 
           if ('dividende' in row && exchangeRatesEUR && exchangeRatesUSD) {
             vlEntry.dividende = parseFloat(row.dividende);
-            vlEntry.dividende_EUR = parseFloat(row.dividende) * exchangeRatesEUR.value;
-            vlEntry.dividende_USD = parseFloat(row.dividende) * exchangeRatesUSD.value;
+            vlEntry.dividende_EUR = parseFloat(row.dividende) / exchangeRatesEUR.value;
+            vlEntry.dividende_USD = parseFloat(row.dividende) / exchangeRatesUSD.value;
           }
 
           if ('indRef' in row && exchangeRatesEUR && exchangeRatesUSD) {
             vlEntry.indRef = parseFloat(row.indRef);
-            vlEntry.indRef_EUR = parseFloat(row.indRef) * exchangeRatesEUR.value;
-            vlEntry.indRef_USD = parseFloat(row.indRef) * exchangeRatesUSD.value;
+            vlEntry.indRef_EUR = parseFloat(row.indRef) / exchangeRatesEUR.value;
+            vlEntry.indRef_USD = parseFloat(row.indRef) / exchangeRatesUSD.value;
           }
 
-          console.log(vlEntry); // Affichez l'entrée VL pour le débogage
 
           const existingEntry = await vl.findOne({
             where: {
@@ -6848,9 +6444,8 @@ GROUP BY f.societe_gestion;
         where: { id:parseInt(req.params.id) },
         include: [{
           model: vl,
-          order: [['date', 'ASC']] // Assurez-vous que les VL sont triées par date croissante
+          order: [['date', 'ASC']]
         }],
-        limit: 500,
       });
   
       // Parcourir chaque fonds et mettre à jour la table VL en tenant compte du cumul des dividendes
@@ -6890,6 +6485,8 @@ GROUP BY f.societe_gestion;
         }
       }
 
+          recalcEvent.emitAndPropagate('VL_INSERT', parseInt(req.params.id), vlEntries[0]?.date || new Date().toISOString().split('T')[0], 'api_uploadsfilevl').catch(() => {});
+
           res.status(200).send('File uploaded and data saved successfully.');
         } catch (error) {
           console.error('Database error:', error);
@@ -6920,11 +6517,10 @@ GROUP BY f.societe_gestion;
     fs.createReadStream(req.file.path)
       .pipe(csv({ separator: ';' })) // Utilisez le séparateur correct pour le fichier CSV
       .on('headers', (headers) => {
-        console.log('Headers:', headers); // Affiche les en-têtes pour vérifier leur structure
       })
-      .on('data', (row) => {
+      .on('data', (rawRow) => {
+        const row = sanitizeRow(rawRow);
         const promise = (async () => {
-          console.log('Row:', row); // Affichez chaque ligne pour le débogage
 
           let fonds = await fond.findOne({
             where: {
@@ -6975,11 +6571,10 @@ GROUP BY f.societe_gestion;
           if ('indRef' in row && exchangeRatesEUR && exchangeRatesUSD) {
             indiceEntry.valeur = parseFloat(row.indRef);
             vlEntry.indRef = parseFloat(row.indRef);
-            vlEntry.indRef_EUR = parseFloat(row.indRef) * exchangeRatesEUR.value;
-            vlEntry.indRef_USD = parseFloat(row.indRef) * exchangeRatesUSD.value;
+            vlEntry.indRef_EUR = parseFloat(row.indRef) / exchangeRatesEUR.value;
+            vlEntry.indRef_USD = parseFloat(row.indRef) / exchangeRatesUSD.value;
           }
 
-          console.log(vlEntry); // Affichez l'entrée VL pour le débogage
 
           const existingVLEntry = await vl.findOne({
             where: {
@@ -7039,6 +6634,8 @@ GROUP BY f.societe_gestion;
 
           // Supprimez le fichier temporaire
           fs.unlinkSync(req.file.path);
+
+          recalcEvent.emitAndPropagate('INDEX_UPDATE', parseInt(req.params.id), vlEntries[0]?.date || new Date().toISOString().split('T')[0], 'api_uploadsfileindice').catch(() => {});
 
           res.status(200).send('File uploaded and data saved successfully.');
         } catch (error) {
@@ -7158,17 +6755,18 @@ GROUP BY f.societe_gestion;
              values: data.value, // Remplacez avec la propriété correcte de l'objet
              valuesInd: data.indRef,
            }));*/
+          const hasIndRef = response.some(d => d.indRef !== null);
           const graphs = response.map(data => {
-            if (data.value !== null && data.indRef !== null) {
-              return {
-                dates: moment(data.date).format('YYYY-MM-DD'), // Remplacez avec la propriété correcte de l'objet
-                values: data.value, // Remplacez avec la propriété correcte de l'objet
-                valuesInd: data.indRef,
-              };
-            } else {
-              return null; // Ignorer les lignes où la condition n'est pas satisfaite
+            if (data.value === null) return null;
+            const point = {
+              dates: moment(data.date).format('YYYY-MM-DD'),
+              values: data.value,
+            };
+            if (hasIndRef && data.indRef != null) {
+              point.valuesInd = data.indRef;
             }
-          }).filter(Boolean); // Supprimer les valeurs nulles de l'array
+            return point;
+          }).filter(Boolean);
 
           // Ajoutez la propriété graphData à l'objet fund
           return {
@@ -7189,7 +6787,7 @@ GROUP BY f.societe_gestion;
         });
 
         // Utilisez Promise.all pour attendre que toutes les requêtes à la deuxième API se terminent
-        Promise.all(promessesAPI2)
+        return Promise.all(promessesAPI2)
           .then((results2) => {
             // Combinez les données de l'API externe initiale avec les données de la deuxième API
             const fundsWithSecondData = fundsWithGraphData.map((fund, index) => ({
@@ -7211,7 +6809,7 @@ GROUP BY f.societe_gestion;
             });
 
             // Utilisez Promise.all pour attendre que toutes les requêtes à la troisième API se terminent
-            Promise.all(promessesAPI3)
+            return Promise.all(promessesAPI3)
               .then((results3) => {
                 // Combinez les données des API précédentes avec les données de la troisième API
                 const fundsWithThirdData = fundsWithSecondData.map((fund, index) => ({
@@ -7233,7 +6831,7 @@ GROUP BY f.societe_gestion;
                 });
 
                 // Utilisez Promise.all pour attendre que toutes les requêtes à la quatrième API se terminent
-                Promise.all(promessesAPI4)
+                return Promise.all(promessesAPI4)
                   .then((results4) => {
                     // Combinez les données des API précédentes avec les données de la quatrième API
                     const fundsWithFourthData = fundsWithThirdData.map((fund, index) => ({
@@ -7241,9 +6839,6 @@ GROUP BY f.societe_gestion;
                       fourthData: results4[index], // Données de la quatrième API
                       graphData: fund.graphData, // Conservez la propriété graphData
                     }));
-                    console.log(fundsWithGraphData);
-                    console.log(fundsWithSecondData);
-                    console.log(fundsWithThirdData);
 
                     // console.log(fundsWithFourthData);
                     res.json({
@@ -7322,9 +6917,9 @@ app.post('/api/uploadsocietefilenew/:societe', upload.single('file'), async (req
     }
 
     // Conversion de la feuille "Data Statiques des fonds" en JSON
-    const fondsData = xlsx.utils.sheet_to_json(fondsSheet, { header: 2 }); // Lignes de fonds à partir de la ligne 3
-    const societesData = xlsx.utils.sheet_to_json(societesSheet, { header: 2 });
-    const personnelsData = xlsx.utils.sheet_to_json(personnelSheet, { header: 2 });
+    const fondsData = xlsx.utils.sheet_to_json(fondsSheet, { header: 2 }).map(sanitizeRow);
+    const societesData = xlsx.utils.sheet_to_json(societesSheet, { header: 2 }).map(sanitizeRow);
+    const personnelsData = xlsx.utils.sheet_to_json(personnelSheet, { header: 2 }).map(sanitizeRow);
 
     // Correspondance des colonnes de la feuille avec les colonnes de la BD
     const fondsEntries = fondsData.map(row => ({
@@ -7483,6 +7078,7 @@ const personnelsEntries = personnelsData.map(row => ({
   }
 
   app.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
+    try {
     // Récupérer les taux_sans_risques en fonction des valeurs de la table fond
     const tauxSansRisques = await tsr.findAll({
       attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
@@ -7590,7 +7186,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -7895,7 +7490,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -7957,7 +7551,6 @@ const personnelsEntries = personnelsData.map(row => ({
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -8191,8 +7784,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -8234,7 +7825,6 @@ const personnelsEntries = personnelsData.map(row => ({
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -8522,7 +8112,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -8602,7 +8191,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -8677,7 +8265,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -8757,7 +8344,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -8832,7 +8418,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -8912,7 +8497,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -8988,7 +8572,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -9067,7 +8650,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -9111,9 +8693,18 @@ const personnelsEntries = personnelsData.map(row => ({
 
 
       })
+      .catch(err => {
+        console.error('[ratiosportefeuille] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille' });
+      })
+    } catch (error) {
+      console.error('Erreur ratiosportefeuille:', error);
+      res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille' });
+    }
   })
 
   app.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
+    try {
     // Récupérer les taux_sans_risques en fonction des valeurs de la table fond
     const tauxSansRisques = await tsr.findAll({
       attributes: ['valeur', 'valeur2', 'semaine', 'rate', 'date', 'pays'],
@@ -9242,7 +8833,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -9547,7 +9137,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -9609,7 +9198,6 @@ const personnelsEntries = personnelsData.map(row => ({
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -9843,8 +9431,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -9886,7 +9472,6 @@ const personnelsEntries = personnelsData.map(row => ({
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10174,7 +9759,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10254,7 +9838,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -10329,7 +9912,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10409,7 +9991,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -10484,7 +10065,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10564,7 +10144,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -10640,7 +10219,6 @@ const personnelsEntries = personnelsData.map(row => ({
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -10719,7 +10297,6 @@ const personnelsEntries = personnelsData.map(row => ({
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -10763,603 +10340,21 @@ const personnelsEntries = personnelsData.map(row => ({
 
 
       })
+      .catch(err => {
+        console.error('[ratiosportefeuilledev] error:', err.message);
+        res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille devise' });
+      })
+    } catch (error) {
+      console.error('Erreur ratiosportefeuilledev:', error);
+      res.status(500).json({ code: 500, message: 'Erreur calcul ratios portefeuille devise' });
+    }
   })
 
 
 
-  app.get('/api/robotadvisor/fonds', async (req, res) => {
-    const ids = req.query.ids.split(',');
-    const fundIds = ids; // Séparer les IDs des fonds par une virgule
-    var PortfolioAllocation = require('portfolio-allocation');
-    const formdata = req.params.formData;
-    var minWeight = [];
-    var maxWeight = []
-    if (req.query.minweight) {
-      minWeight = JSON.parse(req.query.minweight);
-      maxWeight = JSON.parse(req.query.maxweight);
-    }
+  // --- Robot advisor, simulations ---
+  require('./routes_vl_robotadvisor')(app);
 
-    const minReturn = req.query.minReturn / 100;
-    const maxReturn = req.query.maxReturn / 100;
-    const minVolatility = req.query.minVolatility / 100;
-    const maxVolatility = req.query.maxVolatility / 100;
-
-    // const totalInvestment = 100000;
-    try {
-      // Obtenir l'historique de chaque fond et trouver les dates communes
-      const fundData = await Promise.all(
-        fundIds.map(async fundId => {
-          const data = await vl.findAll({
-            where: {
-              fund_id: fundId
-            },
-            order: [
-              ['date', 'ASC']
-            ],
-            limit: 500,
-          });
-          return {
-            fundId,
-            data
-          };
-        })
-      );
-
-      // Trouver l'ensemble commun de dates
-      const commonDates = findCommonDates(fundData.map(entry => entry.data));
-      // Filtrer les dates pour s'assurer qu'elles sont entre le 1er janvier et le 31 décembre
-
-      // Filtrer les données pour inclure uniquement les dates communes
-      const filteredData = fundData.map(entry => {
-        const filteredValues = entry.data.filter(row => commonDates.includes(moment(row.date).format('YYYY-MM-DD')));
-        return {
-          fundId: entry.fundId,
-          values: filteredValues.map(row => row.value)
-        };
-      });
-      // Calculer les rendements pour chaque fond
-      const returnsData = filteredData.map(entry => {
-        const values = entry.values;
-        const ArrayDates = groupDatesByYear(commonDates);
-        const adaptValues = adaptValuesToGroupedYears(values, ArrayDates);
-        const adaptValues1 = AdaptTableauwithdate(adaptValues, ArrayDates);
-        // const valueYearArray = adaptValues1.map((entry) => Object.values(entry)[0].map((data) => data[2]));
-        return {
-          fundId: entry.fundId,
-          returns: adaptValues1
-        };
-      });
-      const ddd = returnsData.map(entry => entry.returns);
-      // const filteredDdd = ddd.map(subArray => subArray.filter(value => value.length == 12)); 
-      //const filteredDdd = ddd;
-      // Calcul des performances glissantes
-      const extraireRendements = ddd.map(fond => {
-        return fond.map(anneeData => anneeData[2]);
-      });
-      const tableauConcatené = extraireRendements.map((sousTableau) => {
-        // Appliquer un flatMap sur chaque sous-tableau
-        return sousTableau.flatMap((element) => element);
-      });
-      console.log(tableauConcatené);
-      const tableauTransformé = [];
-      for (let i = 0; i < tableauConcatené[0].length; i++) {
-        const colonne = [];
-        for (let j = 0; j < tableauConcatené.length; j++) {
-          colonne.push(tableauConcatené[j][i]);
-        }
-        tableauTransformé.push(colonne);
-      }
-
-
-      const minnestedArray = [];
-      for (let i = 0; i < fundIds.length; i++) {
-        minnestedArray.push(minReturn);
-      }
-      const maxnestedArray = [];
-      for (let i = 0; i < fundIds.length; i++) {
-        maxnestedArray.push(maxReturn);
-      }
-      const meanReturns = PortfolioAllocation.meanVector(tableauConcatené);
-      const covMatrix = PortfolioAllocation.covarianceMatrix(tableauConcatené);
-      var opt = {}
-      if (minWeight.length > 0) {
-        opt = {
-          discretizationType: 'volatility',
-          nbPortfolios: 1000,
-          optimizationMethod: 'automatic',
-          constraints: {
-            minWeights: minWeight,// exemple
-            maxWeights: maxWeight, // exemple
-
-          }
-        };
-      } else {
-        opt = {
-          discretizationType: 'volatility',
-          nbPortfolios: 1000,
-          optimizationMethod: 'automatic',
-
-        };
-      }
-
-      const portfolios = PortfolioAllocation.meanVarianceEfficientFrontierPortfolios(meanReturns, covMatrix, opt
-      );
-      console.log(portfolios)
-      // Filtrer les portefeuilles en fonction des contraintes
-      const filteredPortfolios = portfolios.filter(portfolio => {
-        const portfolioReturn = portfolio[1];
-        const portfolioVolatility = portfolio[2];
-        return portfolioReturn >= minReturn && portfolioReturn <= maxReturn &&
-          portfolioVolatility >= minVolatility && portfolioVolatility <= maxVolatility;
-      });
-
-      // Affichage des portefeuilles efficients filtrés
-      console.log("Portefeuilles efficients filtrés :");
-      filteredPortfolios.forEach((portfolio, index) => {
-        console.log(`Portefeuille ${index + 1}:`);
-        console.log("Poids:", portfolio[0]);
-        console.log("Rendement:", portfolio[1]);
-        console.log("Volatilité:", portfolio[2]);
-        console.log("------------");
-      });
-
-      /*
-              // Calcul de la matrice de covariance des rendements des actifs
-              const covMatrix = PortfolioAllocation.covarianceMatrix(tableauTransformé);
-              const meanReturns = PortfolioAllocation.meanVector(tableauTransformé);
-      
-              // Vous pouvez continuer avec le reste de votre code ici...
-        
-              // Afficher les résultats
-              console.log('La matrice de covariance des rendements des actifs est :');
-              console.log(covMatrix);
-              //var targetReturn = 0.02; // Rendement attendu de 2% par mois
-             // var weights = PortfolioAllocation.proportionalMinimumVarianceWeights(covMatrix, targetReturn);
-              // Calculer les poids optimaux du portefeuille qui minimise la variance
-              // var weights = PortfolioAllocation.globalMinimumVarianceWeights(covMatrix);
-              const weights = PortfolioAllocation.meanVarianceOptimizationWeights(meanReturns,covMatrix, {
-                constraints: {
-                 // return:targetReturn,
-                  maxVolatility: maxVolatility
-                },
-              }).weights;
-      
-              let investmentAmounts = calculateInvestmentAmounts(weights, totalInvestment);
-      
-              // Afficher les résultats
-              console.log('Les poids optimaux du portefeuille sont :');
-              for (var i = 0; i < fundIds.length; i++) {
-                  console.log(fundIds[i] + ' : ' + weights[i]);
-              }*/
-
-
-      res.json({
-        code: 200,
-        data: {
-          filteredPortfolios: filteredPortfolios,
-          //  investmentAmounts:investmentAmounts
-          // Ajoutez d'autres données si nécessaire
-        }
-      });
-    } catch (error) {
-      res.status(500).json({
-        code: 500,
-        message: 'Une erreur s\'est produite lors du traitement de la demande.',
-        error: error.message
-      });
-    }
-  });
-
-  app.get('/api/roboadvisorsetvalue', async (req, res) => {
-    try {
-      const { date, montantinvest, fundids, portefeuilleselect, poids } = req.query;
-      const poidsfond = poids.split(',');
-      const fondids = fundids.split(',');
-
-
-      for (const fond of fondids) {
-        const index = fondids.indexOf(fond);
-
-        // Rechercher la valeur du fond pour la date spécifiée
-        let vls = await vl.findAll({
-          where: {
-            fund_id: fond, date: {
-              [Op.gte]: date // Remplacez 'votreDate' par la date que vous souhaitez comparer.
-            }
-          },
-          limit: 500,
-        });
-
-
-        // Récupérer toutes les dates dans la table vl_fond
-        //  const toutesLesDates = await Fond.findAll({ attributes: ['date'] });
-
-        // Calculer la valorisation pour chaque date à partir de la date spécifiée
-        const valorisations = [];
-        const quantite = (montantinvest * poidsfond[index]) / vls[0].value;
-        for (const dateRow of vls) {
-
-          const valorisation = quantite * dateRow.value;
-          valorisations.push({ date: dateRow.date, value: valorisation, fund_id: fond, portefeuille_id: portefeuilleselect });
-
-        }
-
-        // Insérer les nouvelles valorisations dans la table vl_portefeuille
-        await portefeuilles_proposes_vls.bulkCreate(valorisations);
-      }
-      const updatedData = {
-        poidsportefeuille: poidsfond
-      };
-
-      // Assuming 'portefeuille' is your model for updating data in your database
-      await portefeuille.update(updatedData, {
-        where: { id: portefeuilleselect },
-      });
-      return res.json({ code: 200, data: "Succes" });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Erreur lors du calcul de la valorisation" });
-    }
-  });
-
-  app.post('/api/postportefeuillepropose', async (req, res) => {
-    try {
-      const { portfolios } = req.body;
-
-      // Loop through portfolios to insert each one
-      for (const portfolio of portfolios) {
-        const { poids, fond, simulation_id, portefeuille_id, nom } = portfolio;
-
-        await simulationportefeuille.create({
-          poids: poids.toString(), // Convertir poids en chaîne de caractères
-          fond_ids: fond,
-          nom,
-          simulation_id,
-          portefeuille_id // Assuming this is auto-incremented by your database
-        });
-      }
-
-      // Respond with a success message
-      res.status(200).json({ message: 'Données insérées avec succès' });
-    } catch (error) {
-      // Handle errors
-      console.error('Erreur lors de l\'insertion en base de données :', error);
-      res.status(500).json({ message: 'Erreur lors de l\'insertion en base de données' });
-    }
-  });
-
-  app.get('/api/getsimulationportefeuillebyuser/:id', async (req, res) => {
-    simulationportefeuille.findAll({
-      where: {
-        simulation_id: req.params.id
-
-      },
-      order: [
-        ['id', 'ASC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const simulations = response.map(data => ({
-          id: data.portefeuille_id,
-          poids: data.poids, // Remplacez avec la propriété correcte de l'objet
-          nom: data.nom,
-          fond_ids: data.fond_ids
-
-
-        }));
-        res.json({
-          code: 200,
-          data: {
-            simulations,
-            //  valorisation
-
-          }
-        })
-
-      })
-  })
-
-  async function fetchFundsByValorisation1(selectedValues, selectedcategorie, selectedsociete, selectedDevise, frequence, fund1, fund2) {
-    try {
-      let query;
-      if (selectedValues.length >= 1 && selectedValues[0] != '') {
-  
-        query = `
-      SELECT f.*
-      FROM fond_investissements AS f
-      WHERE  f.id in (${selectedValues.map(cat => cat).join(',')}) and  f.id IN (SELECT v.fund_id FROM valorisations AS v ) and f.id>=${fund1} and  f.id<=${fund2} 
-    `;
-      } else {
-  
-        query = `
-        SELECT f.*
-        FROM fond_investissements AS f
-        WHERE   f.id IN (SELECT v.fund_id FROM valorisations AS v ) and f.id>=${fund1} and  f.id<=${fund2} 
-  `;
-      }
-  
-      if (selectedcategorie != 'undefined') {
-        query += `
-   
-        AND f.categorie_globale = :selectedcategorie
-    
-  `;
-      }
-  
-      if (selectedDevise != 'undefined') {
-        query += `
-   
-        AND f.dev_libelle = :selectedDevise
-    
-  `;
-      }
-  
-      if (frequence != 'undefined' && frequence.length >= 1) {
-        query += `
-   
-        AND f.periodicite = :frequence
-    
-  `;
-      }
-  
-      if (selectedsociete != 'undefined') {
-        query += `
-   
-        AND f.societe_gestion = :selectedsociete
-    
-  `;
-      }
-  
-      const fondsDansCategorie = await sequelize.query(query, {
-        replacements: { selectedsociete, selectedcategorie, selectedDevise, frequence },
-  
-        type: sequelize.QueryTypes.SELECT,
-      });
-  
-      // Retournez la liste des fonds
-      return fondsDansCategorie;
-    } catch (erreur) {
-      console.error('Erreur lors de la récupération des fonds par catégorie :', erreur);
-      throw erreur; // Propagez l'erreur pour qu'elle soit gérée ailleurs si nécessaire
-    }
-  }
-  
-  async function fetchFundsByValorisation(selectedValues, selectedcategorie, selectedsociete, selectedDevise, frequence) {
-    try {
-      let query;
-      if (selectedValues.length >= 1 && selectedValues[0] != '') {
-  
-        query = `
-      SELECT f.*
-      FROM fond_investissements AS f
-      WHERE  f.id in (${selectedValues.map(cat => cat).join(',')}) and  f.id IN (SELECT v.fund_id FROM valorisations AS v )
-    `;
-      } else {
-  
-        query = `
-        SELECT f.*
-        FROM fond_investissements AS f
-        WHERE   f.id IN (SELECT v.fund_id FROM valorisations AS v )
-  `;
-      }
-  
-      if (selectedcategorie != 'undefined') {
-        query += `
-   
-        AND f.categorie_globale = :selectedcategorie
-    
-  `;
-      }
-  
-      if (selectedDevise != 'undefined') {
-        query += `
-   
-        AND f.dev_libelle = :selectedDevise
-    
-  `;
-      }
-  
-      if (frequence != 'undefined' && frequence.length >= 1) {
-        query += `
-   
-        AND f.periodicite = :frequence
-    
-  `;
-      }
-  
-      if (selectedsociete != 'undefined') {
-        query += `
-   
-        AND f.societe_gestion = :selectedsociete
-    
-  `;
-      }
-  
-      const fondsDansCategorie = await sequelize.query(query, {
-        replacements: { selectedsociete, selectedcategorie, selectedDevise, frequence },
-  
-        type: sequelize.QueryTypes.SELECT,
-      });
-  
-      // Retournez la liste des fonds
-      return fondsDansCategorie;
-    } catch (erreur) {
-      console.error('Erreur lors de la récupération des fonds par catégorie :', erreur);
-      throw erreur; // Propagez l'erreur pour qu'elle soit gérée ailleurs si nécessaire
-    }
-  }
-
-
-  // Fonction pour trouver les dates communes parmi plusieurs ensembles de données
-  function findCommonDates(dataSets) {
-    const dateSets = dataSets.map(data => new Set(data.map(row => moment(row.date).format('YYYY-MM-DD'))));
-    let commonDates = [...dateSets[0]];
-    for (let i = 1; i < dateSets.length; i++) {
-      commonDates = commonDates.filter(date => dateSets[i].has(date));
-    }
-    return commonDates;
-  }
-
-
-  app.post('/api/postsimulation', async (req, res) => {
-    try {
-      const {
-        nom,
-        description,
-        userid
-
-        // Ajoutez d'autres champs ici
-      } = req.body;
-
-
-      simulation.create({
-        nom: nom,
-        description: description,
-        user_id: userid
-
-      })
-
-
-
-      // Répondez avec un message de succès ou autre réponse appropriée
-      res.status(200).json({ message: 'Données insérées avec succès' });
-    } catch (error) {
-      // Gérez les erreurs ici
-      console.error('Erreur lors de l\'insertion en base de données :', error);
-      res.status(500).json({ message: 'Erreur lors de l\'insertion en base de données' });
-    }
-  });
-  app.get('/api/getsimulationbyuser/:id', async (req, res) => {
-    simulation.findAll({
-      where: {
-        user_id: req.params.id
-
-      },
-      order: [
-        ['id', 'ASC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const simulations = response.map(data => ({
-          id: data.id,
-          nom: data.nom, // Remplacez avec la propriété correcte de l'objet
-          description: data.description
-
-
-        }));
-        res.json({
-          code: 200,
-          data: {
-            simulations,
-            //  valorisation
-
-          }
-        })
-
-      })
-  })
-
-  app.get('/api/getportefeuillebysimulation/:id', async (req, res) => {
-    simulationportefeuille.findAll({
-      where: {
-        simulation_id: req.params.id
-
-      },
-      order: [
-        ['id', 'ASC']
-      ],
-      limit: 500,
-    })
-      .then(response => {
-        //const funds = response.map((data) => data.id);
-
-        const simulations = response.map(data => ({
-          nom: data.nom, // Remplacez avec la propriété correcte de l'objet
-          fond_ids: data.fond_ids,
-          poids: data.poids,
-          portefeuille_id: data.portefeuille_id,
-
-
-        }));
-        res.json({
-          code: 200,
-          data: {
-            simulations,
-            //  valorisation
-
-          }
-        })
-
-      })
-  })
-  // ==================== PUT ENDPOINTS ====================
-
-  // PUT /api/fonds/:id - Update a fund
-  app.put('/api/fonds/:id', authenticate, async (req, res) => {
-    try {
-      const existingFond = await fond.findByPk(req.params.id);
-      if (!existingFond) {
-        return res.status(404).json({ error: 'Fond non trouvé' });
-      }
-      await existingFond.update(req.body);
-      res.json({ code: 200, data: existingFond });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du fond :', error);
-      res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du fond' });
-    }
-  });
-
-  // PUT /api/portefeuilles/:id - Update a portfolio
-  app.put('/api/portefeuilles/:id', authenticate, async (req, res) => {
-    try {
-      const existingPortefeuille = await portefeuille.findByPk(req.params.id);
-      if (!existingPortefeuille) {
-        return res.status(404).json({ error: 'Portefeuille non trouvé' });
-      }
-      await existingPortefeuille.update(req.body);
-      res.json({ code: 200, data: existingPortefeuille });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour du portefeuille :', error);
-      res.status(500).json({ error: 'Erreur serveur lors de la mise à jour du portefeuille' });
-    }
-  });
-
-  // PUT /api/users/:id - Update user profile (exclude password from update)
-  app.put('/api/users/:id', authenticate, async (req, res) => {
-    try {
-      const existingUser = await users.findByPk(req.params.id);
-      if (!existingUser) {
-        return res.status(404).json({ error: 'Utilisateur non trouvé' });
-      }
-      const { password, ...updateData } = req.body;
-      await existingUser.update(updateData);
-      res.json({ code: 200, data: existingUser });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de l\'utilisateur :', error);
-      res.status(500).json({ error: 'Erreur serveur lors de la mise à jour de l\'utilisateur' });
-    }
-  });
-
-  // PUT /api/societes/:id - Update a societe
-  app.put('/api/societes/:id', authenticate, async (req, res) => {
-    try {
-      const existingSociete = await societe.findByPk(req.params.id);
-      if (!existingSociete) {
-        return res.status(404).json({ error: 'Société non trouvée' });
-      }
-      await existingSociete.update(req.body);
-      res.json({ code: 200, data: existingSociete });
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la société :', error);
-      res.status(500).json({ error: 'Erreur serveur lors de la mise à jour de la société' });
-    }
-  });
 
   app.use(require('./apigestionsociete'));
   app.use(require('./apigestionpays'));
