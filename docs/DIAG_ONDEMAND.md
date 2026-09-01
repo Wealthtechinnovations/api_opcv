@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-08-31 18:37 UTC**
+Derniere execution : **2026-09-01 04:39 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-08-31 18:36:11 UTC — LECTURE SEULE
+Mesure le 2026-09-01 04:37:48 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -78,24 +78,24 @@ Mesure le 2026-08-31 18:36:11 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-08-31 18:37:01 UTC — LECTURE SEULE
+Mesure le 2026-09-01 04:38:45 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
   classementfonds             3619 lignes — aucune colonne de date
   classementfonds_eurs        3635 lignes — aucune colonne de date
   classementfonds_usds        3635 lignes — aucune colonne de date
-  performences               72353 lignes — updated_at max = aucune (?)
-  performences_eurs          28654 lignes — date max = Fri Aug 28 2026 00: (3.8 j)
-  performences_usds          28887 lignes — date max = Fri Aug 28 2026 00: (3.8 j)
+  performences               72624 lignes — updated_at max = aucune (?)
+  performences_eurs          29308 lignes — date max = Fri Aug 28 2026 00: (4.2 j)
+  performences_usds          29541 lignes — date max = Fri Aug 28 2026 00: (4.2 j)
 
 ## B. Retard des performances par pays
 
   pays        fonds  a jour      %  retard moy.  retard max
   ---------- ------ ------- ------ ------------ -----------
-  MAROC         640      18  2.8 %       93.6 j       104 j
+  MAROC         640      18  2.8 %       96.0 j       105 j
   TUNISIE       131       7  5.3 %       90.5 j       102 j
-  UEMOA         109      44 40.4 %       17.6 j        98 j
+  UEMOA         109      44 40.4 %       17.7 j        98 j
   NIGERIA       320     297 92.8 %        6.1 j       665 j
   CEMAC          34      34 100.0 %        0.0 j         0 j
 
@@ -119,13 +119,13 @@ Mesure le 2026-08-31 18:37:01 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260831.log      8.5 h  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260828.log        2.9 j  ECHEC — 5 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     20.6 h  OK
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      3.0 j  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         3.0 j  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                0.1 h  OK  (reserve : Echecs scraping: 27)
-  cron_health_check      tous les j 22:00     africafunds_health_20260830.log      20.6 h  ECHEC — 4 probleme(s)
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260831.log     18.5 h  ECHEC — 1 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260831.log        7.5 h  ECHEC — 2 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.6 h  ECHEC — 2 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      9.6 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         9.1 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               10.1 h  OK  (reserve : Echecs scraping: 27)
+  cron_health_check      tous les j 22:00     africafunds_health_20260831.log       6.6 h  ECHEC — 4 probleme(s)
   sync_production        toutes les heures    sync_production.log                   0.6 h  aucun marqueur de fin
 
 
@@ -147,55 +147,71 @@ Mesure le 2026-08-31 18:37:01 UTC — LECTURE SEULE
   | === NIGERIA WEEKLY UPDATE TERMINE AVEC 1 ERREUR(S) Mon Aug 31 10:09:04 AM UTC 2026 ===
   | ========================================
 
---- cron_daily_update (ECHEC — 5 erreur(s)) — /var/log/africafunds_daily_20260828.log
+--- cron_daily_update (ECHEC — 2 erreur(s)) — /var/log/africafunds_daily_20260831.log
   | === VERIFICATION FINALE ===
   | ============================================================
-  | performences_eurs: 28654 lignes, 1241 fonds
-  | performences_usds: 28887 lignes, 1241 fonds
+  | performences_eurs: 29308 lignes, 1241 fonds
+  | performences_usds: 29541 lignes, 1241 fonds
   | Termine.
   | [8/9] OK
   | [9a/9] Classement local...
-  | [9a/9] ERREUR (HTTP 000)
+  | "finishrank"[9a/9] OK (HTTP 200)
   | [9b/9] Classement EUR...
-  | [9b/9] ERREUR (HTTP 000)
+  | "finishrank"[9b/9] OK (HTTP 200)
   | [9c/9] Classement USD...
-  | [9c/9] ERREUR (HTTP 000)
-  | === MISE A JOUR TERMINEE AVEC 5 ERREUR(S) Fri Aug 28 08:55:01 PM UTC 2026 ===
+  | "finishrank"[9c/9] OK (HTTP 200)
+  | === MISE A JOUR TERMINEE AVEC 2 ERREUR(S) Mon Aug 31 09:09:39 PM UTC 2026 ===
   | ========================================
 
---- cron_health_check (ECHEC — 4 probleme(s)) — /var/log/africafunds_health_20260830.log
-  |   nigeria      pas attendu aujourd'hui (pas lundi)
+--- cron_daily_eur_usd (ECHEC — 2 erreur(s)) — /var/log/cron_eur_usd.log
+  | Termine.
+  | [1/3] OK
+  | --- [2/3] Classements EUR ---
+  | 000
+  | [2a/3] ERREUR (HTTP 000)
+  | --- Classements USD ---
+  | 000
+  | [2b/3] ERREUR (HTTP 000)
+  | --- [3/3] Verification ---
+  |   performences_eurs        29308 lignes / 1241 fonds
+  |   performences_usds        29541 lignes / 1241 fonds
+  |   classementfonds_eurs     3635 lignes / 1235 fonds
+  |   classementfonds_usds     3635 lignes / 1235 fonds
+  | CRON EUR/USD TERMINE AVEC 2 ERREUR(S) — 2026-08-31 22:02:29
+
+--- cron_health_check (ECHEC — 4 probleme(s)) — /var/log/africafunds_health_20260831.log
+  |   nigeria      /var/log/africafunds_nigeria_20260831.log — 18 Ko, modifie il y a 11h
   | === RESUME ===
   | STATUT: 4 PROBLEME(S) DETECTE(S)
-  |   [!] NIGERIA: derniere VL il y a 23 jours (budget 14j)
-  |   [!] CEMAC: derniere VL il y a 626 jours (budget 400j)
-  |   [!] Performances en retard sur les VL: 400/1234 a jour (32.4 %), retard moyen 61.2 j
-  |   [!] Seulement 5 fonds avec perf recente
-  |   [OK] TUNISIE: VL a jour
+  |   [!] NIGERIA: derniere VL il y a 17 jours (budget 14j)
+  |   [!] CEMAC: derniere VL il y a 627 jours (budget 400j)
+  |   [!] Performances en retard sur les VL: 400/1234 a jour (32.4 %), retard moyen 62.6 j
+  |   [!] Seulement 3 fonds avec perf recente
   |   [OK] MAROC: VL a jour
+  |   [OK] TUNISIE: VL a jour
   |   [OK] UEMOA: VL a jour
   |   [OK] Classement local peuple
   |   [OK] Forex a jour
-  | === HEALTH CHECK TERMINE Sun Aug 30 10:00:04 PM UTC 2026 ===
+  | === HEALTH CHECK TERMINE Mon Aug 31 10:00:03 PM UTC 2026 ===
   | ========================================
 
 --- sync_production (aucun marqueur de fin) — /var/log/sync_production.log
-  | ============================================
-  | SYNC PRODUCTION — 2026-08-31 18:00:01
+  | SYNC PRODUCTION — 2026-09-01 04:00:01
   | ============================================
   | --- Generation du snapshot base de donnees ---
   |   -> PRODUCTION_STATE.json genere (44774 octets)
-  | [claude/code-review-improvements-ikvuj 911b6729] chore: snapshot production state 2026-08-31 18:00
-  |  1 file changed, 3 insertions(+), 3 deletions(-)
+  | [claude/code-review-improvements-ikvuj 93af677c6] chore: snapshot production state 2026-09-01 04:00
+  |  1 file changed, 364 insertions(+), 364 deletions(-)
+  |  rewrite PRODUCTION_STATE.json (61%)
   | fatal: could not read Username for 'https://github.com': No such device or address
   |   -> Push ECHEC
   | ============================================
-  | SYNC TERMINE — 2026-08-31 18:00:15
+  | SYNC TERMINE — 2026-09-01 04:00:16
   | ============================================
   | Claude Code peut maintenant lire PRODUCTION_STATE.json
   | pour connaitre l'etat exact de la production.
 
-=== RESUME : 4 OK · 3 en echec · 1 non verifiable(s) ===
+=== RESUME : 3 OK · 4 en echec · 1 non verifiable(s) ===
   « non verifiable » ne veut pas dire « sain » : journal absent, illisible,
   ou sans marqueur de fin. A instruire avant de conclure quoi que ce soit.
 
@@ -204,14 +220,14 @@ Mesure le 2026-08-31 18:37:01 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-08-31T18:37:05.018Z — LECTURE SEULE
+ Genere le 2026-09-01T04:38:49.228Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 9.09 Mo
-   modifie   : 2026-08-31T10:00:29.926Z (il y a 8.6 h)
+   modifie   : 2026-08-31T10:00:29.926Z (il y a 18.6 h)
    lignes    : 7260
    colonnes  : 59
 
@@ -314,7 +330,7 @@ Mesure le 2026-08-31 18:37:01 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-08-31 18:37:05 UTC — LECTURE SEULE
+Mesure le 2026-09-01 04:38:49 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 331
   etiquette CONFORME au contenu : 122
@@ -438,7 +454,7 @@ Fonds Nigeria examines : 331
    2766   118   117    47 %     7 %  INDETERMINE  COMERCIO PARTNERS DOLLAR FUND
    2776    84    83    66 %     5 %  INDETERMINE  STL DOLLAR FUND
    2771    80    79    52 %     5 %  INDETERMINE  CORONATION DOLLAR FUND
-   2773   111    73    60 %    18 %  INDETERMINE  GUARANTY TRUST DOLLAR FUND
+   2773   111    73    62 %    16 %  INDETERMINE  GUARANTY TRUST DOLLAR FUND
    2775    71    70    73 %     6 %  INDETERMINE  PARTHIAN DOLLAR FIXED INCOME F
    2777    70    69    43 %    19 %  INDETERMINE  VETIVA USD FIXED INCOME FUND
    2770    53    52    60 %     8 %  INDETERMINE  CFG AM FIXED INCOME DOLLAR FUN
@@ -473,7 +489,7 @@ Fonds Nigeria examines : 331
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-08-31 18:37:10 UTC — LECTURE SEULE
+Mesure le 2026-09-01 04:38:54 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -485,12 +501,12 @@ VL Nigeria en base : 77374
     40828 ligne(s) CSV appariees a un fonds en base
       644 ligne(s) sans fonds correspondant (nom inconnu)
      1028 ligne(s) dont la date n est pas en base — un import les AJOUTERAIT
-    27130 ligne(s) identiques a moins de 1 %
-    12670 ligne(s) EN ECART
+    27123 ligne(s) identiques a moins de 1 %
+    12677 ligne(s) EN ECART
 
 ## B. Nature des ecarts
 
-      384 changement(s) d ECHELLE (facteur >= 10) — les ruptures visees
+      391 changement(s) d ECHELLE (facteur >= 10) — les ruptures visees
     12286 ecart(s) mineur(s) (1 % a 10x) — a instruire separement, ne pas corriger en masse
 
 ## C. Changements d echelle — ce qu une correction ecrirait
@@ -557,15 +573,15 @@ VL Nigeria en base : 77374
    1257 NGN  2026-06-11        2316.4710           1.6989    1363.5 USD       STANBIC IBTC DOLLAR FUND
    2776 USD  2026-06-11      159840.2900         117.0400    1365.7 USD       STL DOLLAR FUND
    1274 NGN  2026-06-11        1743.8939           1.2756    1367.1 USD       UNITED CAPITAL GLOBAL FIXED IN
-  ... et 324 autre(s)
+  ... et 331 autre(s)
 
-  Sens : 371 correction(s) vers une valeur PLUS PETITE, 13 vers une PLUS GRANDE
+  Sens : 378 correction(s) vers une valeur PLUS PETITE, 13 vers une PLUS GRANDE
 
 ## D. Devise que l extracteur corrige attribue a ces mesures
 
-     346 ligne(s)   USD (source : column_header_matched_fund)
-      27 ligne(s)   NGN (source : column_header_matched_fund)
-      11 ligne(s)   NGN (source : column_header)
+     350 ligne(s)   USD (source : column_header_matched_fund)
+      28 ligne(s)   NGN (source : column_header_matched_fund)
+      13 ligne(s)   NGN (source : column_header)
 
 
 ########## scripts/diag/ondemand/diag_import_nigeria.js ##########
@@ -665,17 +681,17 @@ VL Nigeria en base : 77374
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : e3e273a8 — chore: snapshot production state 2026-08-31 18:00
+  HEAD : 5015d4fa4 — chore: snapshot production state 2026-09-01 04:00
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  161  depuis 225.5 h
-    fundafrique-frontend     online     redemarrages   48  depuis 370.5 h
-    worker-recalculation     online     redemarrages    1  depuis 2296.9 h
-    worker-data-import       online     redemarrages    1  depuis 2296.9 h
+    api-monolith             online     redemarrages  161  depuis 235.5 h
+    fundafrique-frontend     online     redemarrages   48  depuis 380.5 h
+    worker-recalculation     online     redemarrages    1  depuis 2306.9 h
+    worker-data-import       online     redemarrages    1  depuis 2306.9 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -692,7 +708,7 @@ VL Nigeria en base : 77374
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-08-31 18:37:15 UTC — LECTURE SEULE
+Mesure le 2026-09-01 04:39:00 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -761,24 +777,24 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-08-31 18:37:20 UTC — LECTURE SEULE
+Mesure le 2026-09-01 04:39:05 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
 
-Ruptures d echelle Nigeria encore en base : 146
+Ruptures d echelle Nigeria encore en base : 139
 
 ## A. Ce que la source permet
 
-     67 rupture(s) avec un prix naira publie
+     60 rupture(s) avec un prix naira publie
       4 rupture(s) dans la fenetre mais SANS naira publie — rien a ecrire
      75 rupture(s) HORS fenetre du rejeu — non mesurees, pas « sans source »
 
 ## B. Et ce que la correction produirait
 
-     31 RESOLUE(S) — la valeur naira retombe dans la serie
-     16 NON RESOLUE(S) — la valeur naira reste aberrante, NE PAS ECRIRE
-     20 deja conforme(s) — la base porte deja la valeur source
+     27 RESOLUE(S) — la valeur naira retombe dans la serie
+     18 NON RESOLUE(S) — la valeur naira reste aberrante, NE PAS ECRIRE
+     15 deja conforme(s) — la base porte deja la valeur source
       0 sans voisin sain — aucune reference pour juger, ne pas ecrire
 
 ## C. Detail (50 premieres)
@@ -789,7 +805,7 @@ Ruptures d echelle Nigeria encore en base : 146
    2842 2015-12-18       6206.0000               -          0.6447 HORS FENETRE DU REJEU ACAP CANARY GROWTH FUND
    2842 2015-12-23          0.6202               -       6206.0000 HORS FENETRE DU REJEU ACAP CANARY GROWTH FUND
    1141 2022-03-25         92.1946         94.9343      39043.5368 NE RESOUT PAS        AFRINVEST DOLLAR FUND
-   1141 2022-04-08      43617.3655      39441.4650         92.1946 NE RESOUT PAS        AFRINVEST DOLLAR FUND
+   1141 2022-04-01      39441.4650         92.1946         92.1946 NE RESOUT PAS        AFRINVEST DOLLAR FUND
    1141 2023-12-15        109.8529        109.8529     104587.4659 DEJA CONFORME        AFRINVEST DOLLAR FUND
    1141 2023-12-22     114459.8322      94709.8974        109.8529 RESOUT               AFRINVEST DOLLAR FUND
    1141 2025-12-12        114.4702        114.5214     165682.9307 DEJA CONFORME        AFRINVEST DOLLAR FUND
@@ -811,8 +827,6 @@ Ruptures d echelle Nigeria encore en base : 146
    1156 2014-08-01          1.0000               -        339.7568 HORS FENETRE DU REJEU ARM MONEY MARKET FUND
    1156 2014-12-12        100.0000               -          1.0000 HORS FENETRE DU REJEU ARM MONEY MARKET FUND
    1156 2014-12-19          1.0000               -        100.0000 HORS FENETRE DU REJEU ARM MONEY MARKET FUND
-   2858 2026-07-03          1.0591       1459.4726       1444.9904 RESOUT               ARM SPECIALIZED DOLLAR FUND
-   2858 2026-07-10       1462.0144       1449.5936          1.0591 DEJA CONFORME        ARM SPECIALIZED DOLLAR FUND
    1158 2021-11-05        107.1500               -      49755.0000 HORS FENETRE DU REJEU AVA GAM FIXED INCOME DOLLAR 
    1158 2021-11-12      49931.7000               -        107.1500 HORS FENETRE DU REJEU AVA GAM FIXED INCOME DOLLAR 
    2765 2026-07-24          1.3055       1801.8311       1799.0246 RESOUT               CARDINALSTONE DOLLAR FUND
@@ -835,12 +849,14 @@ Ruptures d echelle Nigeria encore en base : 146
    2876 2026-07-24        133.2300     184083.8910     182418.8100 RESOUT               First Asset Dollar Fund (Ret
    2877 2026-07-24        130.0700     179717.7190     178098.3645 RESOUT               First Asset Specialized Doll
    1212 2026-01-16        267.4600        274.1700         26.5700 NE RESOUT PAS        FRONTIER FUND
-  ... et 96 autre(s)
+   2796 2026-05-22       1387.6754       1384.2100        138.2100 DEJA CONFORME        FSDH HALAL FUND
+   2768 2026-05-15          1.0000       1361.3950       1374.9431 RESOUT               FSL EUROBOND FUND
+  ... et 89 autre(s)
 
 ## D. Ruptures que le naira source NE resout pas
 
   [1141] 2022-03-25  base 92.1946 -> source 94.9343  mais voisins a 39043.5368 (ecart x411.3)  AFRINVEST DOLLAR FUND
-  [1141] 2022-04-08  base 43617.3655 -> source 39441.4650  mais voisins a 92.1946 (ecart x427.8)  AFRINVEST DOLLAR FUND
+  [1141] 2022-04-01  base 39441.4650 -> source 92.1946  mais voisins a 92.1946 (ecart x473.1)  AFRINVEST DOLLAR FUND
   [2769] 2026-06-11  base 1.0100 -> source 1375.8344  mais voisins a 1375.8344 (ecart x1362.2)  ALPHA10 DOLLAR FUND
   [2766] 2026-06-26  base 1.1200 -> source 1534.9103  mais voisins a 1519.4241 (ecart x1381.6)  COMERCIO PARTNERS DOLLAR F
   [2878] 2026-07-10  base 2124.6150 -> source 2096.3913  mais voisins a 1.5300 (ecart x1370.2)  FCMBAM USD Bond Fund
@@ -848,7 +864,9 @@ Ruptures d echelle Nigeria encore en base : 146
   [1212] 2026-01-16  base 267.4600 -> source 274.1700  mais voisins a 26.5700 (ecart x10.3)  FRONTIER FUND
   [2772] 2026-06-05  base 1.0800 -> source 1483.1149  mais voisins a 1483.1149 (ecart x1373.3)  GREENWICH FIXED INCOME DOL
   [2772] 2026-07-03  base 1.0700 -> source 1477.5982  mais voisins a 1477.5982 (ecart x1380.9)  GREENWICH FIXED INCOME DOL
+  [2779] 2025-04-11  base 111.0368 -> source 1.1100  mais voisins a 1.1100 (ecart x100.5)  HOUSING SOLUTION FUND
   [2856] 2026-06-11  base 1.1600 -> source 1580.1663  mais voisins a 1580.1663 (ecart x1362.2)  LEAD DOLLAR FIXED INCOME F
+  [1168] 2022-04-01  base 427.1666 -> source 1.0259  mais voisins a 1.0259 (ecart x416.7)  NIGERIA DOLLAR INCOME FUND
   [1239] 2026-05-29  base 1.2700 -> source 1747.0755  mais voisins a 1747.0755 (ecart x1375.7)  NOVA DOLLAR FIXED INCOME F
   [1239] 2026-06-19  base 1863.8120 -> source 1729.8035  mais voisins a 1.2700 (ecart x1362.0)  NOVA DOLLAR FIXED INCOME F
   [1239] 2026-06-26  base 1.3600 -> source 1863.8120  mais voisins a 1863.8120 (ecart x1370.5)  NOVA DOLLAR FIXED INCOME F
@@ -859,27 +877,118 @@ Ruptures d echelle Nigeria encore en base : 146
   Ces lignes relevent d une autre cause. A instruire separement.
 
 
+########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
+
+=== SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
+Mesure le 2026-09-01 04:39:10 UTC — LECTURE SEULE
+
+## Ce que la source revele
+
+      41 segment(s) en dollars, sur 30 fonds
+     157 VL concernees au total
+      12 points isoles — deja traitables par la detection de rupture
+      29 PLATEAUX de 2 releves ou plus — invisibles a cette detection
+     145 VL dans ces plateaux
+
+## Les plateaux, du plus long au plus court
+
+  fonds   n debut      fin              en base   source naira  nom
+  ----- --- ---------- ---------- ------------- --------------  ---
+   2773  12 2026-05-15 2026-07-31        100.00      136139.50  GUARANTY TRUST DOLLAR FUND
+   2769  10 2026-06-11 2026-08-14          1.01        1375.83  ALPHA10 DOLLAR FUND
+   2768   9 2026-05-15 2026-07-10          1.00        1361.39  FSL EUROBOND FUND
+   2777   8 2026-05-15 2026-07-03          1.18        1606.45  VETIVA USD FIXED INCOME FUND
+   2878   8 2026-05-15 2026-07-03          1.52        2069.32  FCMBAM USD Bond Fund
+   2772   7 2026-07-03 2026-08-14          1.07        1477.60  GREENWICH FIXED INCOME DOLLA
+   2778   7 2026-07-03 2026-08-14          1.54        2126.64  ZEDCREST DOLLAR FUND
+   2809   6 2026-07-10 2026-08-14          1.00        1370.19  MYRTLE DOLLAR SHIELD FUND
+   2777   5 2026-07-17 2026-08-14          1.19        1641.75  VETIVA USD FIXED INCOME FUND
+   2856   5 2026-06-11 2026-07-10          1.16        1580.17  LEAD DOLLAR FIXED INCOME FUN
+   2878   5 2026-07-17 2026-08-14          1.54        2124.61  FCMBAM USD Bond Fund
+   2765   4 2026-07-24 2026-08-14          1.31        1801.83  CARDINALSTONE DOLLAR FUND
+   2766   4 2026-07-24 2026-08-14          1.10        1518.20  COMERCIO PARTNERS DOLLAR FUN
+   2770   4 2026-07-24 2026-08-14        106.08      146409.99  CFG AM FIXED INCOME DOLLAR F
+   2771   4 2026-07-24 2026-08-14          1.03        1421.18  CORONATION DOLLAR FUND
+   2774   4 2026-07-24 2026-08-14         10.94       15099.22  MERISTEM DOLLAR FUND
+   2775   4 2026-07-24 2026-08-14          1.09        1501.50  PARTHIAN DOLLAR FIXED INCOME
+   2776   4 2026-07-24 2026-08-14        118.14      163055.02  STL DOLLAR FUND
+   2876   4 2026-07-24 2026-08-14        133.23      184083.89  First Asset Dollar Fund (Ret
+   2877   4 2026-07-24 2026-08-14        130.07      179717.72  First Asset Specialized Doll
+   2879   4 2026-07-24 2026-08-14        112.50      155441.25  First Asset Blended Dollar F
+   2880   4 2026-07-24 2026-08-14          9.93       13709.51  ValuAlliance Specialized Dol
+   1239   3 2026-05-29 2026-06-11          1.27        1747.08  NOVA DOLLAR FIXED INCOME FUN
+   1239   3 2026-06-26 2026-07-10          1.36        1863.81  NOVA DOLLAR FIXED INCOME FUN
+   2766   3 2026-05-29 2026-06-11          1.11        1528.13  COMERCIO PARTNERS DOLLAR FUN
+   2772   3 2026-06-05 2026-06-19          1.08        1483.11  GREENWICH FIXED INCOME DOLLA
+   2856   3 2026-05-15 2026-05-29          1.15        1565.60  LEAD DOLLAR FIXED INCOME FUN
+   2769   2 2026-05-22 2026-05-29          1.01        1384.75  ALPHA10 DOLLAR FUND
+   2778   2 2026-05-29 2026-06-05          1.53        2104.45  ZEDCREST DOLLAR FUND
+
+## Par fonds — ce qui resterait apres correction
+
+  fonds dev     VL  dollars  conformes  ecarts   hors  nom
+  ----- ---- ----- -------- ---------- ------- ------  ---
+   2777 USD     70       13         30      25      2  VETIVA USD FIXED INCOME FU
+   2878 USD     17       13          1       2      1  FCMBAM USD Bond Fund
+   2769 USD     23       12          5       5      1  ALPHA10 DOLLAR FUND
+   2773 USD    111       12         45      16     38  GUARANTY TRUST DOLLAR FUND
+   2772 USD     53       11         22      18      2  GREENWICH FIXED INCOME DOL
+   2768 NGN     71        9         40      20      2  FSL EUROBOND FUND
+   2778 USD    127        9         54      62      2  ZEDCREST DOLLAR FUND
+   2766 USD    118        8         55      53      2  COMERCIO PARTNERS DOLLAR F
+   2856 NGN    131        8         34      87      2  LEAD DOLLAR FIXED INCOME F
+   1239 NGN    292        7         78     148     59  NOVA DOLLAR FIXED INCOME F
+   2809 USD     19        6          7       5      1  MYRTLE DOLLAR SHIELD FUND
+   2765 USD    123        4         71      46      2  CARDINALSTONE DOLLAR FUND
+   2770 USD     53        4         31      16      2  CFG AM FIXED INCOME DOLLAR
+   2771 USD     80        4         41      33      2  CORONATION DOLLAR FUND
+   2774 USD    131        4         71      54      2  MERISTEM DOLLAR FUND
+   2775 USD     71        4         51      14      2  PARTHIAN DOLLAR FIXED INCO
+   2776 USD     84        4         55      23      2  STL DOLLAR FUND
+   2876 USD     17        4          9       3      1  First Asset Dollar Fund (R
+   2877 USD     17        4          9       3      1  First Asset Specialized Do
+   2879 USD     17        4          9       3      1  First Asset Blended Dollar
+   2880 USD     16        4          9       2      1  ValuAlliance Specialized D
+   1163 NGN    267        1        211      21     34  CARDINALSTONE FIXED INCOME
+   1171 NGN    608        1        224       8    375  SFS FIXED INCOME FUND
+   1183 NGN    453        1        188      44    220  CORONATION FIXED INCOME FU
+   1195 NGN    270        1        220      12     37  EMERGING AFRICA BOND FUND
+   1220 NGN    268        1        203      29     35  GDL INCOME FUND
+   1245 NGN    499        1         62     170    266  PACAM FIXED INCOME FUND
+   1271 NGN    525        1         74     158    292  UNITED CAPITAL EQUITY FUND
+   1273 NGN    294        1        227       5     61  UNITED CAPITAL FIXED INCOM
+   1277 NGN    287        1        225       7     54  UNITED CAPITAL SUKUK FUND
+
+## Ce que cette mesure autorise
+
+  Chaque VL ci-dessus a un prix naira PUBLIE pour sa date exacte : la
+  correction serait donc lue, jamais calculee, et ne dependrait d aucun
+  voisinage — c est ce qui a fait echouer les deux tentatives precedentes.
+  Les colonnes « ecarts » et « hors » restent en dehors de ce perimetre :
+  ce sont des sujets distincts, a ne pas melanger a celui-ci.
+
+
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-08-31 18:37:24 UTC — LECTURE SEULE
+Mesure le 2026-09-01 04:39:15 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
-TOTAL : 153 ligne(s) sur 67 fonds
+TOTAL : 146 ligne(s) sur 64 fonds
 
 ## Repartition par pays et lot d insertion
 
      86 ligne(s)   NIGERIA | insere le Sun Aug 02
-     10 ligne(s)   NIGERIA | insere le Mon Jun 22
       9 ligne(s)   NIGERIA | insere le Sun May 17
       9 ligne(s)   NIGERIA | insere le Thu Jun 04
-      9 ligne(s)   NIGERIA | insere le Mon Aug 31
+      8 ligne(s)   NIGERIA | insere le Mon Aug 31
+      6 ligne(s)   NIGERIA | insere le Mon Jun 22
       5 ligne(s)   Nigeria | insere le Mon Aug 31
       4 ligne(s)   NIGERIA | insere le Mon Jun 08
-      4 ligne(s)   NIGERIA | insere le Mon Jul 13
       3 ligne(s)   NIGERIA | insere le Mon Jul 06
-      3 ligne(s)   NIGERIA | insere le Mon Jul 27
+      3 ligne(s)   NIGERIA | insere le Mon Jul 13
       2 ligne(s)   NIGERIA | insere le Mon Jun 29
+      2 ligne(s)   NIGERIA | insere le Mon Jul 27
       2 ligne(s)   TUNISIE | insere le Fri May 22
       2 ligne(s)   UEMOA | insere le Fri Jun 12
       1 ligne(s)   MAROC | insere le Thu Apr 30
@@ -894,7 +1003,7 @@ TOTAL : 153 ligne(s) sur 67 fonds
   ----- ---- ---------- -------------- -------------- ------- ---------- ------ ---  ---
     790 MAD  Fri Jun 08         0.4600        11.2700    24.5 Thu Apr 30 -      non  UPLINE BONDS
    1141 NGN  Fri Mar 25        92.1946     39043.5368   423.5 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
-   1141 NGN  Fri Apr 08     43617.3655        92.1946   473.1 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
+   1141 NGN  Fri Apr 01     39441.4650        92.1946   427.8 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
    1141 NGN  Fri Dec 15       109.8529    104587.4659   952.1 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
    1141 NGN  Fri Dec 22    114459.8322       109.8529  1041.9 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
    1141 NGN  Fri Dec 12       114.4702    165682.9307  1447.4 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
@@ -913,7 +1022,7 @@ TOTAL : 153 ligne(s) sur 67 fonds
    1158 NGN  Fri Nov 12     49931.7000       107.1500     466 Sun May 17 -      non  AVA GAM FIXED INCOME DOLLAR FU
    1168 NGN  Fri Nov 26       415.7564         1.0100   411.6 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
    1168 NGN  Fri Mar 25         1.0259       425.9998   415.2 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
-   1168 NGN  Fri Apr 08       427.5217         1.0259   416.7 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
+   1168 NGN  Fri Apr 01       427.1666         1.0259   416.4 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
    1169 NGN  Fri Aug 29 1046071210.6800       552.2000 1894370.2 Sun Aug 02 NGN    oui  NIGERIA ENERGY SECTOR FUND
    1169 NGN  Fri Sep 05       552.2000 1046071210.6800 1894370.2 Sun Aug 02 NGN    oui  NIGERIA ENERGY SECTOR FUND
    1171 NGN  Fri Oct 21       988.8300         1.2200   810.5 Sun Aug 02 NGN    oui  SFS FIXED INCOME FUND
@@ -952,12 +1061,12 @@ TOTAL : 153 ligne(s) sur 67 fonds
    1255 NGN  Fri Sep 05       129.7700         1.2926   100.4 Sun Aug 02 NGN    oui  STANBIC IBTC BOND FUND
    1259 NGN  Fri Dec 16      7819.0000        78.1900     100 Sun Aug 02 NGN    oui  STANBIC IBTC ETF 30 FUND
    1259 NGN  Fri Dec 30        78.1900      7819.0000     100 Sun Aug 02 NGN    oui  STANBIC IBTC ETF 30 FUND
-  ... et 93 autre(s)
+  ... et 86 autre(s)
 
 ## Provenance
 
   12 ligne(s) SANS provenance — meme signature que les 82 deja retirees
-  141 ligne(s) AVEC provenance — a corriger a la source, jamais par suppression aveugle
+  134 ligne(s) AVEC provenance — a corriger a la source, jamais par suppression aveugle
 
 
 ```
