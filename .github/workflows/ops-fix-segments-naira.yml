@@ -1,0 +1,281 @@
+# OPERATION — ramener au naira les 157 VL libellees en dollars (#73).
+#
+# CE QUE CE WORKFLOW ECRIT, ET SUR QUELLE FOI
+# -------------------------------------------
+# 157 VL nigerianes portent une valeur en DOLLARS dans une serie tenue en NAIRA,
+# reparties en 41 segments sur 30 fonds. 145 d entre elles — 92 % — vivent dans
+# 29 plateaux de deux releves ou plus. Le plus long dure quatorze semaines a
+# 100,00 constant (GUARANTY TRUST, 2026-05-15 au 2026-08-14).
+#
+# Consequence visible en production au 2026-09-01 : 21 fonds sur 330 affichent
+# une performance fausse — +143 958 % pour AFRINVEST, -99,93 % pour quinze
+# autres. Ce ne sont pas des ecarts de calcul : c est un rapport de change
+# applique a une VL de reference.
+#
+# POURQUOI CE TROISIEME CORRECTIF PLUTOT QU UNE RETOUCHE DES DEUX PREMIERS
+# -----------------------------------------------------------------------
+# Les deux precedents jugeaient la serie d apres sa propre forme — une rupture
+# entre VL consecutives, puis un voisinage de reference — et se sont trompes
+# pour la meme raison : une serie ne peut pas s auditer elle-meme quand une
+# partie d elle-meme est fausse.
+#
+#   - un voisin bordant une rupture etait pris pour la coupable (3 bonnes VL
+#     ecrasees le 2026-08-31, restaurees depuis) ;
+#   - un plateau de deux releves se validait lui-meme ;
+#   - un plateau de quatorze releves constants ne declenchait rien du tout.
+#
+# Le critere est donc desormais UNIQUE et EXTERNE : le prix naira publie par la
+# SEC pour la date exacte, retenu seulement si le rapport a la valeur en base
+# depasse 100. Le taux NGN/USD va de 400 (2022) a 1 600 (2026) ; les ecarts de
+# valeur recenses entre base et source sont tous inferieurs a 10x. L intervalle
+# entre 10 et 100 est vide : un rapport au-dela ne peut etre qu un changement
+# d unite monetaire.
+#
+# Chaque ligne est jugee SEULE. Aucun voisin n intervient, donc aucun plateau ne
+# peut se valider lui-meme, quelle que soit sa longueur.
+#
+# DEUX VERROUS
+# 1. Un `push` sur ce fichier ne declenche QUE le dry-run. Il est donc impossible
+#    d ecrire quoi que ce soit en poussant du code.
+# 2. Le mode `execute` exige la phrase exacte ci-dessous, verifiee AVANT toute
+#    connexion SSH.
+#
+#    Phrase requise : VALIDER CORRECTION SEGMENTS NAIRA
+#
+# LES RECALCULS SONT OPTIONNELS, ET CE N EST PAS UN OUBLI. `vl_ajuste`,
+# `value_EUR` et `value_USD` derivent de `value` : sans eux, le site affichera
+# des VL justes et des performances calculees sur les anciennes. Mais le
+# recalcul EUR/USD porte sur ~990 000 lignes, et c est exactement ce profil de
+# charge qui a fait tuer mariadbd par l OOM-killer le 2026-08-31 — la base fuit
+# ~700 Mo/h et se fait abattre vers 13,7 Go (voir docs/OPS_MYSQL_MEMOIRE.md).
+# Enchainer les deux d office reviendrait a jouer la correction contre la
+# disponibilite. Le cron de 20 h les fait de toute facon.
+#
+# ROLLBACK : le script prend un snapshot complet de chaque ligne avant ecriture.
+#   node scripts/fix/fix_segments_dollars_nigeria.js --rollback data/naira_snapshots/<f>.json
+#   ... --ids 123,456   pour n en restaurer qu une partie
+#
+# Ne s execute jamais tout seul : aucun `schedule`.
+
+name: OPS — segments en dollars vers naira (#73)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run (aucune ecriture) ou execute"
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - execute
+      recalculer:
+        description: "Enchainer vl_ajuste + EUR/USD apres ecriture (charge lourde — voir l en-tete)"
+        required: false
+        default: false
+        type: boolean
+      confirmation:
+        description: "Pour execute uniquement — taper : VALIDER CORRECTION SEGMENTS NAIRA"
+        required: false
+        default: ""
+        type: string
+  push:
+    paths:
+      - '.github/workflows/ops-fix-segments-naira.yml'
+
+permissions:
+  # `write` parce que le rapport est consigne dans le depot : le resume GitHub
+  # n est lisible que dans l onglet Actions, donc invisible a toute session sans
+  # acces API. Une operation qui touche la production laisse sa trace la ou vit
+  # le projet.
+  contents: write
+
+concurrency:
+  group: ops-fix-segments-naira
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    name: Perimetre puis, sur validation, correction
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Determiner le mode et verifier la validation
+        id: mode
+        env:
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'dry-run' }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -u
+          PHRASE="VALIDER CORRECTION SEGMENTS NAIRA"
+          if [ "$MODE" != "execute" ]; then
+            echo "Mode : dry-run (aucune ecriture)."
+            echo "mode=dry-run" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Comparaison stricte, sans normalisation : une phrase approximative
+          # doit echouer, sinon le verrou ne verrouille rien.
+          if [ "$CONFIRMATION" != "$PHRASE" ]; then
+            echo "::error::Mode execute demande sans la phrase exacte. Attendu : $PHRASE"
+            exit 1
+          fi
+          echo "Mode : EXECUTE — validation reconnue."
+          echo "mode=execute" >> "$GITHUB_OUTPUT"
+
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          # Un workflow_dispatch peut partir de n importe quelle branche ; le
+          # rapport doit toujours atterrir sur celle-ci.
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Executer
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+          MODE: ${{ steps.mode.outputs.mode }}
+          RECALCULER: ${{ inputs.recalculer }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          # ServerAliveInterval : le recalcul reste muet plusieurs minutes ; sans
+          # ces options le canal est coupe et la sortie perdue alors que le
+          # travail se poursuit cote serveur.
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes \
+              -o ServerAliveInterval=30 -o ServerAliveCountMax=120 \
+              "$SSH_USER@$HOST" \
+            "MODE='$MODE' RECALCULER='$RECALCULER' bash -s" <<'REMOTE' 2>&1 | tee rapport-segments.txt
+            set -u
+            API_DIR=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+            cd "$API_DIR" || exit 3
+
+            # Le serveur doit executer le code POUSSE, pas celui qu il avait. Un
+            # rejeu anterieur a tourne sur une version ancienne du script et rendu
+            # un resultat qui ne correspondait a aucun code source.
+            echo "Commit avant mise a jour : $(git log -1 --oneline)"
+            git pull --rebase origin claude/code-review-improvements-ikvuj \
+              || echo "AVERTISSEMENT : pull impossible, le code du serveur peut etre en retard."
+            echo "Commit retenu        : $(git log -1 --oneline)"
+            echo ""
+
+            echo "=============================================="
+            echo " 1. PERIMETRE (dry-run de controle)"
+            echo "=============================================="
+            # Toujours execute, y compris avant une ecriture : si le perimetre a
+            # bouge depuis la mesure, on le voit AVANT d ecrire.
+            node scripts/fix/fix_segments_dollars_nigeria.js || exit 4
+
+            if [ "${MODE:-dry-run}" != "execute" ]; then
+              echo ""
+              echo "Mode dry-run — aucune ecriture. Fin."
+              exit 0
+            fi
+
+            echo ""
+            echo "=============================================="
+            echo " 2. CORRECTION"
+            echo "=============================================="
+            node scripts/fix/fix_segments_dollars_nigeria.js --execute || exit 5
+
+            echo ""
+            echo "=============================================="
+            echo " 3. VERIFICATION — le script est idempotent"
+            echo "=============================================="
+            # Relance : il ne doit plus rien trouver a corriger.
+            node scripts/fix/fix_segments_dollars_nigeria.js || true
+
+            if [ "${RECALCULER:-false}" = "true" ]; then
+              echo ""
+              echo "=============================================="
+              echo " 4. RECALCULS DERIVES (demandes explicitement)"
+              echo "=============================================="
+              echo "Charge lourde : c est ce profil qui a fait tuer mariadbd par"
+              echo "l OOM-killer le 2026-08-31. Un echec ici n annule PAS la"
+              echo "correction — les VL ecrites restent justes."
+              node scripts/recalc/recalc_vl_ajuste.js \
+                || echo "AVERTISSEMENT : recalc_vl_ajuste en echec, a relancer."
+              node scripts/recalc/recalc_eur_usd_daily_rate.js \
+                || echo "AVERTISSEMENT : recalc EUR/USD en echec, a relancer."
+            else
+              echo ""
+              echo "Recalculs NON demandes — vl_ajuste, value_EUR et value_USD"
+              echo "restent perimes pour les lignes corrigees jusqu au cron de 20 h."
+            fi
+
+            echo ""
+            echo "Snapshots disponibles pour rollback :"
+            ls -1t data/naira_snapshots/*.json 2>/dev/null | head -3 || echo "  aucun"
+          REMOTE
+
+      - name: Publier le rapport
+        if: always()
+        run: |
+          {
+            echo "## Segments en dollars vers naira — mode : ${{ steps.mode.outputs.mode }}"
+            echo ""
+            echo '```'
+            cat rapport-segments.txt 2>/dev/null || echo "(aucun rapport)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Consigner le rapport dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          {
+            echo "# Segments en dollars vers naira — journal des operations"
+            echo
+            echo "> Genere par \`ops-fix-segments-naira.yml\`. Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo "Mode : **${{ steps.mode.outputs.mode }}**"
+            echo "Declencheur : \`${{ github.event_name }}\` — par \`${{ github.actor }}\`"
+            echo
+            echo '```'
+            cat rapport-segments.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+          } > docs/OPS_FIX_SEGMENTS_NAIRA.md
+
+          git add docs/OPS_FIX_SEGMENTS_NAIRA.md
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(ops): segments naira — ${{ steps.mode.outputs.mode }} $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : ne jamais ecraser un commit pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Rapport consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
