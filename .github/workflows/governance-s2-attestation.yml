@@ -1,0 +1,155 @@
+name: Attestation gouvernance GitHub S2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/governance-s2-attestation.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: governance-s2-attestation
+  cancel-in-progress: false
+
+jobs:
+  attest:
+    name: Attester GitHub, S2 et runtime FundAfrica
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Verifier les secrets S2
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST ou S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets S2 presents."
+
+      - name: Preparer SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Mesurer S2 sans modification
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" 'bash -s' <<'REMOTE'
+            set -u
+            BRANCH='claude/code-review-improvements-ikvuj'
+            API='/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api'
+            FRONT='/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend'
+
+            inspect_repo() {
+              NAME="$1"
+              DIR="$2"
+              echo "===== ${NAME} ====="
+              cd "$DIR" || { echo "ERROR: path missing: $DIR"; return 20; }
+              test -d .git || { echo "ERROR: not a git repository"; return 21; }
+
+              LOCAL_BRANCH="$(git branch --show-current)"
+              LOCAL_HEAD="$(git rev-parse HEAD)"
+              TRACKING_HEAD="$(git rev-parse "origin/$BRANCH" 2>/dev/null || echo MISSING)"
+              REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
+              [ -n "$REMOTE_HEAD" ] || REMOTE_HEAD='MISSING'
+
+              echo "path=$DIR"
+              echo "branch=$LOCAL_BRANCH"
+              echo "local_head=$LOCAL_HEAD"
+              echo "tracking_head=$TRACKING_HEAD"
+              echo "remote_head=$REMOTE_HEAD"
+
+              if [ "$LOCAL_BRANCH" = "$BRANCH" ]; then
+                echo "branch_match=YES"
+              else
+                echo "branch_match=NO"
+              fi
+
+              if [ "$LOCAL_HEAD" = "$REMOTE_HEAD" ]; then
+                echo "remote_alignment=EXACT"
+              else
+                echo "remote_alignment=MISMATCH"
+              fi
+
+              echo '-- git status --'
+              git status -sb
+              echo '-- porcelain --'
+              git status --porcelain=v1
+
+              if [ "$TRACKING_HEAD" != 'MISSING' ]; then
+                echo "ahead_vs_tracking=$(git rev-list --count "origin/$BRANCH..HEAD" 2>/dev/null || echo UNKNOWN)"
+                echo "behind_vs_tracking=$(git rev-list --count "HEAD..origin/$BRANCH" 2>/dev/null || echo UNKNOWN)"
+                echo '-- top changed paths in local-ahead commits --'
+                git log --name-only --pretty=format: "origin/$BRANCH..HEAD" 2>/dev/null \
+                  | sed '/^$/d' | sort | uniq -c | sort -nr | head -40 || true
+
+                echo '-- recent local-ahead commits --'
+                git log --format='%H | %cI | %s' "origin/$BRANCH..HEAD" -n 30 2>/dev/null || true
+
+                SNAPSHOT_ONLY=0
+                OTHER=0
+                OTHER_SHOWN=0
+                while IFS= read -r C; do
+                  [ -n "$C" ] || continue
+                  FILES="$(git diff-tree --no-commit-id --name-only -r "$C" | sed '/^$/d')"
+                  COUNT="$(printf '%s\n' "$FILES" | sed '/^$/d' | wc -l | tr -d ' ')"
+                  if [ "$COUNT" = '1' ] && [ "$FILES" = 'PRODUCTION_STATE.json' ]; then
+                    SNAPSHOT_ONLY=$((SNAPSHOT_ONLY + 1))
+                  else
+                    OTHER=$((OTHER + 1))
+                    if [ "$OTHER_SHOWN" -lt 40 ]; then
+                      SUBJECT="$(git log -1 --format='%s' "$C")"
+                      echo "non_snapshot_commit=$C | $SUBJECT | files=$(printf '%s' "$FILES" | tr '\n' ',')"
+                      OTHER_SHOWN=$((OTHER_SHOWN + 1))
+                    fi
+                  fi
+                done < <(git rev-list "origin/$BRANCH..HEAD" 2>/dev/null || true)
+                echo "snapshot_only_commits_vs_tracking=$SNAPSHOT_ONLY"
+                echo "other_commits_vs_tracking=$OTHER"
+              fi
+              echo
+            }
+
+            inspect_repo 'API OPCVM' "$API"
+            inspect_repo 'FRONTEND OPCVM' "$FRONT"
+
+            echo '===== PM2 RUNTIME ====='
+            pm2 jlist 2>/dev/null | node -e '
+              let s=""; process.stdin.on("data",d=>s+=d); process.stdin.on("end",()=>{
+                const rows=JSON.parse(s);
+                for (const p of rows.filter(x=>["api-monolith","fundafrique-frontend"].includes(x.name))) {
+                  const e=p.pm2_env||{};
+                  console.log(JSON.stringify({name:p.name,status:e.status,pid:p.pid,restarts:e.restart_time,node_version:e.node_version,pm_cwd:e.pm_cwd,pm_exec_path:e.pm_exec_path,version:e.version}));
+                }
+              });'
+
+            echo '===== HTTP SMOKE ====='
+            for URL in \
+              'https://africafunds.chainsolutions.fr/' \
+              'https://africafunds.chainsolutions.fr/home' \
+              'https://africafunds.chainsolutions.fr/api/getactualite'; do
+              printf '%s -> ' "$URL"
+              curl -sS -L --max-redirs 3 --max-time 20 -o /dev/null -w 'HTTP %{http_code} | %{time_total}s | %{url_effective}\n' "$URL" || true
+            done
+          REMOTE
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
