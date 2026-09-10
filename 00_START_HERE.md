@@ -18,13 +18,16 @@ Avant toute analyse ou ecriture :
 2. `GOVERNANCE.md`
 3. `SOURCE_OF_TRUTH.md`
 4. `AGENTS.md`
-5. `DIRECTIVE_TRAVAIL.md`
-6. `CLAUDE.md` des deux depots
-7. `front_end_opcvm/SUIVI.md` — suivi operationnel officiel unique
-8. les `README*`, `TODO.md`, `ROADMAP.md`, `CODE_REVIEW.md`, `CHANGELOG.md`, `DEPLOYMENT_PRODUCTION.md` pertinents
-9. `api_opcv/docs/ETAT_PRODUCTION_VERIFIE.md` et toute mesure live disponible pour les faits de production
-10. les fichiers, migrations, scripts, routes, composants et tests directement concernes
-11. les HEAD, commits recents, checks et travaux en cours des deux depots.
+5. `LOOP_ENGINEERING.md`
+6. `DIRECTIVE_TRAVAIL.md`
+7. `CLAUDE.md` des deux depots
+8. `front_end_opcvm/SUIVI.md` — suivi operationnel officiel unique
+9. les `README*`, `TODO.md`, `ROADMAP.md`, `CODE_REVIEW.md`, `CHANGELOG.md`, `DEPLOYMENT_PRODUCTION.md` pertinents
+10. `api_opcv/docs/ETAT_PRODUCTION_VERIFIE.md` et toute mesure live disponible pour les faits de production
+11. les fichiers, migrations, scripts, routes, composants et tests directement concernes
+12. les HEAD, commits recents, checks et travaux en cours des deux depots.
+
+`LOOP_ENGINEERING.md` definit COMMENT le travail gouverne est execute. Il complete mais ne remplace aucune instruction de plus haute autorite ou specifique au depot.
 
 Le `SUIVI.md` de `api_opcv` reste un pointeur et ne devient pas un second suivi.
 
@@ -82,4 +85,4 @@ Ne jamais recreer un Fund Master, un Manager Master, une authentification, un su
 
 ## Fin d'intervention
 
-Une intervention ne peut etre declaree terminee qu'apres les controles applicables de `GOVERNANCE.md`, la verification de non-regression, la mise a jour du suivi canonique lorsqu'elle est requise et la verification du nouvel etat distant. Une validation non executee doit etre marquee `NON VERIFIE` ou `BLOCKED`, jamais inventee.
+Une intervention ne peut etre declaree terminee qu'apres les controles applicables de `GOVERNANCE.md`, la boucle applicable de `LOOP_ENGINEERING.md`, la verification de non-regression, la mise a jour du suivi canonique lorsqu'elle est requise et la verification du nouvel etat distant. Une validation non executee doit etre marquee `NON VERIFIE` ou `BLOCKED`, jamais inventee.
