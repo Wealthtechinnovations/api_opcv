@@ -3,18 +3,18 @@
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
 Derniere execution : **2026-09-10 05:30 UTC**
-Declencheur : `push` — par `Wealthtechinnovations`
+Declencheur : `workflow_dispatch` — par `Wealthtechinnovations`
 
 ```
 ==============================================
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        9299         858         184        7787        8109
+Mem:           17945        9286         867         184        7792        8123
 Swap:           2047         760        1287
 
 RSS actuel de mariadbd :
-  6.54 Go — demarre depuis 23:05:14
+  6.54 Go — demarre depuis 23:05:28
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
