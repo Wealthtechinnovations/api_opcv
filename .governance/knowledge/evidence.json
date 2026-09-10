@@ -26,6 +26,14 @@
       "provenance": "doc-drift.yml -> docs/ETAT_PRODUCTION_VERIFIE.md",
       "observed_at": "2026-09-10T02:02:00Z",
       "summary": "8/16 controles OK — 6 echecs critiques (C2, C3, C4.NIGERIA, C4.TUNISIE, C7, C8), 2 alertes (C4.CEMAC, C6.CEMAC)."
+    },
+    {
+      "id": "AF-EVD-012",
+      "type": "RUNTIME_INCIDENT",
+      "result": "OBSERVED",
+      "provenance": "ops-mysql-memoire.yml -> journalctl -k / journalctl -u mariadb",
+      "observed_at": "2026-09-10T05:33:00Z",
+      "summary": "OOM-kill de mariadbd le 2026-09-08 20:02:42 a 14,6 Go RSS, declenche par un node de cron.service. Aucun redemarrage automatique : service relance le 2026-09-09 06:25:03. Indisponibilite 10 h 22."
     }
   ],
   "note": "Les preuves de ce commit et de la CI seront ajoutées après publication et observation réelle; elles ne sont pas pré-déclarées PASS."

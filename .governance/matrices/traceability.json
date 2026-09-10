@@ -163,6 +163,18 @@
       "evidence_refs": [
         "AF-EVD-011"
       ]
+    },
+    {
+      "requirement_id": "AF-REQ-016",
+      "change_refs": [
+        ".github/workflows/ops-mysql-memoire.yml"
+      ],
+      "test_refs": [
+        ".github/workflows/ops-mysql-memoire.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-012"
+      ]
     }
   ]
 }
