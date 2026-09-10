@@ -138,6 +138,9 @@ jobs:
                   fi
                 done
                 echo "sync_production_blob=$(git hash-object scripts/deploy/sync_production.sh 2>/dev/null || echo MISSING)"
+                echo "production_state_tracked=$(git ls-files --error-unmatch PRODUCTION_STATE.json >/dev/null 2>&1 && echo YES || echo NO)"
+                echo '-- tracked references to PRODUCTION_STATE / sync_production --'
+                git grep -n -E 'PRODUCTION_STATE|sync_production' -- ':!PRODUCTION_STATE.json' 2>/dev/null | head -200 || true
               fi
 
               if [ "$NAME" = 'FRONTEND OPCVM' ]; then
