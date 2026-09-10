@@ -25,6 +25,11 @@ VERIFY_AFTER_WRITE = REQUIRED
 MEASURED_PRODUCTION_FACTS_OVERRIDE_STALE_PROSE = TRUE
 GITHUB_TO_S2_DEPLOYMENT_PATH = REQUIRED
 DIRECT_SERVER_DEVELOPMENT_AS_AUTHORITY = FORBIDDEN
+RUNTIME_GIT_COMMITS = FORBIDDEN
+RUNTIME_GIT_PUSH = FORBIDDEN
+UNTRACKED_DELETE_WITHOUT_CLASSIFICATION = FORBIDDEN
+S2_DIVERGENCE_REQUIRES_BACKUP_BEFORE_REPOSITION = TRUE
+POST_DOCUMENTATION_REMOTE_ATTESTATION = REQUIRED
 ```
 
 ## Autorites existantes preservees
@@ -136,6 +141,41 @@ GitHub canonical FRONTEND HEAD == S2 frontend deployed HEAD
 ```
 
 Toute divergence doit etre expliquee et reconciliee avant une nouvelle evolution sensible.
+
+## Invariants GOV-006 — GitHub / S2 / runtime
+
+Le post-mortem canonique est `docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md` et le runbook est `docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md`.
+
+Les regles suivantes sont normatives :
+
+1. GitHub est l'unique autorite Git canonique.
+2. S2 peut executer, mesurer et produire des artefacts runtime ; il ne fabrique pas automatiquement de commits Git.
+3. Aucun cron ou processus runtime ne doit effectuer `git add`, `git commit` ou `git push` pour journaliser la production.
+4. Le snapshot live est `/var/lib/fundafrica/runtime/PRODUCTION_STATE.json` et doit etre genere hors du working tree.
+5. Le fichier Git `PRODUCTION_STATE.json`, lorsqu'il existe, est historique/fallback et non l'autorite live.
+6. `git reset --hard`, `git clean -fd` et force-push ne sont jamais des outils de diagnostic de divergence.
+7. Tout commit local exclusif est classifie avant toute decision de realignement.
+8. Toute modification locale legitime est preservee et remontee dans GitHub avant synchronisation.
+9. Tout artefact `untracked` est classe `GENERATED_SAFE`, `LOG`, `CACHE`, `DOWNLOAD`, `BUSINESS_DATA` ou `UNKNOWN`; `UNKNOWN` est preserve.
+10. Un repositionnement de branche locale exige une sauvegarde recouvrable et verifiee lorsque des commits exclusifs existent.
+11. Une documentation qui avance le HEAD fait partie du cycle et exige une attestation distante post-commit.
+12. Une production HTTP saine ne prouve jamais a elle seule l'egalite GitHub/S2.
+
+### Gate de divergence S2
+
+```text
+OBSERVE
+-> CLASSIFY
+-> IDENTIFY_ROOT_CAUSE
+-> BACKUP
+-> PRESERVE_UNKNOWN
+-> CORRECT_ROOT_CAUSE
+-> RECONCILE
+-> VERIFY_FRESH_REMOTE_EQUALITY
+-> VERIFY_RUNTIME
+```
+
+Si un commit applicatif local reste inexpliqué ou non sauvegarde, le write gate reste ferme.
 
 ## Memoire persistante
 
