@@ -75,6 +75,8 @@ jobs:
               echo "local_head=$LOCAL_HEAD"
               echo "tracking_head=$TRACKING_HEAD"
               echo "remote_head=$REMOTE_HEAD"
+              echo "head_subject=$(git log -1 --format='%s')"
+              echo "head_date=$(git log -1 --format='%cI')"
 
               if [ "$LOCAL_BRANCH" = "$BRANCH" ]; then
                 echo "branch_match=YES"
@@ -124,19 +126,50 @@ jobs:
                 echo "snapshot_only_commits_vs_tracking=$SNAPSHOT_ONLY"
                 echo "other_commits_vs_tracking=$OTHER"
               fi
+
+              if [ "$NAME" = 'API OPCVM' ]; then
+                echo '-- API generated/untracked artifact sizes --'
+                for P in 0 data/datejour_snapshots data/naira_snapshots data/scale_break_snapshots sec_ng_downloads; do
+                  if [ -e "$P" ]; then
+                    du -sh "$P" 2>/dev/null || true
+                    if [ -d "$P" ]; then
+                      echo "files[$P]=$(find "$P" -type f 2>/dev/null | wc -l | tr -d ' ')"
+                    fi
+                  fi
+                done
+                echo "sync_production_blob=$(git hash-object scripts/deploy/sync_production.sh 2>/dev/null || echo MISSING)"
+              fi
+
+              if [ "$NAME" = 'FRONTEND OPCVM' ]; then
+                echo '-- frontend package-lock local diff --'
+                git diff --numstat -- package-lock.json || true
+                git diff -- package-lock.json | sed -n '1,240p' || true
+                echo '-- frontend .mcp_logs size --'
+                du -sh .mcp_logs 2>/dev/null || true
+                echo "mcp_log_files=$(find .mcp_logs -type f 2>/dev/null | wc -l | tr -d ' ')"
+              fi
               echo
             }
 
             inspect_repo 'API OPCVM' "$API"
             inspect_repo 'FRONTEND OPCVM' "$FRONT"
 
+            echo '===== CRON / SNAPSHOT PRODUCER ====='
+            (crontab -l 2>/dev/null || true) | grep -E 'sync_production|PRODUCTION_STATE|africafunds' || echo '(no matching root crontab line)'
+            grep -R -n -E 'sync_production|PRODUCTION_STATE' /etc/cron.d /etc/cron.hourly /etc/cron.daily 2>/dev/null | head -80 || true
+
             echo '===== PM2 RUNTIME ====='
-            pm2 jlist 2>/dev/null | node -e '
+            PM2_RAW="$(pm2 jlist 2>&1 || true)"
+            printf '%s\n' "$PM2_RAW" | sed -n '/^\[/,$p' | node -e '
               let s=""; process.stdin.on("data",d=>s+=d); process.stdin.on("end",()=>{
-                const rows=JSON.parse(s);
-                for (const p of rows.filter(x=>["api-monolith","fundafrique-frontend"].includes(x.name))) {
-                  const e=p.pm2_env||{};
-                  console.log(JSON.stringify({name:p.name,status:e.status,pid:p.pid,restarts:e.restart_time,node_version:e.node_version,pm_cwd:e.pm_cwd,pm_exec_path:e.pm_exec_path,version:e.version}));
+                try {
+                  const rows=JSON.parse(s);
+                  for (const p of rows.filter(x=>["api-monolith","fundafrique-frontend"].includes(x.name))) {
+                    const e=p.pm2_env||{};
+                    console.log(JSON.stringify({name:p.name,status:e.status,pid:p.pid,restarts:e.restart_time,node_version:e.node_version,pm_cwd:e.pm_cwd,pm_exec_path:e.pm_exec_path,version:e.version,uptime:e.pm_uptime}));
+                  }
+                } catch (e) {
+                  console.log("PM2_JSON_PARSE_ERROR="+e.message);
                 }
               });'
 
