@@ -29,8 +29,20 @@ if len(ids) != len(set(ids)): errors.append('DUPLICATE_REQUIREMENT_ID')
 trace=json.loads((ROOT/'.governance/matrices/traceability.json').read_text())['rows']
 for row in trace:
     if row['requirement_id'] not in ids: errors.append(f"ORPHAN_TRACE:{row['requirement_id']}")
-for forbidden in ['FundAfrica']:
-    for rel in ['PROJECT_CONTEXT.md','STATUS.md','docs/01-governance/PROJECT_RULES.md']:
-        if forbidden in (ROOT/rel).read_text(encoding='utf-8'): errors.append(f'NONCANONICAL_PRODUCT_NAME:{rel}')
+
+# Product naming policy: new canonical identity must be AfricaFunds, while explicit
+# historical references to FundAfrica remain allowed for traceability and for real
+# technical paths that have not been migrated.
+canonical_markers = {
+    'PROJECT_CONTEXT.md': ['# PROJECT_CONTEXT — AfricaFunds API', 'Produit canonique : **AfricaFunds**.'],
+    'STATUS.md': ['# STATUS — AfricaFunds API'],
+    'docs/01-governance/PROJECT_RULES.md': ['# PROJECT_RULES — AfricaFunds API'],
+}
+for rel, markers in canonical_markers.items():
+    text=(ROOT/rel).read_text(encoding='utf-8')
+    for marker in markers:
+        if marker not in text:
+            errors.append(f'NONCANONICAL_PRODUCT_IDENTITY:{rel}:{marker}')
+
 print(json.dumps({'valid':not errors,'errors':errors,'requirements':len(ids),'trace_rows':len(trace)},indent=2))
 sys.exit(1 if errors else 0)
