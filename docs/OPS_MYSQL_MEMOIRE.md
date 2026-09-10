@@ -2,19 +2,19 @@
 
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-10 05:28 UTC**
-Declencheur : `workflow_dispatch` — par `Wealthtechinnovations`
+Derniere execution : **2026-09-10 05:30 UTC**
+Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
 ==============================================
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        9372         823         184        7749        8036
+Mem:           17945        9299         858         184        7787        8109
 Swap:           2047         760        1287
 
 RSS actuel de mariadbd :
-  6.54 Go — demarre depuis 23:03:32
+  6.54 Go — demarre depuis 23:05:14
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
@@ -55,6 +55,21 @@ Threads_running	1
   Colonnes : global_Go | par_session_Mo | max_conn | pire_cas_Go | heap_Mo | tmp_Mo
   Comparer pire_cas_Go a la RAM totale relevee en section 1.
   Rappel : mariadbd a ete tue a 13,7 Go sur 17,9 Go de RAM.
+
+==============================================
+ 3b. HISTORIQUE DES ARRETS — POURQUOI IL A REDEMARRE
+==============================================
+--- tueries memoire (OOM) sur 14 jours ---
+Sep 08 20:02:42 priceless-mayer kernel: node invoked oom-killer: gfp_mask=0x1100cca(GFP_HIGHUSER_MOVABLE), order=0, oom_score_adj=0
+Sep 08 20:02:42 priceless-mayer kernel: oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=cron.service,mems_allowed=0,global_oom,task_memcg=/system.slice/mariadb.service,task=mariadbd,pid=239498,uid=113
+Sep 08 20:02:42 priceless-mayer kernel: Out of memory: Killed process 239498 (mariadbd) total-vm:19716580kB, anon-rss:14613428kB, file-rss:0kB, shmem-rss:0kB, UID:113 pgtables:33712kB oom_score_adj:0
+
+--- demarrages et arrets du service sur 14 jours ---
+Sep 08 20:02:42 priceless-mayer systemd[1]: mariadb.service: A process of this unit has been killed by the OOM killer.
+Sep 08 20:02:44 priceless-mayer systemd[1]: mariadb.service: Main process exited, code=killed, status=9/KILL
+Sep 08 20:02:44 priceless-mayer systemd[1]: mariadb.service: Failed with result 'oom-kill'.
+Sep 09 06:25:02 priceless-mayer mariadbd[1256690]: 2026-09-09  6:25:02 0 [Note] InnoDB: 10.6.23 started; log sequence number 52527160550; transaction id 20187007
+Sep 09 06:25:03 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
 
 ==============================================
  4. QUI CONSOMME, MAINTENANT
