@@ -1,4 +1,4 @@
-# GOVERNANCE — FundAfrica
+# GOVERNANCE — AfricaFunds
 
 > Statut : `APPLICABLE`
 > Nature : adaptateur transversal de gouvernance.
@@ -48,7 +48,7 @@ En cas de contradiction, ne jamais choisir silencieusement. Pour un fait d'execu
 
 ## Une application, deux depots, un etat
 
-FundAfrica est une seule application. L'etat canonique est :
+AfricaFunds est une seule application. L'etat canonique est :
 
 ```text
 FUND_STATE = (API_HEAD, FRONTEND_HEAD, SUIVI_CHECKPOINT, PRODUCTION_ATTESTATION)

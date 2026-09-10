@@ -1,4 +1,4 @@
-# AGENTS.md — Regles universelles FundAfrica
+# AGENTS.md — Regles universelles AfricaFunds
 
 > S'applique a Claude, ChatGPT, Codex, Copilot, Gemini, agents MCP, automatisations et tout autre intervenant.
 > Complete les `CLAUDE.md` existants ; ne les remplace pas.

@@ -1,11 +1,11 @@
-# SOURCE_OF_TRUTH — FundAfrica
+# SOURCE_OF_TRUTH — AfricaFunds
 
 > Statut : `APPLICABLE`
-> Portee : les deux depots FundAfrica.
+> Portee : les deux depots AfricaFunds.
 
 ## Etat canonique
 
-FundAfrica est une seule application repartie sur deux depots. Son etat est :
+AfricaFunds est une seule application repartie sur deux depots. Son etat est :
 
 ```text
 FUND_STATE = (API_HEAD, FRONTEND_HEAD, SUIVI_CHECKPOINT, PRODUCTION_ATTESTATION)
@@ -119,4 +119,4 @@ API_BASE = f4e1ef4163aa33a0b1abaf2f82b46e89611cfb90
 FRONTEND_BASE = b9af99e99ebc239997625999fdaa4844d5972e19
 ```
 
-Ces SHA documentent le point de depart de l'adoption et ne sont pas des HEAD perpetuels. Aucune regle metier specifique au produit Regulatory n'est importee dans FundAfrica.
+Ces SHA documentent le point de depart de l'adoption et ne sont pas des HEAD perpetuels. Aucune regle metier specifique au produit Regulatory n'est importee dans AfricaFunds.
