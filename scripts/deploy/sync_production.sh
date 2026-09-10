@@ -1,37 +1,31 @@
 #!/bin/bash
 # ===========================================================================
-# SYNC PRODUCTION <-> DEV (repos locaux Claude Code)
+# SNAPSHOT PRODUCTION RUNTIME — LECTURE / MESURE, SANS ECRITURE GIT
 # ===========================================================================
 # Ce script tourne sur le SERVEUR DE PRODUCTION.
-# Il fait un git push depuis la production vers les repos distants,
-# permettant a Claude Code de toujours avoir le code identique a la prod.
+# Il mesure l'etat reel de FundAfrica sans faire de la production une autorite
+# Git concurrente. Le snapshot runtime est ecrit hors du working tree Git.
 #
 # Usage:
-#   Sur le serveur de production, lancer:
-#     bash sync_production.sh
+#   bash scripts/deploy/sync_production.sh
 #
 # Ce qu'il fait:
-#   1. Pull les derniers changements depuis le repo distant
-#   2. Dump un snapshot de l'etat de la base de donnees (structure + stats)
-#   3. Push le snapshot vers le repo distant
-#   4. Teste les routes API critiques et sauvegarde les resultats
+#   1. Mesure l'etat de la base de donnees et des routes critiques
+#   2. Ecrit atomiquement le snapshot runtime hors du depot Git
+#   3. N'effectue AUCUN git add, commit, push, pull, reset ou checkout
 #
-# Le fichier PRODUCTION_STATE.json genere contient:
-#   - Etat des tables (nombre de lignes, colonnes)
-#   - Dernieres VL par pays
-#   - Etat des indices
-#   - Etat des performances
-#   - Etat des taux de change
-#   - Version du code deploye (git log)
-#   - Tests des routes critiques
+# Le fichier historique PRODUCTION_STATE.json du depot reste disponible comme
+# fallback documentaire, mais n'est plus rafraichi ni commite depuis S2.
 # ===========================================================================
 
 set -e
 
-BRANCH="claude/code-review-improvements-ikvuj"
 API_DIR="/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api"
 FRONTEND_DIR="/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend"
 API_URL="http://localhost:3005"
+STATE_DIR="${FUNDAFRICA_RUNTIME_STATE_DIR:-/var/lib/fundafrica/runtime}"
+STATE_FILE="$STATE_DIR/PRODUCTION_STATE.json"
+
 source "$API_DIR/.env" 2>/dev/null || true
 DB_USER="${DB_USER:-fund_opcvm}"
 DB_PASS="${DB_PASSWORD:-}"
@@ -39,14 +33,17 @@ DB_NAME="${DB_NAME:-fund_opcvm}"
 DB_HOST="${DB_HOST:-127.0.0.1}"
 
 echo "============================================"
-echo "SYNC PRODUCTION — $(date '+%Y-%m-%d %H:%M:%S')"
+echo "SNAPSHOT PRODUCTION — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "============================================"
 
-# 1. Generer PRODUCTION_STATE.json avec etat complet de la base
 echo ""
 echo "--- Generation du snapshot base de donnees ---"
 
 cd "$API_DIR"
+mkdir -p "$STATE_DIR"
+chmod 755 "$STATE_DIR"
+TMP_STATE="$(mktemp "$STATE_DIR/.PRODUCTION_STATE.json.XXXXXX")"
+trap 'rm -f "$TMP_STATE"' EXIT
 
 node -e "
 const mysql = require('mysql2/promise');
@@ -70,7 +67,6 @@ const mysql = require('mysql2/promise');
     routes_test: {}
   };
 
-  // Stats tables principales
   const tables = [
     'fond_investissements', 'valorisations', 'indice_references',
     'devisedechanges', 'performences', 'performences_eurs', 'performences_usds',
@@ -84,7 +80,6 @@ const mysql = require('mysql2/promise');
     } catch(e) { state.tables[t] = 'ERROR: ' + e.message; }
   }
 
-  // Derniere VL par pays
   const [vlPays] = await conn.query(\`
     SELECT f.pays, COUNT(DISTINCT v.fund_id) as nb_fonds, COUNT(*) as nb_vl,
            MAX(v.date) as derniere_date, MIN(v.date) as premiere_date
@@ -95,7 +90,6 @@ const mysql = require('mysql2/promise');
   \`);
   state.derniere_vl_par_pays = vlPays;
 
-  // Couverture indRef
   const [indrefCov] = await conn.query(\`
     SELECT f.pays,
            COUNT(*) as total_vl,
@@ -109,7 +103,6 @@ const mysql = require('mysql2/promise');
   \`);
   state.valorisations_indref_coverage = indrefCov;
 
-  // Stats indices
   const [indStats] = await conn.query(\`
     SELECT id_indice, nom_indice, COUNT(*) as nb_entrees,
            MIN(date) as date_min, MAX(date) as date_max
@@ -118,7 +111,6 @@ const mysql = require('mysql2/promise');
   \`);
   state.indices_references_stats = indStats;
 
-  // Stats performances
   const [perfStats] = await conn.query(\`
     SELECT 'performences' as tbl, COUNT(*) as cnt, COUNT(DISTINCT fond_id) as nb_fonds FROM performences
     UNION ALL
@@ -128,14 +120,12 @@ const mysql = require('mysql2/promise');
   \`);
   state.performances_stats = perfStats;
 
-  // Stats devises
   const [devStats] = await conn.query(\`
     SELECT paire, COUNT(*) as nb_entrees, MIN(date) as date_min, MAX(date) as date_max
     FROM devisedechanges GROUP BY paire ORDER BY paire
   \`);
   state.devisedechanges_stats = devStats;
 
-  // Fonds actifs par pays
   const [fondsPays] = await conn.query(\`
     SELECT pays, COUNT(*) as nb_fonds, SUM(CASE WHEN active=1 THEN 1 ELSE 0 END) as actifs
     FROM fond_investissements GROUP BY pays ORDER BY pays
@@ -144,7 +134,6 @@ const mysql = require('mysql2/promise');
 
   await conn.end();
 
-  // Git info
   const { execSync } = require('child_process');
   try {
     state.git_api = execSync('git -C $API_DIR log --oneline -5 2>/dev/null').toString().trim();
@@ -156,7 +145,6 @@ const mysql = require('mysql2/promise');
     state.pm2_status = execSync('pm2 jlist 2>/dev/null').toString().trim();
   } catch(e) {}
 
-  // Test routes critiques
   const http = require('http');
   const testUrl = (url) => new Promise((resolve) => {
     const req = http.get(url, { timeout: 10000 }, (res) => {
@@ -177,21 +165,19 @@ const mysql = require('mysql2/promise');
 
   process.stdout.write(JSON.stringify(state, null, 2));
 })();
-" > PRODUCTION_STATE.json
+" > "$TMP_STATE"
 
-echo "  -> PRODUCTION_STATE.json genere ($(wc -c < PRODUCTION_STATE.json) octets)"
+chmod 644 "$TMP_STATE"
+mv -f "$TMP_STATE" "$STATE_FILE"
+trap - EXIT
 
-# 2. Commit et push le snapshot
-git add PRODUCTION_STATE.json
-git diff --cached --quiet && echo "  Aucun changement" || {
-  git commit -m "chore: snapshot production state $(date '+%Y-%m-%d %H:%M')"
-  git push origin "$BRANCH" && echo "  -> Push OK" || echo "  -> Push ECHEC"
-}
+echo "  -> Snapshot runtime genere: $STATE_FILE ($(wc -c < "$STATE_FILE") octets)"
+echo "  -> Git non modifie: aucun add/commit/push"
 
 echo ""
 echo "============================================"
-echo "SYNC TERMINE — $(date '+%Y-%m-%d %H:%M:%S')"
+echo "SNAPSHOT TERMINE — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "============================================"
 echo ""
-echo "Claude Code peut maintenant lire PRODUCTION_STATE.json"
-echo "pour connaitre l'etat exact de la production."
+echo "Etat production runtime: $STATE_FILE"
+echo "Le depot Git reste une source de code canonique, pas une sortie de cron."
