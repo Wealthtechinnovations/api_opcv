@@ -21,7 +21,8 @@ FUND_STATE = (API_HEAD, FRONTEND_HEAD, SUIVI_CHECKPOINT, PRODUCTION_ATTESTATION)
 | Etat operationnel / point de reprise | `front_end_opcvm/SUIVI.md` uniquement |
 | Backend versionne | `Wealthtechinnovations/api_opcv` / `claude/code-review-improvements-ikvuj` |
 | Frontend versionne | `Wealthtechinnovations/front_end_opcvm` / `claude/code-review-improvements-ikvuj` |
-| Faits production | mesure live la plus recente ; `api_opcv/docs/ETAT_PRODUCTION_VERIFIE.md` lorsqu'il reflete cette mesure |
+| Faits production | mesure live la plus recente ; snapshot runtime `/var/lib/fundafrica/runtime/PRODUCTION_STATE.json` sur S2 ; `api_opcv/docs/ETAT_PRODUCTION_VERIFIE.md` lorsqu'il reflete cette mesure |
+| Snapshot historique Git | `api_opcv/PRODUCTION_STATE.json` est un fallback/historique ; il n'est pas l'autorite live et ne doit plus etre rafraichi par des commits automatiques S2 |
 | Schema attendu | migrations + modeles versionnes, confrontes au schema DB reel avant migration |
 | Donnees financieres | sources et pipelines canoniques documentes pour chaque pays/domaine ; jamais une supposition IA |
 | Deploiement | scripts/procedures versionnes confrontes au runtime reel |
@@ -36,6 +37,8 @@ FUND_STATE = (API_HEAD, FRONTEND_HEAD, SUIVI_CHECKPOINT, PRODUCTION_ATTESTATION)
 5. Pour une contradiction structurante, appliquer la regle la plus restrictive et ne jamais trancher silencieusement.
 6. Une source secondaire, un exemple ou une donnee calculee ne remplace jamais l'autorite primaire qui existe deja.
 7. `api_opcv/SUIVI.md` reste un pointeur ; aucune information operationnelle nouvelle ne doit y etre stockee.
+8. Un cron S2 peut mesurer et ecrire des artefacts runtime hors Git ; il ne doit jamais creer, commiter ou pousser un historique Git autonome.
+9. Le snapshot production live est runtime et hors working tree. Git conserve le code, la gouvernance et l'historique valide ; il ne sert pas de journal horaire de production.
 
 ## Branches de verite
 
