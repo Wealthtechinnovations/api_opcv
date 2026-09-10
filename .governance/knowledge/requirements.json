@@ -3,15 +3,227 @@
   "product": "AfricaFunds",
   "repository": "Wealthtechinnovations/api_opcv",
   "requirements": [
-    {"id":"AF-REQ-001","title":"Préserver l’existant","status":"IN_PROGRESS","authority":"GOVERNANCE.md","acceptance_criteria":["aucun document historique utile supprimé","aucune autorité dupliquée"],"evidence_required":["git_tree","document_review"],"dependencies":[]},
-    {"id":"AF-REQ-002","title":"Mémoire opérationnelle structurée","status":"IN_PROGRESS","authority":"docs/adr/ADR-AF-0002-operational-memory-and-loop.md","acceptance_criteria":["STATUS/LOOP/WORK_LOG/HANDOFF/NEXT_ACTION présents et rôles distincts"],"evidence_required":["git_tree","governance_validation"],"dependencies":["AF-REQ-001"]},
-    {"id":"AF-REQ-003","title":"Loop Engineering","status":"IN_PROGRESS","authority":"LOOP_ENGINEERING.md","acceptance_criteria":["baseline, verify, regression, persist et next action appliqués"],"evidence_required":["loop_state","work_log"],"dependencies":["AF-REQ-002"]},
-    {"id":"AF-REQ-004","title":"Double HEAD AfricaFunds","status":"VERIFIED","authority":"SOURCE_OF_TRUTH.md","acceptance_criteria":["API_HEAD et FRONTEND_HEAD suivis séparément"],"evidence_required":["git_state"],"dependencies":[]},
-    {"id":"AF-REQ-005","title":"GitHub-S2-runtime","status":"VERIFIED","authority":"docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md","acceptance_criteria":["GitHub autorité Git","runtime ne fabrique pas l’historique"],"evidence_required":["GOV-006"],"dependencies":[]},
-    {"id":"AF-REQ-006","title":"Quality gates","status":"IN_PROGRESS","authority":"docs/05-quality/QUALITY_GATES.md","acceptance_criteria":["contrôles applicables documentés et non inventés"],"evidence_required":["ci","tests"],"dependencies":["AF-REQ-001"]},
-    {"id":"AF-REQ-007","title":"Gouvernance IA","status":"IN_PROGRESS","authority":"AGENTS.md","acceptance_criteria":["autonomie, approval et tools documentés"],"evidence_required":["git_tree"],"dependencies":["AF-REQ-001"]},
-    {"id":"AF-REQ-008","title":"Data integrity","status":"IN_PROGRESS","authority":"docs/03-data/CANONICAL_DATA_DICTIONARY_V1.md","acceptance_criteria":["null != 0","provenance et transformations traçables"],"evidence_required":["data_tests"],"dependencies":[]},
-    {"id":"AF-REQ-009","title":"Delivery gouverné","status":"IN_PROGRESS","authority":"docs/06-delivery/DEPLOYMENT.md","acceptance_criteria":["déploiement séparé du commit","attestation si production touchée"],"evidence_required":["workflow","runtime_attestation"],"dependencies":["AF-REQ-006"]},
-    {"id":"AF-REQ-010","title":"Décisions versionnées","status":"IN_PROGRESS","authority":"docs/DECISIONS.md","acceptance_criteria":["décisions structurantes indexées et ADR détaillées"],"evidence_required":["git_tree"],"dependencies":[]}
+    {
+      "id": "AF-REQ-001",
+      "title": "Préserver l’existant",
+      "status": "IN_PROGRESS",
+      "authority": "GOVERNANCE.md",
+      "acceptance_criteria": [
+        "aucun document historique utile supprimé",
+        "aucune autorité dupliquée"
+      ],
+      "evidence_required": [
+        "git_tree",
+        "document_review"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-002",
+      "title": "Mémoire opérationnelle structurée",
+      "status": "IN_PROGRESS",
+      "authority": "docs/adr/ADR-AF-0002-operational-memory-and-loop.md",
+      "acceptance_criteria": [
+        "STATUS/LOOP/WORK_LOG/HANDOFF/NEXT_ACTION présents et rôles distincts"
+      ],
+      "evidence_required": [
+        "git_tree",
+        "governance_validation"
+      ],
+      "dependencies": [
+        "AF-REQ-001"
+      ]
+    },
+    {
+      "id": "AF-REQ-003",
+      "title": "Loop Engineering",
+      "status": "IN_PROGRESS",
+      "authority": "LOOP_ENGINEERING.md",
+      "acceptance_criteria": [
+        "baseline, verify, regression, persist et next action appliqués"
+      ],
+      "evidence_required": [
+        "loop_state",
+        "work_log"
+      ],
+      "dependencies": [
+        "AF-REQ-002"
+      ]
+    },
+    {
+      "id": "AF-REQ-004",
+      "title": "Double HEAD AfricaFunds",
+      "status": "VERIFIED",
+      "authority": "SOURCE_OF_TRUTH.md",
+      "acceptance_criteria": [
+        "API_HEAD et FRONTEND_HEAD suivis séparément"
+      ],
+      "evidence_required": [
+        "git_state"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-005",
+      "title": "GitHub-S2-runtime",
+      "status": "VERIFIED",
+      "authority": "docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md",
+      "acceptance_criteria": [
+        "GitHub autorité Git",
+        "runtime ne fabrique pas l’historique"
+      ],
+      "evidence_required": [
+        "GOV-006"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-006",
+      "title": "Quality gates",
+      "status": "IN_PROGRESS",
+      "authority": "docs/05-quality/QUALITY_GATES.md",
+      "acceptance_criteria": [
+        "contrôles applicables documentés et non inventés"
+      ],
+      "evidence_required": [
+        "ci",
+        "tests"
+      ],
+      "dependencies": [
+        "AF-REQ-001"
+      ]
+    },
+    {
+      "id": "AF-REQ-007",
+      "title": "Gouvernance IA",
+      "status": "IN_PROGRESS",
+      "authority": "AGENTS.md",
+      "acceptance_criteria": [
+        "autonomie, approval et tools documentés"
+      ],
+      "evidence_required": [
+        "git_tree"
+      ],
+      "dependencies": [
+        "AF-REQ-001"
+      ]
+    },
+    {
+      "id": "AF-REQ-008",
+      "title": "Data integrity",
+      "status": "IN_PROGRESS",
+      "authority": "docs/03-data/CANONICAL_DATA_DICTIONARY_V1.md",
+      "acceptance_criteria": [
+        "null != 0",
+        "provenance et transformations traçables"
+      ],
+      "evidence_required": [
+        "data_tests"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-009",
+      "title": "Delivery gouverné",
+      "status": "IN_PROGRESS",
+      "authority": "docs/06-delivery/DEPLOYMENT.md",
+      "acceptance_criteria": [
+        "déploiement séparé du commit",
+        "attestation si production touchée"
+      ],
+      "evidence_required": [
+        "workflow",
+        "runtime_attestation"
+      ],
+      "dependencies": [
+        "AF-REQ-006"
+      ]
+    },
+    {
+      "id": "AF-REQ-010",
+      "title": "Décisions versionnées",
+      "status": "IN_PROGRESS",
+      "authority": "docs/DECISIONS.md",
+      "acceptance_criteria": [
+        "décisions structurantes indexées et ADR détaillées"
+      ],
+      "evidence_required": [
+        "git_tree"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-011",
+      "title": "Aucune serie de VL ne melange deux echelles monetaires",
+      "status": "OPEN",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "acceptance_criteria": [
+        "Aucun fonds ne presente un rapport max/min proche d un taux de change sur 12 mois",
+        "Toute valeur ecrite est LUE dans la source publiee, jamais calculee"
+      ],
+      "evidence_required": [
+        "scripts/diag/ondemand/diag_plateaux_nigeria.js",
+        "data_tests"
+      ],
+      "dependencies": [],
+      "note": "C7 — 15 series, facteur ~1500 (taux NGN/USD). 157 VL identifiees, correctif prepare et dry-run valide ; ecriture soumise au verrou VALIDER CORRECTION SEGMENTS NAIRA."
+    },
+    {
+      "id": "AF-REQ-012",
+      "title": "Aucune performance recente au-dela de 500 %",
+      "status": "OPEN",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "acceptance_criteria": [
+        "Aucune performance YTD ou 1 an hors de [-100 %, +500 %] sans justification documentee"
+      ],
+      "evidence_required": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "dependencies": [],
+      "note": "C3 — consequence directe de C7 : la VL de reference et la VL courante ne sont pas dans la meme unite."
+    },
+    {
+      "id": "AF-REQ-013",
+      "title": "Les performances suivent les VL",
+      "status": "OPEN",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "acceptance_criteria": [
+        "Part des fonds dont la performance atteint leur derniere VL >= 80 % par pays"
+      ],
+      "evidence_required": [
+        "scripts/monitoring/check_cron_health.js"
+      ],
+      "dependencies": [],
+      "note": "C8 — MAROC 1.4 %, TUNISIE 6.1 %, UEMOA 32.4 %. VL fraiches mais performances perimees : le site affiche des chiffres plausibles et faux."
+    },
+    {
+      "id": "AF-REQ-014",
+      "title": "Aucune performance orpheline en tete de serie",
+      "status": "OPEN",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "acceptance_criteria": [
+        "Aucun fonds dont la performance la plus recente porte une date sans VL",
+        "Instruction fonds par fonds AVANT toute suppression"
+      ],
+      "evidence_required": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "dependencies": [],
+      "note": "C2 — 14 fonds en local, 23 en EUR, 23 en USD. C est cette performance que l API sert."
+    },
+    {
+      "id": "AF-REQ-015",
+      "title": "Fraicheur des VL par pays dans le budget declare",
+      "status": "OPEN",
+      "authority": "src/lib/freshness_budgets.js",
+      "acceptance_criteria": [
+        "Chaque pays respecte le budget de fraicheur declare, ou l ecart est justifie"
+      ],
+      "evidence_required": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "dependencies": [],
+      "note": "C4 — NIGERIA 27 j (budget 14), TUNISIE 13 j (budget 9). CEMAC 637 j reste une ALERTE toleree : aucun pipeline."
+    }
   ]
 }
