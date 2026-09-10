@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "evidenceName": "GOV-006 GitHub-S2 reconciliation evidence",
+  "project": "AfricaFunds / FundAfrica",
+  "date": "2026-09-10",
+  "canonicalBranch": "claude/code-review-improvements-ikvuj",
+  "repositories": {
+    "api": {
+      "repository": "Wealthtechinnovations/api_opcv",
+      "remoteObservedOnS2": "https://github.com/Wealthtechinnovations/api_opcv.git",
+      "preDocumentationS2Head": "723f893da2d6925b03cd1c81c9a91b6440ddaacf",
+      "preDocumentationRemoteComparison": {
+        "status": "identical",
+        "aheadBy": 0,
+        "behindBy": 0
+      },
+      "localCommitClassification": {
+        "exclusiveLocalCommits": 854,
+        "productionStateOnlyCommits": 854,
+        "applicationCodeCommits": 0
+      },
+      "oldLocalTipRecordedDuringReconciliation": "cbcaf66966ba54e2ba52c7f3ea76140733278078",
+      "untrackedObserved": [
+        "0",
+        "data/datejour_snapshots/",
+        "data/naira_snapshots/",
+        "data/scale_break_snapshots/",
+        "sec_ng_downloads/"
+      ],
+      "unknownArtifacts": ["0"]
+    },
+    "frontend": {
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "remoteObservedOnS2": "https://github.com/Wealthtechinnovations/front_end_opcvm.git",
+      "preDocumentationS2Head": "edd597b18e5879667152c92164226437a259f42b",
+      "preDocumentationRemoteComparison": {
+        "status": "identical",
+        "aheadBy": 0,
+        "behindBy": 0
+      },
+      "preservedLocalChange": "package-lock.json engines.node >=18.17.0",
+      "ignoredLocalRuntimeLogs": ".mcp_logs/"
+    }
+  },
+  "runtimeSnapshot": {
+    "canonicalRuntimePath": "/var/lib/fundafrica/runtime/PRODUCTION_STATE.json",
+    "historicalGeneratedAtRecordedDuringGov006": "2026-09-10T02:08:14.243Z",
+    "requiredInvariant": "Git HEAD must not change when the runtime snapshot is generated"
+  },
+  "backupRecordedDuringReconciliation": {
+    "root": "/var/backups/fundafrica-governance/20260910T020803Z",
+    "apiBundle": "api/local-branch-before.bundle",
+    "bundleVerifyRecorded": "success"
+  },
+  "runtimeObserved": {
+    "pm2": {
+      "api-monolith": "online",
+      "fundafrique-frontend": "online",
+      "worker-data-import": "online",
+      "worker-recalculation": "online"
+    },
+    "publicHttps": {
+      "url": "https://africafunds.chainsolutions.fr",
+      "status": 200
+    },
+    "pm2VersionNote": {
+      "inMemory": "6.0.14",
+      "local": "6.0.13",
+      "classification": "separate non-blocking maintenance issue"
+    }
+  },
+  "dbReadonlyCountsRecordedDuringGov006": {
+    "funds": 2985,
+    "managementCompanies": 1915,
+    "valuations": 798462
+  },
+  "safety": {
+    "forcePushUsed": false,
+    "gitResetHardUsed": false,
+    "gitCleanFdUsed": false,
+    "unknownArtifactsDeleted": false,
+    "applicationCodeLocalCommitsLost": false
+  },
+  "closureRule": "After documentation commits, fresh GitHub HEADs must be measured, S2 must be synchronized non-destructively, and GitHub-S2-runtime equality must be re-attested before GOV-006 is CERTIFIED."
+}
