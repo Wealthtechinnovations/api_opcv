@@ -11,6 +11,10 @@ on:
       - 'SOURCE_OF_TRUTH.md'
       - 'LOOP_ENGINEERING.md'
       - 'SUIVI.md'
+      - 'docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md'
+      - 'docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md'
+      - 'docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md'
+      - 'docs/evidence/GOV-006_EVIDENCE_2026-09-10.json'
       - '.github/workflows/governance-contract.yml'
   workflow_dispatch:
 
@@ -63,6 +67,10 @@ jobs:
               'GOVERNANCE.md',
               'SOURCE_OF_TRUTH.md',
               'LOOP_ENGINEERING.md',
+              'docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md',
+              'docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md',
+              'docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md',
+              'docs/evidence/GOV-006_EVIDENCE_2026-09-10.json',
           ]
 
           if current_repo not in repos:
@@ -83,8 +91,18 @@ jobs:
           start_here = local_blob('00_START_HERE.md').decode('utf-8')
           if 'LOOP_ENGINEERING.md' not in start_here:
               raise SystemExit('00_START_HERE.md does not require LOOP_ENGINEERING.md')
+          if 'GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md' not in start_here:
+              raise SystemExit('00_START_HERE.md does not require GOV-006 reconciliation context')
           if branch not in start_here:
               raise SystemExit('00_START_HERE.md does not declare the canonical branch')
+
+          source_of_truth = local_blob('SOURCE_OF_TRUTH.md').decode('utf-8')
+          if '/var/lib/fundafrica/runtime/PRODUCTION_STATE.json' not in source_of_truth:
+              raise SystemExit('SOURCE_OF_TRUTH.md does not declare the runtime snapshot authority')
+
+          governance = local_blob('GOVERNANCE.md').decode('utf-8')
+          if 'RUNTIME_GIT_COMMITS = FORBIDDEN' not in governance:
+              raise SystemExit('GOVERNANCE.md does not forbid runtime-generated Git commits')
 
           if current_repo.endswith('/api_opcv'):
               suivi = local_blob('SUIVI.md').decode('utf-8', errors='replace')
@@ -108,9 +126,9 @@ jobs:
               return base64.b64decode(payload['content'])
 
           mismatches = []
-          # A mirrored write is performed sequentially across two repositories.
-          # Retry briefly so the first repository does not fail merely because the
-          # second canonical commit is still being created.
+          # Mirrored writes are sequential across two repositories. Retry briefly
+          # so the first repository does not fail only because its peer commit is
+          # still being created.
           for attempt in range(1, 7):
               mismatches = []
               for path in mirror_files:
@@ -135,5 +153,6 @@ jobs:
           print('Repository:', current_repo)
           print('Peer:', peer_repo)
           print('Canonical branch:', branch)
+          print('Mirrored files checked:', len(mirror_files))
           print('Local HEAD:', subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip())
           PY
