@@ -155,17 +155,23 @@ async function main() {
         `derniere VL ${String(r.derniere).slice(0, 10)}, soit ${r.age} j`);
     }
 
-    // C5 — le snapshot que CLAUDE.md declare source de verite est-il reellement frais ?
-    const snap = path.resolve(__dirname, '../../PRODUCTION_STATE.json');
-    let snapOk = false, snapDetail = 'fichier absent';
+    // C5 — le snapshot runtime doit etre frais. Depuis GOV-006, S2 n'ecrit plus
+    // de commits Git horaires : le snapshot live est hors du working tree.
+    // Fallback historique conserve pour les clones/environnements non migres.
+    const runtimeSnap = process.env.FUNDAFRICA_PRODUCTION_STATE
+      || '/var/lib/fundafrica/runtime/PRODUCTION_STATE.json';
+    const legacySnap = path.resolve(__dirname, '../../PRODUCTION_STATE.json');
+    const snap = fs.existsSync(runtimeSnap) ? runtimeSnap : legacySnap;
+    const snapSource = snap === runtimeSnap ? 'runtime' : 'fallback historique';
+    let snapOk = false, snapDetail = `fichier absent (${runtimeSnap} et ${legacySnap})`;
     if (fs.existsSync(snap)) {
       const gen = JSON.parse(fs.readFileSync(snap, 'utf8')).generated_at;
       const ageH = (Date.now() - new Date(gen).getTime()) / 3600000;
       snapOk = ageH <= 6;
-      snapDetail = `genere le ${String(gen).slice(0, 16)}, soit ${ageH.toFixed(1)} h`;
-      if (!snapOk) snapDetail += ' — CLAUDE.md en fait la source de verite : ne pas s\'y fier en l\'etat';
+      snapDetail = `${snapSource}: genere le ${String(gen).slice(0, 16)}, soit ${ageH.toFixed(1)} h`;
+      if (!snapOk) snapDetail += ' — snapshot perime : ne pas s\'y fier en l\'etat';
     }
-    record('C5', 'AVERTISSEMENT', 'Snapshot PRODUCTION_STATE.json frais (< 6 h)', snapOk, snapDetail);
+    record('C5', 'AVERTISSEMENT', 'Snapshot production runtime frais (< 6 h)', snapOk, snapDetail);
 
     // C7 — series de VL contaminees par deux echelles de devise.
     //
