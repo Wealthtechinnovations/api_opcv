@@ -1,10 +1,10 @@
 {
   "schema_version":"1.0.0",
-  "loop_id":"AF-GOV-REGULATORY-PLUS-001",
-  "stage":"IMPLEMENT_COMPATIBLY",
-  "api_sha":"cd24305db790f4c0c3f663ef1cca037978145ef6",
-  "frontend_sha":"345991d153c08f95f9a0bcfc7180e71352fc0b43",
-  "next_action":"Publier le commit API Regulatory Plus, vérifier le remote et les checks, puis appliquer l’intégration correspondante au frontend.",
+  "loop_id":"AF-GOV-RECONCILE-20260910-01",
+  "stage":"PERSIST_STATE",
+  "api_sha":"584793adc956831543b4daf995a30f774fcb9453",
+  "frontend_sha":"e2ac5996c4429910f378b1ddd8b111a08e2d96cf",
+  "next_action":"Vérifier le commit de réconciliation sur le remote et ses checks CI, puis poursuivre l’audit de parité Regulatory actuelle et sélectionner le prochain lot exécutable sans régression.",
   "blockers":[],
-  "proof_refs":["AF-EVD-001","AF-EVD-002"]
+  "proof_refs":["AF-EVD-013","AF-EVD-014","AF-EVD-015","AF-EVD-016","AF-EVD-017"]
 }

@@ -1,8 +1,8 @@
 {
   "schema_version":"1.0.0",
   "tasks":[
-    {"id":"AF-TASK-001","title":"Intégration Regulatory Plus API","status":"IN_PROGRESS","requirements":["AF-REQ-001","AF-REQ-002","AF-REQ-003","AF-REQ-006","AF-REQ-007","AF-REQ-010"],"next_action":"Commit + validation remote"},
-    {"id":"AF-TASK-002","title":"Intégration Regulatory Plus frontend","status":"READY","requirements":["AF-REQ-001","AF-REQ-002","AF-REQ-003","AF-REQ-006","AF-REQ-007","AF-REQ-010"],"depends_on":["AF-TASK-001"],"next_action":"Construire le tree frontend sans écraser l’existant"},
-    {"id":"AF-TASK-003","title":"Attestation finale bi-repository","status":"BLOCKED","depends_on":["AF-TASK-001","AF-TASK-002"],"next_action":"Relever les deux HEAD et contrôles puis persister le checkpoint"}
+    {"id":"AF-TASK-001","title":"Intégration Regulatory Plus API","status":"DONE","requirements":["AF-REQ-001","AF-REQ-002","AF-REQ-003","AF-REQ-006","AF-REQ-007","AF-REQ-010"],"next_action":"Terminé : intégration publiée ; conserver les preuves et poursuivre par réconciliation de l’état courant."},
+    {"id":"AF-TASK-002","title":"Intégration Regulatory Plus frontend","status":"DONE","requirements":["AF-REQ-001","AF-REQ-002","AF-REQ-003","AF-REQ-006","AF-REQ-007","AF-REQ-010"],"depends_on":["AF-TASK-001"],"next_action":"Terminé : miroir racine et contrat de gouvernance frontend publiés et contrôlés par CI."},
+    {"id":"AF-TASK-003","title":"Attestation finale bi-repository de la gouvernance","status":"IN_PROGRESS","depends_on":["AF-TASK-001","AF-TASK-002"],"next_action":"Réconcilier les registres devenus périmés, vérifier les HEAD et CI actuels, contrôler les écarts avec Regulatory/main actuel, puis persister le verdict et la prochaine action."}
   ]
 }

@@ -34,7 +34,47 @@
       "provenance": "ops-mysql-memoire.yml -> journalctl -k / journalctl -u mariadb",
       "observed_at": "2026-09-10T05:33:00Z",
       "summary": "OOM-kill de mariadbd le 2026-09-08 20:02:42 a 14,6 Go RSS, declenche par un node de cron.service. Aucun redemarrage automatique : service relance le 2026-09-09 06:25:03. Indisponibilite 10 h 22."
+    },
+    {
+      "id": "AF-EVD-013",
+      "type": "GIT_STATE",
+      "result": "OBSERVED",
+      "provenance": "GitHub canonical API branch observed before governance reconciliation commit",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "584793adc956831543b4daf995a30f774fcb9453"
+    },
+    {
+      "id": "AF-EVD-014",
+      "type": "GIT_STATE",
+      "result": "OBSERVED",
+      "provenance": "GitHub canonical frontend branch observed before governance reconciliation commit",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "e2ac5996c4429910f378b1ddd8b111a08e2d96cf"
+    },
+    {
+      "id": "AF-EVD-015",
+      "type": "CI",
+      "result": "PASS",
+      "provenance": "GitHub Actions Governance Regulatory Plus on API canonical branch",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "584793adc956831543b4daf995a30f774fcb9453"
+    },
+    {
+      "id": "AF-EVD-016",
+      "type": "CI",
+      "result": "PASS",
+      "provenance": "GitHub Actions governance-contract on frontend canonical branch",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "e2ac5996c4429910f378b1ddd8b111a08e2d96cf"
+    },
+    {
+      "id": "AF-EVD-017",
+      "type": "REFERENCE_GOVERNANCE",
+      "result": "OBSERVED",
+      "provenance": "chainsolutions-wealthtech/Regulatory main current reference",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "4590be6800dd3dbb5c9dde106509967082e28afc"
     }
   ],
-  "note": "Les preuves de ce commit et de la CI seront ajoutées après publication et observation réelle; elles ne sont pas pré-déclarées PASS."
+  "note": "Les preuves historiques sont conservées. Les nouvelles preuves sont ajoutées sans réécrire les observations précédentes ; tout HEAD doit être réobservé avant une nouvelle écriture."
 }
