@@ -64,6 +64,31 @@ Un recouvrement de sujet n’est pas une duplication. Les rôles suivants sont d
 
 Aucun de ces registres ne remplace l’historique de `SUIVI.md`.
 
+### Où vivent ces registres
+
+Ce fichier est **identique dans les deux dépôts**, mais les registres qu’il
+prescrit ne le sont pas — et ce n’est pas un oubli : les dupliquer créerait deux
+autorités concurrentes pour une même question, ce que `GOVERNANCE.md` interdit.
+
+| Registre | Dépôt porteur |
+|---|---|
+| `SUIVI.md` — historique et checkpoint global | `front_end_opcvm` |
+| `SUIVI.md` — pointeur, ne rien y écrire | `api_opcv` |
+| `PROJECT_CONTEXT.md`, `STATUS.md`, `NEXT_ACTION.md` | `api_opcv` |
+| `LOOP_STATE.md`, `CURRENT_ITERATION.md`, `LOOP_CONTRACT.md` | `api_opcv` |
+| `WORK_LOG.md`, `HANDOFF.md`, `OPEN_QUESTIONS.md` | `api_opcv` |
+| `DOCUMENT_INDEX.md`, `FILES_CATALOG.md`, `docs/DECISIONS.md` | `api_opcv` |
+| `.governance/` — projections machine-readable | `api_opcv` |
+| `docs/ETAT_PRODUCTION_VERIFIE.md` — état **mesuré** | `api_opcv` |
+| `CLAUDE.md`, `DIRECTIVE_TRAVAIL.md`, `README.md`, `TODO.md` | les deux |
+
+**Une session travaillant sur `front_end_opcvm` doit donc lire ces registres dans
+`api_opcv`.** Sans cette précision, l’ordre de lecture obligatoire ci-dessus
+envoyait chercher douze fichiers absents du dépôt ouvert — et une lecture qui
+échoue en silence ramène l’agent à supposer, ce que ce fichier existe précisément
+pour empêcher.
+
+
 ## Branches canoniques
 
 ```text
