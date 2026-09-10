@@ -4,26 +4,43 @@
 
 ## Action courante
 
-Lancer `.github/workflows/ops-fix-segments-naira.yml` en mode `execute`, entrée
-`recalculer: false`, avec la phrase exacte `VALIDER CORRECTION SEGMENTS NAIRA`.
+Donner à `mariadb.service` une politique de redémarrage automatique couvrant
+l'arrêt par OOM, sur S2 :
 
-Cela corrige les 157 VL libellées en dollars dans des séries tenues en naira
-(`AF-REQ-011` / C7) et, par voie de conséquence, les performances aberrantes
-(`AF-REQ-012` / C3). Périmètre mesuré et dry-run validé le 2026-09-01 : 41
-segments sur 30 fonds, dont 145 VL dans 29 plateaux. Chaque valeur écrite est
-LUE dans la source SEC pour sa date exacte — aucune n'est calculée.
+```ini
+# /etc/systemd/system/mariadb.service.d/override.conf
+[Service]
+Restart=on-failure
+RestartSec=10
+```
+puis `systemctl daemon-reload`.
+
+## Pourquoi celle-ci d'abord
+
+Mesure du 2026-09-10 (`AF-EVD-012`) : le 2026-09-08 à 20:02:42, `mariadbd` a été
+tué par l'OOM-killer à 14,6 Go, par un `node` lancé depuis `cron.service` — deux
+minutes après le démarrage de `cron_daily_update.sh`. `systemd` a constaté
+`Failed with result 'oom-kill'` **puis n'a rien fait**. Le service n'est reparti
+que le 2026-09-09 à 06:25:03 : **10 h 22 sans base, donc sans API**.
+
+L'incident se reproduira — le cron de recalcul tourne chaque jour ouvré à 20:00.
+Cette ligne ramène l'indisponibilité de dix heures à quelques secondes. Elle ne
+traite pas la cause (pic de RSS à 14,6 Go pour un buffer pool de 128 Mo,
+`AF-REQ-016` second critère), mais elle en supprime la conséquence la plus
+coûteuse.
 
 ## Gate
 
-`REQUIRED_HUMAN_APPROVAL`. La phrase de confirmation est un verrou délibéré : il
-existe pour que cette écriture en base financière de production soit un acte
-tracé du propriétaire, non un effet de bord d'une boucle automatique. Une session
-disposant d'un accès API GitHub authentifié pourrait techniquement la fournir
-elle-même — elle ne doit pas.
+`REQUIRED_HUMAN_APPROVAL` — modification de configuration d'un service de
+production. Aucun outil gouverné de cette session n'écrit dans `/etc/systemd`.
 
-`recalculer: false` est recommandé : le recalcul EUR/USD porte sur ~990 000
-lignes, et c'est ce profil de charge qui a fait tuer `mariadbd` par l'OOM-killer
-le 2026-08-31. Le cron de 20 h s'en charge.
+## Action suivante, une fois celle-ci faite
+
+Lancer `.github/workflows/ops-fix-segments-naira.yml` en mode `execute`,
+`recalculer: false`, phrase `VALIDER CORRECTION SEGMENTS NAIRA` — corrige les 157
+VL (`AF-REQ-011` / C7) et les performances aberrantes (`AF-REQ-012` / C3).
+`recalculer: false` reste recommandé : le recalcul EUR/USD porte sur ~990 000
+lignes, exactement le profil de charge qui provoque l'OOM.
 
 ## Stop conditions
 
