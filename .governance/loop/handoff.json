@@ -1,0 +1,11 @@
+{
+  "schema_version":"1.0.0",
+  "product":"AfricaFunds",
+  "loop_id":"AF-GOV-REGULATORY-PLUS-001",
+  "repository":"Wealthtechinnovations/api_opcv",
+  "baseline_api_sha":"cd24305db790f4c0c3f663ef1cca037978145ef6",
+  "frontend_sha_at_last_observation":"345991d153c08f95f9a0bcfc7180e71352fc0b43",
+  "completed":["reference Regulatory inspected","existing AfricaFunds governance preserved","additive API tree prepared"],
+  "open":["commit API","validate remote/checks","integrate frontend","final cross-repo attestation"],
+  "next_action":"Commit API tree in fast-forward only and verify GitHub state."
+}

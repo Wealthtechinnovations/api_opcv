@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "product": "AfricaFunds",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "requirements": [
+    {"id":"AF-REQ-001","title":"Préserver l’existant","status":"IN_PROGRESS","authority":"GOVERNANCE.md","acceptance_criteria":["aucun document historique utile supprimé","aucune autorité dupliquée"],"evidence_required":["git_tree","document_review"],"dependencies":[]},
+    {"id":"AF-REQ-002","title":"Mémoire opérationnelle structurée","status":"IN_PROGRESS","authority":"docs/adr/ADR-AF-0002-operational-memory-and-loop.md","acceptance_criteria":["STATUS/LOOP/WORK_LOG/HANDOFF/NEXT_ACTION présents et rôles distincts"],"evidence_required":["git_tree","governance_validation"],"dependencies":["AF-REQ-001"]},
+    {"id":"AF-REQ-003","title":"Loop Engineering","status":"IN_PROGRESS","authority":"LOOP_ENGINEERING.md","acceptance_criteria":["baseline, verify, regression, persist et next action appliqués"],"evidence_required":["loop_state","work_log"],"dependencies":["AF-REQ-002"]},
+    {"id":"AF-REQ-004","title":"Double HEAD AfricaFunds","status":"VERIFIED","authority":"SOURCE_OF_TRUTH.md","acceptance_criteria":["API_HEAD et FRONTEND_HEAD suivis séparément"],"evidence_required":["git_state"],"dependencies":[]},
+    {"id":"AF-REQ-005","title":"GitHub-S2-runtime","status":"VERIFIED","authority":"docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md","acceptance_criteria":["GitHub autorité Git","runtime ne fabrique pas l’historique"],"evidence_required":["GOV-006"],"dependencies":[]},
+    {"id":"AF-REQ-006","title":"Quality gates","status":"IN_PROGRESS","authority":"docs/05-quality/QUALITY_GATES.md","acceptance_criteria":["contrôles applicables documentés et non inventés"],"evidence_required":["ci","tests"],"dependencies":["AF-REQ-001"]},
+    {"id":"AF-REQ-007","title":"Gouvernance IA","status":"IN_PROGRESS","authority":"AGENTS.md","acceptance_criteria":["autonomie, approval et tools documentés"],"evidence_required":["git_tree"],"dependencies":["AF-REQ-001"]},
+    {"id":"AF-REQ-008","title":"Data integrity","status":"IN_PROGRESS","authority":"docs/03-data/CANONICAL_DATA_DICTIONARY_V1.md","acceptance_criteria":["null != 0","provenance et transformations traçables"],"evidence_required":["data_tests"],"dependencies":[]},
+    {"id":"AF-REQ-009","title":"Delivery gouverné","status":"IN_PROGRESS","authority":"docs/06-delivery/DEPLOYMENT.md","acceptance_criteria":["déploiement séparé du commit","attestation si production touchée"],"evidence_required":["workflow","runtime_attestation"],"dependencies":["AF-REQ-006"]},
+    {"id":"AF-REQ-010","title":"Décisions versionnées","status":"IN_PROGRESS","authority":"docs/DECISIONS.md","acceptance_criteria":["décisions structurantes indexées et ADR détaillées"],"evidence_required":["git_tree"],"dependencies":[]}
+  ]
+}

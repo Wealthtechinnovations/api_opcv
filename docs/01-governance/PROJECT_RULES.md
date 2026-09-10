@@ -1,0 +1,3 @@
+# PROJECT_RULES — AfricaFunds API
+
+Règles : branche canonique existante uniquement ; single writer par scope ; deux HEAD observés avant write ; zéro régression ; réutilisation avant création ; migration compatible ; aucune donnée/validation inventée ; documentation et preuves dans le même chantier ; GitHub autorité Git ; S2 projection/runtime ; toute opération destructive exige décision explicite et plan de rollback.

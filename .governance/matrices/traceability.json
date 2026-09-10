@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "rows": [
+    {"requirement_id":"AF-REQ-001","change_refs":["DOCUMENT_INTEGRATION_MATRIX.md","FILES_CATALOG.md"],"test_refs":["scripts/governance/validate_regulatory_plus.py"],"evidence_refs":[]},
+    {"requirement_id":"AF-REQ-002","change_refs":["STATUS.md","LOOP_STATE.md","CURRENT_ITERATION.md","WORK_LOG.md","HANDOFF.md","NEXT_ACTION.md"],"test_refs":["scripts/governance/validate_regulatory_plus.py"],"evidence_refs":[]},
+    {"requirement_id":"AF-REQ-003","change_refs":["LOOP_ENGINEERING.md","LOOP_CONTRACT.md","docs/09-loop/"],"test_refs":["scripts/governance/validate_regulatory_plus.py"],"evidence_refs":[]},
+    {"requirement_id":"AF-REQ-004","change_refs":["SOURCE_OF_TRUTH.md","PROJECT_CONTEXT.md"],"test_refs":[],"evidence_refs":["AF-EVD-001"]},
+    {"requirement_id":"AF-REQ-005","change_refs":["docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md"],"test_refs":[],"evidence_refs":[]},
+    {"requirement_id":"AF-REQ-006","change_refs":["docs/05-quality/"],"test_refs":["scripts/governance/validate_regulatory_plus.py"],"evidence_refs":[]},
+    {"requirement_id":"AF-REQ-007","change_refs":["docs/10-ai/"],"test_refs":["scripts/governance/validate_regulatory_plus.py"],"evidence_refs":[]},
+    {"requirement_id":"AF-REQ-008","change_refs":["docs/03-data/","docs/12-optional/DATA_QUALITY.md"],"test_refs":[],"evidence_refs":[]},
+    {"requirement_id":"AF-REQ-009","change_refs":["docs/06-delivery/","docs/07-operations/"],"test_refs":[],"evidence_refs":[]},
+    {"requirement_id":"AF-REQ-010","change_refs":["docs/DECISIONS.md","docs/adr/"],"test_refs":["scripts/governance/validate_regulatory_plus.py"],"evidence_refs":[]}
+  ]
+}

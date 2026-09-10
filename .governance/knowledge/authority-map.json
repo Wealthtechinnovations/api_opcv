@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "product": "AfricaFunds",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "domains": [
+    {"domain":"governance","authority":"GOVERNANCE.md","representation":"HUMAN_NORMATIVE"},
+    {"domain":"authority_resolution","authority":"SOURCE_OF_TRUTH.md","representation":"HUMAN_NORMATIVE"},
+    {"domain":"global_history_checkpoint","authority":"Wealthtechinnovations/front_end_opcvm/SUIVI.md","representation":"HUMAN_NORMATIVE"},
+    {"domain":"current_api_state","authority":"STATUS.md","representation":"OPERATIONAL_VIEW"},
+    {"domain":"loop_state","authority":".governance/loop/state.json","representation":"MACHINE_CANONICAL"},
+    {"domain":"requirements","authority":".governance/knowledge/requirements.json","representation":"MACHINE_CANONICAL_IDS"},
+    {"domain":"evidence","authority":".governance/knowledge/evidence.json","representation":"MACHINE_CANONICAL_INDEX"},
+    {"domain":"git_s2_runtime","authority":"docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md","representation":"SPECIALIZED_HUMAN"}
+  ],
+  "rule": "Une projection machine ne remplace pas une politique humaine normative; toute contradiction ferme le write gate jusqu’à réconciliation."
+}

@@ -1,0 +1,3 @@
+# AUTONOMOUS_COMPLETION_MATRIX — Adaptation AfricaFunds
+
+Le fichier Regulatory daté est spécifique à son audit. Pour AfricaFunds, l’autonomie se décide selon risque : read/analysis et validations déterministes peuvent continuer automatiquement ; écriture bornée selon single writer ; production, migration destructive, secret, source de vérité et suppression exigent gate/approbation. Voir `docs/10-ai/AUTONOMY_LEVELS.md`.

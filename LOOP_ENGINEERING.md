@@ -1,12 +1,12 @@
-# LOOP_ENGINEERING - FundAfrica
+# LOOP_ENGINEERING — AfricaFunds
 
 > Statut : `APPLICABLE`
-> Portee : `Wealthtechinnovations/api_opcv` + `Wealthtechinnovations/front_end_opcvm`.
-> Nature : methode d'execution commune a tous les humains, agents IA et automatisations. Ce document complete sans remplacer `GOVERNANCE.md`, `SOURCE_OF_TRUTH.md`, `AGENTS.md`, `DIRECTIVE_TRAVAIL.md`, `CLAUDE.md` et le `SUIVI.md` canonique.
+> Portée : `Wealthtechinnovations/api_opcv` + `Wealthtechinnovations/front_end_opcvm`.
+> Nature : méthode d’exécution commune à tous les humains, agents IA et automatisations. Ce document complète sans remplacer `GOVERNANCE.md`, `SOURCE_OF_TRUTH.md`, `AGENTS.md`, `DIRECTIVE_TRAVAIL.md`, `CLAUDE.md` et le `SUIVI.md` canonique.
 
-## 1. Etat canonique
+## 1. État canonique
 
-FundAfrica est un seul produit reparti sur deux depots. L'etat courant est un tuple, jamais un SHA isole :
+AfricaFunds est un seul produit réparti sur deux dépôts. L’état courant est un tuple, jamais un SHA isolé :
 
 ```text
 FUND_STATE = (
@@ -17,18 +17,20 @@ FUND_STATE = (
 )
 ```
 
-Branches canoniques actuelles dans les deux depots : `claude/code-review-improvements-ikvuj`. Le prefixe `claude/` est historique et ne confere aucune propriete exclusive a Claude.
+Branches canoniques actuelles dans les deux dépôts : `claude/code-review-improvements-ikvuj`. Le préfixe `claude/` est historique et ne confère aucune propriété exclusive à Claude.
 
 ## 2. Contrat de boucle
 
-Toute boucle possede obligatoirement :
+Toute boucle possède obligatoirement :
 
-- **TRIGGER** : raison verifiable d'ouverture ;
-- **SCOPE** : une tache ou Integration Slot borne ;
+- **TRIGGER** : raison vérifiable d’ouverture ;
+- **SCOPE** : une tâche ou Integration Slot borné ;
 - **ACTION** : plus petit changement compatible ;
-- **BUDGET** : fichiers, depots, DB, services, droits et interdictions ;
-- **STOP** : criteres objectifs de fin ou de blocage ;
-- **REPORT** : preuves, nouvel etat et une seule prochaine action.
+- **BUDGET** : fichiers, dépôts, DB, services, droits et interdictions ;
+- **STOP** : critères objectifs de fin ou de blocage ;
+- **REPORT** : preuves, nouvel état et une seule prochaine action.
+
+Voir aussi `LOOP_CONTRACT.md`.
 
 ## 3. Boucle canonique
 
@@ -53,37 +55,37 @@ DISCOVER
 -> SELECT_NEXT
 ```
 
-Aucune etape applicable ne peut etre silencieusement sautee.
+Aucune étape applicable ne peut être silencieusement sautée.
 
 ## 4. DISCOVER
 
-Avant toute modification, lire dans cet ordre : `00_START_HERE.md`, `GOVERNANCE.md`, `SOURCE_OF_TRUTH.md`, `AGENTS.md`, `LOOP_ENGINEERING.md`, `docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md`, `docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md`, `docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md`, `DIRECTIVE_TRAVAIL.md`, les `CLAUDE.md` pertinents, `front_end_opcvm/SUIVI.md`, puis les README/TODO/ROADMAP/CODE_REVIEW/CHANGELOG/DEPLOYMENT et enfin le code, les tests, migrations, routes, modeles et scripts concernes.
+Lire l’ordre complet de `00_START_HERE.md`. La reprise opérationnelle utilise notamment `PROJECT_CONTEXT.md`, `STATUS.md`, le `SUIVI.md` global frontend, `NEXT_ACTION.md`, `LOOP_STATE.md`, `CURRENT_ITERATION.md`, `WORK_LOG.md` et `HANDOFF.md`, puis les décisions, GOV-006 et documents/code directement concernés.
 
-Toujours rechercher l'existant avant de creer une nouvelle autorite, table, composant, service, workflow ou mecanisme de suivi.
+Toujours rechercher l’existant avant de créer une nouvelle autorité, table, composant, service, workflow ou mécanisme de suivi. Les anciens documents restent exploités selon leur rôle.
 
 ## 5. RECONCILE
 
-Resoudre avant l'implementation : API_HEAD, FRONTEND_HEAD, checkpoint SUIVI, travaux actifs, commits/PR/checks pertinents, etat S2/runtime si concerne, etat DB/migrations si concerne.
+Résoudre avant implémentation : API_HEAD, FRONTEND_HEAD, checkpoint SUIVI, travaux actifs, commits/PR/checks pertinents, état S2/runtime si concerné, DB/migrations si concernées et contradictions entre vues opérationnelles.
 
-Les faits mesures de production priment sur une prose documentaire perimee. Une mesure absente vaut `UNKNOWN` ou `PENDING`, jamais `OK`.
+Les faits mesurés de production priment sur une prose périmée. Une mesure absente vaut `UNKNOWN` ou `PENDING`, jamais `OK`.
 
-Si S2 diverge, appliquer obligatoirement le gate GOV-006 de la section 20 avant toute synchronisation ou ecriture serveur.
+Si S2 diverge, appliquer le gate GOV-006 de la section 20 avant toute synchronisation ou écriture serveur.
 
 ## 6. BASELINE
 
-Enregistrer ce qui fonctionne avant modification : comportements, contrats API, routes/pages, donnees/comptages pertinents, calculs financiers representatifs, tests/build/lint/typecheck, cron/runtime et defauts preexistants.
+Enregistrer ce qui fonctionne avant modification : comportements, contrats API, routes/pages, données/comptages pertinents, calculs financiers représentatifs, tests/build/lint/typecheck, cron/runtime et défauts préexistants.
 
-Un defaut preexistant n'est pas une regression du nouveau lot, mais le nouveau lot ne doit jamais l'aggraver.
+Un défaut préexistant n’est pas une régression du nouveau lot, mais le nouveau lot ne doit jamais l’aggraver.
 
 ## 7. SELECT + IMPACT_ANALYSIS
 
-Choisir une seule tache atomique. Cartographier ses impacts frontend, backend, DB, donnees, calculs financiers, auth, imports/crons, sources externes, SEO, infra/runtime, deploiement et documentation.
+Choisir une seule tâche atomique à partir de l’état réel, des dépendances et de `NEXT_ACTION.md`. Cartographier impacts frontend, backend, DB, données, calculs, auth, imports/crons, sources, SEO, infra/runtime, déploiement et documentation.
 
-Si une autorite existante peut etre etendue, il est interdit de creer une autorite parallele.
+Si une autorité existante peut être étendue, il est interdit de créer une autorité parallèle.
 
 ## 8. VERIFY_HEADS
 
-Immediatement avant le premier write, relire les deux HEAD canoniques.
+Immédiatement avant le premier write, relire les deux HEAD canoniques :
 
 ```text
 EXPECTED_HEAD != ACTUAL_HEAD
@@ -91,56 +93,65 @@ EXPECTED_HEAD != ACTUAL_HEAD
 -> RECONCILE AGAIN
 ```
 
-Aucun force push, aucun rewrite d'historique, aucun ecrasement du travail concurrent.
+Aucun force push, rewrite d’historique ou écrasement du travail concurrent.
 
 ## 9. SINGLE WRITER
 
-Plusieurs agents peuvent lire/analyser simultanement. Un seul writer peut modifier un lot gouverne a un instant donne. Le writer possede un Integration Slot borne et le libere apres persistance de l'etat et verification distante. Tout agent suivant repart du nouveau FUND_STATE.
+Plusieurs agents peuvent lire/analyser simultanément. Un seul writer modifie un lot gouverné à un instant donné. Le writer possède un scope borné et le libère après persistance de l’état et vérification distante. Tout agent suivant repart du nouveau `FUND_STATE`.
 
 ## 10. IMPLEMENT COMPATIBLY
 
-Toujours preferer :
+Toujours préférer :
 
-`REUTILISER -> CORRIGER -> RENFORCER -> ETENDRE -> MIGRER COMPATIBLEMENT`.
+`RÉUTILISER -> CORRIGER -> RENFORCER -> ÉTENDRE -> MIGRER COMPATIBLEMENT`.
 
-Preserver les autorites existantes users/auth/fonds/SGO/documents/donnees. Preferer les migrations additives. Aucun `DROP TABLE`, `DROP COLUMN`, rename destructif, truncate ou suppression de donnees sans plan explicitement approuve. S2 reste une cible de deploiement, jamais une source de developpement independante.
+Préserver les autorités existantes users/auth/fonds/SGO/documents/données. Préférer les migrations additives. Aucun `DROP TABLE`, `DROP COLUMN`, rename destructif, truncate ou suppression de données sans plan explicitement approuvé. S2 reste cible de déploiement, jamais source de développement indépendante.
 
-Aucune donnee financiere absente, stale, aberrante ou non qualifiee ne peut etre transformee silencieusement en score valide.
+Aucune donnée financière absente, stale, aberrante ou non qualifiée ne peut être transformée silencieusement en score valide.
 
 ## 11. VERIFY
 
-Executer les controles deterministes applicables :
+Exécuter les contrôles déterministes applicables :
 
 - backend : syntaxe/type, tests, contrats API/routes, auth, migrations, calculs ;
 - frontend : typecheck, lint, build production, routes/pages, parcours critiques ;
-- data : comptages avant/apres, contraintes/FK, orphelins, stale/outliers ;
-- infra : runtime/PM2, cron, HTTP/API, DB si concernee.
+- data : comptages avant/après, contraintes/FK, orphelins, stale/outliers, provenance ;
+- infra : runtime/services, cron, HTTP/API, DB si concernée ;
+- gouvernance : cohérence des registres, JSON machine-readable, liens/autorités, absence de secret introduit.
 
 ## 12. REGRESSION_CHECK
 
-Comparer BEFORE vs AFTER. Une nouveaute fonctionnelle ne suffit pas : les comportements valides non concernes doivent rester valides. Aucun controle ne peut etre affaibli ou supprime uniquement pour obtenir un PASS.
+Comparer BEFORE vs AFTER. Une nouveauté fonctionnelle ne suffit pas : les comportements valides non concernés doivent rester valides. Aucun contrôle ne peut être affaibli ou supprimé uniquement pour obtenir un PASS.
 
 ## 13. CORRECT / VERIFY AGAIN
 
-En cas d'echec : diagnostiquer la cause, appliquer la plus petite correction pertinente, relancer les controles echoues puis les regressions affectees. Un echec inexplique reste un blocage.
+En cas d’échec : diagnostiquer la cause, appliquer la plus petite correction pertinente, relancer les contrôles échoués puis les régressions affectées. Un échec inexpliqué reste un blocage et peut alimenter `docs/09-loop/FAILURE_REGISTER.md` / `ROOT_CAUSE_REGISTER.md`.
 
 ## 14. PERSIST_STATE
 
-Lorsque l'etat operationnel change, mettre a jour l'unique memoire operationnelle canonique : `front_end_opcvm/SUIVI.md`. Ne pas creer de fichier de statut concurrent.
+Les registres ont des fonctions complémentaires et ne remplacent pas l’historique global :
 
-Conserver quand pertinent : lot/Integration Slot, SHA de depart/fin des deux repos, fichiers, DB/data, tests, production, decisions, risques et prochaine action exacte.
+- `front_end_opcvm/SUIVI.md` : historique/checkpoint opérationnel global, append-only selon les règles existantes ;
+- `STATUS.md` : photographie courante du dépôt ;
+- `LOOP_STATE.md` et `.governance/loop/state.json` : état de boucle ;
+- `CURRENT_ITERATION.md` : lot borné ;
+- `WORK_LOG.md` : actions/preuves/anomalies ;
+- `HANDOFF.md` : transmission ;
+- `NEXT_ACTION.md` : une seule action suivante ;
+- `OPEN_QUESTIONS.md` : inconnues réelles ;
+- `.governance/knowledge/*` et `.governance/matrices/*` : identifiants/relations structurés selon `authority-map.json`.
+
+Ne pas recopier intégralement la même information dans chaque registre. Mettre à jour uniquement ceux affectés par le changement, puis ajouter l’entrée de synthèse nécessaire au `SUIVI.md` global lorsque le checkpoint change.
 
 ## 15. COMMIT + VERIFY_REMOTE_STATE
 
-Commit sur la branche canonique existante uniquement, sauf decision explicite du proprietaire modifiant la gouvernance. Interdits : branche agent permanente, force push, rewrite d'historique, suppression d'un historique valide ou contournement d'un gate d'approbation.
+Commit sur la branche canonique existante uniquement, sauf décision explicite du propriétaire. Interdits : branche agent permanente, force push, rewrite d’historique, suppression d’un historique valide ou contournement d’un gate.
 
-Apres push : relire le HEAD distant, verifier le commit, le diff, les checks et les deux HEAD avant qu'un autre agent commence.
+Après push : relire HEAD distant, vérifier commit, diff, checks et les deux HEAD avant qu’un autre agent commence. Le registre machine-readable ne peut pas pré-déclarer le SHA final : il est enrichi après observation lorsque nécessaire.
 
 ## 16. DEPLOY + VERIFY_PRODUCTION
 
-Le chemin normal est GitHub canonique -> S2. Pour tout lot de production, mesurer : SHA S2, working tree, PM2/services, HTTP/API, DB et crons concernes.
-
-Invariant cible :
+Le chemin normal est GitHub canonique -> S2. Pour tout lot production, mesurer : SHA S2, working tree, runtime/services, HTTP/API, DB et crons concernés.
 
 ```text
 GitHub API canonical SHA == S2 API deployed SHA
@@ -149,23 +160,23 @@ GitHub frontend canonical SHA == S2 frontend deployed SHA
 
 Sans mesure : `NOT_ATTESTED`.
 
-Une modification documentaire qui avance un HEAD GitHub doit elle aussi etre synchronisee puis re-attestee si le lot est declare production-verifie.
+Une modification documentaire qui avance un HEAD GitHub doit elle aussi être synchronisée puis re-attestée si le lot est déclaré production-vérifié.
 
 ## 17. DEFINITION OF DONE
 
-Un lot est DONE seulement si toutes les conditions applicables sont satisfaites : comportement demande implemente, scope borne, autorites existantes reutilisees, tests passes, regressions verifiees, integrite data verifiee, changements concurrents reconcilies, etat distant verifie, `SUIVI.md` actualise si necessaire, production verifiee si modifiee, FUND_STATE connu ou explicitement partiellement non atteste, et une seule prochaine action identifiee.
+Un lot est DONE seulement si : comportement/résultat demandé atteint ; scope borné ; autorités existantes réutilisées ; tests passés ; régressions vérifiées ; intégrité data vérifiée si concernée ; changements concurrents réconciliés ; état distant vérifié ; registres de continuité synchronisés ; `SUIVI.md` global actualisé si nécessaire ; production vérifiée si modifiée ; `FUND_STATE` connu ou explicitement partiellement non attesté ; une seule prochaine action identifiée.
 
-`CODE_WRITTEN != DONE`.
+`CODE_WRITTEN != DONE` et `DOCUMENT_WRITTEN != DONE`.
 
 ## 18. STOP CONDITIONS
 
-Garder le write gate ferme si : HEAD inattendu, writer concurrent sur scope chevauchant, autorite requise non mesurable, migration destructive non approuvee, test/regression inexplique, production contradictoire avec les hypotheses, ou action necessitant de contourner gouvernance/autorisation/approbation.
+Garder le write gate fermé si : HEAD inattendu, writer concurrent, autorité requise non mesurable, migration destructive non approuvée, test/régression inexpliqué, production contradictoire, secret/sécurité critique ou action exigeant de contourner gouvernance/autorisation.
 
-Pour une divergence S2, garder aussi le write gate ferme si un commit applicatif local est inexplique, si un artefact potentiellement metier devrait etre detruit pour continuer, ou si la sauvegarde requise echoue.
+Pour une divergence S2 : gate fermé si commit applicatif local inexpliqué, artefact potentiellement métier à détruire ou sauvegarde requise échouée.
 
 ## 19. SELECT_NEXT
 
-Chaque boucle se termine avec une seule prochaine action explicite. La boucle suivante recommence a `DISCOVER` sur le nouvel etat canonique verifie.
+Chaque boucle se termine avec une seule prochaine action explicite. La boucle suivante recommence à `DISCOVER` sur le nouvel état canonique vérifié. Si aucune action sûre n’existe, l’état reste `BLOCKED` avec raison persistée.
 
 ## 20. S2 DIVERGENCE GATE — GOV-006
 
@@ -187,29 +198,16 @@ S2 DIVERGES ?
              -> VERIFY runtime
 ```
 
-### Interdictions
+Interdits : `git pull` sans diagnostic, `git reset --hard`, `git clean -fd`, `git push --force`.
 
-Ne jamais remplacer cette boucle par :
-
-```text
-git pull sans diagnostic
-git reset --hard
-git clean -fd
-git push --force
-```
-
-### Classification des untracked
+Classification des untracked :
 
 ```text
 GENERATED_SAFE | LOG | CACHE | DOWNLOAD | BUSINESS_DATA | UNKNOWN
 ```
 
-`UNKNOWN` est preserve jusqu'a investigation.
+`UNKNOWN` est préservé jusqu’à investigation.
 
-### Snapshot production
+Le snapshot live reste techniquement `/var/lib/fundafrica/runtime/PRODUCTION_STATE.json`. Sa génération ne doit jamais changer Git HEAD ni produire de commit automatique.
 
-Le snapshot live est `/var/lib/fundafrica/runtime/PRODUCTION_STATE.json`. Sa generation ne doit jamais changer Git HEAD ni produire de commit automatique.
-
-### Preuve post-documentation
-
-Tout commit documentaire fait evoluer le FUND_STATE. Apres une documentation de gouvernance liee a la production, refaire obligatoirement la mesure GitHub ↔ S2 ↔ runtime avant de passer le lot a `CERTIFIED`.
+Tout commit documentaire fait évoluer le `FUND_STATE`. Après documentation de gouvernance liée à la production, refaire la mesure GitHub ↔ S2 ↔ runtime avant de passer le lot à `CERTIFIED`.

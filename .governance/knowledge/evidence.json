@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "product": "AfricaFunds",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "evidence": [
+    {"id":"AF-EVD-001","type":"GIT_STATE","result":"OBSERVED","provenance":"GitHub branch API canonical","observed_at":"2026-09-10T04:46:00Z","sha":"cd24305db790f4c0c3f663ef1cca037978145ef6"},
+    {"id":"AF-EVD-002","type":"REFERENCE_GOVERNANCE","result":"OBSERVED","provenance":"chainsolutions-wealthtech/Regulatory main tree 483da3e11c30dd0b4f2a4cee114909d512a1b426","observed_at":"2026-09-10T04:46:00Z","sha":null}
+  ],
+  "note": "Les preuves de ce commit et de la CI seront ajoutées après publication et observation réelle; elles ne sont pas pré-déclarées PASS."
+}

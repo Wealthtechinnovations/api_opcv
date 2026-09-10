@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "africafunds/loop-state.schema.json",
+  "type": "object",
+  "required": ["loop_id", "stage", "api_sha", "frontend_sha", "next_action"],
+  "properties": {
+    "loop_id": {"type": "string"},
+    "stage": {"type": "string"},
+    "api_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "frontend_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "next_action": {"type": "string"},
+    "blockers": {"type": "array", "items": {"type": "string"}},
+    "proof_refs": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}
