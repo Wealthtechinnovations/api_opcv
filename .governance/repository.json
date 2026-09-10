@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "project_id": "chainsolutions.africafunds",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "repository_role": "API",
+  "peer_repository": "Wealthtechinnovations/front_end_opcvm",
+  "canonical_branch": "claude/code-review-improvements-ikvuj",
+  "global_checkpoint_repository": "Wealthtechinnovations/front_end_opcvm"
+}

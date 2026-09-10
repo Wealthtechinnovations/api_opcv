@@ -6,6 +6,18 @@
 > Branche canonique : `claude/code-review-improvements-ikvuj`.
 > Production : S2.
 
+## Identité projet versionnée
+
+```text
+PROJECT_UID  = CS-AFRICAFUNDS-001
+PROJECT_ID   = chainsolutions.africafunds
+PROJECT_NAME = AfricaFunds
+REPOSITORY_ROLE = API
+PEER_REPOSITORY = Wealthtechinnovations/front_end_opcvm
+```
+
+L’identité structurée commune est `.governance/project.json`. Le rôle local de ce dépôt est `.governance/repository.json`. L’explication humaine canonique du lien se trouve dans `docs/01-governance/PROJECT_IDENTITY.md`.
+
 ## Rôle
 
 Ce dépôt porte le backend, les APIs, modèles, migrations, calculs financiers, imports, crons, workers et contrôles de données d’AfricaFunds.
