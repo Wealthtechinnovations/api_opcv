@@ -57,7 +57,7 @@ Aucune etape applicable ne peut etre silencieusement sautee.
 
 ## 4. DISCOVER
 
-Avant toute modification, lire dans cet ordre : `00_START_HERE.md`, `GOVERNANCE.md`, `SOURCE_OF_TRUTH.md`, `AGENTS.md`, `LOOP_ENGINEERING.md`, `DIRECTIVE_TRAVAIL.md`, les `CLAUDE.md` pertinents, `front_end_opcvm/SUIVI.md`, puis les README/TODO/ROADMAP/CODE_REVIEW/CHANGELOG/DEPLOYMENT et enfin le code, les tests, migrations, routes, modeles et scripts concernes.
+Avant toute modification, lire dans cet ordre : `00_START_HERE.md`, `GOVERNANCE.md`, `SOURCE_OF_TRUTH.md`, `AGENTS.md`, `LOOP_ENGINEERING.md`, `docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md`, `docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md`, `docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md`, `DIRECTIVE_TRAVAIL.md`, les `CLAUDE.md` pertinents, `front_end_opcvm/SUIVI.md`, puis les README/TODO/ROADMAP/CODE_REVIEW/CHANGELOG/DEPLOYMENT et enfin le code, les tests, migrations, routes, modeles et scripts concernes.
 
 Toujours rechercher l'existant avant de creer une nouvelle autorite, table, composant, service, workflow ou mecanisme de suivi.
 
@@ -66,6 +66,8 @@ Toujours rechercher l'existant avant de creer une nouvelle autorite, table, comp
 Resoudre avant l'implementation : API_HEAD, FRONTEND_HEAD, checkpoint SUIVI, travaux actifs, commits/PR/checks pertinents, etat S2/runtime si concerne, etat DB/migrations si concerne.
 
 Les faits mesures de production priment sur une prose documentaire perimee. Une mesure absente vaut `UNKNOWN` ou `PENDING`, jamais `OK`.
+
+Si S2 diverge, appliquer obligatoirement le gate GOV-006 de la section 20 avant toute synchronisation ou ecriture serveur.
 
 ## 6. BASELINE
 
@@ -147,6 +149,8 @@ GitHub frontend canonical SHA == S2 frontend deployed SHA
 
 Sans mesure : `NOT_ATTESTED`.
 
+Une modification documentaire qui avance un HEAD GitHub doit elle aussi etre synchronisee puis re-attestee si le lot est declare production-verifie.
+
 ## 17. DEFINITION OF DONE
 
 Un lot est DONE seulement si toutes les conditions applicables sont satisfaites : comportement demande implemente, scope borne, autorites existantes reutilisees, tests passes, regressions verifiees, integrite data verifiee, changements concurrents reconcilies, etat distant verifie, `SUIVI.md` actualise si necessaire, production verifiee si modifiee, FUND_STATE connu ou explicitement partiellement non atteste, et une seule prochaine action identifiee.
@@ -157,6 +161,55 @@ Un lot est DONE seulement si toutes les conditions applicables sont satisfaites 
 
 Garder le write gate ferme si : HEAD inattendu, writer concurrent sur scope chevauchant, autorite requise non mesurable, migration destructive non approuvee, test/regression inexplique, production contradictoire avec les hypotheses, ou action necessitant de contourner gouvernance/autorisation/approbation.
 
+Pour une divergence S2, garder aussi le write gate ferme si un commit applicatif local est inexplique, si un artefact potentiellement metier devrait etre detruit pour continuer, ou si la sauvegarde requise echoue.
+
 ## 19. SELECT_NEXT
 
 Chaque boucle se termine avec une seule prochaine action explicite. La boucle suivante recommence a `DISCOVER` sur le nouvel etat canonique verifie.
+
+## 20. S2 DIVERGENCE GATE — GOV-006
+
+Toute divergence GitHub/S2 passe obligatoirement par :
+
+```text
+S2 DIVERGES ?
+  |
+  +-- NO  -> continue normal loop
+  |
+  +-- YES -> CLASSIFY COMMITS AND FILES
+             -> IDENTIFY AUTOMATIC PRODUCER / ROOT CAUSE
+             -> BACKUP RECOVERABLE STATE
+             -> PRESERVE UNKNOWN UNTRACKED
+             -> PRESERVE LEGITIMATE LOCAL CHANGES
+             -> CORRECT ROOT CAUSE
+             -> RECONCILE WITH FRESH REMOTE HEAD
+             -> VERIFY ahead=0 / behind=0
+             -> VERIFY runtime
+```
+
+### Interdictions
+
+Ne jamais remplacer cette boucle par :
+
+```text
+git pull sans diagnostic
+git reset --hard
+git clean -fd
+git push --force
+```
+
+### Classification des untracked
+
+```text
+GENERATED_SAFE | LOG | CACHE | DOWNLOAD | BUSINESS_DATA | UNKNOWN
+```
+
+`UNKNOWN` est preserve jusqu'a investigation.
+
+### Snapshot production
+
+Le snapshot live est `/var/lib/fundafrica/runtime/PRODUCTION_STATE.json`. Sa generation ne doit jamais changer Git HEAD ni produire de commit automatique.
+
+### Preuve post-documentation
+
+Tout commit documentaire fait evoluer le FUND_STATE. Apres une documentation de gouvernance liee a la production, refaire obligatoirement la mesure GitHub ↔ S2 ↔ runtime avant de passer le lot a `CERTIFIED`.
