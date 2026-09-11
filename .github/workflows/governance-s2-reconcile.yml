@@ -1,13 +1,26 @@
-# GOV-006 final certification reconciliation trigger — 2026-09-10
 name: Reconciliation gouvernee GitHub S2
 
 on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "observe ou reconcile"
+        required: true
+        default: observe
+        type: choice
+        options:
+          - observe
+          - reconcile
+      confirmation:
+        description: "RECONCILE AFRICAFUNDS S2"
+        required: false
+        default: ""
   push:
     branches:
       - claude/code-review-improvements-ikvuj
     paths:
       - '.github/workflows/governance-s2-reconcile.yml'
-  workflow_dispatch:
+      - 'scripts/governance/s2_git_guard.sh'
 
 permissions:
   contents: read
@@ -18,204 +31,107 @@ concurrency:
 
 jobs:
   reconcile:
-    name: Reconciler S2 sans perte ni reset destructif
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 20
     steps:
-      - name: Verifier les secrets S2
-        env:
-          HOST: ${{ secrets.S2_HOST }}
-          KEY: ${{ secrets.S2_SSH_KEY }}
-        run: |
-          set -euo pipefail
-          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
-            echo '::error::Secrets S2_HOST ou S2_SSH_KEY manquants.'
-            exit 1
-          fi
+      - name: Checkout canonical governance
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
 
-      - name: Preparer SSH
+      - name: Resolve safe action
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          REQUESTED: ${{ inputs.action }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          ACTION="observe"
+          if [ "$EVENT" = "workflow_dispatch" ]; then ACTION="${REQUESTED:-observe}"; fi
+          case "$ACTION" in observe|reconcile) ;; *) echo "::error::invalid action"; exit 2;; esac
+          if [ "$ACTION" = "reconcile" ] && [ "$CONFIRMATION" != "RECONCILE AFRICAFUNDS S2" ]; then
+            echo "::error::reconciliation confirmation phrase missing"
+            exit 3
+          fi
+          echo "action=$ACTION" >> "$GITHUB_OUTPUT"
+
+      - name: Verify strict SSH material
         env:
           HOST: ${{ secrets.S2_HOST }}
           KEY: ${{ secrets.S2_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
+          test -n "$HOST" || { echo "::error::S2_HOST missing"; exit 1; }
+          test -n "$KEY" || { echo "::error::S2_SSH_KEY missing"; exit 1; }
+          test -n "$KNOWN_HOSTS" || { echo "::error::S2_KNOWN_HOSTS missing: pinned host key is mandatory"; exit 1; }
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "$KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          chmod 644 ~/.ssh/known_hosts
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
-      - name: Reconciliation atomique et sauvegardee
+      - name: GOV-006 preflight — observe both repositories
         env:
           HOST: ${{ secrets.S2_HOST }}
           USER_SSH: ${{ secrets.S2_USER }}
         run: |
           set -euo pipefail
           SSH_USER="${USER_SSH:-root}"
-          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" 'bash -s' <<'REMOTE'
-            set -euo pipefail
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- observe both' \
+            < scripts/governance/s2_git_guard.sh | tee reconciliation-preflight.txt
 
-            BRANCH='claude/code-review-improvements-ikvuj'
-            API='/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api'
-            FRONT='/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend'
-            TS="$(date -u '+%Y%m%dT%H%M%SZ')"
-            BACKUP="/var/backups/fundafrica-governance/$TS"
-            mkdir -p "$BACKUP/api" "$BACKUP/frontend"
-            chmod 700 "$BACKUP"
+      - name: Reconcile both repositories through shared guard
+        if: steps.mode.outputs.action == 'reconcile'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- reconcile both' \
+            < scripts/governance/s2_git_guard.sh | tee reconciliation-result.txt
 
-            echo "backup_dir=$BACKUP"
+      - name: Measure complete S2 state after operation
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' < scripts/governance/s2_observe.py > S2_OBSERVATION.json
+          python3 -m json.tool S2_OBSERVATION.json >/dev/null
 
-            # -----------------------------------------------------------------
-            # API — preflight strict : aucun changement tracked et tous les
-            # commits locaux exclusifs doivent etre des snapshots uniquement.
-            # -----------------------------------------------------------------
-            cd "$API"
-            test "$(git branch --show-current)" = "$BRANCH"
-            API_START="$(git rev-parse HEAD)"
-            git status -sb > "$BACKUP/api/status-before.txt"
-            git log --format='%H | %cI | %s' -n 80 > "$BACKUP/api/log-before.txt"
-            cp -a PRODUCTION_STATE.json "$BACKUP/api/PRODUCTION_STATE.before.json" 2>/dev/null || true
-
-            TRACKED_DIRTY="$(git status --porcelain=v1 | grep -v '^?? ' || true)"
-            if [ -n "$TRACKED_DIRTY" ]; then
-              echo '::error::API contient des modifications tracked non commitees.'
-              printf '%s\n' "$TRACKED_DIRTY"
-              exit 20
-            fi
-
-            git fetch --prune origin "$BRANCH"
-            API_REMOTE="$(git rev-parse "origin/$BRANCH")"
-            API_REMOTE_LS="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-            test "$API_REMOTE" = "$API_REMOTE_LS"
-
-            SNAPSHOT_ONLY=0
-            OTHER=0
-            while IFS= read -r C; do
-              [ -n "$C" ] || continue
-              FILES="$(git diff-tree --no-commit-id --name-only -r "$C" | sed '/^$/d')"
-              COUNT="$(printf '%s\n' "$FILES" | sed '/^$/d' | wc -l | tr -d ' ')"
-              if [ "$COUNT" = '1' ] && [ "$FILES" = 'PRODUCTION_STATE.json' ]; then
-                SNAPSHOT_ONLY=$((SNAPSHOT_ONLY + 1))
-              else
-                OTHER=$((OTHER + 1))
-                echo "UNSAFE_COMMIT=$C files=$(printf '%s' "$FILES" | tr '\n' ',')"
+      - name: Publish evidence
+        if: always()
+        run: |
+          {
+            echo "## GOV-006 — ${{ steps.mode.outputs.action }}"
+            for f in reconciliation-preflight.txt reconciliation-result.txt; do
+              if [ -f "$f" ]; then
+                echo
+                echo "### $f"
+                echo '~~~text'
+                tail -200 "$f"
+                echo '~~~'
               fi
-            done < <(git rev-list "origin/$BRANCH..HEAD")
-
-            echo "api_snapshot_only_commits=$SNAPSHOT_ONLY"
-            echo "api_other_local_commits=$OTHER"
-            if [ "$OTHER" -ne 0 ]; then
-              echo '::error::API contient au moins un commit local applicatif/non-snapshot. Reconciliation refusee.'
-              exit 21
-            fi
-
-            git bundle create "$BACKUP/api/local-branch-before.bundle" "$BRANCH"
-            git bundle verify "$BACKUP/api/local-branch-before.bundle"
-            printf '%s\n' "$API_START" > "$BACKUP/api/local-head-before.txt"
-            printf '%s\n' "$API_REMOTE" > "$BACKUP/api/remote-head-target.txt"
-
-            test "$(git rev-parse HEAD)" = "$API_START"
-            test "$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')" = "$API_REMOTE"
-
-            git switch --detach "$API_REMOTE"
-            git branch -f "$BRANCH" "$API_REMOTE"
-            git switch "$BRANCH"
-            test "$(git rev-parse HEAD)" = "$API_REMOTE"
-
-            API_HEAD_BEFORE_SNAPSHOT="$(git rev-parse HEAD)"
-            bash scripts/deploy/sync_production.sh
-            test "$(git rev-parse HEAD)" = "$API_HEAD_BEFORE_SNAPSHOT"
-            test -s /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
-
-            API_TRACKED_AFTER="$(git status --porcelain=v1 | grep -v '^?? ' || true)"
-            if [ -n "$API_TRACKED_AFTER" ]; then
-              echo '::error::API tracked dirty apres reconciliation/snapshot.'
-              printf '%s\n' "$API_TRACKED_AFTER"
-              exit 22
-            fi
-
-            # -----------------------------------------------------------------
-            # FRONTEND — la seule modification tracked locale connue est le
-            # package-lock. Elle doit etre identique au contenu canonique remote
-            # avant que nous la restaurions depuis l ancien HEAD puis fast-forward.
-            # -----------------------------------------------------------------
-            cd "$FRONT"
-            test "$(git branch --show-current)" = "$BRANCH"
-            FRONT_START="$(git rev-parse HEAD)"
-            git status -sb > "$BACKUP/frontend/status-before.txt"
-            git log --format='%H | %cI | %s' -n 80 > "$BACKUP/frontend/log-before.txt"
-            cp -a package-lock.json "$BACKUP/frontend/package-lock.before.json"
-
-            FRONT_DIRTY_PATHS="$(git status --porcelain=v1 | grep -v '^?? ' | awk '{print $2}' | sort -u || true)"
-            if [ -n "$FRONT_DIRTY_PATHS" ] && [ "$FRONT_DIRTY_PATHS" != 'package-lock.json' ]; then
-              echo '::error::Frontend contient des modifications tracked inattendues.'
-              printf '%s\n' "$FRONT_DIRTY_PATHS"
-              exit 30
-            fi
-
-            git fetch --prune origin "$BRANCH"
-            FRONT_REMOTE="$(git rev-parse "origin/$BRANCH")"
-            FRONT_REMOTE_LS="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-            test "$FRONT_REMOTE" = "$FRONT_REMOTE_LS"
-
-            test "$(git rev-list --count "origin/$BRANCH..HEAD")" = '0'
-
-            if git status --porcelain=v1 | grep -q '^ M package-lock.json$'; then
-              LOCAL_LOCK_HASH="$(git hash-object package-lock.json)"
-              REMOTE_LOCK_HASH="$(git rev-parse "origin/$BRANCH:package-lock.json")"
-              echo "frontend_local_lock_hash=$LOCAL_LOCK_HASH"
-              echo "frontend_remote_lock_hash=$REMOTE_LOCK_HASH"
-              if [ "$LOCAL_LOCK_HASH" != "$REMOTE_LOCK_HASH" ]; then
-                echo '::error::Le package-lock local contient un travail non preserve dans GitHub.'
-                exit 31
-              fi
-              git restore --source=HEAD -- package-lock.json
-            fi
-
-            test "$(git rev-parse HEAD)" = "$FRONT_START"
-            test "$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')" = "$FRONT_REMOTE"
-            git merge --ff-only "origin/$BRANCH"
-            test "$(git rev-parse HEAD)" = "$FRONT_REMOTE"
-
-            FRONT_TRACKED_AFTER="$(git status --porcelain=v1 | grep -v '^?? ' || true)"
-            if [ -n "$FRONT_TRACKED_AFTER" ]; then
-              echo '::error::Frontend tracked dirty apres fast-forward.'
-              printf '%s\n' "$FRONT_TRACKED_AFTER"
-              exit 32
-            fi
-
-            echo '===== FINAL API ====='
-            cd "$API"
-            echo "branch=$(git branch --show-current)"
-            echo "head=$(git rev-parse HEAD)"
-            echo "remote=$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-            git status -sb
-            echo "runtime_snapshot_generated_at=$(node -e "const s=require('/var/lib/fundafrica/runtime/PRODUCTION_STATE.json');process.stdout.write(String(s.generated_at||''))")"
-
-            echo '===== FINAL FRONTEND ====='
-            cd "$FRONT"
-            echo "branch=$(git branch --show-current)"
-            echo "head=$(git rev-parse HEAD)"
-            echo "remote=$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-            git status -sb
-
-            echo '===== PM2 ====='
-            pm2 list
-
-            echo '===== HTTP ====='
-            for URL in \
-              'https://africafunds.chainsolutions.fr/' \
-              'https://africafunds.chainsolutions.fr/home' \
-              'https://africafunds.chainsolutions.fr/api/getactualite'; do
-              printf '%s -> ' "$URL"
-              curl -sS -L --max-redirs 3 --max-time 20 -o /dev/null -w 'HTTP %{http_code} | %{time_total}s | %{url_effective}\n' "$URL"
             done
+          } >> "$GITHUB_STEP_SUMMARY"
 
-            echo "RECONCILIATION_BACKUP=$BACKUP"
-          REMOTE
+      - name: Upload observation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-s2-reconciliation-evidence
+          path: S2_OBSERVATION.json
+          if-no-files-found: warn
+          retention-days: 30
 
-      - name: Effacer la cle SSH
+      - name: Remove SSH key
         if: always()
         run: rm -f ~/.ssh/id_deploy
