@@ -2,9 +2,11 @@
 /node_modules
 
 # Environment variables (NEVER commit secrets)
+# Historical tracked env files are handled by SECURITY_GATE; ignore rules alone
+# do not untrack them. New env variants must never enter Git.
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 uploads/.env.local
 
 # Logs
