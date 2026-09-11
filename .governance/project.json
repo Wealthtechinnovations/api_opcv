@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "project_uid": "CS-AFRICAFUNDS-001",
   "project_id": "chainsolutions.africafunds",
   "project_name": "AfricaFunds",
@@ -8,11 +8,38 @@
   "public_api": "https://africafunds.chainsolutions.fr/api",
   "canonical_branch": "claude/code-review-improvements-ikvuj",
   "repositories": [
-    {"role": "API", "full_name": "Wealthtechinnovations/api_opcv"},
-    {"role": "FRONTEND", "full_name": "Wealthtechinnovations/front_end_opcvm"}
+    {
+      "role": "API",
+      "full_name": "Wealthtechinnovations/api_opcv"
+    },
+    {
+      "role": "FRONTEND",
+      "full_name": "Wealthtechinnovations/front_end_opcvm"
+    }
   ],
   "global_checkpoint_repository": "Wealthtechinnovations/front_end_opcvm",
   "production_target": "S2",
   "state_model": "FUND_STATE",
-  "state_fields": ["API_SHA", "FRONTEND_SHA", "SUIVI_CHECKPOINT", "PRODUCTION_ATTESTATION"]
+  "state_fields": [
+    "API_SHA",
+    "FRONTEND_SHA",
+    "SUIVI_CHECKPOINT",
+    "PRODUCTION_ATTESTATION"
+  ],
+  "central_governance_repository": "Wealthtechinnovations/api_opcv",
+  "global_checkpoint_file": "SUIVI.md",
+  "context_reconstruction_before_work": "REQUIRED",
+  "cross_repo_discovery": "REQUIRED",
+  "no_blind_work": "REQUIRED",
+  "work_gate_requires_context_pass": true,
+  "server_observation_channels": [
+    {
+      "name": "wealthtech_ssh_bridge",
+      "role": "NOMINAL"
+    },
+    {
+      "name": "github_actions_ssh",
+      "role": "FALLBACK_WHEN_BRIDGE_UNAVAILABLE"
+    }
+  ]
 }

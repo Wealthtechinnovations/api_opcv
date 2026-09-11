@@ -211,3 +211,9 @@ GENERATED_SAFE | LOG | CACHE | DOWNLOAD | BUSINESS_DATA | UNKNOWN
 Le snapshot live reste techniquement `/var/lib/fundafrica/runtime/PRODUCTION_STATE.json`. Sa génération ne doit jamais changer Git HEAD ni produire de commit automatique.
 
 Tout commit documentaire fait évoluer le `FUND_STATE`. Après documentation de gouvernance liée à la production, refaire la mesure GitHub ↔ S2 ↔ runtime avant de passer le lot à `CERTIFIED`.
+
+## 21. CONTEXT RECONSTRUCTION GATE
+
+Toute boucle ouverte dans une nouvelle session commence par une reconstruction déterministe : découverte du peer repository, vérification des deux default/canonical branches et HEAD, lecture des autorités/registres, inspection CI récente et observation S2/runtime si le scope en dépend. La sortie attendue est un `FUND_STATE` reconstruit et un `CONTEXT_RECONSTRUCTION=PASS`. Sans ce PASS, `WORK_GATE=CLOSED`.
+
+Le canal d'observation serveur est abstrait : bridge MCP nominal, GitHub Actions → SSH S2 en fallback. Changer de canal ne change ni les autorités, ni les gates, ni les interdictions de mutation.

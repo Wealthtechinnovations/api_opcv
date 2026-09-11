@@ -163,3 +163,18 @@ GitHub est l’autorité Git. S2 est une cible de déploiement et un runtime. Le
 Une intervention n’est terminée qu’après les contrôles applicables de `GOVERNANCE.md`, la boucle `LOOP_ENGINEERING.md`, la non-régression, la persistance des registres appropriés, la mise à jour append-only du suivi global lorsque nécessaire et la vérification du nouvel état distant.
 
 Une validation non exécutée est `NON_VERIFIE`, `NOT_RUN`, `UNKNOWN` ou `BLOCKED`, jamais inventée. Une modification documentaire qui avance un HEAD GitHub exige elle aussi une attestation GitHub ↔ S2 avant de déclarer un lot production `CERTIFIED`.
+
+## Gate de reconstruction de contexte — obligatoire
+
+Toute nouvelle conversation ou session (Claude, ChatGPT, Codex, Copilot, Gemini, agent MCP ou autre) doit reconstruire le contexte depuis Git avant toute écriture. La mémoire conversationnelle n'est jamais requise ni suffisante.
+
+```text
+CONTEXT_RECONSTRUCTION_BEFORE_WORK = REQUIRED
+CROSS_REPO_DISCOVERY = REQUIRED
+NO_BLIND_WORK = REQUIRED
+WORK_GATE_REQUIRES_CONTEXT_PASS = TRUE
+```
+
+Séquence minimale : ouvrir un des deux dépôts → lire `.governance/project.json` et `.governance/repository.json` → découvrir l'autre dépôt → vérifier les default/canonical branches et les deux HEAD → lire les autorités et registres de reprise → inspecter commits/CI récents → observer S2/runtime si la tâche en dépend → reconstruire `FUND_STATE`. Si une étape obligatoire échoue, `WORK_GATE=CLOSED` jusqu'à résolution ou blocage documenté.
+
+Lorsqu'une observation S2 est nécessaire, le bridge MCP est le canal nominal. S'il est indisponible, l'agent doit utiliser le canal gouverné GitHub Actions → SSH S2 prévu par le projet pour observer l'état réel ; l'absence du bridge n'autorise jamais le travail à l'aveugle ni une mutation production automatique.

@@ -18,6 +18,10 @@ VERIFY_AFTER_WRITE = REQUIRED
 S2_IS_RUNTIME_NOT_GIT_AUTHORITY = REQUIRED
 CLASSIFY_BEFORE_RECONCILE = REQUIRED
 PRESERVE_UNKNOWN_UNTRACKED = REQUIRED
+CONTEXT_RECONSTRUCTION_BEFORE_WORK = REQUIRED
+CROSS_REPO_DISCOVERY = REQUIRED
+NO_BLIND_WORK = REQUIRED
+WORK_GATE_REQUIRES_CONTEXT_PASS = TRUE
 ```
 
 Le nom historique `claude/` ne confere aucune exclusivite a Claude. Tous les agents utilisent la meme ligne de verite.
@@ -102,3 +106,10 @@ Une modification documentaire de gouvernance qui avance un HEAD doit etre inclus
 ## Handoff
 
 Le suivi operationnel officiel reste `front_end_opcvm/SUIVI.md`. Ne pas creer `CHATGPT_STATUS.md`, `CODEX_STATUS.md`, un second `SUIVI.md` ou toute memoire d'agent concurrente. Une conversation n'est pas une source de verite.
+
+
+## Gate de nouvelle session
+
+Avant toute écriture, tout agent doit reconstruire le contexte depuis Git : identifier AfricaFunds, découvrir automatiquement l'autre repository via `.governance/project.json` / `.governance/repository.json`, vérifier les default/canonical branches et les deux HEAD, lire les registres de reprise et reconstruire `FUND_STATE`. La conversation précédente ne peut pas être une dépendance.
+
+Si une tâche dépend de production, observer S2/runtime avant décision. Bridge MCP disponible : utiliser le canal nominal. Bridge MCP indisponible : utiliser le fallback GitHub Actions → SSH S2 en lecture/diagnostic gouverné. En l'absence de preuve serveur, l'état vaut `UNKNOWN/NOT_ATTESTED`, jamais `OK` supposé.

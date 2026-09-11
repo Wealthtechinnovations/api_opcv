@@ -20,6 +20,11 @@ IMPROVEMENT_ONLY = REQUIRED
 ZERO_REGRESSION = REQUIRED
 READ_EXISTING_BEFORE_CREATE = REQUIRED
 PERSISTENT_MEMORY = REQUIRED
+CONTEXT_RECONSTRUCTION_BEFORE_WORK = REQUIRED
+CROSS_REPO_DISCOVERY = REQUIRED
+NO_BLIND_WORK = REQUIRED
+WORK_GATE_REQUIRES_CONTEXT_PASS = TRUE
+CI_SSH_FALLBACK_REQUIRED = TRUE
 VERIFY_BEFORE_WRITE = REQUIRED
 VERIFY_AFTER_WRITE = REQUIRED
 MEASURED_PRODUCTION_FACTS_OVERRIDE_STALE_PROSE = TRUE
@@ -180,3 +185,10 @@ Si un commit applicatif local reste inexpliqué ou non sauvegarde, le write gate
 ## Memoire persistante
 
 La conversation d'un agent n'est jamais la memoire canonique du projet. Le depot et `front_end_opcvm/SUIVI.md` portent la reprise. Ne pas creer un second fichier de suivi operationnel pour un agent ou un module.
+
+
+## Reconstruction de contexte et anti-dispersion
+
+Une session ne peut pas déduire son contexte de la conversation. Elle doit découvrir le produit depuis Git, charger le peer repository, vérifier les deux branches/HEAD, lire la mémoire persistante et reconstruire `FUND_STATE` avant tout write. Un échec ferme le work gate. Cette règle s'applique de manière identique à Claude, ChatGPT et tout autre agent.
+
+Pour toute tâche liée à S2, l'observation réelle est obligatoire. `wealthtech_ssh_bridge` est nominal ; GitHub Actions → SSH S2 est le fallback gouverné quand le bridge est indisponible. Le fallback d'observation ne confère aucune autorisation de mutation production.
