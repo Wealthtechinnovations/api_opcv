@@ -1,31 +1,39 @@
 # NEXT_ACTION — AfricaFunds API
 
-> Une seule prochaine action exécutable, sélectionnée par directive explicite du propriétaire le 2026-09-11.
+> Projection humaine de la task queue centrale. Une seule action exécutable à la fois.
 
-## Action courante
+## Action courante — AF-TASK-006
 
-Terminer `AF-TASK-004` : imposer et vérifier la reconstruction de contexte à chaque nouvelle session et la découverte croisée des deux repositories depuis l'un ou l'autre, puis brancher cette règle sur les validateurs CI.
+Établir un **pin SSH S2 auditable**, puis exécuter l'observation S2 read-only sans dépendre du bridge MCP.
 
-Critères immédiats :
+État déjà prouvé :
 
 ```text
-CONTEXT_RECONSTRUCTION_BEFORE_WORK = REQUIRED
-CROSS_REPO_DISCOVERY = REQUIRED
-DEFAULT_BRANCH == CANONICAL_WORK_BRANCH
-READ_BOTH_HEADS = REQUIRED
-WORK_GATE = CLOSED UNTIL CONTEXT_RECONSTRUCTION_PASS
+AF-TASK-004 CONTEXT RECONSTRUCTION = DONE
+AF-TASK-005 MARKDOWN CERTIFICATION = DONE
+MULTI_AGENT_RESUME = PASS
+STATE_COHERENCE = PASS
+BRANCH_POLICY_CI = PASS
+FRONTEND_MARKDOWN_CONTRACT = PASS
 ```
 
-La règle doit être portée par les autorités existantes (`00_START_HERE.md`, `GOVERNANCE.md`, `AGENTS.md`, `LOOP_ENGINEERING.md`) et par les contrats machine-readable existants ; aucun nouveau système parallèle.
+Le workflow `ops-s2-hostkey-bootstrap.yml` a produit un candidat de clé hôte. Aucune empreinte historique indépendante n'a été retrouvée dans Git. Si aucun canal OOB n'est accessible, le seul déblocage non aveugle permis est un **TOFU borné et explicitement classé non OOB-vérifié** : collecter une seule fois, persister le pin public, puis imposer `StrictHostKeyChecking=yes` pour toutes les connexions suivantes. Ce statut ne doit jamais être présenté comme une vérification OOB.
 
-## Ensuite
+Après connexion read-only réussie :
 
-`AF-TASK-005` : certification dynamique path-by-path de **tous** les `.md` présents au HEAD réel des deux repositories, avec preuve `TOTAL_MD_DISCOVERED == TOTAL_MD_CERTIFIED`.
+1. produire `S2_OBSERVATION.json` ;
+2. réobserver Git API/frontend, PM2, HTTP, DB read-only, ressources et cron ;
+3. compléter AF-TASK-007 par des dry-runs sans mutation ;
+4. ouvrir la remédiation AF-TASK-010 des secrets suivis à partir de la réalité S2 ;
+5. ne redémarrer/déployer/rotater aucun secret tant que le lot concerné n'a pas ses propres gates.
 
-## Opération production différée conservée
+## Blockers distincts à conserver
 
-L'ancien `NEXT_ACTION` concernant `mariadb.service Restart=on-failure` n'est pas supprimé de la connaissance projet : il reste une opération séparée nécessitant `REQUIRED_HUMAN_APPROVAL`. La directive actuelle du propriétaire priorise le programme de certification de gouvernance ; aucune mutation `/etc/systemd` n'est effectuée dans ce lot.
+- `S2_HOST_KEY_NOT_OOB_VERIFIED` — déblocable par TOFU borné, mais reste à confirmer OOB ultérieurement ;
+- `TRACKED_REAL_SECRETS_SECURITY_GATE` — nécessite migration runtime puis rotations ;
+- `GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR` — la détection CI est active mais ne remplace pas l'enforcement natif ;
+- `AF-OPS-001` MariaDB Restart — opération production séparée à approbation humaine.
 
-## Stop conditions
+## Interdictions
 
-Arrêter l'écriture si un HEAD change de manière concurrente, si une autorité historique contredit le changement sans résolution, ou si une action exigerait force-push, réécriture d'historique, suppression non autorisée ou destruction d'un artefact `UNKNOWN`.
+Aucun force-push, reset destructif, git clean, suppression d'artefact UNKNOWN, shell distant arbitraire, affichage de secret, nouvelle branche ou travail production sans observation réelle.

@@ -1,17 +1,28 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "loop_id": "AF-GOV-FINAL-CERT-20260911-01",
   "stage": "IMPLEMENT_COMPATIBLY",
-  "current_task_id": "AF-TASK-004",
+  "current_task_id": "AF-TASK-006",
   "parent_task_id": "AF-TASK-003",
-  "observed_api_sha": "b2753cd860e2f466f53ddc5e8651c80c62d41d12",
-  "observed_frontend_sha": "c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d",
+  "observed_api_sha": "d2cdcec6f3fbf8e1e1a01f57b61457de4e7f5a08",
+  "observed_frontend_sha": "1a0e52c22e19d3d29916a9bc1a689dfc6dd7fdae",
   "head_semantics": "OBSERVED_BASELINE_NOT_SELF_REFERENTIAL",
-  "next_action": "Enforce context reconstruction and cross-repository discovery gates, then validate them in CI.",
-  "blockers": [],
+  "next_action": "Pin S2 host key audibly, execute read-only S2 observation, then unlock live fallback proofs.",
+  "blockers": [
+    "S2_HOST_KEY_NOT_OOB_VERIFIED",
+    "TRACKED_REAL_SECRETS_SECURITY_GATE",
+    "GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR"
+  ],
   "proof_refs": [
-    "GITHUB_REPO_METADATA_2026-09-11",
-    "DEFAULT_BRANCH_ALIGNMENT_2026-09-11"
+    "AF-EVD-018",
+    "AF-EVD-019",
+    "AF-EVD-020",
+    "AF-EVD-021",
+    "AF-EVD-022",
+    "AF-EVD-023",
+    "RUN_34650108333_REGULATORY_PLUS_PASS",
+    "RUN_34650108346_STATE_COHERENCE_PASS",
+    "RUN_34650147170_FRONTEND_MARKDOWN_PASS"
   ],
   "rules": {
     "context_reconstruction_before_work": "REQUIRED",

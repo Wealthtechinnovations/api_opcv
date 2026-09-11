@@ -39,3 +39,14 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 - drift confirmé : task queue plus récente que `LOOP_STATE.md`, `HANDOFF.md`, `.governance/loop/state.json` et `.governance/loop/handoff.json` ;
 - décision : réconcilier les registres avant toute nouvelle capacité ;
 - l'ancienne action MariaDB reste conservée comme opération distincte à approbation humaine ; aucune mutation production dans ce lot.
+
+
+## 2026-09-11 — réconciliation du point de reprise après reprise de session
+
+- HEAD réobservés : API `d2cdcec6f3fbf8e1e1a01f57b61457de4e7f5a08`, frontend `1a0e52c22e19d3d29916a9bc1a689dfc6dd7fdae`.
+- Drift détecté : la task queue et les projections humaines étaient restées sur AF-TASK-004 malgré les preuves ultérieures.
+- AF-TASK-004 et AF-TASK-005 classées DONE à partir des CI/artefacts existants.
+- AF-TASK-006 devient tâche courante ; AF-TASK-010 (secrets) et AF-TASK-011 (attestation finale) ajoutées explicitement.
+- Aucun canal wealthtech_ssh_bridge n'est exposé dans la session actuelle ; aucun travail serveur n'est supposé.
+- Recherche Git d'une empreinte S2 historique indépendante : aucune empreinte vérifiable trouvée.
+- Stratégie : TOFU borné possible pour débloquer l'observation, mais son statut reste distinct d'une vérification OOB.

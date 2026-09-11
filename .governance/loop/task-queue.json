@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "active_loop_id": "AF-GOV-FINAL-CERT-20260911-01",
   "tasks": [
     {
@@ -46,66 +46,91 @@
     {
       "id": "AF-TASK-004",
       "title": "Reconstruction de contexte et découverte croisée obligatoires",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "depends_on": [
         "AF-TASK-002"
       ],
-      "next_action": "Enrichir autorités et contrats existants ; valider en CI."
+      "next_action": "Terminé et prouvé : reconstruction Git-only, découverte croisée et tests Claude/ChatGPT verts."
     },
     {
       "id": "AF-TASK-005",
       "title": "Certification exhaustive de tous les Markdown courants",
-      "status": "PENDING",
+      "status": "DONE",
       "depends_on": [
         "AF-TASK-004"
       ],
-      "next_action": "Inventorier dynamiquement les deux trees et certifier chaque path."
+      "next_action": "Terminé : audit exhaustif 241/241, 0 autorité orpheline, 0 contradiction critique ; maintenir par CI."
     },
     {
       "id": "AF-TASK-006",
       "title": "Observabilité S2 sans bridge MCP",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "AF-TASK-004"
       ],
-      "next_action": "Étendre le canal GitHub Actions/SSH read-only et produire une preuve machine-readable."
+      "next_action": "Établir un pin SSH S2 auditable (TOFU borné si aucune preuve OOB n'existe), puis exécuter l'observateur read-only et persister S2_OBSERVATION."
     },
     {
       "id": "AF-TASK-007",
       "title": "Fallback déploiement API/frontend et preflight GOV-006 commun",
-      "status": "PENDING",
+      "status": "IMPLEMENTED_AWAITING_LIVE_PROOF",
       "depends_on": [
         "AF-TASK-006"
       ],
-      "next_action": "Durcir API et créer le fallback frontend sans duplication d'autorité."
+      "next_action": "Après AF-TASK-006, exécuter les fallbacks API/frontend en mode observation/build non destructif avant toute mutation."
     },
     {
       "id": "AF-TASK-008",
       "title": "Enforcement GitHub et détection de drift",
-      "status": "PENDING",
+      "status": "PARTIALLY_ENFORCED",
       "depends_on": [
         "AF-TASK-004",
         "AF-TASK-005"
       ],
-      "next_action": "Appliquer au maximum les protections disponibles et attester les gaps externes."
+      "next_action": "Conserver branch-policy CI vert ; native GitHub rulesets restent gap externe faute de surface admin."
     },
     {
       "id": "AF-TASK-009",
       "title": "Tests reprise multi-agent, bridge-down et certification finale",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "AF-TASK-005",
         "AF-TASK-006",
         "AF-TASK-007",
         "AF-TASK-008"
       ],
-      "next_action": "Exécuter tests déterministes puis attester FULLY_GOVERNED uniquement si toutes preuves vertes."
+      "next_action": "Multi-agent PASS ; compléter bridge-down/S2 live proof puis certification finale."
     },
     {
       "id": "AF-OPS-001",
       "title": "MariaDB Restart=on-failure après OOM",
       "status": "BLOCKED_HUMAN_APPROVAL",
       "next_action": "Conserver jusqu'à approbation distincte ; ne pas confondre avec la certification de gouvernance."
+    },
+    {
+      "id": "AF-TASK-010",
+      "title": "Remédiation des secrets suivis sans régression runtime",
+      "status": "SECURITY_GATE",
+      "depends_on": [
+        "AF-TASK-006"
+      ],
+      "requirements": [
+        "AF-REQ-022"
+      ],
+      "next_action": "Observer les consommateurs S2, préparer migration runtime non suivie, puis rotation service par service ; aucune valeur sensible dans Git/logs."
+    },
+    {
+      "id": "AF-TASK-011",
+      "title": "Synchronisation finale des registres et attestation bi-repository",
+      "status": "PENDING",
+      "depends_on": [
+        "AF-TASK-006",
+        "AF-TASK-007",
+        "AF-TASK-008",
+        "AF-TASK-009",
+        "AF-TASK-010"
+      ],
+      "next_action": "Rejouer Markdown/state/multi-agent/branch/S2/security gates, mettre à jour SUIVI global et produire verdict final."
     }
   ]
 }

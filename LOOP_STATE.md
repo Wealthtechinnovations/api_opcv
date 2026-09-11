@@ -1,44 +1,45 @@
 # LOOP_STATE — AfricaFunds API
 
-> Statut : `IN_PROGRESS`
 > Boucle : `AF-GOV-FINAL-CERT-20260911-01`
-> Tâche parente : `AF-TASK-003` — attestation finale bi-repository.
+> Stage : `IMPLEMENT_COMPATIBLY`
+> Tâche courante : `AF-TASK-006`
+> Parent : `AF-TASK-003`
 
-## Baseline observée avant le premier write
+## État réconcilié au 2026-09-11
 
-- API : `b2753cd860e2f466f53ddc5e8651c80c62d41d12`.
-- Frontend : `c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d`.
-- Branche canonique et default branch des deux dépôts : `claude/code-review-improvements-ikvuj`.
-- GitHub rulesets observés : aucun dans les deux dépôts au démarrage de cette boucle.
-- Production S2 : à réattester après les commits de gouvernance ; aucun état production n'est supposé.
+Baseline observée avant ce write :
+- API : `d2cdcec6f3fbf8e1e1a01f57b61457de4e7f5a08`
+- Frontend : `1a0e52c22e19d3d29916a9bc1a689dfc6dd7fdae`
 
-Ces SHA sont des checkpoints d'ouverture, jamais des valeurs auto-référentielles. Toute écriture relit les deux HEAD.
+```text
+AF-TASK-001 DONE
+AF-TASK-002 DONE
+AF-TASK-004 DONE
+AF-TASK-005 DONE
+AF-TASK-006 IN_PROGRESS
+AF-TASK-007 IMPLEMENTED_AWAITING_LIVE_PROOF
+AF-TASK-008 PARTIALLY_ENFORCED
+AF-TASK-009 IN_PROGRESS
+AF-TASK-010 SECURITY_GATE
+AF-TASK-011 PENDING
+```
 
-## State
+## Preuves vertes
 
-- `DISCOVER` : DONE — deux dépôts, branches, gouvernance et gaps relus.
-- `RECONCILE` : DONE — drift des registres identifié ; task queue plus récente que handoff/state historiques.
-- `BASELINE` : DONE.
-- `SELECT` : DONE — programme final de certification demandé explicitement par le propriétaire.
-- `IMPACT_ANALYSIS` : DONE pour le lot de gouvernance ; aucun changement métier/data prévu.
-- `VERIFY_HEADS` : REQUIRED avant chaque write.
-- `CLAIM_SINGLE_WRITER` : REQUIRED par lot.
-- `IMPLEMENT_COMPATIBLY` : IN_PROGRESS.
-- `VERIFY` : PENDING après chaque commit.
-- `REGRESSION_CHECK` : PENDING après chaque commit.
-- `PERSIST_STATE` : IN_PROGRESS.
-- `VERIFY_REMOTE_STATE` : PENDING après chaque commit.
-- `VERIFY_PRODUCTION` : PENDING ; uniquement par mesure GitHub↔S2/runtime/HTTP.
+- Regulatory Plus API : PASS.
+- State Coherence : PASS.
+- Project Link API/frontend : PASS.
+- Multi-Agent Resume : PASS.
+- Markdown exhaustive audit : 241/241 au dernier registre durable, 0 orphan, 0 contradiction critique.
+- Frontend Markdown Contract : PASS.
+- Branch Policy API/frontend : PASS.
 
-## Sous-lots de certification
+## Blockers mesurés
 
-1. `AF-TASK-004` — reconstruction de contexte + découverte croisée + gates.
-2. `AF-TASK-005` — certification exhaustive de tous les Markdown courants, path-by-path.
-3. `AF-TASK-006` — observabilité S2 / fallback GitHub Actions SSH indépendant du bridge.
-4. `AF-TASK-007` — fallback déploiement API/front et unification des preflights GOV-006.
-5. `AF-TASK-008` — enforcement GitHub au maximum des capacités disponibles.
-6. `AF-TASK-009` — tests reprise multi-agent / bridge-down / attestation finale.
+1. clé hôte S2 candidate disponible mais non vérifiée OOB ;
+2. secrets réels suivis dans le repo API public ;
+3. rulesets GitHub natifs absents et surface admin non exposée par le connecteur actuel.
 
 ## Règle
 
-Le suivi historique global reste `front_end_opcvm/SUIVI.md`. Ce fichier est l'état de boucle structuré pour la reprise et ne remplace pas cet historique.
+Le travail continue automatiquement sur tout lot sûr. `FULLY_GOVERNED` reste interdit tant que le SECURITY_GATE et l'attestation S2 finale ne sont pas résolus.

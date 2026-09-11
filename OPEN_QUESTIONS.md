@@ -12,3 +12,9 @@ Ce registre contient uniquement les inconnues réelles ; il ne remplace ni déci
 - Les chemins optionnels Regulatory Plus doivent rester `CONDITIONAL` tant que leur applicabilité AfricaFunds n’est pas prouvée.
 
 Toute réponse structurante doit être persistée dans une décision/ADR puis retirée de cette section par une nouvelle entrée historique, sans réécrire les décisions passées.
+
+## 2026-09-11 — questions/gaps de certification finale
+
+- S2 host key OOB : aucune empreinte historique indépendante trouvée dans les deux repos ; le candidat issu du bootstrap peut être épinglé en TOFU pour continuer, mais doit rester marqué `PENDING_OOB_VERIFICATION`.
+- GitHub native rulesets : aucun ruleset observé et aucune action admin de création disponible dans le connecteur GitHub actuel.
+- Secrets suivis : remédiation runtime/rotation reste SECURITY_GATE et ne peut pas être résolue par simple modification documentaire.

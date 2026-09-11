@@ -2,16 +2,23 @@
 
 ## AF-GOV-FINAL-CERT-20260911-01
 
-**Objectif :** terminer de bout en bout la certification AfricaFunds demandée par le propriétaire : reconstruction obligatoire de contexte pour toute nouvelle session, découverte croisée des deux repositories, certification 100 % des Markdown, reprise multi-agent déterministe, observabilité S2 sans travail à l'aveugle même sans bridge MCP, fallback GitHub Actions/SSH gouverné, enforcement GitHub et attestation finale.
+Objectif inchangé : terminer la certification AfricaFunds sans système parallèle et sans régression.
 
-**Scope :** gouvernance/versioning, mémoire persistante, CI GitHub, workflows d'observation/déploiement S2, validateurs, registres machine-readable et tests de reprise.
+### État courant
 
-**Hors scope sans gate distinct :** changement métier des fonds, correction de données financières, migration DB destructive, suppression d'artefacts S2 `UNKNOWN`, rotation de secrets ou mutation de configuration production non autorisée.
+La phase Git/documentation/mémoire a franchi les gates principaux : reconstruction de contexte, découverte croisée, audit Markdown exhaustif, reprise Claude↔ChatGPT, branch drift et cohérence d'état sont installés et testés.
 
-**Invariant :** `KEEP/ENRICH/ADAPT/CREATE`, jamais `DELETE/REPLACE/RENAME` lorsqu'une autorité existante peut être enrichie.
+Le lot actif est désormais **AF-TASK-006 — S2 live observation sans bridge MCP**. Le bridge n'est pas disponible dans la présente session ; le fallback GitHub Actions→SSH doit donc être utilisé.
 
-**Baseline d'ouverture :**
-- API `b2753cd860e2f466f53ddc5e8651c80c62d41d12`
-- Frontend `c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d`
+### Ordre de continuation
 
-Toute écriture réobserve les deux HEAD avant commit.
+```text
+AF-TASK-006 S2 OBSERVE
+→ AF-TASK-007 FALLBACK LIVE PROOF
+→ AF-TASK-010 SECRET RUNTIME MIGRATION / ROTATION
+→ AF-TASK-008 ENFORCEMENT MAXIMAL
+→ AF-TASK-009 FINAL RESUME/BRIDGE-DOWN TESTS
+→ AF-TASK-011 FINAL SYNCHRONIZATION + ATTESTATION
+```
+
+Les opérations métier/data historiques restent hors scope de cette itération tant qu'elles ne sont pas nécessaires à la gouvernance finale.
