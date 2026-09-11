@@ -5,9 +5,13 @@ on:
     branches:
       - claude/code-review-improvements-ikvuj
     paths:
+      - '*.md'
+      - '**/*.md'
       - 'scripts/governance/audit_markdown.py'
       - '.governance/schemas/markdown-registry.schema.json'
       - '.github/workflows/governance-markdown-audit.yml'
+  schedule:
+    - cron: '37 * * * *'
   workflow_dispatch:
 
 permissions:
