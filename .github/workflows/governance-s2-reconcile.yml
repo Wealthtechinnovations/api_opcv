@@ -8,9 +8,7 @@ on:
         required: true
         default: observe
         type: choice
-        options:
-          - observe
-          - reconcile
+        options: [observe, reconcile]
       confirmation:
         description: "RECONCILE AFRICAFUNDS S2"
         required: false
@@ -21,6 +19,9 @@ on:
     paths:
       - '.github/workflows/governance-s2-reconcile.yml'
       - 'scripts/governance/s2_git_guard.sh'
+      - 'scripts/governance/prepare_s2_ssh.sh'
+      - '.governance/ssh/s2_known_hosts.tofu'
+      - '.governance/ops/s2-reconcile-request.json'
 
 permissions:
   contents: read
@@ -38,6 +39,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: claude/code-review-improvements-ikvuj
+          fetch-depth: 2
 
       - name: Resolve safe action
         id: mode
@@ -45,33 +47,50 @@ jobs:
           EVENT: ${{ github.event_name }}
           REQUESTED: ${{ inputs.action }}
           CONFIRMATION: ${{ inputs.confirmation }}
+          GITHUB_SHA_VALUE: ${{ github.sha }}
         run: |
           set -euo pipefail
           ACTION="observe"
-          if [ "$EVENT" = "workflow_dispatch" ]; then ACTION="${REQUESTED:-observe}"; fi
-          case "$ACTION" in observe|reconcile) ;; *) echo "::error::invalid action"; exit 2;; esac
-          if [ "$ACTION" = "reconcile" ] && [ "$CONFIRMATION" != "RECONCILE AFRICAFUNDS S2" ]; then
-            echo "::error::reconciliation confirmation phrase missing"
-            exit 3
-          fi
-          echo "action=$ACTION" >> "$GITHUB_OUTPUT"
+          AUTH_SOURCE="NONE"
 
-      - name: Verify strict SSH material
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            ACTION="${REQUESTED:-observe}"
+            AUTH_SOURCE="WORKFLOW_DISPATCH"
+            if [ "$ACTION" = "reconcile" ] && [ "$CONFIRMATION" != "RECONCILE AFRICAFUNDS S2" ]; then
+              echo "::error::reconciliation confirmation phrase missing"
+              exit 3
+            fi
+          elif git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA_VALUE" \
+              | grep -Fxq '.governance/ops/s2-reconcile-request.json'; then
+            test -s .governance/ops/s2-reconcile-request.json
+            python3 - <<'PY'
+          import json
+          p=json.load(open('.governance/ops/s2-reconcile-request.json',encoding='utf-8'))
+          assert p['schema_version']=='1.0.0'
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['action']=='RECONCILE_BOTH'
+          assert p['confirmation']=='RECONCILE AFRICAFUNDS S2'
+          assert p['one_shot'] is True
+          assert p['preserve_untracked'] is True
+          assert p['expected_frontend_sha']
+          print('VERSIONED_RECONCILIATION_REQUEST=PASS')
+          PY
+            ACTION="reconcile"
+            AUTH_SOURCE="VERSIONED_ONE_SHOT_REQUEST"
+          fi
+
+          case "$ACTION" in observe|reconcile) ;; *) echo "::error::invalid action"; exit 2;; esac
+          echo "action=$ACTION" >> "$GITHUB_OUTPUT"
+          echo "auth_source=$AUTH_SOURCE" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare strict pinned SSH
         env:
-          HOST: ${{ secrets.S2_HOST }}
-          KEY: ${{ secrets.S2_SSH_KEY }}
-          KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
-          test -n "$HOST" || { echo "::error::S2_HOST missing"; exit 1; }
-          test -n "$KEY" || { echo "::error::S2_SSH_KEY missing"; exit 1; }
-          test -n "$KNOWN_HOSTS" || { echo "::error::S2_KNOWN_HOSTS missing: pinned host key is mandatory"; exit 1; }
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+          bash scripts/governance/prepare_s2_ssh.sh
 
       - name: GOV-006 preflight — observe both repositories
         env:
@@ -100,18 +119,36 @@ jobs:
         env:
           HOST: ${{ secrets.S2_HOST }}
           USER_SSH: ${{ secrets.S2_USER }}
+          ACTION: ${{ steps.mode.outputs.action }}
+          GITHUB_SHA_VALUE: ${{ github.sha }}
         run: |
           set -euo pipefail
           SSH_USER="${USER_SSH:-root}"
           ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
             "$SSH_USER@$HOST" 'python3 -' < scripts/governance/s2_observe.py > S2_OBSERVATION.json
           python3 -m json.tool S2_OBSERVATION.json >/dev/null
+          python3 - <<'PY'
+          import json, os
+          p=json.load(open('S2_OBSERVATION.json',encoding='utf-8'))
+          if os.environ['ACTION']=='reconcile':
+              assert p['git']['api']['head']==os.environ['GITHUB_SHA_VALUE'], (
+                  p['git']['api']['head'], os.environ['GITHUB_SHA_VALUE'])
+              req=json.load(open('.governance/ops/s2-reconcile-request.json',encoding='utf-8'))
+              assert p['git']['frontend']['head']==req['expected_frontend_sha'], (
+                  p['git']['frontend']['head'], req['expected_frontend_sha'])
+              assert p['git']['api']['tracked_dirty']==[]
+              assert p['git']['frontend']['tracked_dirty']==[]
+              print('GOV006_RECONCILIATION=PASS')
+          else:
+              print('GOV006_OBSERVATION=PASS')
+          PY
 
       - name: Publish evidence
         if: always()
         run: |
           {
             echo "## GOV-006 — ${{ steps.mode.outputs.action }}"
+            echo "Authorization: ${{ steps.mode.outputs.auth_source }}"
             for f in reconciliation-preflight.txt reconciliation-result.txt; do
               if [ -f "$f" ]; then
                 echo
