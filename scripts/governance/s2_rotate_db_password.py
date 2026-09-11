@@ -93,12 +93,13 @@ def active_sensitive_jobs():
     return rows
 
 def alter_password(user,host,password):
-    # Password is generated as hex, so it contains only [0-9a-f].
-    if not all(ch in "0123456789abcdef" for ch in password):
-        raise RuntimeError("generated password format invalid")
     if user != EXPECTED_USER or host != "%":
         raise RuntimeError("unexpected DB account")
-    mysql_root("ALTER USER '"+user+"'@'"+host+"' IDENTIFIED BY '"+password+"'; FLUSH PRIVILEGES;")
+    # Never embed the credential as a SQL string literal. MariaDB PASSWORD()
+    # accepts a binary hex literal, so special characters in rollback material
+    # cannot change SQL syntax and are never logged.
+    hex_value=password.encode("utf-8").hex()
+    mysql_root("SET PASSWORD FOR '"+user+"'@'"+host+"' = PASSWORD(0x"+hex_value+"); FLUSH PRIVILEGES;")
 
 def main():
     if os.geteuid()!=0:
