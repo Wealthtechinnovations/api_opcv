@@ -1,0 +1,174 @@
+name: OPS — deployer frontend AfricaFunds sans bridge
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "observe, build ou deploy"
+        required: true
+        default: observe
+        type: choice
+        options:
+          - observe
+          - build
+          - deploy
+      confirmation:
+        description: "BUILD AFRICAFUNDS FRONTEND ou DEPLOY AFRICAFUNDS FRONTEND"
+        required: false
+        default: ""
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/ops-deploy-frontend.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ops-deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout governance primitives
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Resolve safe action
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          REQUESTED: ${{ inputs.action }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          ACTION="observe"
+          if [ "$EVENT" = "workflow_dispatch" ]; then ACTION="${REQUESTED:-observe}"; fi
+          case "$ACTION" in observe|build|deploy) ;; *) echo "::error::invalid action"; exit 2;; esac
+          if [ "$ACTION" = "build" ] && [ "$CONFIRMATION" != "BUILD AFRICAFUNDS FRONTEND" ]; then
+            echo "::error::build confirmation phrase missing"; exit 3
+          fi
+          if [ "$ACTION" = "deploy" ] && [ "$CONFIRMATION" != "DEPLOY AFRICAFUNDS FRONTEND" ]; then
+            echo "::error::deploy confirmation phrase missing"; exit 4
+          fi
+          echo "action=$ACTION" >> "$GITHUB_OUTPUT"
+
+      - name: Verify strict SSH material
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$HOST" || { echo "::error::S2_HOST missing"; exit 1; }
+          test -n "$KEY" || { echo "::error::S2_SSH_KEY missing"; exit 1; }
+          test -n "$KNOWN_HOSTS" || { echo "::error::S2_KNOWN_HOSTS missing: pinned host key is mandatory"; exit 1; }
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Observe both repositories before any mutation
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- observe both' \
+            < scripts/governance/s2_git_guard.sh | tee frontend-preflight.txt
+
+      - name: Reconcile frontend through GOV-006 guard
+        if: steps.mode.outputs.action != 'observe'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- reconcile frontend' \
+            < scripts/governance/s2_git_guard.sh | tee frontend-reconcile.txt
+
+      - name: Build frontend with repository Node selector
+        if: steps.mode.outputs.action == 'build' || steps.mode.outputs.action == 'deploy'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s' <<'REMOTE' | tee frontend-build.txt
+              set -euo pipefail
+              FRONT=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend
+              cd "$FRONT"
+              test "$(git branch --show-current)" = "claude/code-review-improvements-ikvuj"
+              REMOTE_HEAD="$(git ls-remote origin refs/heads/claude/code-review-improvements-ikvuj | awk '{print $1}')"
+              test "$(git rev-parse HEAD)" = "$REMOTE_HEAD"
+              source ./scripts/_pick-node.sh
+              node --version
+              npm --version
+              npm ci --no-audit --no-fund
+              npm run build:next
+              echo "frontend_build_head=$(git rev-parse HEAD)"
+            REMOTE
+
+      - name: Restart frontend only for explicit deploy
+        if: steps.mode.outputs.action == 'deploy'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s' <<'REMOTE' | tee frontend-deploy.txt
+              set -euo pipefail
+              FRONT=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend
+              cd "$FRONT"
+              REMOTE_HEAD="$(git ls-remote origin refs/heads/claude/code-review-improvements-ikvuj | awk '{print $1}')"
+              test "$(git rev-parse HEAD)" = "$REMOTE_HEAD"
+              pm2 restart fundafrique-frontend
+              CODE=000
+              for i in 1 2 3 4 5 6 7 8 9 10; do
+                sleep 3
+                CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 http://localhost:3000/home || true)"
+                echo "local_frontend_attempt_$i=$CODE"
+                case "$CODE" in 2*|3*) break;; esac
+              done
+              case "$CODE" in 2*|3*) ;; *) echo "frontend local HTTP check failed" >&2; exit 40;; esac
+              PUBLIC="$(curl -sS -L --max-redirs 3 -o /dev/null -w '%{http_code}' --max-time 20 https://africafunds.chainsolutions.fr/home || true)"
+              echo "public_frontend_http=$PUBLIC"
+              case "$PUBLIC" in 2*|3*) ;; *) exit 41;; esac
+              pm2 describe fundafrique-frontend | grep -E 'status|restarts|exec interpreter|script path' || true
+            REMOTE
+
+      - name: Publish report
+        if: always()
+        run: |
+          {
+            echo "## Frontend fallback — ${{ steps.mode.outputs.action }}"
+            for f in frontend-preflight.txt frontend-reconcile.txt frontend-build.txt frontend-deploy.txt; do
+              if [ -f "$f" ]; then
+                echo
+                echo "### $f"
+                echo '~~~text'
+                tail -200 "$f"
+                echo '~~~'
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
