@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "17dec08c75ccb9f394fb3615d14c5f4b67214154"
+      "head": "5e84ab6211946e598cd10cfe9b76cf95aaac62fc"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "04696f01d2b38661a2c2c1514727d2ae0c861df3"
+      "head": "82772fec2951731fe78e1cd67ccf00c9bd2a88f7"
     }
   },
   "summary": {
@@ -2677,7 +2677,12 @@
         "Si les outils MCP sont absents ou disparaissent : MODE RELAIS MCP EXTERNE",
         "Non-regression (permanent)",
         "Documentation (permanent)",
-        "Regle MCP globale"
+        "Regle MCP globale",
+        "Continuité AfricaFunds — GitHub / MCP / SSH CI (2026-09-11)",
+        "Reconstruction obligatoire avant travail",
+        "Canaux serveur",
+        "Matrice de capacités",
+        "Règle de précédence"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -2693,11 +2698,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "MCP_AUTONOMY.md",
-      "git_blob_sha": "19199ef878d1e87352ad20bff49129edf5178b57",
-      "last_validated_sha": "19199ef878d1e87352ad20bff49129edf5178b57",
-      "content_sha256": "1c78f01cbdde8d83b42d6c2ac6113b132eb55ef8b4e033e7a67fc73e84d0c061",
-      "line_count": 111,
-      "byte_count": 4390,
+      "git_blob_sha": "b2442e01e660a200a027b6ca5839f12c71771dcc",
+      "last_validated_sha": "b2442e01e660a200a027b6ca5839f12c71771dcc",
+      "content_sha256": "8ac8d29a4a9c562d730c2b3b3fa278cf31c9670a1f9934dbb1ff92f3d8ab147c",
+      "line_count": 155,
+      "byte_count": 7228,
       "headings": [
         {
           "level": 1,
@@ -2746,6 +2751,26 @@
         {
           "level": 3,
           "text": "Regle MCP globale"
+        },
+        {
+          "level": 2,
+          "text": "Continuité AfricaFunds — GitHub / MCP / SSH CI (2026-09-11)"
+        },
+        {
+          "level": 3,
+          "text": "Reconstruction obligatoire avant travail"
+        },
+        {
+          "level": 3,
+          "text": "Canaux serveur"
+        },
+        {
+          "level": 3,
+          "text": "Matrice de capacités"
+        },
+        {
+          "level": 3,
+          "text": "Règle de précédence"
         }
       ]
     },
@@ -11834,7 +11859,12 @@
         "Si les outils MCP sont absents ou disparaissent : MODE RELAIS MCP EXTERNE",
         "Non-regression (permanent)",
         "Documentation (permanent)",
-        "Regle MCP globale"
+        "Regle MCP globale",
+        "Continuité AfricaFunds — GitHub / MCP / SSH CI (2026-09-11)",
+        "Reconstruction obligatoire avant travail",
+        "Canaux serveur",
+        "Matrice de capacités",
+        "Règle de précédence"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -11850,11 +11880,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "MCP_AUTONOMY.md",
-      "git_blob_sha": "f0d3c0f262440dfa4a042741ef3559efe1b67223",
-      "last_validated_sha": "f0d3c0f262440dfa4a042741ef3559efe1b67223",
-      "content_sha256": "9427173ba984e948bb0739f0d9780da59287120756eb8fe132e351fd5a92a907",
-      "line_count": 111,
-      "byte_count": 4420,
+      "git_blob_sha": "9e361dd0d2f93293fe77a6d9eec3a9e24ccaca66",
+      "last_validated_sha": "9e361dd0d2f93293fe77a6d9eec3a9e24ccaca66",
+      "content_sha256": "a2bc2050524d284e81994cab399e73f80b308f6385fcf542dfd6d958e8be6d59",
+      "line_count": 155,
+      "byte_count": 7258,
       "headings": [
         {
           "level": 1,
@@ -11903,6 +11933,26 @@
         {
           "level": 3,
           "text": "Regle MCP globale"
+        },
+        {
+          "level": 2,
+          "text": "Continuité AfricaFunds — GitHub / MCP / SSH CI (2026-09-11)"
+        },
+        {
+          "level": 3,
+          "text": "Reconstruction obligatoire avant travail"
+        },
+        {
+          "level": 3,
+          "text": "Canaux serveur"
+        },
+        {
+          "level": 3,
+          "text": "Matrice de capacités"
+        },
+        {
+          "level": 3,
+          "text": "Règle de précédence"
         }
       ]
     },
