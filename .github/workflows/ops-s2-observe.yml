@@ -7,6 +7,9 @@ on:
       - claude/code-review-improvements-ikvuj
     paths:
       - 'scripts/governance/s2_observe.py'
+      - 'scripts/governance/prepare_s2_ssh.sh'
+      - '.governance/ssh/s2_known_hosts.tofu'
+      - '.governance/ssh/s2_hostkey_trust.json'
       - '.github/workflows/ops-s2-observe.yml'
 
 permissions:
@@ -27,29 +30,14 @@ jobs:
         with:
           ref: claude/code-review-improvements-ikvuj
 
-      - name: Verify SSH secrets and pinned host key
+      - name: Prepare strict pinned SSH
         env:
-          HOST: ${{ secrets.S2_HOST }}
-          KEY: ${{ secrets.S2_SSH_KEY }}
-          KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
-          test -n "$HOST" || { echo "::error::S2_HOST missing"; exit 1; }
-          test -n "$KEY" || { echo "::error::S2_SSH_KEY missing"; exit 1; }
-          test -n "$KNOWN_HOSTS" || { echo "::error::S2_KNOWN_HOSTS missing: pinned host key is mandatory"; exit 1; }
-
-      - name: Prepare strict SSH
-        env:
-          KEY: ${{ secrets.S2_SSH_KEY }}
-          KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
-        run: |
-          set -euo pipefail
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+          bash scripts/governance/prepare_s2_ssh.sh
 
       - name: Observe S2 without bridge MCP
         env:
