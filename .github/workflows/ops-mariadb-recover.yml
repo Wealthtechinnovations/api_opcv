@@ -84,16 +84,14 @@ jobs:
           fi
           echo "Secrets presents."
 
-      - name: Preparer la connexion SSH
+      - name: Preparer la connexion SSH epinglee
         env:
-          HOST: ${{ secrets.S2_HOST }}
-          KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
         run: |
-          mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          chmod 644 ~/.ssh/known_hosts
+          set -euo pipefail
+          bash scripts/governance/prepare_s2_ssh.sh
 
       - name: Diagnostic, redemarrage, verification
         env:
