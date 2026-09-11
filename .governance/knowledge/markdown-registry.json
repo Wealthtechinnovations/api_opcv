@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "761ab7b130f69454280261a45f0438e9205993ae"
+      "head": "0408f820aafcbd4cd2bb54d36968c8a7c4e804f8"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -7065,7 +7065,11 @@
       "authority_level": "CURRENT_SPECIALIZED",
       "canonical_authority": "docs/08-security/ACCESS_CONTROL.md",
       "unique_information": [
-        "SECRETS_MANAGEMENT — AfricaFunds"
+        "SECRETS_MANAGEMENT — AfricaFunds",
+        "Incident confirmé — 2026-09-11",
+        "SECURITY_GATE",
+        "Ordre de remédiation obligatoire",
+        "Contrôle continu"
       ],
       "consumers": [
         "SECURITY_REVIEW",
@@ -7077,20 +7081,36 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "SECRETS_MANAGEMENT — AfricaFunds",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/08-security/SECRETS_MANAGEMENT.md",
-      "git_blob_sha": "06b9391ec30b7be2cdbc5f0b2f10f07e8b4800f5",
-      "last_validated_sha": "06b9391ec30b7be2cdbc5f0b2f10f07e8b4800f5",
-      "content_sha256": "5c0d176ab63271929abb8866ea3cd878000a0d449bd63b365428829d5fd0a723",
-      "line_count": 3,
-      "byte_count": 351,
+      "git_blob_sha": "aca712f6fbd71ca7c5d156062322388f1d31661b",
+      "last_validated_sha": "aca712f6fbd71ca7c5d156062322388f1d31661b",
+      "content_sha256": "4e97d36648bd357c02d94025d075544e7fd43d97bc22b31f0dfda1d107497751",
+      "line_count": 39,
+      "byte_count": 2991,
       "headings": [
         {
           "level": 1,
           "text": "SECRETS_MANAGEMENT — AfricaFunds"
+        },
+        {
+          "level": 2,
+          "text": "Incident confirmé — 2026-09-11"
+        },
+        {
+          "level": 3,
+          "text": "SECURITY_GATE"
+        },
+        {
+          "level": 3,
+          "text": "Ordre de remédiation obligatoire"
+        },
+        {
+          "level": 3,
+          "text": "Contrôle continu"
         }
       ]
     },
