@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "action": "RECONCILE_BOTH",
+  "confirmation": "RECONCILE AFRICAFUNDS S2",
+  "one_shot": true,
+  "preserve_untracked": true,
+  "authorization_basis": "explicit owner instruction in current ChatGPT session on 2026-09-11 to continue end-to-end and unblock all safe blockers",
+  "observed_s2_before": {
+    "api_head": "516be52b2f2f403db528d727b747580442de60df",
+    "frontend_head": "4b8797984eed5ca3cd02cde7447a30253ebcca40",
+    "api_tracked_dirty": [],
+    "frontend_tracked_dirty": [],
+    "api_untracked": [
+      "0",
+      "data/datejour_snapshots/",
+      "data/naira_snapshots/",
+      "data/scale_break_snapshots/",
+      "sec_ng_downloads/"
+    ]
+  },
+  "expected_frontend_sha": "1a0e52c22e19d3d29916a9bc1a689dfc6dd7fdae",
+  "safety": {
+    "force_push": false,
+    "reset_hard": false,
+    "git_clean": false,
+    "delete_untracked": false,
+    "arbitrary_shell": false,
+    "backup_snapshot_only_commits": true,
+    "fast_forward_frontend_only": true
+  }
+}
