@@ -109,3 +109,47 @@ Mettre a jour SUIVI.md (POINT DE REPRISE COURANT) apres chaque lot.
 ### Regle MCP globale
 Respecter les fichiers .md du depot MCP : NO_REGRESSION_POLICY.md, MCP_PERMISSIONS_MODEL.md,
 MCP_GITHUB_GOVERNANCE.md, MCP_ANTI_DISPERSION_GOVERNANCE.md, SOURCE_OF_TRUTH.md, PROJECT_RULES.md.
+
+
+---
+
+## Continuité AfricaFunds — GitHub / MCP / SSH CI (2026-09-11)
+
+Le nom canonique du produit est **AfricaFunds**. Les mentions historiques `FundAfrica` / `Fundafrique` dans les chemins runtime ou l'historique restent traçables mais ne définissent plus l'identité du projet.
+
+### Reconstruction obligatoire avant travail
+
+```text
+CONTEXT_RECONSTRUCTION_BEFORE_WORK = REQUIRED
+CROSS_REPO_DISCOVERY = REQUIRED
+NO_BLIND_WORK = REQUIRED
+NEW_BRANCH_CREATION = FORBIDDEN
+```
+
+Toute session Claude, ChatGPT, Codex ou autre agent doit commencer par les autorités communes, découvrir l'autre repository via `.governance/project.json` / `.governance/repository.json`, vérifier les deux default/canonical branches et HEAD, lire le `SUIVI.md` global et les registres centraux API, puis reconstruire `FUND_STATE`. La conversation précédente n'est ni requise ni suffisante.
+
+### Canaux serveur
+
+- canal nominal : `wealthtech_ssh_bridge` ;
+- fallback gouverné quand le bridge est indisponible : **GitHub Actions → SSH S2**, avec clé hôte épinglée et `StrictHostKeyChecking=yes` ;
+- absence du bridge ≠ autorisation de travailler à l'aveugle ;
+- absence de preuve S2 = `UNKNOWN/NOT_ATTESTED`, jamais `OK` supposé ;
+- le fallback d'observation ne confère aucune autorisation implicite de mutation production.
+
+### Matrice de capacités
+
+| Capacité | Canal nominal | Fallback GitHub Actions / SSH | Mutation |
+|---|---|---|---|
+| état Git API + frontend, PM2, services, HTTP, DB read-only, ressources, cron, runtime | bridge | `ops-s2-observe.yml` | non |
+| attestation GitHub ↔ S2 ↔ runtime | bridge | `governance-s2-attestation.yml` | non |
+| réconciliation Git S2 | outils gouvernés bridge | `governance-s2-reconcile.yml` + `scripts/governance/s2_git_guard.sh` | oui, confirmation explicite |
+| déploiement/restart API | `deploy_project_s2 project=api_opcv` | `ops-deploy-api.yml` | oui, confirmation explicite |
+| build/déploiement/restart frontend | `deploy_project_s2 project=front_end_opcvm` | `ops-deploy-frontend.yml` | oui, confirmation explicite |
+| récupération MariaDB | selon capacité disponible | `ops-mariadb-recover.yml` | oui, workflow dédié |
+| opérations data sensibles | outils/scripts gouvernés | workflows `ops-*.yml` spécialisés | gates dédiés |
+
+Les workflows ne doivent jamais fournir un shell distant arbitraire. Les commandes sont prédéfinies, bornées et tracées.
+
+### Règle de précédence
+
+Les sections historiques de ce fichier qui décrivent un « relais MCP externe » ou une ancienne séquence de synchronisation restent des traces historiques. Pour le comportement courant, `GOVERNANCE.md`, `AGENTS.md`, `LOOP_ENGINEERING.md`, GOV-006 et la présente section priment : diagnostic avant mutation, guard partagé, préservation des `UNKNOWN`, aucun `git pull` aveugle.
