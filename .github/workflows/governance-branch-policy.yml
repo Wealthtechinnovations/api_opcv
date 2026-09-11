@@ -1,0 +1,78 @@
+name: AfricaFunds Branch Policy
+
+on:
+  create:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.governance/branch-baseline.json'
+      - '.github/workflows/governance-branch-policy.yml'
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-branch-policy
+  cancel-in-progress: false
+
+jobs:
+  enforce-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout canonical branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verify default branch and no unexpected branch
+        env:
+          REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, urllib.request
+          baseline=json.load(open('.governance/branch-baseline.json',encoding='utf-8'))
+          repo=os.environ['REPOSITORY']
+          token=os.environ['GITHUB_TOKEN']
+          expected='claude/code-review-improvements-ikvuj'
+          headers={
+            'Accept':'application/vnd.github+json',
+            'Authorization':f'Bearer {token}',
+            'User-Agent':'AfricaFunds-branch-policy',
+          }
+          def get(url):
+              req=urllib.request.Request(url,headers=headers)
+              with urllib.request.urlopen(req,timeout=20) as r:
+                  return json.load(r)
+          meta=get(f'https://api.github.com/repos/{repo}')
+          if meta.get('default_branch') != expected:
+              raise SystemExit(f"DEFAULT_BRANCH_DRIFT: {meta.get('default_branch')} != {expected}")
+          current=[]
+          page=1
+          while True:
+              rows=get(f'https://api.github.com/repos/{repo}/branches?per_page=100&page={page}')
+              if not rows: break
+              current.extend(x['name'] for x in rows)
+              if len(rows)<100: break
+              page+=1
+          allowed=sorted(x['name'] for x in baseline['allowed_existing_branches'])
+          current=sorted(current)
+          unexpected=sorted(set(current)-set(allowed))
+          missing=sorted(set(allowed)-set(current))
+          print('repository=',repo)
+          print('default_branch=',meta.get('default_branch'))
+          print('current_branches=',json.dumps(current))
+          print('baseline_branches=',json.dumps(allowed))
+          print('unexpected_branches=',json.dumps(unexpected))
+          print('missing_historical_branches=',json.dumps(missing))
+          if unexpected:
+              raise SystemExit('NEW_BRANCH_CREATION_FORBIDDEN: unexpected branch(es): '+', '.join(unexpected))
+          print('NEW_BRANCH_CREATION_POLICY=PASS')
+          print('NATIVE_RULESET_ENFORCEMENT=SEPARATE_GATE')
+          PY
