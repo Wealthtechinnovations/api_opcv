@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "5e84ab6211946e598cd10cfe9b76cf95aaac62fc"
+      "head": "761ab7b130f69454280261a45f0438e9205993ae"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "82772fec2951731fe78e1cd67ccf00c9bd2a88f7"
+      "head": "6eb7757de8f02498784a45fd215080ff8e1b9e78"
     }
   },
   "summary": {
@@ -2402,11 +2402,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "LOOP_ENGINEERING.md",
-      "git_blob_sha": "bbc91dea1185f7da5239d1280462883e0139c1e3",
-      "last_validated_sha": "bbc91dea1185f7da5239d1280462883e0139c1e3",
-      "content_sha256": "47689e1f1e2d0e9d9cfba2d32ff4b8b5cfeec2c2725bb16cea780c8a82a5f211",
-      "line_count": 219,
-      "byte_count": 10745,
+      "git_blob_sha": "bb5b7c68657a875749aab290d9a9fdafe47d3326",
+      "last_validated_sha": "bb5b7c68657a875749aab290d9a9fdafe47d3326",
+      "content_sha256": "943cdeb53dea4a9c848e9c48e3efa7de38d14b0ee7108fac957526ee9eaa6c5e",
+      "line_count": 228,
+      "byte_count": 10902,
       "headings": [
         {
           "level": 1,
@@ -11746,11 +11746,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "LOOP_ENGINEERING.md",
-      "git_blob_sha": "bbc91dea1185f7da5239d1280462883e0139c1e3",
-      "last_validated_sha": "bbc91dea1185f7da5239d1280462883e0139c1e3",
-      "content_sha256": "47689e1f1e2d0e9d9cfba2d32ff4b8b5cfeec2c2725bb16cea780c8a82a5f211",
-      "line_count": 219,
-      "byte_count": 10745,
+      "git_blob_sha": "bb5b7c68657a875749aab290d9a9fdafe47d3326",
+      "last_validated_sha": "bb5b7c68657a875749aab290d9a9fdafe47d3326",
+      "content_sha256": "943cdeb53dea4a9c848e9c48e3efa7de38d14b0ee7108fac957526ee9eaa6c5e",
+      "line_count": 228,
+      "byte_count": 10902,
       "headings": [
         {
           "level": 1,
