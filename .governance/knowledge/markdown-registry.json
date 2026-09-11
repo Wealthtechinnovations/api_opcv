@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "863fc9db514ff854b7551b945365f901ac6c4ace"
+      "head": "6888040c3d66bf8560c60c7d690a52fa8b19d617"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -9270,13 +9270,9 @@
         "D. Confrontation au referentiel (dev_libelle en base)",
         "E. L etiquette de devise correspond-elle a l echelle ?",
         "F. Ce que cela implique pour l etape 0",
-        "Etiquette en desaccord avec le contenu de `value`",
-        "Indetermines — a NE PAS basculer automatiquement (199 avec VL)",
-        "Les 27 fonds declares USD — les deux taux, cote a cote",
-        "Consequence mesuree",
-        "A. Appariement",
-        "B. Nature des ecarts",
-        "C. Changements d echelle — ce qu une correction ecrirait"
+        "Repartition par pays et lot d insertion",
+        "Detail (60 premieres)",
+        "Provenance"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -9292,11 +9288,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "5e823cdcfcb77c075c0419db63f60fdc8b7d2f89",
-      "last_validated_sha": "5e823cdcfcb77c075c0419db63f60fdc8b7d2f89",
-      "content_sha256": "fe04f042eeb9fba050c670791992f45c60f4f422c9de32baa78121f6c8076330",
-      "line_count": 1072,
-      "byte_count": 70468,
+      "git_blob_sha": "eae491d72c197fbda991db3039d730ce810e4d0e",
+      "last_validated_sha": "eae491d72c197fbda991db3039d730ce810e4d0e",
+      "content_sha256": "9abb65b87eed3c547093f6da93033909a1835b0d91663d8602979381f85dfe13",
+      "line_count": 580,
+      "byte_count": 35407,
       "headings": [
         {
           "level": 1,
@@ -9352,82 +9348,6 @@
         },
         {
           "level": 2,
-          "text": "Etiquette en desaccord avec le contenu de `value`"
-        },
-        {
-          "level": 2,
-          "text": "Indetermines — a NE PAS basculer automatiquement (199 avec VL)"
-        },
-        {
-          "level": 2,
-          "text": "Les 27 fonds declares USD — les deux taux, cote a cote"
-        },
-        {
-          "level": 2,
-          "text": "Consequence mesuree"
-        },
-        {
-          "level": 2,
-          "text": "A. Appariement"
-        },
-        {
-          "level": 2,
-          "text": "B. Nature des ecarts"
-        },
-        {
-          "level": 2,
-          "text": "C. Changements d echelle — ce qu une correction ecrirait"
-        },
-        {
-          "level": 2,
-          "text": "D. Devise que l extracteur corrige attribue a ces mesures"
-        },
-        {
-          "level": 2,
-          "text": "Devise emise par l extracteur, par annee (fonds concernes seulement)"
-        },
-        {
-          "level": 2,
-          "text": "Cout par fonds (les 30 plus exposes)"
-        },
-        {
-          "level": 2,
-          "text": "Total"
-        },
-        {
-          "level": 2,
-          "text": "A. Ce que la source permet"
-        },
-        {
-          "level": 2,
-          "text": "B. Et ce que la correction produirait"
-        },
-        {
-          "level": 2,
-          "text": "C. Detail (50 premieres)"
-        },
-        {
-          "level": 2,
-          "text": "D. Ruptures que le naira source NE resout pas"
-        },
-        {
-          "level": 2,
-          "text": "Ce que la source revele"
-        },
-        {
-          "level": 2,
-          "text": "Les plateaux, du plus long au plus court"
-        },
-        {
-          "level": 2,
-          "text": "Par fonds — ce qui resterait apres correction"
-        },
-        {
-          "level": 2,
-          "text": "Ce que cette mesure autorise"
-        },
-        {
-          "level": 2,
           "text": "Repartition par pays et lot d insertion"
         },
         {
@@ -9463,11 +9383,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "52251969cfc12f820ce4eb6824f59b69fea9098a",
-      "last_validated_sha": "52251969cfc12f820ce4eb6824f59b69fea9098a",
-      "content_sha256": "8813db6db84ac595dd5c099c78069a1a8879178b583c5752e9bd95d371cf8590",
-      "line_count": 62,
-      "byte_count": 4475,
+      "git_blob_sha": "590a7e42967e7f5285e9ea0f92dd1dff80c09188",
+      "last_validated_sha": "590a7e42967e7f5285e9ea0f92dd1dff80c09188",
+      "content_sha256": "6c94529b932e4e2910cefe9a30540edb6a38466381bbc1965db7b5e194e7ac4b",
+      "line_count": 63,
+      "byte_count": 4562,
       "headings": [
         {
           "level": 1,
@@ -9508,11 +9428,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/MESURE_DEVISE_SEC.md",
-      "git_blob_sha": "6bd4eb02639a7e01185d31af14a9ff4d9c208c7b",
-      "last_validated_sha": "6bd4eb02639a7e01185d31af14a9ff4d9c208c7b",
-      "content_sha256": "a038faa20e0f06c262915454ecbd1894dc519e0efc4b19493872d892e4c5ce9c",
-      "line_count": 260,
-      "byte_count": 19069,
+      "git_blob_sha": "983bd8ec43467a8f66ae6ba13ab31fdb59fdfe87",
+      "last_validated_sha": "983bd8ec43467a8f66ae6ba13ab31fdb59fdfe87",
+      "content_sha256": "d7e585e4594705d45737d390b58b64d0d1972d634394072a0507af2bc70fbb87",
+      "line_count": 261,
+      "byte_count": 19146,
       "headings": [
         {
           "level": 1,
@@ -9572,11 +9492,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_FIX_SEGMENTS_NAIRA.md",
-      "git_blob_sha": "181c3b2cae6e90f09b98e4ca2cdf7662c7556ecf",
-      "last_validated_sha": "181c3b2cae6e90f09b98e4ca2cdf7662c7556ecf",
-      "content_sha256": "f85a9d234f8b1e1bab52c2dcbb5d18bc0858706946932b8930704f4cae44e807",
-      "line_count": 746,
-      "byte_count": 17966,
+      "git_blob_sha": "c782573b57095e5f317a3c71c86419033b6ad597",
+      "last_validated_sha": "c782573b57095e5f317a3c71c86419033b6ad597",
+      "content_sha256": "2ddbd5e40bb3249d98540a2c38d9fc28b8274a8a37aa35b77f0a149060be86c0",
+      "line_count": 21,
+      "byte_count": 924,
       "headings": [
         {
           "level": 1,
@@ -9591,7 +9511,8 @@
       "canonical_authority": "docs/07-operations/RUNBOOK.md",
       "unique_information": [
         "MariaDB — journal des pannes et des remises en route",
-        "Execution du 2026-08-31 18:39 UTC"
+        "Execution du 2026-08-31 18:39 UTC",
+        "Execution du 2026-09-11 22:08 UTC"
       ],
       "consumers": [
         "CI",
@@ -9609,11 +9530,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_MARIADB.md",
-      "git_blob_sha": "69bfaaff4ef05a48031ae04c9ac411cdd353a656",
-      "last_validated_sha": "69bfaaff4ef05a48031ae04c9ac411cdd353a656",
-      "content_sha256": "a8c2a5a0d359aca1d40b48b403ff459a22390dce7837db94b8412574d7d5c90b",
-      "line_count": 110,
-      "byte_count": 8264,
+      "git_blob_sha": "0a42f42aa7dfa7f89935de775dbe31e130733e4e",
+      "last_validated_sha": "0a42f42aa7dfa7f89935de775dbe31e130733e4e",
+      "content_sha256": "114c248e746a66dbfba315b39101f1918cbbc300358c58d12ebf7b02b8413f20",
+      "line_count": 211,
+      "byte_count": 17782,
       "headings": [
         {
           "level": 1,
@@ -9622,6 +9543,10 @@
         {
           "level": 2,
           "text": "Execution du 2026-08-31 18:39 UTC"
+        },
+        {
+          "level": 2,
+          "text": "Execution du 2026-09-11 22:08 UTC"
         }
       ]
     },
@@ -9685,11 +9610,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_RECALC_DERIVES.md",
-      "git_blob_sha": "0d4ffdfa146ffad0b2cb51a1fe771b980f06ca88",
-      "last_validated_sha": "0d4ffdfa146ffad0b2cb51a1fe771b980f06ca88",
-      "content_sha256": "7f2cbc8563e92f2d30732ee5667f990946af6891962e3f09a733f95f3b05a5df",
-      "line_count": 713,
-      "byte_count": 14996,
+      "git_blob_sha": "aa4d9a57998a7fab138a567b19528617022a6774",
+      "last_validated_sha": "aa4d9a57998a7fab138a567b19528617022a6774",
+      "content_sha256": "dcdbca0e3e9456d03c939ce093682b4046fa81a130c68fe03e78fde8353f0a3f",
+      "line_count": 61,
+      "byte_count": 2508,
       "headings": [
         {
           "level": 1,
@@ -9916,16 +9841,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "NONE",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "Rejeu SEC — etape 2, phase seche",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REJEU_SEC_ETAPE2.md",
-      "git_blob_sha": "08e4da2821a153b2a02f620a30f46a78d63edfb5",
-      "last_validated_sha": "08e4da2821a153b2a02f620a30f46a78d63edfb5",
-      "content_sha256": "558cf7004e5f929d2d961aaf9bd8fd4be4de9252165a2b8dace9c8e753a2727d",
-      "line_count": 991,
-      "byte_count": 38492,
+      "git_blob_sha": "70c29a0342a33c83d393db4856b25e482000fea3",
+      "last_validated_sha": "70c29a0342a33c83d393db4856b25e482000fea3",
+      "content_sha256": "902e78f3801827e801c9f98488da0147bdeb25a71b4bff55b400a076f05e9531",
+      "line_count": 391,
+      "byte_count": 27017,
       "headings": [
         {
           "level": 1,
