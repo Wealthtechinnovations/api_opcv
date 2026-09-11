@@ -1,6 +1,6 @@
 # MANIFEST — AfricaFunds API Regulatory Plus
 
-> Statut : `OPERATIONAL_WITH_OPEN_GAPS` — réconciliation GitHub du 2026-09-10.
+> Statut : `FINAL_CERTIFICATION_IN_PROGRESS` — boucle `AF-GOV-FINAL-CERT-20260911-01`.
 
 ## Source et continuité
 
@@ -68,3 +68,8 @@ Le statut `FULLY_GOVERNED` ne peut être déclaré qu’après :
 - absence de régression introduite ;
 - attestation des gaps externes éventuels ;
 - prochaine action déterministe persistée.
+
+
+## Programme final de certification
+
+Le propriétaire exige désormais une preuve déterministe de : reconstruction de contexte sans mémoire conversationnelle, découverte croisée des deux repos, exploitation certifiée de tous les Markdown, cohérence automatique des registres, reprise multi-agent, observation S2 même sans bridge MCP, fallback de déploiement gouverné et enforcement GitHub. `FULLY_GOVERNED` reste interdit tant qu'un de ces gates n'est pas vert.

@@ -80,3 +80,12 @@ La prochaine action opérationnelle canonique reste celle de `NEXT_ACTION.md` : 
 ## Règle de reprise
 
 Un agent reprend par `00_START_HERE.md`, puis lit les autorités, `STATUS.md`, le `SUIVI.md` global, `LOOP_STATE.md`, `CURRENT_ITERATION.md`, `HANDOFF.md` et `NEXT_ACTION.md`. Il réobserve ensuite les deux HEAD avant toute écriture.
+
+
+## Boucle finale de certification — 2026-09-11
+
+Directive propriétaire : terminer la gouvernance de bout en bout sans créer de système parallèle. Baseline observée avant write : API `b2753cd860e2f466f53ddc5e8651c80c62d41d12`, frontend `c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d`. Default/canonical branch des deux dépôts : `claude/code-review-improvements-ikvuj`.
+
+Le nouveau programme exige : reconstruction de contexte avant travail, découverte croisée obligatoire, certification dynamique 100 % des Markdown, cohérence des registres, fallback GitHub Actions/SSH lorsque le bridge MCP est indisponible, enforcement GitHub au maximum et tests multi-agent avant toute déclaration `FULLY_GOVERNED`.
+
+Les SHA ci-dessus restent des checkpoints observés ; l'état courant doit toujours être relu depuis GitHub.

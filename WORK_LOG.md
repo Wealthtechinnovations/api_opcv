@@ -28,3 +28,14 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
   critiques mesures sont traces (`AF-REQ-011` a `AF-REQ-015`, `AF-EVD-011`) ;
 - aucune suppression, aucun rename, aucun force-push, aucune ecriture de donnees,
   aucun deploiement. `FILES_DELETED = 0`.
+
+
+## 2026-09-11 — AF-GOV-FINAL-CERT-20260911-01
+
+- directive propriétaire : exécuter le programme final de certification sans nouvelle branche ni architecture parallèle ;
+- connexion GitHub authentifiée confirmée sur `Wealthtechinnovations/api_opcv` et `Wealthtechinnovations/front_end_opcvm` ;
+- default branch des deux dépôts confirmée : `claude/code-review-improvements-ikvuj` ;
+- baseline avant write : API `b2753cd860e2f466f53ddc5e8651c80c62d41d12`, frontend `c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d` ;
+- drift confirmé : task queue plus récente que `LOOP_STATE.md`, `HANDOFF.md`, `.governance/loop/state.json` et `.governance/loop/handoff.json` ;
+- décision : réconcilier les registres avant toute nouvelle capacité ;
+- l'ancienne action MariaDB reste conservée comme opération distincte à approbation humaine ; aucune mutation production dans ce lot.

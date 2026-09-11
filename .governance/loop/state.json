@@ -1,10 +1,24 @@
 {
-  "schema_version":"1.0.0",
-  "loop_id":"AF-GOV-RECONCILE-20260910-01",
-  "stage":"PERSIST_STATE",
-  "api_sha":"584793adc956831543b4daf995a30f774fcb9453",
-  "frontend_sha":"e2ac5996c4429910f378b1ddd8b111a08e2d96cf",
-  "next_action":"Vérifier le commit de réconciliation sur le remote et ses checks CI, puis poursuivre l’audit de parité Regulatory actuelle et sélectionner le prochain lot exécutable sans régression.",
-  "blockers":[],
-  "proof_refs":["AF-EVD-013","AF-EVD-014","AF-EVD-015","AF-EVD-016","AF-EVD-017"]
+  "schema_version": "1.1.0",
+  "loop_id": "AF-GOV-FINAL-CERT-20260911-01",
+  "stage": "IMPLEMENT_COMPATIBLY",
+  "current_task_id": "AF-TASK-004",
+  "parent_task_id": "AF-TASK-003",
+  "observed_api_sha": "b2753cd860e2f466f53ddc5e8651c80c62d41d12",
+  "observed_frontend_sha": "c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d",
+  "head_semantics": "OBSERVED_BASELINE_NOT_SELF_REFERENTIAL",
+  "next_action": "Enforce context reconstruction and cross-repository discovery gates, then validate them in CI.",
+  "blockers": [],
+  "proof_refs": [
+    "GITHUB_REPO_METADATA_2026-09-11",
+    "DEFAULT_BRANCH_ALIGNMENT_2026-09-11"
+  ],
+  "rules": {
+    "context_reconstruction_before_work": "REQUIRED",
+    "cross_repo_discovery": "REQUIRED",
+    "new_branch_creation": "FORBIDDEN",
+    "single_writer": "REQUIRED",
+    "verify_both_heads_before_write": "REQUIRED",
+    "no_blind_work": "REQUIRED"
+  }
 }

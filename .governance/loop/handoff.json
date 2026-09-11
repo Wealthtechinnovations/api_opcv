@@ -1,11 +1,37 @@
 {
-  "schema_version":"1.0.0",
-  "product":"AfricaFunds",
-  "loop_id":"AF-GOV-REGULATORY-PLUS-001",
-  "repository":"Wealthtechinnovations/api_opcv",
-  "baseline_api_sha":"cd24305db790f4c0c3f663ef1cca037978145ef6",
-  "frontend_sha_at_last_observation":"345991d153c08f95f9a0bcfc7180e71352fc0b43",
-  "completed":["reference Regulatory inspected","existing AfricaFunds governance preserved","additive API tree prepared"],
-  "open":["commit API","validate remote/checks","integrate frontend","final cross-repo attestation"],
-  "next_action":"Commit API tree in fast-forward only and verify GitHub state."
+  "schema_version": "1.1.0",
+  "product": "AfricaFunds",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "loop_id": "AF-GOV-FINAL-CERT-20260911-01",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "peer_repository": "Wealthtechinnovations/front_end_opcvm",
+  "canonical_branch": "claude/code-review-improvements-ikvuj",
+  "observed_api_sha": "b2753cd860e2f466f53ddc5e8651c80c62d41d12",
+  "observed_frontend_sha": "c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d",
+  "head_semantics": "OBSERVED_BASELINE_NOT_SELF_REFERENTIAL",
+  "completed": [
+    "AF-TASK-001",
+    "AF-TASK-002"
+  ],
+  "active": [
+    "AF-TASK-003",
+    "AF-TASK-004"
+  ],
+  "open": [
+    "AF-TASK-005",
+    "AF-TASK-006",
+    "AF-TASK-007",
+    "AF-TASK-008",
+    "AF-TASK-009"
+  ],
+  "next_action": "Enforce context reconstruction and cross-repository discovery gates, then validate CI.",
+  "resume_contract": {
+    "conversation_memory_required": false,
+    "discover_peer_repository": true,
+    "verify_both_default_branches": true,
+    "read_both_heads": true,
+    "read_global_suivi": true,
+    "observe_s2_if_relevant": true,
+    "work_gate_requires_context_reconstruction": true
+  }
 }

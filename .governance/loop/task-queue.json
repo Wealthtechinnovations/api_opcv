@@ -1,8 +1,111 @@
 {
-  "schema_version":"1.0.0",
-  "tasks":[
-    {"id":"AF-TASK-001","title":"Intégration Regulatory Plus API","status":"DONE","requirements":["AF-REQ-001","AF-REQ-002","AF-REQ-003","AF-REQ-006","AF-REQ-007","AF-REQ-010"],"next_action":"Terminé : intégration publiée ; conserver les preuves et poursuivre par réconciliation de l’état courant."},
-    {"id":"AF-TASK-002","title":"Intégration Regulatory Plus frontend","status":"DONE","requirements":["AF-REQ-001","AF-REQ-002","AF-REQ-003","AF-REQ-006","AF-REQ-007","AF-REQ-010"],"depends_on":["AF-TASK-001"],"next_action":"Terminé : miroir racine et contrat de gouvernance frontend publiés et contrôlés par CI."},
-    {"id":"AF-TASK-003","title":"Attestation finale bi-repository de la gouvernance","status":"IN_PROGRESS","depends_on":["AF-TASK-001","AF-TASK-002"],"next_action":"Réconcilier les registres devenus périmés, vérifier les HEAD et CI actuels, contrôler les écarts avec Regulatory/main actuel, puis persister le verdict et la prochaine action."}
+  "schema_version": "1.1.0",
+  "active_loop_id": "AF-GOV-FINAL-CERT-20260911-01",
+  "tasks": [
+    {
+      "id": "AF-TASK-001",
+      "title": "Intégration Regulatory Plus API",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-001",
+        "AF-REQ-002",
+        "AF-REQ-003",
+        "AF-REQ-006",
+        "AF-REQ-007",
+        "AF-REQ-010"
+      ],
+      "next_action": "Terminé ; conserver preuves et historique."
+    },
+    {
+      "id": "AF-TASK-002",
+      "title": "Intégration Regulatory Plus frontend",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-001",
+        "AF-REQ-002",
+        "AF-REQ-003",
+        "AF-REQ-006",
+        "AF-REQ-007",
+        "AF-REQ-010"
+      ],
+      "depends_on": [
+        "AF-TASK-001"
+      ],
+      "next_action": "Terminé ; conserver preuves et historique."
+    },
+    {
+      "id": "AF-TASK-003",
+      "title": "Attestation finale bi-repository de la gouvernance",
+      "status": "IN_PROGRESS",
+      "depends_on": [
+        "AF-TASK-001",
+        "AF-TASK-002"
+      ],
+      "next_action": "Exécuter AF-TASK-004 à AF-TASK-009 puis produire l'attestation finale."
+    },
+    {
+      "id": "AF-TASK-004",
+      "title": "Reconstruction de contexte et découverte croisée obligatoires",
+      "status": "IN_PROGRESS",
+      "depends_on": [
+        "AF-TASK-002"
+      ],
+      "next_action": "Enrichir autorités et contrats existants ; valider en CI."
+    },
+    {
+      "id": "AF-TASK-005",
+      "title": "Certification exhaustive de tous les Markdown courants",
+      "status": "PENDING",
+      "depends_on": [
+        "AF-TASK-004"
+      ],
+      "next_action": "Inventorier dynamiquement les deux trees et certifier chaque path."
+    },
+    {
+      "id": "AF-TASK-006",
+      "title": "Observabilité S2 sans bridge MCP",
+      "status": "PENDING",
+      "depends_on": [
+        "AF-TASK-004"
+      ],
+      "next_action": "Étendre le canal GitHub Actions/SSH read-only et produire une preuve machine-readable."
+    },
+    {
+      "id": "AF-TASK-007",
+      "title": "Fallback déploiement API/frontend et preflight GOV-006 commun",
+      "status": "PENDING",
+      "depends_on": [
+        "AF-TASK-006"
+      ],
+      "next_action": "Durcir API et créer le fallback frontend sans duplication d'autorité."
+    },
+    {
+      "id": "AF-TASK-008",
+      "title": "Enforcement GitHub et détection de drift",
+      "status": "PENDING",
+      "depends_on": [
+        "AF-TASK-004",
+        "AF-TASK-005"
+      ],
+      "next_action": "Appliquer au maximum les protections disponibles et attester les gaps externes."
+    },
+    {
+      "id": "AF-TASK-009",
+      "title": "Tests reprise multi-agent, bridge-down et certification finale",
+      "status": "PENDING",
+      "depends_on": [
+        "AF-TASK-005",
+        "AF-TASK-006",
+        "AF-TASK-007",
+        "AF-TASK-008"
+      ],
+      "next_action": "Exécuter tests déterministes puis attester FULLY_GOVERNED uniquement si toutes preuves vertes."
+    },
+    {
+      "id": "AF-OPS-001",
+      "title": "MariaDB Restart=on-failure après OOM",
+      "status": "BLOCKED_HUMAN_APPROVAL",
+      "next_action": "Conserver jusqu'à approbation distincte ; ne pas confondre avec la certification de gouvernance."
+    }
   ]
 }

@@ -1,26 +1,44 @@
 # LOOP_STATE — AfricaFunds API
 
 > Statut : `IN_PROGRESS`
-> Boucle : `AF-GOV-REGULATORY-PLUS-001`
+> Boucle : `AF-GOV-FINAL-CERT-20260911-01`
+> Tâche parente : `AF-TASK-003` — attestation finale bi-repository.
+
+## Baseline observée avant le premier write
+
+- API : `b2753cd860e2f466f53ddc5e8651c80c62d41d12`.
+- Frontend : `c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d`.
+- Branche canonique et default branch des deux dépôts : `claude/code-review-improvements-ikvuj`.
+- GitHub rulesets observés : aucun dans les deux dépôts au démarrage de cette boucle.
+- Production S2 : à réattester après les commits de gouvernance ; aucun état production n'est supposé.
+
+Ces SHA sont des checkpoints d'ouverture, jamais des valeurs auto-référentielles. Toute écriture relit les deux HEAD.
 
 ## State
 
-- `DISCOVER` : DONE
-- `RECONCILE` : DONE pour la baseline GitHub initiale
-- `BASELINE` : DONE
-- `SELECT` : DONE
-- `IMPACT_ANALYSIS` : DONE
-- `IMPLEMENT_COMPATIBLY` : IN_PROGRESS (documentaire ; les correctifs de donnees restent devant un gate proprietaire)
-- `VERIFY` : DONE — validateur regulatory_plus vert, contrat inter-depots vert
-- `REGRESSION_CHECK` : DONE — 9/9 fichiers miroir identiques sur origin, aucun requirement existant modifie
-- `PERSIST_STATE` : DONE — SUIVI.md lot AV, registres .governance mis a jour
-- `VERIFY_REMOTE_STATE` : DONE — checks `governance` et `FundAfrica governance contract` au vert
+- `DISCOVER` : DONE — deux dépôts, branches, gouvernance et gaps relus.
+- `RECONCILE` : DONE — drift des registres identifié ; task queue plus récente que handoff/state historiques.
+- `BASELINE` : DONE.
+- `SELECT` : DONE — programme final de certification demandé explicitement par le propriétaire.
+- `IMPACT_ANALYSIS` : DONE pour le lot de gouvernance ; aucun changement métier/data prévu.
+- `VERIFY_HEADS` : REQUIRED avant chaque write.
+- `CLAIM_SINGLE_WRITER` : REQUIRED par lot.
+- `IMPLEMENT_COMPATIBLY` : IN_PROGRESS.
+- `VERIFY` : PENDING après chaque commit.
+- `REGRESSION_CHECK` : PENDING après chaque commit.
+- `PERSIST_STATE` : IN_PROGRESS.
+- `VERIFY_REMOTE_STATE` : PENDING après chaque commit.
+- `VERIFY_PRODUCTION` : PENDING ; uniquement par mesure GitHub↔S2/runtime/HTTP.
 
-## Baseline
+## Sous-lots de certification
 
-API : `58cbefe3d4e439053b36343d4a16df5ec585a458` (baseline initiale du lot : `cd24305db790f4c0c3f663ef1cca037978145ef6`).
-Frontend de référence avant le plan de coordination : `5e6faa6eb68d0b9c9cabe99996fac1b9f6af4bd1`; le frontend a ensuite avancé par le commit de plan Regulatory Plus et doit être relu avant toute transaction bi-repository suivante.
+1. `AF-TASK-004` — reconstruction de contexte + découverte croisée + gates.
+2. `AF-TASK-005` — certification exhaustive de tous les Markdown courants, path-by-path.
+3. `AF-TASK-006` — observabilité S2 / fallback GitHub Actions SSH indépendant du bridge.
+4. `AF-TASK-007` — fallback déploiement API/front et unification des preflights GOV-006.
+5. `AF-TASK-008` — enforcement GitHub au maximum des capacités disponibles.
+6. `AF-TASK-009` — tests reprise multi-agent / bridge-down / attestation finale.
 
 ## Règle
 
-Ce fichier est un état de boucle, pas l’historique global. L’historique global reste `front_end_opcvm/SUIVI.md`.
+Le suivi historique global reste `front_end_opcvm/SUIVI.md`. Ce fichier est l'état de boucle structuré pour la reprise et ne remplace pas cet historique.
