@@ -214,6 +214,15 @@ Tout commit documentaire fait évoluer le `FUND_STATE`. Après documentation de 
 
 ## 21. CONTEXT RECONSTRUCTION GATE
 
+
+```text
+CONTEXT_RECONSTRUCTION_BEFORE_WORK = REQUIRED
+CROSS_REPO_DISCOVERY = REQUIRED
+NO_BLIND_WORK = REQUIRED
+WORK_GATE_REQUIRES_CONTEXT_PASS = TRUE
+```
+
+
 Toute boucle ouverte dans une nouvelle session commence par une reconstruction déterministe : découverte du peer repository, vérification des deux default/canonical branches et HEAD, lecture des autorités/registres, inspection CI récente et observation S2/runtime si le scope en dépend. La sortie attendue est un `FUND_STATE` reconstruit et un `CONTEXT_RECONSTRUCTION=PASS`. Sans ce PASS, `WORK_GATE=CLOSED`.
 
 Le canal d'observation serveur est abstrait : bridge MCP nominal, GitHub Actions → SSH S2 en fallback. Changer de canal ne change ni les autorités, ni les gates, ni les interdictions de mutation.
