@@ -240,6 +240,135 @@
       ],
       "dependencies": [],
       "note": "Mesure du 2026-09-10 : OOM le 2026-09-08 a 20:02:42 (mariadbd a 14,6 Go, tueur = node lance par cron.service, deux minutes apres cron_daily_update.sh). systemd a constate « Failed with result oom-kill » puis n a rien fait : service repart le 2026-09-09 a 06:25:03, soit 10 h 22 d indisponibilite totale de l API. Le rythme de croissance n est PAS lineaire — 6,54 Go apres 23 h contre 6,95 Go apres 9 h 51 le 2026-09-01 — l extrapolation a ~700 Mo/h etait fondee sur un point unique et ne decrit rien de reel. Le pic ponctuel a 14,6 Go, lui, est reel."
+    },
+    {
+      "id": "AF-REQ-017",
+      "title": "Reconstruction de contexte et découverte croisée obligatoires",
+      "status": "VERIFIED",
+      "authority": "AGENTS.md",
+      "acceptance_criteria": [
+        "Toute nouvelle session reconstruit le contexte depuis Git avant write",
+        "Connexion à un repo découvre le peer repo et les deux branches",
+        "Conversation memory non requise"
+      ],
+      "evidence_required": [
+        "multi_agent_resume_ci",
+        "project_link_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-002",
+        "AF-REQ-007"
+      ]
+    },
+    {
+      "id": "AF-REQ-018",
+      "title": "Certification exhaustive de tous les Markdown courants",
+      "status": "VERIFIED",
+      "authority": "DOCUMENT_INTEGRATION_MATRIX.md",
+      "acceptance_criteria": [
+        "TOTAL_MD_DISCOVERED == TOTAL_MD_CERTIFIED",
+        "ORPHAN_AUTHORITY == 0",
+        "UNRESOLVED_CRITICAL_CONTRADICTION == 0",
+        "Chaque path est fingerprinté et classifié"
+      ],
+      "evidence_required": [
+        "markdown_registry",
+        "markdown_audit_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-001"
+      ]
+    },
+    {
+      "id": "AF-REQ-019",
+      "title": "Observation S2 sans bridge MCP et sans travail à l'aveugle",
+      "status": "BLOCKED_EXTERNAL_SECRET",
+      "authority": "MCP_AUTONOMY.md",
+      "acceptance_criteria": [
+        "GitHub Actions SSH observe S2 en lecture seule",
+        "StrictHostKeyChecking=yes avec host key épinglée",
+        "Aucun shell distant arbitraire"
+      ],
+      "evidence_required": [
+        "s2_observer_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-005"
+      ]
+    },
+    {
+      "id": "AF-REQ-020",
+      "title": "Fallback de déploiement API et frontend gouverné",
+      "status": "BLOCKED_EXTERNAL_SECRET",
+      "authority": "docs/06-delivery/DEPLOYMENT.md",
+      "acceptance_criteria": [
+        "API utilise le guard GOV-006 partagé",
+        "Frontend utilise le guard GOV-006 partagé et Node selector existant",
+        "Restart seulement après confirmation explicite",
+        "Aucun --update-env"
+      ],
+      "evidence_required": [
+        "api_fallback_ci",
+        "frontend_fallback_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-019",
+        "AF-REQ-009"
+      ]
+    },
+    {
+      "id": "AF-REQ-021",
+      "title": "Aucune nouvelle branche de travail",
+      "status": "PARTIALLY_ENFORCED",
+      "authority": "docs/04-development/BRANCH_POLICY.md",
+      "acceptance_criteria": [
+        "Default branch == canonical branch dans les deux repos",
+        "Toute branche nouvelle hors baseline est détectée",
+        "Ruleset natif appliqué dès qu'une surface admin compatible est disponible"
+      ],
+      "evidence_required": [
+        "branch_policy_ci",
+        "github_ruleset_observation"
+      ],
+      "dependencies": [
+        "AF-REQ-017"
+      ]
+    },
+    {
+      "id": "AF-REQ-022",
+      "title": "Aucun secret réel versionné dans un repository public",
+      "status": "SECURITY_GATE",
+      "authority": "docs/08-security/SECRETS_MANAGEMENT.md",
+      "acceptance_criteria": [
+        "Secrets exposés rotatés",
+        "Runtime migre vers secret store ou fichier serveur non suivi",
+        "Fichiers suivis ne contiennent plus de credential réel",
+        "Historique évalué et réponse incident documentée"
+      ],
+      "evidence_required": [
+        "secret_audit",
+        "rotation_evidence",
+        "runtime_validation"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-023",
+      "title": "Reprise multi-agent sans divergence",
+      "status": "VERIFIED_GIT_CONTEXT",
+      "authority": "LOOP_ENGINEERING.md",
+      "acceptance_criteria": [
+        "Claude et ChatGPT reconstruisent le même contexte depuis API ou frontend",
+        "SAME_CURRENT_TASK == TRUE",
+        "SAME_NEXT_ACTION == TRUE",
+        "NO_CONVERSATION_MEMORY == TRUE"
+      ],
+      "evidence_required": [
+        "multi_agent_resume_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-017"
+      ]
     }
   ]
 }

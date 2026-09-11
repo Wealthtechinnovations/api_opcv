@@ -175,6 +175,111 @@
       "evidence_refs": [
         "AF-EVD-012"
       ]
+    },
+    {
+      "requirement_id": "AF-REQ-017",
+      "change_refs": [
+        "AGENTS.md",
+        "GOVERNANCE.md",
+        "00_START_HERE.md",
+        "LOOP_ENGINEERING.md",
+        ".governance/project.json",
+        ".governance/repository.json",
+        ".github/workflows/project-link-contract.yml"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-multi-agent-resume.yml",
+        ".github/workflows/project-link-contract.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-018",
+        "AF-EVD-019"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-018",
+      "change_refs": [
+        "scripts/governance/audit_markdown.py",
+        ".governance/knowledge/markdown-registry.json",
+        ".governance/schemas/markdown-registry.schema.json"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-markdown-audit.yml",
+        "scripts/governance/validate_regulatory_plus.py"
+      ],
+      "evidence_refs": [
+        "AF-EVD-020"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-019",
+      "change_refs": [
+        "scripts/governance/s2_observe.py",
+        ".github/workflows/ops-s2-observe.yml",
+        "MCP_AUTONOMY.md"
+      ],
+      "test_refs": [
+        ".github/workflows/ops-s2-observe.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-021"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-020",
+      "change_refs": [
+        "scripts/governance/s2_git_guard.sh",
+        ".github/workflows/ops-deploy-api.yml",
+        ".github/workflows/ops-deploy-frontend.yml",
+        ".github/workflows/governance-s2-reconcile.yml",
+        ".github/workflows/governance-s2-attestation.yml"
+      ],
+      "test_refs": [
+        "GitHub Actions workflow load/secret gates"
+      ],
+      "evidence_refs": [
+        "AF-EVD-021"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-021",
+      "change_refs": [
+        ".governance/branch-baseline.json",
+        ".github/workflows/governance-branch-policy.yml",
+        "docs/04-development/BRANCH_POLICY.md"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-branch-policy.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-022"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-022",
+      "change_refs": [
+        ".gitignore",
+        "docs/08-security/SECRETS_MANAGEMENT.md"
+      ],
+      "test_refs": [
+        "tracked env audit"
+      ],
+      "evidence_refs": [
+        "AF-EVD-023"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-023",
+      "change_refs": [
+        "scripts/governance/reconstruct_context.py",
+        ".github/workflows/governance-multi-agent-resume.yml"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-multi-agent-resume.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-019"
+      ]
     }
   ]
 }

@@ -74,6 +74,54 @@
       "provenance": "chainsolutions-wealthtech/Regulatory main current reference",
       "observed_at": "2026-09-10T05:44:00Z",
       "sha": "4590be6800dd3dbb5c9dde106509967082e28afc"
+    },
+    {
+      "id": "AF-EVD-018",
+      "type": "PROJECT_LINK",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Project Link Contract run 34648496692 + mirrored frontend run 34648518431",
+      "observed_at": "2026-09-11T21:16:09Z",
+      "summary": "Both repositories expose the same project identity, peer mapping and canonical/default branch contract."
+    },
+    {
+      "id": "AF-EVD-019",
+      "type": "MULTI_AGENT_RESUME",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Multi-Agent Resume Contract run 34649651106",
+      "observed_at": "2026-09-11T21:29:47Z",
+      "summary": "Claude/API, Claude/frontend, ChatGPT/API and ChatGPT/frontend reconstruct identical logical context without conversation memory."
+    },
+    {
+      "id": "AF-EVD-020",
+      "type": "MARKDOWN_CERTIFICATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Markdown Exhaustive Audit run 34648775372 + durable registry bot commit 12a418dd689f2d7ee0f72f796a7cb095d0ae54f3",
+      "observed_at": "2026-09-11T21:22:08Z",
+      "summary": "241/241 Markdown read byte-for-byte and classified: API 216, frontend 25, orphan authority 0, unresolved critical contradiction 0. Final rerun still required after later Markdown edits."
+    },
+    {
+      "id": "AF-EVD-021",
+      "type": "CI_SSH_FALLBACK",
+      "result": "BLOCKED_EXTERNAL_SECRET",
+      "provenance": "OPS S2 observer run 34648880344 and subsequent S2 wrapper/fallback runs",
+      "observed_at": "2026-09-11T21:20:31Z",
+      "summary": "S2_HOST and S2_SSH_KEY are present; S2_KNOWN_HOSTS is missing. Workflows fail before SSH/mutation by design. StrictHostKeyChecking is not weakened."
+    },
+    {
+      "id": "AF-EVD-022",
+      "type": "BRANCH_POLICY",
+      "result": "PASS_WITH_NATIVE_ENFORCEMENT_GAP",
+      "provenance": "GitHub branch inventory + Branch Policy runs 34649503793 (API) and 34649506048 (frontend)",
+      "observed_at": "2026-09-11T21:27:54Z",
+      "summary": "Each repo has 3 pre-existing branches; default/canonical branch is correct; any new branch outside baseline is detected. GitHub native rulesets remain absent."
+    },
+    {
+      "id": "AF-EVD-023",
+      "type": "SECURITY_AUDIT",
+      "result": "SECURITY_GATE",
+      "provenance": "GitHub tracked .env audit without exposing values",
+      "observed_at": "2026-09-11T21:30:00Z",
+      "summary": "Public tracked .env contains non-placeholder DB password, JWT secret, email password and Magic secret key material. Application and scripts load .env directly. Safe remediation requires runtime secret migration plus rotation before sanitizing tracked files."
     }
   ],
   "note": "Les preuves historiques sont conservées. Les nouvelles preuves sont ajoutées sans réécrire les observations précédentes ; tout HEAD doit être réobservé avant une nouvelle écriture."
