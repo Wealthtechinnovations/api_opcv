@@ -1,0 +1,72 @@
+name: AfricaFunds Markdown Exhaustive Audit
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/governance/audit_markdown.py'
+      - '.governance/schemas/markdown-registry.schema.json'
+      - '.github/workflows/governance-markdown-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-markdown-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout API canonical branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          path: api
+          fetch-depth: 1
+
+      - name: Checkout frontend canonical branch
+        uses: actions/checkout@v4
+        with:
+          repository: Wealthtechinnovations/front_end_opcvm
+          ref: claude/code-review-improvements-ikvuj
+          path: frontend
+          fetch-depth: 1
+          token: ${{ github.token }}
+
+      - name: Read and classify every Markdown file
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 api/scripts/governance/audit_markdown.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/markdown-registry.json \
+            --summary out/markdown-audit-summary.txt
+
+      - name: Publish summary
+        if: always()
+        run: |
+          {
+            echo '## AfricaFunds exhaustive Markdown audit'
+            echo
+            echo '~~~text'
+            cat out/markdown-audit-summary.txt 2>/dev/null || echo 'audit did not produce a summary'
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload deterministic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-markdown-audit
+          path: |
+            out/markdown-registry.json
+            out/markdown-audit-summary.txt
+          if-no-files-found: error
+          retention-days: 30
