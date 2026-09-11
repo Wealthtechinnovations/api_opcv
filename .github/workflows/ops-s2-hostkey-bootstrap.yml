@@ -1,0 +1,58 @@
+name: OPS — collecter empreinte hote S2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/ops-s2-hostkey-bootstrap.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ops-s2-hostkey-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require S2 host only
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+        run: |
+          set -euo pipefail
+          test -n "$HOST" || { echo "::error::S2_HOST missing"; exit 1; }
+
+      - name: Collect candidate public host keys without logging into S2
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+        run: |
+          set -euo pipefail
+          umask 077
+          ssh-keyscan -T 10 -t ed25519,ecdsa,rsa "$HOST" 2>/dev/null > S2_KNOWN_HOSTS_CANDIDATE
+          test -s S2_KNOWN_HOSTS_CANDIDATE || { echo "::error::no host key returned"; exit 2; }
+          ssh-keygen -lf S2_KNOWN_HOSTS_CANDIDATE -E sha256 > S2_HOSTKEY_FINGERPRINTS.txt
+          {
+            echo '## S2 host-key candidate'
+            echo
+            echo 'No SSH login was attempted. Verify these fingerprints independently'
+            echo 'from the server/provider console before storing the candidate as S2_KNOWN_HOSTS.'
+            echo
+            echo '~~~text'
+            cat S2_HOSTKEY_FINGERPRINTS.txt
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload verification material
+        uses: actions/upload-artifact@v4
+        with:
+          name: s2-hostkey-candidate
+          path: |
+            S2_KNOWN_HOSTS_CANDIDATE
+            S2_HOSTKEY_FINGERPRINTS.txt
+          if-no-files-found: error
+          retention-days: 7
