@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "action": "ROTATE_DB_PASSWORD",
+  "confirmation": "ROTATE AFRICAFUNDS DB PASSWORD",
+  "one_shot": true,
+  "expected_account": "fund_opcvm@%",
+  "expected_database": "fund_opcvm",
+  "rollback_required": true,
+  "restart_backend_processes": [
+    "api-monolith",
+    "worker-recalculation",
+    "worker-data-import"
+  ],
+  "authorization_basis": "explicit owner instruction in current ChatGPT session to continue end-to-end and unblock safe security blockers",
+  "preflight_evidence": {
+    "mariadb_root_socket": "PASS",
+    "db_scope": "fund_opcvm only",
+    "active_db_connections": 7,
+    "pm2_sensitive_env_presence": false,
+    "runtime_env_untracked": true,
+    "runtime_env_mode": "0600"
+  },
+  "safety": {
+    "password_generated_on_s2": true,
+    "password_never_logged": true,
+    "backup_runtime_env_before_change": true,
+    "automatic_rollback_on_failure": true,
+    "old_password_must_be_rejected_after_success": true,
+    "no_username_change": true,
+    "no_schema_change": true,
+    "no_data_change": true,
+    "frontend_restart": false
+  }
+}
