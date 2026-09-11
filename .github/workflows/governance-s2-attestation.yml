@@ -7,6 +7,7 @@ on:
       - claude/code-review-improvements-ikvuj
     paths:
       - '.github/workflows/governance-s2-attestation.yml'
+      - 'scripts/governance/s2_observe.py'
 
 permissions:
   contents: read
@@ -17,175 +18,78 @@ concurrency:
 
 jobs:
   attest:
-    name: Attester GitHub, S2 et runtime FundAfrica
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
+    timeout-minutes: 12
     steps:
-      - name: Verifier les secrets S2
-        env:
-          HOST: ${{ secrets.S2_HOST }}
-          KEY: ${{ secrets.S2_SSH_KEY }}
-        run: |
-          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
-            echo "::error::Secrets S2_HOST ou S2_SSH_KEY manquants."
-            exit 1
-          fi
-          echo "Secrets S2 presents."
+      - name: Checkout canonical governance
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
 
-      - name: Preparer SSH
+      - name: Verify strict SSH material
         env:
           HOST: ${{ secrets.S2_HOST }}
           KEY: ${{ secrets.S2_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
         run: |
+          set -euo pipefail
+          test -n "$HOST" || { echo "::error::S2_HOST missing"; exit 1; }
+          test -n "$KEY" || { echo "::error::S2_SSH_KEY missing"; exit 1; }
+          test -n "$KNOWN_HOSTS" || { echo "::error::S2_KNOWN_HOSTS missing: pinned host key is mandatory"; exit 1; }
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "$KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          chmod 644 ~/.ssh/known_hosts
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
-      - name: Mesurer S2 sans modification
+      - name: Measure S2 without mutation
         env:
           HOST: ${{ secrets.S2_HOST }}
           USER_SSH: ${{ secrets.S2_USER }}
         run: |
+          set -euo pipefail
           SSH_USER="${USER_SSH:-root}"
-          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" 'bash -s' <<'REMOTE'
-            set -u
-            BRANCH='claude/code-review-improvements-ikvuj'
-            API='/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api'
-            FRONT='/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend'
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' < scripts/governance/s2_observe.py > S2_OBSERVATION.json
+          python3 -m json.tool S2_OBSERVATION.json >/dev/null
+          python3 - <<'PY'
+          import json
+          p=json.load(open('S2_OBSERVATION.json',encoding='utf-8'))
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['safety']['read_only_observer'] is True
+          assert p['safety']['production_mutation_performed'] is False
+          print('GitHub/S2 read-only attestation evidence collected.')
+          PY
 
-            inspect_repo() {
-              NAME="$1"
-              DIR="$2"
-              echo "===== ${NAME} ====="
-              cd "$DIR" || { echo "ERROR: path missing: $DIR"; return 20; }
-              test -d .git || { echo "ERROR: not a git repository"; return 21; }
+      - name: Publish summary
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib
+          print('## AfricaFunds GitHub ↔ S2 attestation')
+          pth=pathlib.Path('S2_OBSERVATION.json')
+          if not pth.exists():
+              print('Evidence unavailable; see job logs.')
+          else:
+              p=json.loads(pth.read_text())
+              for role in ('api','frontend'):
+                  g=p['git'][role]
+                  print(f"- {role}: branch={g.get('branch')} head={g.get('head')} remote={g.get('remote_head')} alignment={g.get('remote_alignment')}")
+              for h in p.get('http',[]):
+                  print(f"- HTTP {h.get('url')}: {h.get('http_code')}")
+              print('- DB:', p.get('database',{}).get('connectivity'))
+          PY
 
-              LOCAL_BRANCH="$(git branch --show-current)"
-              LOCAL_HEAD="$(git rev-parse HEAD)"
-              TRACKING_HEAD="$(git rev-parse "origin/$BRANCH" 2>/dev/null || echo MISSING)"
-              REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-              [ -n "$REMOTE_HEAD" ] || REMOTE_HEAD='MISSING'
+      - name: Upload machine-readable attestation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-s2-attestation
+          path: S2_OBSERVATION.json
+          if-no-files-found: warn
+          retention-days: 30
 
-              echo "path=$DIR"
-              echo "branch=$LOCAL_BRANCH"
-              echo "local_head=$LOCAL_HEAD"
-              echo "tracking_head=$TRACKING_HEAD"
-              echo "remote_head=$REMOTE_HEAD"
-              echo "head_subject=$(git log -1 --format='%s')"
-              echo "head_date=$(git log -1 --format='%cI')"
-
-              if [ "$LOCAL_BRANCH" = "$BRANCH" ]; then
-                echo "branch_match=YES"
-              else
-                echo "branch_match=NO"
-              fi
-
-              if [ "$LOCAL_HEAD" = "$REMOTE_HEAD" ]; then
-                echo "remote_alignment=EXACT"
-              else
-                echo "remote_alignment=MISMATCH"
-              fi
-
-              echo '-- git status --'
-              git status -sb
-              echo '-- porcelain --'
-              git status --porcelain=v1
-
-              if [ "$TRACKING_HEAD" != 'MISSING' ]; then
-                echo "ahead_vs_tracking=$(git rev-list --count "origin/$BRANCH..HEAD" 2>/dev/null || echo UNKNOWN)"
-                echo "behind_vs_tracking=$(git rev-list --count "HEAD..origin/$BRANCH" 2>/dev/null || echo UNKNOWN)"
-                echo '-- top changed paths in local-ahead commits --'
-                git log --name-only --pretty=format: "origin/$BRANCH..HEAD" 2>/dev/null \
-                  | sed '/^$/d' | sort | uniq -c | sort -nr | head -40 || true
-
-                echo '-- recent local-ahead commits --'
-                git log --format='%H | %cI | %s' "origin/$BRANCH..HEAD" -n 30 2>/dev/null || true
-
-                SNAPSHOT_ONLY=0
-                OTHER=0
-                OTHER_SHOWN=0
-                while IFS= read -r C; do
-                  [ -n "$C" ] || continue
-                  FILES="$(git diff-tree --no-commit-id --name-only -r "$C" | sed '/^$/d')"
-                  COUNT="$(printf '%s\n' "$FILES" | sed '/^$/d' | wc -l | tr -d ' ')"
-                  if [ "$COUNT" = '1' ] && [ "$FILES" = 'PRODUCTION_STATE.json' ]; then
-                    SNAPSHOT_ONLY=$((SNAPSHOT_ONLY + 1))
-                  else
-                    OTHER=$((OTHER + 1))
-                    if [ "$OTHER_SHOWN" -lt 40 ]; then
-                      SUBJECT="$(git log -1 --format='%s' "$C")"
-                      echo "non_snapshot_commit=$C | $SUBJECT | files=$(printf '%s' "$FILES" | tr '\n' ',')"
-                      OTHER_SHOWN=$((OTHER_SHOWN + 1))
-                    fi
-                  fi
-                done < <(git rev-list "origin/$BRANCH..HEAD" 2>/dev/null || true)
-                echo "snapshot_only_commits_vs_tracking=$SNAPSHOT_ONLY"
-                echo "other_commits_vs_tracking=$OTHER"
-              fi
-
-              if [ "$NAME" = 'API OPCVM' ]; then
-                echo '-- API generated/untracked artifact sizes --'
-                for P in 0 data/datejour_snapshots data/naira_snapshots data/scale_break_snapshots sec_ng_downloads; do
-                  if [ -e "$P" ]; then
-                    du -sh "$P" 2>/dev/null || true
-                    if [ -d "$P" ]; then
-                      echo "files[$P]=$(find "$P" -type f 2>/dev/null | wc -l | tr -d ' ')"
-                    fi
-                  fi
-                done
-                echo "sync_production_blob=$(git hash-object scripts/deploy/sync_production.sh 2>/dev/null || echo MISSING)"
-                echo "production_state_tracked=$(git ls-files --error-unmatch PRODUCTION_STATE.json >/dev/null 2>&1 && echo YES || echo NO)"
-                echo '-- tracked references to PRODUCTION_STATE / sync_production --'
-                git grep -n -E 'PRODUCTION_STATE|sync_production' -- ':!PRODUCTION_STATE.json' 2>/dev/null | head -200 || true
-              fi
-
-              if [ "$NAME" = 'FRONTEND OPCVM' ]; then
-                echo '-- frontend package-lock local diff --'
-                git diff --numstat -- package-lock.json || true
-                git diff -- package-lock.json | sed -n '1,240p' || true
-                echo '-- frontend .mcp_logs size --'
-                du -sh .mcp_logs 2>/dev/null || true
-                echo "mcp_log_files=$(find .mcp_logs -type f 2>/dev/null | wc -l | tr -d ' ')"
-              fi
-              echo
-            }
-
-            inspect_repo 'API OPCVM' "$API"
-            inspect_repo 'FRONTEND OPCVM' "$FRONT"
-
-            echo '===== CRON / SNAPSHOT PRODUCER ====='
-            (crontab -l 2>/dev/null || true) | grep -E 'sync_production|PRODUCTION_STATE|africafunds' || echo '(no matching root crontab line)'
-            grep -R -n -E 'sync_production|PRODUCTION_STATE' /etc/cron.d /etc/cron.hourly /etc/cron.daily 2>/dev/null | head -80 || true
-
-            echo '===== PM2 RUNTIME ====='
-            PM2_RAW="$(pm2 jlist 2>&1 || true)"
-            printf '%s\n' "$PM2_RAW" | sed -n '/^\[/,$p' | node -e '
-              let s=""; process.stdin.on("data",d=>s+=d); process.stdin.on("end",()=>{
-                try {
-                  const rows=JSON.parse(s);
-                  for (const p of rows.filter(x=>["api-monolith","fundafrique-frontend"].includes(x.name))) {
-                    const e=p.pm2_env||{};
-                    console.log(JSON.stringify({name:p.name,status:e.status,pid:p.pid,restarts:e.restart_time,node_version:e.node_version,pm_cwd:e.pm_cwd,pm_exec_path:e.pm_exec_path,version:e.version,uptime:e.pm_uptime}));
-                  }
-                } catch (e) {
-                  console.log("PM2_JSON_PARSE_ERROR="+e.message);
-                }
-              });'
-
-            echo '===== HTTP SMOKE ====='
-            for URL in \
-              'https://africafunds.chainsolutions.fr/' \
-              'https://africafunds.chainsolutions.fr/home' \
-              'https://africafunds.chainsolutions.fr/api/getactualite'; do
-              printf '%s -> ' "$URL"
-              curl -sS -L --max-redirs 3 --max-time 20 -o /dev/null -w 'HTTP %{http_code} | %{time_total}s | %{url_effective}\n' "$URL" || true
-            done
-          REMOTE
-
-      - name: Effacer la cle SSH
+      - name: Remove SSH key
         if: always()
         run: rm -f ~/.ssh/id_deploy
