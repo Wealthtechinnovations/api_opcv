@@ -1,0 +1,57 @@
+name: AfricaFunds Active Sensitive Jobs
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/governance/s2_active_jobs.py'
+      - '.github/workflows/governance-s2-active-jobs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-active-sensitive-jobs
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Prepare strict pinned SSH
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Inspect active sensitive jobs
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' \
+            < scripts/governance/s2_active_jobs.py > S2_ACTIVE_JOBS.json
+          python3 -m json.tool S2_ACTIVE_JOBS.json
+
+      - name: Upload safe evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-active-sensitive-jobs
+          path: S2_ACTIVE_JOBS.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
