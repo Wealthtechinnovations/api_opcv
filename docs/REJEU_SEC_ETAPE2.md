@@ -3,23 +3,22 @@
 > Genere par `ops-sec-replay-dryrun.yml`. Ne pas modifier a la main.
 > **Aucune ecriture en base** : extraction dans un fichier dedie, import en dry-run.
 
-Derniere execution : **2026-08-29 14:59 UTC**
+Derniere execution : **2026-09-11 22:23 UTC**
 
 ```
 ==============================================
  0. MISE A JOUR ET VERSION DU CODE
 ==============================================
- * branch              claude/code-review-improvements-ikvuj -> FETCH_HEAD
-   889088a5..dc1604c0  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
-Rebasing (1/597)Rebasing (2/597)Rebasing (3/597)Rebasing (4/597)Rebasing (5/597)Rebasing (6/597)Rebasing (7/597)Rebasing (8/597)Rebasing (9/597)Rebasing (10/597)Rebasing (11/597)Rebasing (12/597)Rebasing (13/597)Rebasing (14/597)Rebasing (15/597)Rebasing (16/597)Rebasing (17/597)Rebasing (18/597)Rebasing (19/597)Rebasing (20/597)Rebasing (21/597)Rebasing (22/597)Rebasing (23/597)Rebasing (24/597)Rebasing (25/597)Rebasing (26/597)Rebasing (27/597)Rebasing (28/597)Rebasing (29/597)Rebasing (30/597)Rebasing (31/597)Rebasing (32/597)Rebasing (33/597)Rebasing (34/597)Rebasing (35/597)Rebasing (36/597)Rebasing (37/597)Rebasing (38/597)Rebasing (39/597)Rebasing (40/597)Rebasing (41/597)Rebasing (42/597)Rebasing (43/597)Rebasing (44/597)Rebasing (45/597)Rebasing (46/597)Rebasing (47/597)Rebasing (48/597)Rebasing (49/597)Rebasing (50/597)Rebasing (51/597)Rebasing (52/597)Rebasing (53/597)Rebasing (54/597)Rebasing (55/597)Rebasing (56/597)Rebasing (57/597)Rebasing (58/597)Rebasing (59/597)Rebasing (60/597)Rebasing (61/597)Rebasing (62/597)Rebasing (63/597)Rebasing (64/597)Rebasing (65/597)Rebasing (66/597)Rebasing (67/597)Rebasing (68/597)Rebasing (69/597)Rebasing (70/597)Rebasing (71/597)Rebasing (72/597)Rebasing (73/597)Rebasing (74/597)Rebasing (75/597)Rebasing (76/597)Rebasing (77/597)Rebasing (78/597)Rebasing (79/597)Rebasing (80/597)Rebasing (81/597)Rebasing (82/597)Rebasing (83/597)Rebasing (84/597)Rebasing (85/597)Rebasing (86/597)Rebasing (87/597)Rebasing (88/597)Rebasing (89/597)Rebasing (90/597)Rebasing (91/597)Rebasing (92/597)Rebasing (93/597)Rebasing (94/597)Rebasing (95/597)Rebasing (96/597)Rebasing (97/597)Rebasing (98/597)Rebasing (99/597)Rebasing (100/597)Rebasing (101/597)Rebasing (102/597)Rebasing (103/597)Rebasing (104/597)Rebasing (105/597)Rebasing (106/597)Rebasing (107/597)Rebasing (108/597)Rebasing (109/597)Rebasing (110/597)Rebasing (111/597)Rebasing (112/597)Rebasing (113/597)Rebasing (114/597)Rebasing (115/597)Rebasing (116/597)Rebasing (117/597)Rebasing (118/597)Rebasing (119/597)Rebasing (120/597)Rebasing (121/597)Rebasing (122/597)Rebasing (123/597)Rebasing (124/597)Rebasing (125/597)Rebasing (126/597)Rebasing (127/597)Rebasing (128/597)Rebasing (129/597)Rebasing (130/597)Rebasing (131/597)Rebasing (132/597)Rebasing (133/597)Rebasing (134/597)Rebasing (135/597)Rebasing (136/597)Rebasing (137/597)Rebasing (138/597)Rebasing (139/597)Rebasing (140/597)Rebasing (141/597)Rebasing (142/597)Rebasing (143/597)Rebasing (144/597)Rebasing (145/597)Rebasing (146/597)Rebasing (147/597)Rebasing (148/597)Rebasing (149/597)Rebasing (150/597)Rebasing (151/597)Rebasing (152/597)Rebasing (153/597)Rebasing (154/597)Rebasing (155/597)Rebasing (156/597)Rebasing (157/597)Rebasing (158/597)Rebasing (159/597)Rebasing (160/597)Rebasing (161/597)Rebasing (162/597)Rebasing (163/597)Rebasing (164/597)Rebasing (165/597)Rebasing (166/597)Rebasing (167/597)Rebasing (168/597)Rebasing (169/597)Rebasing (170/597)Rebasing (171/597)Rebasing (172/597)Rebasing (173/597)Rebasing (174/597)Rebasing (175/597)Rebasing (176/597)Rebasing (177/597)Rebasing (178/597)Rebasing (179/597)Rebasing (180/597)Rebasing (181/597)Rebasing (182/597)Rebasing (183/597)Rebasing (184/597)Rebasing (185/597)Rebasing (186/597)Rebasing (187/597)Rebasing (188/597)Rebasing (189/597)Rebasing (190/597)Rebasing (191/597)Rebasing (192/597)Rebasing (193/597)Rebasing (194/597)Rebasing (195/597)Rebasing (196/597)Rebasing (197/597)Rebasing (198/597)Rebasing (199/597)Rebasing (200/597)Rebasing (201/597)Rebasing (202/597)Rebasing (203/597)Rebasing (204/597)Rebasing (205/597)Rebasing (206/597)Rebasing (207/597)Rebasing (208/597)Rebasing (209/597)Rebasing (210/597)Rebasing (211/597)Rebasing (212/597)Rebasing (213/597)Rebasing (214/597)Rebasing (215/597)Rebasing (216/597)Rebasing (217/597)Rebasing (218/597)Rebasing (219/597)Rebasing (220/597)Rebasing (221/597)Rebasing (222/597)Rebasing (223/597)Rebasing (224/597)Rebasing (225/597)Rebasing (226/597)Rebasing (227/597)Rebasing (228/597)Rebasing (229/597)Rebasing (230/597)Rebasing (231/597)Rebasing (232/597)Rebasing (233/597)Rebasing (234/597)Rebasing (235/597)Rebasing (236/597)Rebasing (237/597)Rebasing (238/597)Rebasing (239/597)Rebasing (240/597)Rebasing (241/597)Rebasing (242/597)Rebasing (243/597)Rebasing (244/597)Rebasing (245/597)Rebasing (246/597)Rebasing (247/597)Rebasing (248/597)Rebasing (249/597)Rebasing (250/597)Rebasing (251/597)Rebasing (252/597)Rebasing (253/597)Rebasing (254/597)Rebasing (255/597)Rebasing (256/597)Rebasing (257/597)Rebasing (258/597)Rebasing (259/597)Rebasing (260/597)Rebasing (261/597)Rebasing (262/597)Rebasing (263/597)Rebasing (264/597)Rebasing (265/597)Rebasing (266/597)Rebasing (267/597)Rebasing (268/597)Rebasing (269/597)Rebasing (270/597)Rebasing (271/597)Rebasing (272/597)Rebasing (273/597)Rebasing (274/597)Rebasing (275/597)Rebasing (276/597)Rebasing (277/597)Rebasing (278/597)Rebasing (279/597)Rebasing (280/597)Rebasing (281/597)Rebasing (282/597)Rebasing (283/597)Rebasing (284/597)Rebasing (285/597)Rebasing (286/597)Rebasing (287/597)Rebasing (288/597)Rebasing (289/597)Rebasing (290/597)Rebasing (291/597)Rebasing (292/597)Rebasing (293/597)Rebasing (294/597)Rebasing (295/597)Rebasing (296/597)Rebasing (297/597)Rebasing (298/597)Rebasing (299/597)Rebasing (300/597)Rebasing (301/597)Rebasing (302/597)Rebasing (303/597)Rebasing (304/597)Rebasing (305/597)Rebasing (306/597)Rebasing (307/597)Rebasing (308/597)Rebasing (309/597)Rebasing (310/597)Rebasing (311/597)Rebasing (312/597)Rebasing (313/597)Rebasing (314/597)Rebasing (315/597)Rebasing (316/597)Rebasing (317/597)Rebasing (318/597)Rebasing (319/597)Rebasing (320/597)Rebasing (321/597)Rebasing (322/597)Rebasing (323/597)Rebasing (324/597)Rebasing (325/597)Rebasing (326/597)Rebasing (327/597)Rebasing (328/597)Rebasing (329/597)Rebasing (330/597)Rebasing (331/597)Rebasing (332/597)Rebasing (333/597)Rebasing (334/597)Rebasing (335/597)Rebasing (336/597)Rebasing (337/597)Rebasing (338/597)Rebasing (339/597)Rebasing (340/597)Rebasing (341/597)Rebasing (342/597)Rebasing (343/597)Rebasing (344/597)Rebasing (345/597)Rebasing (346/597)Rebasing (347/597)Rebasing (348/597)Rebasing (349/597)Rebasing (350/597)Rebasing (351/597)Rebasing (352/597)Rebasing (353/597)Rebasing (354/597)Rebasing (355/597)Rebasing (356/597)Rebasing (357/597)Rebasing (358/597)Rebasing (359/597)Rebasing (360/597)Rebasing (361/597)Rebasing (362/597)Rebasing (363/597)Rebasing (364/597)Rebasing (365/597)Rebasing (366/597)Rebasing (367/597)Rebasing (368/597)Rebasing (369/597)Rebasing (370/597)Rebasing (371/597)Rebasing (372/597)Rebasing (373/597)Rebasing (374/597)Rebasing (375/597)Rebasing (376/597)Rebasing (377/597)Rebasing (378/597)Rebasing (379/597)Rebasing (380/597)Rebasing (381/597)Rebasing (382/597)Rebasing (383/597)Rebasing (384/597)Rebasing (385/597)Rebasing (386/597)Rebasing (387/597)Rebasing (388/597)Rebasing (389/597)Rebasing (390/597)Rebasing (391/597)Rebasing (392/597)Rebasing (393/597)Rebasing (394/597)Rebasing (395/597)Rebasing (396/597)Rebasing (397/597)Rebasing (398/597)Rebasing (399/597)Rebasing (400/597)Rebasing (401/597)Rebasing (402/597)Rebasing (403/597)Rebasing (404/597)Rebasing (405/597)Rebasing (406/597)Rebasing (407/597)Rebasing (408/597)Rebasing (409/597)Rebasing (410/597)Rebasing (411/597)Rebasing (412/597)Rebasing (413/597)Rebasing (414/597)Rebasing (415/597)Rebasing (416/597)Rebasing (417/597)Rebasing (418/597)Rebasing (419/597)Rebasing (420/597)Rebasing (421/597)Rebasing (422/597)Rebasing (423/597)Rebasing (424/597)Rebasing (425/597)Rebasing (426/597)Rebasing (427/597)Rebasing (428/597)Rebasing (429/597)Rebasing (430/597)Rebasing (431/597)Rebasing (432/597)Rebasing (433/597)Rebasing (434/597)Rebasing (435/597)Rebasing (436/597)Rebasing (437/597)Rebasing (438/597)Rebasing (439/597)Rebasing (440/597)Rebasing (441/597)Rebasing (442/597)Rebasing (443/597)Rebasing (444/597)Rebasing (445/597)Rebasing (446/597)Rebasing (447/597)Rebasing (448/597)Rebasing (449/597)Rebasing (450/597)Rebasing (451/597)Rebasing (452/597)Rebasing (453/597)Rebasing (454/597)Rebasing (455/597)Rebasing (456/597)Rebasing (457/597)Rebasing (458/597)Rebasing (459/597)Rebasing (460/597)Rebasing (461/597)Rebasing (462/597)Rebasing (463/597)Rebasing (464/597)Rebasing (465/597)Rebasing (466/597)Rebasing (467/597)Rebasing (468/597)Rebasing (469/597)Rebasing (470/597)Rebasing (471/597)Rebasing (472/597)Rebasing (473/597)Rebasing (474/597)Rebasing (475/597)Rebasing (476/597)Rebasing (477/597)Rebasing (478/597)Rebasing (479/597)Rebasing (480/597)Rebasing (481/597)Rebasing (482/597)Rebasing (483/597)Rebasing (484/597)Rebasing (485/597)Rebasing (486/597)Rebasing (487/597)Rebasing (488/597)Rebasing (489/597)Rebasing (490/597)Rebasing (491/597)Rebasing (492/597)Rebasing (493/597)Rebasing (494/597)Rebasing (495/597)Rebasing (496/597)Rebasing (497/597)Rebasing (498/597)Rebasing (499/597)Rebasing (500/597)Rebasing (501/597)Rebasing (502/597)Rebasing (503/597)Rebasing (504/597)Rebasing (505/597)Rebasing (506/597)Rebasing (507/597)Rebasing (508/597)Rebasing (509/597)Rebasing (510/597)Rebasing (511/597)Rebasing (512/597)Rebasing (513/597)Rebasing (514/597)Rebasing (515/597)Rebasing (516/597)Rebasing (517/597)Rebasing (518/597)Rebasing (519/597)Rebasing (520/597)Rebasing (521/597)Rebasing (522/597)Rebasing (523/597)Rebasing (524/597)Rebasing (525/597)Rebasing (526/597)Rebasing (527/597)Rebasing (528/597)Rebasing (529/597)Rebasing (530/597)Rebasing (531/597)Rebasing (532/597)Rebasing (533/597)Rebasing (534/597)Rebasing (535/597)Rebasing (536/597)Rebasing (537/597)Rebasing (538/597)Rebasing (539/597)Rebasing (540/597)Rebasing (541/597)Rebasing (542/597)Rebasing (543/597)Rebasing (544/597)Rebasing (545/597)Rebasing (546/597)Rebasing (547/597)Rebasing (548/597)Rebasing (549/597)Rebasing (550/597)Rebasing (551/597)Rebasing (552/597)Rebasing (553/597)Rebasing (554/597)Rebasing (555/597)Rebasing (556/597)Rebasing (557/597)Rebasing (558/597)Rebasing (559/597)Rebasing (560/597)Rebasing (561/597)Rebasing (562/597)Rebasing (563/597)Rebasing (564/597)Rebasing (565/597)Rebasing (566/597)Rebasing (567/597)Rebasing (568/597)Rebasing (569/597)Rebasing (570/597)Rebasing (571/597)Rebasing (572/597)Rebasing (573/597)Rebasing (574/597)Rebasing (575/597)Rebasing (576/597)Rebasing (577/597)Rebasing (578/597)Rebasing (579/597)Rebasing (580/597)Rebasing (581/597)Rebasing (582/597)Rebasing (583/597)Rebasing (584/597)Rebasing (585/597)Rebasing (586/597)Rebasing (587/597)Rebasing (588/597)Rebasing (589/597)Rebasing (590/597)Rebasing (591/597)Rebasing (592/597)Rebasing (593/597)Rebasing (594/597)Rebasing (595/597)Rebasing (596/597)Rebasing (597/597)                                                                                Successfully rebased and updated refs/heads/claude/code-review-improvements-ikvuj.
-cc7a3776 chore: snapshot production state 2026-08-29 14:00
+ 10 files changed, 127 insertions(+), 67 deletions(-)
+ create mode 100644 .github/workflows/governance-s2-active-jobs.yml
+ create mode 100644 scripts/governance/s2_active_jobs.py
+d57810153 security(ssh): pin S2 host key across legacy workflows
 extracteur : 2026-08-29 14:45:15
 annees rejouees : 2026 2025 2024 2023 2022
 
 ==============================================
  1. REJEU DE L EXTRACTION
 ==============================================
-CSV (17 h) anterieur a l extracteur — reextraction imposee.
 [OK] 2022 | NAV-as-at-23rd-December-2022.xlsx | rows=147 | dates=2022-12-23
 [OK] 2022 | NAV-as-at-23rd-September-2022.xlsx | rows=143 | dates=2022-09-23
 [OK] 2022 | NAV-as-at-24th-June-2022.xlsx | rows=139 | dates=2022-06-24
@@ -195,8 +194,8 @@ Lecture de sec_ng_replay.csv...
 
 Connecte a la base fund_opcvm
 Chargement des taux de change...
-  132196 entrees forex chargees
-329 fonds Nigeria existants en base
+  132440 entrees forex chargees
+331 fonds Nigeria existants en base
   Progression: 20/314 fonds (0 VL inserees)...
   Progression: 40/314 fonds (0 VL inserees)...
   Progression: 60/314 fonds (0 VL inserees)...
@@ -221,9 +220,9 @@ Fichier CSV:                   sec_ng_replay.csv
 Lignes CSV totales:            41626
 Lignes valides:                41471
 Fonds dans le CSV:             314
-Fonds matches (existants):     306
+Fonds matches (existants):     308
   dont fuzzy match:            4
-Fonds crees (nouveaux):        8
+Fonds crees (nouveaux):        6
 Fonds ignores (--skip-existing): 0
 Fonds metadata MAJ:            0
 VL inserees:                   0
@@ -231,10 +230,10 @@ VL deja existantes (gardees):  0
 VL sans taux forex:            0
 Erreurs:                       0
 
-Contrat d ecriture:            mode warn, lot SECNG_20260829_145900
+Contrat d ecriture:            mode warn, lot SECNG_20260911_222306
   Qualite des mesures:         (aucune)
   Mesures refusees:            0
-  Rollback de ce lot:          DELETE FROM valorisations WHERE correction_batch = 'SECNG_20260829_145900'
+  Rollback de ce lot:          DELETE FROM valorisations WHERE correction_batch = 'SECNG_20260911_222306'
 
 Matches fuzzy (a verifier):
   CSV: "Nigeria Real Estate Investment Trust" <-> DB: "NIGERIAN REAL ESTATE INVESTMENT TRUST" (sim=0.954)
@@ -271,24 +270,24 @@ Connexion fermee
 ==============================================
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-08-29 14:59:03 UTC — LECTURE SEULE
+Mesure le 2026-09-11 22:23:09 UTC — LECTURE SEULE
 CSV : sec_ng_replay.csv
 
 Lignes CSV : 41626
-Fonds Nigeria en base : 329
-VL Nigeria en base : 77315
+Fonds Nigeria en base : 331
+VL Nigeria en base : 77374
 
 ## A. Appariement
 
-    40826 ligne(s) CSV appariees a un fonds en base
-      646 ligne(s) sans fonds correspondant (nom inconnu)
-     1085 ligne(s) dont la date n est pas en base — un import les AJOUTERAIT
-    27077 ligne(s) identiques a moins de 1 %
-    12664 ligne(s) EN ECART
+    40828 ligne(s) CSV appariees a un fonds en base
+      644 ligne(s) sans fonds correspondant (nom inconnu)
+     1028 ligne(s) dont la date n est pas en base — un import les AJOUTERAIT
+    27123 ligne(s) identiques a moins de 1 %
+    12677 ligne(s) EN ECART
 
 ## B. Nature des ecarts
 
-      378 changement(s) d ECHELLE (facteur >= 10) — les ruptures visees
+      391 changement(s) d ECHELLE (facteur >= 10) — les ruptures visees
     12286 ecart(s) mineur(s) (1 % a 10x) — a instruire separement, ne pas corriger en masse
 
 ## C. Changements d echelle — ce qu une correction ecrirait
@@ -302,6 +301,7 @@ VL Nigeria en base : 77315
    2765 USD  2026-07-10        1799.0246           1.2988    1385.1 USD       CARDINALSTONE DOLLAR FUND
    2766 USD  2026-07-10        1391.3469           1.0900    1276.5 USD       COMERCIO PARTNERS DOLLAR FUND
    2767 NGN  2026-07-10        2101.9892           1.5209    1382.1 USD       COWRY EUROBOND FUND
+   1189 NGN  2026-07-10      153009.1620         111.6700    1370.2 USD       EDC DOLLAR FUND
    1196 NGN  2026-07-10      159006.0360         114.9100    1383.7 USD       EMERGING AFRICA EUROBOND FUND
    2878 USD  2026-07-10        2124.6150           1.5300    1388.6 USD       FCMBAM USD Bond Fund
    2876 USD  2026-07-10      183694.8768         132.7800    1383.5 USD       First Asset Dollar Fund (Retai
@@ -354,16 +354,15 @@ VL Nigeria en base : 77315
    1257 NGN  2026-06-11        2316.4710           1.6989    1363.5 USD       STANBIC IBTC DOLLAR FUND
    2776 USD  2026-06-11      159840.2900         117.0400    1365.7 USD       STL DOLLAR FUND
    1274 NGN  2026-06-11        1743.8939           1.2756    1367.1 USD       UNITED CAPITAL GLOBAL FIXED IN
-   2857 NGN  2026-06-11      158351.2300         116.3300    1361.2 USD       RMBN DOLLAR FIXED INCOME FUND
-  ... et 318 autre(s)
+  ... et 331 autre(s)
 
-  Sens : 339 correction(s) vers une valeur PLUS PETITE, 39 vers une PLUS GRANDE
+  Sens : 378 correction(s) vers une valeur PLUS PETITE, 13 vers une PLUS GRANDE
 
 ## D. Devise que l extracteur corrige attribue a ces mesures
 
-     306 ligne(s)   USD (source : column_header_matched_fund)
-      43 ligne(s)   NGN (source : column_header_matched_fund)
-      29 ligne(s)   NGN (source : column_header)
+     350 ligne(s)   USD (source : column_header_matched_fund)
+      28 ligne(s)   NGN (source : column_header_matched_fund)
+      13 ligne(s)   NGN (source : column_header)
 
 
 ==============================================
@@ -371,22 +370,22 @@ VL Nigeria en base : 77315
 ==============================================
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-08-29 14:59:09 UTC — LECTURE SEULE
+Mesure le 2026-09-11 22:23:15 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
-TOTAL : 233 ligne(s) sur 84 fonds
+TOTAL : 146 ligne(s) sur 64 fonds
 
 ## Repartition par pays et lot d insertion
 
-     91 ligne(s)   NIGERIA | insere le Sun Aug 02
-     54 ligne(s)   NIGERIA | insere le Sun May 17
-     16 ligne(s)   NIGERIA | insere le Mon Jun 22
-     16 ligne(s)   NIGERIA | insere le Thu Jun 04
-      9 ligne(s)   NIGERIA | insere le Mon Aug 24
-      7 ligne(s)   NIGERIA | insere le Mon Jul 06
-      7 ligne(s)   NIGERIA | insere le Mon Jun 08
-      7 ligne(s)   NIGERIA | insere le Mon Jun 01
-      5 ligne(s)   Nigeria | insere le Mon Aug 24
-      4 ligne(s)   NIGERIA | insere le Mon Jun 29
-      3 ligne(s)   NIGERIA | insere le Mon Jul 27
+     86 ligne(s)   NIGERIA | insere le Sun Aug 02
+      9 ligne(s)   NIGERIA | insere le Sun May 17
+      9 ligne(s)   NIGERIA | insere le Thu Jun 04
+      8 ligne(s)   NIGERIA | insere le Mon Aug 31
+      6 ligne(s)   NIGERIA | insere le Mon Jun 22
+      5 ligne(s)   Nigeria | insere le Mon Aug 31
+      4 ligne(s)   NIGERIA | insere le Mon Jun 08
+      3 ligne(s)   NIGERIA | insere le Mon Jul 06
+      3 ligne(s)   NIGERIA | insere le Mon Jul 13
+      2 ligne(s)   NIGERIA | insere le Mon Jun 29
+      2 ligne(s)   NIGERIA | insere le Mon Jul 27
 ```
