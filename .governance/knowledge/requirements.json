@@ -282,7 +282,7 @@
     {
       "id": "AF-REQ-019",
       "title": "Observation S2 sans bridge MCP et sans travail à l'aveugle",
-      "status": "BLOCKED_EXTERNAL_SECRET",
+      "status": "VERIFIED_WITH_EXTERNAL_TRUST_GAP",
       "authority": "MCP_AUTONOMY.md",
       "acceptance_criteria": [
         "GitHub Actions SSH observe S2 en lecture seule",
@@ -294,12 +294,13 @@
       ],
       "dependencies": [
         "AF-REQ-005"
-      ]
+      ],
+      "note": "GitHub Actions→SSH S2 observe/reconcile/attest est live et StrictHostKeyChecking=yes utilise un pin TOFU versionné. Vérification OOB indépendante du host key reste à fournir."
     },
     {
       "id": "AF-REQ-020",
       "title": "Fallback de déploiement API et frontend gouverné",
-      "status": "BLOCKED_EXTERNAL_SECRET",
+      "status": "VERIFIED",
       "authority": "docs/06-delivery/DEPLOYMENT.md",
       "acceptance_criteria": [
         "API utilise le guard GOV-006 partagé",
@@ -314,12 +315,13 @@
       "dependencies": [
         "AF-REQ-019",
         "AF-REQ-009"
-      ]
+      ],
+      "note": "Fallback API/frontend et guard GOV-006 commun ont été exécutés en mode sûr/live avec preuve SSH S2."
     },
     {
       "id": "AF-REQ-021",
       "title": "Aucune nouvelle branche de travail",
-      "status": "PARTIALLY_ENFORCED",
+      "status": "PARTIALLY_ENFORCED_EXTERNAL_GAP",
       "authority": "docs/04-development/BRANCH_POLICY.md",
       "acceptance_criteria": [
         "Default branch == canonical branch dans les deux repos",
@@ -332,12 +334,13 @@
       ],
       "dependencies": [
         "AF-REQ-017"
-      ]
+      ],
+      "note": "Branch-policy CI et default/canonical branch sont enforce/détectés. Les rulesets GitHub natifs sont absents et aucune surface admin d'écriture n'est exposée par le connecteur courant."
     },
     {
       "id": "AF-REQ-022",
       "title": "Aucun secret réel versionné dans un repository public",
-      "status": "SECURITY_GATE",
+      "status": "BLOCKED_EXTERNAL_PROVIDER_ROTATION",
       "authority": "docs/08-security/SECRETS_MANAGEMENT.md",
       "acceptance_criteria": [
         "Secrets exposés rotatés",
@@ -350,12 +353,13 @@
         "rotation_evidence",
         "runtime_validation"
       ],
-      "dependencies": []
+      "dependencies": [],
+      "note": "Le .env réel n'est plus suivi et reste runtime 0600. DB_PASSWORD a été rotaté et l'ancien rejeté. JWT_SECRET a été rotaté puis l'ancienne clé compromise révoquée. EMAIL_PASSWORD et MAGIC_SECRET_KEY nécessitent une rotation côté fournisseurs externes non disponibles via les outils courants."
     },
     {
       "id": "AF-REQ-023",
       "title": "Reprise multi-agent sans divergence",
-      "status": "VERIFIED_GIT_CONTEXT",
+      "status": "VERIFIED",
       "authority": "LOOP_ENGINEERING.md",
       "acceptance_criteria": [
         "Claude et ChatGPT reconstruisent le même contexte depuis API ou frontend",
@@ -368,7 +372,8 @@
       ],
       "dependencies": [
         "AF-REQ-017"
-      ]
+      ],
+      "note": "Claude et ChatGPT reconstruisent le même contexte logique depuis API ou frontend sans mémoire conversationnelle."
     }
   ]
 }
