@@ -20,6 +20,14 @@ Les SHA sont des checkpoints d'ouverture ; la reprise relit toujours GitHub.
 - `AF-TASK-002` : DONE — intégration Regulatory Plus frontend.
 - `AF-TASK-003` : IN_PROGRESS — certification finale bi-repository.
 - `AF-TASK-004` : IN_PROGRESS — reconstruction de contexte/découverte croisée/gates.
+- `AF-OPS-001` : BLOCKED_HUMAN_APPROVAL — MariaDB Restart=on-failure après OOM.
+- `AF-TASK-005` : DONE — Certification exhaustive de tous les Markdown courants.
+- `AF-TASK-006` : IN_PROGRESS — Observabilité S2 sans bridge MCP.
+- `AF-TASK-007` : IMPLEMENTED_AWAITING_LIVE_PROOF — Fallback déploiement API/frontend et preflight GOV-006 commun.
+- `AF-TASK-008` : PARTIALLY_ENFORCED — Enforcement GitHub et détection de drift.
+- `AF-TASK-009` : IN_PROGRESS — Tests reprise multi-agent, bridge-down et certification finale.
+- `AF-TASK-010` : SECURITY_GATE — Remédiation des secrets suivis sans régression runtime.
+- `AF-TASK-011` : PENDING — Synchronisation finale des registres et attestation bi-repository.
 - lots suivants : voir `.governance/loop/task-queue.json`.
 
 ## Reprise obligatoire par tout agent
