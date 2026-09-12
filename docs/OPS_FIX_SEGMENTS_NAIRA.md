@@ -2,26 +2,21 @@
 
 > Genere par `ops-fix-segments-naira.yml`. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-12 01:37 UTC**
+Derniere execution : **2026-09-12 06:34 UTC**
 Mode : **dry-run**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
-Commit avant mise a jour : dd2ddb5b5 chore(governance): certify all current Markdown [skip ci]
+Commit avant mise a jour : 867d894fc ops(governance): authorize final bi-repo S2 reconciliation
 From https://github.com/Wealthtechinnovations/api_opcv
  * branch                claude/code-review-improvements-ikvuj -> FETCH_HEAD
-   dd2ddb5b5..4bdcff783  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
-Updating dd2ddb5b5..4bdcff783
+   867d894fc..85f556085  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
+Updating 867d894fc..85f556085
 Fast-forward
- .github/workflows/ops-fix-segments-naira.yml | 13 +++-
- .governance/knowledge/markdown-registry.json | 88 ++++++++++++++++++++--------
- HANDOFF.md                                   |  8 +++
- docs/OPS_FIX_SCALE_BREAK.md                  | 24 ++++++++
- docs/OPS_FIX_SEGMENTS_NAIRA.md               | 86 +++++++++++++++++++++++++--
- docs/OPS_MYSQL_MEMOIRE.md                    | 10 ++--
- 6 files changed, 190 insertions(+), 39 deletions(-)
- create mode 100644 docs/OPS_FIX_SCALE_BREAK.md
-Commit retenu        : 4bdcff783 docs(ops): retirer une vitesse de fuite memoire que la mesure a dementie
+ .github/workflows/ops-fix-segments-naira.yml | 6 +++---
+ .governance/knowledge/markdown-registry.json | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+Commit retenu        : 85f556085 docs(ops): recomposer le paragraphe coupe par le commit precedent
 
 ==============================================
  1. PERIMETRE (dry-run de controle)
