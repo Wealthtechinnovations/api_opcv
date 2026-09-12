@@ -255,6 +255,62 @@ def db_auth_diagnostic():
         "secret_values_exposed": False,
     }
 
+def process_cwd_inventory():
+    current_db_password = None
+    env_file = API / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8", errors="ignore").splitlines():
+            if line.startswith("DB_PASSWORD="):
+                current_db_password = line.split("=",1)[1].strip().strip("\"'")
+                break
+
+    rows = []
+    proc = Path("/proc")
+    for p in proc.iterdir() if proc.exists() else []:
+        if not p.name.isdigit():
+            continue
+        try:
+            cwd = os.readlink(p / "cwd")
+        except Exception:
+            continue
+        if not (cwd.startswith(str(API)) or cwd.startswith(str(FRONT))):
+            continue
+        try:
+            comm = (p / "comm").read_text(encoding="utf-8", errors="ignore").strip()
+        except Exception:
+            comm = None
+        try:
+            raw = (p / "cmdline").read_bytes().replace(b"\0", b" ").decode("utf-8", errors="ignore").strip()
+        except Exception:
+            raw = ""
+        env_keys = []
+        db_password_state = "UNAVAILABLE"
+        try:
+            env_raw = (p / "environ").read_bytes().split(b"\0")
+            env_map = {}
+            for item in env_raw:
+                if b"=" not in item:
+                    continue
+                k,v=item.split(b"=",1)
+                key=k.decode("utf-8",errors="ignore")
+                env_map[key]=v.decode("utf-8",errors="ignore")
+            env_keys = sorted(k for k in env_map if k.startswith("DB_") or k in {"MYSQL_PWD","DATABASE_URL"})
+            if "DB_PASSWORD" in env_map and current_db_password is not None:
+                db_password_state = "MATCHES_RUNTIME" if env_map["DB_PASSWORD"] == current_db_password else "DIFFERS_FROM_RUNTIME"
+            elif "DB_PASSWORD" not in env_map:
+                db_password_state = "NOT_IN_INITIAL_ENV"
+        except Exception:
+            pass
+        rows.append({
+            "pid": int(p.name),
+            "comm": comm,
+            "cwd": cwd,
+            "cmdline": sanitize(raw)[:700],
+            "db_env_keys": env_keys,
+            "db_password_state": db_password_state,
+        })
+    return sorted(rows, key=lambda x:x["pid"])
+
 def runtime_snapshot():
     p = Path("/var/lib/fundafrica/runtime/PRODUCTION_STATE.json")
     out = {"path": str(p), "exists": p.exists()}
@@ -296,6 +352,7 @@ def main():
         },
         "database": db_readonly(),
         "db_auth_diagnostic": db_auth_diagnostic(),
+        "process_cwd_inventory": process_cwd_inventory(),
         "http": [
             http_probe("https://africafunds.chainsolutions.fr/"),
             http_probe("https://africafunds.chainsolutions.fr/home"),
