@@ -222,7 +222,9 @@
         ".github/workflows/ops-s2-observe.yml"
       ],
       "evidence_refs": [
-        "AF-EVD-021"
+        "AF-EVD-021",
+        "AF-EVD-024",
+        "AF-EVD-025"
       ]
     },
     {
@@ -238,7 +240,8 @@
         "GitHub Actions workflow load/secret gates"
       ],
       "evidence_refs": [
-        "AF-EVD-021"
+        "AF-EVD-021",
+        "AF-EVD-026"
       ]
     },
     {
@@ -252,7 +255,8 @@
         ".github/workflows/governance-branch-policy.yml"
       ],
       "evidence_refs": [
-        "AF-EVD-022"
+        "AF-EVD-022",
+        "AF-EVD-033"
       ]
     },
     {
@@ -265,7 +269,13 @@
         "tracked env audit"
       ],
       "evidence_refs": [
-        "AF-EVD-023"
+        "AF-EVD-023",
+        "AF-EVD-027",
+        "AF-EVD-028",
+        "AF-EVD-029",
+        "AF-EVD-030",
+        "AF-EVD-031",
+        "AF-EVD-032"
       ]
     },
     {
