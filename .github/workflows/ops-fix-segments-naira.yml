@@ -49,7 +49,9 @@
 # charge qui a fait tuer mariadbd par l OOM-killer — le 2026-08-31 a 13,7 Go, puis
 # le 2026-09-08 a 14,6 Go, deux minutes apres le cron de recalcul de 20 h. Cette
 # seconde fois, systemd n avait aucune politique `Restart=` : la base est restee
-# morte 10 h 22 (voir docs/OPS_MYSQL_MEMOIRE.md).
+# morte 10 h 22 (voir docs/OPS_MYSQL_MEMOIRE.md). Enchainer les deux d office
+# reviendrait a jouer la correction contre la disponibilite ; le cron de 20 h les
+# fait de toute facon.
 #
 # CORRECTION D UNE AFFIRMATION QUI FIGURAIT ICI. Ce commentaire annoncait une
 # fuite de « ~700 Mo/h ». C etait une extrapolation faite sur UN seul releve, et
@@ -57,8 +59,6 @@
 # 8,81 Go apres 2 j 18 h le 2026-09-12, soit ~53 Mo/h entre ces deux points. Le
 # risque reste reel — le swap est consomme a 90 % — mais aucune vitesse de fuite
 # fiable n est etablie, et ce fichier ne doit pas en affirmer une.
-# Enchainer les deux d office reviendrait a jouer la correction contre la
-# disponibilite. Le cron de 20 h les fait de toute facon.
 #
 # ROLLBACK : le script prend un snapshot complet de chaque ligne avant ecriture.
 #   node scripts/fix/fix_segments_dollars_nigeria.js --rollback data/naira_snapshots/<f>.json
