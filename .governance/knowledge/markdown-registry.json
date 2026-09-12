@@ -6,24 +6,24 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "b91e6f884635e26556ec4413886329f2ea3c1d95"
+      "head": "2f1ea921f82f8de6298f7aa225aa80b84b5b341f"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "1a68751f67c17aef2a9619edd1d29678c217c485"
+      "head": "d1aae176cc9ade8801f5e2e1ba69e752cd697316"
     }
   },
   "summary": {
-    "total_md_discovered": 241,
-    "total_md_certified": 241,
+    "total_md_discovered": 242,
+    "total_md_certified": 242,
     "by_repository": {
-      "API": 216,
+      "API": 217,
       "FRONTEND": 25
     },
     "by_status": {
       "TEMPLATE": 5,
       "CURRENT_CANONICAL": 21,
-      "CURRENT_SPECIALIZED": 189,
+      "CURRENT_SPECIALIZED": 190,
       "ADAPTER": 7,
       "HISTORICAL": 3,
       "DIAGNOSTIC_SNAPSHOT": 3,
@@ -9474,6 +9474,42 @@
       "authority_level": "CURRENT_SPECIALIZED",
       "canonical_authority": "docs/07-operations/RUNBOOK.md",
       "unique_information": [
+        "Ruptures d echelle #73 — journal des operations"
+      ],
+      "consumers": [
+        "CI",
+        "OPERATIONS",
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "NONE",
+      "production_impact": "NO",
+      "title": "Ruptures d echelle #73 — journal des operations",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/OPS_FIX_SCALE_BREAK.md",
+      "git_blob_sha": "cd91f19f57e68795ef922e87f104535165dd64e1",
+      "last_validated_sha": "cd91f19f57e68795ef922e87f104535165dd64e1",
+      "content_sha256": "837f20e020af2b75da374b648ecaac122e4b2d53fb9a4a83ce2936b21e1da854",
+      "line_count": 24,
+      "byte_count": 710,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Ruptures d echelle #73 — journal des operations"
+        }
+      ]
+    },
+    {
+      "role": "operations",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/07-operations/RUNBOOK.md",
+      "unique_information": [
         "Segments en dollars vers naira — journal des operations"
       ],
       "consumers": [
@@ -9574,11 +9610,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_MYSQL_MEMOIRE.md",
-      "git_blob_sha": "ea1edc0b8d5ffb13df9d118a9b07fe73294e03b3",
-      "last_validated_sha": "ea1edc0b8d5ffb13df9d118a9b07fe73294e03b3",
-      "content_sha256": "4cdb72b0efed39941cd9364d9e4c09e5d5f394cdafffdbc0d3c503bd89ff3038",
+      "git_blob_sha": "574936099cc39ada8bec396618785b69a7a0ba31",
+      "last_validated_sha": "574936099cc39ada8bec396618785b69a7a0ba31",
+      "content_sha256": "db81e5a4689ad38510e349b7feed516c9c8f5c6a1e57f207121c95c4cff6d4ad",
       "line_count": 82,
-      "byte_count": 3431,
+      "byte_count": 3433,
       "headings": [
         {
           "level": 1,
@@ -12438,11 +12474,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "ee6c09fd3a71605d50274f6a32c5ff57c1d26f8d",
-      "last_validated_sha": "ee6c09fd3a71605d50274f6a32c5ff57c1d26f8d",
-      "content_sha256": "ae2ce902b8eb55d322b54259c61b31d53081cadb9c787a62f143f81618f99f16",
-      "line_count": 5741,
-      "byte_count": 414218,
+      "git_blob_sha": "55e828db006576191a8c9a2c9cc950c104f55d91",
+      "last_validated_sha": "55e828db006576191a8c9a2c9cc950c104f55d91",
+      "content_sha256": "ab73b7376a20cf2bc2b21cd89055ca96c2b180b7f1ab279e41c434ec50b50c37",
+      "line_count": 5789,
+      "byte_count": 416783,
       "headings": [
         {
           "level": 1,
