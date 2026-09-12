@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "6888040c3d66bf8560c60c7d690a52fa8b19d617"
+      "head": "b91e6f884635e26556ec4413886329f2ea3c1d95"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "1a0e52c22e19d3d29916a9bc1a689dfc6dd7fdae"
+      "head": "1a68751f67c17aef2a9619edd1d29678c217c485"
     }
   },
   "summary": {
@@ -2299,17 +2299,17 @@
       "contradictions": [],
       "duplication_risk": "NONE",
       "stale_state": [],
-      "security_impact": "NONE",
+      "security_impact": "HIGH",
       "production_impact": "YES",
       "title": "HANDOFF — AfricaFunds API",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "HANDOFF.md",
-      "git_blob_sha": "74c1cc6dda1fc465121eb05a1793380de44a7967",
-      "last_validated_sha": "74c1cc6dda1fc465121eb05a1793380de44a7967",
-      "content_sha256": "b4f75a4cdb5e289819dd0d3e59b627fa52467f4ed47c17535570a169f9bb44ec",
-      "line_count": 38,
-      "byte_count": 1976,
+      "git_blob_sha": "40e008504d7451b2f794bec76bb876d2c21a7fb3",
+      "last_validated_sha": "40e008504d7451b2f794bec76bb876d2c21a7fb3",
+      "content_sha256": "9da96f187a8a7c90fce9acfef44ed15073067730e4e01a7a8cadcbc97e3bedbb",
+      "line_count": 46,
+      "byte_count": 2702,
       "headings": [
         {
           "level": 1,
@@ -9492,11 +9492,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_FIX_SEGMENTS_NAIRA.md",
-      "git_blob_sha": "c782573b57095e5f317a3c71c86419033b6ad597",
-      "last_validated_sha": "c782573b57095e5f317a3c71c86419033b6ad597",
-      "content_sha256": "2ddbd5e40bb3249d98540a2c38d9fc28b8274a8a37aa35b77f0a149060be86c0",
-      "line_count": 21,
-      "byte_count": 924,
+      "git_blob_sha": "561ee810433441d37f1d798c55fecd4b6142a0c3",
+      "last_validated_sha": "561ee810433441d37f1d798c55fecd4b6142a0c3",
+      "content_sha256": "57e6efed07cff3ef2fd1f9a25f78b953971da3618a29cde2b9cf0d25a0c30b05",
+      "line_count": 95,
+      "byte_count": 5989,
       "headings": [
         {
           "level": 1,
@@ -12438,11 +12438,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "662b4cc5dcdb4bbc2005d3131287c1c566dc388a",
-      "last_validated_sha": "662b4cc5dcdb4bbc2005d3131287c1c566dc388a",
-      "content_sha256": "11a488e99102cfa3c0869defb97476b9f531f486ef94c24d4119fe881c65c71d",
-      "line_count": 5694,
-      "byte_count": 411748,
+      "git_blob_sha": "ee6c09fd3a71605d50274f6a32c5ff57c1d26f8d",
+      "last_validated_sha": "ee6c09fd3a71605d50274f6a32c5ff57c1d26f8d",
+      "content_sha256": "ae2ce902b8eb55d322b54259c61b31d53081cadb9c787a62f143f81618f99f16",
+      "line_count": 5741,
+      "byte_count": 414218,
       "headings": [
         {
           "level": 1,
