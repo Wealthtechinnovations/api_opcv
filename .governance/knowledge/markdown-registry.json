@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "2ad83ba896f8a3845b2efabda30880ff1b933ae4"
+      "head": "a35a0199c914b896db4b64523544f4d8483e69c3"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "d1aae176cc9ade8801f5e2e1ba69e752cd697316"
+      "head": "fbbb4e9586e7f2a0bc683832d26591224c14bdb3"
     }
   },
   "summary": {
@@ -3483,7 +3483,8 @@
         "Écarts de gouvernance ouverts",
         "Règle de reprise",
         "Boucle finale de certification — 2026-09-11",
-        "Certification finale en cours — 2026-09-12"
+        "Certification finale en cours — 2026-09-12",
+        "Trigger de certification Markdown finale — 2026-09-12"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3499,11 +3500,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "bbeb23957e3ec4da4ad30f6d801e9f3013e8561a",
-      "last_validated_sha": "bbeb23957e3ec4da4ad30f6d801e9f3013e8561a",
-      "content_sha256": "a28d0722f27255bb1fe96fcd73fb81ad1d19f3cfaf12a89abfde9e1a1ba66076",
-      "line_count": 103,
-      "byte_count": 6527,
+      "git_blob_sha": "d5907c7cff47851b6e9f89bbca55ee99af24faac",
+      "last_validated_sha": "d5907c7cff47851b6e9f89bbca55ee99af24faac",
+      "content_sha256": "4b44ae780dcfd512cc625e1b0b86dd4dea1b5fae40b687c6b68be2940a1a7a77",
+      "line_count": 108,
+      "byte_count": 6812,
       "headings": [
         {
           "level": 1,
@@ -3544,6 +3545,10 @@
         {
           "level": 2,
           "text": "Certification finale en cours — 2026-09-12"
+        },
+        {
+          "level": 3,
+          "text": "Trigger de certification Markdown finale — 2026-09-12"
         }
       ]
     },
@@ -12490,11 +12495,12 @@
       "canonical_authority": "SUIVI.md",
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
-        "POINT DE REPRISE COURANT — GOV-006 / gouvernance GitHub ↔ S2",
-        "Réalisé et vérifié",
-        "Vigilance conservée",
-        "Autorités et runbook",
-        "Certification GOV-006",
+        "POINT DE REPRISE COURANT — AF-GOV-FINAL-CERT / AF-TASK-011",
+        "Produit et Git",
+        "Loop Engineering / gouvernance",
+        "Canal serveur sans MCP",
+        "Remédiation secrets exécutée",
+        "Gaps externes qui empêchent FULLY_GOVERNED",
         "Prochaine action unique",
         "BACKLOG CONSOLIDE UNIQUE — etabli le 2026-08-12",
         "1. ETAT REEL DE LA PLATEFORME (verifie PROD le 2026-08-12)",
@@ -12507,8 +12513,7 @@
         "5. REGLES PERMANENTES — RAPPEL DES PLUS ENGAGEANTES",
         "6. PLAN D'EXECUTION RECOMMANDE",
         "Architecture",
-        "Panels utilisateur",
-        "Points valides et deployes"
+        "Panels utilisateur"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -12524,11 +12529,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "55e828db006576191a8c9a2c9cc950c104f55d91",
-      "last_validated_sha": "55e828db006576191a8c9a2c9cc950c104f55d91",
-      "content_sha256": "ab73b7376a20cf2bc2b21cd89055ca96c2b180b7f1ab279e41c434ec50b50c37",
-      "line_count": 5789,
-      "byte_count": 416783,
+      "git_blob_sha": "9f72ba2dc356d29c4cea16190926cd77728a0996",
+      "last_validated_sha": "9f72ba2dc356d29c4cea16190926cd77728a0996",
+      "content_sha256": "aff40853fc73c1561f4db2fa69c2f6434945ab07a2be647e106447e3a2eaa984",
+      "line_count": 5804,
+      "byte_count": 416425,
       "headings": [
         {
           "level": 1,
@@ -12536,23 +12541,27 @@
         },
         {
           "level": 2,
-          "text": "POINT DE REPRISE COURANT — GOV-006 / gouvernance GitHub ↔ S2"
+          "text": "POINT DE REPRISE COURANT — AF-GOV-FINAL-CERT / AF-TASK-011"
         },
         {
           "level": 3,
-          "text": "Réalisé et vérifié"
+          "text": "Produit et Git"
         },
         {
           "level": 3,
-          "text": "Vigilance conservée"
+          "text": "Loop Engineering / gouvernance"
         },
         {
           "level": 3,
-          "text": "Autorités et runbook"
+          "text": "Canal serveur sans MCP"
         },
         {
           "level": 3,
-          "text": "Certification GOV-006"
+          "text": "Remédiation secrets exécutée"
+        },
+        {
+          "level": 3,
+          "text": "Gaps externes qui empêchent FULLY_GOVERNED"
         },
         {
           "level": 3,
@@ -12685,10 +12694,6 @@
         {
           "level": 3,
           "text": "2026-05-16 - Script import historique Forex (5 XLSX, 9 paires, 2000-2026)"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-16 - Fix MySQL host IPv6 dans tous les scripts"
         }
       ]
     },
