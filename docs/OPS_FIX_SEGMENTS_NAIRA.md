@@ -2,27 +2,26 @@
 
 > Genere par `ops-fix-segments-naira.yml`. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-11 23:34 UTC**
+Derniere execution : **2026-09-12 01:37 UTC**
 Mode : **dry-run**
-Declencheur : `workflow_dispatch` — par `Wealthtechinnovations`
+Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
-Commit avant mise a jour : d57810153 security(ssh): pin S2 host key across legacy workflows
+Commit avant mise a jour : dd2ddb5b5 chore(governance): certify all current Markdown [skip ci]
 From https://github.com/Wealthtechinnovations/api_opcv
  * branch                claude/code-review-improvements-ikvuj -> FETCH_HEAD
-   d57810153..dd2ddb5b5  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
-Updating d57810153..dd2ddb5b5
+   dd2ddb5b5..4bdcff783  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
+Updating dd2ddb5b5..4bdcff783
 Fast-forward
- .governance/knowledge/markdown-registry.json | 167 +++-----
- docs/DIAG_ONDEMAND.md                        | 598 +++------------------------
- docs/ETAT_PRODUCTION_VERIFIE.md              |  15 +-
- docs/MESURE_DEVISE_SEC.md                    |  11 +-
- docs/OPS_FIX_SEGMENTS_NAIRA.md               |  76 +---
- docs/OPS_MARIADB.md                          | 101 +++++
- docs/OPS_RECALC_DERIVES.md                   |  27 +-
- docs/REJEU_SEC_ETAPE2.md                     |  79 ++--
- 8 files changed, 272 insertions(+), 802 deletions(-)
-Commit retenu        : dd2ddb5b5 chore(governance): certify all current Markdown [skip ci]
+ .github/workflows/ops-fix-segments-naira.yml | 13 +++-
+ .governance/knowledge/markdown-registry.json | 88 ++++++++++++++++++++--------
+ HANDOFF.md                                   |  8 +++
+ docs/OPS_FIX_SCALE_BREAK.md                  | 24 ++++++++
+ docs/OPS_FIX_SEGMENTS_NAIRA.md               | 86 +++++++++++++++++++++++++--
+ docs/OPS_MYSQL_MEMOIRE.md                    | 10 ++--
+ 6 files changed, 190 insertions(+), 39 deletions(-)
+ create mode 100644 docs/OPS_FIX_SCALE_BREAK.md
+Commit retenu        : 4bdcff783 docs(ops): retirer une vitesse de fuite memoire que la mesure a dementie
 
 ==============================================
  1. PERIMETRE (dry-run de controle)
