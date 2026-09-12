@@ -122,7 +122,7 @@
     {
       "id": "AF-TASK-011",
       "title": "Synchronisation finale des registres et attestation bi-repository",
-      "status": "FINAL_S2_ATTESTATION",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "AF-TASK-006",
         "AF-TASK-007",
@@ -130,7 +130,8 @@
         "AF-TASK-009",
         "AF-TASK-010"
       ],
-      "next_action": "Réconcilier S2 vers les HEAD GitHub finaux puis exécuter observation/attestation runtime finale."
+      "next_action": "Réconcilier S2 vers les HEAD GitHub finaux puis exécuter observation/attestation runtime finale.",
+      "phase": "FINAL_S2_ATTESTATION"
     }
   ]
 }
