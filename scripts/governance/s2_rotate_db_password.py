@@ -95,11 +95,20 @@ def active_sensitive_jobs():
 def alter_password(user,host,password):
     if user != EXPECTED_USER or host != "%":
         raise RuntimeError("unexpected DB account")
-    # Never embed the credential as a SQL string literal. MariaDB PASSWORD()
-    # accepts a binary hex literal, so special characters in rollback material
-    # cannot change SQL syntax and are never logged.
+    # Tested on S2 with a temporary MariaDB account (CI run 34666976544).
+    # The plaintext never appears in SQL: it is reconstructed server-side from
+    # a hex literal, QUOTE() performs SQL-safe escaping, then PREPARE executes
+    # the ALTER USER statement. This supports arbitrary rollback material.
     hex_value=password.encode("utf-8").hex()
-    mysql_root("SET PASSWORD FOR '"+user+"'@'"+host+"' = PASSWORD(0x"+hex_value+"); FLUSH PRIVILEGES;")
+    sql=(
+        "SET @af_pwd=CONVERT(0x"+hex_value+" USING utf8mb4);"
+        "SET @af_sql=CONCAT(\"ALTER USER '"+user+"'@'"+host+"' IDENTIFIED BY \",QUOTE(@af_pwd));"
+        "PREPARE af_stmt FROM @af_sql;"
+        "EXECUTE af_stmt;"
+        "DEALLOCATE PREPARE af_stmt;"
+        "FLUSH PRIVILEGES;"
+    )
+    mysql_root(sql)
 
 def main():
     if os.geteuid()!=0:
