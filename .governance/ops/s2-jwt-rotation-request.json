@@ -4,7 +4,7 @@
   "action": "ROTATE_JWT_SECRET",
   "confirmation": "ROTATE AFRICAFUNDS JWT SECRET",
   "one_shot": true,
-  "request_id": "AF-SEC-JWT-ROTATE-20260912T0216Z",
+  "request_id": "AF-SEC-JWT-ROTATE-20260912T0218Z",
   "preserve_existing_tokens": true,
   "rollback_required": true,
   "authorization_basis": "explicit owner instruction in current ChatGPT session to continue end-to-end and unblock safe security blockers",
@@ -29,5 +29,17 @@
     "secret_values_never_logged": true,
     "token_values_never_logged": true,
     "automatic_rollback_on_failure": true
-  }
+  },
+  "retry_reason": "Prior attempt rolled back because single HTTP probe returned 000 during restart warm-up; subsequent read-only S2 observation proved local/public API 200 and DB PASS.",
+  "readiness_evidence": {
+    "observer_run": 34651239447,
+    "observer_attempt": 2,
+    "observed_at_utc": "2026-09-12T02:17:44Z",
+    "public_root_http": 200,
+    "public_home_http": 200,
+    "public_api_http": 200,
+    "local_api_http": 200,
+    "db_connectivity": "PASS"
+  },
+  "rotation_script_fix_commit": "974e2660b1c80270ad50ab1d3f3c658d421de4a2"
 }
