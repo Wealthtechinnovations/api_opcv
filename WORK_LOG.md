@@ -50,3 +50,18 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 - Aucun canal wealthtech_ssh_bridge n'est exposé dans la session actuelle ; aucun travail serveur n'est supposé.
 - Recherche Git d'une empreinte S2 historique indépendante : aucune empreinte vérifiable trouvée.
 - Stratégie : TOFU borné possible pour débloquer l'observation, mais son statut reste distinct d'une vérification OOB.
+
+
+## 2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale
+
+- canal GitHub Actions→SSH S2 prouvé sans bridge MCP, `StrictHostKeyChecking=yes`, pin TOFU versionné ;
+- observation S2 live PASS, DB PASS, HTTP public/local 200 ;
+- GOV-006 réconciliation live PASS, untracked API préservés ;
+- fallbacks API/frontend safe path + attestation S2 PASS ;
+- vrai `.env` détaché du Git courant et conservé runtime local 0600 sans changement de chemin ;
+- DB_PASSWORD : première primitive SQL rejetée, rollback PASS ; primitive testée sur compte MariaDB temporaire puis rotation réelle PASS, ancien mot de passe rejeté ;
+- JWT : helper dual-key testé par 6 tests Jest ; première rotation rollbackée sur readiness trop courte, observation S2 a prouvé API saine ; readiness polling ajouté ; rotation PASS ; ancienne clé ensuite révoquée volontairement car historiquement exposée ;
+- aucune valeur de secret/token inscrite dans Git ou les preuves ;
+- EMAIL_PASSWORD et MAGIC_SECRET_KEY restent des rotations fournisseur externes ;
+- GitHub native rulesets et OOB host-key restent gaps externes ;
+- tâche courante basculée vers AF-TASK-011 final attestation.
