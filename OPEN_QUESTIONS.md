@@ -18,3 +18,11 @@ Toute réponse structurante doit être persistée dans une décision/ADR puis re
 - S2 host key OOB : aucune empreinte historique indépendante trouvée dans les deux repos ; le candidat issu du bootstrap peut être épinglé en TOFU pour continuer, mais doit rester marqué `PENDING_OOB_VERIFICATION`.
 - GitHub native rulesets : aucun ruleset observé et aucune action admin de création disponible dans le connecteur GitHub actuel.
 - Secrets suivis : remédiation runtime/rotation reste SECURITY_GATE et ne peut pas être résolue par simple modification documentaire.
+
+
+## 2026-09-12 — gaps externes après remédiation interne
+
+- `EMAIL_PASSWORD` : le secret historique doit être révoqué/rotaté côté fournisseur SMTP ; aucun connecteur fournisseur compatible n'est disponible dans la session. Ne jamais remplacer la valeur runtime avant émission d'un nouveau credential valide.
+- `MAGIC_SECRET_KEY` : rotation requise dans la console/API administrateur Magic ; aucun connecteur d'administration Magic disponible. Ne jamais blanker la clé runtime.
+- clé hôte S2 : pin TOFU immuable et StrictHostKeyChecking fonctionnent ; vérification OOB indépendante reste souhaitée.
+- GitHub rulesets : liste vide dans les deux repos ; la surface connector actuelle n'expose pas la création de ruleset/protection native.
