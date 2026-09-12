@@ -194,6 +194,9 @@ jobs:
             # publication elle-meme, et non dans un groupe `concurrency` qui ne
             # couvrirait que les executions de GitHub Actions.
             rm -f sec_ng_replay.csv.partiel sec_ng_replay_audit.csv.partiel sec_ng_replay_coherence.csv.partiel
+            # Nombre de lignes de la source en place AVANT extraction : sert de
+            # garde-fou ci-dessous. Zero si elle n existe pas encore.
+            LIGNES_AVANT=$(wc -l < sec_ng_replay.csv 2>/dev/null || echo 0)
             timeout 2400 python3 sec_ng_nav_extractor_v6.py \
               --years ${ANNEES} \
               --cache-dir sec_ng_downloads \
@@ -203,7 +206,34 @@ jobs:
               2>&1 | tail -40
             RC=${PIPESTATUS[0]}
             echo "code de sortie extraction : $RC"
-            if [ -s sec_ng_replay.csv.partiel ]; then
+            LIGNES_APRES=$(wc -l < sec_ng_replay.csv.partiel 2>/dev/null || echo 0)
+            echo "lignes produites : ${LIGNES_APRES} (source en place : ${LIGNES_AVANT})"
+
+            # TROIS CONDITIONS POUR PUBLIER, ET « FICHIER NON VIDE » NE SUFFIT PAS.
+            # La premiere version de ce garde-fou ne testait que `-s`. Un banc
+            # d essai local l a mise en defaut : un extracteur qui ecrit puis
+            # meurt laisse un fichier NON VIDE et TRONQUE, que `-s` accepte. Le
+            # fragment etait alors publie par-dessus la source saine — c est
+            # exactement le cas grave que cette correction pretendait fermer.
+            #
+            #   1. code de sortie nul — `timeout` rend 124 s il a tue le
+            #      processus, ce qui est le scenario de troncature realiste sur
+            #      une extraction bornee a quarante minutes ;
+            #   2. fichier non vide ;
+            #   3. pas d effondrement du volume. L archive de la SEC ne
+            #      retrecit pas : rejouer les memes annees ne peut pas perdre la
+            #      moitie des lignes. Une chute sous 50 % denonce une extraction
+            #      amputee qui se serait terminee proprement. Le controle ne
+            #      s applique pas a la premiere extraction (aucune reference).
+            PUBLIER=1
+            [ "$RC" -ne 0 ] && PUBLIER=0
+            [ ! -s sec_ng_replay.csv.partiel ] && PUBLIER=0
+            if [ "$LIGNES_AVANT" -gt 0 ] && [ $((LIGNES_APRES * 2)) -lt "$LIGNES_AVANT" ]; then
+              echo "::warning::Volume effondre : ${LIGNES_APRES} lignes contre ${LIGNES_AVANT} attendues."
+              PUBLIER=0
+            fi
+
+            if [ "$PUBLIER" = "1" ]; then
               mv -f sec_ng_replay.csv.partiel sec_ng_replay.csv
               [ -s sec_ng_replay_audit.csv.partiel ] && mv -f sec_ng_replay_audit.csv.partiel sec_ng_replay_audit.csv
               [ -s sec_ng_replay_coherence.csv.partiel ] && mv -f sec_ng_replay_coherence.csv.partiel sec_ng_replay_coherence.csv
@@ -211,12 +241,12 @@ jobs:
               echo "CSV publie de facon atomique."
             else
               # L ancien CSV n a pas ete detruit : les autres outils gardent une
-              # source datee mais complete, ce qui vaut mieux que pas de source.
+              # source datee mais complete, ce qui vaut mieux qu un fragment.
               # Cette mesure-ci echoue quand meme — l extraction etait son objet,
               # et la mener sur un CSV qu elle n a pas produit ne prouverait
               # rien. C est le meme arret qu avant, sans le dommage collateral.
-              rm -f sec_ng_replay.csv.partiel
-              echo "::error::Extraction sans resultat. Le CSV precedent est conserve intact pour les autres outils, mais cette mesure ne peut pas etre faite dessus."
+              rm -f sec_ng_replay.csv.partiel sec_ng_replay_audit.csv.partiel sec_ng_replay_coherence.csv.partiel
+              echo "::error::Extraction inexploitable (code ${RC}, ${LIGNES_APRES} lignes). Le CSV precedent est conserve intact pour les autres outils, mais cette mesure ne peut pas etre faite dessus."
               exit 4
             fi
             fi
