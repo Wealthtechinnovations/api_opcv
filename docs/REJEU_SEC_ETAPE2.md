@@ -3,16 +3,16 @@
 > Genere par `ops-sec-replay-dryrun.yml`. Ne pas modifier a la main.
 > **Aucune ecriture en base** : extraction dans un fichier dedie, import en dry-run.
 
-Derniere execution : **2026-09-12 10:53 UTC**
+Derniere execution : **2026-09-12 11:04 UTC**
 
 ```
 ==============================================
  0. MISE A JOUR ET VERSION DU CODE
 ==============================================
- docs/DIAG_ONDEMAND.md                       | 558 ++++++++++++++++++++++++++--
- docs/ETAT_PRODUCTION_VERIFIE.md             |  15 +-
- 3 files changed, 575 insertions(+), 45 deletions(-)
-14a07d53d ops(sec): publier le CSV de rejeu de facon atomique
+ .github/workflows/ops-sec-replay-dryrun.yml | 38 ++++++++++++++++--
+ docs/REJEU_SEC_ETAPE2.md                    | 60 +++++------------------------
+ 2 files changed, 44 insertions(+), 54 deletions(-)
+76d4db379 ops(sec): refuser un CSV tronque, pas seulement un CSV vide
 extracteur : 2026-08-29 14:45:15
 annees rejouees : 2026 2025 2024 2023 2022
 
@@ -190,10 +190,10 @@ VL deja existantes (gardees):  0
 VL sans taux forex:            0
 Erreurs:                       0
 
-Contrat d ecriture:            mode warn, lot SECNG_20260912_105256
+Contrat d ecriture:            mode warn, lot SECNG_20260912_110324
   Qualite des mesures:         (aucune)
   Mesures refusees:            0
-  Rollback de ce lot:          DELETE FROM valorisations WHERE correction_batch = 'SECNG_20260912_105256'
+  Rollback de ce lot:          DELETE FROM valorisations WHERE correction_batch = 'SECNG_20260912_110324'
 
 Matches fuzzy (a verifier):
   CSV: "Nigeria Real Estate Investment Trust" <-> DB: "NIGERIAN REAL ESTATE INVESTMENT TRUST" (sim=0.954)
@@ -230,7 +230,7 @@ Connexion fermee
 ==============================================
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-09-12 10:52:59 UTC — LECTURE SEULE
+Mesure le 2026-09-12 11:03:28 UTC — LECTURE SEULE
 CSV : sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -330,7 +330,7 @@ VL Nigeria en base : 77374
 ==============================================
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-09-12 10:53:04 UTC — LECTURE SEULE
+Mesure le 2026-09-12 11:03:33 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 146 ligne(s) sur 64 fonds
