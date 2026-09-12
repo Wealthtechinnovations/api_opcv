@@ -187,7 +187,11 @@ def main():
     try:
         raw = run(["pm2","jlist"], timeout=15)
         if raw["code"] == 0:
-            rows = json.loads(raw["stdout"])
+            payload = raw["stdout"]
+            start = payload.find("[")
+            if start < 0:
+                raise ValueError("PM2 JSON array not found")
+            rows = json.loads(payload[start:])
             observation["runtime"]["pm2"] = [
                 {
                     "name": row.get("name"),
