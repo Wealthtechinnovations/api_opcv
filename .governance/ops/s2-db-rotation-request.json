@@ -4,7 +4,7 @@
   "action": "ROTATE_DB_PASSWORD",
   "confirmation": "ROTATE AFRICAFUNDS DB PASSWORD",
   "one_shot": true,
-  "request_id": "AF-SEC-DB-ROTATE-20260912T0209Z",
+  "request_id": "AF-SEC-DB-ROTATE-20260912T0212Z",
   "expected_account": "fund_opcvm@%",
   "expected_database": "fund_opcvm",
   "rollback_required": true,
@@ -38,5 +38,11 @@
     "no_data_change": true,
     "frontend_restart": false,
     "active_job_guard_rechecked_inside_rotation_script": true
+  },
+  "password_change_primitive": {
+    "method": "SERVER_SIDE_QUOTE_FROM_HEX",
+    "probe_run": 34666976544,
+    "result": "PASS",
+    "temporary_account_removed": true
   }
 }
