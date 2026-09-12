@@ -1,32 +1,31 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "product": "AfricaFunds",
   "project_uid": "CS-AFRICAFUNDS-001",
   "loop_id": "AF-GOV-FINAL-CERT-20260911-01",
   "repository": "Wealthtechinnovations/api_opcv",
   "peer_repository": "Wealthtechinnovations/front_end_opcvm",
   "canonical_branch": "claude/code-review-improvements-ikvuj",
-  "observed_api_sha": "d2cdcec6f3fbf8e1e1a01f57b61457de4e7f5a08",
-  "observed_frontend_sha": "1a0e52c22e19d3d29916a9bc1a689dfc6dd7fdae",
+  "observed_api_sha": "7fe4e9aaf0ca04967ae0406703fa1e81a6a34cbb",
+  "observed_frontend_sha": "d1aae176cc9ade8801f5e2e1ba69e752cd697316",
   "head_semantics": "OBSERVED_BASELINE_NOT_SELF_REFERENTIAL",
   "completed": [
     "AF-TASK-001",
     "AF-TASK-002",
     "AF-TASK-004",
-    "AF-TASK-005"
+    "AF-TASK-005",
+    "AF-TASK-006",
+    "AF-TASK-007",
+    "AF-TASK-008"
   ],
   "active": [
     "AF-TASK-003",
-    "AF-TASK-006",
     "AF-TASK-009",
-    "AF-TASK-010"
-  ],
-  "open": [
-    "AF-TASK-007",
-    "AF-TASK-008",
+    "AF-TASK-010",
     "AF-TASK-011"
   ],
-  "next_action": "Establish auditable S2 host-key trust, run read-only live observation, then advance fallback and security gates.",
+  "open": [],
+  "next_action": "Run final bi-repository synchronization and attestation; do not claim FULLY_GOVERNED while external provider rotations/ruleset/OOB gaps remain.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -35,10 +34,15 @@
     "read_global_suivi": true,
     "observe_s2_if_relevant": true,
     "work_gate_requires_context_reconstruction": true,
-    "current_operational_task": "AF-TASK-006",
+    "current_operational_task": "AF-TASK-011",
     "bridge_available_in_current_chat": false,
     "ssh_fallback_required": true,
-    "host_key_trust_status": "TOFU_CANDIDATE_AVAILABLE_PENDING_PIN",
-    "secret_gate": "OPEN_CRITICAL"
+    "host_key_trust_status": "TOFU_PINNED_PENDING_OOB",
+    "secret_gate": "PARTIAL_EXTERNAL_PROVIDER_GAP",
+    "ssh_fallback_proven": true,
+    "db_password_rotation": "PASS",
+    "jwt_rotation_and_revocation": "PASS",
+    "email_password_rotation": "EXTERNAL_PROVIDER_REQUIRED",
+    "magic_secret_rotation": "EXTERNAL_PROVIDER_REQUIRED"
   }
 }
