@@ -92,14 +92,14 @@
     {
       "id": "AF-TASK-009",
       "title": "Tests reprise multi-agent, bridge-down et certification finale",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "depends_on": [
         "AF-TASK-005",
         "AF-TASK-006",
         "AF-TASK-007",
         "AF-TASK-008"
       ],
-      "next_action": "Multi-agent et bridge-down PASS ; rejouer les gates finaux après la dernière synchronisation documentaire/S2."
+      "next_action": "Final reruns PASS : Regulatory Plus, State Coherence, Multi-Agent Resume, Secret Gate, Branch Policy API/frontend et Project Link."
     },
     {
       "id": "AF-OPS-001",
@@ -122,7 +122,7 @@
     {
       "id": "AF-TASK-011",
       "title": "Synchronisation finale des registres et attestation bi-repository",
-      "status": "IN_PROGRESS",
+      "status": "FINAL_S2_ATTESTATION",
       "depends_on": [
         "AF-TASK-006",
         "AF-TASK-007",
@@ -130,7 +130,7 @@
         "AF-TASK-009",
         "AF-TASK-010"
       ],
-      "next_action": "Synchroniser registres + SUIVI, rejouer tous les gates, réconcilier S2 avec les HEAD finaux, attester HTTP/DB/Git et produire le verdict."
+      "next_action": "Réconcilier S2 vers les HEAD GitHub finaux puis exécuter observation/attestation runtime finale."
     }
   ]
 }
