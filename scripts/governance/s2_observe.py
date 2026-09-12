@@ -122,6 +122,48 @@ def db_readonly():
         result["error"] = sanitize(r["stderr"])
     return result
 
+def db_auth_diagnostic():
+    denied = []
+    r = run(["journalctl","-u","mariadb","--since","2026-09-12 00:00:00","--no-pager","-o","short-iso"], timeout=30)
+    pattern = re.compile(r"Access denied for user 'fund_opcvm'@'localhost'")
+    if r["code"] == 0:
+        for line in r["stdout"].splitlines():
+            if pattern.search(line):
+                denied.append(line[:260])
+
+    cron_lines = []
+    root_cron = run(["crontab","-l"], timeout=10)
+    if root_cron["code"] == 0:
+        for line in root_cron["stdout"].splitlines():
+            t = line.strip()
+            if not t or t.startswith("#"):
+                continue
+            low = t.lower()
+            if "africafunds" in low or "fundafrica" in low or "scripts/" in low:
+                cron_lines.append(sanitize(t)[:700])
+
+    process_lines = []
+    ps = run(["ps","-eo","pid=,lstart=,args="], timeout=10)
+    if ps["code"] == 0:
+        for line in ps["stdout"].splitlines():
+            low = line.lower()
+            if "africafunds.chainsolutions.fr/api" in low or "fund_opcvm" in low:
+                process_lines.append(sanitize(line.strip())[:700])
+
+    return {
+        "access_denied_count_since_midnight": len(denied),
+        "access_denied_lines": denied[-50:],
+        "root_project_cron_lines": cron_lines,
+        "project_processes": process_lines[:100],
+        "runtime_env": {
+            "exists": (API / ".env").exists(),
+            "tracked": run(["git","ls-files","--error-unmatch",".env"], API)["code"] == 0,
+            "ignored": run(["git","check-ignore","--no-index",".env"], API)["code"] == 0,
+        },
+        "read_only": True,
+        "secret_values_exposed": False,
+    }
+
 def runtime_snapshot():
     p = Path("/var/lib/fundafrica/runtime/PRODUCTION_STATE.json")
     out = {"path": str(p), "exists": p.exists()}
@@ -162,6 +204,7 @@ def main():
             "npm_version": run(["npm","--version"])["stdout"] if shutil.which("npm") else None,
         },
         "database": db_readonly(),
+        "db_auth_diagnostic": db_auth_diagnostic(),
         "http": [
             http_probe("https://africafunds.chainsolutions.fr/"),
             http_probe("https://africafunds.chainsolutions.fr/home"),
