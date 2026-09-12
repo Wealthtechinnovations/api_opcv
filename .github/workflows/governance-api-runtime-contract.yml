@@ -1,0 +1,41 @@
+name: Contrat gouvernance runtime API
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/deploy/sync_production.sh'
+      - 'scripts/diag/check_doc_drift.js'
+      - '.github/workflows/governance-api-runtime-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    name: Valider snapshot et diagnostic read-only
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Syntaxe shell du snapshot runtime
+        run: bash -n scripts/deploy/sync_production.sh
+
+      - name: Syntaxe Node du diagnostic documentaire
+        run: node --check scripts/diag/check_doc_drift.js
+
+      - name: Interdire les ecritures Git depuis le snapshot S2
+        run: |
+          set -euo pipefail
+          if grep -nE '^[[:space:]]*git[[:space:]]+(add|commit|push|pull|reset|checkout|switch|merge|rebase|clean)[[:space:]]' scripts/deploy/sync_production.sh; then
+            echo '::error::sync_production.sh contient une operation Git mutante interdite.'
+            exit 1
+          fi
+          grep -F '/var/lib/fundafrica/runtime' scripts/deploy/sync_production.sh >/dev/null
+          grep -F '/var/lib/fundafrica/runtime/PRODUCTION_STATE.json' scripts/diag/check_doc_drift.js >/dev/null
+          echo 'Contrat runtime conforme: mesure S2 hors Git + diagnostic compatible.'

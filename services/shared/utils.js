@@ -32,7 +32,6 @@ function createServiceApp(serviceName, port) {
     try {
       await initDb();
       app.listen(port, () => {
-        console.log(`${serviceName} running on port ${port}`);
       });
     } catch (error) {
       console.error(`Failed to start ${serviceName}:`, error);

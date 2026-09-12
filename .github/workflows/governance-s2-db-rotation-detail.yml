@@ -1,0 +1,85 @@
+name: AfricaFunds DB Rotation Detail
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/governance/s2_db_rotation_detail.py'
+      - '.github/workflows/governance-s2-db-rotation-detail.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-db-rotation-detail
+  cancel-in-progress: false
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Prepare strict pinned SSH
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Inspect DB rotation detail
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' \
+            < scripts/governance/s2_db_rotation_detail.py > S2_DB_ROTATION_DETAIL.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('S2_DB_ROTATION_DETAIL.json',encoding='utf-8'))
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['safety']['read_only'] is True
+          assert p['safety']['secret_values_exposed'] is False
+          assert p['safety']['database_modified'] is False
+          assert p['safety']['services_restarted'] is False
+          print('DB_ROTATION_DETAIL=PASS')
+          PY
+
+      - name: Publish safe summary
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json,pathlib
+          print('## AfricaFunds DB rotation detail')
+          pth=pathlib.Path('S2_DB_ROTATION_DETAIL.json')
+          if pth.exists():
+              p=json.loads(pth.read_text())
+              print('- DB user:',p.get('configured_db_user'))
+              print('- PM2 parse:',p.get('pm2',{}).get('parse'))
+              for row in p.get('pm2',{}).get('processes',[]):
+                  if row.get('name') in ('api-monolith','worker-recalculation','worker-data-import'):
+                      print('- PM2',row['name'],'sensitive-env-presence=',row.get('sensitive_env_presence'))
+              print('- schema privileges:',p.get('db_scope',{}).get('schema_privileges'))
+              print('- DB connections:',p.get('db_scope',{}).get('process_databases'))
+          PY
+
+      - name: Upload safe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-db-rotation-detail
+          path: S2_DB_ROTATION_DETAIL.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

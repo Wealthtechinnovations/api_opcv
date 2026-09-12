@@ -1,0 +1,49 @@
+name: AfricaFunds JWT Rotation Contract
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'src/lib/jwt-rotation.js'
+      - 'src/middleware/auth.js'
+      - 'services/shared/middleware.js'
+      - 'services/auth/routes.js'
+      - 'tests/jwt-rotation.test.js'
+      - '.env.example'
+      - '.github/workflows/governance-jwt-rotation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-jwt-rotation-contract
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Prove dual-key JWT compatibility
+        run: npx jest tests/jwt-rotation.test.js --runInBand --forceExit
+
+      - name: Static load smoke
+        env:
+          JWT_SECRET: test-current-secret-not-production
+          JWT_SECRET_PREVIOUS: test-previous-secret-not-production
+        run: |
+          node -e "require('./src/lib/jwt-rotation'); require('./src/middleware/auth'); require('./services/shared/middleware'); console.log('JWT_MODULE_LOAD=PASS')"

@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "product": "AfricaFunds",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "domains": [
+    {
+      "domain": "governance",
+      "authority": "GOVERNANCE.md",
+      "representation": "HUMAN_NORMATIVE"
+    },
+    {
+      "domain": "authority_resolution",
+      "authority": "SOURCE_OF_TRUTH.md",
+      "representation": "HUMAN_NORMATIVE"
+    },
+    {
+      "domain": "global_history_checkpoint",
+      "authority": "Wealthtechinnovations/front_end_opcvm/SUIVI.md",
+      "representation": "HUMAN_NORMATIVE"
+    },
+    {
+      "domain": "current_api_state",
+      "authority": "STATUS.md",
+      "representation": "OPERATIONAL_VIEW"
+    },
+    {
+      "domain": "loop_state",
+      "authority": ".governance/loop/state.json",
+      "representation": "MACHINE_CANONICAL"
+    },
+    {
+      "domain": "requirements",
+      "authority": ".governance/knowledge/requirements.json",
+      "representation": "MACHINE_CANONICAL_IDS"
+    },
+    {
+      "domain": "evidence",
+      "authority": ".governance/knowledge/evidence.json",
+      "representation": "MACHINE_CANONICAL_INDEX"
+    },
+    {
+      "domain": "git_s2_runtime",
+      "authority": "docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md",
+      "representation": "SPECIALIZED_HUMAN"
+    },
+    {
+      "domain": "production_measured_state",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "representation": "MEASURED_CANONICAL"
+    },
+    {
+      "domain": "runtime_snapshot",
+      "authority": "PRODUCTION_STATE.json",
+      "representation": "MACHINE_OBSERVED"
+    },
+    {
+      "domain": "permanent_work_directive",
+      "authority": "DIRECTIVE_TRAVAIL.md",
+      "representation": "HUMAN_NORMATIVE"
+    },
+    {
+      "domain": "agent_operating_rules",
+      "authority": "CLAUDE.md",
+      "representation": "HUMAN_NORMATIVE"
+    },
+    {
+      "domain": "frontend_architecture",
+      "authority": "Wealthtechinnovations/front_end_opcvm/CLAUDE.md",
+      "representation": "SPECIALIZED_HUMAN"
+    },
+    {
+      "domain": "financial_business_rules",
+      "authority": "CLAUDE.md",
+      "representation": "HUMAN_NORMATIVE"
+    },
+    {
+      "domain": "deployment_procedure",
+      "authority": "DEPLOYMENT_PRODUCTION.md",
+      "representation": "SPECIALIZED_HUMAN"
+    },
+    {
+      "domain": "mcp_autonomy",
+      "authority": "MCP_AUTONOMY.md",
+      "representation": "SPECIALIZED_HUMAN"
+    },
+    {
+      "domain": "web_semantics_seo",
+      "authority": "DIRECTIVE_TRAVAIL.md",
+      "representation": "HUMAN_NORMATIVE"
+    }
+  ],
+  "rule": "Une projection machine ne remplace pas une politique humaine normative; toute contradiction ferme le write gate jusqu’à réconciliation.",
+  "precedence": [
+    "production_measured_state",
+    "governance",
+    "authority_resolution",
+    "permanent_work_directive",
+    "agent_operating_rules",
+    "global_history_checkpoint"
+  ],
+  "precedence_rule": "En cas de contradiction, l autorite la plus haute de `precedence` tranche. `production_measured_state` prime sur toute prose documentaire : un document decrit ce qu on croyait vrai a sa date, la mesure decrit ce qui est."
+}

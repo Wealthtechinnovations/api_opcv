@@ -1,0 +1,216 @@
+{
+  "schema_version": "1.0.0",
+  "product": "AfricaFunds",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "evidence": [
+    {
+      "id": "AF-EVD-001",
+      "type": "GIT_STATE",
+      "result": "OBSERVED",
+      "provenance": "GitHub branch API canonical",
+      "observed_at": "2026-09-10T04:46:00Z",
+      "sha": "cd24305db790f4c0c3f663ef1cca037978145ef6"
+    },
+    {
+      "id": "AF-EVD-002",
+      "type": "REFERENCE_GOVERNANCE",
+      "result": "OBSERVED",
+      "provenance": "chainsolutions-wealthtech/Regulatory main tree 483da3e11c30dd0b4f2a4cee114909d512a1b426",
+      "observed_at": "2026-09-10T04:46:00Z",
+      "sha": null
+    },
+    {
+      "id": "AF-EVD-011",
+      "type": "MEASURED_PRODUCTION_STATE",
+      "result": "OBSERVED",
+      "provenance": "doc-drift.yml -> docs/ETAT_PRODUCTION_VERIFIE.md",
+      "observed_at": "2026-09-10T02:02:00Z",
+      "summary": "8/16 controles OK — 6 echecs critiques (C2, C3, C4.NIGERIA, C4.TUNISIE, C7, C8), 2 alertes (C4.CEMAC, C6.CEMAC)."
+    },
+    {
+      "id": "AF-EVD-012",
+      "type": "RUNTIME_INCIDENT",
+      "result": "OBSERVED",
+      "provenance": "ops-mysql-memoire.yml -> journalctl -k / journalctl -u mariadb",
+      "observed_at": "2026-09-10T05:33:00Z",
+      "summary": "OOM-kill de mariadbd le 2026-09-08 20:02:42 a 14,6 Go RSS, declenche par un node de cron.service. Aucun redemarrage automatique : service relance le 2026-09-09 06:25:03. Indisponibilite 10 h 22."
+    },
+    {
+      "id": "AF-EVD-013",
+      "type": "GIT_STATE",
+      "result": "OBSERVED",
+      "provenance": "GitHub canonical API branch observed before governance reconciliation commit",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "584793adc956831543b4daf995a30f774fcb9453"
+    },
+    {
+      "id": "AF-EVD-014",
+      "type": "GIT_STATE",
+      "result": "OBSERVED",
+      "provenance": "GitHub canonical frontend branch observed before governance reconciliation commit",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "e2ac5996c4429910f378b1ddd8b111a08e2d96cf"
+    },
+    {
+      "id": "AF-EVD-015",
+      "type": "CI",
+      "result": "PASS",
+      "provenance": "GitHub Actions Governance Regulatory Plus on API canonical branch",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "584793adc956831543b4daf995a30f774fcb9453"
+    },
+    {
+      "id": "AF-EVD-016",
+      "type": "CI",
+      "result": "PASS",
+      "provenance": "GitHub Actions governance-contract on frontend canonical branch",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "e2ac5996c4429910f378b1ddd8b111a08e2d96cf"
+    },
+    {
+      "id": "AF-EVD-017",
+      "type": "REFERENCE_GOVERNANCE",
+      "result": "OBSERVED",
+      "provenance": "chainsolutions-wealthtech/Regulatory main current reference",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "4590be6800dd3dbb5c9dde106509967082e28afc"
+    },
+    {
+      "id": "AF-EVD-018",
+      "type": "PROJECT_LINK",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Project Link Contract run 34648496692 + mirrored frontend run 34648518431",
+      "observed_at": "2026-09-11T21:16:09Z",
+      "summary": "Both repositories expose the same project identity, peer mapping and canonical/default branch contract."
+    },
+    {
+      "id": "AF-EVD-019",
+      "type": "MULTI_AGENT_RESUME",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Multi-Agent Resume Contract run 34649651106",
+      "observed_at": "2026-09-11T21:29:47Z",
+      "summary": "Claude/API, Claude/frontend, ChatGPT/API and ChatGPT/frontend reconstruct identical logical context without conversation memory."
+    },
+    {
+      "id": "AF-EVD-020",
+      "type": "MARKDOWN_CERTIFICATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Markdown Exhaustive Audit run 34648775372 + durable registry bot commit 12a418dd689f2d7ee0f72f796a7cb095d0ae54f3",
+      "observed_at": "2026-09-11T21:22:08Z",
+      "summary": "241/241 Markdown read byte-for-byte and classified: API 216, frontend 25, orphan authority 0, unresolved critical contradiction 0. Final rerun still required after later Markdown edits."
+    },
+    {
+      "id": "AF-EVD-021",
+      "type": "CI_SSH_FALLBACK",
+      "result": "BLOCKED_EXTERNAL_SECRET",
+      "provenance": "OPS S2 observer run 34648880344 and subsequent S2 wrapper/fallback runs",
+      "observed_at": "2026-09-11T21:20:31Z",
+      "summary": "S2_HOST and S2_SSH_KEY are present; S2_KNOWN_HOSTS is missing. Workflows fail before SSH/mutation by design. StrictHostKeyChecking is not weakened."
+    },
+    {
+      "id": "AF-EVD-022",
+      "type": "BRANCH_POLICY",
+      "result": "PASS_WITH_NATIVE_ENFORCEMENT_GAP",
+      "provenance": "GitHub branch inventory + Branch Policy runs 34649503793 (API) and 34649506048 (frontend)",
+      "observed_at": "2026-09-11T21:27:54Z",
+      "summary": "Each repo has 3 pre-existing branches; default/canonical branch is correct; any new branch outside baseline is detected. GitHub native rulesets remain absent."
+    },
+    {
+      "id": "AF-EVD-023",
+      "type": "SECURITY_AUDIT",
+      "result": "SECURITY_GATE",
+      "provenance": "GitHub tracked .env audit without exposing values",
+      "observed_at": "2026-09-11T21:30:00Z",
+      "summary": "Public tracked .env contains non-placeholder DB password, JWT secret, email password and Magic secret key material. Application and scripts load .env directly. Safe remediation requires runtime secret migration plus rotation before sanitizing tracked files."
+    },
+    {
+      "id": "AF-EVD-024",
+      "type": "S2_READ_ONLY_OBSERVATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions OPS — observer S2 read-only run 34651239447; attempt 2 revalidated post-JWT rollback",
+      "observed_at": "2026-09-12T02:17:44Z",
+      "summary": "SSH fallback independent of MCP is live with strict pinned host key; public /, /home, /api/getactualite and local API returned 200; DB connectivity PASS; no production mutation."
+    },
+    {
+      "id": "AF-EVD-025",
+      "type": "S2_GIT_RECONCILIATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions Reconciliation gouvernee GitHub S2 run 34651393361",
+      "observed_at": "2026-09-11T21:52:18Z",
+      "summary": "Shared GOV-006 guard reconciled API/frontend S2 without force/reset/clean and preserved API untracked artifacts."
+    },
+    {
+      "id": "AF-EVD-026",
+      "type": "S2_FALLBACK_LIVE_PROOF",
+      "result": "PASS",
+      "provenance": "Runs 34651530657 attestation, 34651530777 API fallback observe, 34651530695 frontend fallback observe",
+      "observed_at": "2026-09-11T21:53:48Z",
+      "summary": "Attestation and both deployment fallbacks use the same pinned SSH primitive and passed their safe live paths."
+    },
+    {
+      "id": "AF-EVD-027",
+      "type": "RUNTIME_SECRET_DETACH",
+      "result": "PASS",
+      "provenance": "Transactional env detach workflow + subsequent Tracked Secret Gate PASS",
+      "observed_at": "2026-09-11T21:58:00Z",
+      "summary": "Real .env removed from current Git tree, restored on S2 at same path as ignored local runtime file mode 0600; dotenv, DB and local API validated."
+    },
+    {
+      "id": "AF-EVD-028",
+      "type": "DB_PASSWORD_ROTATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Rotate DB Password run 34667014996 artifact 10288688421",
+      "observed_at": "2026-09-12T02:12:50Z",
+      "summary": "New DB password generated on S2, validated, old credential rejected, backend processes online, local API 200, no rollback."
+    },
+    {
+      "id": "AF-EVD-029",
+      "type": "JWT_ROTATION_CONTRACT",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds JWT Rotation Contract run 34667114586",
+      "observed_at": "2026-09-12T02:15:14Z",
+      "summary": "Six Jest tests prove current-key signing, previous-key transitional verification, expiry preservation, malformed-token rejection and mandatory current secret."
+    },
+    {
+      "id": "AF-EVD-030",
+      "type": "JWT_SECRET_ROTATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Rotate JWT Secret run 34667308136 artifact 10288798552",
+      "observed_at": "2026-09-12T02:19:14Z",
+      "summary": "New JWT key active, old token remained valid during transactional transition, new token rejected by old key, local API 200, no rollback."
+    },
+    {
+      "id": "AF-EVD-031",
+      "type": "JWT_COMPROMISED_KEY_REVOCATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Finalize JWT Rotation run 34667384549 artifact 10289224045",
+      "observed_at": "2026-09-12T02:20:43Z",
+      "summary": "Previous exposed JWT key disabled; current token valid; token signed by old key rejected; old sessions revoked; local API 200; no rollback."
+    },
+    {
+      "id": "AF-EVD-032",
+      "type": "EXTERNAL_SECRET_ROTATION_GAP",
+      "result": "BLOCKED_EXTERNAL_PROVIDER",
+      "provenance": "Repository consumer mapping + plugin capability search",
+      "observed_at": "2026-09-12T02:21:00Z",
+      "summary": "EMAIL_PASSWORD and MAGIC_SECRET_KEY remain provider-side rotations. Current tools expose neither compatible SMTP-provider credential management nor Magic secret rotation; runtime values are not printed or blanked."
+    },
+    {
+      "id": "AF-EVD-033",
+      "type": "GITHUB_NATIVE_ENFORCEMENT",
+      "result": "EXTERNAL_TOOL_GAP",
+      "provenance": "GitHub rulesets read on both repositories",
+      "observed_at": "2026-09-12T02:21:00Z",
+      "summary": "Both repositories return an empty ruleset list. Branch-policy CI is active, but the current GitHub connector exposes no administration action to create/update native rulesets."
+    },
+    {
+      "id": "AF-EVD-034",
+      "type": "FINAL_INTERNAL_GATES",
+      "result": "PASS",
+      "provenance": "Rerun attempts: Regulatory Plus 34667697672#2; State Coherence 34667674612#2; Multi-Agent Resume 34667668841#2; Tracked Secret Gate 34667096245#2; API Branch Policy 34661338979#2; frontend Branch Policy 34661457841#2; frontend Project Link 34648518431#2; final Markdown audit 34667765458",
+      "observed_at": "2026-09-12T02:30:35Z",
+      "summary": "All internal governance gates are green after the final documentation/SUIVI stabilization. Markdown registry is 242/242 with zero orphan authority and zero unresolved critical contradiction."
+    }
+  ],
+  "note": "Les preuves historiques sont conservées. Les nouvelles preuves sont ajoutées sans réécrire les observations précédentes ; tout HEAD doit être réobservé avant une nouvelle écriture."
+}

@@ -51,10 +51,11 @@ const sequelize = new Sequelize(
   process.env.DB_USER,
   process.env.DB_PASSWORD,
   {
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || '127.0.0.1',
     dialect: process.env.DB_DIALECT || 'mysql',
     dialectOptions: {
       timezone: process.env.DB_TIMEZONE || '+00:00',
+      connectTimeout: 20000,
     },
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     pool: {
@@ -62,9 +63,25 @@ const sequelize = new Sequelize(
       min: parseInt(process.env.DB_POOL_MIN) || 5,
       acquire: 30000,
       idle: 10000,
+      evict: 30000,
+      validate: (connection) => {
+        try { return connection && !connection._closing; } catch { return false; }
+      },
     },
     retry: {
-      max: 3,
+      max: 5,
+      match: [
+        /ECONNREFUSED/,
+        /ECONNRESET/,
+        /ETIMEDOUT/,
+        /EPIPE/,
+        /SequelizeConnectionError/,
+        /SequelizeConnectionRefusedError/,
+        /SequelizeHostNotFoundError/,
+        /SequelizeHostNotReachableError/,
+        /SequelizeInvalidConnectionError/,
+        /SequelizeConnectionTimedOutError/,
+      ],
     },
   }
 );
@@ -123,7 +140,9 @@ vl.belongsTo(fond, { foreignKey: 'fund_id' });
 // Fond <-> Performances
 fond.hasMany(performences, { foreignKey: 'fond_id' });
 performences.belongsTo(fond, { foreignKey: 'fond_id' });
+fond.hasMany(performences_eurs, { foreignKey: 'fond_id' });
 performences_eurs.belongsTo(fond, { foreignKey: 'fond_id' });
+fond.hasMany(performences_usds, { foreignKey: 'fond_id' });
 performences_usds.belongsTo(fond, { foreignKey: 'fond_id' });
 
 // Fond <-> Rendement
@@ -213,9 +232,17 @@ apikeys.belongsTo(users, { foreignKey: 'user_id' });
 portefeuille.hasMany(cashdb, { foreignKey: 'portefeuille_id' });
 cashdb.belongsTo(portefeuille, { foreignKey: 'portefeuille_id' });
 
-// Fond <-> Classementfonds
+// Fond <-> Classementfonds (local + EUR + USD)
 fond.hasMany(classementfonds, { foreignKey: 'fond_id' });
 classementfonds.belongsTo(fond, { foreignKey: 'fond_id' });
+fond.hasMany(classementfonds_eurs, { foreignKey: 'fond_id' });
+classementfonds_eurs.belongsTo(fond, { foreignKey: 'fond_id' });
+fond.hasMany(classementfonds_usds, { foreignKey: 'fond_id' });
+classementfonds_usds.belongsTo(fond, { foreignKey: 'fond_id' });
+
+// Fond <-> Societe (by societe_id)
+fond.belongsTo(societe, { foreignKey: 'societe_id' });
+societe.hasMany(fond, { foreignKey: 'societe_id' });
 
 // ---------------------
 // URLs (from environment)
@@ -227,18 +254,31 @@ const urllsite = process.env.SITE_BASE_URL || 'http://localhost:3000';
 // Database Init
 // ---------------------
 const initDb = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Connexion à la base de données établie.');
+  const maxRetries = 5;
+  const retryDelay = 3000;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await sequelize.authenticate();
+      console.log('Database connected successfully');
 
-    // Sync models that need it
-    await taux.sync();
-    await tra.sync();
-
-    console.log('Modèles synchronisés.');
-  } catch (error) {
-    console.error('Erreur de connexion à la base de données:', error.message);
-    process.exit(1); // Exit on DB connection failure
+      if (process.env.DB_SYNC_ALTER === 'true') {
+        await sequelize.sync({ alter: true });
+        console.log('Database tables synced (alter mode)');
+      } else if (process.env.DB_SYNC === 'true') {
+        await sequelize.sync();
+        console.log('Database tables synced');
+      }
+      return;
+    } catch (error) {
+      console.error(`Database connection attempt ${attempt}/${maxRetries} failed:`, error.message);
+      if (attempt < maxRetries) {
+        console.log(`Retrying in ${retryDelay / 1000}s...`);
+        await new Promise(r => setTimeout(r, retryDelay));
+      } else {
+        console.error('All database connection attempts failed. Exiting.');
+        process.exit(1);
+      }
+    }
   }
 };
 

@@ -1,0 +1,295 @@
+{
+  "schema_version": "1.0.0",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "rows": [
+    {
+      "requirement_id": "AF-REQ-001",
+      "change_refs": [
+        "DOCUMENT_INTEGRATION_MATRIX.md",
+        "FILES_CATALOG.md"
+      ],
+      "test_refs": [
+        "scripts/governance/validate_regulatory_plus.py"
+      ],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-002",
+      "change_refs": [
+        "STATUS.md",
+        "LOOP_STATE.md",
+        "CURRENT_ITERATION.md",
+        "WORK_LOG.md",
+        "HANDOFF.md",
+        "NEXT_ACTION.md"
+      ],
+      "test_refs": [
+        "scripts/governance/validate_regulatory_plus.py"
+      ],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-003",
+      "change_refs": [
+        "LOOP_ENGINEERING.md",
+        "LOOP_CONTRACT.md",
+        "docs/09-loop/"
+      ],
+      "test_refs": [
+        "scripts/governance/validate_regulatory_plus.py"
+      ],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-004",
+      "change_refs": [
+        "SOURCE_OF_TRUTH.md",
+        "PROJECT_CONTEXT.md"
+      ],
+      "test_refs": [],
+      "evidence_refs": [
+        "AF-EVD-001"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-005",
+      "change_refs": [
+        "docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md"
+      ],
+      "test_refs": [],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-006",
+      "change_refs": [
+        "docs/05-quality/"
+      ],
+      "test_refs": [
+        "scripts/governance/validate_regulatory_plus.py"
+      ],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-007",
+      "change_refs": [
+        "docs/10-ai/"
+      ],
+      "test_refs": [
+        "scripts/governance/validate_regulatory_plus.py"
+      ],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-008",
+      "change_refs": [
+        "docs/03-data/",
+        "docs/12-optional/DATA_QUALITY.md"
+      ],
+      "test_refs": [],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-009",
+      "change_refs": [
+        "docs/06-delivery/",
+        "docs/07-operations/"
+      ],
+      "test_refs": [],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-010",
+      "change_refs": [
+        "docs/DECISIONS.md",
+        "docs/adr/"
+      ],
+      "test_refs": [
+        "scripts/governance/validate_regulatory_plus.py"
+      ],
+      "evidence_refs": []
+    },
+    {
+      "requirement_id": "AF-REQ-011",
+      "change_refs": [
+        "scripts/fix/fix_segments_dollars_nigeria.js",
+        ".github/workflows/ops-fix-segments-naira.yml"
+      ],
+      "test_refs": [
+        "scripts/diag/ondemand/diag_plateaux_nigeria.js",
+        "data_tests"
+      ],
+      "evidence_refs": [
+        "AF-EVD-011"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-012",
+      "change_refs": [],
+      "test_refs": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "evidence_refs": [
+        "AF-EVD-011"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-013",
+      "change_refs": [
+        ".github/workflows/ops-recalc-derives.yml"
+      ],
+      "test_refs": [
+        "scripts/monitoring/check_cron_health.js"
+      ],
+      "evidence_refs": [
+        "AF-EVD-011"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-014",
+      "change_refs": [],
+      "test_refs": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "evidence_refs": [
+        "AF-EVD-011"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-015",
+      "change_refs": [],
+      "test_refs": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "evidence_refs": [
+        "AF-EVD-011"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-016",
+      "change_refs": [
+        ".github/workflows/ops-mysql-memoire.yml"
+      ],
+      "test_refs": [
+        ".github/workflows/ops-mysql-memoire.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-012"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-017",
+      "change_refs": [
+        "AGENTS.md",
+        "GOVERNANCE.md",
+        "00_START_HERE.md",
+        "LOOP_ENGINEERING.md",
+        ".governance/project.json",
+        ".governance/repository.json",
+        ".github/workflows/project-link-contract.yml"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-multi-agent-resume.yml",
+        ".github/workflows/project-link-contract.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-018",
+        "AF-EVD-019"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-018",
+      "change_refs": [
+        "scripts/governance/audit_markdown.py",
+        ".governance/knowledge/markdown-registry.json",
+        ".governance/schemas/markdown-registry.schema.json"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-markdown-audit.yml",
+        "scripts/governance/validate_regulatory_plus.py"
+      ],
+      "evidence_refs": [
+        "AF-EVD-020"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-019",
+      "change_refs": [
+        "scripts/governance/s2_observe.py",
+        ".github/workflows/ops-s2-observe.yml",
+        "MCP_AUTONOMY.md"
+      ],
+      "test_refs": [
+        ".github/workflows/ops-s2-observe.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-021",
+        "AF-EVD-024",
+        "AF-EVD-025"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-020",
+      "change_refs": [
+        "scripts/governance/s2_git_guard.sh",
+        ".github/workflows/ops-deploy-api.yml",
+        ".github/workflows/ops-deploy-frontend.yml",
+        ".github/workflows/governance-s2-reconcile.yml",
+        ".github/workflows/governance-s2-attestation.yml"
+      ],
+      "test_refs": [
+        "GitHub Actions workflow load/secret gates"
+      ],
+      "evidence_refs": [
+        "AF-EVD-021",
+        "AF-EVD-026"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-021",
+      "change_refs": [
+        ".governance/branch-baseline.json",
+        ".github/workflows/governance-branch-policy.yml",
+        "docs/04-development/BRANCH_POLICY.md"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-branch-policy.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-022",
+        "AF-EVD-033"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-022",
+      "change_refs": [
+        ".gitignore",
+        "docs/08-security/SECRETS_MANAGEMENT.md"
+      ],
+      "test_refs": [
+        "tracked env audit"
+      ],
+      "evidence_refs": [
+        "AF-EVD-023",
+        "AF-EVD-027",
+        "AF-EVD-028",
+        "AF-EVD-029",
+        "AF-EVD-030",
+        "AF-EVD-031",
+        "AF-EVD-032"
+      ]
+    },
+    {
+      "requirement_id": "AF-REQ-023",
+      "change_refs": [
+        "scripts/governance/reconstruct_context.py",
+        ".github/workflows/governance-multi-agent-resume.yml"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-multi-agent-resume.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-019"
+      ]
+    }
+  ]
+}

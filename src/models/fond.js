@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
     societe_gestion: {
       type: DataTypes.STRING(255),
     },
+    societe_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     categorie_libelle: {
       type: DataTypes.STRING(255),
     },
@@ -185,6 +189,26 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    indice_fundafrica: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    indice_fundafrica_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    categorie_fundafrica_locale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    categorie_fundafrica_regionale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    categorie_fundafrica_globale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -202,6 +226,7 @@ module.exports = (sequelize, DataTypes) => {
       { fields: ['pays'] },
       { fields: ['categorie_libelle'] },
       { fields: ['active'] },
+      { fields: ['societe_id'] },
     ]
   });
 

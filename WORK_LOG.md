@@ -1,0 +1,67 @@
+# WORK_LOG — AfricaFunds API
+
+## 2026-09-10 — AF-GOV-REGULATORY-PLUS-001
+
+- comparaison directe de `chainsolutions-wealthtech/Regulatory` via GitHub ;
+- lecture des autorités Regulatory : `00_START_HERE`, `GOVERNANCE`, `SOURCE_OF_TRUTH`, `AGENTS`, `LOOP_ENGINEERING`, `FILES_CATALOG`, `MANIFEST`, `DOCUMENT_INTEGRATION_MATRIX` ;
+- lecture de l’arbre API AfricaFunds sur la branche canonique ;
+- confirmation du socle AfricaFunds existant et de GOV-006 ;
+- décision : enrichir l’existant et créer uniquement les rôles manquants ;
+- aucune suppression, aucun rename, aucun force-push, aucun changement de données ou production.
+
+Les preuves Git supplémentaires sont enregistrées par les commits et contrôles GitHub du lot.
+
+## 2026-09-10 — lots CI et gouvernance (suite de AF-GOV-REGULATORY-PLUS-001)
+
+- check `governance` en echec (`NONCANONICAL_PRODUCT_NAME`) : diagnostic — le commit
+  632c954 livrait d un bloc la regle interdisant « FundAfrica » et la phrase qui
+  l explique. Correctif redige puis **abandonne** au rebase : une session parallele
+  avait deja resolu la cause autrement (`3f5c80a`), verifiee vert. Rien impose ;
+- check `FundAfrica governance contract` en echec : derive miroir reelle. Deux des
+  neuf fichiers avaient ete refondus cote API sans propagation. Verification de
+  non-perte par normalisation Unicode et comparaison de sections — la version API
+  est un sur-ensemble reformule — puis propagation. 9/9 identiques sur origin ;
+- `authority-map.json` : 9 domaines reels ajoutes, dont `production_measured_state`
+  qui manquait alors que les deux CLAUDE.md le declarent source de verite n°1 ;
+  preseance explicite ajoutee ;
+- `requirements.json` / `traceability.json` / `evidence.json` : les six echecs
+  critiques mesures sont traces (`AF-REQ-011` a `AF-REQ-015`, `AF-EVD-011`) ;
+- aucune suppression, aucun rename, aucun force-push, aucune ecriture de donnees,
+  aucun deploiement. `FILES_DELETED = 0`.
+
+
+## 2026-09-11 — AF-GOV-FINAL-CERT-20260911-01
+
+- directive propriétaire : exécuter le programme final de certification sans nouvelle branche ni architecture parallèle ;
+- connexion GitHub authentifiée confirmée sur `Wealthtechinnovations/api_opcv` et `Wealthtechinnovations/front_end_opcvm` ;
+- default branch des deux dépôts confirmée : `claude/code-review-improvements-ikvuj` ;
+- baseline avant write : API `b2753cd860e2f466f53ddc5e8651c80c62d41d12`, frontend `c4c3fba5bf90f3be1c2ebaeadb8fcd0f1d5b1d6d` ;
+- drift confirmé : task queue plus récente que `LOOP_STATE.md`, `HANDOFF.md`, `.governance/loop/state.json` et `.governance/loop/handoff.json` ;
+- décision : réconcilier les registres avant toute nouvelle capacité ;
+- l'ancienne action MariaDB reste conservée comme opération distincte à approbation humaine ; aucune mutation production dans ce lot.
+
+
+## 2026-09-11 — réconciliation du point de reprise après reprise de session
+
+- HEAD réobservés : API `d2cdcec6f3fbf8e1e1a01f57b61457de4e7f5a08`, frontend `1a0e52c22e19d3d29916a9bc1a689dfc6dd7fdae`.
+- Drift détecté : la task queue et les projections humaines étaient restées sur AF-TASK-004 malgré les preuves ultérieures.
+- AF-TASK-004 et AF-TASK-005 classées DONE à partir des CI/artefacts existants.
+- AF-TASK-006 devient tâche courante ; AF-TASK-010 (secrets) et AF-TASK-011 (attestation finale) ajoutées explicitement.
+- Aucun canal wealthtech_ssh_bridge n'est exposé dans la session actuelle ; aucun travail serveur n'est supposé.
+- Recherche Git d'une empreinte S2 historique indépendante : aucune empreinte vérifiable trouvée.
+- Stratégie : TOFU borné possible pour débloquer l'observation, mais son statut reste distinct d'une vérification OOB.
+
+
+## 2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale
+
+- canal GitHub Actions→SSH S2 prouvé sans bridge MCP, `StrictHostKeyChecking=yes`, pin TOFU versionné ;
+- observation S2 live PASS, DB PASS, HTTP public/local 200 ;
+- GOV-006 réconciliation live PASS, untracked API préservés ;
+- fallbacks API/frontend safe path + attestation S2 PASS ;
+- vrai `.env` détaché du Git courant et conservé runtime local 0600 sans changement de chemin ;
+- DB_PASSWORD : première primitive SQL rejetée, rollback PASS ; primitive testée sur compte MariaDB temporaire puis rotation réelle PASS, ancien mot de passe rejeté ;
+- JWT : helper dual-key testé par 6 tests Jest ; première rotation rollbackée sur readiness trop courte, observation S2 a prouvé API saine ; readiness polling ajouté ; rotation PASS ; ancienne clé ensuite révoquée volontairement car historiquement exposée ;
+- aucune valeur de secret/token inscrite dans Git ou les preuves ;
+- EMAIL_PASSWORD et MAGIC_SECRET_KEY restent des rotations fournisseur externes ;
+- GitHub native rulesets et OOB host-key restent gaps externes ;
+- tâche courante basculée vers AF-TASK-011 final attestation.

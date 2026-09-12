@@ -1,0 +1,89 @@
+name: Attestation gouvernance GitHub S2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/governance-s2-attestation.yml'
+      - 'scripts/governance/prepare_s2_ssh.sh'
+      - '.governance/ssh/s2_known_hosts.tofu'
+      - 'scripts/governance/s2_observe.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: governance-s2-attestation
+  cancel-in-progress: false
+
+jobs:
+  attest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout canonical governance
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Prepare strict pinned SSH
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Measure S2 without mutation
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' < scripts/governance/s2_observe.py > S2_OBSERVATION.json
+          python3 -m json.tool S2_OBSERVATION.json >/dev/null
+          python3 - <<'PY'
+          import json
+          p=json.load(open('S2_OBSERVATION.json',encoding='utf-8'))
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['safety']['read_only_observer'] is True
+          assert p['safety']['production_mutation_performed'] is False
+          print('GitHub/S2 read-only attestation evidence collected.')
+          PY
+
+      - name: Publish summary
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib
+          print('## AfricaFunds GitHub ↔ S2 attestation')
+          pth=pathlib.Path('S2_OBSERVATION.json')
+          if not pth.exists():
+              print('Evidence unavailable; see job logs.')
+          else:
+              p=json.loads(pth.read_text())
+              for role in ('api','frontend'):
+                  g=p['git'][role]
+                  print(f"- {role}: branch={g.get('branch')} head={g.get('head')} remote={g.get('remote_head')} alignment={g.get('remote_alignment')}")
+              for h in p.get('http',[]):
+                  print(f"- HTTP {h.get('url')}: {h.get('http_code')}")
+              print('- DB:', p.get('database',{}).get('connectivity'))
+          PY
+
+      - name: Upload machine-readable attestation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-s2-attestation
+          path: S2_OBSERVATION.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

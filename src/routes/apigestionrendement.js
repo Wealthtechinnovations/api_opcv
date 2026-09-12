@@ -9,13 +9,12 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const fs = require('fs');
-const cron = require('node-cron');
 const _ = require('lodash');
 const path = require('path');
 const express = require('express');
 const app = express();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Set your upload directory
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 const PortfolioAnalytics = require('portfolio-analytics');
 const ss = require('simple-statistics')
 const socktrader = require('@socktrader/indicators');
@@ -33,12 +32,12 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 const router = express.Router();
 
 
 
-app.get('/api/rendement/fonds', async (req, res) => {
+router.get('/api/rendement/fonds', async (req, res) => {
     const { categorie, ids } = req.query;
     let whereClause = {};
 
@@ -62,8 +61,8 @@ app.get('/api/rendement/fonds', async (req, res) => {
             order: [['date', 'ASC']]
           }
         ],
-      });
         limit: 500,
+      });
 
       // Vérifier la périodicité
       let periodicite = 'Journalière';
@@ -103,17 +102,19 @@ app.get('/api/rendement/fonds', async (req, res) => {
 
 // Fonction pour calculer les rendements quotidiens
 async function calculatejourReturns(fundId) {
+  const twoYearsAgo = new Date();
+  twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+  const startDate = twoYearsAgo.toISOString().split('T')[0];
   const vlData = await vl.findAll({
     where: {
       fund_id: fundId,
       date: {
-        [Op.between]: ['2023-01-01', '2023-12-31']
+        [Op.gte]: startDate
       }
     },
     order: [['date', 'ASC']],
     attributes: ['date', 'value'],
   });
-    limit: 500,
 
   const dailyReturns = vlData.map((vl, index) => {
     if (index === 0) return null; // Pas de rendement pour le premier jour
@@ -145,8 +146,8 @@ router.get('/api/saverendementsjour', async (req, res) => {
     const fonds = await vl.findAll({
         attributes: ['fund_id'],
         group: ['fund_id'],
-      });
         limit: 500,
+      });
 
       // Traiter chaque fonds de manière séquentielle
     for (const fund of fonds) {
@@ -170,16 +171,16 @@ router.get('/api/saverendements', async (req, res) => {
       const fonds = await vl.findAll({
         attributes: ['fund_id'],
         group: ['fund_id'],
-      });
         limit: 500,
+      });
 
       for (const fund of fonds) {
         const fundId = fund.fund_id;
         const valorisations = await vl.findAll({
           where: { fund_id: fundId },
           order: [['date', 'ASC']],
-        });
           limit: 500,
+        });
 
         let weeklyValues = {};
         let monthlyValues = {};

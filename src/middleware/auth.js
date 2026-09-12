@@ -1,6 +1,4 @@
-const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const { signJwt, verifyJwt } = require('../lib/jwt-rotation');
 
 /**
  * Middleware d'authentification JWT
@@ -16,7 +14,7 @@ const authenticate = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyJwt(token);
     req.user = decoded;
     next();
   } catch (error) {
@@ -37,7 +35,8 @@ const authorize = (...roles) => {
       return res.status(401).json({ error: 'Authentification requise' });
     }
 
-    if (!roles.includes(req.user.role)) {
+    const isAdmin = roles.includes('admin') && req.user.typeusers_id === 0;
+    if (!isAdmin && !roles.includes(req.user.role)) {
       return res.status(403).json({ error: 'Accès non autorisé pour ce rôle' });
     }
 
@@ -54,7 +53,7 @@ const optionalAuth = (req, res, next) => {
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
     try {
-      req.user = jwt.verify(token, JWT_SECRET);
+      req.user = verifyJwt(token);
     } catch (error) {
       // Token invalide - on continue sans authentification
     }
@@ -69,14 +68,15 @@ const optionalAuth = (req, res, next) => {
  * @param {string} expiresIn - Durée de validité (ex: '24h', '7d')
  */
 const generateToken = (user, expiresIn = '24h') => {
-  return jwt.sign(
+  return signJwt(
     {
       id: user.id,
       email: user.email,
       role: user.typeusers || 'investisseur',
-      societe: user.denomination || null
+      typeusers_id: user.typeusers_id != null ? Number(user.typeusers_id) : 1,
+      societe: user.denomination || null,
+      pays: user.pays || null
     },
-    JWT_SECRET,
     { expiresIn }
   );
 };

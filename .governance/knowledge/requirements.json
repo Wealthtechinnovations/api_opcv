@@ -1,0 +1,379 @@
+{
+  "schema_version": "1.0.0",
+  "product": "AfricaFunds",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "requirements": [
+    {
+      "id": "AF-REQ-001",
+      "title": "Préserver l’existant",
+      "status": "IN_PROGRESS",
+      "authority": "GOVERNANCE.md",
+      "acceptance_criteria": [
+        "aucun document historique utile supprimé",
+        "aucune autorité dupliquée"
+      ],
+      "evidence_required": [
+        "git_tree",
+        "document_review"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-002",
+      "title": "Mémoire opérationnelle structurée",
+      "status": "IN_PROGRESS",
+      "authority": "docs/adr/ADR-AF-0002-operational-memory-and-loop.md",
+      "acceptance_criteria": [
+        "STATUS/LOOP/WORK_LOG/HANDOFF/NEXT_ACTION présents et rôles distincts"
+      ],
+      "evidence_required": [
+        "git_tree",
+        "governance_validation"
+      ],
+      "dependencies": [
+        "AF-REQ-001"
+      ]
+    },
+    {
+      "id": "AF-REQ-003",
+      "title": "Loop Engineering",
+      "status": "IN_PROGRESS",
+      "authority": "LOOP_ENGINEERING.md",
+      "acceptance_criteria": [
+        "baseline, verify, regression, persist et next action appliqués"
+      ],
+      "evidence_required": [
+        "loop_state",
+        "work_log"
+      ],
+      "dependencies": [
+        "AF-REQ-002"
+      ]
+    },
+    {
+      "id": "AF-REQ-004",
+      "title": "Double HEAD AfricaFunds",
+      "status": "VERIFIED",
+      "authority": "SOURCE_OF_TRUTH.md",
+      "acceptance_criteria": [
+        "API_HEAD et FRONTEND_HEAD suivis séparément"
+      ],
+      "evidence_required": [
+        "git_state"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-005",
+      "title": "GitHub-S2-runtime",
+      "status": "VERIFIED",
+      "authority": "docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md",
+      "acceptance_criteria": [
+        "GitHub autorité Git",
+        "runtime ne fabrique pas l’historique"
+      ],
+      "evidence_required": [
+        "GOV-006"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-006",
+      "title": "Quality gates",
+      "status": "IN_PROGRESS",
+      "authority": "docs/05-quality/QUALITY_GATES.md",
+      "acceptance_criteria": [
+        "contrôles applicables documentés et non inventés"
+      ],
+      "evidence_required": [
+        "ci",
+        "tests"
+      ],
+      "dependencies": [
+        "AF-REQ-001"
+      ]
+    },
+    {
+      "id": "AF-REQ-007",
+      "title": "Gouvernance IA",
+      "status": "IN_PROGRESS",
+      "authority": "AGENTS.md",
+      "acceptance_criteria": [
+        "autonomie, approval et tools documentés"
+      ],
+      "evidence_required": [
+        "git_tree"
+      ],
+      "dependencies": [
+        "AF-REQ-001"
+      ]
+    },
+    {
+      "id": "AF-REQ-008",
+      "title": "Data integrity",
+      "status": "IN_PROGRESS",
+      "authority": "docs/03-data/CANONICAL_DATA_DICTIONARY_V1.md",
+      "acceptance_criteria": [
+        "null != 0",
+        "provenance et transformations traçables"
+      ],
+      "evidence_required": [
+        "data_tests"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-009",
+      "title": "Delivery gouverné",
+      "status": "IN_PROGRESS",
+      "authority": "docs/06-delivery/DEPLOYMENT.md",
+      "acceptance_criteria": [
+        "déploiement séparé du commit",
+        "attestation si production touchée"
+      ],
+      "evidence_required": [
+        "workflow",
+        "runtime_attestation"
+      ],
+      "dependencies": [
+        "AF-REQ-006"
+      ]
+    },
+    {
+      "id": "AF-REQ-010",
+      "title": "Décisions versionnées",
+      "status": "IN_PROGRESS",
+      "authority": "docs/DECISIONS.md",
+      "acceptance_criteria": [
+        "décisions structurantes indexées et ADR détaillées"
+      ],
+      "evidence_required": [
+        "git_tree"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "AF-REQ-011",
+      "title": "Aucune serie de VL ne melange deux echelles monetaires",
+      "status": "OPEN",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "acceptance_criteria": [
+        "Aucun fonds ne presente un rapport max/min proche d un taux de change sur 12 mois",
+        "Toute valeur ecrite est LUE dans la source publiee, jamais calculee"
+      ],
+      "evidence_required": [
+        "scripts/diag/ondemand/diag_plateaux_nigeria.js",
+        "data_tests"
+      ],
+      "dependencies": [],
+      "note": "C7 — 15 series, facteur ~1500 (taux NGN/USD). 157 VL identifiees, correctif prepare et dry-run valide ; ecriture soumise au verrou VALIDER CORRECTION SEGMENTS NAIRA."
+    },
+    {
+      "id": "AF-REQ-012",
+      "title": "Aucune performance recente au-dela de 500 %",
+      "status": "OPEN",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "acceptance_criteria": [
+        "Aucune performance YTD ou 1 an hors de [-100 %, +500 %] sans justification documentee"
+      ],
+      "evidence_required": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "dependencies": [],
+      "note": "C3 — consequence directe de C7 : la VL de reference et la VL courante ne sont pas dans la meme unite."
+    },
+    {
+      "id": "AF-REQ-013",
+      "title": "Les performances suivent les VL",
+      "status": "OPEN",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "acceptance_criteria": [
+        "Part des fonds dont la performance atteint leur derniere VL >= 80 % par pays"
+      ],
+      "evidence_required": [
+        "scripts/monitoring/check_cron_health.js"
+      ],
+      "dependencies": [],
+      "note": "C8 — MAROC 1.4 %, TUNISIE 6.1 %, UEMOA 32.4 %. VL fraiches mais performances perimees : le site affiche des chiffres plausibles et faux."
+    },
+    {
+      "id": "AF-REQ-014",
+      "title": "Aucune performance orpheline en tete de serie",
+      "status": "OPEN",
+      "authority": "docs/ETAT_PRODUCTION_VERIFIE.md",
+      "acceptance_criteria": [
+        "Aucun fonds dont la performance la plus recente porte une date sans VL",
+        "Instruction fonds par fonds AVANT toute suppression"
+      ],
+      "evidence_required": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "dependencies": [],
+      "note": "C2 — 14 fonds en local, 23 en EUR, 23 en USD. C est cette performance que l API sert."
+    },
+    {
+      "id": "AF-REQ-015",
+      "title": "Fraicheur des VL par pays dans le budget declare",
+      "status": "OPEN",
+      "authority": "src/lib/freshness_budgets.js",
+      "acceptance_criteria": [
+        "Chaque pays respecte le budget de fraicheur declare, ou l ecart est justifie"
+      ],
+      "evidence_required": [
+        "scripts/diag/check_doc_drift.js"
+      ],
+      "dependencies": [],
+      "note": "C4 — NIGERIA 27 j (budget 14), TUNISIE 13 j (budget 9). CEMAC 637 j reste une ALERTE toleree : aucun pipeline."
+    },
+    {
+      "id": "AF-REQ-016",
+      "title": "Le service de base de donnees redemarre seul apres un arret non planifie",
+      "status": "OPEN",
+      "authority": "docs/OPS_MYSQL_MEMOIRE.md",
+      "acceptance_criteria": [
+        "mariadb.service declare une politique Restart= couvrant oom-kill",
+        "Aucune indisponibilite superieure a quelques minutes apres un OOM",
+        "Le pic de RSS de mariadbd pendant les crons de recalcul reste sous la RAM disponible"
+      ],
+      "evidence_required": [
+        ".github/workflows/ops-mysql-memoire.yml"
+      ],
+      "dependencies": [],
+      "note": "Mesure du 2026-09-10 : OOM le 2026-09-08 a 20:02:42 (mariadbd a 14,6 Go, tueur = node lance par cron.service, deux minutes apres cron_daily_update.sh). systemd a constate « Failed with result oom-kill » puis n a rien fait : service repart le 2026-09-09 a 06:25:03, soit 10 h 22 d indisponibilite totale de l API. Le rythme de croissance n est PAS lineaire — 6,54 Go apres 23 h contre 6,95 Go apres 9 h 51 le 2026-09-01 — l extrapolation a ~700 Mo/h etait fondee sur un point unique et ne decrit rien de reel. Le pic ponctuel a 14,6 Go, lui, est reel."
+    },
+    {
+      "id": "AF-REQ-017",
+      "title": "Reconstruction de contexte et découverte croisée obligatoires",
+      "status": "VERIFIED",
+      "authority": "AGENTS.md",
+      "acceptance_criteria": [
+        "Toute nouvelle session reconstruit le contexte depuis Git avant write",
+        "Connexion à un repo découvre le peer repo et les deux branches",
+        "Conversation memory non requise"
+      ],
+      "evidence_required": [
+        "multi_agent_resume_ci",
+        "project_link_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-002",
+        "AF-REQ-007"
+      ]
+    },
+    {
+      "id": "AF-REQ-018",
+      "title": "Certification exhaustive de tous les Markdown courants",
+      "status": "VERIFIED",
+      "authority": "DOCUMENT_INTEGRATION_MATRIX.md",
+      "acceptance_criteria": [
+        "TOTAL_MD_DISCOVERED == TOTAL_MD_CERTIFIED",
+        "ORPHAN_AUTHORITY == 0",
+        "UNRESOLVED_CRITICAL_CONTRADICTION == 0",
+        "Chaque path est fingerprinté et classifié"
+      ],
+      "evidence_required": [
+        "markdown_registry",
+        "markdown_audit_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-001"
+      ]
+    },
+    {
+      "id": "AF-REQ-019",
+      "title": "Observation S2 sans bridge MCP et sans travail à l'aveugle",
+      "status": "VERIFIED_WITH_EXTERNAL_TRUST_GAP",
+      "authority": "MCP_AUTONOMY.md",
+      "acceptance_criteria": [
+        "GitHub Actions SSH observe S2 en lecture seule",
+        "StrictHostKeyChecking=yes avec host key épinglée",
+        "Aucun shell distant arbitraire"
+      ],
+      "evidence_required": [
+        "s2_observer_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-005"
+      ],
+      "note": "GitHub Actions→SSH S2 observe/reconcile/attest est live et StrictHostKeyChecking=yes utilise un pin TOFU versionné. Vérification OOB indépendante du host key reste à fournir."
+    },
+    {
+      "id": "AF-REQ-020",
+      "title": "Fallback de déploiement API et frontend gouverné",
+      "status": "VERIFIED",
+      "authority": "docs/06-delivery/DEPLOYMENT.md",
+      "acceptance_criteria": [
+        "API utilise le guard GOV-006 partagé",
+        "Frontend utilise le guard GOV-006 partagé et Node selector existant",
+        "Restart seulement après confirmation explicite",
+        "Aucun --update-env"
+      ],
+      "evidence_required": [
+        "api_fallback_ci",
+        "frontend_fallback_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-019",
+        "AF-REQ-009"
+      ],
+      "note": "Fallback API/frontend et guard GOV-006 commun ont été exécutés en mode sûr/live avec preuve SSH S2."
+    },
+    {
+      "id": "AF-REQ-021",
+      "title": "Aucune nouvelle branche de travail",
+      "status": "PARTIALLY_ENFORCED_EXTERNAL_GAP",
+      "authority": "docs/04-development/BRANCH_POLICY.md",
+      "acceptance_criteria": [
+        "Default branch == canonical branch dans les deux repos",
+        "Toute branche nouvelle hors baseline est détectée",
+        "Ruleset natif appliqué dès qu'une surface admin compatible est disponible"
+      ],
+      "evidence_required": [
+        "branch_policy_ci",
+        "github_ruleset_observation"
+      ],
+      "dependencies": [
+        "AF-REQ-017"
+      ],
+      "note": "Branch-policy CI et default/canonical branch sont enforce/détectés. Les rulesets GitHub natifs sont absents et aucune surface admin d'écriture n'est exposée par le connecteur courant."
+    },
+    {
+      "id": "AF-REQ-022",
+      "title": "Aucun secret réel versionné dans un repository public",
+      "status": "BLOCKED_EXTERNAL_PROVIDER_ROTATION",
+      "authority": "docs/08-security/SECRETS_MANAGEMENT.md",
+      "acceptance_criteria": [
+        "Secrets exposés rotatés",
+        "Runtime migre vers secret store ou fichier serveur non suivi",
+        "Fichiers suivis ne contiennent plus de credential réel",
+        "Historique évalué et réponse incident documentée"
+      ],
+      "evidence_required": [
+        "secret_audit",
+        "rotation_evidence",
+        "runtime_validation"
+      ],
+      "dependencies": [],
+      "note": "Le .env réel n'est plus suivi et reste runtime 0600. DB_PASSWORD a été rotaté et l'ancien rejeté. JWT_SECRET a été rotaté puis l'ancienne clé compromise révoquée. EMAIL_PASSWORD et MAGIC_SECRET_KEY nécessitent une rotation côté fournisseurs externes non disponibles via les outils courants."
+    },
+    {
+      "id": "AF-REQ-023",
+      "title": "Reprise multi-agent sans divergence",
+      "status": "VERIFIED",
+      "authority": "LOOP_ENGINEERING.md",
+      "acceptance_criteria": [
+        "Claude et ChatGPT reconstruisent le même contexte depuis API ou frontend",
+        "SAME_CURRENT_TASK == TRUE",
+        "SAME_NEXT_ACTION == TRUE",
+        "NO_CONVERSATION_MEMORY == TRUE"
+      ],
+      "evidence_required": [
+        "multi_agent_resume_ci"
+      ],
+      "dependencies": [
+        "AF-REQ-017"
+      ],
+      "note": "Claude et ChatGPT reconstruisent le même contexte logique depuis API ou frontend sans mémoire conversationnelle."
+    }
+  ]
+}

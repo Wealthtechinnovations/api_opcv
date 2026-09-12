@@ -1,0 +1,139 @@
+name: OPS — collecter et epingler la cle hote S2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/ops-s2-hostkey-bootstrap.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ops-s2-hostkey-bootstrap
+  cancel-in-progress: false
+
+jobs:
+  collect-and-pin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Checkout canonical governance
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          fetch-depth: 1
+
+      - name: Require S2 host only
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+        run: |
+          set -euo pipefail
+          test -n "$HOST" || { echo "::error::S2_HOST missing"; exit 1; }
+
+      - name: Collect one-time TOFU candidate without SSH login
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p .governance/ssh /tmp/africafunds-hostkey
+          ssh-keyscan -T 10 -t ed25519,ecdsa,rsa "$HOST" 2>/dev/null \
+            | sort -u > /tmp/africafunds-hostkey/known_hosts
+          test -s /tmp/africafunds-hostkey/known_hosts || {
+            echo "::error::no S2 host key returned"
+            exit 2
+          }
+
+          # Hash the hostname before versioning the public host key.
+          cp /tmp/africafunds-hostkey/known_hosts /tmp/africafunds-hostkey/known_hosts_hashed
+          ssh-keygen -H -f /tmp/africafunds-hostkey/known_hosts_hashed >/dev/null 2>&1
+          rm -f /tmp/africafunds-hostkey/known_hosts_hashed.old
+          sort -u /tmp/africafunds-hostkey/known_hosts_hashed \
+            > /tmp/africafunds-hostkey/pin
+
+          ssh-keygen -lf /tmp/africafunds-hostkey/pin -E sha256 \
+            > /tmp/africafunds-hostkey/fingerprints.txt
+
+          if [ -f .governance/ssh/s2_known_hosts.tofu ]; then
+            if cmp -s .governance/ssh/s2_known_hosts.tofu /tmp/africafunds-hostkey/pin; then
+              echo "HOST_KEY_PIN_STATUS=UNCHANGED"
+              exit 0
+            fi
+            echo "::error::S2 host key changed from the existing pin. Refusing automatic rotation."
+            exit 3
+          fi
+
+          cp /tmp/africafunds-hostkey/pin .governance/ssh/s2_known_hosts.tofu
+          cp /tmp/africafunds-hostkey/fingerprints.txt .governance/ssh/s2_hostkey_fingerprints.txt
+          cat > .governance/ssh/s2_hostkey_trust.json <<'JSON'
+          {
+            "schema_version": "1.0.0",
+            "project_uid": "CS-AFRICAFUNDS-001",
+            "server": "S2",
+            "trust_model": "TOFU_PINNED_PENDING_OOB",
+            "source": "one-time ssh-keyscan from GitHub-hosted runner; no SSH login",
+            "strict_host_key_checking_required": true,
+            "automatic_key_rotation": false,
+            "oob_verification": "PENDING",
+            "note": "The host key is public material. A future mismatch is a hard failure until independently investigated."
+          }
+          JSON
+
+      - name: Persist the first pin by fast-forward only
+        run: |
+          set -euo pipefail
+          if [ ! -f .governance/ssh/s2_known_hosts.tofu ]; then
+            echo "No new pin to persist."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .governance/ssh/s2_known_hosts.tofu \
+                  .governance/ssh/s2_hostkey_fingerprints.txt \
+                  .governance/ssh/s2_hostkey_trust.json
+          if git diff --cached --quiet; then
+            echo "Pin already persisted."
+            exit 0
+          fi
+          git fetch origin claude/code-review-improvements-ikvuj
+          LOCAL_HEAD="$(git rev-parse HEAD)"
+          REMOTE_HEAD="$(git rev-parse origin/claude/code-review-improvements-ikvuj)"
+          test "$LOCAL_HEAD" = "$REMOTE_HEAD" || {
+            echo "::error::HEAD moved during host-key collection; refusing write."
+            exit 4
+          }
+          git commit -m "chore(security): pin S2 host key by audited TOFU"
+          git push origin HEAD:claude/code-review-improvements-ikvuj
+
+      - name: Publish non-secret fingerprints
+        if: always()
+        run: |
+          {
+            echo '## S2 host-key pin'
+            echo
+            echo 'Trust model: TOFU_PINNED_PENDING_OOB'
+            echo
+            echo 'No SSH login is performed by this workflow.'
+            echo 'A future key mismatch is a hard failure.'
+            echo
+            if [ -f .governance/ssh/s2_hostkey_fingerprints.txt ]; then
+              echo '~~~text'
+              cat .governance/ssh/s2_hostkey_fingerprints.txt
+              echo '~~~'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload verification material
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: s2-hostkey-pin-evidence
+          path: |
+            .governance/ssh/s2_known_hosts.tofu
+            .governance/ssh/s2_hostkey_fingerprints.txt
+            .governance/ssh/s2_hostkey_trust.json
+          if-no-files-found: warn
+          retention-days: 30

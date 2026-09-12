@@ -1,0 +1,169 @@
+name: AfricaFunds Project Link Contract
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.governance/project.json'
+      - '.governance/repository.json'
+      - 'docs/01-governance/PROJECT_IDENTITY.md'
+      - 'PROJECT_CONTEXT.md'
+      - '.github/workflows/project-link-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  project-link:
+    name: Verify AfricaFunds project identity link
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout canonical state
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Verify local and peer project identity
+        shell: bash
+        env:
+          CURRENT_REPOSITORY: ${{ github.repository }}
+          CURRENT_REF_NAME: ${{ github.ref_name }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          branch = 'claude/code-review-improvements-ikvuj'
+          project_uid = 'CS-AFRICAFUNDS-001'
+          project_id = 'chainsolutions.africafunds'
+          current = os.environ['CURRENT_REPOSITORY']
+          current_ref = os.environ['CURRENT_REF_NAME']
+          expected = {
+              'Wealthtechinnovations/api_opcv': {
+                  'role': 'API',
+                  'peer': 'Wealthtechinnovations/front_end_opcvm',
+              },
+              'Wealthtechinnovations/front_end_opcvm': {
+                  'role': 'FRONTEND',
+                  'peer': 'Wealthtechinnovations/api_opcv',
+              },
+          }
+
+          if current not in expected:
+              raise SystemExit(f'Unexpected repository: {current}')
+          if current_ref != branch:
+              raise SystemExit(f'Unexpected branch: {current_ref}; expected {branch}')
+
+          local_project_bytes = Path('.governance/project.json').read_bytes()
+          local_project = json.loads(local_project_bytes)
+          local_repo = json.loads(Path('.governance/repository.json').read_text(encoding='utf-8'))
+          local_identity_bytes = Path('docs/01-governance/PROJECT_IDENTITY.md').read_bytes()
+          context = Path('PROJECT_CONTEXT.md').read_text(encoding='utf-8')
+
+          if local_project.get('project_uid') != project_uid:
+              raise SystemExit('Invalid PROJECT_UID')
+          if local_project.get('project_id') != project_id:
+              raise SystemExit('Invalid PROJECT_ID')
+          if local_project.get('project_name') != 'AfricaFunds':
+              raise SystemExit('Invalid PROJECT_NAME')
+          if local_project.get('canonical_branch') != branch:
+              raise SystemExit('Invalid canonical branch in project.json')
+
+          repo_map = {item['role']: item['full_name'] for item in local_project.get('repositories', [])}
+          if repo_map != {
+              'API': 'Wealthtechinnovations/api_opcv',
+              'FRONTEND': 'Wealthtechinnovations/front_end_opcvm',
+          }:
+              raise SystemExit(f'Invalid repository topology: {repo_map}')
+
+          role = expected[current]['role']
+          peer = expected[current]['peer']
+          required_local = {
+              'project_uid': project_uid,
+              'project_id': project_id,
+              'repository': current,
+              'repository_role': role,
+              'peer_repository': peer,
+              'canonical_branch': branch,
+          }
+          for key, value in required_local.items():
+              if local_repo.get(key) != value:
+                  raise SystemExit(f'Invalid local repository identity {key}: {local_repo.get(key)!r}')
+
+          for token in (project_uid, project_id, peer):
+              if token not in context:
+                  raise SystemExit(f'PROJECT_CONTEXT.md missing identity token: {token}')
+
+          def github_json(url):
+              headers = {
+                  'Accept': 'application/vnd.github+json',
+                  'User-Agent': 'AfricaFunds-project-link-contract',
+              }
+              token = os.environ.get('GITHUB_TOKEN')
+              if token:
+                  headers['Authorization'] = f'Bearer {token}'
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req, timeout=20) as response:
+                  return json.load(response)
+
+          def fetch_repo_metadata(repository):
+              return github_json(f'https://api.github.com/repos/{repository}')
+
+          # GitHub metadata itself is part of the contract: default branch must
+          # equal the canonical branch in BOTH repositories.
+          for repository in (current, peer):
+              metadata = fetch_repo_metadata(repository)
+              if metadata.get('default_branch') != branch:
+                  raise SystemExit(
+                      f'Default branch drift for {repository}: '
+                      f"{metadata.get('default_branch')!r} != {branch!r}"
+                  )
+
+          def fetch_peer(path):
+              quoted_ref = urllib.parse.quote(branch, safe='')
+              quoted_path = '/'.join(urllib.parse.quote(part, safe='') for part in path.split('/'))
+              url = f'https://api.github.com/repos/{peer}/contents/{quoted_path}?ref={quoted_ref}'
+              payload = github_json(url)
+              return base64.b64decode(payload['content'])
+
+          peer_project_bytes = fetch_peer('.governance/project.json')
+          if peer_project_bytes != local_project_bytes:
+              raise SystemExit('Cross-repository drift: .governance/project.json differs from peer')
+
+          peer_identity_bytes = fetch_peer('docs/01-governance/PROJECT_IDENTITY.md')
+          if peer_identity_bytes != local_identity_bytes:
+              raise SystemExit('Cross-repository drift: PROJECT_IDENTITY.md differs from peer')
+
+          peer_repo = json.loads(fetch_peer('.governance/repository.json'))
+          required_peer = {
+              'project_uid': project_uid,
+              'project_id': project_id,
+              'repository': peer,
+              'repository_role': 'FRONTEND' if role == 'API' else 'API',
+              'peer_repository': current,
+              'canonical_branch': branch,
+          }
+          for key, value in required_peer.items():
+              if peer_repo.get(key) != value:
+                  raise SystemExit(f'Invalid peer repository identity {key}: {peer_repo.get(key)!r}')
+
+          print('AfricaFunds project link contract: PASS')
+          print('Project UID:', project_uid)
+          print('Project ID:', project_id)
+          print('Repository:', current)
+          print('Role:', role)
+          print('Peer:', peer)
+          print('Canonical branch:', branch)
+          print('Context reconstruction: REQUIRED')
+          print('Cross-repository discovery: REQUIRED')
+          PY

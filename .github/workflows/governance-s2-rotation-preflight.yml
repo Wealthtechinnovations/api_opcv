@@ -1,0 +1,87 @@
+name: AfricaFunds Credential Rotation Preflight
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/governance/s2_rotation_preflight.py'
+      - '.github/workflows/governance-s2-rotation-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-rotation-preflight
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Prepare strict pinned SSH
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Inspect rotation dependencies without values
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' \
+            < scripts/governance/s2_rotation_preflight.py > S2_ROTATION_PREFLIGHT.json
+          python3 -m json.tool S2_ROTATION_PREFLIGHT.json >/dev/null
+          python3 - <<'PY'
+          import json
+          p=json.load(open('S2_ROTATION_PREFLIGHT.json',encoding='utf-8'))
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['safety']['read_only'] is True
+          assert p['safety']['secret_values_exposed'] is False
+          assert p['safety']['database_modified'] is False
+          assert p['safety']['services_restarted'] is False
+          print('ROTATION_PREFLIGHT=PASS')
+          PY
+
+      - name: Publish safe summary
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json,pathlib
+          print('## AfricaFunds credential rotation preflight')
+          pth=pathlib.Path('S2_ROTATION_PREFLIGHT.json')
+          if not pth.exists():
+              print('Preflight unavailable.')
+          else:
+              p=json.loads(pth.read_text())
+              print('- local MariaDB root socket:',p['db']['mysql'].get('root_socket_access'))
+              print('- hardcoded DB-user path count:',p['db']['configured_user_literal_path_count'])
+              print('- JWT consumer paths:',p['jwt']['consumer_path_count'])
+              print('- email rotation:',p['email']['provider_rotation'])
+              print('- Magic rotation:',p['magic']['provider_rotation'])
+              print('- PM2 parse:',p['pm2'].get('parse'))
+          PY
+
+      - name: Upload non-secret evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-rotation-preflight
+          path: S2_ROTATION_PREFLIGHT.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

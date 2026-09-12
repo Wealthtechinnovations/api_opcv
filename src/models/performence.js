@@ -29,6 +29,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    categorie_fundafrica_regionale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    categorie_fundafrica_globale: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
     anomalie: {
       type: DataTypes.STRING(255),
       allowNull: true,
@@ -342,6 +350,30 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
     },
     kurtosis5an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    r2_1an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    r2_3an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    r2_5an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    alpha1an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    alpha3an: {
+      type: DataTypes.DOUBLE,
+      allowNull: true,
+    },
+    alpha5an: {
       type: DataTypes.DOUBLE,
       allowNull: true,
     },

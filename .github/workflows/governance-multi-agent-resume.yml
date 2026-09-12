@@ -1,0 +1,108 @@
+name: AfricaFunds Multi-Agent Resume Contract
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/governance/reconstruct_context.py'
+      - '.governance/project.json'
+      - '.governance/repository.json'
+      - '.governance/loop/**'
+      - 'NEXT_ACTION.md'
+      - '.github/workflows/governance-multi-agent-resume.yml'
+  schedule:
+    - cron: '47 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-multi-agent-resume
+  cancel-in-progress: false
+
+jobs:
+  reconstruct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout API canonical branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          path: api
+          fetch-depth: 1
+
+      - name: Checkout frontend canonical branch
+        uses: actions/checkout@v4
+        with:
+          repository: Wealthtechinnovations/front_end_opcvm
+          ref: claude/code-review-improvements-ikvuj
+          path: frontend
+          fetch-depth: 1
+          token: ${{ github.token }}
+
+      - name: Reconstruct from four fresh agent/start-repository combinations
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          for AGENT in CLAUDE CHATGPT; do
+            for START in API FRONTEND; do
+              python3 api/scripts/governance/reconstruct_context.py \
+                --agent-profile "$AGENT" \
+                --start-repo "$START" \
+                --api-root api \
+                --frontend-root frontend \
+                --output "out/${AGENT}_${START}.json" >/dev/null
+            done
+          done
+
+      - name: Require identical logical reconstruction
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, pathlib
+          files=sorted(pathlib.Path('out').glob('*.json'))
+          rows=[json.loads(p.read_text()) for p in files]
+          assert len(rows)==4
+          canonical=rows[0]['logical_context']
+          fund=rows[0]['fund_state']
+          for row in rows:
+              assert row['conversation_memory_used'] is False
+              assert row['context_reconstruction']=='PASS'
+              assert row['logical_context']==canonical, (row['agent_profile'],row['start_repository_role'])
+              assert row['fund_state']==fund
+          agents={r['agent_profile'] for r in rows}
+          starts={r['start_repository_role'] for r in rows}
+          assert agents=={'CLAUDE','CHATGPT'}
+          assert starts=={'API','FRONTEND'}
+          print('NEW_SESSION_CONTEXT_RECONSTRUCTION=PASS')
+          print('CROSS_REPO_DISCOVERY=PASS')
+          print('CLAUDE_TO_CHATGPT_HANDOFF=PASS')
+          print('CHATGPT_TO_CLAUDE_HANDOFF=PASS')
+          print('SAME_CURRENT_TASK=TRUE')
+          print('SAME_NEXT_ACTION=TRUE')
+          print('NO_CONVERSATION_MEMORY=TRUE')
+          PY
+
+      - name: Publish evidence
+        run: |
+          {
+            echo '## AfricaFunds multi-agent resume contract'
+            echo
+            echo '- Claude starting from API: PASS'
+            echo '- Claude starting from frontend: PASS'
+            echo '- ChatGPT starting from API: PASS'
+            echo '- ChatGPT starting from frontend: PASS'
+            echo '- Logical context equality: PASS'
+            echo '- Conversation memory required: NO'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload reconstruction evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-multi-agent-resume
+          path: out/*.json
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.3.0",
+  "loop_id": "AF-GOV-FINAL-CERT-20260911-01",
+  "stage": "VERIFY_PRODUCTION",
+  "current_task_id": "AF-TASK-011",
+  "parent_task_id": "AF-TASK-003",
+  "observed_api_sha": "7fe4e9aaf0ca04967ae0406703fa1e81a6a34cbb",
+  "observed_frontend_sha": "d1aae176cc9ade8801f5e2e1ba69e752cd697316",
+  "head_semantics": "OBSERVED_BASELINE_NOT_SELF_REFERENTIAL",
+  "next_action": "Reconcile S2 to final Git heads and execute final runtime attestation.",
+  "blockers": [
+    "EMAIL_PASSWORD_PROVIDER_ROTATION_REQUIRED",
+    "MAGIC_SECRET_KEY_PROVIDER_ROTATION_REQUIRED",
+    "S2_HOST_KEY_OOB_VERIFICATION_PENDING",
+    "GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR"
+  ],
+  "proof_refs": [
+    "AF-EVD-018",
+    "AF-EVD-019",
+    "AF-EVD-020",
+    "AF-EVD-022",
+    "AF-EVD-024",
+    "AF-EVD-025",
+    "AF-EVD-026",
+    "AF-EVD-027",
+    "AF-EVD-028",
+    "AF-EVD-029",
+    "AF-EVD-030",
+    "AF-EVD-031",
+    "AF-EVD-034"
+  ],
+  "rules": {
+    "context_reconstruction_before_work": "REQUIRED",
+    "cross_repo_discovery": "REQUIRED",
+    "new_branch_creation": "FORBIDDEN",
+    "single_writer": "REQUIRED",
+    "verify_both_heads_before_write": "REQUIRED",
+    "no_blind_work": "REQUIRED"
+  }
+}
