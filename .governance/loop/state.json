@@ -1,13 +1,13 @@
 {
   "schema_version": "1.3.0",
   "loop_id": "AF-GOV-FINAL-CERT-20260911-01",
-  "stage": "FINAL_ATTESTATION",
+  "stage": "VERIFY_PRODUCTION",
   "current_task_id": "AF-TASK-011",
   "parent_task_id": "AF-TASK-003",
   "observed_api_sha": "7fe4e9aaf0ca04967ae0406703fa1e81a6a34cbb",
   "observed_frontend_sha": "d1aae176cc9ade8801f5e2e1ba69e752cd697316",
   "head_semantics": "OBSERVED_BASELINE_NOT_SELF_REFERENTIAL",
-  "next_action": "Finalize registries and SUIVI, rerun all governance gates, reconcile S2 to final Git heads, then attest.",
+  "next_action": "Reconcile S2 to final Git heads and execute final runtime attestation.",
   "blockers": [
     "EMAIL_PASSWORD_PROVIDER_ROTATION_REQUIRED",
     "MAGIC_SECRET_KEY_PROVIDER_ROTATION_REQUIRED",
@@ -26,7 +26,8 @@
     "AF-EVD-028",
     "AF-EVD-029",
     "AF-EVD-030",
-    "AF-EVD-031"
+    "AF-EVD-031",
+    "AF-EVD-034"
   ],
   "rules": {
     "context_reconstruction_before_work": "REQUIRED",
