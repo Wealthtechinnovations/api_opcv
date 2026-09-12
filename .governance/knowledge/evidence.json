@@ -202,6 +202,14 @@
       "provenance": "GitHub rulesets read on both repositories",
       "observed_at": "2026-09-12T02:21:00Z",
       "summary": "Both repositories return an empty ruleset list. Branch-policy CI is active, but the current GitHub connector exposes no administration action to create/update native rulesets."
+    },
+    {
+      "id": "AF-EVD-034",
+      "type": "FINAL_INTERNAL_GATES",
+      "result": "PASS",
+      "provenance": "Rerun attempts: Regulatory Plus 34667697672#2; State Coherence 34667674612#2; Multi-Agent Resume 34667668841#2; Tracked Secret Gate 34667096245#2; API Branch Policy 34661338979#2; frontend Branch Policy 34661457841#2; frontend Project Link 34648518431#2; final Markdown audit 34667765458",
+      "observed_at": "2026-09-12T02:30:35Z",
+      "summary": "All internal governance gates are green after the final documentation/SUIVI stabilization. Markdown registry is 242/242 with zero orphan authority and zero unresolved critical contradiction."
     }
   ],
   "note": "Les preuves historiques sont conservées. Les nouvelles preuves sont ajoutées sans réécrire les observations précédentes ; tout HEAD doit être réobservé avant une nouvelle écriture."
