@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "2f1ea921f82f8de6298f7aa225aa80b84b5b341f"
+      "head": "2ad83ba896f8a3845b2efabda30880ff1b933ae4"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -1464,9 +1464,10 @@
       "canonical_authority": "CURRENT_ITERATION.md",
       "unique_information": [
         "CURRENT_ITERATION — AfricaFunds API",
-        "AF-GOV-FINAL-CERT-20260911-01",
-        "État courant",
-        "Ordre de continuation"
+        "AF-GOV-FINAL-CERT-20260911-01 — FINAL_ATTESTATION",
+        "Terminé",
+        "Actif",
+        "Externes"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -1482,11 +1483,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CURRENT_ITERATION.md",
-      "git_blob_sha": "c9ae0cb4d09f2994b2188079d343677c39865944",
-      "last_validated_sha": "c9ae0cb4d09f2994b2188079d343677c39865944",
-      "content_sha256": "5e46f2fb75ad349cff7c4e6646e037d717f8bffb98a0aa06feda7e5c3b4702ef",
-      "line_count": 24,
-      "byte_count": 1070,
+      "git_blob_sha": "72d2578f744f4e335b6b86827f927bd3f0ca6501",
+      "last_validated_sha": "72d2578f744f4e335b6b86827f927bd3f0ca6501",
+      "content_sha256": "2ca34b1a67006e2e9045fcf376c66befbf453693ad110d62651112f31ecf0dff",
+      "line_count": 26,
+      "byte_count": 923,
       "headings": [
         {
           "level": 1,
@@ -1494,15 +1495,19 @@
         },
         {
           "level": 2,
-          "text": "AF-GOV-FINAL-CERT-20260911-01"
+          "text": "AF-GOV-FINAL-CERT-20260911-01 — FINAL_ATTESTATION"
         },
         {
           "level": 3,
-          "text": "État courant"
+          "text": "Terminé"
         },
         {
           "level": 3,
-          "text": "Ordre de continuation"
+          "text": "Actif"
+        },
+        {
+          "level": 3,
+          "text": "Externes"
         }
       ]
     },
@@ -2549,10 +2554,10 @@
       "canonical_authority": "LOOP_STATE.md",
       "unique_information": [
         "LOOP_STATE — AfricaFunds API",
-        "État réconcilié au 2026-09-11",
-        "Preuves vertes",
-        "Blockers mesurés",
-        "Règle"
+        "Checkpoint observé",
+        "État des lots",
+        "Sécurité",
+        "Prochaine étape"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -2568,11 +2573,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "LOOP_STATE.md",
-      "git_blob_sha": "c314fdd96a5bca4a66e7b59597ef4a7069d33eda",
-      "last_validated_sha": "c314fdd96a5bca4a66e7b59597ef4a7069d33eda",
-      "content_sha256": "96b21eecc1a0baa27c135914cb022ab57463b937ccbf4b003c65b09511881b23",
-      "line_count": 45,
-      "byte_count": 1320,
+      "git_blob_sha": "d2c35e332a8575b45399819fb71eef8f6ccda3f9",
+      "last_validated_sha": "d2c35e332a8575b45399819fb71eef8f6ccda3f9",
+      "content_sha256": "07ff6811641182980fb8a84452fc083c822da15e8ec608c2626c93a67a87bccc",
+      "line_count": 42,
+      "byte_count": 1304,
       "headings": [
         {
           "level": 1,
@@ -2580,19 +2585,19 @@
         },
         {
           "level": 2,
-          "text": "État réconcilié au 2026-09-11"
+          "text": "Checkpoint observé"
         },
         {
           "level": 2,
-          "text": "Preuves vertes"
+          "text": "État des lots"
         },
         {
           "level": 2,
-          "text": "Blockers mesurés"
+          "text": "Sécurité"
         },
         {
           "level": 2,
-          "text": "Règle"
+          "text": "Prochaine étape"
         }
       ]
     },
@@ -2791,8 +2796,9 @@
       "canonical_authority": "NEXT_ACTION.md",
       "unique_information": [
         "NEXT_ACTION — AfricaFunds API",
-        "Action courante — AF-TASK-006",
-        "Blockers distincts à conserver",
+        "Action courante — AF-TASK-011",
+        "État désormais prouvé",
+        "Gaps externes conservés",
         "Interdictions"
       ],
       "consumers": [
@@ -2809,11 +2815,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "429845ce35b75d2f979a12a27bda48cba73df6eb",
-      "last_validated_sha": "429845ce35b75d2f979a12a27bda48cba73df6eb",
-      "content_sha256": "d3ca43044fe609fcf93af1c8871170728e805d5678779c3df3be65728be31305",
-      "line_count": 39,
-      "byte_count": 2076,
+      "git_blob_sha": "35decd1cef6ac473d700fa6ef829ed141f29af49",
+      "last_validated_sha": "35decd1cef6ac473d700fa6ef829ed141f29af49",
+      "content_sha256": "78703d78ac39a67f3d66657b7ea3290fede27bda163d6253d333e773969d85dd",
+      "line_count": 45,
+      "byte_count": 1702,
       "headings": [
         {
           "level": 1,
@@ -2821,11 +2827,15 @@
         },
         {
           "level": 2,
-          "text": "Action courante — AF-TASK-006"
+          "text": "Action courante — AF-TASK-011"
         },
         {
           "level": 2,
-          "text": "Blockers distincts à conserver"
+          "text": "État désormais prouvé"
+        },
+        {
+          "level": 2,
+          "text": "Gaps externes conservés"
         },
         {
           "level": 2,
@@ -2841,7 +2851,8 @@
       "unique_information": [
         "OPEN_QUESTIONS — AfricaFunds API",
         "Ouvert",
-        "2026-09-11 — questions/gaps de certification finale"
+        "2026-09-11 — questions/gaps de certification finale",
+        "2026-09-12 — gaps externes après remédiation interne"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -2857,11 +2868,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "OPEN_QUESTIONS.md",
-      "git_blob_sha": "95b26dd75bd5f03b2647a4bef81bbaf070349eb1",
-      "last_validated_sha": "95b26dd75bd5f03b2647a4bef81bbaf070349eb1",
-      "content_sha256": "0d5475b4ab4f3ea66ce66977935113d735989959fdeb1b6c4700b400690df5c9",
-      "line_count": 20,
-      "byte_count": 1544,
+      "git_blob_sha": "6d9830a6dd03fae60d7a8e84e8c49e66d1a0d3c7",
+      "last_validated_sha": "6d9830a6dd03fae60d7a8e84e8c49e66d1a0d3c7",
+      "content_sha256": "a804acc7294f9ce3941ad312a202ff688d2024b450c0d377699801dd18469384",
+      "line_count": 28,
+      "byte_count": 2299,
       "headings": [
         {
           "level": 1,
@@ -2874,6 +2885,10 @@
         {
           "level": 2,
           "text": "2026-09-11 — questions/gaps de certification finale"
+        },
+        {
+          "level": 2,
+          "text": "2026-09-12 — gaps externes après remédiation interne"
         }
       ]
     },
@@ -3467,7 +3482,8 @@
         "Incident opérationnel prioritaire",
         "Écarts de gouvernance ouverts",
         "Règle de reprise",
-        "Boucle finale de certification — 2026-09-11"
+        "Boucle finale de certification — 2026-09-11",
+        "Certification finale en cours — 2026-09-12"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3477,17 +3493,17 @@
       "contradictions": [],
       "duplication_risk": "NONE",
       "stale_state": [],
-      "security_impact": "NONE",
+      "security_impact": "HIGH",
       "production_impact": "YES",
       "title": "STATUS — AfricaFunds API",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "fd89b17f63f62e5fc38541125311bde310303081",
-      "last_validated_sha": "fd89b17f63f62e5fc38541125311bde310303081",
-      "content_sha256": "a19bddf5d0c702ad86bcf709c8f88370af130eed0ead25be138992a28b76a28e",
-      "line_count": 91,
-      "byte_count": 5654,
+      "git_blob_sha": "bbeb23957e3ec4da4ad30f6d801e9f3013e8561a",
+      "last_validated_sha": "bbeb23957e3ec4da4ad30f6d801e9f3013e8561a",
+      "content_sha256": "a28d0722f27255bb1fe96fcd73fb81ad1d19f3cfaf12a89abfde9e1a1ba66076",
+      "line_count": 103,
+      "byte_count": 6527,
       "headings": [
         {
           "level": 1,
@@ -3524,6 +3540,10 @@
         {
           "level": 2,
           "text": "Boucle finale de certification — 2026-09-11"
+        },
+        {
+          "level": 2,
+          "text": "Certification finale en cours — 2026-09-12"
         }
       ]
     },
@@ -3914,7 +3934,8 @@
         "2026-09-10 — AF-GOV-REGULATORY-PLUS-001",
         "2026-09-10 — lots CI et gouvernance (suite de AF-GOV-REGULATORY-PLUS-001)",
         "2026-09-11 — AF-GOV-FINAL-CERT-20260911-01",
-        "2026-09-11 — réconciliation du point de reprise après reprise de session"
+        "2026-09-11 — réconciliation du point de reprise après reprise de session",
+        "2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3930,11 +3951,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "4749103dc96e1dea94e4019916843bad8fc8d6cd",
-      "last_validated_sha": "4749103dc96e1dea94e4019916843bad8fc8d6cd",
-      "content_sha256": "3c836c143cac707089d0198204cb6ef7ba0defa47e6ddc7b1a97882406478270",
-      "line_count": 52,
-      "byte_count": 3717,
+      "git_blob_sha": "47a92c5b5c79305421eed938db0da2dda1c2d90e",
+      "last_validated_sha": "47a92c5b5c79305421eed938db0da2dda1c2d90e",
+      "content_sha256": "298eb49192170a39b939eddba8f0dfa91f06eef5818320b691fa0d1dc141d52c",
+      "line_count": 67,
+      "byte_count": 4913,
       "headings": [
         {
           "level": 1,
@@ -3955,6 +3976,10 @@
         {
           "level": 2,
           "text": "2026-09-11 — réconciliation du point de reprise après reprise de session"
+        },
+        {
+          "level": 2,
+          "text": "2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale"
         }
       ]
     },
@@ -7084,7 +7109,12 @@
         "Incident confirmé — 2026-09-11",
         "SECURITY_GATE",
         "Ordre de remédiation obligatoire",
-        "Contrôle continu"
+        "Contrôle continu",
+        "Remédiation exécutée — 2026-09-12",
+        "Git/runtime",
+        "DB_PASSWORD",
+        "JWT_SECRET",
+        "Rotations externes restantes"
       ],
       "consumers": [
         "SECURITY_REVIEW",
@@ -7101,11 +7131,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/08-security/SECRETS_MANAGEMENT.md",
-      "git_blob_sha": "aca712f6fbd71ca7c5d156062322388f1d31661b",
-      "last_validated_sha": "aca712f6fbd71ca7c5d156062322388f1d31661b",
-      "content_sha256": "4e97d36648bd357c02d94025d075544e7fd43d97bc22b31f0dfda1d107497751",
-      "line_count": 39,
-      "byte_count": 2991,
+      "git_blob_sha": "2f352c6fe03ca86d784b14f737310f9fc2aa9142",
+      "last_validated_sha": "2f352c6fe03ca86d784b14f737310f9fc2aa9142",
+      "content_sha256": "da2010b27c9d49e03e4a3c7f470cbf810b4cb42c33d31815e98960baf06674a0",
+      "line_count": 86,
+      "byte_count": 4644,
       "headings": [
         {
           "level": 1,
@@ -7126,6 +7156,26 @@
         {
           "level": 3,
           "text": "Contrôle continu"
+        },
+        {
+          "level": 2,
+          "text": "Remédiation exécutée — 2026-09-12"
+        },
+        {
+          "level": 3,
+          "text": "Git/runtime"
+        },
+        {
+          "level": 3,
+          "text": "DB_PASSWORD"
+        },
+        {
+          "level": 3,
+          "text": "JWT_SECRET"
+        },
+        {
+          "level": 3,
+          "text": "Rotations externes restantes"
         }
       ]
     },
@@ -9523,16 +9573,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "NONE",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Segments en dollars vers naira — journal des operations",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_FIX_SEGMENTS_NAIRA.md",
-      "git_blob_sha": "561ee810433441d37f1d798c55fecd4b6142a0c3",
-      "last_validated_sha": "561ee810433441d37f1d798c55fecd4b6142a0c3",
-      "content_sha256": "57e6efed07cff3ef2fd1f9a25f78b953971da3618a29cde2b9cf0d25a0c30b05",
-      "line_count": 95,
-      "byte_count": 5989,
+      "git_blob_sha": "ee1cfab1b92dafec82de6ad97c15f1a7c4f96cb9",
+      "last_validated_sha": "ee1cfab1b92dafec82de6ad97c15f1a7c4f96cb9",
+      "content_sha256": "02f3d2cb7e5739a4db066b7f788b90619bfb6f43f518b7614aa8cff9f74aa6f9",
+      "line_count": 94,
+      "byte_count": 5949,
       "headings": [
         {
           "level": 1,
