@@ -59,6 +59,15 @@ def http_code():
     p=run(["curl","-sS","-o","/dev/null","-w","%{http_code}","--max-time","20","http://localhost:3005/api/getactualite"],timeout=25)
     return p.stdout.strip()
 
+def wait_http(attempts=15, delay=2):
+    last="000"
+    for _ in range(attempts):
+        last=http_code()
+        if last.startswith("2"):
+            return last
+        time.sleep(delay)
+    return last
+
 def node_probe(old_secret,old_token):
     env=os.environ.copy()
     env["ROTATION_OLD_SECRET"]=old_secret
@@ -115,7 +124,7 @@ def main():
 
     # Load the new dual-key code first while still using the old key.
     restart_api()
-    before=http_code()
+    before=wait_http()
     if not before.startswith("2"):
         raise RuntimeError("API failed after code-only restart")
     old_token=make_old_token(old)
@@ -140,7 +149,7 @@ def main():
         changed=True
 
         restart_api()
-        after=http_code()
+        after=wait_http()
         if not after.startswith("2"):
             raise RuntimeError("API failed after JWT rotation")
         if not node_probe(old,old_token):
@@ -170,7 +179,7 @@ def main():
                 shutil.copyfile(backup_env,ENV)
                 os.chmod(ENV,0o600)
             restart_api()
-            rollback_http=http_code()
+            rollback_http=wait_http()
         except Exception:
             rollback_http="UNKNOWN"
         print(json.dumps({
