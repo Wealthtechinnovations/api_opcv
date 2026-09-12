@@ -122,6 +122,86 @@
       "provenance": "GitHub tracked .env audit without exposing values",
       "observed_at": "2026-09-11T21:30:00Z",
       "summary": "Public tracked .env contains non-placeholder DB password, JWT secret, email password and Magic secret key material. Application and scripts load .env directly. Safe remediation requires runtime secret migration plus rotation before sanitizing tracked files."
+    },
+    {
+      "id": "AF-EVD-024",
+      "type": "S2_READ_ONLY_OBSERVATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions OPS — observer S2 read-only run 34651239447; attempt 2 revalidated post-JWT rollback",
+      "observed_at": "2026-09-12T02:17:44Z",
+      "summary": "SSH fallback independent of MCP is live with strict pinned host key; public /, /home, /api/getactualite and local API returned 200; DB connectivity PASS; no production mutation."
+    },
+    {
+      "id": "AF-EVD-025",
+      "type": "S2_GIT_RECONCILIATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions Reconciliation gouvernee GitHub S2 run 34651393361",
+      "observed_at": "2026-09-11T21:52:18Z",
+      "summary": "Shared GOV-006 guard reconciled API/frontend S2 without force/reset/clean and preserved API untracked artifacts."
+    },
+    {
+      "id": "AF-EVD-026",
+      "type": "S2_FALLBACK_LIVE_PROOF",
+      "result": "PASS",
+      "provenance": "Runs 34651530657 attestation, 34651530777 API fallback observe, 34651530695 frontend fallback observe",
+      "observed_at": "2026-09-11T21:53:48Z",
+      "summary": "Attestation and both deployment fallbacks use the same pinned SSH primitive and passed their safe live paths."
+    },
+    {
+      "id": "AF-EVD-027",
+      "type": "RUNTIME_SECRET_DETACH",
+      "result": "PASS",
+      "provenance": "Transactional env detach workflow + subsequent Tracked Secret Gate PASS",
+      "observed_at": "2026-09-11T21:58:00Z",
+      "summary": "Real .env removed from current Git tree, restored on S2 at same path as ignored local runtime file mode 0600; dotenv, DB and local API validated."
+    },
+    {
+      "id": "AF-EVD-028",
+      "type": "DB_PASSWORD_ROTATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Rotate DB Password run 34667014996 artifact 10288688421",
+      "observed_at": "2026-09-12T02:12:50Z",
+      "summary": "New DB password generated on S2, validated, old credential rejected, backend processes online, local API 200, no rollback."
+    },
+    {
+      "id": "AF-EVD-029",
+      "type": "JWT_ROTATION_CONTRACT",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds JWT Rotation Contract run 34667114586",
+      "observed_at": "2026-09-12T02:15:14Z",
+      "summary": "Six Jest tests prove current-key signing, previous-key transitional verification, expiry preservation, malformed-token rejection and mandatory current secret."
+    },
+    {
+      "id": "AF-EVD-030",
+      "type": "JWT_SECRET_ROTATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Rotate JWT Secret run 34667308136 artifact 10288798552",
+      "observed_at": "2026-09-12T02:19:14Z",
+      "summary": "New JWT key active, old token remained valid during transactional transition, new token rejected by old key, local API 200, no rollback."
+    },
+    {
+      "id": "AF-EVD-031",
+      "type": "JWT_COMPROMISED_KEY_REVOCATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Finalize JWT Rotation run 34667384549 artifact 10289224045",
+      "observed_at": "2026-09-12T02:20:43Z",
+      "summary": "Previous exposed JWT key disabled; current token valid; token signed by old key rejected; old sessions revoked; local API 200; no rollback."
+    },
+    {
+      "id": "AF-EVD-032",
+      "type": "EXTERNAL_SECRET_ROTATION_GAP",
+      "result": "BLOCKED_EXTERNAL_PROVIDER",
+      "provenance": "Repository consumer mapping + plugin capability search",
+      "observed_at": "2026-09-12T02:21:00Z",
+      "summary": "EMAIL_PASSWORD and MAGIC_SECRET_KEY remain provider-side rotations. Current tools expose neither compatible SMTP-provider credential management nor Magic secret rotation; runtime values are not printed or blanked."
+    },
+    {
+      "id": "AF-EVD-033",
+      "type": "GITHUB_NATIVE_ENFORCEMENT",
+      "result": "EXTERNAL_TOOL_GAP",
+      "provenance": "GitHub rulesets read on both repositories",
+      "observed_at": "2026-09-12T02:21:00Z",
+      "summary": "Both repositories return an empty ruleset list. Branch-policy CI is active, but the current GitHub connector exposes no administration action to create/update native rulesets."
     }
   ],
   "note": "Les preuves historiques sont conservées. Les nouvelles preuves sont ajoutées sans réécrire les observations précédentes ; tout HEAD doit être réobservé avant une nouvelle écriture."
