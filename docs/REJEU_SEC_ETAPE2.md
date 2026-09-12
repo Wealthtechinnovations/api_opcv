@@ -3,63 +3,23 @@
 > Genere par `ops-sec-replay-dryrun.yml`. Ne pas modifier a la main.
 > **Aucune ecriture en base** : extraction dans un fichier dedie, import en dry-run.
 
-Derniere execution : **2026-09-11 22:23 UTC**
+Derniere execution : **2026-09-12 10:53 UTC**
 
 ```
 ==============================================
  0. MISE A JOUR ET VERSION DU CODE
 ==============================================
- 10 files changed, 127 insertions(+), 67 deletions(-)
- create mode 100644 .github/workflows/governance-s2-active-jobs.yml
- create mode 100644 scripts/governance/s2_active_jobs.py
-d57810153 security(ssh): pin S2 host key across legacy workflows
+ docs/DIAG_ONDEMAND.md                       | 558 ++++++++++++++++++++++++++--
+ docs/ETAT_PRODUCTION_VERIFIE.md             |  15 +-
+ 3 files changed, 575 insertions(+), 45 deletions(-)
+14a07d53d ops(sec): publier le CSV de rejeu de facon atomique
 extracteur : 2026-08-29 14:45:15
 annees rejouees : 2026 2025 2024 2023 2022
 
 ==============================================
  1. REJEU DE L EXTRACTION
 ==============================================
-[OK] 2022 | NAV-as-at-23rd-December-2022.xlsx | rows=147 | dates=2022-12-23
-[OK] 2022 | NAV-as-at-23rd-September-2022.xlsx | rows=143 | dates=2022-09-23
-[OK] 2022 | NAV-as-at-24th-June-2022.xlsx | rows=139 | dates=2022-06-24
-[OK] 2022 | NAV-as-at-25th-February-2022.xlsx | rows=135 | dates=2022-02-25
-[OK] 2022 | NAV-as-at-25th-March-2022.xlsx | rows=135 | dates=2022-03-25
-[OK] 2022 | NAV-as-at-25th-November-2022.xlsx | rows=143 | dates=2022-11-25
-[OK] 2022 | NAV-as-at-26th-August-2022.xlsx | rows=140 | dates=2022-08-26
-[OK] 2022 | NAV-as-at-27th-May-2022.xlsx | rows=136 | dates=2022-05-27
-[OK] 2022 | NAV-as-at-28th-January-2022.xlsx | rows=135 | dates=2022-01-28
-[OK] 2022 | NAV-as-at-28th-October-2022.xlsx | rows=143 | dates=2022-10-28
-[OK] 2022 | NAV-as-at-29th-April-2022-1.xlsx | rows=136 | dates=2022-04-29
-[OK] 2022 | NAV-as-at-29th-July-2022.xlsx | rows=140 | dates=2022-07-29
-[OK] 2022 | NAV-as-at-2nd-December-2022-1.xlsx | rows=144 | dates=2022-12-02
-[OK] 2022 | NAV-as-at-2nd-September-2022-1.xlsx | rows=140 | dates=2022-09-02
-[OK] 2022 | NAV-as-at-30th-December-2022-2.xlsx | rows=147 | dates=2022-12-30
-[OK] 2022 | NAV-as-at-30th-September-2022.xlsx | rows=143 | dates=2022-09-30
-[OK] 2022 | NAV-as-at-3rd-June-2022.xlsx | rows=138 | dates=2022-06-03
-[OK] 2022 | NAV-as-at-4th-February-2022.xlsx | rows=135 | dates=2022-02-04
-[OK] 2022 | NAV-as-at-4th-March-2022.xlsx | rows=135 | dates=2022-03-04
-[OK] 2022 | NAV-as-at-4th-November-2022.xlsx | rows=143 | dates=2022-11-04
-[OK] 2022 | NAV-as-at-5th-August-2022.xlsx | rows=140 | dates=2022-08-05
-[OK] 2022 | NAV-as-at-6th-May-2022.xlsx | rows=136 | dates=2022-05-06
-[OK] 2022 | NAV-as-at-7th-January-2022.xlsx | rows=134 | dates=2022-01-07
-[OK] 2022 | NAV-as-at-7th-October-2022.xlsx | rows=143 | dates=2022-10-07
-[OK] 2022 | NAV-as-at-8th-April-2022.xlsx | rows=136 | dates=2022-04-08
-[OK] 2022 | NAV-as-at-8th-July-2022.xlsx | rows=139 | dates=2022-07-08
-[OK] 2022 | NAV-as-at-9th-September-2022.xlsx | rows=143 | dates=2022-09-09
-
-Extraction terminée.
-Lignes extraites avant filtre qualité : 41626
-Lignes écrites : 41626
-Fichiers / feuilles audités : 239
-Lignes de cohérence inter-fichiers : 155
-Lignes de couverture annuelle : 5
-Suggestions fuzzy naming : 4
-CSV données : sec_ng_replay.csv
-CSV audit : sec_ng_replay_audit.csv
-CSV cohérence : sec_ng_replay_coherence.csv
-CSV couverture annuelle : sec_ng_nav_annual_coverage_v6.csv
-CSV fuzzy names : sec_ng_nav_fuzzy_names_v6.csv
-code de sortie extraction : 0
+CSV de rejeu existant, 12 h, posterieur a l extracteur — reutilise.
 lignes extraites : 41627
 
 ==============================================
@@ -230,10 +190,10 @@ VL deja existantes (gardees):  0
 VL sans taux forex:            0
 Erreurs:                       0
 
-Contrat d ecriture:            mode warn, lot SECNG_20260911_222306
+Contrat d ecriture:            mode warn, lot SECNG_20260912_105256
   Qualite des mesures:         (aucune)
   Mesures refusees:            0
-  Rollback de ce lot:          DELETE FROM valorisations WHERE correction_batch = 'SECNG_20260911_222306'
+  Rollback de ce lot:          DELETE FROM valorisations WHERE correction_batch = 'SECNG_20260912_105256'
 
 Matches fuzzy (a verifier):
   CSV: "Nigeria Real Estate Investment Trust" <-> DB: "NIGERIAN REAL ESTATE INVESTMENT TRUST" (sim=0.954)
@@ -270,7 +230,7 @@ Connexion fermee
 ==============================================
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-09-11 22:23:09 UTC — LECTURE SEULE
+Mesure le 2026-09-12 10:52:59 UTC — LECTURE SEULE
 CSV : sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -370,7 +330,7 @@ VL Nigeria en base : 77374
 ==============================================
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-09-11 22:23:15 UTC — LECTURE SEULE
+Mesure le 2026-09-12 10:53:04 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 146 ligne(s) sur 64 fonds
