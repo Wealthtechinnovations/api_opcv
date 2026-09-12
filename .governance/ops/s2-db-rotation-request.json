@@ -4,6 +4,7 @@
   "action": "ROTATE_DB_PASSWORD",
   "confirmation": "ROTATE AFRICAFUNDS DB PASSWORD",
   "one_shot": true,
+  "request_id": "AF-SEC-DB-ROTATE-20260912T0209Z",
   "expected_account": "fund_opcvm@%",
   "expected_database": "fund_opcvm",
   "rollback_required": true,
@@ -13,10 +14,15 @@
     "worker-data-import"
   ],
   "authorization_basis": "explicit owner instruction in current ChatGPT session to continue end-to-end and unblock safe security blockers",
-  "preflight_evidence": {
+  "live_preflight": {
+    "checked_at_utc": "2026-09-12T02:09:26Z",
+    "source": "GitHub Actions run 34652476964 attempt 3 artifact 10288698253",
+    "active_sensitive_jobs": 0,
+    "arguments_exposed": false
+  },
+  "prior_preflight_evidence": {
     "mariadb_root_socket": "PASS",
     "db_scope": "fund_opcvm only",
-    "active_db_connections": 7,
     "pm2_sensitive_env_presence": false,
     "runtime_env_untracked": true,
     "runtime_env_mode": "0600"
@@ -30,6 +36,7 @@
     "no_username_change": true,
     "no_schema_change": true,
     "no_data_change": true,
-    "frontend_restart": false
+    "frontend_restart": false,
+    "active_job_guard_rechecked_inside_rotation_script": true
   }
 }
