@@ -101,3 +101,8 @@ Remédiation sécurité exécutée sans exposition de valeur :
 - EMAIL_PASSWORD et MAGIC_SECRET_KEY : rotations fournisseur externes encore requises.
 
 GitHub native rulesets restent absents ; le branch drift detector CI reste la protection disponible. Le verdict `FULLY_GOVERNED` est donc interdit tant que ces gaps externes subsistent.
+
+
+### Trigger de certification Markdown finale — 2026-09-12
+
+Le checkpoint global frontend a été avancé au commit `fbbb4e9586e7f2a0bc683832d26591224c14bdb3`. Le prochain audit Markdown central doit donc relire les deux repositories après ce commit avant l'attestation S2 finale.
