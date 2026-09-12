@@ -37,3 +37,50 @@ FULLY_GOVERNED = FORBIDDEN_UNTIL_RESOLVED
 ### Contrôle continu
 
 `scripts/governance/audit_tracked_secrets.py` et `governance-secret-gate.yml` doivent rester actifs. Leur sortie ne contient que le chemin et le nom de variable, jamais la valeur, un hash, une longueur ou un préfixe susceptible de faciliter la récupération du secret.
+
+
+## Remédiation exécutée — 2026-09-12
+
+Aucune valeur sensible n'est reproduite ici.
+
+### Git/runtime
+
+- le vrai `.env` n'est plus suivi dans le HEAD courant ;
+- S2 conserve le fichier au même chemin runtime, local, ignoré par Git, permissions `0600` ;
+- le secret gate CI est vert sur le tree courant.
+
+### DB_PASSWORD
+
+Rotation transactionnelle exécutée via GitHub Actions→SSH S2 :
+- nouvelle valeur générée uniquement sur S2 ;
+- connexion avec la nouvelle valeur : PASS ;
+- ancien credential : rejeté ;
+- trois processus backend concernés : online ;
+- API locale : HTTP 200 ;
+- aucune modification de schéma ou de donnée métier.
+
+### JWT_SECRET
+
+Rotation gouvernée exécutée :
+- helper de rotation testé (6/6 tests Jest) ;
+- nouvelle clé de signature active ;
+- phase transitoire dual-key validée ;
+- ancienne clé historiquement exposée ensuite désactivée ;
+- token courant valide ;
+- token signé par l'ancienne clé rejeté ;
+- anciennes sessions révoquées comme mesure d'incident ;
+- API locale : HTTP 200.
+
+### Rotations externes restantes
+
+`EMAIL_PASSWORD` et `MAGIC_SECRET_KEY` sont utilisés par le runtime mais ne peuvent pas être rotatés uniquement depuis Git/S2 : le nouveau credential doit être émis/révoqué chez le fournisseur correspondant. Les outils actuellement disponibles n'exposent pas ces surfaces d'administration.
+
+```text
+TRACKED_REAL_ENV_CURRENT_HEAD = RESOLVED
+DB_PASSWORD_ROTATION = PASS
+JWT_SECRET_ROTATION = PASS
+OLD_JWT_KEY_REVOCATION = PASS
+EMAIL_PASSWORD_ROTATION = BLOCKED_EXTERNAL_PROVIDER
+MAGIC_SECRET_KEY_ROTATION = BLOCKED_EXTERNAL_PROVIDER
+HISTORY_REWRITE = NOT_AUTHORIZED
+```
