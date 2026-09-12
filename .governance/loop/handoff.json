@@ -16,16 +16,16 @@
     "AF-TASK-005",
     "AF-TASK-006",
     "AF-TASK-007",
-    "AF-TASK-008"
+    "AF-TASK-008",
+    "AF-TASK-009"
   ],
   "active": [
     "AF-TASK-003",
-    "AF-TASK-009",
     "AF-TASK-010",
     "AF-TASK-011"
   ],
   "open": [],
-  "next_action": "Run final bi-repository synchronization and attestation; do not claim FULLY_GOVERNED while external provider rotations/ruleset/OOB gaps remain.",
+  "next_action": "Reconcile S2 API/frontend to final Git heads, then final read-only runtime attestation.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
