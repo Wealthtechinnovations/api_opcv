@@ -1,24 +1,26 @@
 # CURRENT_ITERATION — AfricaFunds API
 
-## AF-GOV-FINAL-CERT-20260911-01
+## AF-GOV-FINAL-CERT-20260911-01 — FINAL_ATTESTATION
 
-Objectif inchangé : terminer la certification AfricaFunds sans système parallèle et sans régression.
+Le programme Regulatory Plus / Loop Engineering n'est plus en phase d'installation. Les fonctions centrales sont en service et testées.
 
-### État courant
+### Terminé
 
-La phase Git/documentation/mémoire a franchi les gates principaux : reconstruction de contexte, découverte croisée, audit Markdown exhaustif, reprise Claude↔ChatGPT, branch drift et cohérence d'état sont installés et testés.
+- reconstruction déterministe Claude/ChatGPT depuis l'un ou l'autre repo ;
+- découverte croisée API ↔ frontend ;
+- certification exhaustive des Markdown ;
+- branch drift CI ;
+- SSH GitHub Actions→S2 indépendant du bridge MCP ;
+- GOV-006 partagé ;
+- fallbacks API/frontend safe path ;
+- détachement du vrai `.env` de Git sans changer son chemin runtime ;
+- rotation DB ;
+- rotation JWT + révocation de l'ancienne clé.
 
-Le lot actif est désormais **AF-TASK-006 — S2 live observation sans bridge MCP**. Le bridge n'est pas disponible dans la présente session ; le fallback GitHub Actions→SSH doit donc être utilisé.
+### Actif
 
-### Ordre de continuation
+`AF-TASK-011` : synchronisation finale des registres, du `SUIVI.md` global et de S2, puis attestation finale.
 
-```text
-AF-TASK-006 S2 OBSERVE
-→ AF-TASK-007 FALLBACK LIVE PROOF
-→ AF-TASK-010 SECRET RUNTIME MIGRATION / ROTATION
-→ AF-TASK-008 ENFORCEMENT MAXIMAL
-→ AF-TASK-009 FINAL RESUME/BRIDGE-DOWN TESTS
-→ AF-TASK-011 FINAL SYNCHRONIZATION + ATTESTATION
-```
+### Externes
 
-Les opérations métier/data historiques restent hors scope de cette itération tant qu'elles ne sont pas nécessaires à la gouvernance finale.
+SMTP/EMAIL provider rotation, Magic provider rotation, OOB host-key verification et GitHub native rulesets.
