@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.0",
   "active_loop_id": "AF-GOV-FINAL-CERT-20260911-01",
   "tasks": [
     {
@@ -41,7 +41,7 @@
         "AF-TASK-001",
         "AF-TASK-002"
       ],
-      "next_action": "Exécuter AF-TASK-004 à AF-TASK-009 puis produire l'attestation finale."
+      "next_action": "Exécuter AF-TASK-011 puis produire le verdict final bi-repository avec les gaps externes explicitement attestés."
     },
     {
       "id": "AF-TASK-004",
@@ -59,35 +59,35 @@
       "depends_on": [
         "AF-TASK-004"
       ],
-      "next_action": "Terminé : audit exhaustif 241/241, 0 autorité orpheline, 0 contradiction critique ; maintenir par CI."
+      "next_action": "Maintenir la certification dynamique ; dernier registre observé 242/242, 0 autorité orpheline, 0 contradiction critique."
     },
     {
       "id": "AF-TASK-006",
       "title": "Observabilité S2 sans bridge MCP",
-      "status": "IN_PROGRESS",
+      "status": "DONE_WITH_EXTERNAL_TRUST_GAP",
       "depends_on": [
         "AF-TASK-004"
       ],
-      "next_action": "Établir un pin SSH S2 auditable (TOFU borné si aucune preuve OOB n'existe), puis exécuter l'observateur read-only et persister S2_OBSERVATION."
+      "next_action": "Observateur SSH sans bridge, pin TOFU, StrictHostKeyChecking et preuves live PASS. Vérification OOB du host key reste externe."
     },
     {
       "id": "AF-TASK-007",
       "title": "Fallback déploiement API/frontend et preflight GOV-006 commun",
-      "status": "IMPLEMENTED_AWAITING_LIVE_PROOF",
+      "status": "DONE",
       "depends_on": [
         "AF-TASK-006"
       ],
-      "next_action": "Après AF-TASK-006, exécuter les fallbacks API/frontend en mode observation/build non destructif avant toute mutation."
+      "next_action": "Guard GOV-006 partagé, fallback API/frontend observe et attestation S2 live prouvés ; mutations restent soumises à confirmation."
     },
     {
       "id": "AF-TASK-008",
       "title": "Enforcement GitHub et détection de drift",
-      "status": "PARTIALLY_ENFORCED",
+      "status": "DONE_WITH_EXTERNAL_GAP",
       "depends_on": [
         "AF-TASK-004",
         "AF-TASK-005"
       ],
-      "next_action": "Conserver branch-policy CI vert ; native GitHub rulesets restent gap externe faute de surface admin."
+      "next_action": "Default/canonical branch et branch drift CI enforced. GitHub native rulesets restent absents faute de surface admin disponible."
     },
     {
       "id": "AF-TASK-009",
@@ -99,7 +99,7 @@
         "AF-TASK-007",
         "AF-TASK-008"
       ],
-      "next_action": "Multi-agent PASS ; compléter bridge-down/S2 live proof puis certification finale."
+      "next_action": "Multi-agent et bridge-down PASS ; rejouer les gates finaux après la dernière synchronisation documentaire/S2."
     },
     {
       "id": "AF-OPS-001",
@@ -110,19 +110,19 @@
     {
       "id": "AF-TASK-010",
       "title": "Remédiation des secrets suivis sans régression runtime",
-      "status": "SECURITY_GATE",
+      "status": "BLOCKED_EXTERNAL_PROVIDER_ROTATION",
       "depends_on": [
         "AF-TASK-006"
       ],
       "requirements": [
         "AF-REQ-022"
       ],
-      "next_action": "Observer les consommateurs S2, préparer migration runtime non suivie, puis rotation service par service ; aucune valeur sensible dans Git/logs."
+      "next_action": "Runtime .env détaché de Git, DB_PASSWORD rotaté, JWT_SECRET rotaté et ancienne clé révoquée. Restent EMAIL_PASSWORD et MAGIC_SECRET_KEY à rotater dans les consoles fournisseurs externes."
     },
     {
       "id": "AF-TASK-011",
       "title": "Synchronisation finale des registres et attestation bi-repository",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "depends_on": [
         "AF-TASK-006",
         "AF-TASK-007",
@@ -130,7 +130,7 @@
         "AF-TASK-009",
         "AF-TASK-010"
       ],
-      "next_action": "Rejouer Markdown/state/multi-agent/branch/S2/security gates, mettre à jour SUIVI global et produire verdict final."
+      "next_action": "Synchroniser registres + SUIVI, rejouer tous les gates, réconcilier S2 avec les HEAD finaux, attester HTTP/DB/Git et produire le verdict."
     }
   ]
 }
