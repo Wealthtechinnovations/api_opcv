@@ -1,39 +1,45 @@
 # NEXT_ACTION — AfricaFunds API
 
-> Projection humaine de la task queue centrale. Une seule action exécutable à la fois.
+> Projection humaine de la task queue centrale. Une seule prochaine action exécutable.
 
-## Action courante — AF-TASK-006
+## Action courante — AF-TASK-011
 
-Établir un **pin SSH S2 auditable**, puis exécuter l'observation S2 read-only sans dépendre du bridge MCP.
+Finaliser la synchronisation et l'attestation bi-repository :
 
-État déjà prouvé :
+1. mettre à jour le checkpoint global frontend sans supprimer l'historique ;
+2. rejouer les gates Regulatory Plus, State Coherence, Multi-Agent Resume, Markdown, Branch Policy et Secret Gate ;
+3. attendre le registre Markdown durable final ;
+4. réconcilier S2 API + frontend vers les HEAD GitHub finaux avec le guard GOV-006 ;
+5. exécuter une dernière observation/attestation S2 (Git, PM2, DB, HTTP) ;
+6. produire le verdict final.
+
+## État désormais prouvé
 
 ```text
-AF-TASK-004 CONTEXT RECONSTRUCTION = DONE
-AF-TASK-005 MARKDOWN CERTIFICATION = DONE
-MULTI_AGENT_RESUME = PASS
-STATE_COHERENCE = PASS
-BRANCH_POLICY_CI = PASS
-FRONTEND_MARKDOWN_CONTRACT = PASS
+CONTEXT_RECONSTRUCTION = PASS
+CROSS_REPO_DISCOVERY = PASS
+MARKDOWN_CERTIFICATION = 242/242 (dernier registre observé)
+MCP_INDEPENDENT_SSH = PASS
+S2_OBSERVATION = PASS
+GOV006_RECONCILIATION = PASS
+API_FALLBACK_SAFE_PATH = PASS
+FRONTEND_FALLBACK_SAFE_PATH = PASS
+TRACKED_REAL_ENV_IN_CURRENT_GIT = NO
+DB_PASSWORD_ROTATED = PASS
+OLD_DB_PASSWORD_REJECTED = PASS
+JWT_SECRET_ROTATED = PASS
+OLD_JWT_KEY_REVOKED = PASS
 ```
 
-Le workflow `ops-s2-hostkey-bootstrap.yml` a produit un candidat de clé hôte. Aucune empreinte historique indépendante n'a été retrouvée dans Git. Si aucun canal OOB n'est accessible, le seul déblocage non aveugle permis est un **TOFU borné et explicitement classé non OOB-vérifié** : collecter une seule fois, persister le pin public, puis imposer `StrictHostKeyChecking=yes` pour toutes les connexions suivantes. Ce statut ne doit jamais être présenté comme une vérification OOB.
+## Gaps externes conservés
 
-Après connexion read-only réussie :
+- rotation fournisseur de `EMAIL_PASSWORD` ;
+- rotation fournisseur de `MAGIC_SECRET_KEY` ;
+- vérification OOB indépendante de la clé hôte S2 (le pin TOFU strict fonctionne) ;
+- rulesets/protection GitHub natifs non créables via la surface connector actuelle.
 
-1. produire `S2_OBSERVATION.json` ;
-2. réobserver Git API/frontend, PM2, HTTP, DB read-only, ressources et cron ;
-3. compléter AF-TASK-007 par des dry-runs sans mutation ;
-4. ouvrir la remédiation AF-TASK-010 des secrets suivis à partir de la réalité S2 ;
-5. ne redémarrer/déployer/rotater aucun secret tant que le lot concerné n'a pas ses propres gates.
-
-## Blockers distincts à conserver
-
-- `S2_HOST_KEY_NOT_OOB_VERIFIED` — déblocable par TOFU borné, mais reste à confirmer OOB ultérieurement ;
-- `TRACKED_REAL_SECRETS_SECURITY_GATE` — nécessite migration runtime puis rotations ;
-- `GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR` — la détection CI est active mais ne remplace pas l'enforcement natif ;
-- `AF-OPS-001` MariaDB Restart — opération production séparée à approbation humaine.
+Ces gaps interdisent `FULLY_GOVERNED`. Si tous les contrôles internes finaux passent, le verdict cible est `GOVERNED_WITH_EXTERNAL_GAPS`.
 
 ## Interdictions
 
-Aucun force-push, reset destructif, git clean, suppression d'artefact UNKNOWN, shell distant arbitraire, affichage de secret, nouvelle branche ou travail production sans observation réelle.
+Aucun force-push, history rewrite, nouvelle branche, suppression d'untracked/UNKNOWN, secret affiché ou mutation métier opportuniste.
