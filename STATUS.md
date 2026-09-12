@@ -89,3 +89,15 @@ Directive propriétaire : terminer la gouvernance de bout en bout sans créer de
 Le nouveau programme exige : reconstruction de contexte avant travail, découverte croisée obligatoire, certification dynamique 100 % des Markdown, cohérence des registres, fallback GitHub Actions/SSH lorsque le bridge MCP est indisponible, enforcement GitHub au maximum et tests multi-agent avant toute déclaration `FULLY_GOVERNED`.
 
 Les SHA ci-dessus restent des checkpoints observés ; l'état courant doit toujours être relu depuis GitHub.
+
+
+## Certification finale en cours — 2026-09-12
+
+La boucle a dépassé l'ancien checkpoint AF-TASK-006. Le fallback GitHub Actions→SSH S2 est opérationnel avec pin hôte strict ; GOV-006 et les chemins d'observation API/frontend ont des preuves live. Le vrai `.env` a été retiré du tree Git et reste un fichier runtime S2 local non suivi en mode 0600.
+
+Remédiation sécurité exécutée sans exposition de valeur :
+- DB_PASSWORD : rotation réelle PASS ; ancien credential rejeté ;
+- JWT_SECRET : rotation réelle PASS ; ancienne clé compromise désactivée ; anciens tokens révoqués ;
+- EMAIL_PASSWORD et MAGIC_SECRET_KEY : rotations fournisseur externes encore requises.
+
+GitHub native rulesets restent absents ; le branch drift detector CI reste la protection disponible. Le verdict `FULLY_GOVERNED` est donc interdit tant que ces gaps externes subsistent.
