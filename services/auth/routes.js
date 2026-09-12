@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { Magic } = require('@magic-sdk/admin');
 
@@ -11,6 +10,7 @@ const {
 } = require('../shared/db');
 
 const { authenticate, authorize, generateToken } = require('../shared/middleware');
+const { signJwt, verifyJwt } = require('../../src/lib/jwt-rotation');
 
 const magic = new Magic(process.env.MAGIC_SECRET_KEY);
 
@@ -254,7 +254,7 @@ router.post('/api/forgot-password', async (req, res) => {
   }
 
   // Créer un jeton de réinitialisation
-  const resetToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  const resetToken = signJwt({ userId: user.id }, { expiresIn: '1h' });
 
   // Lien de réinitialisation
   const resetUrl = `${process.env.FRONTEND_URL}/panel/societegestionpanel/login/reset-password?token=${resetToken}`;
@@ -290,7 +290,7 @@ router.post('/api/reset-password', async (req, res) => {
 
   try {
     // Vérifier le jeton
-    const decoded = jwt.verify(tokenapp, process.env.JWT_SECRET);
+    const decoded = verifyJwt(tokenapp);
     const user = await users.findOne({ where: { id: decoded.userId } });
 
     if (!user) {
