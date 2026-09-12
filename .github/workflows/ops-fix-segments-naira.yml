@@ -46,8 +46,17 @@
 # `value_EUR` et `value_USD` derivent de `value` : sans eux, le site affichera
 # des VL justes et des performances calculees sur les anciennes. Mais le
 # recalcul EUR/USD porte sur ~990 000 lignes, et c est exactement ce profil de
-# charge qui a fait tuer mariadbd par l OOM-killer le 2026-08-31 — la base fuit
-# ~700 Mo/h et se fait abattre vers 13,7 Go (voir docs/OPS_MYSQL_MEMOIRE.md).
+# charge qui a fait tuer mariadbd par l OOM-killer — le 2026-08-31 a 13,7 Go, puis
+# le 2026-09-08 a 14,6 Go, deux minutes apres le cron de recalcul de 20 h. Cette
+# seconde fois, systemd n avait aucune politique `Restart=` : la base est restee
+# morte 10 h 22 (voir docs/OPS_MYSQL_MEMOIRE.md).
+#
+# CORRECTION D UNE AFFIRMATION QUI FIGURAIT ICI. Ce commentaire annoncait une
+# fuite de « ~700 Mo/h ». C etait une extrapolation faite sur UN seul releve, et
+# deux mesures ulterieures l ont dementie : 6,54 Go apres 23 h le 2026-09-10,
+# 8,81 Go apres 2 j 18 h le 2026-09-12, soit ~53 Mo/h entre ces deux points. Le
+# risque reste reel — le swap est consomme a 90 % — mais aucune vitesse de fuite
+# fiable n est etablie, et ce fichier ne doit pas en affirmer une.
 # Enchainer les deux d office reviendrait a jouer la correction contre la
 # disponibilite. Le cron de 20 h les fait de toute facon.
 #
