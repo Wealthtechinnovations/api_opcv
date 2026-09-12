@@ -4,19 +4,17 @@
   "action": "RECONCILE_BOTH",
   "confirmation": "RECONCILE AFRICAFUNDS S2",
   "one_shot": true,
-  "request_id": "AF-FINAL-S2-RECONCILE-20260912T0232Z",
+  "request_id": "AF-FINAL-S2-RECONCILE-20260912T1526P2",
   "preserve_untracked": true,
-  "authorization_basis": "explicit owner instruction to continue final governance work end-to-end; final internal gates are green",
+  "authorization_basis": "explicit owner approval to continue AF-TASK-011 end-to-end in the current ChatGPT session",
   "preconditions": {
-    "api_git_head_before_request": "86d8545ad34bb79071b11c25a9ac1bb1c4fd555e",
-    "frontend_expected_sha": "fbbb4e9586e7f2a0bc683832d26591224c14bdb3",
-    "state_coherence_run": 34667935635,
-    "state_coherence_result": "PASS",
-    "final_markdown_registry_commit": "223d1c3a519236d89b8d058acde0655750bf8614",
-    "final_markdown_discovered": 242,
-    "final_markdown_certified": 242
+    "api_head_before_request": "cec82afcb208dc51529e846a826aed1dee97b523",
+    "frontend_expected_sha": "cac9f1d7d0cb821345304b506cfe6d51daab4f68",
+    "internal_gates": "PASS",
+    "markdown_registry": "242/242",
+    "no_new_branch": true
   },
-  "expected_frontend_sha": "fbbb4e9586e7f2a0bc683832d26591224c14bdb3",
+  "expected_frontend_sha": "cac9f1d7d0cb821345304b506cfe6d51daab4f68",
   "safety": {
     "force_push": false,
     "reset_hard": false,
