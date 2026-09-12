@@ -1,0 +1,144 @@
+name: AfricaFunds Rotate JWT Secret
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.governance/ops/s2-jwt-rotation-request.json'
+      - '.github/workflows/governance-s2-jwt-rotate.yml'
+      - 'scripts/governance/s2_rotate_jwt_secret.py'
+      - 'src/lib/jwt-rotation.js'
+      - 'scripts/governance/prepare_s2_ssh.sh'
+      - 'scripts/governance/s2_git_guard.sh'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-jwt-secret-rotation
+  cancel-in-progress: false
+
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout canonical governance
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          fetch-depth: 2
+
+      - name: Resolve one-shot authorization
+        id: auth
+        env:
+          GITHUB_SHA_VALUE: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "authorized=false" >> "$GITHUB_OUTPUT"
+          if ! git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA_VALUE" \
+              | grep -Fxq '.governance/ops/s2-jwt-rotation-request.json'; then
+            echo "No JWT rotation request in this commit; safe no-op."
+            exit 0
+          fi
+          python3 - <<'PY'
+          import json
+          p=json.load(open('.governance/ops/s2-jwt-rotation-request.json',encoding='utf-8'))
+          assert p['schema_version']=='1.0.0'
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['action']=='ROTATE_JWT_SECRET'
+          assert p['confirmation']=='ROTATE AFRICAFUNDS JWT SECRET'
+          assert p['one_shot'] is True
+          assert p['preserve_existing_tokens'] is True
+          assert p['rollback_required'] is True
+          print('VERSIONED_JWT_ROTATION_REQUEST=PASS')
+          PY
+          echo "authorized=true" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare strict pinned SSH
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Reconcile API checkout before JWT rotation
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- reconcile api' \
+            < scripts/governance/s2_git_guard.sh | tee jwt-rotation-reconcile.txt
+
+      - name: Rotate JWT secret with previous-key compatibility
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' \
+            < scripts/governance/s2_rotate_jwt_secret.py \
+            | tee JWT_ROTATION_RESULT.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('JWT_ROTATION_RESULT.json',encoding='utf-8'))
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['result']=='PASS'
+          assert p['new_key_active'] is True
+          assert p['previous_key_verification_enabled'] is True
+          assert p['old_token_still_valid'] is True
+          assert p['new_token_rejected_by_old_key'] is True
+          assert p['api_monolith_online'] is True
+          assert str(p['local_api_http']).startswith('2')
+          assert p['secret_values_exposed'] is False
+          assert p['token_values_exposed'] is False
+          assert p['rollback_used'] is False
+          print('JWT_SECRET_ROTATION=PASS')
+          PY
+
+      - name: Re-inventory secret posture after JWT rotation
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' \
+            < scripts/governance/s2_secret_inventory.py > S2_SECRET_INVENTORY_AFTER_JWT_ROTATION.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('S2_SECRET_INVENTORY_AFTER_JWT_ROTATION.json',encoding='utf-8'))
+          env=p['files']['.env']
+          assert env['exists'] is True
+          assert env['tracked_by_git'] is False
+          assert env['git_status']==[]
+          assert p['safety']['values_exposed'] is False
+          print('POST_JWT_ROTATION_SECRET_INVENTORY=PASS')
+          PY
+
+      - name: Upload non-secret evidence
+        if: always() && steps.auth.outputs.authorized == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-jwt-secret-rotation
+          path: |
+            JWT_ROTATION_RESULT.json
+            S2_SECRET_INVENTORY_AFTER_JWT_ROTATION.json
+            jwt-rotation-reconcile.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
