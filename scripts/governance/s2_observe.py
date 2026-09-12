@@ -132,15 +132,68 @@ def db_auth_diagnostic():
                 denied.append(line[:260])
 
     cron_lines = []
+    cron_env_keys = []
     root_cron = run(["crontab","-l"], timeout=10)
     if root_cron["code"] == 0:
         for line in root_cron["stdout"].splitlines():
             t = line.strip()
             if not t or t.startswith("#"):
                 continue
+            if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t):
+                key = t.split("=",1)[0]
+                cron_env_keys.append(key)
+                continue
             low = t.lower()
             if "africafunds" in low or "fundafrica" in low or "scripts/" in low:
                 cron_lines.append(sanitize(t)[:700])
+
+    cron_users = []
+    spool = Path("/var/spool/cron/crontabs")
+    if spool.exists():
+        for p in sorted(spool.iterdir()):
+            if not p.is_file():
+                continue
+            user_rows = []
+            env_keys = []
+            try:
+                txt = p.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            for line in txt.splitlines():
+                t = line.strip()
+                if not t or t.startswith("#"):
+                    continue
+                if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t):
+                    env_keys.append(t.split("=",1)[0])
+                    continue
+                low = t.lower()
+                if "africafunds" in low or "fundafrica" in low or "fund_opcvm" in low:
+                    user_rows.append(sanitize(t)[:700])
+            if user_rows or any(k.startswith("DB_") for k in env_keys):
+                cron_users.append({"user":p.name,"env_keys":sorted(set(env_keys)),"project_lines":user_rows})
+
+    global_env_keys = []
+    for env_path in [Path("/etc/environment"), Path("/root/.profile"), Path("/root/.bashrc")]:
+        if not env_path.exists():
+            continue
+        try:
+            txt=env_path.read_text(encoding="utf-8",errors="ignore")
+        except Exception:
+            continue
+        for line in txt.splitlines():
+            t=line.strip().replace("export ","",1)
+            if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=",t):
+                key=t.split("=",1)[0]
+                if key.startswith("DB_") or key in {"MYSQL_PWD","DATABASE_URL"}:
+                    global_env_keys.append({"source":str(env_path),"key":key})
+
+    timers = []
+    timer_out = run(["systemctl","list-timers","--all","--no-pager","--no-legend"], timeout=15)
+    if timer_out["code"] == 0:
+        for line in timer_out["stdout"].splitlines():
+            low=line.lower()
+            if "africa" in low or "fund" in low:
+                timers.append(line[:500])
 
     process_lines = []
     ps = run(["ps","-eo","pid=,lstart=,args="], timeout=10)
@@ -150,11 +203,49 @@ def db_auth_diagnostic():
             if "africafunds.chainsolutions.fr/api" in low or "fund_opcvm" in low:
                 process_lines.append(sanitize(line.strip())[:700])
 
+    log_matches = []
+    candidates = []
+    for pattern_glob in [
+        "/var/log/africafunds*.log",
+        "/var/log/cron_*.log",
+        "/root/.pm2/logs/*.log",
+        str(API / "data" / "**" / "*.log"),
+    ]:
+        import glob
+        candidates.extend(glob.glob(pattern_glob, recursive=True))
+    seen=set()
+    for raw_path in candidates:
+        if raw_path in seen:
+            continue
+        seen.add(raw_path)
+        p=Path(raw_path)
+        try:
+            if not p.is_file() or p.stat().st_size > 200_000_000:
+                continue
+            with p.open("rb") as fh:
+                size=p.stat().st_size
+                fh.seek(max(0,size-2_000_000))
+                txt=fh.read().decode("utf-8",errors="ignore")
+        except Exception:
+            continue
+        hits=[]
+        for line in txt.splitlines():
+            low=line.lower()
+            if "access denied" in low or "er_access_denied_error" in low:
+                hits.append(sanitize(line)[:700])
+        if hits:
+            log_matches.append({"path":str(p),"matches":hits[-8:]})
+
     return {
         "access_denied_count_since_midnight": len(denied),
         "access_denied_lines": denied[-50:],
+        "root_cron_env_keys": sorted(set(cron_env_keys)),
         "root_project_cron_lines": cron_lines,
+        "cron_users": cron_users,
+        "global_db_env_keys": global_env_keys,
+        "project_systemd_timers": timers,
         "project_processes": process_lines[:100],
+        "log_correlations": log_matches[:100],
         "runtime_env": {
             "exists": (API / ".env").exists(),
             "tracked": run(["git","ls-files","--error-unmatch",".env"], API)["code"] == 0,
