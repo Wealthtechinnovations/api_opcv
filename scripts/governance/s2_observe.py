@@ -369,6 +369,103 @@ def duplicate_env_inventory():
         })
     return sorted(rows,key=lambda x:x["path"])
 
+def db_credential_consumers_inventory():
+    runtime = {}
+    env_file = API / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8", errors="ignore").splitlines():
+            t=line.strip()
+            if not t or t.startswith("#") or "=" not in t:
+                continue
+            k,v=t.split("=",1)
+            runtime[k.strip()] = v.strip().strip("\"'")
+    current_user=runtime.get("DB_USER")
+    current_password=runtime.get("DB_PASSWORD")
+
+    processes=[]
+    proc=Path("/proc")
+    for p in proc.iterdir() if proc.exists() else []:
+        if not p.name.isdigit():
+            continue
+        try:
+            items=(p/"environ").read_bytes().split(b"\0")
+        except Exception:
+            continue
+        env={}
+        for item in items:
+            if b"=" not in item:
+                continue
+            k,v=item.split(b"=",1)
+            env[k.decode("utf-8",errors="ignore")] = v.decode("utf-8",errors="ignore")
+        if env.get("DB_USER") != current_user:
+            continue
+        try:
+            cwd=os.readlink(p/"cwd")
+        except Exception:
+            cwd=None
+        try:
+            comm=(p/"comm").read_text(encoding="utf-8",errors="ignore").strip()
+        except Exception:
+            comm=None
+        state="NOT_IN_INITIAL_ENV"
+        if "DB_PASSWORD" in env and current_password is not None:
+            state="MATCHES_RUNTIME" if env["DB_PASSWORD"] == current_password else "DIFFERS_FROM_RUNTIME"
+        processes.append({
+            "pid":int(p.name),
+            "comm":comm,
+            "cwd":cwd,
+            "db_password_state":state,
+            "db_host":env.get("DB_HOST"),
+            "db_name":env.get("DB_NAME"),
+        })
+
+    env_files=[]
+    roots=[
+        Path("/var/www/vhosts/chainsolutions.fr"),
+        Path("/opt/apps"),
+        Path("/root"),
+    ]
+    seen=0
+    for root in roots:
+        if not root.exists():
+            continue
+        for path in root.rglob(".env"):
+            seen += 1
+            if seen > 500:
+                break
+            try:
+                if not path.is_file() or path.stat().st_size > 2_000_000:
+                    continue
+                vals={}
+                for line in path.read_text(encoding="utf-8",errors="ignore").splitlines():
+                    t=line.strip()
+                    if not t or t.startswith("#") or "=" not in t:
+                        continue
+                    if "=" not in t:
+                        continue
+                    k,v=t.split("=",1)
+                    vals[k.strip()] = v.strip().strip("\"'")
+                if vals.get("DB_USER") != current_user:
+                    continue
+                state="MISSING"
+                if "DB_PASSWORD" in vals and current_password is not None:
+                    state="MATCHES_RUNTIME" if vals["DB_PASSWORD"] == current_password else "DIFFERS_FROM_RUNTIME"
+                env_files.append({
+                    "path":str(path),
+                    "db_password_state":state,
+                    "mode":oct(stat.S_IMODE(path.stat().st_mode)),
+                })
+            except Exception:
+                continue
+
+    return {
+        "runtime_db_user_present": bool(current_user),
+        "processes_with_same_db_user": sorted(processes,key=lambda x:x["pid"]),
+        "env_files_with_same_db_user": sorted(env_files,key=lambda x:x["path"]),
+        "secret_values_exposed": False,
+        "read_only": True,
+    }
+
 def runtime_snapshot():
     p = Path("/var/lib/fundafrica/runtime/PRODUCTION_STATE.json")
     out = {"path": str(p), "exists": p.exists()}
@@ -411,6 +508,7 @@ def main():
         "database": db_readonly(),
         "db_auth_diagnostic": db_auth_diagnostic(),
         "process_cwd_inventory": process_cwd_inventory(),
+        "db_credential_consumers_inventory": db_credential_consumers_inventory(),
         "duplicate_env_inventory": duplicate_env_inventory(),
         "http": [
             http_probe("https://africafunds.chainsolutions.fr/"),
