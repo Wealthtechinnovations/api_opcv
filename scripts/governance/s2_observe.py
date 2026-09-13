@@ -466,6 +466,152 @@ def db_credential_consumers_inventory():
         "read_only": True,
     }
 
+
+def cross_vhost_db_forensics():
+    """Read-only search for DB consumers outside the canonical AfricaFunds vhost.
+
+    Values are never emitted. Candidate environment passwords are classified only
+    as MATCHES_RUNTIME / DIFFERS_FROM_RUNTIME / PLACEHOLDER / MISSING.
+    """
+    runtime = {}
+    env_file = API / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8", errors="ignore").splitlines():
+            t=line.strip()
+            if not t or t.startswith("#") or "=" not in t:
+                continue
+            k,v=t.split("=",1)
+            runtime[k.strip()] = v.strip().strip("\"'")
+    current_user=runtime.get("DB_USER")
+    current_password=runtime.get("DB_PASSWORD")
+
+    proc_rows=[]
+    proc=Path("/proc")
+    for p in proc.iterdir() if proc.exists() else []:
+        if not p.name.isdigit():
+            continue
+        try:
+            cwd=os.readlink(p/"cwd")
+        except Exception:
+            cwd=""
+        try:
+            cmd=(p/"cmdline").read_bytes().replace(b"\0",b" ").decode("utf-8",errors="ignore").strip()
+        except Exception:
+            cmd=""
+        env={}
+        try:
+            for item in (p/"environ").read_bytes().split(b"\0"):
+                if b"=" not in item:
+                    continue
+                k,v=item.split(b"=",1)
+                env[k.decode("utf-8",errors="ignore")]=v.decode("utf-8",errors="ignore")
+        except Exception:
+            pass
+        hay=(cwd+" "+cmd).lower()
+        if not (cwd.startswith("/var/www/vhosts/") and ("fund" in hay or "opcvm" in hay)) and env.get("DB_USER") != current_user:
+            continue
+        state="NOT_IN_INITIAL_ENV"
+        if "DB_PASSWORD" in env and current_password is not None:
+            state="MATCHES_RUNTIME" if env["DB_PASSWORD"] == current_password else "DIFFERS_FROM_RUNTIME"
+        proc_rows.append({
+            "pid":int(p.name),
+            "cwd":cwd or None,
+            "cmdline":sanitize(cmd)[:700],
+            "db_user_matches_runtime": bool(current_user and env.get("DB_USER")==current_user),
+            "db_password_state":state,
+        })
+
+    file_rows=[]
+    root=Path("/var/www/vhosts")
+    patterns=[".env",".env.*","*config*.js","*config*.json","*database*.js","*db*.js","ecosystem*.js"]
+    candidates=[]
+    seen=set()
+    if root.exists():
+        for pattern in patterns:
+            try:
+                for p in root.rglob(pattern):
+                    sp=str(p)
+                    if sp in seen or "/node_modules/" in sp or "/.git/" in sp:
+                        continue
+                    seen.add(sp)
+                    candidates.append(p)
+                    if len(candidates) >= 2500:
+                        break
+            except Exception:
+                continue
+            if len(candidates) >= 2500:
+                break
+    for p in candidates:
+        try:
+            if not p.is_file() or p.stat().st_size > 2_000_000:
+                continue
+            txt=p.read_text(encoding="utf-8",errors="ignore")
+        except Exception:
+            continue
+        low=txt.lower()
+        if "fund_opcvm" not in low and "db_user" not in low:
+            continue
+        vals={}
+        if p.name.startswith(".env"):
+            for line in txt.splitlines():
+                t=line.strip()
+                if not t or t.startswith("#") or "=" not in t:
+                    continue
+                k,v=t.split("=",1)
+                vals[k.strip()]=v.strip().strip("\"'")
+        state="NOT_PARSEABLE"
+        if vals.get("DB_USER")==current_user:
+            candidate=vals.get("DB_PASSWORD")
+            if candidate is None:
+                state="MISSING"
+            elif current_password is not None and candidate==current_password:
+                state="MATCHES_RUNTIME"
+            elif re.search(r"(?i)(changer|change|example|your_|mot_de_passe|password_here|placeholder)",candidate or ""):
+                state="PLACEHOLDER"
+            else:
+                state="DIFFERS_FROM_RUNTIME"
+        markers=[m for m in ["fund_opcvm","DB_USER","DB_PASSWORD","mysql","sequelize"] if m.lower() in low]
+        file_rows.append({
+            "path":str(p),
+            "markers":markers,
+            "env_db_user_matches_runtime": vals.get("DB_USER")==current_user if vals else None,
+            "db_password_state":state,
+            "mtime_epoch":int(p.stat().st_mtime),
+        })
+
+    ssh_lines=[]
+    for unit in ["ssh","sshd"]:
+        r=run(["journalctl","-u",unit,"--since","2 hours ago","--no-pager","-o","short-iso"],timeout=20)
+        if r["code"]==0:
+            for line in r["stdout"].splitlines():
+                low=line.lower()
+                if "accepted publickey" in low or "session opened" in low or "session closed" in low or "disconnected from" in low:
+                    ssh_lines.append(sanitize(line)[:700])
+
+    cron_lines=[]
+    r=run(["journalctl","-u","cron","--since","2 hours ago","--no-pager","-o","short-iso"],timeout=20)
+    if r["code"]==0:
+        for line in r["stdout"].splitlines():
+            low=line.lower()
+            if "fund" in low or "opcvm" in low or "africa" in low:
+                cron_lines.append(sanitize(line)[:700])
+
+    lastcomm={"available": bool(shutil.which("lastcomm")), "lines":[]}
+    if lastcomm["available"]:
+        r=run(["lastcomm","node"],timeout=15)
+        if r["code"]==0:
+            lastcomm["lines"]=[sanitize(x)[:500] for x in r["stdout"].splitlines()[-80:]]
+
+    return {
+        "processes": sorted(proc_rows,key=lambda x:x["pid"]),
+        "candidate_files": sorted(file_rows,key=lambda x:x["path"]),
+        "recent_ssh_events": ssh_lines[-120:],
+        "recent_project_cron_events": cron_lines[-120:],
+        "process_accounting_node": lastcomm,
+        "read_only": True,
+        "secret_values_exposed": False,
+    }
+
 def runtime_snapshot():
     p = Path("/var/lib/fundafrica/runtime/PRODUCTION_STATE.json")
     out = {"path": str(p), "exists": p.exists()}
@@ -510,6 +656,7 @@ def main():
         "process_cwd_inventory": process_cwd_inventory(),
         "db_credential_consumers_inventory": db_credential_consumers_inventory(),
         "duplicate_env_inventory": duplicate_env_inventory(),
+        "cross_vhost_db_forensics": cross_vhost_db_forensics(),
         "http": [
             http_probe("https://africafunds.chainsolutions.fr/"),
             http_probe("https://africafunds.chainsolutions.fr/home"),
