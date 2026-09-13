@@ -58,7 +58,8 @@ def main():
     queue=load_json(api/".governance/loop/task-queue.json")
     active=[x for x in queue["tasks"] if x["status"] in {"IN_PROGRESS","PENDING","BLOCKED_EXTERNAL_PROVIDER_ROTATION"}]
     current=[x for x in queue["tasks"] if x["status"]=="IN_PROGRESS"]
-    blocked_external=[x for x in active if x["status"]=="BLOCKED_EXTERNAL_PROVIDER_ROTATION"]\n    current_task=current[-1] if current else (blocked_external[0] if blocked_external else (active[0] if active else None))
+    blocked_external=[x for x in active if x["status"]=="BLOCKED_EXTERNAL_PROVIDER_ROTATION"]
+    current_task=current[-1] if current else (blocked_external[0] if blocked_external else (active[0] if active else None))
 
     next_action=(api/"NEXT_ACTION.md").read_text(encoding="utf-8")
     next_hash=hashlib.sha256(next_action.encode()).hexdigest()
