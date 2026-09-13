@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "e83cfbe438957f10f69f3fed2cdbeda53486adcb"
+      "head": "4a400dbd5d04fe470b5807df99a1abc05b17f676"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "55191a74c8d581adb383123ce1d9f5bea98dc267"
+      "head": "38a5120677ec76dcc65b5d799a5f24f8ce236328"
     }
   },
   "summary": {
@@ -1464,6 +1464,8 @@
       "canonical_authority": "CURRENT_ITERATION.md",
       "unique_information": [
         "CURRENT_ITERATION — AfricaFunds API",
+        "AF-GOV-FINAL-CERT-20260911-01 — CLOSED_WITH_EXTERNAL_GAPS",
+        "Historique conservé",
         "AF-GOV-FINAL-CERT-20260911-01 — FINAL_ATTESTATION",
         "Terminé",
         "Actif",
@@ -1483,15 +1485,23 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CURRENT_ITERATION.md",
-      "git_blob_sha": "72d2578f744f4e335b6b86827f927bd3f0ca6501",
-      "last_validated_sha": "72d2578f744f4e335b6b86827f927bd3f0ca6501",
-      "content_sha256": "2ca34b1a67006e2e9045fcf376c66befbf453693ad110d62651112f31ecf0dff",
-      "line_count": 26,
-      "byte_count": 923,
+      "git_blob_sha": "edbb0491555df39deeb7e7982d8b2597d48700c3",
+      "last_validated_sha": "edbb0491555df39deeb7e7982d8b2597d48700c3",
+      "content_sha256": "2107cb3dede63aee675556b6b9e6a218e0ffe828e9a90bf3c0ef4871429dd9be",
+      "line_count": 34,
+      "byte_count": 1376,
       "headings": [
         {
           "level": 1,
           "text": "CURRENT_ITERATION — AfricaFunds API"
+        },
+        {
+          "level": 2,
+          "text": "AF-GOV-FINAL-CERT-20260911-01 — CLOSED_WITH_EXTERNAL_GAPS"
+        },
+        {
+          "level": 3,
+          "text": "Historique conservé"
         },
         {
           "level": 2,
@@ -2290,6 +2300,8 @@
       "canonical_authority": "HANDOFF.md",
       "unique_information": [
         "HANDOFF — AfricaFunds API",
+        "Point de reprise courant — clôture 2026-09-13",
+        "Historique conservé",
         "Point de reprise courant",
         "Baseline observée",
         "État",
@@ -2310,15 +2322,23 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "HANDOFF.md",
-      "git_blob_sha": "40e008504d7451b2f794bec76bb876d2c21a7fb3",
-      "last_validated_sha": "40e008504d7451b2f794bec76bb876d2c21a7fb3",
-      "content_sha256": "9da96f187a8a7c90fce9acfef44ed15073067730e4e01a7a8cadcbc97e3bedbb",
-      "line_count": 46,
-      "byte_count": 2702,
+      "git_blob_sha": "b55d7ce1a42fa53b1ba00081efbe4a6da444a41d",
+      "last_validated_sha": "b55d7ce1a42fa53b1ba00081efbe4a6da444a41d",
+      "content_sha256": "a714e8d745eec06fc2b819a2b9af91a233e353c32900a562d78e9ae54177b619",
+      "line_count": 61,
+      "byte_count": 3494,
       "headings": [
         {
           "level": 1,
           "text": "HANDOFF — AfricaFunds API"
+        },
+        {
+          "level": 2,
+          "text": "Point de reprise courant — clôture 2026-09-13"
+        },
+        {
+          "level": 3,
+          "text": "Historique conservé"
         },
         {
           "level": 2,
@@ -2554,6 +2574,8 @@
       "canonical_authority": "LOOP_STATE.md",
       "unique_information": [
         "LOOP_STATE — AfricaFunds API",
+        "État courant — clôture interne",
+        "Historique conservé",
         "Checkpoint observé",
         "État des lots",
         "Sécurité",
@@ -2573,15 +2595,23 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "LOOP_STATE.md",
-      "git_blob_sha": "d2c35e332a8575b45399819fb71eef8f6ccda3f9",
-      "last_validated_sha": "d2c35e332a8575b45399819fb71eef8f6ccda3f9",
-      "content_sha256": "07ff6811641182980fb8a84452fc083c822da15e8ec608c2626c93a67a87bccc",
-      "line_count": 42,
-      "byte_count": 1304,
+      "git_blob_sha": "7d9fe22d6583bfd6d2493c9465cb7b177d2cf5c6",
+      "last_validated_sha": "7d9fe22d6583bfd6d2493c9465cb7b177d2cf5c6",
+      "content_sha256": "be4ab953fc39ebdc951ebc99e60070501e1aa3f1eaccb8c05a8259a5e72a1dd3",
+      "line_count": 67,
+      "byte_count": 1935,
       "headings": [
         {
           "level": 1,
           "text": "LOOP_STATE — AfricaFunds API"
+        },
+        {
+          "level": 2,
+          "text": "État courant — clôture interne"
+        },
+        {
+          "level": 3,
+          "text": "Historique conservé"
         },
         {
           "level": 2,
@@ -2796,6 +2826,8 @@
       "canonical_authority": "NEXT_ACTION.md",
       "unique_information": [
         "NEXT_ACTION — AfricaFunds API",
+        "Action courante — AF-TASK-010",
+        "Historique conservé de l'action précédente",
         "Action courante — AF-TASK-011",
         "État désormais prouvé",
         "Gaps externes conservés",
@@ -2815,15 +2847,23 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "35decd1cef6ac473d700fa6ef829ed141f29af49",
-      "last_validated_sha": "35decd1cef6ac473d700fa6ef829ed141f29af49",
-      "content_sha256": "78703d78ac39a67f3d66657b7ea3290fede27bda163d6253d333e773969d85dd",
-      "line_count": 45,
-      "byte_count": 1702,
+      "git_blob_sha": "0fb5662cba389357b7e750fc302299ce28567b3a",
+      "last_validated_sha": "0fb5662cba389357b7e750fc302299ce28567b3a",
+      "content_sha256": "b0aab1065e556627cd75105356d17461434e7b53a468ca4290a37faa8b610975",
+      "line_count": 59,
+      "byte_count": 2449,
       "headings": [
         {
           "level": 1,
           "text": "NEXT_ACTION — AfricaFunds API"
+        },
+        {
+          "level": 2,
+          "text": "Action courante — AF-TASK-010"
+        },
+        {
+          "level": 3,
+          "text": "Historique conservé de l'action précédente"
         },
         {
           "level": 2,
@@ -3484,7 +3524,8 @@
         "Règle de reprise",
         "Boucle finale de certification — 2026-09-11",
         "Certification finale en cours — 2026-09-12",
-        "Trigger de certification Markdown finale — 2026-09-12"
+        "Trigger de certification Markdown finale — 2026-09-12",
+        "Clôture gouvernée AF-TASK-011 — 2026-09-13 17:59 UTC"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3500,11 +3541,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "d5907c7cff47851b6e9f89bbca55ee99af24faac",
-      "last_validated_sha": "d5907c7cff47851b6e9f89bbca55ee99af24faac",
-      "content_sha256": "4b44ae780dcfd512cc625e1b0b86dd4dea1b5fae40b687c6b68be2940a1a7a77",
-      "line_count": 108,
-      "byte_count": 6812,
+      "git_blob_sha": "ad057dfc44c91d1598a02260bdc1a66a633f2462",
+      "last_validated_sha": "ad057dfc44c91d1598a02260bdc1a66a633f2462",
+      "content_sha256": "e5efaa29a83ee235e754438fb1efca3142c2d2e7434014176e1d021c60550ea4",
+      "line_count": 118,
+      "byte_count": 7798,
       "headings": [
         {
           "level": 1,
@@ -3549,6 +3590,10 @@
         {
           "level": 3,
           "text": "Trigger de certification Markdown finale — 2026-09-12"
+        },
+        {
+          "level": 2,
+          "text": "Clôture gouvernée AF-TASK-011 — 2026-09-13 17:59 UTC"
         }
       ]
     },
@@ -3940,7 +3985,8 @@
         "2026-09-10 — lots CI et gouvernance (suite de AF-GOV-REGULATORY-PLUS-001)",
         "2026-09-11 — AF-GOV-FINAL-CERT-20260911-01",
         "2026-09-11 — réconciliation du point de reprise après reprise de session",
-        "2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale"
+        "2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale",
+        "2026-09-13 — clôture AF-TASK-011"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3956,11 +4002,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "47a92c5b5c79305421eed938db0da2dda1c2d90e",
-      "last_validated_sha": "47a92c5b5c79305421eed938db0da2dda1c2d90e",
-      "content_sha256": "298eb49192170a39b939eddba8f0dfa91f06eef5818320b691fa0d1dc141d52c",
-      "line_count": 67,
-      "byte_count": 4913,
+      "git_blob_sha": "3ca218f22a975278c3f3051f2bc9a15bb8745a4f",
+      "last_validated_sha": "3ca218f22a975278c3f3051f2bc9a15bb8745a4f",
+      "content_sha256": "3e09a6e9ef4bb2a0821c86a35bcabfea14198e448972502eeb91cee7b155b658",
+      "line_count": 79,
+      "byte_count": 6304,
       "headings": [
         {
           "level": 1,
@@ -3985,6 +4031,10 @@
         {
           "level": 2,
           "text": "2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale"
+        },
+        {
+          "level": 2,
+          "text": "2026-09-13 — clôture AF-TASK-011"
         }
       ]
     },
@@ -12575,6 +12625,12 @@
       "canonical_authority": "SUIVI.md",
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
+        "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée",
+        "Verdict de la boucle de gouvernance",
+        "Preuve GitHub ↔ S2 mesurée",
+        "Refus MariaDB post-rotation — classification",
+        "Gaps externes conservés",
+        "Prochaine action",
         "POINT DE REPRISE COURANT — AF-GOV-FINAL-CERT / AF-TASK-011",
         "Produit et Git",
         "Loop Engineering / gouvernance",
@@ -12587,13 +12643,7 @@
         "2. BACKLOG CONSOLIDE — CE QUI RESTE VRAIMENT A FAIRE",
         "P1 — Bloquant (donnee fausse affichee, ou perte de visibilite)",
         "P2 — Important (integrite, securite, exploitation)",
-        "P3 — Dette technique et surveillance",
-        "3. DEJA FAIT — NE PLUS REFAIRE (preuve PROD du 2026-08-12)",
-        "4. DECISIONS UTILISATEUR — **DEJA TRANCHEES LE 2026-07-14, JAMAIS EXECUTEES**",
-        "5. REGLES PERMANENTES — RAPPEL DES PLUS ENGAGEANTES",
-        "6. PLAN D'EXECUTION RECOMMANDE",
-        "Architecture",
-        "Panels utilisateur"
+        "P3 — Dette technique et surveillance"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -12609,15 +12659,39 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "f2066b097b5b4750e602f3d9485eac8364e4c4c2",
-      "last_validated_sha": "f2066b097b5b4750e602f3d9485eac8364e4c4c2",
-      "content_sha256": "1e02907c0b725c7479d80a1adf110cc4cb23150fe08460132423f354c73cd921",
-      "line_count": 6026,
-      "byte_count": 428870,
+      "git_blob_sha": "a678dc9241a027a6ebfe59782589d73558d02d79",
+      "last_validated_sha": "a678dc9241a027a6ebfe59782589d73558d02d79",
+      "content_sha256": "5e8cba214c51be9573ef743344aeab7f58abf98db0a329e97e0569d61a7511fa",
+      "line_count": 6072,
+      "byte_count": 432102,
       "headings": [
         {
           "level": 1,
           "text": "Carnet de suivi - Africafunds (Fundafrique)"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée"
+        },
+        {
+          "level": 3,
+          "text": "Verdict de la boucle de gouvernance"
+        },
+        {
+          "level": 3,
+          "text": "Preuve GitHub ↔ S2 mesurée"
+        },
+        {
+          "level": 3,
+          "text": "Refus MariaDB post-rotation — classification"
+        },
+        {
+          "level": 3,
+          "text": "Gaps externes conservés"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine action"
         },
         {
           "level": 2,
@@ -12750,30 +12824,6 @@
         {
           "level": 3,
           "text": "2026-05-15 - Fix country-panel anomalies (endpoint URL incorrect)"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Fix script Phase 2 (forme_juridique -> structure_fond)"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Script import VL Maroc (ASFIM CSV)"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Script import VL Maroc XLSX (consolide ASFIM)"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Script import VL UEMOA/BRVM (XLSX nettoye)"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-16 - Script import VL Maroc quotidiennes ASFIM (2024-2026)"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-16 - Script import historique Forex (5 XLSX, 9 paires, 2000-2026)"
         }
       ]
     },
