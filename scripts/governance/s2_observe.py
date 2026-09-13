@@ -311,6 +311,64 @@ def process_cwd_inventory():
         })
     return sorted(rows, key=lambda x:x["pid"])
 
+def duplicate_env_inventory():
+    runtime = {}
+    env_file = API / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8", errors="ignore").splitlines():
+            if "=" not in line or line.lstrip().startswith("#"):
+                continue
+            k,v=line.split("=",1)
+            runtime[k.strip()]=v.strip().strip("\"'")
+
+    root = Path("/var/www/vhosts/chainsolutions.fr")
+    rows=[]
+    if not root.exists():
+        return rows
+    for p in root.rglob(".env*"):
+        if not p.is_file():
+            continue
+        sp=str(p)
+        if "/node_modules/" in sp or "/.git/" in sp:
+            continue
+        try:
+            txt=p.read_text(encoding="utf-8",errors="ignore")
+        except Exception:
+            continue
+        vals={}
+        for line in txt.splitlines():
+            if "=" not in line or line.lstrip().startswith("#"):
+                continue
+            k,v=line.split("=",1)
+            vals[k.strip()]=v.strip().strip("\"'")
+        if vals.get("DB_USER") != "fund_opcvm":
+            continue
+        candidate=vals.get("DB_PASSWORD")
+        current=runtime.get("DB_PASSWORD")
+        if candidate is None:
+            state="MISSING"
+        elif current is not None and candidate == current:
+            state="MATCHES_RUNTIME"
+        elif re.search(r"(?i)(changer|change|example|your_|mot_de_passe|password_here)", candidate or ""):
+            state="PLACEHOLDER"
+        else:
+            state="DIFFERS_FROM_RUNTIME"
+        try:
+            st=p.stat()
+            mode=oct(st.st_mode & 0o777)
+            mtime=int(st.st_mtime)
+        except Exception:
+            mode=None; mtime=None
+        rows.append({
+            "path":sp,
+            "db_host":vals.get("DB_HOST"),
+            "db_name":vals.get("DB_NAME"),
+            "db_password_state":state,
+            "mode":mode,
+            "mtime_epoch":mtime,
+        })
+    return sorted(rows,key=lambda x:x["path"])
+
 def runtime_snapshot():
     p = Path("/var/lib/fundafrica/runtime/PRODUCTION_STATE.json")
     out = {"path": str(p), "exists": p.exists()}
@@ -353,6 +411,7 @@ def main():
         "database": db_readonly(),
         "db_auth_diagnostic": db_auth_diagnostic(),
         "process_cwd_inventory": process_cwd_inventory(),
+        "duplicate_env_inventory": duplicate_env_inventory(),
         "http": [
             http_probe("https://africafunds.chainsolutions.fr/"),
             http_probe("https://africafunds.chainsolutions.fr/home"),
