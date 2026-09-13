@@ -4,18 +4,24 @@
   "action": "RECONCILE_BOTH",
   "confirmation": "RECONCILE AFRICAFUNDS S2",
   "one_shot": true,
-  "request_id": "AF-TASK-011-S2-RECONCILE-20260913T1758Z",
+  "request_id": "AF-TASK-011-FINAL-POSTDOC-RECONCILE-20260913T1806Z",
   "preserve_untracked": true,
-  "authorization_basis": "explicit owner approval to continue AF-TASK-011 end-to-end in the current ChatGPT session",
+  "authorization_basis": "explicit owner approval to complete AF-TASK-011 end-to-end; final post-documentation GOV-006 reconciliation",
   "preconditions": {
-    "api_head_before_request": "8ae99556ac5142590ccacdcba9ea1343a78c150e",
-    "frontend_expected_sha": "55191a74c8d581adb383123ce1d9f5bea98dc267",
-    "internal_gates": "PASS_AT_8ae99556_PRE_RECONCILE",
-    "markdown_registry": "242/242",
-    "db_access_denied_classification": "NO_PERSISTENT_STALE_CONSUMER_OBSERVED; HISTORICAL_EXACT_SOURCE_UNATTRIBUTABLE_WITH_CURRENT_MARIADB_TELEMETRY",
-    "no_new_branch": true
+    "api_head_before_request": "bd0699ece588e910db16d3f9eb2969e55f74d33f",
+    "frontend_expected_sha": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
+    "regulatory_plus": "PASS_RUN_34773530401",
+    "state_coherence": "PASS_RUN_34773485672_INPUTS_UNCHANGED_AFTER",
+    "multi_agent_resume": "PASS_RUN_34773530441",
+    "markdown_exhaustive": "PASS_RUN_34773485641_REGISTRY_COMMIT_322d2778075df4f10914b76240d8a0e940aef0d3",
+    "branch_policy": "PASS_FRESH_LIVE_REPLICATION_NO_UNEXPECTED_BRANCHES",
+    "project_link_contract": "PASS_FRESH_LIVE_IDENTITY_REPLICATION",
+    "tracked_secret_gate": "UNCHANGED_INPUTS_PREVIOUS_PASS_AND_CURRENT_TRACKED_ENV_SURFACE_UNCHANGED",
+    "files_deleted": 0,
+    "preserve_untracked": true,
+    "no_business_data_mutation": true
   },
-  "expected_frontend_sha": "55191a74c8d581adb383123ce1d9f5bea98dc267",
+  "expected_frontend_sha": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
   "safety": {
     "force_push": false,
     "reset_hard": false,
@@ -25,5 +31,5 @@
     "backup_snapshot_only_commits": true,
     "fast_forward_frontend_only": true
   },
-  "previous_request_id": "AF-FINAL-S2-RECONCILE-20260912T1526P2"
+  "previous_request_id": "AF-TASK-011-S2-RECONCILE-20260913T1758Z"
 }
