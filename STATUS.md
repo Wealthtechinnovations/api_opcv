@@ -106,3 +106,13 @@ GitHub native rulesets restent absents ; le branch drift detector CI reste la pr
 ### Trigger de certification Markdown finale — 2026-09-12
 
 Le checkpoint global frontend a été avancé au commit `fbbb4e9586e7f2a0bc683832d26591224c14bdb3`. Le prochain audit Markdown central doit donc relire les deux repositories après ce commit avant l'attestation S2 finale.
+
+## Clôture gouvernée AF-TASK-011 — 2026-09-13 17:59 UTC
+
+- `AF-TASK-011 = DONE`.
+- `AF-TASK-003 = DONE_WITH_EXTERNAL_GAPS`.
+- Dernière attestation S2 avant persistance de ce checkpoint : API `ceff72e0e0dad7a7522835940a9537662b16f844`, frontend `55191a74c8d581adb383123ce1d9f5bea98dc267`, alignement exact, tracked clean, untracked API préservés, PM2 online, DB PASS, HTTP 200.
+- Le checkpoint global frontend a ensuite avancé à `38a5120677ec76dcc65b5d799a5f24f8ce236328` pour consigner la clôture ; une réconciliation post-documentation GOV-006 est donc obligatoire et sera exécutée sans modifier le métier.
+- Refus MariaDB : aucun consommateur stale persistant observé ; source historique exacte non attribuable avec la télémétrie MariaDB alors inactive. Aucune re-rotation DB.
+- Verdict : `GOVERNED_WITH_EXTERNAL_GAPS`.
+- Tâche gouvernée restante : `AF-TASK-010` (rotations fournisseurs externes), avec OOB host-key et GitHub native rulesets comme gaps externes.

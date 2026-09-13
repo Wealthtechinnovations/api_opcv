@@ -1,5 +1,19 @@
 # NEXT_ACTION — AfricaFunds API
 
+## Action courante — AF-TASK-010
+
+La certification interne `AF-TASK-011` est terminée. Aucune nouvelle tâche interne de gouvernance n'est à ouvrir.
+
+La seule action gouvernée restante est externe :
+1. émettre/révoquer `EMAIL_PASSWORD` chez le fournisseur SMTP ;
+2. émettre/révoquer `MAGIC_SECRET_KEY` chez Magic ;
+3. fournir une vérification OOB indépendante de la clé hôte S2 ;
+4. appliquer des GitHub native rulesets lorsqu'une surface administrative compatible est disponible.
+
+Ne jamais blanker, inventer ou remplacer un credential runtime avant émission fournisseur valide. Toute reprise doit réobserver les deux HEAD et S2. Verdict courant : `GOVERNED_WITH_EXTERNAL_GAPS`.
+
+### Historique conservé de l'action précédente
+
 > Projection humaine de la task queue centrale. Une seule prochaine action exécutable.
 
 ## Action courante — AF-TASK-011

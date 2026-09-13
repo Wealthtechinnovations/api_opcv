@@ -65,3 +65,15 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 - EMAIL_PASSWORD et MAGIC_SECRET_KEY restent des rotations fournisseur externes ;
 - GitHub native rulesets et OOB host-key restent gaps externes ;
 - tâche courante basculée vers AF-TASK-011 final attestation.
+
+## 2026-09-13 — clôture AF-TASK-011
+
+- reprise effectuée depuis les autorités Git/S2 live, sans rejouer AF-TASK-001→009 ;
+- drift GitHub constaté et préservé : API avait avancé à `8ae99556ac5142590ccacdcba9ea1343a78c150e`, frontend à `55191a74c8d581adb383123ce1d9f5bea98dc267` ;
+- analyse des `Access denied` MariaDB terminée sans nouvelle rotation : DB actuelle PASS, diagnostic/observer non causal, workers/crons/workflows/env stale persistants écartés ; deux observations successives ont conservé comme dernier refus `2026-09-13 17:36:56 UTC` ; attribution historique exacte impossible avec general_log/performance_schema/audit désactivés ;
+- GOV-006 run `34773189857` : fast-forward API/frontend PASS, sauvegarde `/var/backups/fundafrica-governance/20260913T175849Z`, untracked API préservés, tracked clean ;
+- attestation : API `ceff72e0e0dad7a7522835940a9537662b16f844`, frontend `55191a74c8d581adb383123ce1d9f5bea98dc267`, PM2 online, DB PASS, HTTP public/local 200 ;
+- Regulatory Plus sur `ceff72e0e0dad7a7522835940a9537662b16f844` : PASS ;
+- frontend SUIVI global avancé à `38a5120677ec76dcc65b5d799a5f24f8ce236328` pour consigner la clôture ;
+- persistance finale des registres dans ce commit ; une dernière réconciliation post-documentation est requise conformément à GOV-006 ;
+- `FILES_DELETED = 0` ; aucune donnée métier C2/C3/C4/C7/C8 modifiée.

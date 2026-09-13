@@ -290,6 +290,34 @@
       "evidence_refs": [
         "AF-EVD-019"
       ]
+    },
+    {
+      "requirement_id": "AF-REQ-024",
+      "change_refs": [
+        ".governance/loop/task-queue.json",
+        ".governance/loop/state.json",
+        ".governance/loop/handoff.json",
+        "STATUS.md",
+        "NEXT_ACTION.md",
+        "LOOP_STATE.md",
+        "CURRENT_ITERATION.md",
+        "HANDOFF.md",
+        "WORK_LOG.md",
+        "scripts/governance/s2_observe.py",
+        "scripts/governance/s2_git_guard.sh",
+        ".github/workflows/governance-s2-reconcile.yml"
+      ],
+      "test_refs": [
+        ".github/workflows/governance-regulatory-plus.yml",
+        ".github/workflows/governance-state-coherence.yml",
+        ".github/workflows/governance-multi-agent-resume.yml",
+        ".github/workflows/governance-markdown-audit.yml",
+        ".github/workflows/governance-s2-reconcile.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-035",
+        "AF-EVD-036"
+      ]
     }
   ]
 }

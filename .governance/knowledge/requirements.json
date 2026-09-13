@@ -374,6 +374,30 @@
         "AF-REQ-017"
       ],
       "note": "Claude et ChatGPT reconstruisent le même contexte logique depuis API ou frontend sans mémoire conversationnelle."
+    },
+    {
+      "id": "AF-REQ-024",
+      "title": "Clôture bi-repository et attestation runtime finale sans régression",
+      "status": "VERIFIED",
+      "authority": "GOVERNANCE.md",
+      "acceptance_criteria": [
+        "GitHub API et frontend réconciliés vers S2 via GOV-006 sans force/reset-hard/git-clean",
+        "Tracked clean sur les deux repositories et untracked API préservés",
+        "PM2 API/frontend online, DB connectivity PASS et HTTP public/local 200",
+        "Aucun consommateur DB stale persistant observé après rotation",
+        "Verdict final distinct des gaps fournisseurs/OOB/rulesets externes"
+      ],
+      "evidence_required": [
+        "AF-EVD-035",
+        "AF-EVD-036"
+      ],
+      "dependencies": [
+        "AF-REQ-019",
+        "AF-REQ-020",
+        "AF-REQ-022",
+        "AF-REQ-023"
+      ],
+      "note": "Attestation GOV-006 run 34773189857: API/Frontend alignés et runtime sain. Les refus MariaDB historiques post-rotation ne correspondent à aucun consommateur stale persistant identifié; attribution exacte historique impossible avec general_log/performance_schema/audit désactivés."
     }
   ]
 }

@@ -1,5 +1,20 @@
 # HANDOFF — AfricaFunds API
 
+## Point de reprise courant — clôture 2026-09-13
+
+Boucle `AF-GOV-FINAL-CERT-20260911-01` fermée côté contrôles internes.
+
+- `AF-TASK-011 = DONE`.
+- `AF-TASK-003 = DONE_WITH_EXTERNAL_GAPS`.
+- tâche gouvernée courante : `AF-TASK-010 = BLOCKED_EXTERNAL_PROVIDER_ROTATION`.
+- verdict : `GOVERNED_WITH_EXTERNAL_GAPS`.
+- preuves : `AF-EVD-035`, `AF-EVD-036`.
+- aucune mémoire conversationnelle n'est requise : reconstruire depuis les deux repos, le SUIVI global et S2.
+- ne pas considérer les refus MariaDB historiques comme un credential runtime actuel : aucun consommateur stale persistant n'a été observé ; réobserver avant toute conclusion future.
+- gaps externes : EMAIL_PASSWORD, MAGIC_SECRET_KEY, vérification OOB host-key, GitHub native rulesets.
+
+### Historique conservé
+
 ## Point de reprise courant
 
 Boucle `AF-GOV-FINAL-CERT-20260911-01` en cours sur la branche canonique existante `claude/code-review-improvements-ikvuj`, sans création de branche.

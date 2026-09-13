@@ -6,9 +6,9 @@
   "repository": "Wealthtechinnovations/api_opcv",
   "peer_repository": "Wealthtechinnovations/front_end_opcvm",
   "canonical_branch": "claude/code-review-improvements-ikvuj",
-  "observed_api_sha": "7fe4e9aaf0ca04967ae0406703fa1e81a6a34cbb",
-  "observed_frontend_sha": "d1aae176cc9ade8801f5e2e1ba69e752cd697316",
-  "head_semantics": "OBSERVED_BASELINE_NOT_SELF_REFERENTIAL",
+  "observed_api_sha": "ceff72e0e0dad7a7522835940a9537662b16f844",
+  "observed_frontend_sha": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
+  "head_semantics": "OBSERVED_AT_CLOSURE_NOT_SELF_REFERENTIAL",
   "completed": [
     "AF-TASK-001",
     "AF-TASK-002",
@@ -17,15 +17,14 @@
     "AF-TASK-006",
     "AF-TASK-007",
     "AF-TASK-008",
-    "AF-TASK-009"
-  ],
-  "active": [
-    "AF-TASK-003",
-    "AF-TASK-010",
+    "AF-TASK-009",
     "AF-TASK-011"
   ],
+  "active": [
+    "AF-TASK-010"
+  ],
   "open": [],
-  "next_action": "Reconcile S2 API/frontend to final Git heads, then final read-only runtime attestation.",
+  "next_action": "AF-TASK-010 uniquement: rotations fournisseur EMAIL_PASSWORD/MAGIC_SECRET_KEY quand une surface administrateur compatible est disponible; OOB host-key et GitHub native rulesets restent externes.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -34,7 +33,7 @@
     "read_global_suivi": true,
     "observe_s2_if_relevant": true,
     "work_gate_requires_context_reconstruction": true,
-    "current_operational_task": "AF-TASK-011",
+    "current_operational_task": "AF-TASK-010",
     "bridge_available_in_current_chat": false,
     "ssh_fallback_required": true,
     "host_key_trust_status": "TOFU_PINNED_PENDING_OOB",
@@ -43,6 +42,12 @@
     "db_password_rotation": "PASS",
     "jwt_rotation_and_revocation": "PASS",
     "email_password_rotation": "EXTERNAL_PROVIDER_REQUIRED",
-    "magic_secret_rotation": "EXTERNAL_PROVIDER_REQUIRED"
-  }
+    "magic_secret_rotation": "EXTERNAL_PROVIDER_REQUIRED",
+    "final_governance_verdict": "GOVERNED_WITH_EXTERNAL_GAPS",
+    "db_access_denied_active_stale_consumer": "NOT_OBSERVED",
+    "db_access_denied_historical_attribution": "UNAVAILABLE_WITH_CURRENT_MARIADB_TELEMETRY"
+  },
+  "closed_with_external_gaps": [
+    "AF-TASK-003"
+  ]
 }

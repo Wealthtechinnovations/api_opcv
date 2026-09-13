@@ -210,7 +210,23 @@
       "provenance": "Rerun attempts: Regulatory Plus 34667697672#2; State Coherence 34667674612#2; Multi-Agent Resume 34667668841#2; Tracked Secret Gate 34667096245#2; API Branch Policy 34661338979#2; frontend Branch Policy 34661457841#2; frontend Project Link 34648518431#2; final Markdown audit 34667765458",
       "observed_at": "2026-09-12T02:30:35Z",
       "summary": "All internal governance gates are green after the final documentation/SUIVI stabilization. Markdown registry is 242/242 with zero orphan authority and zero unresolved critical contradiction."
+    },
+    {
+      "id": "AF-EVD-035",
+      "type": "DB_AUTH_POST_ROTATION_CLASSIFICATION",
+      "result": "NO_ACTIVE_STALE_CONSUMER_OBSERVED_WITH_HISTORICAL_ATTRIBUTION_LIMIT",
+      "provenance": "Two read-only S2 observations at 2026-09-13 17:42Z and 17:56Z + process/env/cron/workflow inventory + MariaDB telemetry query",
+      "observed_at": "2026-09-13T17:56:30Z",
+      "summary": "DB connectivity PASS. Last Access denied remained 2026-09-13 17:36:56Z across two observations; no current process/env/cron/GitHub workflow with stale DB credential was found. db_readonly succeeds and db_auth_diagnostic does not authenticate. Exact historical executable cannot be reconstructed because MariaDB general_log=OFF, performance_schema=OFF and no audit/userstat plugin is active. No DB re-rotation justified."
+    },
+    {
+      "id": "AF-EVD-036",
+      "type": "FINAL_S2_RECONCILIATION_RUNTIME",
+      "result": "PASS",
+      "provenance": "GitHub Actions Reconciliation gouvernee GitHub S2 run 34773189857 artifact 10322627099",
+      "observed_at": "2026-09-13T17:59:08Z",
+      "summary": "GOV-006 fast-forwarded API to ceff72e0e0dad7a7522835940a9537662b16f844 and frontend to 55191a74c8d581adb383123ce1d9f5bea98dc267; ahead/behind 0/0, tracked clean, all API untracked preserved. api-monolith and fundafrique-frontend online; DB PASS; public root/home/API and local API all HTTP 200."
     }
   ],
-  "note": "Les preuves historiques sont conservées. Les nouvelles preuves sont ajoutées sans réécrire les observations précédentes ; tout HEAD doit être réobservé avant une nouvelle écriture."
+  "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
 }

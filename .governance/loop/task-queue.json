@@ -36,12 +36,16 @@
     {
       "id": "AF-TASK-003",
       "title": "Attestation finale bi-repository de la gouvernance",
-      "status": "IN_PROGRESS",
+      "status": "DONE_WITH_EXTERNAL_GAPS",
       "depends_on": [
         "AF-TASK-001",
         "AF-TASK-002"
       ],
-      "next_action": "Exécuter AF-TASK-011 puis produire le verdict final bi-repository avec les gaps externes explicitement attestés."
+      "next_action": "Certification bi-repository fermée. Les actions restantes sont exclusivement les gaps externes portés par AF-TASK-010 et les contrôles externes OOB/rulesets.",
+      "closure_evidence": [
+        "AF-EVD-035",
+        "AF-EVD-036"
+      ]
     },
     {
       "id": "AF-TASK-004",
@@ -122,7 +126,7 @@
     {
       "id": "AF-TASK-011",
       "title": "Synchronisation finale des registres et attestation bi-repository",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "depends_on": [
         "AF-TASK-006",
         "AF-TASK-007",
@@ -130,8 +134,12 @@
         "AF-TASK-009",
         "AF-TASK-010"
       ],
-      "next_action": "Réconcilier S2 vers les HEAD GitHub finaux puis exécuter observation/attestation runtime finale.",
-      "phase": "FINAL_S2_ATTESTATION"
+      "next_action": "Aucune action interne restante. Conserver les preuves et ne rouvrir qu'en cas de drift mesuré.",
+      "phase": "FINAL_S2_ATTESTATION_COMPLETE",
+      "closure_evidence": [
+        "AF-EVD-035",
+        "AF-EVD-036"
+      ]
     }
   ]
 }

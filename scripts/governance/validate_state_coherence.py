@@ -30,7 +30,7 @@ def main():
     if queue.get("active_loop_id") != loop_id: errors.append("QUEUE_LOOP_ID_DRIFT")
     tasks={x.get("id"):x for x in queue.get("tasks",[])}
     if task_id not in tasks: errors.append("CURRENT_TASK_MISSING_FROM_QUEUE")
-    elif tasks[task_id].get("status") not in {"IN_PROGRESS","BLOCKED_EXTERNAL_SECRET","SECURITY_GATE","PARTIALLY_ENFORCED"}:
+    elif tasks[task_id].get("status") not in {"IN_PROGRESS","BLOCKED_EXTERNAL_SECRET","BLOCKED_EXTERNAL_PROVIDER_ROTATION","SECURITY_GATE","PARTIALLY_ENFORCED"}:
         errors.append("CURRENT_TASK_NOT_ACTIVE")
     if handoff.get("loop_id") != loop_id: errors.append("HANDOFF_LOOP_ID_DRIFT")
     if task_id not in set(handoff.get("active",[])): errors.append("HANDOFF_CURRENT_TASK_DRIFT")
