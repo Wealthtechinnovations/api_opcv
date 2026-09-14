@@ -45,6 +45,7 @@ on:
   push:
     paths:
       - '.github/workflows/ops-mysql-memoire.yml'
+      - 'scripts/governance/s2_ssh_readonly_retry.sh'
 
 permissions:
   # `write` pour consigner le releve dans le depot : le resume GitHub n est
@@ -97,9 +98,7 @@ jobs:
         run: |
           set -o pipefail
           SSH_USER="${USER_SSH:-root}"
-          ssh -i ~/.ssh/id_deploy -o BatchMode=yes \
-              -o ServerAliveInterval=30 -o ServerAliveCountMax=20 \
-              "$SSH_USER@$HOST" bash -s <<'REMOTE' 2>&1 | tee rapport-mem.txt
+          cat > /tmp/af-mariadb-memory-diag.sh <<'REMOTE'
             set -u
             cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api 2>/dev/null || exit 3
 
@@ -145,7 +144,59 @@ jobs:
 
             echo ""
             echo "=============================================="
-            echo " 3. LE PIRE CAS, CALCULE"
+            echo " 2b. MEMORY_USED / PROC / ALLOCATEUR"
+            echo "=============================================="
+            Q "SHOW GLOBAL STATUS WHERE Variable_name IN (
+                 'Memory_used','Memory_used_initial','Max_used_connections',
+                 'Threads_connected','Threads_running','Threads_created',
+                 'Connections','Aborted_connects','Created_tmp_disk_tables',
+                 'Created_tmp_tables','Created_tmp_files','Open_tables',
+                 'Opened_tables','Open_table_definitions','Opened_table_definitions',
+                 'Open_files','Opened_files','Uptime');" || true
+
+            echo ""
+            echo "--- version / instrumentation ---"
+            Q "SELECT VERSION(), @@version_comment;" || true
+            Q "SHOW VARIABLES WHERE Variable_name IN ('performance_schema','version_malloc_library','aria_pagecache_buffer_size','table_definition_cache');" || true
+
+            PID="$(pgrep -xo mariadbd 2>/dev/null || true)"
+            echo "MARIADB_PID=${PID:-ABSENT}"
+            if [ -n "${PID:-}" ]; then
+              echo "--- /proc status ---"
+              ps -o pid=,rss=,vsz=,etime=,nlwp=,%mem=,cmd= -p "$PID" 2>/dev/null || true
+              grep -E '^(VmPeak|VmSize|VmRSS|RssAnon|RssFile|RssShmem|VmData|VmSwap|Threads):' /proc/$PID/status 2>/dev/null || true
+              echo "--- smaps_rollup ---"
+              grep -E '^(Rss|Pss|Pss_Anon|Pss_File|Private_Clean|Private_Dirty|Anonymous|AnonHugePages|Swap):' /proc/$PID/smaps_rollup 2>/dev/null || true
+              echo "--- pmap totals ---"
+              pmap -x "$PID" 2>/dev/null | tail -2 || true
+              echo "--- allocator libraries ---"
+              BIN="$(readlink -f /proc/$PID/exe 2>/dev/null || true)"
+              [ -z "${BIN:-}" ] || ldd "$BIN" 2>/dev/null | grep -Ei 'jemalloc|tcmalloc|libc\.so' || true
+            fi
+
+            echo "--- systemd/cgroup memory ---"
+            systemctl show mariadb -p ActiveState -p SubState -p Result -p NRestarts -p MemoryCurrent -p MemoryPeak -p MemorySwapCurrent -p OOMPolicy -p Restart 2>/dev/null || true
+            CG="/sys/fs/cgroup/system.slice/mariadb.service"
+            if [ -d "$CG" ]; then
+              for x in memory.current memory.peak memory.swap.current memory.events memory.events.local; do
+                [ ! -r "$CG/$x" ] || { echo "[$x]"; cat "$CG/$x"; }
+              done
+            fi
+            echo "--- THP ---"
+            cat /sys/kernel/mm/transparent_hugepage/enabled 2>/dev/null || true
+
+            echo ""
+            echo "--- top connexions par memoire ---"
+            Q "SELECT ID,LEFT(COALESCE(USER,'?'),24),LEFT(COALESCE(HOST,'?'),40),
+                      LEFT(COALESCE(COMMAND,'?'),16),TIME,
+                      ROUND(COALESCE(MEMORY_USED,0)/1048576,2),
+                      ROUND(COALESCE(MAX_MEMORY_USED,0)/1048576,2)
+                 FROM information_schema.PROCESSLIST
+                ORDER BY COALESCE(MEMORY_USED,0) DESC LIMIT 20;" || true
+
+            echo ""
+            echo "=============================================="
+            echo " 3. PLAFOND CONFIGURE, PAS RSS REEL"
             echo "=============================================="
             # global + (par_session x max_connections). C est ce que le serveur
             # s autorise, pas ce qu il consomme maintenant : c est justement ce
@@ -166,7 +217,7 @@ jobs:
                  ROUND(@@max_heap_table_size / 1048576, 0) AS heap_table_Mo,
                  ROUND(@@tmp_table_size / 1048576, 0) AS tmp_table_Mo;"
             echo ""
-            echo "  Colonnes : global_Go | par_session_Mo | max_conn | pire_cas_Go | heap_Mo | tmp_Mo"
+            echo "  Colonnes : global_Go | par_session_Mo | max_conn | pire_cas_Go | heap_Mo | tmp_Mo\n  Si ce plafond reste tres inferieur au RSS, ne pas conclure a une saturation de buffers."
             echo "  Comparer pire_cas_Go a la RAM totale relevee en section 1."
             echo "  Rappel : mariadbd a ete tue a 13,7 Go sur 17,9 Go de RAM."
 
@@ -203,9 +254,38 @@ jobs:
 
             echo ""
             echo "=============================================="
+            echo " 5. SERIE COURTE RSS vs Memory_used"
+            echo "=============================================="
+            PID="$(pgrep -xo mariadbd 2>/dev/null || true)"
+            i=1
+            while [ "$i" -le 6 ]; do
+              TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+              RSS_KB=0
+              ANON_KB=0
+              SWAP_KB=0
+              if [ -n "${PID:-}" ]; then
+                RSS_KB="$(awk '/^VmRSS:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+                ANON_KB="$(awk '/^RssAnon:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+                SWAP_KB="$(awk '/^VmSwap:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+              fi
+              MEM_USED="$(Q "SHOW GLOBAL STATUS LIKE 'Memory_used';" 2>/dev/null | awk '{print $2}' | tail -1)"
+              THREADS="$(Q "SHOW GLOBAL STATUS LIKE 'Threads_connected';" 2>/dev/null | awk '{print $2}' | tail -1)"
+              echo "SAMPLE ts=$TS rss_kb=${RSS_KB:-0} rssanon_kb=${ANON_KB:-0} swap_kb=${SWAP_KB:-0} mariadb_memory_used_bytes=${MEM_USED:-NA} connections=${THREADS:-NA}"
+              [ "$i" -eq 6 ] || sleep 15
+              i=$((i+1))
+            done
+
+            echo ""
+            echo "=============================================="
             echo " FIN — aucune variable modifiee, aucun service redemarre"
             echo "=============================================="
           REMOTE
+
+          AFRICAFUNDS_SSH_OPERATION_CLASS=READ_ONLY \
+            bash scripts/governance/s2_ssh_readonly_retry.sh \
+            "$SSH_USER@$HOST" 'bash -s' /tmp/af-mariadb-memory-diag.sh \
+            2>&1 | tee rapport-mem.txt
+          test -s rapport-mem.txt
 
       - name: Publier le rapport
         if: always()
