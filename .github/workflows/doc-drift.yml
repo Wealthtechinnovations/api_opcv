@@ -94,16 +94,45 @@ jobs:
           HOST: ${{ secrets.S2_HOST }}
           USER_SSH: ${{ secrets.S2_USER }}
         run: |
-          # Les etapes GitHub tournent en `bash -eo pipefail` : si le controle
-          # sort en code 1 (echec critique), cette etape echoue et le job devient
-          # rouge. C'est exactement l'effet recherche — l'etape de rapport qui
-          # suit porte `if: always()` et publie quand meme le detail.
+          # CE COMMENTAIRE AFFIRMAIT UNE CHOSE FAUSSE, ET ELLE A COUTE QUATRE
+          # HEURES DE PRODUCTION. Il disait : « Les etapes GitHub tournent en
+          # `bash -eo pipefail` : si le controle sort en code 1, cette etape
+          # echoue et le job devient rouge. » Le shell par defaut d une etape
+          # GitHub sur Linux est `bash -e {0}` — **sans** `pipefail` ; les
+          # journaux de ce depot l affichent a chaque execution. Le `ssh` etant
+          # suivi d un `| tee`, c est le code de `tee` qui comptait : toujours 0.
+          #
+          # CONSEQUENCE MESUREE. Le 2026-09-14 a 12:21 UTC, le controle a rendu
+          # « Erreur fatale : connect ECONNREFUSED 127.0.0.1:3306 » et sorti en
+          # code 2 : `mariadbd` avait ete tue par l OOM-killer a 10:04 et n avait
+          # aucune politique `Restart=`. Le job est reste **vert**. La panne n a
+          # ete vue qu a 13:59, par lecture humaine du fichier produit — soit
+          # 3 h 56 d API en HTTP 500. Un controle qui ne peut pas mesurer et se
+          # declare quand meme satisfait est pire qu un controle absent : il
+          # fabrique une certitude fausse, et `CLAUDE.md` en fait la source de
+          # verite n°1.
+          #
+          # DEUX CODES, DEUX SENS — et un seul doit rendre le job rouge :
+          #   - code 1 : la mesure a REUSSI et a trouve des derives critiques.
+          #     C est l etat courant connu (C2, C3, C7, C8) et le sujet du
+          #     backlog. Le faire echouer rendrait ce check rouge en permanence,
+          #     donc illisible, donc ignore — l inverse du but recherche.
+          #   - code >= 2 : la mesure n a PAS PU AVOIR LIEU (base injoignable,
+          #     repertoire absent, SSH coupe). Il n y a alors aucun etat mesure,
+          #     et le silence est un mensonge. C est ce cas, et lui seul, qui
+          #     doit alerter.
+          #
+          # Aucun controle n est desactive ici : un echec jusqu alors muet
+          # devient audible. L etape de rapport qui suit porte `if: always()` et
+          # publie le detail dans tous les cas.
+          set -o pipefail
           SSH_USER="${USER_SSH:-root}"
 
           # Le depot serveur porte en permanence des fichiers modifies (logs.txt
           # notamment) : on met de cote, on met a jour, on remet en place.
           # Aucune donnee n'est perdue et rien n'est ecrase de force.
-          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" bash -s <<'REMOTE' 2>&1 | tee rapport.txt
+          RC=0
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes "$SSH_USER@$HOST" bash -s <<'REMOTE' 2>&1 | tee rapport.txt || RC=$?
             set -u
             cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api || exit 3
 
@@ -119,6 +148,14 @@ jobs:
 
             node scripts/diag/check_doc_drift.js --verbose
           REMOTE
+
+          # Code 1 = derives critiques mesurees : c est le backlog, pas une
+          # panne du controle. On le laisse passer, le rapport le detaille.
+          if [ "$RC" -ge 2 ]; then
+            echo "::error::La mesure n a pas pu avoir lieu (code ${RC}). Production ou base injoignable — l etat publie ne vaut rien tant que ce code n est pas 0 ou 1. Voir docs/OPS_MARIADB.md et ops-mariadb-recover.yml."
+            exit "$RC"
+          fi
+          echo "Code de sortie du controle : ${RC} (0 = tout tient, 1 = derives critiques mesurees)."
 
       - name: Executer les diagnostics a la demande
         if: always()
