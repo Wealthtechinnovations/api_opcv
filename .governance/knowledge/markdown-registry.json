@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "ff8588964e6942b6f408d146bee1623417de13e5"
+      "head": "be63084778ffb9305048a2bc8faf3df223f2dcb8"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -1509,7 +1509,8 @@
         "AF-GOV-FINAL-CERT-20260911-01 — FINAL_ATTESTATION",
         "Terminé",
         "Actif",
-        "Externes"
+        "Externes",
+        "Priorité opérationnelle pré-V2 — AF-OPS-003"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -1525,11 +1526,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CURRENT_ITERATION.md",
-      "git_blob_sha": "edbb0491555df39deeb7e7982d8b2597d48700c3",
-      "last_validated_sha": "edbb0491555df39deeb7e7982d8b2597d48700c3",
-      "content_sha256": "2107cb3dede63aee675556b6b9e6a218e0ffe828e9a90bf3c0ef4871429dd9be",
-      "line_count": 34,
-      "byte_count": 1376,
+      "git_blob_sha": "e0398aed2e88efd5dd83d5df99e76889703d7f08",
+      "last_validated_sha": "e0398aed2e88efd5dd83d5df99e76889703d7f08",
+      "content_sha256": "0a6eac53f36c9706a92ac0d1be8eb8b7c39ffba973909d1406962ff5845c40cc",
+      "line_count": 41,
+      "byte_count": 1837,
       "headings": [
         {
           "level": 1,
@@ -1558,6 +1559,10 @@
         {
           "level": 3,
           "text": "Externes"
+        },
+        {
+          "level": 2,
+          "text": "Priorité opérationnelle pré-V2 — AF-OPS-003"
         }
       ]
     },
@@ -2624,7 +2629,8 @@
         "Checkpoint observé",
         "État des lots",
         "Sécurité",
-        "Prochaine étape"
+        "Prochaine étape",
+        "Couche opérationnelle post-certification"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -2640,11 +2646,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "LOOP_STATE.md",
-      "git_blob_sha": "7d9fe22d6583bfd6d2493c9465cb7b177d2cf5c6",
-      "last_validated_sha": "7d9fe22d6583bfd6d2493c9465cb7b177d2cf5c6",
-      "content_sha256": "be4ab953fc39ebdc951ebc99e60070501e1aa3f1eaccb8c05a8259a5e72a1dd3",
-      "line_count": 67,
-      "byte_count": 1935,
+      "git_blob_sha": "43df5318cbffae3598c756cae47899f8a19daf26",
+      "last_validated_sha": "43df5318cbffae3598c756cae47899f8a19daf26",
+      "content_sha256": "ecb8c63b5bdf3af3f4f07cfc81cdc637a25a36dc801054aab521ffb66531c936",
+      "line_count": 81,
+      "byte_count": 2508,
       "headings": [
         {
           "level": 1,
@@ -2673,6 +2679,10 @@
         {
           "level": 2,
           "text": "Prochaine étape"
+        },
+        {
+          "level": 2,
+          "text": "Couche opérationnelle post-certification"
         }
       ]
     },
@@ -2871,11 +2881,10 @@
       "canonical_authority": "NEXT_ACTION.md",
       "unique_information": [
         "NEXT_ACTION — AfricaFunds API",
-        "Action courante — AF-TASK-010",
-        "Historique conservé de l'action précédente",
-        "Action courante — AF-TASK-011",
-        "État désormais prouvé",
-        "Gaps externes conservés",
+        "Priorité opérationnelle pré-V2 — AF-OPS-003",
+        "Ce qui est prouvé",
+        "Prochaine preuve",
+        "Autres blockers indépendants",
         "Interdictions"
       ],
       "consumers": [
@@ -2892,11 +2901,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "0fb5662cba389357b7e750fc302299ce28567b3a",
-      "last_validated_sha": "0fb5662cba389357b7e750fc302299ce28567b3a",
-      "content_sha256": "b0aab1065e556627cd75105356d17461434e7b53a468ca4290a37faa8b610975",
+      "git_blob_sha": "6084ee2b7a3f353f5d980e14df45bf8a6cef8654",
+      "last_validated_sha": "6084ee2b7a3f353f5d980e14df45bf8a6cef8654",
+      "content_sha256": "a2b51563bcc57fba5604ec36ad7b0bef24eceeeb10ad5af00004297435665a88",
       "line_count": 59,
-      "byte_count": 2449,
+      "byte_count": 1868,
       "headings": [
         {
           "level": 1,
@@ -2904,23 +2913,19 @@
         },
         {
           "level": 2,
-          "text": "Action courante — AF-TASK-010"
+          "text": "Priorité opérationnelle pré-V2 — AF-OPS-003"
         },
         {
           "level": 3,
-          "text": "Historique conservé de l'action précédente"
+          "text": "Ce qui est prouvé"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine preuve"
         },
         {
           "level": 2,
-          "text": "Action courante — AF-TASK-011"
-        },
-        {
-          "level": 2,
-          "text": "État désormais prouvé"
-        },
-        {
-          "level": 2,
-          "text": "Gaps externes conservés"
+          "text": "Autres blockers indépendants"
         },
         {
           "level": 2,
