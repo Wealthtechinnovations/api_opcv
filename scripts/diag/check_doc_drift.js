@@ -165,11 +165,32 @@ async function main() {
     const snapSource = snap === runtimeSnap ? 'runtime' : 'fallback historique';
     let snapOk = false, snapDetail = `fichier absent (${runtimeSnap} et ${legacySnap})`;
     if (fs.existsSync(snap)) {
-      const gen = JSON.parse(fs.readFileSync(snap, 'utf8')).generated_at;
-      const ageH = (Date.now() - new Date(gen).getTime()) / 3600000;
-      snapOk = ageH <= 6;
-      snapDetail = `${snapSource}: genere le ${String(gen).slice(0, 16)}, soit ${ageH.toFixed(1)} h`;
-      if (!snapOk) snapDetail += ' — snapshot perime : ne pas s\'y fier en l\'etat';
+      // UN AVERTISSEMENT NE DOIT PAS POUVOIR TUER LES CONTROLES CRITIQUES.
+      // Ce `JSON.parse` etait nu. Le 2026-09-14, apres les 3 h 56 pendant
+      // lesquelles `mariadbd` est reste mort, `sync_production.sh` — qui tourne
+      // a l heure — a laisse un snapshot tronque. La lecture a lance
+      // « Unexpected end of JSON input », l exception est remontee jusqu au
+      // `main().catch()`, et TOUTE la mesure a ete perdue : C2, C3, C4, C7 et
+      // C8 compris, alors qu ils n ont rien a voir avec ce fichier.
+      //
+      // C5 est declare AVERTISSEMENT : un snapshot illisible doit le faire
+      // echouer LUI, et rien d autre. Le cas « fichier corrompu » est d ailleurs
+      // plus informatif qu une absence — il dit que le producteur a tourne et
+      // mal fini, ce qui est exactement ce qui s est passe.
+      try {
+        const brut = fs.readFileSync(snap, 'utf8');
+        const gen = JSON.parse(brut).generated_at;
+        const ageH = (Date.now() - new Date(gen).getTime()) / 3600000;
+        snapOk = Number.isFinite(ageH) && ageH <= 6;
+        snapDetail = `${snapSource}: genere le ${String(gen).slice(0, 16)}, soit ${ageH.toFixed(1)} h`;
+        if (!snapOk) snapDetail += ' — snapshot perime : ne pas s\'y fier en l\'etat';
+      } catch (err) {
+        snapOk = false;
+        const taille = (() => { try { return fs.statSync(snap).size; } catch { return '?'; } })();
+        snapDetail = `${snapSource}: fichier ILLISIBLE (${taille} octets) — ${err.message}. `
+          + 'Le producteur a tourne et mal fini ; regenerer par sync_production.sh. '
+          + 'Les autres controles restent valides.';
+      }
     }
     record('C5', 'AVERTISSEMENT', 'Snapshot production runtime frais (< 6 h)', snapOk, snapDetail);
 
