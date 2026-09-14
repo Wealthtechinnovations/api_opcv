@@ -234,6 +234,14 @@
       "provenance": "Read-only S2 SQL/global-status observations 2026-09-14 19:25-19:30 UTC + current GitHub/S2 reconciliation",
       "observed_at": "2026-09-14T19:30:37Z",
       "summary": "Exact MariaDB journal evidence proves fund_opcvm@localhost Access denied events on 2026-09-14 before the 10:04Z OOM, with the last persisted exact line at 09:47:32Z. After the 14:00Z MariaDB recovery, server-wide GLOBAL_STATUS at 19:30Z showed UPTIME=19807s, ABORTED_CONNECTS=12, ACCESS_DENIED_ERRORS=12 and ABORTED_CONNECTS_PREAUTH=0; the counters remained 12 across repeated observation. These GLOBAL_STATUS counters are server-wide and therefore do NOT prove that the post-restart failures belong to fund_opcvm. Current AfricaFunds DB SELECT connectivity passes, authenticated fund_opcvm sessions exist, PM2 processes are online, public AfricaFunds HTTP is 200, and live doc-drift reports C5 runtime snapshot fresh. USERSTAT=OFF, PERFORMANCE_SCHEMA=OFF and GENERAL_LOG=OFF, so exact post-restart per-user/process attribution is unavailable through SQL telemetry. No current STALE_CRON, STALE_PROCESS, EXTERNAL_TOOL, TRANSIENT_DIAGNOSTIC or ACTIVE_RUNTIME_DEFECT classification can be proven without the MariaDB journal/observer execution surface. No DB re-rotation, restart or runtime mutation is justified. AF-TASK-011 remains DONE and the governance verdict remains GOVERNED_WITH_EXTERNAL_GAPS unless future AfricaFunds-specific live drift is measured."
+    },
+    {
+      "id": "AF-EVD-038",
+      "type": "INCIDENT_GOVERNANCE_CONTRACT",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Incident Governance run 34900784210 on 742dca2a3d35053e1a55db124913bb13a251c1f4",
+      "observed_at": "2026-09-14T21:48:13Z",
+      "summary": "Canonical incident registry validates 4 known incidents, linked tasks/evidence/postmortems, recurrence escalation, and fail-closed closure rule requiring a PROVEN root cause for CLOSED incidents."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
