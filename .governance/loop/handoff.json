@@ -44,10 +44,44 @@
     "email_password_rotation": "EXTERNAL_PROVIDER_REQUIRED",
     "magic_secret_rotation": "EXTERNAL_PROVIDER_REQUIRED",
     "final_governance_verdict": "GOVERNED_WITH_EXTERNAL_GAPS",
-    "db_access_denied_active_stale_consumer": "NOT_OBSERVED",
-    "db_access_denied_historical_attribution": "UNAVAILABLE_WITH_CURRENT_MARIADB_TELEMETRY"
+    "db_access_denied_active_stale_consumer": "NOT_PROVEN_POST_RESTART_AUTH_FAILURES_OBSERVED",
+    "db_access_denied_historical_attribution": "UNAVAILABLE_WITH_CURRENT_MARIADB_TELEMETRY",
+    "db_auth_latest_evidence": "AF-EVD-037"
   },
   "closed_with_external_gaps": [
     "AF-TASK-003"
-  ]
+  ],
+  "latest_reobservation": {
+    "observed_at": "2026-09-14T19:30:37Z",
+    "github_api_sha": "37e4019328b07216216d686cbd9dc97f41cfe934",
+    "github_frontend_sha": "53ff6ed60d96d13e74e82fad488018d6166ff871",
+    "s2_api_sha": "9f051c035e4bf72f919004f5a654ccf015f159ee",
+    "s2_frontend_sha": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
+    "s2_git_drift_scope": {
+      "api": "GitHub ahead by governance/diagnostic evidence and generated documentation only; no newer runtime code than S2",
+      "frontend": "GitHub ahead by SUIVI.md documentation only"
+    },
+    "runtime": {
+      "pm2": "ONLINE",
+      "database_connectivity": "PASS",
+      "public_http_root": 200,
+      "runtime_snapshot": "FRESH_C5_OK"
+    },
+    "db_auth_drift": {
+      "evidence_ref": "AF-EVD-037",
+      "post_restart_access_denied_errors": 12,
+      "post_restart_aborted_connects": 12,
+      "post_restart_aborted_connects_preauth": 0,
+      "repeated_counter_observation": "STABLE_12_TO_12",
+      "attribution": "UNAVAILABLE_WITH_CURRENT_TELEMETRY",
+      "classification": "UNATTRIBUTED_AUTH_DRIFT_NOT_PROVEN_RUNTIME_DEFECT",
+      "mutation_performed": false
+    },
+    "task_status_preserved": {
+      "AF-TASK-011": "DONE",
+      "AF-TASK-003": "DONE_WITH_EXTERNAL_GAPS",
+      "AF-TASK-010": "BLOCKED_EXTERNAL_PROVIDER_ROTATION"
+    },
+    "final_governance_verdict": "GOVERNED_WITH_EXTERNAL_GAPS"
+  }
 }
