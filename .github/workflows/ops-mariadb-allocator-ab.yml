@@ -138,11 +138,13 @@ jobs:
 
           capture() {
             local label="$1"
-            local pid rss anon swap mem_used mem_initial conn threads tmp tmpdisk uptime
+            local pid rss anon swap vmsize private_dirty mem_used mem_initial conn threads tmp tmpdisk uptime
             pid="$(pgrep -xo mariadbd)"
             rss="$(awk '/^VmRSS:/ {print $2}' /proc/$pid/status)"
             anon="$(awk '/^RssAnon:/ {print $2}' /proc/$pid/status)"
             swap="$(awk '/^VmSwap:/ {print $2}' /proc/$pid/status)"
+            vmsize="$(awk '/^VmSize:/ {print $2}' /proc/$pid/status)"
+            private_dirty="$(awk '/^Private_Dirty:/ {print $2}' /proc/$pid/smaps_rollup 2>/dev/null || echo 0)"
             mem_used="$(Q "SHOW GLOBAL STATUS LIKE 'Memory_used';" | awk '{print $2}' | tail -1)"
             mem_initial="$(Q "SHOW GLOBAL STATUS LIKE 'Memory_used_initial';" | awk '{print $2}' | tail -1)"
             conn="$(Q "SHOW GLOBAL STATUS LIKE 'Threads_connected';" | awk '{print $2}' | tail -1)"
@@ -150,7 +152,7 @@ jobs:
             tmp="$(Q "SHOW GLOBAL STATUS LIKE 'Created_tmp_tables';" | awk '{print $2}' | tail -1)"
             tmpdisk="$(Q "SHOW GLOBAL STATUS LIKE 'Created_tmp_disk_tables';" | awk '{print $2}' | tail -1)"
             uptime="$(Q "SHOW GLOBAL STATUS LIKE 'Uptime';" | awk '{print $2}' | tail -1)"
-            echo "METRIC label=$label ts=$(date -u +%Y-%m-%dT%H:%M:%SZ) pid=$pid rss_kb=$rss rssanon_kb=$anon swap_kb=$swap memory_used_bytes=$mem_used memory_initial_bytes=$mem_initial connections=$conn threads=$threads tmp_tables=$tmp tmp_disk_tables=$tmpdisk uptime_s=$uptime"
+            echo "METRIC label=$label ts=$(date -u +%Y-%m-%dT%H:%M:%SZ) pid=$pid rss_kb=$rss rssanon_kb=$anon private_dirty_kb=$private_dirty vmsize_kb=$vmsize swap_kb=$swap memory_used_bytes=$mem_used memory_initial_bytes=$mem_initial connections=$conn threads=$threads tmp_tables=$tmp tmp_disk_tables=$tmpdisk uptime_s=$uptime"
           }
 
           workload() {
@@ -161,7 +163,7 @@ jobs:
             Q "SELECT COUNT(*) FROM valorisations;" | sed 's/^/valorisations_count=/'
             failures=0
             wave=1
-            while [ "$wave" -le 3 ]; do
+            while [ "$wave" -le 40 ]; do
               pids=""
               i=1
               while [ "$i" -le 8 ]; do
@@ -194,12 +196,19 @@ jobs:
           echo "jemalloc_preinstalled=$PKG_WAS_INSTALLED"
 
           echo "=============================================="
-          echo "A — SYSTEM MALLOC"
+          echo "A — SYSTEM MALLOC (FRESH PROCESS)"
           echo "=============================================="
+          systemctl restart mariadb
+          sleep 6
           health "A_PRE"
+          PID_A="$(pgrep -xo mariadbd)"
+          if grep -F "libjemalloc" /proc/$PID_A/maps >/dev/null 2>&1; then
+            echo "ABORT: jemalloc unexpectedly loaded during A"
+            exit 26
+          fi
           capture "A_PRE"
           workload "A"
-          sleep 20
+          sleep 30
           capture "A_POST"
           health "A_POST"
 
@@ -237,7 +246,7 @@ jobs:
           echo "=============================================="
           capture "B_PRE"
           workload "B"
-          sleep 20
+          sleep 30
           capture "B_POST"
           health "B_POST"
 
