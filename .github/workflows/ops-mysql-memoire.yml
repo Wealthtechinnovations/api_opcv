@@ -189,33 +189,9 @@ jobs:
             command -v memleak-bpfcc 2>/dev/null || command -v memleak 2>/dev/null || echo "BPF_MEMLEAK_TOOL=ABSENT"
             ldconfig -p 2>/dev/null | grep -Ei 'libjemalloc|libtcmalloc' || echo "ALT_ALLOCATOR_LIBRARY=ABSENT"
 
-            if [ -n "${PID:-}" ] && [ -r "/proc/$PID/smaps" ]; then
-              echo "--- top mappings par Private_Dirty (kB) ---"
-              python3 - "$PID" <<'PYMAP'
-import re, sys
-pid=sys.argv[1]
-rows=[]
-name=None
-dirty=0
-rss=0
-with open(f"/proc/{pid}/smaps","r",encoding="utf-8",errors="replace") as fh:
-    for line in fh:
-        if re.match(r"^[0-9a-fA-F]+-[0-9a-fA-F]+ ", line):
-            if name is not None:
-                rows.append((dirty,rss,name))
-            parts=line.rstrip().split(maxsplit=5)
-            name=parts[5] if len(parts)>5 else "[anonymous]"
-            dirty=0
-            rss=0
-        elif line.startswith("Private_Dirty:"):
-            dirty=int(line.split()[1])
-        elif line.startswith("Rss:"):
-            rss=int(line.split()[1])
-if name is not None:
-    rows.append((dirty,rss,name))
-for dirty,rss,name in sorted(rows, reverse=True)[:20]:
-    print(f"MAP private_dirty_kb={dirty} rss_kb={rss} name={name}")
-PYMAP
+            if [ -n "${PID:-}" ]; then
+              echo "--- top mappings pmap par dirty kB ---"
+              pmap -x "$PID" 2>/dev/null | awk 'NR>2 && $1 != "total" {print}' | sort -k4,4n | tail -20 || true
             fi
 
             echo ""
