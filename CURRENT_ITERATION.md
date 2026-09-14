@@ -32,3 +32,10 @@ Le programme Regulatory Plus / Loop Engineering n'est plus en phase d'installati
 ### Externes
 
 SMTP/EMAIL provider rotation, Magic provider rotation, OOB host-key verification et GitHub native rulesets.
+
+
+## Priorité opérationnelle pré-V2 — AF-OPS-003
+
+La certification de gouvernance reste fermée et son verdict reste `GOVERNED_WITH_EXTERNAL_GAPS`.
+
+La priorité opérationnelle distincte est désormais `AF-OPS-003` / `AF-INC-20260817-001`. La RCA allocator est au niveau `PROBABLE`, soutenue par `AF-EVD-040`. Le prochain test causal est l'A/B jemalloc documenté dans `docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md`, sous `REQUIRED_HUMAN_APPROVAL`.

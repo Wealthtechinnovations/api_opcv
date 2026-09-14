@@ -12,7 +12,8 @@
     "EMAIL_PASSWORD_PROVIDER_ROTATION_REQUIRED",
     "MAGIC_SECRET_KEY_PROVIDER_ROTATION_REQUIRED",
     "S2_HOST_KEY_OOB_VERIFICATION_PENDING",
-    "GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR"
+    "GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR",
+    "AF_OPS_003_ALLOCATOR_AB_HUMAN_APPROVAL"
   ],
   "proof_refs": [
     "AF-EVD-018",
@@ -39,5 +40,8 @@
     "verify_both_heads_before_write": "REQUIRED",
     "no_blind_work": "REQUIRED"
   },
-  "final_verdict": "GOVERNED_WITH_EXTERNAL_GAPS"
+  "final_verdict": "GOVERNED_WITH_EXTERNAL_GAPS",
+  "operational_priority_task_id": "AF-OPS-003",
+  "operational_priority_status": "BLOCKED_HUMAN_APPROVAL",
+  "operational_priority_reason": "Allocator A/B requires package installation, systemd drop-in and controlled MariaDB restart."
 }

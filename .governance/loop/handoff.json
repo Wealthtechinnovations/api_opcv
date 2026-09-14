@@ -21,10 +21,11 @@
     "AF-TASK-011"
   ],
   "active": [
-    "AF-TASK-010"
+    "AF-TASK-010",
+    "AF-OPS-003"
   ],
   "open": [],
-  "next_action": "AF-TASK-010 uniquement: rotations fournisseur EMAIL_PASSWORD/MAGIC_SECRET_KEY quand une surface administrateur compatible est disponible; OOB host-key et GitHub native rulesets restent externes.",
+  "next_action": "Pre-V2 operational priority: AF-OPS-003 is blocked on explicit human approval for the controlled jemalloc A/B experiment. Governance task AF-TASK-010 remains independently blocked on external provider rotations.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -33,7 +34,7 @@
     "read_global_suivi": true,
     "observe_s2_if_relevant": true,
     "work_gate_requires_context_reconstruction": true,
-    "current_operational_task": "AF-TASK-010",
+    "current_operational_task": "AF-OPS-003",
     "bridge_available_in_current_chat": false,
     "ssh_fallback_required": true,
     "host_key_trust_status": "TOFU_PINNED_PENDING_OOB",
@@ -47,7 +48,14 @@
     "db_access_denied_active_stale_consumer": "NOT_PROVEN_CURRENTLY",
     "db_access_denied_historical_attribution": "UNAVAILABLE_WITH_CURRENT_MARIADB_TELEMETRY",
     "db_auth_latest_evidence": "AF-EVD-037",
-    "db_access_denied_post_restart_fund_opcvm": "UNPROVEN_WITH_CURRENT_SQL_TELEMETRY"
+    "db_access_denied_post_restart_fund_opcvm": "UNPROVEN_WITH_CURRENT_SQL_TELEMETRY",
+    "operational_task_status": "BLOCKED_HUMAN_APPROVAL",
+    "mariadb_oom_incident": "AF-INC-20260817-001",
+    "mariadb_root_cause_status": "PROBABLE",
+    "mariadb_root_cause_candidate": "SYSTEM_MALLOC_FRAGMENTATION_RETENTION",
+    "mariadb_latest_evidence": "AF-EVD-040",
+    "mariadb_next_proof": "CONTROLLED_JEMALLOC_A_B",
+    "mariadb_mutation_authorized": false
   },
   "closed_with_external_gaps": [
     "AF-TASK-003"

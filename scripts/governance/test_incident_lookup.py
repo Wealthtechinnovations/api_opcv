@@ -19,8 +19,9 @@ assert p.returncode == 0, p.stderr
 j = json.loads(p.stdout)
 assert j["found"] is True
 assert j["matches"][0]["id"] == "AF-INC-20260817-001"
-assert j["matches"][0]["root_cause"]["status"] == "UNKNOWN"
+assert j["matches"][0]["root_cause"]["status"] == "PROBABLE"
 assert "AF-OPS-003" in j["matches"][0]["linked_tasks"]
+assert "AF-EVD-040" in j["matches"][0]["root_cause"]["evidence_refs"]
 
 p = call("--id", "AF-INC-20260914-001")
 assert p.returncode == 0

@@ -65,3 +65,17 @@ AF-TASK-011 IN_PROGRESS
 ## Prochaine étape
 
 Exécuter la certification finale interne, puis conclure `GOVERNED_WITH_EXTERNAL_GAPS` si et seulement si tous les gates internes sont verts.
+
+
+## Couche opérationnelle post-certification
+
+La boucle `AF-GOV-FINAL-CERT-20260911-01` reste `CLOSED_WITH_EXTERNAL_GAPS` avec `AF-TASK-010` comme tâche de gouvernance externe.
+
+Une priorité opérationnelle post-certification existe en parallèle dans **la même task queue** :
+- `AF-OPS-003 = BLOCKED_HUMAN_APPROVAL` ;
+- incident `AF-INC-20260817-001` ;
+- root cause candidate `PROBABLE SYSTEM_MALLOC_FRAGMENTATION_RETENTION` ;
+- preuve `AF-EVD-040` ;
+- prochaine preuve : A/B allocator contrôlé.
+
+Ce n'est pas une réouverture d'`AF-TASK-011` ni une seconde queue.

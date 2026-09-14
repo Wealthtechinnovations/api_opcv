@@ -1,59 +1,59 @@
 # NEXT_ACTION — AfricaFunds API
 
-## Action courante — AF-TASK-010
+## Priorité opérationnelle pré-V2 — AF-OPS-003
 
-La certification interne `AF-TASK-011` est terminée. Aucune nouvelle tâche interne de gouvernance n'est à ouvrir.
-
-La seule action gouvernée restante est externe :
-1. émettre/révoquer `EMAIL_PASSWORD` chez le fournisseur SMTP ;
-2. émettre/révoquer `MAGIC_SECRET_KEY` chez Magic ;
-3. fournir une vérification OOB indépendante de la clé hôte S2 ;
-4. appliquer des GitHub native rulesets lorsqu'une surface administrative compatible est disponible.
-
-Ne jamais blanker, inventer ou remplacer un credential runtime avant émission fournisseur valide. Toute reprise doit réobserver les deux HEAD et S2. Verdict courant : `GOVERNED_WITH_EXTERNAL_GAPS`.
-
-### Historique conservé de l'action précédente
-
-> Projection humaine de la task queue centrale. Une seule prochaine action exécutable.
-
-## Action courante — AF-TASK-011
-
-Finaliser la synchronisation et l'attestation bi-repository :
-
-1. mettre à jour le checkpoint global frontend sans supprimer l'historique ;
-2. rejouer les gates Regulatory Plus, State Coherence, Multi-Agent Resume, Markdown, Branch Policy et Secret Gate ;
-3. attendre le registre Markdown durable final ;
-4. réconcilier S2 API + frontend vers les HEAD GitHub finaux avec le guard GOV-006 ;
-5. exécuter une dernière observation/attestation S2 (Git, PM2, DB, HTTP) ;
-6. produire le verdict final.
-
-## État désormais prouvé
+La boucle de certification de gouvernance reste fermée :
 
 ```text
-CONTEXT_RECONSTRUCTION = PASS
-CROSS_REPO_DISCOVERY = PASS
-MARKDOWN_CERTIFICATION = 242/242 (dernier registre observé)
-MCP_INDEPENDENT_SSH = PASS
-S2_OBSERVATION = PASS
-GOV006_RECONCILIATION = PASS
-API_FALLBACK_SAFE_PATH = PASS
-FRONTEND_FALLBACK_SAFE_PATH = PASS
-TRACKED_REAL_ENV_IN_CURRENT_GIT = NO
-DB_PASSWORD_ROTATED = PASS
-OLD_DB_PASSWORD_REJECTED = PASS
-JWT_SECRET_ROTATED = PASS
-OLD_JWT_KEY_REVOKED = PASS
+AF-TASK-003 = DONE_WITH_EXTERNAL_GAPS
+AF-TASK-011 = DONE
 ```
 
-## Gaps externes conservés
+Le prochain chantier interne déterministe demandé par le propriétaire est :
 
-- rotation fournisseur de `EMAIL_PASSWORD` ;
-- rotation fournisseur de `MAGIC_SECRET_KEY` ;
-- vérification OOB indépendante de la clé hôte S2 (le pin TOFU strict fonctionne) ;
-- rulesets/protection GitHub natifs non créables via la surface connector actuelle.
+```text
+AF-OPS-003
+MariaDB — RCA des OOM répétés
+status = BLOCKED_HUMAN_APPROVAL
+phase = ALLOCATOR_A_B_REQUIRED
+incident = AF-INC-20260817-001
+evidence = AF-EVD-040
+```
 
-Ces gaps interdisent `FULLY_GOVERNED`. Si tous les contrôles internes finaux passent, le verdict cible est `GOVERNED_WITH_EXTERNAL_GAPS`.
+### Ce qui est prouvé
+
+- OOM-kill de `mariadbd` : PROVEN ;
+- RSS multi-Gio presque entièrement `RssAnon/Private_Dirty` : PROVEN ;
+- buffers SQL / connexions insuffisants pour expliquer le RSS : PROVEN ;
+- `Memory_used` MariaDB ≈ 444 Mio contre RSS ≈ 6,68 Gio : PROVEN ;
+- allocateur courant : `system` / glibc : PROVEN ;
+- rétention/fragmentation system malloc : **PROBABLE**, pas PROVEN.
+
+### Prochaine preuve
+
+Exécuter l'A/B gouverné décrit dans :
+
+`docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md`
+
+Cette expérience exige une approbation humaine explicite car elle implique :
+1. installation de `libjemalloc2` ;
+2. drop-in systemd `LD_PRELOAD` ;
+3. redémarrage MariaDB ;
+4. observation comparative sous workload comparable ;
+5. rollback immédiat en cas de régression.
+
+Aucun changement de buffer SQL, de version MariaDB ou de schéma ne doit être mélangé à cet A/B.
+
+## Autres blockers indépendants
+
+`AF-TASK-010` reste bloquée sur :
+- rotation fournisseur `EMAIL_PASSWORD` ;
+- rotation fournisseur `MAGIC_SECRET_KEY`.
+
+Restent également externes :
+- vérification OOB de la clé hôte S2 ;
+- GitHub native rulesets.
 
 ## Interdictions
 
-Aucun force-push, history rewrite, nouvelle branche, suppression d'untracked/UNKNOWN, secret affiché ou mutation métier opportuniste.
+Ne jamais déclarer la RCA PROVEN avant l'A/B, ne pas redémarrer MariaDB sans gate humain, ne pas réactiver d'ancienne clé/secrets, ne pas créer de branche, ne pas modifier le frontend concurrent sans revalidation des deux HEAD.
