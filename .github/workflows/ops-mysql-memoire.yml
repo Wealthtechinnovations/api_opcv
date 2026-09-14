@@ -364,6 +364,62 @@ jobs:
 
             echo ""
             echo "=============================================="
+            echo " 7. HANDLERS BATCH API — PREUVE DE CONTINUATION"
+            echo "=============================================="
+            echo "--- logs.txt processFundmysql ---"
+            if [ -f logs.txt ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' logs.txt 2>/dev/null || true
+              echo "finish_count=$(grep -c "finish l'ID" logs.txt 2>/dev/null || true)"
+              echo "last_finish_ids:"
+              grep "finish l'ID" logs.txt 2>/dev/null | tail -120 || true
+              echo "last_errors:"
+              grep -Ei 'erreur|error|closed state|ECONN|timeout' logs.txt 2>/dev/null | tail -80 || true
+            else
+              echo "PROCESS_FUND_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- PM2 api-monolith metadata ---"
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 describe api-monolith 2>/dev/null \
+                | grep -Ei 'status|uptime|restarts|out log path|error log path|script path|node.js version|pid' \
+                | head -80 || true
+
+              PM2JSON="$(pm2 jlist 2>/dev/null || true)"
+              if [ -n "$PM2JSON" ]; then
+                python3 - <<'PYPM2' "$PM2JSON"
+import json,sys
+try:
+    data=json.loads(sys.argv[1])
+except Exception:
+    data=[]
+for p in data:
+    if p.get("name")=="api-monolith":
+        env=p.get("pm2_env",{})
+        print("PM2_OUT_LOG="+str(env.get("pm_out_log_path","")))
+        print("PM2_ERR_LOG="+str(env.get("pm_err_log_path","")))
+PYPM2
+              fi
+            fi
+
+            echo ""
+            echo "--- PM2 logs: batch/perf/classement markers around Sep 14 ---"
+            for L in "$HOME/.pm2/logs/api-monolith-out.log" "$HOME/.pm2/logs/api-monolith-error.log" /root/.pm2/logs/api-monolith-out.log /root/.pm2/logs/api-monolith-error.log; do
+              [ -f "$L" ] || continue
+              echo "LOGFILE=$L"
+              stat -c 'size=%s mtime=%y' "$L" 2>/dev/null || true
+              grep -Ei 'saveperfdatemysql|processFundmysql|finish l.ID|classementmysql|classementeur|classementusd|Error processing fund|closed state|ECONN|timeout|performances locales' "$L" \
+                | tail -180 || true
+            done
+
+            echo ""
+            echo "--- processus node/mysql encore vivants ---"
+            ps -eo pid,ppid,lstart,etime,cmd --sort=lstart 2>/dev/null \
+              | grep -Ei 'node|mariadbd|cron_daily|saveperf|classement' \
+              | grep -v grep | tail -120 || true
+
+            echo ""
+            echo "=============================================="
             echo " FIN — aucune variable modifiee, aucun service redemarre"
             echo "=============================================="
           REMOTE
