@@ -116,3 +116,14 @@ Le checkpoint global frontend a été avancé au commit `fbbb4e9586e7f2a0bc68383
 - Refus MariaDB : aucun consommateur stale persistant observé ; source historique exacte non attribuable avec la télémétrie MariaDB alors inactive. Aucune re-rotation DB.
 - Verdict : `GOVERNED_WITH_EXTERNAL_GAPS`.
 - Tâche gouvernée restante : `AF-TASK-010` (rotations fournisseurs externes), avec OOB host-key et GitHub native rulesets comme gaps externes.
+
+
+## AF-OPS-003 — RCA mémoire MariaDB — 2026-09-14 22:53 UTC
+
+Le mécanisme OOM reste PROVEN. La cause de la croissance mémoire passe de `UNKNOWN` à `PROBABLE` : rétention/fragmentation du `system malloc` (glibc).
+
+Mesure live `AF-EVD-040` : RSS ~6.68 Gio, mémoire anonyme privée ~6.65 Gio, mais `Memory_used` MariaDB ~444 Mio et plafond buffers/sessions ~0.70 Gio, avec seulement 9 connexions / 18 threads. `version_malloc_library=system`; aucun jemalloc/tcmalloc ou BPF memleak n'est installé. Les mappings sont majoritairement anonymes ~64/128 Mio.
+
+Le vieux libellé « fuite ~700 Mo/h prouvée » ne doit plus être utilisé comme RCA : les séries historiques ne sont pas linéaires et six échantillons courts du 2026-09-14 sont stables.
+
+Prochaine preuve : A/B allocateur selon `docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md`. Cette étape exige une approbation humaine car elle installe une librairie et redémarre MariaDB. `AF-OPS-001` (Restart=on-failure) reste un gate de résilience séparé.

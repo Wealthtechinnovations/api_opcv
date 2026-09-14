@@ -51,25 +51,26 @@
       },
       "mechanism": {
         "status": "PROVEN",
-        "statement": "mariadbd a été tué par l'OOM-killer sur des occurrences documentées; le service est ensuite resté inactif faute de politique de redémarrage automatique.",
+        "statement": "mariadbd accumule plusieurs Gio de mémoire anonyme privée puis a été tué par l'OOM-killer sur des occurrences documentées. Le service observé utilise Restart=on-abort; ce mode n'a pas récupéré l'oom-kill du 2026-09-14.",
         "evidence_refs": [
           "AF-EVD-012",
-          "docs/OPS_MARIADB.md",
-          "d18b1d5beb802ff2f60cd2f8a0b7dd58a383d340"
+          "AF-EVD-040",
+          "docs/OPS_MARIADB.md"
         ]
       },
       "root_cause": {
-        "status": "UNKNOWN",
-        "statement": "La cause de la croissance mémoire anormale de mariadbd n'est pas encore prouvée.",
+        "status": "PROBABLE",
+        "statement": "La croissance multi-Gio du RSS est très probablement une rétention/fragmentation du system malloc (glibc), hors des allocations suivies par MariaDB, amplifiée par le workload. Le diagnostic S2 montre RSS≈6.68 Gio et RssAnon/Private_Dirty≈6.65 Gio contre Memory_used≈444 Mio, Memory_used_initial≈422 Mio, 9 connexions, 18 threads et un plafond buffers/sessions≈0.70 Gio. mariadbd utilise version_malloc_library=system et de nombreux mappings anonymes ~64/128 Mio.",
         "evidence_refs": [
-          "d18b1d5beb802ff2f60cd2f8a0b7dd58a383d340"
+          "AF-EVD-012",
+          "AF-EVD-040"
         ],
-        "why_not_proven": "Buffers par session, tables temporaires en mémoire ou fuite MariaDB ont été identifiés comme hypothèses; aucune n'est encore démontrée."
+        "why_not_proven": "Le pattern concorde avec une rétention/fragmentation de l'allocateur système, mais aucun BPF memleak ni allocateur alternatif n'est disponible et aucun A/B jemalloc/tcmalloc n'a encore été exécuté. La causalité définitive exige ce test gouverné."
       },
       "contributing_factors": [
         {
           "status": "PROVEN",
-          "statement": "Absence de Restart=on-failure a transformé le crash en panne prolongée.",
+          "statement": "La politique systemd observée est Restart=on-abort; elle n'a pas relancé MariaDB après l'oom-kill. L'absence de Restart=on-failure a transformé le crash en panne prolongée.",
           "task_ref": "AF-OPS-001"
         },
         {
@@ -110,19 +111,23 @@
         },
         {
           "id": "CA-003",
-          "status": "OPEN",
-          "description": "Établir la root cause de la croissance mémoire puis corriger la cause, pas seulement redémarrer.",
+          "status": "BLOCKED_HUMAN_APPROVAL",
+          "description": "Prouver ou réfuter la fragmentation/rétention system malloc par A/B avec jemalloc, puis conserver le correctif uniquement si le différentiel RSS-Memory_used est durablement réduit sans régression DB/API.",
           "task_refs": [
             "AF-OPS-003"
           ],
           "patch_refs": [
-            ".github/workflows/ops-mysql-memoire.yml"
+            ".github/workflows/ops-mysql-memoire.yml",
+            "docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md"
           ],
           "test_refs": [
-            "read-only memory diagnostics"
+            "GitHub Actions runs 34905885999 and 34906206810",
+            "docs/OPS_MYSQL_MEMOIRE.md"
           ],
-          "rollback": "N/A tant que diagnostic read-only.",
-          "verification_refs": []
+          "rollback": "Supprimer le drop-in LD_PRELOAD, daemon-reload, redémarrer MariaDB sous allocateur system après snapshot de configuration; vérifier DB SELECT, PM2 et HTTP.",
+          "verification_refs": [
+            "AF-EVD-040"
+          ]
         }
       ],
       "preventive_actions": [
@@ -140,7 +145,8 @@
         }
       ],
       "evidence_refs": [
-        "AF-EVD-012"
+        "AF-EVD-012",
+        "AF-EVD-040"
       ],
       "linked_tasks": [
         "AF-OPS-001",
@@ -150,10 +156,13 @@
       "closure": {
         "criteria_met": false,
         "verified_at": null,
-        "verification_refs": [],
+        "verification_refs": [
+          "AF-EVD-040"
+        ],
         "residual_risks": [
-          "Root cause mémoire non prouvée",
-          "Restart=on-failure sous gate humain"
+          "Root cause au niveau PROBABLE seulement tant que l'A/B allocateur n'est pas exécuté",
+          "MariaDB Community 10.6.23 est sur une branche 10.6 arrivée en fin de vie en juillet 2026",
+          "Restart=on-failure reste sous gate humain séparé AF-OPS-001"
         ]
       }
     },

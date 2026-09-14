@@ -250,6 +250,14 @@
       "provenance": "Retry contract 34901007513; DB-auth 34901007464; S2 observer 34901007473; extended read-only runs 34901304396/34901304405/34901304354/34901304437/34901304403",
       "observed_at": "2026-09-14T21:55:10Z",
       "summary": "Bounded READ_ONLY SSH retry retries only approved transient pre-auth/KEX signatures, refuses auth/host-key failures, refuses replay after remote stdout, and cannot be invoked outside READ_ONLY. Live observation, attestation and diagnostics passed. Mutation workflows remain single-attempt."
+    },
+    {
+      "id": "AF-EVD-040",
+      "type": "MARIADB_MEMORY_RCA",
+      "result": "PROBABLE_SYSTEM_MALLOC_FRAGMENTATION",
+      "provenance": "GitHub Actions DIAG memoire MySQL runs 34905885999 and 34906206810; reports e7048e216655b8ec5b6745f364caa739e841e360 and 057364403c9b0869275c3c07b8928fa2d5a63cde; frontend SUIVI lot BG 9a1ff496b5280f779bc216b83b5a978a47d0a75e",
+      "observed_at": "2026-09-14T22:53:54Z",
+      "summary": "After ~8h52 uptime, mariadbd RSS=6,999,328 kB with RssAnon=6,974,948 kB and Private_Dirty≈6,976,696 kB, while MariaDB Memory_used=465,884,576 bytes and Memory_used_initial=442,210,192 bytes. Only 9 connections/18 threads are active, historical max connections=19, configured global+per-session worst case≈0.70 GiB, version_malloc_library=system, libc is linked, BPF memleak and jemalloc/tcmalloc are absent. pmap shows many nearly full anonymous 64/128 MiB mappings. Six 15-second samples were flat, so no short-term linear leak was inferred. This strongly supports system-malloc retention/fragmentation but does not prove causality without an alternative-allocator A/B."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
