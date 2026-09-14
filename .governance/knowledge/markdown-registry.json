@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "9fc4066b06b06071bf3c2a64282c1957352a3b72"
+      "head": "fe8081c201a01547b1db55eac6563e5b166a848d"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -14,16 +14,16 @@
     }
   },
   "summary": {
-    "total_md_discovered": 242,
-    "total_md_certified": 242,
+    "total_md_discovered": 247,
+    "total_md_certified": 247,
     "by_repository": {
-      "API": 217,
+      "API": 222,
       "FRONTEND": 25
     },
     "by_status": {
       "TEMPLATE": 5,
       "CURRENT_CANONICAL": 21,
-      "CURRENT_SPECIALIZED": 190,
+      "CURRENT_SPECIALIZED": 195,
       "ADAPTER": 7,
       "HISTORICAL": 3,
       "DIAGNOSTIC_SNAPSHOT": 3,
@@ -227,14 +227,22 @@
       "authority_level": "TEMPLATE",
       "canonical_authority": ".github/ISSUE_TEMPLATE/incident.md",
       "unique_information": [
+        "Incident ID",
+        "Type / sévérité / statut",
         "Impact",
-        "Détection et chronologie",
+        "Détection et angle mort éventuel",
+        "Chronologie vérifiée",
         "État Git / runtime connu",
-        "Services / données concernés",
-        "Mesures prises",
+        "Mécanisme de panne",
+        "Cause racine",
+        "Facteurs contributifs",
+        "Containment / recovery",
+        "Tâches gouvernées liées",
+        "Patch / tests / rollback",
         "Preuves",
-        "Cause racine / inconnues",
-        "Actions préventives"
+        "Récurrence",
+        "Actions préventives",
+        "Critères de fermeture / risques résiduels"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -246,23 +254,35 @@
       "stale_state": [],
       "security_impact": "NONE",
       "production_impact": "YES",
-      "title": "Impact",
+      "title": "Incident ID",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": ".github/ISSUE_TEMPLATE/incident.md",
-      "git_blob_sha": "29dd8eab2187f4a972c1dbf31d85f40afe7bd03b",
-      "last_validated_sha": "29dd8eab2187f4a972c1dbf31d85f40afe7bd03b",
-      "content_sha256": "4db4e0914b06151a6c48b676364a0b5b17318909340d5bd73fc6e9cba7681fbc",
-      "line_count": 22,
-      "byte_count": 293,
+      "git_blob_sha": "198bddb43e537847095444b809b98cb1606590ae",
+      "last_validated_sha": "198bddb43e537847095444b809b98cb1606590ae",
+      "content_sha256": "53db43e97cb76202cd1ca478560288291f3caa20ba5016059709dfeeb3ecc00d",
+      "line_count": 42,
+      "byte_count": 683,
       "headings": [
+        {
+          "level": 2,
+          "text": "Incident ID"
+        },
+        {
+          "level": 2,
+          "text": "Type / sévérité / statut"
+        },
         {
           "level": 2,
           "text": "Impact"
         },
         {
           "level": 2,
-          "text": "Détection et chronologie"
+          "text": "Détection et angle mort éventuel"
+        },
+        {
+          "level": 2,
+          "text": "Chronologie vérifiée"
         },
         {
           "level": 2,
@@ -270,11 +290,27 @@
         },
         {
           "level": 2,
-          "text": "Services / données concernés"
+          "text": "Mécanisme de panne"
         },
         {
           "level": 2,
-          "text": "Mesures prises"
+          "text": "Cause racine"
+        },
+        {
+          "level": 2,
+          "text": "Facteurs contributifs"
+        },
+        {
+          "level": 2,
+          "text": "Containment / recovery"
+        },
+        {
+          "level": 2,
+          "text": "Tâches gouvernées liées"
+        },
+        {
+          "level": 2,
+          "text": "Patch / tests / rollback"
         },
         {
           "level": 2,
@@ -282,11 +318,15 @@
         },
         {
           "level": 2,
-          "text": "Cause racine / inconnues"
+          "text": "Récurrence"
         },
         {
           "level": 2,
           "text": "Actions préventives"
+        },
+        {
+          "level": 2,
+          "text": "Critères de fermeture / risques résiduels"
         }
       ]
     },
@@ -2047,6 +2087,7 @@
         "DOCUMENT_INDEX — AfricaFunds API",
         "Entrée et gouvernance",
         "Continuité",
+        "Incidents",
         "Familles"
       ],
       "consumers": [
@@ -2063,11 +2104,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "DOCUMENT_INDEX.md",
-      "git_blob_sha": "5fd4dc01e12f2c2cac119228e03c23bf38c29334",
-      "last_validated_sha": "5fd4dc01e12f2c2cac119228e03c23bf38c29334",
-      "content_sha256": "6bfe3a8368c8e2aff18e170fd48c7696a07376bdb5b8a51f51578911010469e0",
-      "line_count": 27,
-      "byte_count": 1039,
+      "git_blob_sha": "6aca5bc367e73faa14f625e9d09e94b1bc6483ce",
+      "last_validated_sha": "6aca5bc367e73faa14f625e9d09e94b1bc6483ce",
+      "content_sha256": "d8cd9e0b4d1eae58a1f37069ec48eb91f433c9e7a1b18e5431538125a166d451",
+      "line_count": 33,
+      "byte_count": 1297,
       "headings": [
         {
           "level": 1,
@@ -2080,6 +2121,10 @@
         {
           "level": 2,
           "text": "Continuité"
+        },
+        {
+          "level": 2,
+          "text": "Incidents"
         },
         {
           "level": 2,
@@ -6705,7 +6750,11 @@
       "authority_level": "CURRENT_SPECIALIZED",
       "canonical_authority": "docs/07-operations/RUNBOOK.md",
       "unique_information": [
-        "ALERTING — AfricaFunds"
+        "ALERTING — AfricaFunds",
+        "Règle fail-closed de mesure",
+        "Récurrence",
+        "Données financières",
+        "Anti-faux-vert"
       ],
       "consumers": [
         "CI",
@@ -6718,20 +6767,36 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "NONE",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "ALERTING — AfricaFunds",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/07-operations/ALERTING.md",
-      "git_blob_sha": "d2d3f2599529c3ec92eb19c0fac814da6c100332",
-      "last_validated_sha": "d2d3f2599529c3ec92eb19c0fac814da6c100332",
-      "content_sha256": "2524d001bfb315eaccefd29f0d19fd87b663ce71500d4e068c3ca8e56d429475",
-      "line_count": 3,
-      "byte_count": 311,
+      "git_blob_sha": "f73de9694da6be16c7ea05b3e68604b33b399e5e",
+      "last_validated_sha": "f73de9694da6be16c7ea05b3e68604b33b399e5e",
+      "content_sha256": "873f8eab99ce2ef7282ad27e40faec44e3e4fb97a5676d380d98797e93ddec57",
+      "line_count": 21,
+      "byte_count": 1110,
       "headings": [
         {
           "level": 1,
           "text": "ALERTING — AfricaFunds"
+        },
+        {
+          "level": 2,
+          "text": "Règle fail-closed de mesure"
+        },
+        {
+          "level": 2,
+          "text": "Récurrence"
+        },
+        {
+          "level": 2,
+          "text": "Données financières"
+        },
+        {
+          "level": 2,
+          "text": "Anti-faux-vert"
         }
       ]
     },
@@ -6813,7 +6878,19 @@
       "authority_level": "CURRENT_SPECIALIZED",
       "canonical_authority": "docs/07-operations/RUNBOOK.md",
       "unique_information": [
-        "INCIDENT_RESPONSE — AfricaFunds"
+        "INCIDENT_RESPONSE — AfricaFunds",
+        "Autorité et objectif",
+        "Détection",
+        "Identifiant",
+        "Sévérité",
+        "Type",
+        "Mécanisme vs cause racine",
+        "Récurrence",
+        "Cycle de vie",
+        "Patch et Loop Engineering",
+        "Postmortem",
+        "Secret / sécurité",
+        "Fermeture"
       ],
       "consumers": [
         "CI",
@@ -6825,21 +6902,69 @@
       "contradictions": [],
       "duplication_risk": "NONE",
       "stale_state": [],
-      "security_impact": "NONE",
+      "security_impact": "HIGH",
       "production_impact": "YES",
       "title": "INCIDENT_RESPONSE — AfricaFunds",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/07-operations/INCIDENT_RESPONSE.md",
-      "git_blob_sha": "59c8b4e21d7462b5bbc3974c05f76097e60942e7",
-      "last_validated_sha": "59c8b4e21d7462b5bbc3974c05f76097e60942e7",
-      "content_sha256": "205c50f93049712d31364795c5eebe4b6df0e07e685ffa47738693a68b2d8efa",
-      "line_count": 3,
-      "byte_count": 337,
+      "git_blob_sha": "df3cbd3e6769a3c3ee56796b56766fc827a4489b",
+      "last_validated_sha": "df3cbd3e6769a3c3ee56796b56766fc827a4489b",
+      "content_sha256": "4a416a22157adedf370edd51cc3a8147e396ff088ab9751541fc646b5953684e",
+      "line_count": 97,
+      "byte_count": 4299,
       "headings": [
         {
           "level": 1,
           "text": "INCIDENT_RESPONSE — AfricaFunds"
+        },
+        {
+          "level": 2,
+          "text": "Autorité et objectif"
+        },
+        {
+          "level": 2,
+          "text": "Détection"
+        },
+        {
+          "level": 2,
+          "text": "Identifiant"
+        },
+        {
+          "level": 2,
+          "text": "Sévérité"
+        },
+        {
+          "level": 2,
+          "text": "Type"
+        },
+        {
+          "level": 2,
+          "text": "Mécanisme vs cause racine"
+        },
+        {
+          "level": 2,
+          "text": "Récurrence"
+        },
+        {
+          "level": 2,
+          "text": "Cycle de vie"
+        },
+        {
+          "level": 2,
+          "text": "Patch et Loop Engineering"
+        },
+        {
+          "level": 2,
+          "text": "Postmortem"
+        },
+        {
+          "level": 2,
+          "text": "Secret / sécurité"
+        },
+        {
+          "level": 2,
+          "text": "Fermeture"
         }
       ]
     },
@@ -6958,11 +7083,18 @@
       "canonical_authority": "docs/07-operations/RUNBOOK.md",
       "unique_information": [
         "POSTMORTEM_TEMPLATE — AfricaFunds",
-        "Incident",
+        "Identité",
+        "Impact",
+        "Détection",
         "Chronologie",
+        "Mécanisme de panne",
         "Cause racine",
-        "Réponse",
-        "Prévention"
+        "Facteurs contributifs",
+        "Containment / recovery",
+        "Correctifs",
+        "Prévention / récurrence",
+        "Vérification de fermeture",
+        "Risques résiduels"
       ],
       "consumers": [
         "CI",
@@ -6975,16 +7107,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "NONE",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "POSTMORTEM_TEMPLATE — AfricaFunds",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/07-operations/POSTMORTEM_TEMPLATE.md",
-      "git_blob_sha": "e5f3f2e9cd92014a2a2e168f43f8b458a778b740",
-      "last_validated_sha": "e5f3f2e9cd92014a2a2e168f43f8b458a778b740",
-      "content_sha256": "b25e709f1788cdd00b210faac94531af077c9c67ce8b44cf716261256f5f0c71",
-      "line_count": 18,
-      "byte_count": 361,
+      "git_blob_sha": "09e849546a399ac99508c555c06987b8491822c8",
+      "last_validated_sha": "09e849546a399ac99508c555c06987b8491822c8",
+      "content_sha256": "fede79e0173141b0e12f63a876245a4e8948745423d8dff0fe4329b3ba0f2762",
+      "line_count": 50,
+      "byte_count": 1337,
       "headings": [
         {
           "level": 1,
@@ -6992,7 +7124,15 @@
         },
         {
           "level": 2,
-          "text": "Incident"
+          "text": "Identité"
+        },
+        {
+          "level": 2,
+          "text": "Impact"
+        },
+        {
+          "level": 2,
+          "text": "Détection"
         },
         {
           "level": 2,
@@ -7000,15 +7140,35 @@
         },
         {
           "level": 2,
+          "text": "Mécanisme de panne"
+        },
+        {
+          "level": 2,
           "text": "Cause racine"
         },
         {
           "level": 2,
-          "text": "Réponse"
+          "text": "Facteurs contributifs"
         },
         {
           "level": 2,
-          "text": "Prévention"
+          "text": "Containment / recovery"
+        },
+        {
+          "level": 2,
+          "text": "Correctifs"
+        },
+        {
+          "level": 2,
+          "text": "Prévention / récurrence"
+        },
+        {
+          "level": 2,
+          "text": "Vérification de fermeture"
+        },
+        {
+          "level": 2,
+          "text": "Risques résiduels"
         }
       ]
     },
@@ -7036,11 +7196,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/07-operations/RUNBOOK.md",
-      "git_blob_sha": "51ba4da320e7a789aa8b0e36ee8b8f96dffba2a2",
-      "last_validated_sha": "51ba4da320e7a789aa8b0e36ee8b8f96dffba2a2",
-      "content_sha256": "18c9c6c323c8ace5e87ecc67b06047d60a892996e17ce9908149f4897ad41571",
-      "line_count": 3,
-      "byte_count": 314,
+      "git_blob_sha": "8e624fc4198823b2738bea4343c4a9f0693c280f",
+      "last_validated_sha": "8e624fc4198823b2738bea4343c4a9f0693c280f",
+      "content_sha256": "63b6969278ddabc008e606cc2f1e77e4b1921b363ac31238f3f9d0ddc7f082d0",
+      "line_count": 13,
+      "byte_count": 743,
       "headings": [
         {
           "level": 1,
@@ -7081,6 +7241,281 @@
         {
           "level": 1,
           "text": "TROUBLESHOOTING — AfricaFunds"
+        }
+      ]
+    },
+    {
+      "role": "operations",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/07-operations/RUNBOOK.md",
+      "unique_information": [
+        "AF-INC-20260817-001 — MariaDB arrêts répétés / OOM",
+        "Impact",
+        "Faits et récurrence",
+        "Mécanisme — PROVEN",
+        "Root cause — UNKNOWN",
+        "Facteurs contributifs",
+        "Mesures prises",
+        "Actions ouvertes"
+      ],
+      "consumers": [
+        "CI",
+        "OPERATIONS",
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "NONE",
+      "production_impact": "YES",
+      "title": "AF-INC-20260817-001 — MariaDB arrêts répétés / OOM",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/07-operations/incidents/AF-INC-20260817-001-mariadb-oom.md",
+      "git_blob_sha": "845702fc54495e2573498e211a4c1debb605a14a",
+      "last_validated_sha": "845702fc54495e2573498e211a4c1debb605a14a",
+      "content_sha256": "c086ec8a9742e191523fb8c74cfbd805175c92ae42fb4c04b8848f5ff3a1f55f",
+      "line_count": 32,
+      "byte_count": 1394,
+      "headings": [
+        {
+          "level": 1,
+          "text": "AF-INC-20260817-001 — MariaDB arrêts répétés / OOM"
+        },
+        {
+          "level": 2,
+          "text": "Impact"
+        },
+        {
+          "level": 2,
+          "text": "Faits et récurrence"
+        },
+        {
+          "level": 2,
+          "text": "Mécanisme — PROVEN"
+        },
+        {
+          "level": 2,
+          "text": "Root cause — UNKNOWN"
+        },
+        {
+          "level": 2,
+          "text": "Facteurs contributifs"
+        },
+        {
+          "level": 2,
+          "text": "Mesures prises"
+        },
+        {
+          "level": 2,
+          "text": "Actions ouvertes"
+        }
+      ]
+    },
+    {
+      "role": "operations",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/07-operations/RUNBOOK.md",
+      "unique_information": [
+        "AF-INC-20260912-001 — SSH S2 resets KEX",
+        "Mécanisme — PROVEN",
+        "Root cause — UNKNOWN",
+        "Impact",
+        "Action"
+      ],
+      "consumers": [
+        "CI",
+        "OPERATIONS",
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "NONE",
+      "production_impact": "YES",
+      "title": "AF-INC-20260912-001 — SSH S2 resets KEX",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/07-operations/incidents/AF-INC-20260912-001-s2-ssh-kex.md",
+      "git_blob_sha": "90045ac526f174a2c0cdf785083b3ca31a8fd251",
+      "last_validated_sha": "90045ac526f174a2c0cdf785083b3ca31a8fd251",
+      "content_sha256": "56d06a0742a268467738ec8ba83d4e36475528e9deeba6537c976d15fa537ecc",
+      "line_count": 17,
+      "byte_count": 730,
+      "headings": [
+        {
+          "level": 1,
+          "text": "AF-INC-20260912-001 — SSH S2 resets KEX"
+        },
+        {
+          "level": 2,
+          "text": "Mécanisme — PROVEN"
+        },
+        {
+          "level": 2,
+          "text": "Root cause — UNKNOWN"
+        },
+        {
+          "level": 2,
+          "text": "Impact"
+        },
+        {
+          "level": 2,
+          "text": "Action"
+        }
+      ]
+    },
+    {
+      "role": "operations",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/07-operations/RUNBOOK.md",
+      "unique_information": [
+        "AF-INC-20260914-001 — Contrôle production faux-vert",
+        "Impact",
+        "Root cause — PROVEN",
+        "Vérification",
+        "Prévention"
+      ],
+      "consumers": [
+        "CI",
+        "OPERATIONS",
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "NONE",
+      "production_impact": "YES",
+      "title": "AF-INC-20260914-001 — Contrôle production faux-vert",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/07-operations/incidents/AF-INC-20260914-001-healthcheck-false-green.md",
+      "git_blob_sha": "ef6d380c198f5ba1e031b0a7a4f67d37e316a0dc",
+      "last_validated_sha": "ef6d380c198f5ba1e031b0a7a4f67d37e316a0dc",
+      "content_sha256": "ac944771a88e022c48931aa73f49851dfcad30b48887a7eddf7fda4a813c3586",
+      "line_count": 18,
+      "byte_count": 838,
+      "headings": [
+        {
+          "level": 1,
+          "text": "AF-INC-20260914-001 — Contrôle production faux-vert"
+        },
+        {
+          "level": 2,
+          "text": "Impact"
+        },
+        {
+          "level": 2,
+          "text": "Root cause — PROVEN"
+        },
+        {
+          "level": 2,
+          "text": "Vérification"
+        },
+        {
+          "level": 2,
+          "text": "Prévention"
+        }
+      ]
+    },
+    {
+      "role": "operations",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/07-operations/RUNBOOK.md",
+      "unique_information": [
+        "AF-INC-20260914-002 — DB auth drift post-rotation",
+        "Faits",
+        "État courant observé",
+        "Root cause — UNKNOWN",
+        "Action"
+      ],
+      "consumers": [
+        "CI",
+        "OPERATIONS",
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "HIGH",
+      "production_impact": "YES",
+      "title": "AF-INC-20260914-002 — DB auth drift post-rotation",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/07-operations/incidents/AF-INC-20260914-002-db-auth-drift.md",
+      "git_blob_sha": "42b901146353cd608df98f3fa3d4892140c14c01",
+      "last_validated_sha": "42b901146353cd608df98f3fa3d4892140c14c01",
+      "content_sha256": "c403c569e7cf4a03d1489a0e658a4a061cdfe2b417ac82b72fb70e2ccceb8886",
+      "line_count": 15,
+      "byte_count": 808,
+      "headings": [
+        {
+          "level": 1,
+          "text": "AF-INC-20260914-002 — DB auth drift post-rotation"
+        },
+        {
+          "level": 2,
+          "text": "Faits"
+        },
+        {
+          "level": 2,
+          "text": "État courant observé"
+        },
+        {
+          "level": 2,
+          "text": "Root cause — UNKNOWN"
+        },
+        {
+          "level": 2,
+          "text": "Action"
+        }
+      ]
+    },
+    {
+      "role": "operations",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/07-operations/RUNBOOK.md",
+      "unique_information": [
+        "Incidents AfricaFunds"
+      ],
+      "consumers": [
+        "CI",
+        "OPERATIONS",
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "HIGH",
+      "production_impact": "NO",
+      "title": "Incidents AfricaFunds",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/07-operations/incidents/README.md",
+      "git_blob_sha": "ec0ec858f6708a340bc38048ebec3bd1cba2e819",
+      "last_validated_sha": "ec0ec858f6708a340bc38048ebec3bd1cba2e819",
+      "content_sha256": "238b1798ced3aae2408b887ac0e73256aef7ed3754c0fc101512f828f7434e80",
+      "line_count": 9,
+      "byte_count": 403,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Incidents AfricaFunds"
         }
       ]
     },
