@@ -78,8 +78,9 @@ jobs:
               systemctl start mariadb
               sleep 5
             fi
-            if [ "$PKG_WAS_INSTALLED" -eq 0 ]; then
-              :
+            if [ "$PKG_WAS_INSTALLED" -eq 0 ] && dpkg-query -W -f='${Status}' libjemalloc2 2>/dev/null | grep -q "install ok installed"; then
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get remove -y libjemalloc2 >/dev/null 2>&1 || true
             fi
             echo "CLEANUP_MARIADB=$(systemctl is-active mariadb 2>/dev/null || true)"
             echo "CLEANUP_END"
@@ -111,9 +112,25 @@ jobs:
           echo "active_sensitive_jobs=0"
 
           [ -f .env ] || { echo "ABORT: runtime .env absent"; exit 22; }
-          DBU=$(grep -E '^DB_USER=' .env | head -1 | cut -d= -f2- | tr -d '"'"'')
-          DBN=$(grep -E '^DB_NAME=' .env | head -1 | cut -d= -f2- | tr -d '"'"'')
-          DBP=$(grep -E '^DB_PASSWORD=' .env | head -1 | cut -d= -f2- | tr -d '"'"'')
+          eval "$(python3 - <<'PYENV'
+from pathlib import Path
+import shlex
+wanted={"DB_USER":"DBU","DB_NAME":"DBN","DB_PASSWORD":"DBP"}
+vals={}
+for raw in Path(".env").read_text(encoding="utf-8").splitlines():
+    line=raw.strip()
+    if not line or line.startswith("#") or "=" not in line:
+        continue
+    k,v=line.split("=",1)
+    if k in wanted:
+        v=v.strip()
+        if len(v)>=2 and v[0]==v[-1] and v[0] in {'"', "'"}:
+            v=v[1:-1]
+        vals[k]=v
+for k,out in wanted.items():
+    print(f"{out}={shlex.quote(vals.get(k,''))}")
+PYENV
+)"
           [ -n "${DBU:-}" ] || { echo "ABORT: DB_USER absent"; exit 23; }
           DBN="${DBN:-fund_opcvm}"
 
