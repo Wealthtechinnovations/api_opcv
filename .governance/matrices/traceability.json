@@ -318,6 +318,24 @@
         "AF-EVD-035",
         "AF-EVD-036"
       ]
+    },
+    {
+      "requirement_id": "AF-REQ-025",
+      "change_refs": [
+        "docs/07-operations/INCIDENT_RESPONSE.md",
+        ".governance/incidents/registry.json",
+        ".governance/schemas/incident-registry.schema.json",
+        "docs/07-operations/incidents/",
+        ".github/ISSUE_TEMPLATE/incident.md",
+        ".governance/loop/task-queue.json"
+      ],
+      "test_refs": [
+        "scripts/governance/validate_incidents.py",
+        ".github/workflows/governance-incidents.yml"
+      ],
+      "evidence_refs": [
+        "AF-EVD-038"
+      ]
     }
   ]
 }
