@@ -398,6 +398,31 @@
         "AF-REQ-023"
       ],
       "note": "Attestation GOV-006 run 34773189857: API/Frontend alignés et runtime sain. Les refus MariaDB historiques post-rotation ne correspondent à aucun consommateur stale persistant identifié; attribution exacte historique impossible avec general_log/performance_schema/audit désactivés."
+    },
+    {
+      "id": "AF-REQ-025",
+      "title": "Cycle de vie des incidents, RCA, récurrence et remédiation gouvernée",
+      "status": "VERIFIED",
+      "authority": "docs/07-operations/INCIDENT_RESPONSE.md",
+      "acceptance_criteria": [
+        "chaque incident possède un ID canonique et un postmortem",
+        "mécanisme et cause racine sont séparés avec niveau de preuve",
+        "un incident récurrent exige escalation et tâche gouvernée",
+        "un incident CLOSED exige root cause PROVEN et vérification de fermeture",
+        "les actions correctives pointent vers la task queue AfricaFunds existante",
+        "aucun secret n'est publié dans les rapports"
+      ],
+      "evidence_required": [
+        "incident_registry",
+        "incident_ci",
+        "postmortems",
+        "task_links"
+      ],
+      "dependencies": [
+        "AF-REQ-002",
+        "AF-REQ-003",
+        "AF-REQ-009"
+      ]
     }
   ]
 }
