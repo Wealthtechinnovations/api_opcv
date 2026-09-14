@@ -157,18 +157,17 @@ jobs:
 
           workload() {
             local label="$1"
-            local sql wave i pids failures rc
-            sql="SELECT COUNT(*) FROM (SELECT id FROM (SELECT id FROM valorisations LIMIT 120000) AS base ORDER BY RAND() LIMIT 30000) AS t;"
-            echo "WORKLOAD_BEGIN label=$label"
-            Q "SELECT COUNT(*) FROM valorisations;" | sed 's/^/valorisations_count=/'
+            local wave i pids failures size
+            local sizes="1048576 2097152 4194304 8388608 3145728 6291456 1572864 5242880"
+            echo "WORKLOAD_BEGIN label=$label kind=variable_alloc_free"
             failures=0
             wave=1
-            while [ "$wave" -le 40 ]; do
+            while [ "$wave" -le 200 ]; do
               pids=""
               i=1
-              while [ "$i" -le 8 ]; do
+              for size in $sizes; do
                 (
-                  MYSQL_PWD="$DBP" timeout 60 mysql -N -B -u "$DBU" "$DBN" -e "$sql" >/dev/null
+                  MYSQL_PWD="$DBP" timeout 30 mysql -N -B -u "$DBU" "$DBN"                     -e "SELECT LENGTH(REPEAT('x',$size));" >/dev/null
                 ) &
                 pids="$pids $!"
                 i=$((i+1))
@@ -178,7 +177,9 @@ jobs:
                   failures=$((failures+1))
                 fi
               done
-              echo "WORKLOAD_WAVE label=$label wave=$wave failures=$failures"
+              if [ "$wave" -eq 1 ] || [ "$wave" -eq 25 ] || [ "$wave" -eq 50 ] || [ "$wave" -eq 100 ] || [ "$wave" -eq 150 ] || [ "$wave" -eq 200 ]; then
+                echo "WORKLOAD_WAVE label=$label wave=$wave failures=$failures"
+              fi
               [ "$failures" -eq 0 ] || return 1
               wave=$((wave+1))
             done
@@ -208,7 +209,7 @@ jobs:
           fi
           capture "A_PRE"
           workload "A"
-          sleep 30
+          sleep 45
           capture "A_POST"
           health "A_POST"
 
@@ -246,7 +247,7 @@ jobs:
           echo "=============================================="
           capture "B_PRE"
           workload "B"
-          sleep 30
+          sleep 45
           capture "B_POST"
           health "B_POST"
 
