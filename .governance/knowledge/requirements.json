@@ -290,12 +290,13 @@
         "Aucun shell distant arbitraire"
       ],
       "evidence_required": [
-        "s2_observer_ci"
+        "s2_observer_ci",
+        "read_only_ssh_retry_contract"
       ],
       "dependencies": [
         "AF-REQ-005"
       ],
-      "note": "GitHub Actions→SSH S2 observe/reconcile/attest est live et StrictHostKeyChecking=yes utilise un pin TOFU versionné. Vérification OOB indépendante du host key reste à fournir."
+      "note": "GitHub Actions→SSH S2 observe/reconcile/attest est live et StrictHostKeyChecking=yes utilise un pin TOFU versionné. Vérification OOB indépendante du host key reste à fournir. Read-only SSH paths use a bounded fail-closed retry contract; mutation paths do not auto-retry ambiguous remote execution."
     },
     {
       "id": "AF-REQ-020",

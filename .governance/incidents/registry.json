@@ -168,7 +168,7 @@
         "OBSERVABILITY"
       ],
       "severity": "SEV2",
-      "status": "RCA_PENDING",
+      "status": "MITIGATED",
       "first_observed_at": "2026-09-12",
       "last_observed_at": "2026-09-12",
       "recurrence": {
@@ -214,24 +214,40 @@
       "corrective_actions": [
         {
           "id": "CA-001",
-          "status": "OPEN",
+          "status": "DONE",
           "description": "Ajouter un retry borné uniquement aux opérations read-only et uniquement sur erreurs pré-auth transitoires.",
           "task_refs": [
             "AF-OPS-004"
           ],
-          "patch_refs": [],
-          "test_refs": [],
+          "patch_refs": [
+            "af3cdb6a916dda39b9278d610bab5999bdaed813",
+            "f25935ed31ed35a6f9b149ec1255b6c6b6fc8c3e"
+          ],
+          "test_refs": [
+            "run 34901007513 retry contract",
+            "run 34901007464 DB auth diagnostic",
+            "run 34901007473 S2 observer",
+            "runs 34901304396/34901304405/34901304354/34901304437/34901304403 extended read-only workflows"
+          ],
           "rollback": "Retirer le wrapper et revenir à une tentative unique.",
-          "verification_refs": []
+          "verification_refs": [
+            "AF-EVD-039"
+          ]
         }
       ],
       "preventive_actions": [
         {
+          "status": "DONE",
+          "description": "Les principaux chemins S2 strictement read-only utilisent le wrapper borné fail-closed; les workflows de mutation ne sont volontairement pas auto-retryés."
+        },
+        {
           "status": "OPEN",
-          "description": "Mesurer taux de succès/échec SSH dans le temps et ne pas confondre indisponibilité du canal avec état de production."
+          "description": "Mesurer la fréquence de resets KEX dans le temps et établir la cause réseau/sshd si le phénomène persiste."
         }
       ],
-      "evidence_refs": [],
+      "evidence_refs": [
+        "AF-EVD-039"
+      ],
       "linked_tasks": [
         "AF-OPS-004"
       ],
@@ -239,9 +255,11 @@
       "closure": {
         "criteria_met": false,
         "verified_at": null,
-        "verification_refs": [],
+        "verification_refs": [
+          "AF-EVD-039"
+        ],
         "residual_risks": [
-          "Cause pré-auth non attribuée"
+          "Cause pré-auth réseau/sshd toujours inconnue; mitigation de retry ne constitue pas une RCA."
         ]
       }
     },

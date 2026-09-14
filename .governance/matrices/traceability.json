@@ -216,15 +216,20 @@
       "change_refs": [
         "scripts/governance/s2_observe.py",
         ".github/workflows/ops-s2-observe.yml",
-        "MCP_AUTONOMY.md"
+        "MCP_AUTONOMY.md",
+        "scripts/governance/s2_ssh_readonly_retry.sh",
+        ".github/workflows/governance-s2-readonly-ssh-retry.yml"
       ],
       "test_refs": [
-        ".github/workflows/ops-s2-observe.yml"
+        ".github/workflows/ops-s2-observe.yml",
+        "scripts/governance/test_s2_ssh_readonly_retry.sh",
+        ".github/workflows/governance-s2-readonly-ssh-retry.yml"
       ],
       "evidence_refs": [
         "AF-EVD-021",
         "AF-EVD-024",
-        "AF-EVD-025"
+        "AF-EVD-025",
+        "AF-EVD-039"
       ]
     },
     {

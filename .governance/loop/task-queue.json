@@ -163,11 +163,14 @@
     {
       "id": "AF-OPS-004",
       "title": "S2 SSH — fiabiliser les resets KEX du canal read-only",
-      "status": "OPEN",
+      "status": "DONE",
       "incident_refs": [
         "AF-INC-20260912-001"
       ],
-      "next_action": "Ajouter un retry borné uniquement aux opérations read-only et uniquement sur erreurs pré-auth transitoires ; ne jamais auto-retry une mutation distante ambiguë."
+      "next_action": "Retry read-only borné/fail-closed livré et prouvé. L'incident AF-INC-20260912-001 reste MITIGATED/RCA_PENDING tant que la cause pré-auth réseau/sshd n'est pas prouvée.",
+      "closure_evidence": [
+        "AF-EVD-039"
+      ]
     },
     {
       "id": "AF-OPS-005",
