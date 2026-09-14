@@ -157,33 +157,14 @@ jobs:
 
           workload() {
             local label="$1"
-            local wave i pids failures size
-            local sizes="1048576 2097152 4194304 8388608 3145728 6291456 1572864 5242880"
-            echo "WORKLOAD_BEGIN label=$label kind=variable_alloc_free"
-            failures=0
-            wave=1
-            while [ "$wave" -le 200 ]; do
-              pids=""
-              i=1
-              for size in $sizes; do
-                (
-                  MYSQL_PWD="$DBP" timeout 30 mysql -N -B -u "$DBU" "$DBN"                     -e "SELECT LENGTH(REPEAT('x',$size));" >/dev/null
-                ) &
-                pids="$pids $!"
-                i=$((i+1))
-              done
-              for p in $pids; do
-                if ! wait "$p"; then
-                  failures=$((failures+1))
-                fi
-              done
-              if [ "$wave" -eq 1 ] || [ "$wave" -eq 25 ] || [ "$wave" -eq 50 ] || [ "$wave" -eq 100 ] || [ "$wave" -eq 150 ] || [ "$wave" -eq 200 ]; then
-                echo "WORKLOAD_WAVE label=$label wave=$wave failures=$failures"
-              fi
-              [ "$failures" -eq 0 ] || return 1
-              wave=$((wave+1))
-            done
-            echo "WORKLOAD_END label=$label failures=$failures"
+            local logfile="/tmp/recalc-eur-usd-$label.log"
+            local timefile="/tmp/recalc-eur-usd-$label.time"
+            echo "WORKLOAD_BEGIN label=$label kind=recalc_eur_usd_daily_rate_dry_run"
+            /usr/bin/time -v -o "$timefile"               node scripts/recalc/recalc_eur_usd_daily_rate.js --dry-run               >"$logfile" 2>&1
+            echo "--- workload summary $label ---"
+            grep -E 'MODE DRY-RUN|fonds a traiter|Fonds traites|VL totales|vlTotal|entrees forex|erreur|ERREUR' "$logfile" | tail -40 || true
+            grep -E 'Elapsed \(wall clock\) time|Maximum resident set size|User time|System time' "$timefile" || true
+            echo "WORKLOAD_END label=$label exit=0"
           }
 
           echo "--- snapshot original config ---"
@@ -209,7 +190,7 @@ jobs:
           fi
           capture "A_PRE"
           workload "A"
-          sleep 45
+          sleep 30
           capture "A_POST"
           health "A_POST"
 
@@ -247,7 +228,7 @@ jobs:
           echo "=============================================="
           capture "B_PRE"
           workload "B"
-          sleep 45
+          sleep 30
           capture "B_POST"
           health "B_POST"
 
