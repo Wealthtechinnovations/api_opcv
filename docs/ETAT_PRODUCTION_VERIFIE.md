@@ -5,10 +5,10 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-09-14 12:21 UTC**
+Derniere verification : **2026-09-14 14:07 UTC**
 
 ```
-Erreur fatale : connect ECONNREFUSED 127.0.0.1:3306
+Erreur fatale : Unexpected end of JSON input
 ```
 
 ## Comment lire ce rapport
