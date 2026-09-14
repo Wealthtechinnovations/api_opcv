@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "fe8081c201a01547b1db55eac6563e5b166a848d"
+      "head": "6e15f1b9700a89d21529ce1f5b9e457a5c7b7a14"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -6890,7 +6890,8 @@
         "Patch et Loop Engineering",
         "Postmortem",
         "Secret / sécurité",
-        "Fermeture"
+        "Fermeture",
+        "Known-incident lookup gate"
       ],
       "consumers": [
         "CI",
@@ -6908,11 +6909,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/07-operations/INCIDENT_RESPONSE.md",
-      "git_blob_sha": "df3cbd3e6769a3c3ee56796b56766fc827a4489b",
-      "last_validated_sha": "df3cbd3e6769a3c3ee56796b56766fc827a4489b",
-      "content_sha256": "4a416a22157adedf370edd51cc3a8147e396ff088ab9751541fc646b5953684e",
-      "line_count": 97,
-      "byte_count": 4299,
+      "git_blob_sha": "9be27b52373ad0e77d355d95f037a2bc81141a53",
+      "last_validated_sha": "9be27b52373ad0e77d355d95f037a2bc81141a53",
+      "content_sha256": "c848d1d1ca372c1a5135d4b86c11576f1b458a94feaf4d94414ecb95f65e8a09",
+      "line_count": 116,
+      "byte_count": 4936,
       "headings": [
         {
           "level": 1,
@@ -6965,6 +6966,10 @@
         {
           "level": 2,
           "text": "Fermeture"
+        },
+        {
+          "level": 2,
+          "text": "Known-incident lookup gate"
         }
       ]
     },
