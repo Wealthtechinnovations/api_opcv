@@ -226,6 +226,14 @@
       "provenance": "GitHub Actions Reconciliation gouvernee GitHub S2 run 34773189857 artifact 10322627099",
       "observed_at": "2026-09-13T17:59:08Z",
       "summary": "GOV-006 fast-forwarded API to ceff72e0e0dad7a7522835940a9537662b16f844 and frontend to 55191a74c8d581adb383123ce1d9f5bea98dc267; ahead/behind 0/0, tracked clean, all API untracked preserved. api-monolith and fundafrique-frontend online; DB PASS; public root/home/API and local API all HTTP 200."
+    },
+    {
+      "id": "AF-EVD-037",
+      "type": "POST_CLOSURE_DB_AUTH_DRIFT_OBSERVATION",
+      "result": "ACTIVE_AUTH_FAILURES_POST_RESTART_UNATTRIBUTED",
+      "provenance": "Read-only S2 SQL/global-status observations 2026-09-14 19:25-19:30 UTC + current GitHub/S2 reconciliation",
+      "observed_at": "2026-09-14T19:30:37Z",
+      "summary": "After the MariaDB recovery at 14:00Z, GLOBAL_STATUS showed UPTIME=19807s, ABORTED_CONNECTS=12, ACCESS_DENIED_ERRORS=12 and ABORTED_CONNECTS_PREAUTH=0. The counters remained 12 across repeated observation. DB SELECT connectivity passes, current fund_opcvm sessions are authenticated, PM2 processes are online, public AfricaFunds HTTP is 200, and the live doc-drift diagnostic reports C5 runtime snapshot fresh. USERSTAT=OFF, PERFORMANCE_SCHEMA=OFF and GENERAL_LOG=OFF, so SQL-native attribution to a specific process/tool is unavailable. This proves post-restart authentication drift, but does not prove STALE_CRON, STALE_PROCESS, EXTERNAL_TOOL, TRANSIENT_DIAGNOSTIC or ACTIVE_RUNTIME_DEFECT. No DB re-rotation, restart or runtime mutation is justified by this evidence. AF-TASK-011 remains DONE and the final governance verdict remains GOVERNED_WITH_EXTERNAL_GAPS."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
