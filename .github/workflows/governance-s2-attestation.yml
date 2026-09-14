@@ -10,6 +10,7 @@ on:
       - 'scripts/governance/prepare_s2_ssh.sh'
       - '.governance/ssh/s2_known_hosts.tofu'
       - 'scripts/governance/s2_observe.py'
+      - 'scripts/governance/s2_ssh_readonly_retry.sh'
 
 permissions:
   contents: read
@@ -44,8 +45,10 @@ jobs:
         run: |
           set -euo pipefail
           SSH_USER="${USER_SSH:-root}"
-          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
-            "$SSH_USER@$HOST" 'python3 -' < scripts/governance/s2_observe.py > S2_OBSERVATION.json
+          AFRICAFUNDS_SSH_OPERATION_CLASS=READ_ONLY \
+            bash scripts/governance/s2_ssh_readonly_retry.sh \
+            "$SSH_USER@$HOST" 'python3 -' scripts/governance/s2_observe.py \
+            > S2_OBSERVATION.json
           python3 -m json.tool S2_OBSERVATION.json >/dev/null
           python3 - <<'PY'
           import json
