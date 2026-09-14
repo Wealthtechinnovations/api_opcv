@@ -87,6 +87,16 @@
       "domain": "web_semantics_seo",
       "authority": "DIRECTIVE_TRAVAIL.md",
       "representation": "HUMAN_NORMATIVE"
+    },
+    {
+      "domain": "incident_management",
+      "authority": ".governance/incidents/registry.json",
+      "representation": "MACHINE_CANONICAL"
+    },
+    {
+      "domain": "incident_policy",
+      "authority": "docs/07-operations/INCIDENT_RESPONSE.md",
+      "representation": "HUMAN_NORMATIVE"
     }
   ],
   "rule": "Une projection machine ne remplace pas une politique humaine normative; toute contradiction ferme le write gate jusqu’à réconciliation.",

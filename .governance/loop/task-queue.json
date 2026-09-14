@@ -140,6 +140,56 @@
         "AF-EVD-035",
         "AF-EVD-036"
       ]
+    },
+    {
+      "id": "AF-OPS-002",
+      "title": "Gouvernance des incidents, RCA, récurrence et postmortems",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-025"
+      ],
+      "next_action": "Maintenir le registre d'incidents et son CI ; toute nouvelle action corrective doit être liée à une tâche AfricaFunds existante."
+    },
+    {
+      "id": "AF-OPS-003",
+      "title": "MariaDB — RCA des OOM répétés et durcissement de résilience",
+      "status": "OPEN",
+      "incident_refs": [
+        "AF-INC-20260817-001"
+      ],
+      "depends_on": [],
+      "next_action": "Poursuivre l'analyse mémoire sans modifier la production ; AF-OPS-001 reste le sous-gate humain pour Restart=on-failure. Ne pas déclarer la root cause tant qu'elle n'est pas prouvée."
+    },
+    {
+      "id": "AF-OPS-004",
+      "title": "S2 SSH — fiabiliser les resets KEX du canal read-only",
+      "status": "OPEN",
+      "incident_refs": [
+        "AF-INC-20260912-001"
+      ],
+      "next_action": "Ajouter un retry borné uniquement aux opérations read-only et uniquement sur erreurs pré-auth transitoires ; ne jamais auto-retry une mutation distante ambiguë."
+    },
+    {
+      "id": "AF-OPS-005",
+      "title": "DB auth — attribution des Access denied post-rotation",
+      "status": "OPEN",
+      "incident_refs": [
+        "AF-INC-20260914-002"
+      ],
+      "next_action": "Améliorer la télémétrie d'attribution sans rotation/restart injustifié ; conserver l'état runtime sain tant qu'aucun défaut AfricaFunds spécifique n'est mesuré."
+    },
+    {
+      "id": "AF-OPS-006",
+      "title": "Health check production — éliminer les faux verts et isoler les contrôles",
+      "status": "DONE",
+      "incident_refs": [
+        "AF-INC-20260914-001"
+      ],
+      "closure_evidence": [
+        "d58508f0d3e759b0456c1268b5105068221bfbc4",
+        "9f051c035e4bf72f919004f5a654ccf015f159ee"
+      ],
+      "next_action": "Conserver le contrat : code >=2 = mesure impossible et job rouge ; une alerte C5 ne doit jamais empêcher C2/C3/C4/C7/C8 d'être mesurés."
     }
   ]
 }
