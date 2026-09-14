@@ -6,24 +6,24 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "5e5a2e602b70c87f7cb014e4ae57247330e58125"
+      "head": "ff8588964e6942b6f408d146bee1623417de13e5"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "53ff6ed60d96d13e74e82fad488018d6166ff871"
+      "head": "9a1ff496b5280f779bc216b83b5a978a47d0a75e"
     }
   },
   "summary": {
-    "total_md_discovered": 247,
-    "total_md_certified": 247,
+    "total_md_discovered": 248,
+    "total_md_certified": 248,
     "by_repository": {
-      "API": 222,
+      "API": 223,
       "FRONTEND": 25
     },
     "by_status": {
       "TEMPLATE": 5,
       "CURRENT_CANONICAL": 21,
-      "CURRENT_SPECIALIZED": 195,
+      "CURRENT_SPECIALIZED": 196,
       "ADAPTER": 7,
       "HISTORICAL": 3,
       "DIAGNOSTIC_SNAPSHOT": 3,
@@ -3570,7 +3570,8 @@
         "Boucle finale de certification — 2026-09-11",
         "Certification finale en cours — 2026-09-12",
         "Trigger de certification Markdown finale — 2026-09-12",
-        "Clôture gouvernée AF-TASK-011 — 2026-09-13 17:59 UTC"
+        "Clôture gouvernée AF-TASK-011 — 2026-09-13 17:59 UTC",
+        "AF-OPS-003 — RCA mémoire MariaDB — 2026-09-14 22:53 UTC"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3586,11 +3587,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "ad057dfc44c91d1598a02260bdc1a66a633f2462",
-      "last_validated_sha": "ad057dfc44c91d1598a02260bdc1a66a633f2462",
-      "content_sha256": "e5efaa29a83ee235e754438fb1efca3142c2d2e7434014176e1d021c60550ea4",
-      "line_count": 118,
-      "byte_count": 7798,
+      "git_blob_sha": "d6456d14d49e04688a31522f3d6db49d7c5cc7f9",
+      "last_validated_sha": "d6456d14d49e04688a31522f3d6db49d7c5cc7f9",
+      "content_sha256": "824ee9c1727504d210034252b54bfb8f92ed6e8168e5894f849dea715b7a647a",
+      "line_count": 129,
+      "byte_count": 8820,
       "headings": [
         {
           "level": 1,
@@ -3639,6 +3640,10 @@
         {
           "level": 2,
           "text": "Clôture gouvernée AF-TASK-011 — 2026-09-13 17:59 UTC"
+        },
+        {
+          "level": 2,
+          "text": "AF-OPS-003 — RCA mémoire MariaDB — 2026-09-14 22:53 UTC"
         }
       ]
     },
@@ -7015,6 +7020,92 @@
       "authority_level": "CURRENT_SPECIALIZED",
       "canonical_authority": "docs/07-operations/RUNBOOK.md",
       "unique_information": [
+        "MARIADB_ALLOCATOR_AB_RUNBOOK — AF-OPS-003",
+        "Objet",
+        "Baseline prouvée",
+        "Préflight obligatoire",
+        "A/B proposé",
+        "A — contrôle",
+        "B — candidat",
+        "Critère de preuve",
+        "Rollback",
+        "Après A/B",
+        "Version MariaDB"
+      ],
+      "consumers": [
+        "CI",
+        "OPERATIONS",
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "NONE",
+      "production_impact": "YES",
+      "title": "MARIADB_ALLOCATOR_AB_RUNBOOK — AF-OPS-003",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md",
+      "git_blob_sha": "6826f622a82b0249d4c160acf27f79fef16fca73",
+      "last_validated_sha": "6826f622a82b0249d4c160acf27f79fef16fca73",
+      "content_sha256": "3dc0844026bf14f100e2d00db07fe5b46cd02b47c6edbf0834c62f4d36c152f8",
+      "line_count": 76,
+      "byte_count": 3037,
+      "headings": [
+        {
+          "level": 1,
+          "text": "MARIADB_ALLOCATOR_AB_RUNBOOK — AF-OPS-003"
+        },
+        {
+          "level": 2,
+          "text": "Objet"
+        },
+        {
+          "level": 2,
+          "text": "Baseline prouvée"
+        },
+        {
+          "level": 2,
+          "text": "Préflight obligatoire"
+        },
+        {
+          "level": 2,
+          "text": "A/B proposé"
+        },
+        {
+          "level": 3,
+          "text": "A — contrôle"
+        },
+        {
+          "level": 3,
+          "text": "B — candidat"
+        },
+        {
+          "level": 2,
+          "text": "Critère de preuve"
+        },
+        {
+          "level": 2,
+          "text": "Rollback"
+        },
+        {
+          "level": 2,
+          "text": "Après A/B"
+        },
+        {
+          "level": 2,
+          "text": "Version MariaDB"
+        }
+      ]
+    },
+    {
+      "role": "operations",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/07-operations/RUNBOOK.md",
+      "unique_information": [
         "MONITORING — AfricaFunds"
       ],
       "consumers": [
@@ -7259,10 +7350,11 @@
         "Impact",
         "Faits et récurrence",
         "Mécanisme — PROVEN",
-        "Root cause — UNKNOWN",
+        "Root cause — PROBABLE",
         "Facteurs contributifs",
         "Mesures prises",
-        "Actions ouvertes"
+        "Actions ouvertes",
+        "Prochaine preuve requise — A/B allocateur"
       ],
       "consumers": [
         "CI",
@@ -7280,11 +7372,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/07-operations/incidents/AF-INC-20260817-001-mariadb-oom.md",
-      "git_blob_sha": "845702fc54495e2573498e211a4c1debb605a14a",
-      "last_validated_sha": "845702fc54495e2573498e211a4c1debb605a14a",
-      "content_sha256": "c086ec8a9742e191523fb8c74cfbd805175c92ae42fb4c04b8848f5ff3a1f55f",
-      "line_count": 32,
-      "byte_count": 1394,
+      "git_blob_sha": "93f4bdfd0f54e0869a4ad1a7b554aabaecc1b7b7",
+      "last_validated_sha": "93f4bdfd0f54e0869a4ad1a7b554aabaecc1b7b7",
+      "content_sha256": "c5c93d41f28ceee6bd300bd1208e84b2b616b7790e20afb85c34ca8ff9a3d648",
+      "line_count": 55,
+      "byte_count": 2719,
       "headings": [
         {
           "level": 1,
@@ -7304,7 +7396,7 @@
         },
         {
           "level": 2,
-          "text": "Root cause — UNKNOWN"
+          "text": "Root cause — PROBABLE"
         },
         {
           "level": 2,
@@ -7317,6 +7409,10 @@
         {
           "level": 2,
           "text": "Actions ouvertes"
+        },
+        {
+          "level": 2,
+          "text": "Prochaine preuve requise — A/B allocateur"
         }
       ]
     },
@@ -10240,11 +10336,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_MYSQL_MEMOIRE.md",
-      "git_blob_sha": "574936099cc39ada8bec396618785b69a7a0ba31",
-      "last_validated_sha": "574936099cc39ada8bec396618785b69a7a0ba31",
-      "content_sha256": "db81e5a4689ad38510e349b7feed516c9c8f5c6a1e57f207121c95c4cff6d4ad",
-      "line_count": 82,
-      "byte_count": 3433,
+      "git_blob_sha": "d2b1f8f341f5c4534e6b199c28c732b8afe305b8",
+      "last_validated_sha": "d2b1f8f341f5c4534e6b199c28c732b8afe305b8",
+      "content_sha256": "21b36f5e420c6114b5ff826bae3c246c4c610437ef95c93be4fb5cb5569eb409",
+      "line_count": 208,
+      "byte_count": 7954,
       "headings": [
         {
           "level": 1,
@@ -13104,11 +13200,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "ed93c64cac097323e1db618ccd272383552a8c7f",
-      "last_validated_sha": "ed93c64cac097323e1db618ccd272383552a8c7f",
-      "content_sha256": "e6d43bf7fccaaae913416efa05a72b2b2d5206ee3494c25268c8071a4c50c206",
-      "line_count": 6208,
-      "byte_count": 439504,
+      "git_blob_sha": "bd87938ec9aad35bdcba6fecb97bee29462df8bd",
+      "last_validated_sha": "bd87938ec9aad35bdcba6fecb97bee29462df8bd",
+      "content_sha256": "503845f50648ba05482e521692c27607bd44ab43262a9a1c1ca51ff07b13e108",
+      "line_count": 6286,
+      "byte_count": 443244,
       "headings": [
         {
           "level": 1,
