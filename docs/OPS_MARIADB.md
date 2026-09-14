@@ -209,3 +209,104 @@ srwxrwxrwx 1 mysql mysql 0 Sep  9 06:25 /run/mysqld/mysqld.sock
  FIN
 ==============================================
 ```
+
+---
+
+## Execution du 2026-09-14 14:00 UTC
+
+Declencheur : `workflow_dispatch` — par `Wealthtechinnovations`
+
+```
+==============================================
+ 1. ETAT AVANT INTERVENTION
+==============================================
+Service detecte : mariadb
+× mariadb.service - MariaDB 10.6.23 database server
+     Loaded: loaded (/lib/systemd/system/mariadb.service; enabled; vendor preset: enabled)
+     Active: failed (Result: oom-kill) since Mon 2026-09-14 10:04:14 UTC; 3h 56min ago
+       Docs: man:mariadbd(8)
+             https://mariadb.com/kb/en/library/systemd/
+    Process: 1256690 ExecStart=/usr/sbin/mariadbd $MYSQLD_OPTS $_WSREP_NEW_CLUSTER $_WSREP_START_POSITION (code=killed, signal=KILL)
+   Main PID: 1256690 (code=killed, signal=KILL)
+     Status: "Taking your SQL requests now..."
+        CPU: 1h 50min 36.762s
+
+Sep 14 07:52:16 priceless-mayer mariadbd[1256690]: 2026-09-14  7:52:16 67844 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 07:52:19 priceless-mayer mariadbd[1256690]: 2026-09-14  7:52:19 67847 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 09:19:50 priceless-mayer mariadbd[1256690]: 2026-09-14  9:19:50 68072 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 09:19:55 priceless-mayer mariadbd[1256690]: 2026-09-14  9:19:55 68075 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 09:47:30 priceless-mayer mariadbd[1256690]: 2026-09-14  9:47:30 68178 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 09:47:32 priceless-mayer mariadbd[1256690]: 2026-09-14  9:47:32 68181 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 10:04:11 priceless-mayer systemd[1]: mariadb.service: A process of this unit has been killed by the OOM killer.
+Sep 14 10:04:14 priceless-mayer systemd[1]: mariadb.service: Main process exited, code=killed, status=9/KILL
+Sep 14 10:04:14 priceless-mayer systemd[1]: mariadb.service: Failed with result 'oom-kill'.
+Sep 14 10:04:14 priceless-mayer systemd[1]: mariadb.service: Consumed 1h 50min 36.762s CPU time.
+
+Socket attendu par le client :
+srwxrwxrwx 1 mysql mysql 0 Sep  9 06:25 /run/mysqld/mysqld.sock
+
+==============================================
+ 2. POURQUOI IL S EST ARRETE
+==============================================
+--- journal du service (30 dernieres lignes) ---
+Sep 14 01:16:31 priceless-mayer mariadbd[1256690]: 2026-09-14  1:16:31 66348 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 01:21:13 priceless-mayer mariadbd[1256690]: 2026-09-14  1:21:13 66370 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 01:37:26 priceless-mayer mariadbd[1256690]: 2026-09-14  1:37:26 66421 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 01:53:53 priceless-mayer mariadbd[1256690]: 2026-09-14  1:53:53 66468 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 02:23:27 priceless-mayer mariadbd[1256690]: 2026-09-14  2:23:27 66573 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 02:31:25 priceless-mayer mariadbd[1256690]: 2026-09-14  2:31:25 66609 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 02:55:18 priceless-mayer mariadbd[1256690]: 2026-09-14  2:55:18 66680 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 03:32:25 priceless-mayer mariadbd[1256690]: 2026-09-14  3:32:25 66808 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 04:12:19 priceless-mayer mariadbd[1256690]: 2026-09-14  4:12:19 66943 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 04:13:05 priceless-mayer mariadbd[1256690]: 2026-09-14  4:13:05 66947 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 05:46:43 priceless-mayer mariadbd[1256690]: 2026-09-14  5:46:43 67255 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 05:50:36 priceless-mayer mariadbd[1256690]: 2026-09-14  5:50:36 67272 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 06:00:23 priceless-mayer mariadbd[1256690]: 2026-09-14  6:00:23 60516 [Warning] Aborted connection 60516 to db: 'fund_opcvm' user: 'fund_opcvm' host: 'localhost' (Got timeout reading communication packets)
+Sep 14 06:14:27 priceless-mayer mariadbd[1256690]: 2026-09-14  6:14:27 67356 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 06:16:47 priceless-mayer mariadbd[1256690]: 2026-09-14  6:16:47 67383 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 06:36:46 priceless-mayer mariadbd[1256690]: 2026-09-14  6:36:46 67467 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 06:36:49 priceless-mayer mariadbd[1256690]: 2026-09-14  6:36:49 67470 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 06:48:54 priceless-mayer mariadbd[1256690]: 2026-09-14  6:48:54 67614 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 07:48:02 priceless-mayer mariadbd[1256690]: 2026-09-14  7:48:02 67834 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 07:50:13 priceless-mayer mariadbd[1256690]: 2026-09-14  7:50:13 67841 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 07:52:16 priceless-mayer mariadbd[1256690]: 2026-09-14  7:52:16 67844 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 07:52:19 priceless-mayer mariadbd[1256690]: 2026-09-14  7:52:19 67847 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 09:19:50 priceless-mayer mariadbd[1256690]: 2026-09-14  9:19:50 68072 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 09:19:55 priceless-mayer mariadbd[1256690]: 2026-09-14  9:19:55 68075 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 09:47:30 priceless-mayer mariadbd[1256690]: 2026-09-14  9:47:30 68178 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 09:47:32 priceless-mayer mariadbd[1256690]: 2026-09-14  9:47:32 68181 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+Sep 14 10:04:11 priceless-mayer systemd[1]: mariadb.service: A process of this unit has been killed by the OOM killer.
+Sep 14 10:04:14 priceless-mayer systemd[1]: mariadb.service: Main process exited, code=killed, status=9/KILL
+Sep 14 10:04:14 priceless-mayer systemd[1]: mariadb.service: Failed with result 'oom-kill'.
+Sep 14 10:04:14 priceless-mayer systemd[1]: mariadb.service: Consumed 1h 50min 36.762s CPU time.
+
+--- traces de tuerie memoire (OOM) ---
+Sep 14 10:04:11 priceless-mayer kernel: npm start invoked oom-killer: gfp_mask=0x1100cca(GFP_HIGHUSER_MOVABLE), order=0, oom_score_adj=0
+Sep 14 10:04:12 priceless-mayer kernel: oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=user.slice,mems_allowed=0,global_oom,task_memcg=/system.slice/mariadb.service,task=mariadbd,pid=1256690,uid=113
+Sep 14 10:04:12 priceless-mayer kernel: Out of memory: Killed process 1256690 (mariadbd) total-vm:19512460kB, anon-rss:14902200kB, file-rss:0kB, shmem-rss:0kB, UID:113 pgtables:33628kB oom_score_adj:0
+
+--- memoire disponible ---
+               total        used        free      shared  buff/cache   available
+Mem:           17945        2384       13397         215        2163       14994
+Swap:           2047         381        1666
+
+==============================================
+ 3. REDEMARRAGE
+==============================================
+Demarrage de mariadb ...
+Etat : active
+
+==============================================
+ 4. VERIFICATION — la base repond-elle ?
+==============================================
+srwxrwxrwx 1 mysql mysql 0 Sep 14 14:00 /run/mysqld/mysqld.sock
+1259
+2026-09-10
+
+--- l API repond-elle de nouveau ? ---
+  /api/getfondbypays/MAROC : HTTP 200
+
+==============================================
+ FIN
+==============================================
+```
