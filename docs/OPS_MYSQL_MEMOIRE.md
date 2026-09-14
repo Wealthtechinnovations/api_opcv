@@ -2,7 +2,7 @@
 
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-14 22:49 UTC**
+Derniere execution : **2026-09-14 22:53 UTC**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
@@ -10,11 +10,11 @@ Declencheur : `push` — par `Wealthtechinnovations`
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        9437        4188         216        4319        7940
+Mem:           17945        9444        4177         216        4323        7933
 Swap:           2047         381        1666
 
 RSS actuel de mariadbd :
-  6.68 Go — demarre depuis 08:47:59
+  6.68 Go — demarre depuis 08:52:07
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
@@ -51,23 +51,23 @@ Threads_running	1
  2b. MEMORY_USED / PROC / ALLOCATEUR
 ==============================================
 Aborted_connects	155
-Connections	1877
-Created_tmp_disk_tables	1876
+Connections	1907
+Created_tmp_disk_tables	1912
 Created_tmp_files	18
-Created_tmp_tables	15539
+Created_tmp_tables	15594
 Max_used_connections	19
 Memory_used	465884576
 Memory_used_initial	442210192
 Open_files	81
 Open_table_definitions	400
 Open_tables	236
-Opened_files	8464
+Opened_files	8608
 Opened_table_definitions	607
 Opened_tables	243
 Threads_connected	9
 Threads_created	26
 Threads_running	1
-Uptime	31678
+Uptime	31926
 
 --- version / instrumentation ---
 10.6.23-MariaDB-0ubuntu0.22.04.1	Ubuntu 22.04
@@ -77,7 +77,7 @@ table_definition_cache	400
 version_malloc_library	system
 MARIADB_PID=1784030
 --- /proc status ---
-1784030 6999328 9738320 08:47:59   18 38.0 /usr/sbin/mariadbd
+1784030 6999328 9738320 08:52:07   18 38.0 /usr/sbin/mariadbd
 VmPeak:	 9937360 kB
 VmSize:	 9738320 kB
 VmRSS:	 6999328 kB
@@ -88,30 +88,30 @@ VmData:	 7508292 kB
 VmSwap:	       0 kB
 Threads:	18
 --- smaps_rollup ---
-Rss:             7001156 kB
-Pss:             6995355 kB
-Pss_Anon:        6976688 kB
-Pss_File:          18667 kB
+Rss:             7001164 kB
+Pss:             6995331 kB
+Pss_Anon:        6976696 kB
+Pss_File:          18635 kB
 Private_Clean:     17820 kB
-Private_Dirty:   6976688 kB
-Anonymous:       6976688 kB
+Private_Dirty:   6976696 kB
+Anonymous:       6976696 kB
 AnonHugePages:         0 kB
 Swap:                  0 kB
 --- pmap totals ---
 ---------------- ------- ------- ------- 
-total kB         9738324 7001156 6976688
+total kB         9738324 7001164 6976696
 --- allocator libraries ---
-	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f9972090000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe251649000)
 --- systemd/cgroup memory ---
 Restart=on-abort
 Result=success
 NRestarts=0
 OOMPolicy=stop
-MemoryCurrent=7254331392
+MemoryCurrent=7254355968
 ActiveState=active
 SubState=running
 [memory.current]
-7254331392
+7254355968
 [memory.swap.current]
 0
 [memory.events]
@@ -128,16 +128,40 @@ oom 0
 oom_kill 0
 --- THP ---
 always [madvise] never
+--- outils/profiler/allocateurs disponibles ---
+BPF_MEMLEAK_TOOL=ABSENT
+ALT_ALLOCATOR_LIBRARY=ABSENT
+--- top mappings pmap par dirty kB ---
+00007efc7c000000   65524   65184   65184 rw---   [ anon ]
+00007efc78000000   65516   65204   65204 rw---   [ anon ]
+00007efc28000000   65528   65224   65224 rw---   [ anon ]
+00007efc88000000   65532   65228   65228 rw---   [ anon ]
+00007efe18000000   65524   65228   65228 rw---   [ anon ]
+00007efc30000000   65520   65248   65248 rw---   [ anon ]
+00007efc40000000   65532   65272   65272 rw---   [ anon ]
+00007efc20000000   65516   65312   65312 rw---   [ anon ]
+00007efc2c000000   65520   65352   65352 rw---   [ anon ]
+00007efc44000000   65536   65392   65392 rw---   [ anon ]
+00007efe54000000  131072  119588  119588 rw---   [ anon ]
+00007efcf8000000  131060  123860  123860 rw---   [ anon ]
+00007efd68000000  130948  126508  126508 rw---   [ anon ]
+00007efda0000000  131036  126888  126888 rw---   [ anon ]
+00007efc68000000  131072  130304  130304 rw---   [ anon ]
+00007efc80000000  131072  130328  130328 rw---   [ anon ]
+00007efc38000000  131060  130464  130464 rw---   [ anon ]
+00007efc60000000  131064  130496  130496 rw---   [ anon ]
+00007efc70000000  131068  130564  130564 rw---   [ anon ]
+00007efe63599000  272796  155524  155524 rw---   [ anon ]
 
 --- top connexions par memoire ---
-352	fund_opcvm	localhost:38750	Sleep	2662	0.74	2.46
-1626	fund_opcvm	localhost:50110	Sleep	2431	0.46	3.62
-1620	fund_opcvm	localhost:50042	Sleep	2431	0.46	2.18
-1629	fund_opcvm	localhost:50134	Sleep	2659	0.46	3.72
-1785	fund_opcvm	localhost:57400	Sleep	2659	0.18	2.22
-1880	fund_opcvm	localhost	Query	0	0.15	0.15
-53	fund_opcvm	localhost:50778	Sleep	11	0.09	0.12
-50	fund_opcvm	localhost:58608	Sleep	6	0.08	0.11
+352	fund_opcvm	localhost:38750	Sleep	2910	0.74	2.46
+1626	fund_opcvm	localhost:50110	Sleep	2679	0.46	3.62
+1620	fund_opcvm	localhost:50042	Sleep	2679	0.46	2.18
+1629	fund_opcvm	localhost:50134	Sleep	2908	0.46	3.72
+1785	fund_opcvm	localhost:57400	Sleep	2908	0.18	2.22
+1910	fund_opcvm	localhost	Query	0	0.15	0.15
+53	fund_opcvm	localhost:50778	Sleep	19	0.09	0.12
+50	fund_opcvm	localhost:58608	Sleep	5	0.08	0.11
 
 ==============================================
  3. PLAFOND CONFIGURE, PAS RSS REEL
@@ -171,12 +195,12 @@ Sep 14 14:00:30 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database ser
 ==============================================
  5. SERIE COURTE RSS vs Memory_used
 ==============================================
-SAMPLE ts=2026-09-14T22:48:30Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
-SAMPLE ts=2026-09-14T22:48:45Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
-SAMPLE ts=2026-09-14T22:49:00Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
-SAMPLE ts=2026-09-14T22:49:15Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
-SAMPLE ts=2026-09-14T22:49:30Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
-SAMPLE ts=2026-09-14T22:49:45Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
+SAMPLE ts=2026-09-14T22:52:39Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
+SAMPLE ts=2026-09-14T22:52:54Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
+SAMPLE ts=2026-09-14T22:53:09Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
+SAMPLE ts=2026-09-14T22:53:24Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
+SAMPLE ts=2026-09-14T22:53:39Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
+SAMPLE ts=2026-09-14T22:53:54Z rss_kb=6999328 rssanon_kb=6974948 swap_kb=0 mariadb_memory_used_bytes=464836008 connections=9
 
 ==============================================
  FIN — aucune variable modifiee, aucun service redemarre
