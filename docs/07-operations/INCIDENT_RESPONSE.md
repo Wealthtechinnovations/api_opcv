@@ -95,3 +95,22 @@ Un incident est `CLOSED` seulement si :
 6. récurrence surveillée ;
 7. postmortem et registre à jour ;
 8. risques résiduels explicités.
+
+
+## Known-incident lookup gate
+
+Avant toute recovery, restart, rotation, contournement ou nouveau patch lié à un symptôme déjà vu :
+
+```text
+SIGNAL
+→ LOOKUP INCIDENT ID / SIGNATURE
+→ READ ROOT-CAUSE STATUS
+→ READ PREVIOUS PATCH / TEST / ROLLBACK
+→ READ LINKED TASK
+→ REOBSERVE LIVE STATE
+→ ACT ONLY IF CURRENT EVIDENCE JUSTIFIES IT
+```
+
+Outil read-only : `python3 scripts/governance/incident_lookup.py --id AF-INC-...` ou `--signature <signature>`.
+
+Un incident connu n'est jamais « résolu à nouveau » par copie de l'ancien patch. L'ancien rapport sert de mémoire ; la réalité live décide de l'action actuelle.

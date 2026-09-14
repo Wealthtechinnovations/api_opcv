@@ -11,6 +11,8 @@ on:
       - 'docs/07-operations/INCIDENT_RESPONSE.md'
       - 'docs/07-operations/incidents/**'
       - 'scripts/governance/validate_incidents.py'
+      - 'scripts/governance/incident_lookup.py'
+      - 'scripts/governance/test_incident_lookup.py'
       - '.github/workflows/governance-incidents.yml'
   workflow_dispatch:
 
@@ -28,3 +30,5 @@ jobs:
           fetch-depth: 0
       - name: Validate incident lifecycle and task/evidence links
         run: python3 scripts/governance/validate_incidents.py
+      - name: Test known-incident lookup
+        run: python3 scripts/governance/test_incident_lookup.py
