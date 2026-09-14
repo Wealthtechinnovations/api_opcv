@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "212699f66f8a4f60b142ff45438fce12b0181afc"
+      "head": "577ca8c2ba0687a2607d80a36d1ae194f78cb101"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "38a5120677ec76dcc65b5d799a5f24f8ce236328"
+      "head": "53ff6ed60d96d13e74e82fad488018d6166ff871"
     }
   },
   "summary": {
@@ -9376,8 +9376,8 @@
         "E. L etiquette de devise correspond-elle a l echelle ?",
         "F. Ce que cela implique pour l etape 0",
         "Etiquette en desaccord avec le contenu de `value`",
-        "Indetermines — a NE PAS basculer automatiquement (199 avec VL)",
-        "Les 27 fonds declares USD — les deux taux, cote a cote",
+        "Indetermines — a NE PAS basculer automatiquement (200 avec VL)",
+        "Les 28 fonds declares USD — les deux taux, cote a cote",
         "Consequence mesuree",
         "A. Appariement",
         "B. Nature des ecarts",
@@ -9397,11 +9397,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "55be4fa16da28ca21b43266d5a179eda4f0acfca",
-      "last_validated_sha": "55be4fa16da28ca21b43266d5a179eda4f0acfca",
-      "content_sha256": "75e8c617d4518da0e1c160dee8dd6795ee4f2e92ab3dd2f66a5ad81d66ebab36",
-      "line_count": 1072,
-      "byte_count": 70472,
+      "git_blob_sha": "215add40adfebb506530726f49dd26c65b5384f5",
+      "last_validated_sha": "215add40adfebb506530726f49dd26c65b5384f5",
+      "content_sha256": "7c7a54347eab08103a01e387c4e6c81fd863b4513472eab61812e6d5b711b1de",
+      "line_count": 1073,
+      "byte_count": 71162,
       "headings": [
         {
           "level": 1,
@@ -9461,11 +9461,11 @@
         },
         {
           "level": 2,
-          "text": "Indetermines — a NE PAS basculer automatiquement (199 avec VL)"
+          "text": "Indetermines — a NE PAS basculer automatiquement (200 avec VL)"
         },
         {
           "level": 2,
-          "text": "Les 27 fonds declares USD — les deux taux, cote a cote"
+          "text": "Les 28 fonds declares USD — les deux taux, cote a cote"
         },
         {
           "level": 2,
@@ -9568,11 +9568,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "736a01bdea47a2b6f7d0d04e0822e98421f73ea2",
-      "last_validated_sha": "736a01bdea47a2b6f7d0d04e0822e98421f73ea2",
-      "content_sha256": "91c3d95d42d8a12ec41f0048a858acd32225aba0590ffcde3f6cc1efbabd4664",
+      "git_blob_sha": "dc1d37d5bf3e3cd135c915ca9d14ed59556065ad",
+      "last_validated_sha": "dc1d37d5bf3e3cd135c915ca9d14ed59556065ad",
+      "content_sha256": "45572581f72e7c910eb4f10ffc40f9baca010a6ba7a172d5ccdbaf6e71ab47af",
       "line_count": 62,
-      "byte_count": 4421,
+      "byte_count": 4555,
       "headings": [
         {
           "level": 1,
@@ -9733,7 +9733,8 @@
       "unique_information": [
         "MariaDB — journal des pannes et des remises en route",
         "Execution du 2026-08-31 18:39 UTC",
-        "Execution du 2026-09-11 22:08 UTC"
+        "Execution du 2026-09-11 22:08 UTC",
+        "Execution du 2026-09-14 14:00 UTC"
       ],
       "consumers": [
         "CI",
@@ -9751,11 +9752,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_MARIADB.md",
-      "git_blob_sha": "0a42f42aa7dfa7f89935de775dbe31e130733e4e",
-      "last_validated_sha": "0a42f42aa7dfa7f89935de775dbe31e130733e4e",
-      "content_sha256": "114c248e746a66dbfba315b39101f1918cbbc300358c58d12ebf7b02b8413f20",
-      "line_count": 211,
-      "byte_count": 17782,
+      "git_blob_sha": "56945f932970f1b171f9d3366ef89686c53f3ff1",
+      "last_validated_sha": "56945f932970f1b171f9d3366ef89686c53f3ff1",
+      "content_sha256": "076f65029f8034803f87cdadc77d08b42e1241cd1532125819cd5baa5d353c64",
+      "line_count": 312,
+      "byte_count": 26177,
       "headings": [
         {
           "level": 1,
@@ -9768,6 +9769,10 @@
         {
           "level": 2,
           "text": "Execution du 2026-09-11 22:08 UTC"
+        },
+        {
+          "level": 2,
+          "text": "Execution du 2026-09-14 14:00 UTC"
         }
       ]
     },
@@ -12659,11 +12664,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "a678dc9241a027a6ebfe59782589d73558d02d79",
-      "last_validated_sha": "a678dc9241a027a6ebfe59782589d73558d02d79",
-      "content_sha256": "5e8cba214c51be9573ef743344aeab7f58abf98db0a329e97e0569d61a7511fa",
-      "line_count": 6072,
-      "byte_count": 432102,
+      "git_blob_sha": "ed93c64cac097323e1db618ccd272383552a8c7f",
+      "last_validated_sha": "ed93c64cac097323e1db618ccd272383552a8c7f",
+      "content_sha256": "e6d43bf7fccaaae913416efa05a72b2b2d5206ee3494c25268c8071a4c50c206",
+      "line_count": 6208,
+      "byte_count": 439504,
       "headings": [
         {
           "level": 1,
