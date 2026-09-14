@@ -286,6 +286,84 @@ jobs:
 
             echo ""
             echo "=============================================="
+            echo " 6. CORRELATION CRONS / RSS — 2026-09-14"
+            echo "=============================================="
+            echo "Fenetre : redemarrage MariaDB 14:00 UTC -> mesure RSS ~6.7 Gio a 22:49 UTC."
+            echo ""
+
+            echo "--- crontab live pertinent ---"
+            crontab -l 2>/dev/null | grep -E 'africafunds|cron_daily|cron_tunisie|cron_brvm|cron_indices|sync_production' || true
+
+            echo ""
+            echo "--- journal cron 14:00-23:00 UTC ---"
+            journalctl -u cron --since "2026-09-14 14:00:00" --until "2026-09-14 23:00:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_daily|cron_tunisie|cron_brvm|cron_indices|sync_production' \
+              | tail -220 || true
+
+            echo ""
+            echo "--- daily 20h : stat + jalons uniquement ---"
+            DAILY=/var/log/africafunds_daily_20260914.log
+            if [ -f "$DAILY" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$DAILY" 2>/dev/null || true
+              grep -E '^===|^\[[0-9]+[a-z]?/[0-9]+\]|ERREUR|TERMINEE|Fonds traites|fonds a traiter|VL totales|lignes|Traites|traites' "$DAILY" \
+                | tail -260 || true
+            else
+              echo "DAILY_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- sortie cron principale redirigee ---"
+            if [ -f /var/log/africafunds_cron.log ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' /var/log/africafunds_cron.log 2>/dev/null || true
+              awk '
+                /AFRICAFUNDS DAILY UPDATE/ {buf=$0; n=1; next}
+                n>0 {buf=buf "\n" $0; n++}
+                n>0 && /MISE A JOUR TERMINEE/ {last=buf; n=0}
+                END {if (last!="") print last}
+              ' /var/log/africafunds_cron.log \
+                | grep -E '^===|^\[[0-9]+[a-z]?/[0-9]+\]|ERREUR|TERMINEE|Fonds traites|fonds a traiter|VL totales|lignes|Traites|traites' \
+                | tail -260 || true
+            else
+              echo "MAIN_CRON_REDIRECT_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- cron EUR/USD 21h30 : bloc du 2026-09-14 ---"
+            EURLOG=/var/log/cron_eur_usd.log
+            if [ -f "$EURLOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$EURLOG" 2>/dev/null || true
+              awk '
+                /CRON EUR\/USD.*2026-09-14/ {show=1}
+                show {print}
+                show && /CRON EUR\/USD TERMINE.*2026-09-14/ {exit}
+              ' "$EURLOG" | tail -220 || true
+            else
+              echo "EUR_USD_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- health 22h : bloc du 2026-09-14 ---"
+            HLOG=/var/log/africafunds_health_20260914.log
+            if [ -f "$HLOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$HLOG" 2>/dev/null || true
+              grep -E '^===|PROBLEME|ERREUR|OK|MariaDB|memoire|memory|cron|VL|performance' "$HLOG" | tail -180 || true
+            else
+              echo "HEALTH_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- MariaDB journal 14:00-23:00 UTC ---"
+            journalctl -u mariadb --since "2026-09-14 14:00:00" --until "2026-09-14 23:00:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'Started|ready|error|warning|aborted|memory|oom|killed|shutdown' \
+              | tail -180 || true
+
+            echo ""
+            echo "--- kernel OOM 14:00-23:00 UTC ---"
+            journalctl -k --since "2026-09-14 14:00:00" --until "2026-09-14 23:00:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -iE 'out of memory|oom-kill|killed process' | tail -40 || true
+
+            echo ""
+            echo "=============================================="
             echo " FIN — aucune variable modifiee, aucun service redemarre"
             echo "=============================================="
           REMOTE
