@@ -68,7 +68,7 @@ Ces échecs restent tracés dans les exigences/preuves gouvernées et ne sont pa
 
 `AF-EVD-012` documente l’OOM-kill de `mariadbd` du 2026-09-08 à 20:02:42 et l’absence de redémarrage automatique pendant environ 10 h 22.
 
-La prochaine action opérationnelle canonique reste celle de `NEXT_ACTION.md` : ajouter à `mariadb.service` une politique de redémarrage automatique `Restart=on-failure`, sous `REQUIRED_HUMAN_APPROVAL` car il s’agit d’une modification de configuration de production.
+La prochaine action opérationnelle canonique est `AF-OPS-003` selon `NEXT_ACTION.md` : poursuivre la RCA longue durée en lecture seule. `AF-OPS-001` (`Restart=on-failure`) reste une amélioration de résilience séparée sous `REQUIRED_HUMAN_APPROVAL` et n'est pas la root-cause fix.
 
 ## Écarts de gouvernance ouverts
 
@@ -118,12 +118,12 @@ Le checkpoint global frontend a été avancé au commit `fbbb4e9586e7f2a0bc68383
 - Tâche gouvernée restante : `AF-TASK-010` (rotations fournisseurs externes), avec OOB host-key et GitHub native rulesets comme gaps externes.
 
 
-## AF-OPS-003 — RCA mémoire MariaDB — 2026-09-14 22:53 UTC
+## AF-OPS-003 — RCA mémoire MariaDB — réconciliation post-A/B 2026-09-15
 
-Le mécanisme OOM reste PROVEN. La cause de la croissance mémoire passe de `UNKNOWN` à `PROBABLE` : rétention/fragmentation du `system malloc` (glibc).
+Le mécanisme OOM reste PROVEN. Le large écart entre RSS anonyme privé multi-Gio et `Memory_used` MariaDB reste PROVEN, et les buffers/connexions ne suffisent pas à l'expliquer.
 
-Mesure live `AF-EVD-040` : RSS ~6.68 Gio, mémoire anonyme privée ~6.65 Gio, mais `Memory_used` MariaDB ~444 Mio et plafond buffers/sessions ~0.70 Gio, avec seulement 9 connexions / 18 threads. `version_malloc_library=system`; aucun jemalloc/tcmalloc ou BPF memleak n'est installé. Les mappings sont majoritairement anonymes ~64/128 Mio.
+Le précédent candidat `PROBABLE SYSTEM_MALLOC_FRAGMENTATION_RETENTION` n'est plus une conclusion causale acceptable : les A/B courts ont été exécutés. Les runs `34908277049`, `34908496545`, `34908755786` et `34909181790` montrent respectivement un biais d'âge du processus, un contrôle frais proche, un stress synthétique défavorable à jemalloc et un dry-run EUR/USD pratiquement équivalent (~-1 % de croissance RSS).
 
-Le vieux libellé « fuite ~700 Mo/h prouvée » ne doit plus être utilisé comme RCA : les séries historiques ne sont pas linéaires et six échantillons courts du 2026-09-14 sont stables.
+La root cause exacte est donc `UNKNOWN` sous incident `RCA_PENDING`. Les preuves post-A/B sont `AF-EVD-041` à `AF-EVD-044`; `AF-EVD-040` reste historique.
 
-Prochaine preuve : A/B allocateur selon `docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md`. Cette étape exige une approbation humaine car elle installe une librairie et redémarre MariaDB. `AF-OPS-001` (Restart=on-failure) reste un gate de résilience séparé.
+Prochaine preuve : série longue durée read-only et corrélation RSS ↔ âge du processus ↔ crons ↔ batchs ↔ timeouts ↔ handlers Node ↔ activité MariaDB. Aucun quatrième A/B court n'est requis. `AF-OPS-001` reste un gate de résilience séparé.

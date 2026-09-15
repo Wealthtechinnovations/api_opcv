@@ -12,8 +12,7 @@
     "EMAIL_PASSWORD_PROVIDER_ROTATION_REQUIRED",
     "MAGIC_SECRET_KEY_PROVIDER_ROTATION_REQUIRED",
     "S2_HOST_KEY_OOB_VERIFICATION_PENDING",
-    "GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR",
-    "AF_OPS_003_ALLOCATOR_AB_HUMAN_APPROVAL"
+    "GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR"
   ],
   "proof_refs": [
     "AF-EVD-018",
@@ -42,6 +41,6 @@
   },
   "final_verdict": "GOVERNED_WITH_EXTERNAL_GAPS",
   "operational_priority_task_id": "AF-OPS-003",
-  "operational_priority_status": "BLOCKED_HUMAN_APPROVAL",
-  "operational_priority_reason": "Allocator A/B requires package installation, systemd drop-in and controlled MariaDB restart."
+  "operational_priority_status": "OPEN",
+  "operational_priority_reason": "Short allocator A/B experiments are completed and non-discriminant for the multi-hour RSS growth; continue read-only long-duration correlation before any new MariaDB mutation."
 }

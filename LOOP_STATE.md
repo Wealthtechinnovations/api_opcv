@@ -72,10 +72,11 @@ Exécuter la certification finale interne, puis conclure `GOVERNED_WITH_EXTERNAL
 La boucle `AF-GOV-FINAL-CERT-20260911-01` reste `CLOSED_WITH_EXTERNAL_GAPS` avec `AF-TASK-010` comme tâche de gouvernance externe.
 
 Une priorité opérationnelle post-certification existe en parallèle dans **la même task queue** :
-- `AF-OPS-003 = BLOCKED_HUMAN_APPROVAL` ;
-- incident `AF-INC-20260817-001` ;
-- root cause candidate `PROBABLE SYSTEM_MALLOC_FRAGMENTATION_RETENTION` ;
-- preuve `AF-EVD-040` ;
-- prochaine preuve : A/B allocator contrôlé.
+- `AF-OPS-003 = OPEN` ;
+- incident `AF-INC-20260817-001 = RCA_PENDING` ;
+- mécanisme OOM / large écart RSS-vs-Memory_used : prouvé ;
+- root cause exacte : `UNKNOWN` ;
+- A/B allocateur courts : terminés, preuves `AF-EVD-041..044` ;
+- prochaine preuve : corrélation longue durée read-only des batchs/crons/timeouts/handlers avec le RSS MariaDB.
 
-Ce n'est pas une réouverture d'`AF-TASK-011` ni une seconde queue.
+`AF-EVD-040` reste la preuve historique pré-A/B. `AF-OPS-001` reste un gate humain séparé. Ce n'est pas une réouverture d'`AF-TASK-011` ni une seconde queue.

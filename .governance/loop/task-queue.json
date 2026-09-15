@@ -153,17 +153,20 @@
     {
       "id": "AF-OPS-003",
       "title": "MariaDB — RCA des OOM répétés et durcissement de résilience",
-      "status": "BLOCKED_HUMAN_APPROVAL",
+      "status": "OPEN",
       "incident_refs": [
         "AF-INC-20260817-001"
       ],
       "depends_on": [],
-      "next_action": "RCA intermédiaire: rétention/fragmentation du system malloc (glibc) = PROBABLE. Pour passer à PROVEN, exécuter un A/B gouverné avec jemalloc sous fenêtre contrôlée: préflight, aucun job sensible, snapshot config, installation de libjemalloc2, drop-in LD_PRELOAD avec chemin vérifié, restart MariaDB, vérification DB/PM2/HTTP, puis observation RSS vs Memory_used sous workload comparable. Rollback immédiat si régression. Ne pas appliquer sans approbation humaine explicite.",
-      "phase": "ALLOCATOR_A_B_REQUIRED",
+      "next_action": "Poursuivre la RCA en lecture seule sur la dérive longue durée : corréler RSS/RssAnon/Private_Dirty/Memory_used et âge du processus MariaDB avec crons, batchs, timeouts, handlers Node, activité SQL et fins réelles de traitements. Les A/B allocateur courts sont terminés et non discriminants pour le phénomène de plusieurs heures. Ne pas rejouer jemalloc court, ne pas muter MariaDB tant que des preuves read-only restent accessibles.",
+      "phase": "RCA_PENDING",
       "evidence_refs": [
-        "AF-EVD-040"
-      ],
-      "human_gate": "REQUIRED_FOR_PACKAGE_INSTALL_AND_MARIADB_RESTART"
+        "AF-EVD-040",
+        "AF-EVD-041",
+        "AF-EVD-042",
+        "AF-EVD-043",
+        "AF-EVD-044"
+      ]
     },
     {
       "id": "AF-OPS-004",

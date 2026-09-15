@@ -9,15 +9,15 @@ AF-TASK-003 = DONE_WITH_EXTERNAL_GAPS
 AF-TASK-011 = DONE
 ```
 
-Le prochain chantier interne déterministe demandé par le propriétaire est :
+La priorité opérationnelle distincte reste :
 
 ```text
 AF-OPS-003
 MariaDB — RCA des OOM répétés
-status = BLOCKED_HUMAN_APPROVAL
-phase = ALLOCATOR_A_B_REQUIRED
+status = OPEN
+phase = RCA_PENDING
 incident = AF-INC-20260817-001
-evidence = AF-EVD-040
+latest evidence = AF-EVD-044
 ```
 
 ### Ce qui est prouvé
@@ -25,35 +25,29 @@ evidence = AF-EVD-040
 - OOM-kill de `mariadbd` : PROVEN ;
 - RSS multi-Gio presque entièrement `RssAnon/Private_Dirty` : PROVEN ;
 - buffers SQL / connexions insuffisants pour expliquer le RSS : PROVEN ;
-- `Memory_used` MariaDB ≈ 444 Mio contre RSS ≈ 6,68 Gio : PROVEN ;
-- allocateur courant : `system` / glibc : PROVEN ;
-- rétention/fragmentation system malloc : **PROBABLE**, pas PROVEN.
+- large écart `Memory_used` MariaDB vs RSS : PROVEN ;
+- A/B allocateur courts : COMPLETED, rollback et health checks PASS ;
+- causalité glibc/jemalloc sur la dérive de plusieurs heures : NON PROUVÉE.
+
+### Historique A/B à ne pas rejouer
+
+- `34908277049` — comparaison initiale confondue par l'âge du processus ;
+- `34908496545` — processus frais / charge égale, comportement proche ;
+- `34908755786` — stress synthétique variable_alloc_free, résultat workload-dependent ;
+- `34909181790` — dry-run réel EUR/USD, croissance RSS pratiquement équivalente.
+
+Preuves : `AF-EVD-041` à `AF-EVD-044`. `AF-EVD-040` reste la preuve historique pré-A/B.
 
 ### Prochaine preuve
 
-Exécuter l'A/B gouverné décrit dans :
+Poursuivre **en lecture seule** la corrélation longue durée déjà amorcée par `f082c33...` et `94ed36d...`.
 
-`docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md`
+Mesurer et corréler PID/uptime/RSS/RssAnon/Private_Dirty/Memory_used, crons, batchs, timeouts clients, fin réelle des handlers Node, activité MariaDB et éventuels chevauchements.
 
-Cette expérience exige une approbation humaine explicite car elle implique :
-1. installation de `libjemalloc2` ;
-2. drop-in systemd `LD_PRELOAD` ;
-3. redémarrage MariaDB ;
-4. observation comparative sous workload comparable ;
-5. rollback immédiat en cas de régression.
-
-Aucun changement de buffer SQL, de version MariaDB ou de schéma ne doit être mélangé à cet A/B.
+Aucun nouvel A/B jemalloc, restart MariaDB, changement systemd, buffer, schéma ou version n'est autorisé par cette prochaine action.
 
 ## Autres blockers indépendants
 
-`AF-TASK-010` reste bloquée sur :
-- rotation fournisseur `EMAIL_PASSWORD` ;
-- rotation fournisseur `MAGIC_SECRET_KEY`.
-
-Restent également externes :
-- vérification OOB de la clé hôte S2 ;
-- GitHub native rulesets.
-
-## Interdictions
-
-Ne jamais déclarer la RCA PROVEN avant l'A/B, ne pas redémarrer MariaDB sans gate humain, ne pas réactiver d'ancienne clé/secrets, ne pas créer de branche, ne pas modifier le frontend concurrent sans revalidation des deux HEAD.
+- `AF-OPS-001` reste `BLOCKED_HUMAN_APPROVAL` pour `Restart=on-failure` ;
+- `AF-TASK-010` reste bloquée sur les rotations fournisseur `EMAIL_PASSWORD` et `MAGIC_SECRET_KEY` ;
+- OOB host-key et GitHub native rulesets restent des gaps externes.

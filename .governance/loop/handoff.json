@@ -25,7 +25,7 @@
     "AF-OPS-003"
   ],
   "open": [],
-  "next_action": "Pre-V2 operational priority: AF-OPS-003 is blocked on explicit human approval for the controlled jemalloc A/B experiment. Governance task AF-TASK-010 remains independently blocked on external provider rotations.",
+  "next_action": "Pre-V2 operational priority: AF-OPS-003 remains RCA_PENDING. Short glibc/jemalloc A/B runs are completed; continue read-only long-duration correlation of MariaDB RSS with process age, crons, batch handlers, timeouts and SQL activity. AF-TASK-010 remains independently blocked on external provider rotations.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -49,13 +49,20 @@
     "db_access_denied_historical_attribution": "UNAVAILABLE_WITH_CURRENT_MARIADB_TELEMETRY",
     "db_auth_latest_evidence": "AF-EVD-037",
     "db_access_denied_post_restart_fund_opcvm": "UNPROVEN_WITH_CURRENT_SQL_TELEMETRY",
-    "operational_task_status": "BLOCKED_HUMAN_APPROVAL",
+    "operational_task_status": "OPEN",
     "mariadb_oom_incident": "AF-INC-20260817-001",
-    "mariadb_root_cause_status": "PROBABLE",
-    "mariadb_root_cause_candidate": "SYSTEM_MALLOC_FRAGMENTATION_RETENTION",
-    "mariadb_latest_evidence": "AF-EVD-040",
-    "mariadb_next_proof": "CONTROLLED_JEMALLOC_A_B",
-    "mariadb_mutation_authorized": false
+    "mariadb_root_cause_status": "UNKNOWN",
+    "mariadb_root_cause_candidate": "UNRESOLVED",
+    "mariadb_latest_evidence": "AF-EVD-044",
+    "mariadb_next_proof": "READ_ONLY_LONG_DURATION_CORRELATION",
+    "mariadb_mutation_authorized": false,
+    "mariadb_short_allocator_ab": "COMPLETED_NON_DISCRIMINANT_FOR_LONG_DURATION_RSS",
+    "mariadb_allocator_ab_runs": [
+      34908277049,
+      34908496545,
+      34908755786,
+      34909181790
+    ]
   },
   "closed_with_external_gaps": [
     "AF-TASK-003"

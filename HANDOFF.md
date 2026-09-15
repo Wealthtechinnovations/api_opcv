@@ -1,5 +1,15 @@
 # HANDOFF — AfricaFunds API
 
+## Reprise opérationnelle actuelle — AF-OPS-003
+
+- `AF-OPS-003 = OPEN / RCA_PENDING` ;
+- A/B courts terminés et rollbackés : `34908277049`, `34908496545`, `34908755786`, `34909181790` ;
+- root cause exacte de la dérive multi-Gio : `UNKNOWN` ;
+- prochaine preuve : corrélation longue durée read-only RSS ↔ crons ↔ batchs ↔ timeouts ↔ handlers ↔ MariaDB ;
+- `AF-OPS-001` reste sous gate humain séparé ;
+- `AF-TASK-010` reste la tâche de gouvernance courante bloquée sur fournisseurs externes.
+
+
 ## Point de reprise courant — clôture 2026-09-13
 
 Boucle `AF-GOV-FINAL-CERT-20260911-01` fermée côté contrôles internes.

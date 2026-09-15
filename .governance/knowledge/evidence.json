@@ -258,6 +258,38 @@
       "provenance": "GitHub Actions DIAG memoire MySQL runs 34905885999 and 34906206810; reports e7048e216655b8ec5b6745f364caa739e841e360 and 057364403c9b0869275c3c07b8928fa2d5a63cde; frontend SUIVI lot BG 9a1ff496b5280f779bc216b83b5a978a47d0a75e",
       "observed_at": "2026-09-14T22:53:54Z",
       "summary": "After ~8h52 uptime, mariadbd RSS=6,999,328 kB with RssAnon=6,974,948 kB and Private_Dirty≈6,976,696 kB, while MariaDB Memory_used=465,884,576 bytes and Memory_used_initial=442,210,192 bytes. Only 9 connections/18 threads are active, historical max connections=19, configured global+per-session worst case≈0.70 GiB, version_malloc_library=system, libc is linked, BPF memleak and jemalloc/tcmalloc are absent. pmap shows many nearly full anonymous 64/128 MiB mappings. Six 15-second samples were flat, so no short-term linear leak was inferred. This strongly supports system-malloc retention/fragmentation but does not prove causality without an alternative-allocator A/B."
+    },
+    {
+      "id": "AF-EVD-041",
+      "type": "MARIADB_ALLOCATOR_AB",
+      "result": "SHORT_AB_CONFOUNDED_BY_PROCESS_AGE",
+      "provenance": "GitHub Actions run 34908277049; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit 3357f5968b0d50d70d45881654dfda413f0ce155; frontend SUIVI lot BG ba1f61f0deea1b8fb27194793c6456b20ef69f7f",
+      "observed_at": "2026-09-14T23:18:53Z",
+      "summary": "Initial allocator A/B compared an ~9h-old system-malloc mariadbd (A_PRE RSS 6,999,676 kB) with a freshly restarted jemalloc process (B_PRE 124,200 kB). Its own cold control after rollback was system malloc RSS 122,732 kB, only ~1.2% below B_PRE. Therefore the apparent ~7 GiB vs ~193 MiB contrast is dominated by process age/restart and does not prove allocator causality. Rollback and DB/API/HTTP health checks passed."
+    },
+    {
+      "id": "AF-EVD-042",
+      "type": "MARIADB_ALLOCATOR_AB",
+      "result": "FRESH_PROCESS_EQUAL_LOAD_NEAR_EQUIVALENT",
+      "provenance": "GitHub Actions run 34908496545; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit 73d268d9834eb95d8a5195b217d2940b5da28494",
+      "observed_at": "2026-09-14T23:21:56Z",
+      "summary": "Fresh-process equal-load control: system malloc RSS 122,536→188,380 kB (+65,844 kB); jemalloc 126,676→190,628 kB (+63,952 kB). Both phases remained healthy and rollback restored fresh system malloc RSS 122,536 kB. This short control shows no multi-GiB allocator separation and cannot determine the multi-hour root cause."
+    },
+    {
+      "id": "AF-EVD-043",
+      "type": "MARIADB_ALLOCATOR_AB",
+      "result": "SYNTHETIC_STRESS_WORKLOAD_DEPENDENT",
+      "provenance": "GitHub Actions run 34908755786; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit 3b5537a3f459356e2a32646e7ef7ad199bc5a955; frontend SUIVI lot BG ba1f61f0deea1b8fb27194793c6456b20ef69f7f",
+      "observed_at": "2026-09-14T23:25:13Z",
+      "summary": "Bounded variable_alloc_free synthetic stress on fresh processes: system malloc RSS 122,896→196,696 kB (+73,800 kB); jemalloc 125,796→223,280 kB (+97,484 kB). Jemalloc grew more under this particular short synthetic workload, but the run lasted ~1 minute and does not establish long-duration superiority or inferiority. Rollback and health checks passed."
+    },
+    {
+      "id": "AF-EVD-044",
+      "type": "MARIADB_ALLOCATOR_AB",
+      "result": "REAL_EUR_USD_SHORT_WORKLOAD_NON_DISCRIMINANT",
+      "provenance": "GitHub Actions run 34909181790; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit c8b99a24b1607e52c2777b81da2f5719340322d2; frontend SUIVI lot BG 94e14e0e2ffb594ea900edc0f77eafe03be87b50",
+      "observed_at": "2026-09-14T23:30:50Z",
+      "summary": "Representative recalc_eur_usd_daily_rate.js --dry-run on fresh processes: system malloc RSS 122,964→207,552 kB (+84,588 kB); jemalloc 126,380→210,108 kB (+83,728 kB), about -1.0% growth difference. The workload made no writes, all health probes passed, rollback restored system malloc and libjemalloc2 was removed. Short allocator behavior is therefore non-discriminant for the multi-hour multi-GiB RSS growth."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."

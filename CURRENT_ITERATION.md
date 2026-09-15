@@ -38,4 +38,6 @@ SMTP/EMAIL provider rotation, Magic provider rotation, OOB host-key verification
 
 La certification de gouvernance reste fermée et son verdict reste `GOVERNED_WITH_EXTERNAL_GAPS`.
 
-La priorité opérationnelle distincte est désormais `AF-OPS-003` / `AF-INC-20260817-001`. La RCA allocator est au niveau `PROBABLE`, soutenue par `AF-EVD-040`. Le prochain test causal est l'A/B jemalloc documenté dans `docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md`, sous `REQUIRED_HUMAN_APPROVAL`.
+La priorité opérationnelle distincte est `AF-OPS-003` / `AF-INC-20260817-001`. Les A/B courts glibc/jemalloc ont été exécutés et rollbackés avec succès (runs `34908277049`, `34908496545`, `34908755786`, `34909181790`). Ils ne discriminent pas causalement la dérive RSS de plusieurs heures.
+
+La root cause exacte revient à `UNKNOWN` sous incident `RCA_PENDING`. La prochaine preuve est une corrélation longue durée read-only RSS ↔ âge du processus ↔ crons ↔ batchs ↔ timeouts ↔ handlers ↔ activité MariaDB. Aucun nouvel A/B jemalloc ou restart MariaDB n'est requis à ce stade.

@@ -59,13 +59,17 @@
         ]
       },
       "root_cause": {
-        "status": "PROBABLE",
-        "statement": "La croissance multi-Gio du RSS est très probablement une rétention/fragmentation du system malloc (glibc), hors des allocations suivies par MariaDB, amplifiée par le workload. Le diagnostic S2 montre RSS≈6.68 Gio et RssAnon/Private_Dirty≈6.65 Gio contre Memory_used≈444 Mio, Memory_used_initial≈422 Mio, 9 connexions, 18 threads et un plafond buffers/sessions≈0.70 Gio. mariadbd utilise version_malloc_library=system et de nombreux mappings anonymes ~64/128 Mio.",
+        "status": "UNKNOWN",
+        "statement": "Le mécanisme exact de la croissance multi-Gio du RSS reste non résolu. Les observations prouvent un large écart entre RSS anonyme privé et Memory_used MariaDB, et réfutent une explication suffisante par buffers/connexions. Quatre runs A/B courts glibc/jemalloc ont été exécutés et rollbackés : ils montrent des résultats dépendants du workload et ne discriminent pas causalement le phénomène réel qui se développe sur plusieurs heures.",
         "evidence_refs": [
           "AF-EVD-012",
-          "AF-EVD-040"
+          "AF-EVD-040",
+          "AF-EVD-041",
+          "AF-EVD-042",
+          "AF-EVD-043",
+          "AF-EVD-044"
         ],
-        "why_not_proven": "Le pattern concorde avec une rétention/fragmentation de l'allocateur système, mais aucun BPF memleak ni allocateur alternatif n'est disponible et aucun A/B jemalloc/tcmalloc n'a encore été exécuté. La causalité définitive exige ce test gouverné."
+        "why_not_proven": "Les A/B allocateur courts sont terminés mais durent ~40–60 s sur des processus frais, tandis que les RSS multi-Gio apparaissent après plusieurs heures. Ils ne prouvent ni une causalité glibc ni une supériorité durable de jemalloc. La prochaine preuve doit corréler en lecture seule la croissance RSS longue durée avec âge du processus, crons, batchs, timeouts, handlers Node et activité MariaDB."
       },
       "contributing_factors": [
         {
@@ -111,22 +115,47 @@
         },
         {
           "id": "CA-003",
-          "status": "BLOCKED_HUMAN_APPROVAL",
-          "description": "Prouver ou réfuter la fragmentation/rétention system malloc par A/B avec jemalloc, puis conserver le correctif uniquement si le différentiel RSS-Memory_used est durablement réduit sans régression DB/API.",
+          "status": "DONE",
+          "description": "Exécuter et rollbacker les A/B courts glibc/jemalloc nécessaires pour tester si un effet allocateur est immédiatement discriminant sous processus frais et workloads bornés.",
           "task_refs": [
             "AF-OPS-003"
           ],
           "patch_refs": [
+            ".github/workflows/ops-mariadb-allocator-ab.yml",
             ".github/workflows/ops-mysql-memoire.yml",
             "docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md"
           ],
           "test_refs": [
-            "GitHub Actions runs 34905885999 and 34906206810",
-            "docs/OPS_MYSQL_MEMOIRE.md"
+            "GitHub Actions run 34908277049",
+            "GitHub Actions run 34908496545",
+            "GitHub Actions run 34908755786",
+            "GitHub Actions run 34909181790"
           ],
           "rollback": "Supprimer le drop-in LD_PRELOAD, daemon-reload, redémarrer MariaDB sous allocateur system après snapshot de configuration; vérifier DB SELECT, PM2 et HTTP.",
           "verification_refs": [
-            "AF-EVD-040"
+            "AF-EVD-041",
+            "AF-EVD-042",
+            "AF-EVD-043",
+            "AF-EVD-044"
+          ]
+        },
+        {
+          "id": "CA-004",
+          "status": "OPEN",
+          "description": "Poursuivre la RCA en lecture seule sur plusieurs heures en corrélant RSS/RssAnon/Private_Dirty/Memory_used, âge du processus, crons, batchs, timeouts, handlers Node et activité SQL afin de distinguer croissance liée au temps, au workload, au chevauchement ou à la rétention post-workload.",
+          "task_refs": [
+            "AF-OPS-003"
+          ],
+          "patch_refs": [
+            ".github/workflows/ops-mysql-memoire.yml"
+          ],
+          "test_refs": [
+            "f082c33db85ec0e76aba7def52c130f4620d8065",
+            "94ed36ddf5c1acc2829706ec04e3097debde4720"
+          ],
+          "rollback": "Aucune mutation production autorisée par cette action; observation read-only uniquement.",
+          "verification_refs": [
+            "AF-EVD-044"
           ]
         }
       ],
@@ -146,7 +175,11 @@
       ],
       "evidence_refs": [
         "AF-EVD-012",
-        "AF-EVD-040"
+        "AF-EVD-040",
+        "AF-EVD-041",
+        "AF-EVD-042",
+        "AF-EVD-043",
+        "AF-EVD-044"
       ],
       "linked_tasks": [
         "AF-OPS-001",
@@ -157,10 +190,14 @@
         "criteria_met": false,
         "verified_at": null,
         "verification_refs": [
-          "AF-EVD-040"
+          "AF-EVD-040",
+          "AF-EVD-041",
+          "AF-EVD-042",
+          "AF-EVD-043",
+          "AF-EVD-044"
         ],
         "residual_risks": [
-          "Root cause au niveau PROBABLE seulement tant que l'A/B allocateur n'est pas exécuté",
+          "Root cause exacte toujours non prouvée; les A/B allocateur courts sont non discriminants pour la dérive de plusieurs heures",
           "MariaDB Community 10.6.23 est sur une branche 10.6 arrivée en fin de vie en juillet 2026",
           "Restart=on-failure reste sous gate humain séparé AF-OPS-001"
         ]
