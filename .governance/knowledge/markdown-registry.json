@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "89d4652606d4cca9a04cd099e802901c3af8cf84"
+      "head": "e5c6f17198394d7fe196df38f5bb9512ddb3495f"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -2906,11 +2906,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "fe8573903325f1868ebbbbfcd7547983946951b8",
-      "last_validated_sha": "fe8573903325f1868ebbbbfcd7547983946951b8",
-      "content_sha256": "2c9f60e2ceb92d7e7baf4688d26bfdc914e6220164dc5ca99fd5bd6eca9e4f9b",
+      "git_blob_sha": "80389145c04a2e9b52c7d3df3520a1e68d68416c",
+      "last_validated_sha": "80389145c04a2e9b52c7d3df3520a1e68d68416c",
+      "content_sha256": "ed4f5bce060ff215ece2ec2a0c8183f4fcdabeaec1e4932d3a410997a6a0e654",
       "line_count": 53,
-      "byte_count": 2020,
+      "byte_count": 2348,
       "headings": [
         {
           "level": 1,
@@ -3581,7 +3581,8 @@
         "Certification finale en cours — 2026-09-12",
         "Trigger de certification Markdown finale — 2026-09-12",
         "Clôture gouvernée AF-TASK-011 — 2026-09-13 17:59 UTC",
-        "AF-OPS-003 — RCA mémoire MariaDB — réconciliation post-A/B 2026-09-15"
+        "AF-OPS-003 — RCA mémoire MariaDB — réconciliation post-A/B 2026-09-15",
+        "AF-OPS-003 — nouvelles preuves read-only — 2026-09-15 00:26 UTC"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3597,11 +3598,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "313dda898882d28f7280999a66f6b556afc064fb",
-      "last_validated_sha": "313dda898882d28f7280999a66f6b556afc064fb",
-      "content_sha256": "782b38e6d18f24c5beb3ea1c4a23e4ee69d8128a450539b643a76268a464ebf9",
-      "line_count": 129,
-      "byte_count": 8923,
+      "git_blob_sha": "ad8ebf6499cda7276eab2e831c755fb8ce24c873",
+      "last_validated_sha": "ad8ebf6499cda7276eab2e831c755fb8ce24c873",
+      "content_sha256": "0676d91c8300a75b7ef023dcd5cc0656b0353e28eeeffc5ee0c92028bbc7f3af",
+      "line_count": 138,
+      "byte_count": 9803,
       "headings": [
         {
           "level": 1,
@@ -3654,6 +3655,10 @@
         {
           "level": 2,
           "text": "AF-OPS-003 — RCA mémoire MariaDB — réconciliation post-A/B 2026-09-15"
+        },
+        {
+          "level": 2,
+          "text": "AF-OPS-003 — nouvelles preuves read-only — 2026-09-15 00:26 UTC"
         }
       ]
     },
@@ -7365,7 +7370,12 @@
         "Facteurs contributifs",
         "Mesures prises",
         "Actions ouvertes",
-        "Prochaine preuve requise — corrélation longue durée read-only"
+        "Prochaine preuve requise — corrélation longue durée read-only",
+        "Preuves read-only supplémentaires — 2026-09-15",
+        "Process age / RSS",
+        "Timeout client != annulation serveur",
+        "OOM du 14 septembre : workload actif prouvé",
+        "Prochaine discrimination"
       ],
       "consumers": [
         "CI",
@@ -7383,11 +7393,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/07-operations/incidents/AF-INC-20260817-001-mariadb-oom.md",
-      "git_blob_sha": "d3a2f62b66ca5ebc3247937b4e8ca96380d96e39",
-      "last_validated_sha": "d3a2f62b66ca5ebc3247937b4e8ca96380d96e39",
-      "content_sha256": "a28f8bc2e308114f576e5cca7ab1d7f5581e0e6c39cc5ff2252dab467650c701",
-      "line_count": 47,
-      "byte_count": 2994,
+      "git_blob_sha": "99eee94b96d18c76b8be576b4fa37660d9c930df",
+      "last_validated_sha": "99eee94b96d18c76b8be576b4fa37660d9c930df",
+      "content_sha256": "f5ccbc80a30d80970a61bec4bb029b1949e97c4f8dbd9e1998c9c608c24addc8",
+      "line_count": 64,
+      "byte_count": 4742,
       "headings": [
         {
           "level": 1,
@@ -7428,6 +7438,26 @@
         {
           "level": 2,
           "text": "Prochaine preuve requise — corrélation longue durée read-only"
+        },
+        {
+          "level": 2,
+          "text": "Preuves read-only supplémentaires — 2026-09-15"
+        },
+        {
+          "level": 3,
+          "text": "Process age / RSS"
+        },
+        {
+          "level": 3,
+          "text": "Timeout client != annulation serveur"
+        },
+        {
+          "level": 3,
+          "text": "OOM du 14 septembre : workload actif prouvé"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine discrimination"
         }
       ]
     },
@@ -10351,11 +10381,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_MYSQL_MEMOIRE.md",
-      "git_blob_sha": "140591dc6d4c47ec45f15358d95e3bf32a622451",
-      "last_validated_sha": "140591dc6d4c47ec45f15358d95e3bf32a622451",
-      "content_sha256": "bf930e16f6148e5d7b8e3ea58c51b41bf641e80f0de47355e4ec5bf506a0ff67",
-      "line_count": 816,
-      "byte_count": 75236,
+      "git_blob_sha": "a8564c7c9e3b93bd30e3b79eaccde1415132d33f",
+      "last_validated_sha": "a8564c7c9e3b93bd30e3b79eaccde1415132d33f",
+      "content_sha256": "72b46d5fd2088f396ad904283d6c25764cdeee39b02a26d76a1113ad8283e941",
+      "line_count": 2111,
+      "byte_count": 169903,
       "headings": [
         {
           "level": 1,
