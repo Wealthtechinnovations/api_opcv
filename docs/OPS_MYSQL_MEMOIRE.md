@@ -2,7 +2,7 @@
 
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-15 00:26 UTC**
+Derniere execution : **2026-09-15 00:31 UTC**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
@@ -10,11 +10,11 @@ Declencheur : `push` — par `Wealthtechinnovations`
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        2785         181         209       14978       14599
+Mem:           17945        2794         190         209       14960       14590
 Swap:           2047         412        1635
 
 RSS actuel de mariadbd :
-  0.23 Go — demarre depuis 52:53
+  0.23 Go — demarre depuis 57:03
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
@@ -51,23 +51,23 @@ Threads_running	1
  2b. MEMORY_USED / PROC / ALLOCATEUR
 ==============================================
 Aborted_connects	6
-Connections	799
-Created_tmp_disk_tables	5225
+Connections	836
+Created_tmp_disk_tables	5267
 Created_tmp_files	4
-Created_tmp_tables	5979
+Created_tmp_tables	6042
 Max_used_connections	15
-Memory_used	472887672
+Memory_used	472949936
 Memory_used_initial	442210192
 Open_files	94
 Open_table_definitions	400
-Open_tables	615
-Opened_files	21964
-Opened_table_definitions	689
-Opened_tables	622
+Open_tables	619
+Opened_files	22135
+Opened_table_definitions	692
+Opened_tables	626
 Threads_connected	9
 Threads_created	15
 Threads_running	1
-Uptime	3173
+Uptime	3422
 
 --- version / instrumentation ---
 10.6.23-MariaDB-0ubuntu0.22.04.1	Ubuntu 22.04
@@ -77,41 +77,41 @@ table_definition_cache	400
 version_malloc_library	system
 MARIADB_PID=2100513
 --- /proc status ---
-2100513 246252 2792664     52:54   24  1.3 /usr/sbin/mariadbd
+2100513 246660 2792664     57:03   24  1.3 /usr/sbin/mariadbd
 VmPeak:	 2923768 kB
 VmSize:	 2792664 kB
-VmRSS:	  246252 kB
-RssAnon:	  224156 kB
-RssFile:	   22096 kB
+VmRSS:	  246660 kB
+RssAnon:	  224684 kB
+RssFile:	   21976 kB
 RssShmem:	       0 kB
-VmData:	  611012 kB
+VmData:	  612452 kB
 VmSwap:	       0 kB
 Threads:	24
 --- smaps_rollup ---
-Rss:              249120 kB
-Pss:              242858 kB
-Pss_Anon:         226688 kB
-Pss_File:          16170 kB
-Private_Clean:     15556 kB
-Private_Dirty:    226688 kB
-Anonymous:        226688 kB
+Rss:              249340 kB
+Pss:              243031 kB
+Pss_Anon:         227028 kB
+Pss_File:          16003 kB
+Private_Clean:     15432 kB
+Private_Dirty:    227028 kB
+Anonymous:        227028 kB
 AnonHugePages:         0 kB
 Swap:                  0 kB
 --- pmap totals ---
 ---------------- ------- ------- ------- 
-total kB         2792668  249120  226688
+total kB         2792668  249340  227028
 --- allocator libraries ---
-	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fce905b7000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f6a1a198000)
 --- systemd/cgroup memory ---
 Restart=on-abort
 Result=success
 NRestarts=0
 OOMPolicy=stop
-MemoryCurrent=258015232
+MemoryCurrent=258449408
 ActiveState=active
 SubState=running
 [memory.current]
-258015232
+258449408
 [memory.swap.current]
 0
 [memory.events]
@@ -134,12 +134,12 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 --- top mappings pmap par dirty kB ---
 00007f3668000000     780     540     540 rw---   [ anon ]
 00007f369947f000    1604     540     540 rw---   [ anon ]
-00007f3618000000    1668     684     684 rw---   [ anon ]
-00007f3608000000    4072    1044    1044 rw---   [ anon ]
+00007f3618000000    1796     836     836 rw---   [ anon ]
+00007f3608000000    4072    1056    1056 rw---   [ anon ]
 000055ac6c616000    1352    1352    1352 r---- mariadbd
 00007f3684172000    2364    2104    2104 rw---   [ anon ]
 00007f363c000000    6640    2404    2404 rw---   [ anon ]
-00007f3660000000    4200    2444    2444 rw---   [ anon ]
+00007f3660000000    5352    2464    2464 rw---   [ anon ]
 00007f3698054000    4100    4100    4100 rw---   [ anon ]
 00007f361c000000    6124    4188    4188 rw---   [ anon ]
 000055ac76043000    5884    5080    5080 rw---   [ anon ]
@@ -148,20 +148,20 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 00007f3648000000    7336    7092    7092 rw---   [ anon ]
 00007f3654000000   10444    7588    7588 rw---   [ anon ]
 000055ac6c831000    9060    8712    8712 rw---   [ anon ]
-00007f3664000000    9940    9016    9016 rw---   [ anon ]
+00007f3664000000   10100    9172    9172 rw---   [ anon ]
 00007f3644000000   23316   10808   10808 rw---   [ anon ]
 00007f3684577000  256548   24740   24740 rw---   [ anon ]
 00007f36757ff000  163840  119104  119104 rw---   [ anon ]
 
 --- top connexions par memoire ---
-802	fund_opcvm	localhost	Query	0	0.15	0.15
-209	fund_opcvm	localhost:60356	Sleep	1509	0.09	0.09
-206	fund_opcvm	localhost:60334	Sleep	1507	0.09	0.33
-205	fund_opcvm	localhost:60332	Sleep	1506	0.09	0.33
-204	fund_opcvm	localhost:60324	Sleep	1506	0.09	0.32
-46	fund_opcvm	localhost:40916	Sleep	1506	0.09	3.34
-7	fund_opcvm	localhost:48340	Sleep	0	0.09	0.12
-55	fund_opcvm	localhost:57702	Sleep	0	0.08	0.11
+839	fund_opcvm	localhost	Query	0	0.15	0.15
+209	fund_opcvm	localhost:60356	Sleep	1758	0.09	0.09
+206	fund_opcvm	localhost:60334	Sleep	1756	0.09	0.33
+205	fund_opcvm	localhost:60332	Sleep	1755	0.09	0.33
+204	fund_opcvm	localhost:60324	Sleep	1756	0.09	0.32
+46	fund_opcvm	localhost:40916	Sleep	1755	0.09	3.34
+7	fund_opcvm	localhost:48340	Sleep	9	0.09	0.12
+55	fund_opcvm	localhost:57702	Sleep	9	0.08	0.11
 
 ==============================================
  3. PLAFOND CONFIGURE, PAS RSS REEL
@@ -210,12 +210,12 @@ Sep 14 23:32:32 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database ser
 ==============================================
  5. SERIE COURTE RSS vs Memory_used
 ==============================================
-SAMPLE ts=2026-09-15T00:25:27Z rss_kb=246252 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838528 connections=9
-SAMPLE ts=2026-09-15T00:25:42Z rss_kb=246224 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838512 connections=9
-SAMPLE ts=2026-09-15T00:25:57Z rss_kb=246204 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838512 connections=9
-SAMPLE ts=2026-09-15T00:26:12Z rss_kb=246204 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838648 connections=9
-SAMPLE ts=2026-09-15T00:26:27Z rss_kb=246184 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838648 connections=9
-SAMPLE ts=2026-09-15T00:26:42Z rss_kb=246184 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838648 connections=9
+SAMPLE ts=2026-09-15T00:29:36Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
+SAMPLE ts=2026-09-15T00:29:51Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:30:06Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:30:21Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:30:36Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900640 connections=9
+SAMPLE ts=2026-09-15T00:30:52Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
 
 ==============================================
  6. CORRELATION CRONS / RSS — 2026-09-14
@@ -2090,20 +2090,495 @@ Erreur lors de la récupération des données valLiq: ConnectionRefusedError [Se
     code: 'ECONNREFUSED',
 
 --- processus node/mysql encore vivants ---
- 928517  928318 Fri Sep  4 06:38:13 2026 10-17:48:37 node server.js
- 928551  928371 Fri Sep  4 06:38:13 2026 10-17:48:37 node --import tsx/esm server.ts
- 929244  928551 Fri Sep  4 06:38:16 2026 10-17:48:34 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
- 929356  928501 Fri Sep  4 06:38:17 2026 10-17:48:33 [node] <defunct>
-2100513       1 Mon Sep 14 23:32:31 2026       54:19 /usr/sbin/mariadbd
-3269585    4648 Sat Sep 12 02:12:41 2026  2-22:14:09 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3269605    4648 Sat Sep 12 02:12:43 2026  2-22:14:07 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3273968    4648 Sat Sep 12 02:20:38 2026  2-22:06:12 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
-3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:26:43 node --import tsx/esm server.ts
-3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:26:43 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
-2117834 2117459 Tue Sep 15 00:00:52 2026       25:58 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
-2121710 2117459 Tue Sep 15 00:09:16 2026       17:34 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
-2121903 2117459 Tue Sep 15 00:09:21 2026       17:29 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
-2130437 2117459 Tue Sep 15 00:20:03 2026       06:47 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
+ 928517  928318 Fri Sep  4 06:38:13 2026 10-17:52:47 node server.js
+ 928551  928371 Fri Sep  4 06:38:13 2026 10-17:52:47 node --import tsx/esm server.ts
+ 929244  928551 Fri Sep  4 06:38:16 2026 10-17:52:44 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+ 929356  928501 Fri Sep  4 06:38:17 2026 10-17:52:43 [node] <defunct>
+2100513       1 Mon Sep 14 23:32:31 2026       58:29 /usr/sbin/mariadbd
+3269585    4648 Sat Sep 12 02:12:41 2026  2-22:18:19 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3269605    4648 Sat Sep 12 02:12:43 2026  2-22:18:17 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3273968    4648 Sat Sep 12 02:20:38 2026  2-22:10:22 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
+3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:30:53 node --import tsx/esm server.ts
+3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:30:53 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+2117834 2117459 Tue Sep 15 00:00:52 2026       30:08 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
+2121710 2117459 Tue Sep 15 00:09:16 2026       21:44 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
+2121903 2117459 Tue Sep 15 00:09:21 2026       21:39 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
+2130437 2117459 Tue Sep 15 00:20:03 2026       10:57 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
+
+==============================================
+ 8. CORRELATION MULTI-INCIDENTS — READ ONLY
+==============================================
+--- kernel OOM depuis 2026-08-17 (si journal encore disponible) ---
+2026-09-14T10:04:11+0000 priceless-mayer kernel: npm start invoked oom-killer: gfp_mask=0x1100cca(GFP_HIGHUSER_MOVABLE), order=0, oom_score_adj=0
+2026-09-14T10:04:12+0000 priceless-mayer kernel: oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=user.slice,mems_allowed=0,global_oom,task_memcg=/system.slice/mariadb.service,task=mariadbd,pid=1256690,uid=113
+2026-09-14T10:04:12+0000 priceless-mayer kernel: Out of memory: Killed process 1256690 (mariadbd) total-vm:19512460kB, anon-rss:14902200kB, file-rss:0kB, shmem-rss:0kB, UID:113 pgtables:33628kB oom_score_adj:0
+
+--- cron autour OOM 2026-08-27 21:40/22:00 ---
+LOG=/var/log/africafunds_daily_20260827.log
+========================================
+=== AFRICAFUNDS DAILY UPDATE ===
+=== Thu Aug 27 08:00:02 PM UTC 2026 ===
+========================================
+[1/9] Scrape ASFIM VL Maroc (2026-08-22 -> 2026-08-27)...
+==========================================
+=== RAPPORT SCRAPE & IMPORT ASFIM ===
+==========================================
+[1/9] OK
+[2/9] Mise a jour Forex (derniers jours)...
+    ECB EUR/TND: HTTP 404
+    ECB EUR/NGN: HTTP 404
+    ECB EUR/GHS: HTTP 404
+    ECB EUR/KES: HTTP 404
+    ECB EUR/EGP: HTTP 404
+    ECB EUR/NAD: HTTP 404
+==========================================
+=== RAPPORT IMPORT FOREX ===
+==========================================
+[2/9] OK
+[3/9] Recalcul EUR/USD daily rates...
+1248 fonds a traiter
+==========================================
+=== RAPPORT RECALCUL EUR/USD QUOTIDIEN ===
+==========================================
+Fonds traites:             1246
+[3/9] OK
+[4/9] Recalcul VL Ajuste (tous fonds actifs)...
+1248 fonds a traiter
+[4/9] ERREUR (exit code 1)
+[5/9] Recalcul performances locale (fonds 1-600)...
+{"error":"Une erreur s'est produite lors du traitement."}[5/9] ERREUR (HTTP 500)
+[6/9] Recalcul performances locale (fonds 601-1200)...
+{"error":"Une erreur s'est produite lors du traitement."}[6/9] ERREUR (HTTP 500)
+[7/9] Recalcul performances locale (fonds 1201-3000)...
+{"error":"Une erreur s'est produite lors du traitement."}[7/9] ERREUR (HTTP 500)
+[8/9] Recalcul performances EUR/USD...
+ERREUR FATALE: Error: connect ECONNREFUSED 127.0.0.1:3306
+[8/9] ERREUR (exit code 1)
+[9a/9] Classement local...
+[9a/9] ERREUR (HTTP 000)
+[9b/9] Classement EUR...
+[9b/9] ERREUR (HTTP 000)
+[9c/9] Classement USD...
+[9c/9] ERREUR (HTTP 000)
+=== MISE A JOUR TERMINEE AVEC 8 ERREUR(S) Thu Aug 27 08:18:13 PM UTC 2026 ===
+========================================
+
+--- cron autour OOM 2026-08-31 18:33 ---
+LOG=/var/log/africafunds_nigeria_20260831.log
+========================================
+=== AFRICAFUNDS NIGERIA WEEKLY UPDATE ===
+=== Mon Aug 31 10:00:01 AM UTC 2026 ===
+========================================
+[1/8] Extraction SEC Nigeria (2026)...
+[1/8] OK
+[2/8] Import VL Nigeria dans MySQL...
+==========================================
+=== RAPPORT IMPORT VL NIGERIA (SEC) ===
+==========================================
+[2/8] OK
+[3/8] Recalcul EUR/USD taux quotidiens...
+1250 fonds a traiter
+==========================================
+=== RAPPORT RECALCUL EUR/USD QUOTIDIEN ===
+==========================================
+Fonds traites:             1248
+[3/8] OK
+[4/8] Recalcul VL Ajuste (tous fonds actifs)...
+1250 fonds a traiter
+==========================================
+=== RAPPORT RECALCUL VL AJUSTE ===
+==========================================
+Fonds traites:             1249
+[4/8] OK
+[5a/8] Recalcul performances locale (fonds 1-600)...
+{"message":"Performances locales: 25/25 fonds traites, 0 erreur(s)","total":25,"traites":25,"erreurs":0}[5a/8] OK (HTTP 200)
+[5b/8] Recalcul performances locale (fonds 601-1200)...
+[5b/8] ERREUR (HTTP 000)
+[6a/8] Recalcul performances EUR (fonds 1-600)...
+{"message":"EUR performances: 25/25 fonds traites, 0 erreur(s)","total":25,"traites":25,"erreurs":0}[6a/8] OK (HTTP 200)
+[6b/8] Recalcul performances EUR (fonds 601-1200)...
+{"message":"EUR performances: 586/586 fonds traites, 0 erreur(s)","total":586,"traites":586,"erreurs":0}[6b/8] OK (HTTP 200)
+[7a/8] Recalcul performances USD (fonds 1-600)...
+{"message":"USD performances: 25/25 fonds traites, 0 erreur(s)","total":25,"traites":25,"erreurs":0}[7a/8] OK (HTTP 200)
+[7b/8] Recalcul performances USD (fonds 601-1200)...
+{"message":"USD performances: 586/586 fonds traites, 0 erreur(s)","total":586,"traites":586,"erreurs":0}[7b/8] OK (HTTP 200)
+[8/8] Resynchronisation datejour (Nigeria)...
+=== SYNCHRONISATION datejour <- MAX(valorisations.date) ===
+[8/8] OK
+=== NIGERIA WEEKLY UPDATE TERMINE AVEC 1 ERREUR(S) Mon Aug 31 10:09:04 AM UTC 2026 ===
+========================================
+
+--- cron autour OOM 2026-09-08 20:02 ---
+LOG=/var/log/africafunds_daily_20260908.log
+========================================
+=== AFRICAFUNDS DAILY UPDATE ===
+=== Tue Sep  8 08:00:01 PM UTC 2026 ===
+========================================
+
+[1/9] Scrape ASFIM VL Maroc (2026-09-03 -> 2026-09-08)...
+ASFIM Scrape & Import
+Periode: 2026-09-03 -> 2026-09-08
+API: https://fundshare.asfim.ma/api/performances/export/?date=YYYY-MM-DD
+
+Connecte a la base fund_opcvm
+Forex: EUR/MAD 7510 dates, USD/MAD 7615 dates
+644 fonds MAROC existants (644 avec ISIN, 65 avec code)
+Chargement des VL existantes...
+557590 VL existantes
+
+4 jours ouvrables a traiter
+
+
+Mise a jour datejour + date_premiere_vl...
+
+==========================================
+=== RAPPORT SCRAPE & IMPORT ASFIM ===
+==========================================
+Dates scrapees:       4
+Dates avec donnees:   3
+Dates vides/feries:   1
+Dates en erreur:      0
+VL inserees:          323
+VL deja existantes:   950
+Fonds crees:          0
+Fonds mis a jour:     627
+Erreurs:              0
+
+Verification finale MAROC:
+  Total VL:  557913
+  Fonds:     644
+  Periode:   Fri Dec 29 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Mon Sep 07 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
+
+Termine.
+[1/9] OK
+
+[2/9] Mise a jour Forex (derniers jours)...
+Scrape Forex - depuis 2026-09-03
+
+  Telechargement EUR/USD depuis FRED (St. Louis Fed)...
+    FRED erreur: timeout
+  Telechargement EUR/USD (EURUSD=X)...
+    EUR/USD: 5 entrees
+  Telechargement EUR/MAD (EURMAD=X)...
+    EUR/MAD: 5 entrees
+  Telechargement USD/MAD (USDMAD=X)...
+    USD/MAD: 5 entrees
+  Telechargement EUR/TND (EURTND=X)...
+    EUR/TND: 5 entrees
+  Telechargement USD/TND (USDTND=X)...
+    USD/TND: 5 entrees
+  Telechargement EUR/NGN (EURNGN=X)...
+    EUR/NGN: 5 entrees
+  Telechargement USD/NGN (USDNGN=X)...
+    USD/NGN: 5 entrees
+  Telechargement EUR/GHS (EURGHS=X)...
+    EUR/GHS: 5 entrees
+  Telechargement USD/GHS (USDGHS=X)...
+    USD/GHS: 5 entrees
+  Telechargement EUR/KES (EURKES=X)...
+    EUR/KES: 5 entrees
+  Telechargement USD/KES (USDKES=X)...
+    USD/KES: 5 entrees
+  Telechargement EUR/ZAR (EURZAR=X)...
+    EUR/ZAR: 5 entrees
+  Telechargement USD/ZAR (USDZAR=X)...
+    USD/ZAR: 5 entrees
+  Telechargement EUR/EGP (EUREGP=X)...
+    EUR/EGP: 5 entrees
+  Telechargement USD/EGP (USDEGP=X)...
+    USD/EGP: 5 entrees
+  Telechargement EUR/NAD (EURNAD=X)...
+    EUR/NAD: 5 entrees
+  Telechargement USD/NAD (USDNAD=X)...
+    USD/NAD: 5 entrees
+
+  ECB fallback pour paires EUR/* insuffisantes...
+  EUR/TND: seulement 5 Yahoo — essai ECB...
+    ECB fallback EUR/TND...
+    ECB EUR/TND: erreur unable to get local issuer certificate
+  EUR/NGN: seulement 5 Yahoo — essai ECB...
+    ECB fallback EUR/NGN...
+    ECB EUR/NGN: erreur unable to get local issuer certificate
+  EUR/MAD: seulement 5 Yahoo — essai ECB...
+    ECB fallback EUR/MAD...
+    ECB EUR/MAD: erreur unable to get local issuer certificate
+  EUR/GHS: seulement 5 Yahoo — essai ECB...
+    ECB fallback EUR/GHS...
+    ECB EUR/GHS: erreur unable to get local issuer certificate
+  EUR/KES: seulement 5 Yahoo — essai ECB...
+    ECB fallback EUR/KES...
+    ECB EUR/KES: erreur unable to get local issuer certificate
+  EUR/ZAR: seulement 5 Yahoo — essai ECB...
+    ECB fallback EUR/ZAR...
+    ECB EUR/ZAR: erreur unable to get local issuer certificate
+  EUR/EGP: seulement 5 Yahoo — essai ECB...
+    ECB fallback EUR/EGP...
+    ECB EUR/EGP: erreur unable to get local issuer certificate
+  EUR/NAD: seulement 5 Yahoo — essai ECB...
+    ECB fallback EUR/NAD...
+    ECB EUR/NAD: erreur unable to get local issuer certificate
+
+  Cross-rate derivation USD/* depuis EUR/* et EUR/USD...
+
+  Generation paires CFA (parite fixe 655.957, EUR/USD: 5 dates)...
+    EUR/XOF: 4 entrees generees
+    USD/XOF: 3 entrees generees
+    EUR/XAF: 4 entrees generees
+    USD/XAF: 3 entrees generees
+
+Total: 21 paires collectees
+
+Connecte a la base fund_opcvm
+132353 entrees existantes
+
+  EUR/USD   : 1 inseres, 4 existants
+  EUR/MAD   : 1 inseres, 4 existants
+  USD/MAD   : 1 inseres, 4 existants
+  EUR/TND   : 1 inseres, 4 existants
+  USD/TND   : 1 inseres, 4 existants
+  EUR/NGN   : 1 inseres, 4 existants
+  USD/NGN   : 1 inseres, 4 existants
+  EUR/GHS   : 1 inseres, 4 existants
+  USD/GHS   : 1 inseres, 4 existants
+  EUR/KES   : 1 inseres, 4 existants
+  USD/KES   : 1 inseres, 4 existants
+  EUR/ZAR   : 1 inseres, 4 existants
+  USD/ZAR   : 1 inseres, 4 existants
+  EUR/EGP   : 1 inseres, 4 existants
+  USD/EGP   : 1 inseres, 4 existants
+  EUR/NAD   : 1 inseres, 4 existants
+  USD/NAD   : 1 inseres, 4 existants
+  EUR/XOF   : 1 inseres, 3 existants
+  USD/XOF   : 1 inseres, 2 existants
+  EUR/XAF   : 1 inseres, 3 existants
+  USD/XAF   : 1 inseres, 2 existants
+
+Correction des entrees value=0...
+  Aucune correction necessaire
+
+
+==========================================
+=== RAPPORT IMPORT FOREX ===
+==========================================
+Total inseres:      21
+Total existants:    78
+Total corriges:     0
+
+Etat devisedechanges:
+  EUR/EGP   :   5931 entrees (Mon Dec 01 2003 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/GHS   :   4985 entrees (Sun Jul 01 2007 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/KES   :   6078 entrees (Thu Mar 14 2002 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/MAD   :   7514 entrees (Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/NAD   :   5279 entrees (Mon May 15 2006 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/NGN   :   5279 entrees (Mon May 15 2006 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/TND   :   6046 entrees (Mon Dec 01 2003 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/USD   :   7583 entrees (Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/XAF   :   6963 entrees (Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/XOF   :   6963 entrees (Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  EUR/ZAR   :   6893 entrees (Thu Mar 09 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/EGP   :   6353 entrees (Thu May 31 2001 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/GHS   :   4993 entrees (Tue Jul 10 2007 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/KES   :   5942 entrees (Mon Dec 01 2003 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/MAD   :   7616 entrees (Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/NAD   :   5938 entrees (Mon Dec 01 2003 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/NGN   :   5939 entrees (Mon Dec 01 2003 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/TND   :   6369 entrees (Mon Dec 01 2003 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/XAF   :   6892 entrees (Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/XOF   :   6881 entrees (Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+  USD/ZAR   :   5940 entrees (Mon Dec 01 2003 00:00:00 GMT+0000 (Coordinated Universal Time) -> Tue Sep 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time))
+
+Termine.
+[2/9] OK
+
+[3/9] Recalcul EUR/USD daily rates...
+Connecte a la base fund_opcvm
+Chargement de tous les taux de change...
+  132377 entrees forex chargees
+  Paires disponibles: EUR/USD, USD/MAD, EUR/XOF, USD/XOF, EUR/MAD, EUR/XAF, USD/XAF, EUR/ZAR, USD/EGP, EUR/KES, EUR/TND, USD/TND, USD/NGN, USD/KES, USD/ZAR, EUR/EGP, USD/NAD, EUR/NGN, EUR/NAD, EUR/GHS, USD/GHS
+  EUR/USD: 7583 dates (2000-01-03 -> 2026-09-08)
+
+1250 fonds a traiter
+
+  [50/1250] MAD TWIN CASH: 1548 VL
+  [100/1250] MAD PATRIMOINE OBLIGATIONS: 639 VL
+  [150/1250] MAD FCP UPLINE CAPITAL GARANTI: 1845 VL
+  [200/1250] MAD FCP EMERGENCE ALLOCATION: 331 VL
+  [250/1250] MAD FCP CAP INSTITUTIONS: 1840 VL
+  [300/1250] MAD ELAN SOLIDARITE: 390 VL
+  [350/1250] MAD CFG CORPORATE BONDS: 405 VL
+  [400/1250] MAD CAPITAL TRUST RENDEMENT: 390 VL
+  [450/1250] MAD BMCI PREMIUM LONG TERM BOND: 409 VL
+  [500/1250] MAD ATLAS OBLIGBANCAIRES: 1823 VL
+  [550/1250] MAD AD BALANCED FUND: 396 VL
+  [600/1250] NGN EDC DOLLAR FUND: 152 VL
+Erreur fatale: Error: read ECONNRESET
+    at PromiseConnection.execute (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/node_modules/mysql2/promise.js:112:22)
+    at run (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/recalc/recalc_eur_usd_daily_rate.js:210:33)
+    at runMicrotasks (<anonymous>)
+    at processTicksAndRejections (internal/process/task_queues.js:93:5) {
+  code: 'ECONNRESET',
+  errno: -104,
+  sql: undefined,
+  sqlState: undefined,
+  sqlMessage: undefined
+}
+[3/9] ERREUR (exit code 1)
+
+[4/9] Recalcul VL Ajuste (tous fonds actifs)...
+Erreur fatale: Error: connect ECONNREFUSED 127.0.0.1:3306
+    at Object.createConnection (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/node_modules/mysql2/promise.js:253:31)
+    at run (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/recalc/recalc_vl_ajuste.js:35:28)
+    at Object.<anonymous> (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/recalc/recalc_vl_ajuste.js:222:1)
+    at Module._compile (internal/modules/cjs/loader.js:1063:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1092:10)
+    at Module.load (internal/modules/cjs/loader.js:928:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:769:14)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)
+    at internal/main/run_main_module.js:17:47 {
+  code: 'ECONNREFUSED',
+  errno: -111,
+  sqlState: undefined
+}
+[4/9] ERREUR (exit code 1)
+
+[5/9] Recalcul performances locale (fonds 1-600)...
+{"error":"Une erreur s'est produite lors du traitement."}[5/9] ERREUR (HTTP 500)
+
+[6/9] Recalcul performances locale (fonds 601-1200)...
+{"error":"Une erreur s'est produite lors du traitement."}[6/9] ERREUR (HTTP 500)
+
+[7/9] Recalcul performances locale (fonds 1201-3000)...
+{"error":"Une erreur s'est produite lors du traitement."}[7/9] ERREUR (HTTP 500)
+
+[8/9] Recalcul performances EUR/USD...
+ERREUR FATALE: Error: connect ECONNREFUSED 127.0.0.1:3306
+    at Object.createConnection (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/node_modules/mysql2/promise.js:253:31)
+    at run (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/fix/fix_populate_performances_eur_usd.js:324:28)
+    at Object.<anonymous> (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/fix/fix_populate_performances_eur_usd.js:369:1)
+    at Module._compile (internal/modules/cjs/loader.js:1063:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1092:10)
+    at Module.load (internal/modules/cjs/loader.js:928:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:769:14)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)
+    at internal/main/run_main_module.js:17:47 {
+  code: 'ECONNREFUSED',
+  errno: -111,
+  sqlState: undefined
+}
+[8/9] ERREUR (exit code 1)
+
+[9a/9] Classement local...
+[9a/9] ERREUR (HTTP 000)
+
+[9b/9] Classement EUR...
+[9b/9] ERREUR (HTTP 000)
+
+[9c/9] Classement USD...
+[9c/9] ERREUR (HTTP 000)
+
+=== MISE A JOUR TERMINEE AVEC 9 ERREUR(S) Tue Sep  8 09:32:46 PM UTC 2026 ===
+========================================
+
+--- PM2 access markers autour des occurrences ---
+::ffff:127.0.0.1 - - [27/Aug/2026:21:35:01 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [27/Aug/2026:21:40:01 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
+217.160.249.254 - - [31/Aug/2026:18:00:13 +0000] "GET /api/ratiosnew/3/866 HTTP/1.1" 200 2165 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:00:13 +0000] "GET /api/ratiosnew/1/866 HTTP/1.1" 200 2249 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:00:13 +0000] "GET /api/ratiosnew/5/866 HTTP/1.1" 200 2216 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:00:13 +0000] "GET /api/performances/fond/866?date=2026-08-27 HTTP/1.1" 200 2893 "-" "node"
+::ffff:127.0.0.1 - - [31/Aug/2026:18:00:13 +0000] "GET /api/valLiq/866 HTTP/1.1" 200 110451 "-" "-"
+217.160.249.254 - - [31/Aug/2026:18:00:14 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1851 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:00:14 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:00:15 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1808 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:00:15 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+::ffff:127.0.0.1 - - [31/Aug/2026:18:00:15 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31250 "-" "-"
+::ffff:127.0.0.1 - - [31/Aug/2026:18:00:15 +0000] "GET /api/getactualite HTTP/1.1" 200 2 "-" "-"
+::ffff:127.0.0.1 - - [31/Aug/2026:18:00:15 +0000] "GET /api/getPaysall HTTP/1.1" 200 1598 "-" "-"
+217.160.249.254 - - [31/Aug/2026:18:34:24 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1841 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:34:24 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:34:24 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:34:24 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1810 "-" "node"
+160.79.106.130 - - [31/Aug/2026:18:34:24 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31270 "-" "curl/8.5.0"
+::ffff:127.0.0.1 - - [31/Aug/2026:18:34:31 +0000] "GET /api/getfondbypays/MAROC HTTP/1.1" 200 141152 "-" "curl/7.81.0"
+217.160.249.254 - - [31/Aug/2026:18:39:26 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:26 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1841 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:26 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1810 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:26 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+160.79.106.137 - - [31/Aug/2026:18:39:26 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31270 "-" "curl/8.5.0"
+217.160.249.254 - - [31/Aug/2026:18:39:27 +0000] "GET /api/ratiosnew/1/1168 HTTP/1.1" 200 1845 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:28 +0000] "GET /api/ratiosnew/3/1168 HTTP/1.1" 200 1768 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:28 +0000] "GET /api/ratiosnew/5/1168 HTTP/1.1" 200 24 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:28 +0000] "GET /api/performances/fond/1168?date=2026-07-10 HTTP/1.1" 200 2756 "-" "node"
+160.79.106.131 - - [31/Aug/2026:18:39:28 +0000] "GET /api/valLiq/1168 HTTP/1.1" 200 24581 "-" "curl/8.5.0"
+::ffff:127.0.0.1 - - [31/Aug/2026:18:39:30 +0000] "GET /api/getfondbypays/MAROC HTTP/1.1" 200 141152 "-" "curl/7.81.0"
+217.160.249.254 - - [31/Aug/2026:18:39:32 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1841 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:32 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:32 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:33 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1810 "-" "node"
+160.79.106.128 - - [31/Aug/2026:18:39:33 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31270 "-" "curl/8.5.0"
+217.160.249.254 - - [31/Aug/2026:18:39:34 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1841 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:34 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:34 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+217.160.249.254 - - [31/Aug/2026:18:39:34 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1810 "-" "node"
+160.79.106.133 - - [31/Aug/2026:18:39:34 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31270 "-" "curl/8.5.0"
+217.160.249.254 - - [08/Sep/2026:19:00:13 +0000] "GET /api/ratiosnew/1/866 HTTP/1.1" 200 2232 "-" "node"
+217.160.249.254 - - [08/Sep/2026:19:00:13 +0000] "GET /api/ratiosnew/3/866 HTTP/1.1" 200 2173 "-" "node"
+217.160.249.254 - - [08/Sep/2026:19:00:14 +0000] "GET /api/ratiosnew/5/866 HTTP/1.1" 200 2201 "-" "node"
+217.160.249.254 - - [08/Sep/2026:19:00:14 +0000] "GET /api/performances/fond/866?date=2026-09-04 HTTP/1.1" 200 2900 "-" "node"
+::ffff:127.0.0.1 - - [08/Sep/2026:19:00:14 +0000] "GET /api/valLiq/866 HTTP/1.1" 200 110633 "-" "-"
+217.160.249.254 - - [08/Sep/2026:19:00:14 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [08/Sep/2026:19:00:15 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1841 "-" "node"
+217.160.249.254 - - [08/Sep/2026:19:00:15 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1809 "-" "node"
+217.160.249.254 - - [08/Sep/2026:19:00:15 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+::ffff:127.0.0.1 - - [08/Sep/2026:19:00:15 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31213 "-" "-"
+::ffff:127.0.0.1 - - [08/Sep/2026:19:00:15 +0000] "GET /api/getactualite HTTP/1.1" 200 2 "-" "-"
+::ffff:127.0.0.1 - - [08/Sep/2026:19:00:15 +0000] "GET /api/getPaysall HTTP/1.1" 200 1598 "-" "-"
+217.160.249.254 - - [08/Sep/2026:20:00:12 +0000] "GET /api/ratiosnew/3/866 HTTP/1.1" 200 2173 "-" "node"
+217.160.249.254 - - [08/Sep/2026:20:00:12 +0000] "GET /api/ratiosnew/1/866 HTTP/1.1" 200 2232 "-" "node"
+217.160.249.254 - - [08/Sep/2026:20:00:13 +0000] "GET /api/ratiosnew/5/866 HTTP/1.1" 200 2201 "-" "node"
+217.160.249.254 - - [08/Sep/2026:20:00:13 +0000] "GET /api/performances/fond/866?date=2026-09-04 HTTP/1.1" 200 2900 "-" "node"
+::ffff:127.0.0.1 - - [08/Sep/2026:20:00:13 +0000] "GET /api/valLiq/866 HTTP/1.1" 200 110633 "-" "-"
+217.160.249.254 - - [08/Sep/2026:20:00:13 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1841 "-" "node"
+217.160.249.254 - - [08/Sep/2026:20:00:14 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [08/Sep/2026:20:00:14 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1809 "-" "node"
+217.160.249.254 - - [08/Sep/2026:20:00:14 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+::ffff:127.0.0.1 - - [08/Sep/2026:20:00:14 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31213 "-" "-"
+::ffff:127.0.0.1 - - [08/Sep/2026:20:00:14 +0000] "GET /api/getactualite HTTP/1.1" 200 2 "-" "-"
+::ffff:127.0.0.1 - - [08/Sep/2026:20:00:14 +0000] "GET /api/getPaysall HTTP/1.1" 200 1598 "-" "-"
+::ffff:127.0.0.1 - - [08/Sep/2026:20:02:45 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 500 57 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [08/Sep/2026:20:02:45 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" 500 57 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [08/Sep/2026:20:02:46 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" 500 57 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [08/Sep/2026:20:32:46 +0000] "GET /api/classementmysql HTTP/1.1" - - "-" "curl/7.81.0"
+217.160.249.254 - - [14/Sep/2026:09:00:13 +0000] "GET /api/ratiosnew/3/866 HTTP/1.1" 200 2173 "-" "node"
+217.160.249.254 - - [14/Sep/2026:09:00:14 +0000] "GET /api/ratiosnew/1/866 HTTP/1.1" 200 2232 "-" "node"
+217.160.249.254 - - [14/Sep/2026:09:00:14 +0000] "GET /api/ratiosnew/5/866 HTTP/1.1" 200 2201 "-" "node"
+217.160.249.254 - - [14/Sep/2026:09:00:14 +0000] "GET /api/performances/fond/866?date=2026-09-10 HTTP/1.1" 200 2893 "-" "node"
+::ffff:127.0.0.1 - - [14/Sep/2026:09:00:14 +0000] "GET /api/valLiq/866 HTTP/1.1" 200 110604 "-" "-"
+217.160.249.254 - - [14/Sep/2026:09:00:15 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1841 "-" "node"
+217.160.249.254 - - [14/Sep/2026:09:00:15 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [14/Sep/2026:09:00:15 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1809 "-" "node"
+217.160.249.254 - - [14/Sep/2026:09:00:15 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+::ffff:127.0.0.1 - - [14/Sep/2026:09:00:15 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31133 "-" "-"
+::ffff:127.0.0.1 - - [14/Sep/2026:09:00:15 +0000] "GET /api/getactualite HTTP/1.1" 200 2 "-" "-"
+::ffff:127.0.0.1 - - [14/Sep/2026:09:00:15 +0000] "GET /api/getPaysall HTTP/1.1" 200 1598 "-" "-"
+217.160.249.254 - - [14/Sep/2026:10:00:14 +0000] "GET /api/ratiosnew/1/866 HTTP/1.1" 200 2232 "-" "node"
+217.160.249.254 - - [14/Sep/2026:10:00:15 +0000] "GET /api/ratiosnew/3/866 HTTP/1.1" 200 2173 "-" "node"
+217.160.249.254 - - [14/Sep/2026:10:00:15 +0000] "GET /api/ratiosnew/5/866 HTTP/1.1" 200 2201 "-" "node"
+217.160.249.254 - - [14/Sep/2026:10:00:15 +0000] "GET /api/performances/fond/866?date=2026-09-10 HTTP/1.1" 200 2893 "-" "node"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:00:15 +0000] "GET /api/valLiq/866 HTTP/1.1" 200 110604 "-" "-"
+217.160.249.254 - - [14/Sep/2026:10:00:16 +0000] "GET /api/ratiosnew/1/1141 HTTP/1.1" 200 1841 "-" "node"
+217.160.249.254 - - [14/Sep/2026:10:00:16 +0000] "GET /api/ratiosnew/3/1141 HTTP/1.1" 200 1754 "-" "node"
+217.160.249.254 - - [14/Sep/2026:10:00:16 +0000] "GET /api/ratiosnew/5/1141 HTTP/1.1" 200 1809 "-" "node"
+217.160.249.254 - - [14/Sep/2026:10:00:16 +0000] "GET /api/performances/fond/1141?date=2026-07-10 HTTP/1.1" 200 2897 "-" "node"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:00:16 +0000] "GET /api/valLiq/1141 HTTP/1.1" 200 31133 "-" "-"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:00:16 +0000] "GET /api/getactualite HTTP/1.1" 200 2 "-" "-"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:00:16 +0000] "GET /api/getPaysall HTTP/1.1" 200 1598 "-" "-"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:04:14 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 500 57 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:04:15 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" 500 57 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:04:15 +0000] "GET /api/saveperfdateeur/1/600 HTTP/1.1" 500 47 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:04:16 +0000] "GET /api/saveperfdateeur/601/1200 HTTP/1.1" 500 47 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:04:16 +0000] "GET /api/saveperfdateusd/1/600 HTTP/1.1" 500 47 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [14/Sep/2026:10:04:17 +0000] "GET /api/saveperfdateusd/601/1200 HTTP/1.1" 500 47 "-" "curl/7.81.0"
 
 ==============================================
  FIN — aucune variable modifiee, aucun service redemarre
