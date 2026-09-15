@@ -2,7 +2,7 @@
 
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-15 00:23 UTC**
+Derniere execution : **2026-09-15 00:26 UTC**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
@@ -10,11 +10,11 @@ Declencheur : `push` — par `Wealthtechinnovations`
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        2788         785         210       14372       14595
-Swap:           2047         409        1638
+Mem:           17945        2785         181         209       14978       14599
+Swap:           2047         412        1635
 
 RSS actuel de mariadbd :
-  0.24 Go — demarre depuis 49:02
+  0.23 Go — demarre depuis 52:53
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
@@ -51,23 +51,23 @@ Threads_running	1
  2b. MEMORY_USED / PROC / ALLOCATEUR
 ==============================================
 Aborted_connects	6
-Connections	770
-Created_tmp_disk_tables	5218
+Connections	799
+Created_tmp_disk_tables	5225
 Created_tmp_files	4
-Created_tmp_tables	5953
+Created_tmp_tables	5979
 Max_used_connections	15
-Memory_used	472887056
+Memory_used	472887672
 Memory_used_initial	442210192
 Open_files	94
 Open_table_definitions	400
 Open_tables	615
-Opened_files	21936
+Opened_files	21964
 Opened_table_definitions	689
 Opened_tables	622
 Threads_connected	9
 Threads_created	15
 Threads_running	1
-Uptime	2941
+Uptime	3173
 
 --- version / instrumentation ---
 10.6.23-MariaDB-0ubuntu0.22.04.1	Ubuntu 22.04
@@ -77,41 +77,41 @@ table_definition_cache	400
 version_malloc_library	system
 MARIADB_PID=2100513
 --- /proc status ---
-2100513 246976 2792664     49:02   24  1.3 /usr/sbin/mariadbd
+2100513 246252 2792664     52:54   24  1.3 /usr/sbin/mariadbd
 VmPeak:	 2923768 kB
 VmSize:	 2792664 kB
-VmRSS:	  246976 kB
-RssAnon:	  223892 kB
-RssFile:	   23084 kB
+VmRSS:	  246252 kB
+RssAnon:	  224156 kB
+RssFile:	   22096 kB
 RssShmem:	       0 kB
 VmData:	  611012 kB
 VmSwap:	       0 kB
 Threads:	24
 --- smaps_rollup ---
-Rss:              249876 kB
-Pss:              243613 kB
-Pss_Anon:         226456 kB
-Pss_File:          17157 kB
-Private_Clean:     16544 kB
-Private_Dirty:    226456 kB
-Anonymous:        226456 kB
+Rss:              249120 kB
+Pss:              242858 kB
+Pss_Anon:         226688 kB
+Pss_File:          16170 kB
+Private_Clean:     15556 kB
+Private_Dirty:    226688 kB
+Anonymous:        226688 kB
 AnonHugePages:         0 kB
 Swap:                  0 kB
 --- pmap totals ---
 ---------------- ------- ------- ------- 
-total kB         2792668  249876  226456
+total kB         2792668  249120  226688
 --- allocator libraries ---
-	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd4e3c96000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fce905b7000)
 --- systemd/cgroup memory ---
 Restart=on-abort
 Result=success
 NRestarts=0
 OOMPolicy=stop
-MemoryCurrent=261492736
+MemoryCurrent=258015232
 ActiveState=active
 SubState=running
 [memory.current]
-261492736
+258015232
 [memory.swap.current]
 0
 [memory.events]
@@ -135,13 +135,13 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 00007f3668000000     780     540     540 rw---   [ anon ]
 00007f369947f000    1604     540     540 rw---   [ anon ]
 00007f3618000000    1668     684     684 rw---   [ anon ]
-00007f3608000000    4072     820     820 rw---   [ anon ]
+00007f3608000000    4072    1044    1044 rw---   [ anon ]
 000055ac6c616000    1352    1352    1352 r---- mariadbd
 00007f3684172000    2364    2104    2104 rw---   [ anon ]
 00007f363c000000    6640    2404    2404 rw---   [ anon ]
 00007f3660000000    4200    2444    2444 rw---   [ anon ]
 00007f3698054000    4100    4100    4100 rw---   [ anon ]
-00007f361c000000    6124    4180    4180 rw---   [ anon ]
+00007f361c000000    6124    4188    4188 rw---   [ anon ]
 000055ac76043000    5884    5080    5080 rw---   [ anon ]
 00007f3620000000    6164    5240    5240 rw---   [ anon ]
 00007f3698456000   16544    6424    6424 rw---   [ anon ]
@@ -154,14 +154,14 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 00007f36757ff000  163840  119104  119104 rw---   [ anon ]
 
 --- top connexions par memoire ---
-773	fund_opcvm	localhost	Query	0	0.15	0.15
-209	fund_opcvm	localhost:60356	Sleep	1277	0.09	0.09
-206	fund_opcvm	localhost:60334	Sleep	1275	0.09	0.33
-205	fund_opcvm	localhost:60332	Sleep	1274	0.09	0.33
-204	fund_opcvm	localhost:60324	Sleep	1274	0.09	0.32
-46	fund_opcvm	localhost:40916	Sleep	1274	0.09	3.34
-7	fund_opcvm	localhost:48340	Sleep	8	0.09	0.12
-55	fund_opcvm	localhost:57702	Sleep	8	0.08	0.11
+802	fund_opcvm	localhost	Query	0	0.15	0.15
+209	fund_opcvm	localhost:60356	Sleep	1509	0.09	0.09
+206	fund_opcvm	localhost:60334	Sleep	1507	0.09	0.33
+205	fund_opcvm	localhost:60332	Sleep	1506	0.09	0.33
+204	fund_opcvm	localhost:60324	Sleep	1506	0.09	0.32
+46	fund_opcvm	localhost:40916	Sleep	1506	0.09	3.34
+7	fund_opcvm	localhost:48340	Sleep	0	0.09	0.12
+55	fund_opcvm	localhost:57702	Sleep	0	0.08	0.11
 
 ==============================================
  3. PLAFOND CONFIGURE, PAS RSS REEL
@@ -210,12 +210,12 @@ Sep 14 23:32:32 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database ser
 ==============================================
  5. SERIE COURTE RSS vs Memory_used
 ==============================================
-SAMPLE ts=2026-09-15T00:21:35Z rss_kb=246976 rssanon_kb=223892 swap_kb=0 mariadb_memory_used_bytes=471838000 connections=9
-SAMPLE ts=2026-09-15T00:21:50Z rss_kb=246976 rssanon_kb=223892 swap_kb=0 mariadb_memory_used_bytes=471838072 connections=9
-SAMPLE ts=2026-09-15T00:22:05Z rss_kb=246976 rssanon_kb=223892 swap_kb=0 mariadb_memory_used_bytes=471838472 connections=9
-SAMPLE ts=2026-09-15T00:22:20Z rss_kb=246976 rssanon_kb=223892 swap_kb=0 mariadb_memory_used_bytes=471838560 connections=9
-SAMPLE ts=2026-09-15T00:22:35Z rss_kb=246976 rssanon_kb=223892 swap_kb=0 mariadb_memory_used_bytes=471838512 connections=9
-SAMPLE ts=2026-09-15T00:22:50Z rss_kb=246976 rssanon_kb=223892 swap_kb=0 mariadb_memory_used_bytes=471838376 connections=9
+SAMPLE ts=2026-09-15T00:25:27Z rss_kb=246252 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838528 connections=9
+SAMPLE ts=2026-09-15T00:25:42Z rss_kb=246224 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838512 connections=9
+SAMPLE ts=2026-09-15T00:25:57Z rss_kb=246204 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838512 connections=9
+SAMPLE ts=2026-09-15T00:26:12Z rss_kb=246204 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838648 connections=9
+SAMPLE ts=2026-09-15T00:26:27Z rss_kb=246184 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838648 connections=9
+SAMPLE ts=2026-09-15T00:26:42Z rss_kb=246184 rssanon_kb=224156 swap_kb=0 mariadb_memory_used_bytes=471838648 connections=9
 
 ==============================================
  6. CORRELATION CRONS / RSS — 2026-09-14
@@ -453,6 +453,331 @@ Fenetre : redemarrage MariaDB 14:00 UTC -> mesure RSS ~6.7 Gio a 22:49 UTC.
 2026-09-14T22:59:01+0000 priceless-mayer CRON[2059819]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
 2026-09-14T22:59:01+0000 priceless-mayer CRON[2059820]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
 2026-09-14T22:59:01+0000 priceless-mayer CRON[2059821]: (psaadm) CMD (/opt/psa/admin/bin/php -dauto_prepend_file=sdk.php '/opt/psa/admin/plib/modules/monitoring/scripts/cloud-alerts.php')
+
+--- journal cron 09:55-10:10 UTC — OOM du 2026-09-14 ---
+2026-09-14T09:55:01+0000 priceless-mayer CRON[837836]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T09:55:01+0000 priceless-mayer CRON[837835]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T09:55:01+0000 priceless-mayer CRON[837838]: (root) CMD (/usr/bin/python3 /usr/local/bin/fix-brvm-nginx.py >> /var/log/brvm-nginx-fix.log 2>&1)
+2026-09-14T09:55:01+0000 priceless-mayer CRON[837837]: (root) CMD (   bash -c 'sleep $((RANDOM % 60))' ; /opt/imunify360/venv/share/imunify360/scripts/check-detached.py > /dev/null 2>&1 || :)
+2026-09-14T09:56:01+0000 priceless-mayer CRON[838236]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T09:56:01+0000 priceless-mayer CRON[838237]: (root) CMD ([ -x /opt/psa/admin/sbin/backupmng ] && /opt/psa/admin/sbin/backupmng >/dev/null 2>&1)
+2026-09-14T09:56:01+0000 priceless-mayer CRON[838238]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T09:57:01+0000 priceless-mayer CRON[838653]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T09:57:01+0000 priceless-mayer CRON[838654]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T09:57:01+0000 priceless-mayer CRON[838655]: (psaadm) CMD (/opt/psa/admin/bin/php -dauto_prepend_file=sdk.php '/opt/psa/admin/plib/modules/sslit/scripts/keep-secured.php')
+2026-09-14T09:58:01+0000 priceless-mayer CRON[839073]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T09:58:01+0000 priceless-mayer CRON[839074]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T09:59:01+0000 priceless-mayer CRON[839483]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T09:59:01+0000 priceless-mayer CRON[839484]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T09:59:01+0000 priceless-mayer CRON[839485]: (psaadm) CMD (/opt/psa/admin/bin/php -dauto_prepend_file=sdk.php '/opt/psa/admin/plib/modules/monitoring/scripts/cloud-alerts.php')
+2026-09-14T10:00:01+0000 priceless-mayer CRON[839888]: (root) CMD (   bash -c 'sleep $((RANDOM % 1800))' ;imunify-antivirus imunify-patch subscriptions refresh > /dev/null 2>&1)
+2026-09-14T10:00:01+0000 priceless-mayer CRON[839887]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T10:00:01+0000 priceless-mayer CRON[839889]: (root) CMD (   bash -c 'sleep $((RANDOM % 60))' ; /opt/imunify360/venv/share/imunify360/scripts/check-detached.py > /dev/null 2>&1 || :)
+2026-09-14T10:00:01+0000 priceless-mayer CRON[839891]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T10:00:01+0000 priceless-mayer CRON[839893]: (root) CMD (cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api && bash scripts/deploy/sync_production.sh >> /var/log/sync_production.log 2>&1)
+2026-09-14T10:00:01+0000 priceless-mayer CRON[839906]: (root) CMD (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1)
+2026-09-14T10:00:01+0000 priceless-mayer CRON[839905]: (psaadm) CMD (/opt/psa/admin/bin/php -dauto_prepend_file=sdk.php '/opt/psa/admin/plib/modules/monitoring/scripts/cloud-alerts.php')
+2026-09-14T10:00:01+0000 priceless-mayer CRON[839914]: (root) CMD (/usr/bin/python3 /usr/local/bin/fix-brvm-nginx.py >> /var/log/brvm-nginx-fix.log 2>&1)
+2026-09-14T10:01:01+0000 priceless-mayer CRON[840409]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T10:01:01+0000 priceless-mayer CRON[840410]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T10:02:01+0000 priceless-mayer CRON[840813]: (psaadm) CMD (/opt/psa/admin/bin/php -dauto_prepend_file=sdk.php '/opt/psa/admin/plib/modules/wp-toolkit/scripts/maintenance.php')
+2026-09-14T10:02:01+0000 priceless-mayer CRON[840815]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T10:05:01+0000 priceless-mayer CRON[843008]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T10:05:01+0000 priceless-mayer CRON[843009]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T10:05:01+0000 priceless-mayer CRON[843010]: (root) CMD (/usr/bin/python3 /usr/local/bin/fix-brvm-nginx.py >> /var/log/brvm-nginx-fix.log 2>&1)
+2026-09-14T10:05:01+0000 priceless-mayer CRON[843022]: (root) CMD (   bash -c 'sleep $((RANDOM % 60))' ; /opt/imunify360/venv/share/imunify360/scripts/check-detached.py > /dev/null 2>&1 || :)
+2026-09-14T10:06:01+0000 priceless-mayer CRON[844972]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T10:06:01+0000 priceless-mayer CRON[844973]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T10:07:01+0000 priceless-mayer CRON[845373]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T10:07:01+0000 priceless-mayer CRON[845374]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T10:08:01+0000 priceless-mayer CRON[845774]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T10:08:01+0000 priceless-mayer CRON[845775]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T10:09:01+0000 priceless-mayer CRON[846206]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T10:09:01+0000 priceless-mayer CRON[846207]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)
+2026-09-14T10:09:01+0000 priceless-mayer CRON[846208]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T10:09:01+0000 priceless-mayer CRON[846209]: (psaadm) CMD (/opt/psa/admin/bin/php -dauto_prepend_file=sdk.php '/opt/psa/admin/plib/modules/monitoring/scripts/cloud-alerts.php')
+
+--- Nigeria lundi 10h — execution du 2026-09-14 ---
+FILE=/var/log/africafunds_nigeria_20260914.log size=17436 mtime=2026-09-14 10:04:17.504632568 +0000
+========================================
+=== AFRICAFUNDS NIGERIA WEEKLY UPDATE ===
+=== Mon Sep 14 10:00:01 AM UTC 2026 ===
+========================================
+
+[1/8] Extraction SEC Nigeria (2026)...
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_10th_April_2026.xlsx | rows=222 | dates=2026-04-10
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_10th_July_2026.xlsx | rows=223 | dates=2026-07-10
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_11th_June_2026.xlsx | rows=222 | dates=2026-06-11
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_13th_February_2026.xlsx | rows=216 | dates=2026-02-13
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_13th_March_2026.xlsx | rows=219 | dates=2026-03-13
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_15th_May_2026.xlsx | rows=221 | dates=2026-05-15
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_16th_January_2026.xlsx | rows=214 | dates=2026-01-16
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_17th_April_2026.xlsx | rows=221 | dates=2026-04-17
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_17th_July_2026.xlsx | rows=225 | dates=2026-07-17
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_18th_March_2026.xlsx | rows=219 | dates=2026-03-18
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_19th_June_2026.xlsx | rows=222 | dates=2026-06-19
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_20th_February_2026.xlsx | rows=216 | dates=2026-02-20
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_21st_August_2026.xlsx | rows=227 | dates=2026-08-21
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_22nd_May_2026.xlsx | rows=221 | dates=2026-05-22
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_23rd_January_2026.xlsx | rows=214 | dates=2026-01-23
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_24th_April_2026.xlsx | rows=221 | dates=2026-04-24
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_24th_July_2026.xlsx | rows=225 | dates=2026-07-24
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_26th_June_2026.xlsx | rows=222 | dates=2026-06-26
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_27th_February_2026.xlsx | rows=217 | dates=2026-02-27
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_27th_March_2026.xlsx | rows=219 | dates=2026-03-27
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_28th_August_2026.xlsx | rows=227 | dates=2026-08-28
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_29th_May_2026.xlsx | rows=221 | dates=2026-05-29
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_2nd_April_2026.xlsx | rows=220 | dates=2026-04-02
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_2nd_January_2026.xlsx | rows=214 | dates=2026-01-02
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_30th_April_2026.xlsx | rows=222 | dates=2026-04-30
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_30th_January_2026.xlsx | rows=214 | dates=2026-01-30
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_31st_July_2026.xlsx | rows=225 | dates=2026-07-31
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_3rd_July_2026.xlsx | rows=222 | dates=2026-07-03
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_5th_June_2026.xlsx | rows=222 | dates=2026-06-05
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_6th_February_2026.xlsx | rows=215 | dates=2026-02-06
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_6th_March_2026.xlsx | rows=217 | dates=2026-03-06
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_7th_August_2026.xlsx | rows=227 | dates=2026-08-07
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_8th_May_2026.xlsx | rows=221 | dates=2026-05-08
+[OK] 2026 | Net_Asset_Value_and_Unit_Price_as_at_9th_January_2026.xlsx | rows=214 | dates=2026-01-09
+
+Extraction terminée.
+Lignes extraites avant filtre qualité : 7487
+Lignes écrites : 7487
+Fichiers / feuilles audités : 34
+Lignes de cohérence inter-fichiers : 0
+Lignes de couverture annuelle : 1
+Suggestions fuzzy naming : 2
+CSV données : sec_ng_latest.csv
+CSV audit : sec_ng_audit_latest.csv
+CSV cohérence : sec_ng_coherence_latest.csv
+CSV couverture annuelle : sec_ng_coverage_latest.csv
+CSV fuzzy names : sec_ng_fuzzy_latest.csv
+[1/8] OK
+
+[2/8] Import VL Nigeria dans MySQL...
+Lecture de sec_ng_latest.csv...
+7487 lignes lues depuis le CSV
+7430 lignes valides (avec date + prix + nom)
+  57 lignes rejetees (VL hors bornes [0.0001-1000000] ou NAV > 5000000000000)
+252 fonds distincts identifies
+Connecte a la base fund_opcvm
+Chargement des taux de change...
+  132440 entrees forex chargees
+  321 fonds normalises: pays -> 'Nigeria'
+331 fonds Nigeria existants en base
+  Progression: 20/252 fonds (0 VL inserees)...
+  Progression: 40/252 fonds (0 VL inserees)...
+  Progression: 60/252 fonds (0 VL inserees)...
+  Progression: 80/252 fonds (0 VL inserees)...
+  Progression: 100/252 fonds (0 VL inserees)...
+  Progression: 120/252 fonds (4 VL inserees)...
+  Progression: 140/252 fonds (20 VL inserees)...
+  Progression: 160/252 fonds (24 VL inserees)...
+  Progression: 180/252 fonds (24 VL inserees)...
+  Progression: 200/252 fonds (24 VL inserees)...
+  Progression: 220/252 fonds (24 VL inserees)...
+  Progression: 240/252 fonds (37 VL inserees)...
+
+
+==========================================
+=== RAPPORT IMPORT VL NIGERIA (SEC) ===
+==========================================
+Fichier CSV:                   sec_ng_latest.csv
+Lignes CSV totales:            7487
+Lignes valides:                7430
+Fonds dans le CSV:             252
+Fonds matches (existants):     251
+  dont fuzzy match:            2
+Fonds crees (nouveaux):        1
+Fonds ignores (--skip-existing): 0
+Fonds metadata MAJ:            0
+VL inserees:                   46
+VL deja existantes (gardees):  6148
+VL sans taux forex:            0
+Erreurs:                       40
+
+Contrat d ecriture:            mode warn, lot SECNG_20260914_100032
+  Qualite des mesures:         CURRENCY_MISMATCH=1236  UNQUALIFIED=46
+  Mesures refusees:            1236  <-- devise contredisant celle du fonds
+  Rollback de ce lot:          DELETE FROM valorisations WHERE correction_batch = 'SECNG_20260914_100032'
+
+Matches fuzzy (a verifier):
+  CSV: "Nigeria Real Estate Investment Trust" <-> DB: "NIGERIAN REAL ESTATE INVESTMENT TRUST" (sim=0.954)
+  CSV: "D'Namaz Halal Fixed Income Fund" <-> DB: "D NAMAZ HALAL FIXED INCOME FUND" (sim=0.963)
+
+Premieres erreurs (max 20):
+  - CONTRAT Afrinvest Equity Fund 2026-07-17 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1142 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Afrinvest Equity Fund 2026-08-21 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1142 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Afrinvest Equity Fund 2026-07-24 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1142 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Afrinvest Equity Fund 2026-08-28 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1142 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Afrinvest Equity Fund 2026-07-31 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1142 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Afrinvest Equity Fund 2026-08-07 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1142 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Anchoria Equity Fund 2026-07-17 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1148 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Anchoria Equity Fund 2026-08-21 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1148 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Anchoria Equity Fund 2026-07-24 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1148 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Anchoria Equity Fund 2026-08-28 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1148 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Anchoria Equity Fund 2026-07-31 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1148 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT Anchoria Equity Fund 2026-08-07 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1148 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT ARM Aggressive Growth Fund 2026-07-17 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1151 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT ARM Aggressive Growth Fund 2026-08-21 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1151 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT ARM Aggressive Growth Fund 2026-07-24 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1151 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT ARM Aggressive Growth Fund 2026-08-28 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1151 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT ARM Aggressive Growth Fund 2026-07-31 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1151 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT ARM Aggressive Growth Fund 2026-08-07 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1151 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT AXA Mansard Equity Income Fund 2026-07-17 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1161 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+  - CONTRAT AXA Mansard Equity Income Fund 2026-08-21 : type de prix absent ; devise de la mesure (USD) differente de celle du fonds 1161 (NGN) — choisir la colonne publiee dans la devise du fonds, ne jamais convertir ; aucune provenance (ni URL ni identifiant de document)
+
+Categories extraites:
+  OBLIGATAIRE (59 fonds) => OBLIGATIONS / OBLIGATIONS
+  MONETAIRE (48 fonds) => MONETAIRE / MONETAIRE
+  AUTRE (43 fonds) => AUTRE / AUTRE
+  DOLLAR (29 fonds) => DOLLAR / DOLLAR
+  DIVERSIFIE (29 fonds) => DIVERSIFIE / DIVERSIFIE
+  ACTIONS (22 fonds) => ACTIONS / ACTIONS
+  ETF (11 fonds) => ETF / ETF
+  IMMOBILIER (6 fonds) => IMMOBILIER / IMMOBILIER
+  ETHIQUE (2 fonds) => ETHIQUE / ETHIQUE
+  INFRASTRUCTURE (2 fonds) => INFRASTRUCTURE / INFRASTRUCTURE
+  CHARIA (1 fonds) => CHARIA / CHARIA
+
+VL par annee:
+  2026: 7430 VL
+
+Connexion fermee
+[2/8] OK
+
+[3/8] Recalcul EUR/USD taux quotidiens...
+Connecte a la base fund_opcvm
+Chargement de tous les taux de change...
+  132440 entrees forex chargees
+  Paires disponibles: EUR/USD, USD/MAD, EUR/XOF, USD/XOF, EUR/MAD, EUR/XAF, USD/XAF, EUR/ZAR, USD/EGP, EUR/KES, EUR/TND, USD/TND, USD/NGN, USD/KES, USD/ZAR, EUR/EGP, USD/NAD, EUR/NGN, EUR/NAD, EUR/GHS, USD/GHS
+  EUR/USD: 7586 dates (2000-01-03 -> 2026-09-11)
+
+1251 fonds a traiter
+
+  [50/1251] MAD TWIN CASH: 1551 VL
+  [100/1251] MAD PATRIMOINE OBLIGATIONS: 642 VL
+  [150/1251] MAD FCP UPLINE CAPITAL GARANTI: 1848 VL
+  [200/1251] MAD FCP EMERGENCE ALLOCATION: 331 VL
+  [250/1251] MAD FCP CAP INSTITUTIONS: 1843 VL
+  [300/1251] MAD ELAN SOLIDARITE: 390 VL
+  [350/1251] MAD CFG CORPORATE BONDS: 405 VL
+  [400/1251] MAD CAPITAL TRUST RENDEMENT: 390 VL
+  [450/1251] MAD BMCI PREMIUM LONG TERM BOND: 409 VL
+  [500/1251] MAD ATLAS OBLIGBANCAIRES: 1826 VL
+  [550/1251] MAD AD BALANCED FUND: 396 VL
+  [600/1251] NGN EDC DOLLAR FUND: 152 VL
+  [650/1251] NGN NOVA DOLLAR FIXED INCOME FUND: 292 VL
+  [700/1251] NGN ZENITH MONEY MARKET FUND: 440 VL
+  [750/1251] TND INTERNATIONALE OBLIGATAIRE SICAV: 3138 VL
+  [800/1251] TND SICAV PATRIMOINE OBLIGATAIRE: 3139 VL
+  [850/1251] TND FCP AL IMTIEZ: 3114 VL
+  [900/1251] XOF FCP CORIS PERFORMANCE: 417 VL
+  [950/1251] XOF FCP ATLANTIQUE SECURITE: 218 VL
+  [1000/1251] XAF FCP RAPEC: 61 VL
+  [1050/1251] MAD TWIN LIQUID BANK: 121 VL
+  [1100/1251] USD ZEDCREST DOLLAR FUND: 129 VL
+  [1150/1251] USD FBN EUROBOND (NIGERIA EUROBOND USD) FUND (INSTITUTIONAL): 209 VL
+  [1200/1251] USD ValuAlliance Specialized Dollar Fund: 18 VL
+  [1250/1251] USD Alpha10 Halal Fund: 3 VL
+  [1251/1251] USD First Asset Dollar Fund: 1 VL
+
+==========================================
+=== RAPPORT RECALCUL EUR/USD QUOTIDIEN ===
+==========================================
+Mode:                      REEL
+Fonds traites:             1249
+Fonds skipped:             2
+VL recalculees:            989187 / 989187
+Erreurs:                   0
+
+VL par devise:
+  MAD: 558882 VL
+  TND: 307689 VL
+  NGN: 75454 VL
+  XOF: 43309 VL
+  XAF: 2134 VL
+  USD: 1719 VL
+
+Echantillons avant/apres (MAD):
+  AD HARMONIE DIVERSIFIE (2026-09-04):
+    value=1115.27 MAD
+    EUR: 102.5441 -> 102.5441
+    USD: 118.9837 -> 118.9837
+  WINEO OCT PLUS (2026-09-10):
+    value=1075.45 MAD
+    EUR: 99.0468 -> 99.0468
+    USD: 114.8470 -> 114.8470
+  WINEO DIVIDENDES ET CROISSANCE (2026-09-04):
+    value=1368.99 MAD
+    EUR: 125.8726 -> 125.8726
+    USD: 146.0521 -> 146.0521
+
+Verification (sur le perimetre traite) : le taux implicite
+value / value_EUR correspond-il au taux reel du jour ?
+  2026-09-10 MAD: 1075.45 / 99.0468 EUR = 10.8580 (reel: 10.8580) OK
+  2026-09-10 MAD: 1363.05 / 125.5342 EUR = 10.8580 (reel: 10.8580) OK
+  2026-09-10 MAD: 2023.05 / 186.3188 EUR = 10.8580 (reel: 10.8580) OK
+  2026-09-10 MAD: 1550.84 / 142.8293 EUR = 10.8580 (reel: 10.8580) OK
+  2026-09-10 MAD: 154.79 / 14.2558 EUR = 10.8580 (reel: 10.8580) OK
+
+Termine.
+[3/8] OK
+
+[4/8] Recalcul VL Ajuste (tous fonds actifs)...
+Connecte a la base fund_opcvm
+1251 fonds a traiter
+
+  [50/1251] TWIN CASH: 1551 VL
+  [100/1251] PATRIMOINE OBLIGATIONS: 642 VL
+  [150/1251] FCP UPLINE CAPITAL GARANTI: 1848 VL
+  [200/1251] FCP EMERGENCE ALLOCATION: 331 VL
+  [250/1251] FCP CAP INSTITUTIONS: 1843 VL
+  [300/1251] ELAN SOLIDARITE: 390 VL
+  [350/1251] CFG CORPORATE BONDS: 405 VL
+  [400/1251] CAPITAL TRUST RENDEMENT: 390 VL
+  [450/1251] BMCI PREMIUM LONG TERM BOND: 409 VL
+  [500/1251] ATLAS OBLIGBANCAIRES: 1826 VL
+  [550/1251] AD BALANCED FUND: 396 VL
+  [600/1251] EDC DOLLAR FUND: 153 VL
+  [650/1251] NOVA DOLLAR FIXED INCOME FUND: 292 VL
+  [700/1251] ZENITH MONEY MARKET FUND: 440 VL
+Erreur fatale: Error: Can't add new command when connection is in closed state
+    at PromiseConnection.execute (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/node_modules/mysql2/promise.js:112:22)
+    at run (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/recalc/recalc_vl_ajuste.js:88:33)
+    at processTicksAndRejections (internal/process/task_queues.js:93:5) {
+  code: undefined,
+  errno: undefined,
+  sql: undefined,
+  sqlState: undefined,
+  sqlMessage: undefined
+}
+[4/8] ERREUR (exit code 1)
+
+[5a/8] Recalcul performances locale (fonds 1-600)...
+{"error":"Une erreur s'est produite lors du traitement."}[5a/8] ERREUR (HTTP 500)
+
+[5b/8] Recalcul performances locale (fonds 601-1200)...
+{"error":"Une erreur s'est produite lors du traitement."}[5b/8] ERREUR (HTTP 500)
+
+[6a/8] Recalcul performances EUR (fonds 1-600)...
+{"error":"connect ECONNREFUSED 127.0.0.1:3306"}[6a/8] ERREUR (HTTP 500)
+
+[6b/8] Recalcul performances EUR (fonds 601-1200)...
+{"error":"connect ECONNREFUSED 127.0.0.1:3306"}[6b/8] ERREUR (HTTP 500)
+
+[7a/8] Recalcul performances USD (fonds 1-600)...
+{"error":"connect ECONNREFUSED 127.0.0.1:3306"}[7a/8] ERREUR (HTTP 500)
+
+[7b/8] Recalcul performances USD (fonds 601-1200)...
+{"error":"connect ECONNREFUSED 127.0.0.1:3306"}[7b/8] ERREUR (HTTP 500)
+
+[8/8] Resynchronisation datejour (Nigeria)...
+Erreur fatale : connect ECONNREFUSED 127.0.0.1:3306
+[8/8] ERREUR (exit code 1)
+
+=== NIGERIA WEEKLY UPDATE TERMINE AVEC 8 ERREUR(S) Mon Sep 14 10:04:17 AM UTC 2026 ===
+========================================
 
 --- daily 20h : stat + jalons uniquement ---
 FILE=/var/log/africafunds_daily_20260914.log size=16515 mtime=2026-09-14 21:13:15.284247576 +0000
@@ -1036,7 +1361,7 @@ Erreur lors de l'appel à l'API pour le fond avec l'ID 1200
 
 --- PM2 logs: batch/perf/classement markers around Sep 14 ---
 LOGFILE=/root/.pm2/logs/api-monolith-out.log
-size=46484520 mtime=2026-09-15 00:00:19.452105966 +0000
+size=46484885 mtime=2026-09-15 00:24:18.875600420 +0000
 ::ffff:127.0.0.1 - - [18/Aug/2026:20:49:08 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [18/Aug/2026:20:54:08 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [18/Aug/2026:21:56:27 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
@@ -1400,7 +1725,7 @@ Erreur lors de la récupération des données valLiq: ConnectionRefusedError [Se
   original: Error: connect ECONNREFUSED 127.0.0.1:3306
     code: 'ECONNREFUSED',
 LOGFILE=/root/.pm2/logs/api-monolith-out.log
-size=46484520 mtime=2026-09-15 00:00:19.452105966 +0000
+size=46484885 mtime=2026-09-15 00:24:18.875600420 +0000
 ::ffff:127.0.0.1 - - [18/Aug/2026:20:49:08 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [18/Aug/2026:20:54:08 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [18/Aug/2026:21:56:27 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
@@ -1765,31 +2090,22 @@ Erreur lors de la récupération des données valLiq: ConnectionRefusedError [Se
     code: 'ECONNREFUSED',
 
 --- processus node/mysql encore vivants ---
- 928517  928318 Fri Sep  4 06:38:13 2026 10-17:44:48 node server.js
- 928551  928371 Fri Sep  4 06:38:13 2026 10-17:44:48 node --import tsx/esm server.ts
- 929244  928551 Fri Sep  4 06:38:16 2026 10-17:44:45 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
- 929356  928501 Fri Sep  4 06:38:17 2026 10-17:44:44 [node] <defunct>
-2100513       1 Mon Sep 14 23:32:31 2026       50:30 /usr/sbin/mariadbd
-3269585    4648 Sat Sep 12 02:12:41 2026  2-22:10:20 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3269605    4648 Sat Sep 12 02:12:43 2026  2-22:10:18 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3273968    4648 Sat Sep 12 02:20:38 2026  2-22:02:23 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
-3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:22:54 node --import tsx/esm server.ts
-3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:22:54 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
-2117834 2117459 Tue Sep 15 00:00:52 2026       22:09 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
-2121710 2117459 Tue Sep 15 00:09:16 2026       13:45 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
-2121903 2117459 Tue Sep 15 00:09:21 2026       13:40 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
-2130437 2117459 Tue Sep 15 00:20:03 2026       02:58 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
+ 928517  928318 Fri Sep  4 06:38:13 2026 10-17:48:37 node server.js
+ 928551  928371 Fri Sep  4 06:38:13 2026 10-17:48:37 node --import tsx/esm server.ts
+ 929244  928551 Fri Sep  4 06:38:16 2026 10-17:48:34 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+ 929356  928501 Fri Sep  4 06:38:17 2026 10-17:48:33 [node] <defunct>
+2100513       1 Mon Sep 14 23:32:31 2026       54:19 /usr/sbin/mariadbd
+3269585    4648 Sat Sep 12 02:12:41 2026  2-22:14:09 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3269605    4648 Sat Sep 12 02:12:43 2026  2-22:14:07 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3273968    4648 Sat Sep 12 02:20:38 2026  2-22:06:12 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
+3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:26:43 node --import tsx/esm server.ts
+3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:26:43 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+2117834 2117459 Tue Sep 15 00:00:52 2026       25:58 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
+2121710 2117459 Tue Sep 15 00:09:16 2026       17:34 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
+2121903 2117459 Tue Sep 15 00:09:21 2026       17:29 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
+2130437 2117459 Tue Sep 15 00:20:03 2026       06:47 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
 
 ==============================================
  FIN — aucune variable modifiee, aucun service redemarre
 ==============================================
-Traceback (most recent call last):
-  File "<string>", line 1, in <module>
-  File "/usr/lib/python3.10/json/__init__.py", line 346, in loads
-    return _default_decoder.decode(s)
-  File "/usr/lib/python3.10/json/decoder.py", line 337, in decode
-    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-  File "/usr/lib/python3.10/json/decoder.py", line 355, in raw_decode
-    raise JSONDecodeError("Expecting value", s, err.value) from None
-json.decoder.JSONDecodeError: Expecting value: line 2 column 1 (char 1)
 ```
