@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "53dd4b541beb108a2fabbcbc2749d35f90142170"
+      "head": "87896703d545c36812d4eb00dbc42e2c647f4864"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "7164973afd0b67b6274c9f1b0326f2d0f16f7f73"
+      "head": "63170bc0cf21c3f483f34b5566e3209ad098686c"
     }
   },
   "summary": {
@@ -10390,17 +10390,17 @@
       "contradictions": [],
       "duplication_risk": "NONE",
       "stale_state": [],
-      "security_impact": "NONE",
+      "security_impact": "HIGH",
       "production_impact": "NO",
       "title": "Memoire MySQL — releve",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_MYSQL_MEMOIRE.md",
-      "git_blob_sha": "97049fa02659438f0e9ff97733bbf060fb61f55c",
-      "last_validated_sha": "97049fa02659438f0e9ff97733bbf060fb61f55c",
-      "content_sha256": "431ac5abcece862045873d33021d67b533601db276d1c068577fe499a73d9341",
-      "line_count": 3237,
-      "byte_count": 227926,
+      "git_blob_sha": "279938f970a46c99c0a14c06db994e37fbd6e602",
+      "last_validated_sha": "279938f970a46c99c0a14c06db994e37fbd6e602",
+      "content_sha256": "0c96f27b6a4281ac3036286e7176de812c4d57a880f64993c41bb668fb33e66c",
+      "line_count": 3389,
+      "byte_count": 238940,
       "headings": [
         {
           "level": 1,
@@ -13260,11 +13260,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "2d1da67034d87407bf53d4556acd828376168d05",
-      "last_validated_sha": "2d1da67034d87407bf53d4556acd828376168d05",
-      "content_sha256": "a6ed0f5f60fdf378993ea8bd951d667a226b08d3f1bce9edabbf5312c8857007",
-      "line_count": 6386,
-      "byte_count": 448450,
+      "git_blob_sha": "c04bda53b65a91387f90296acaed3d06ea842152",
+      "last_validated_sha": "c04bda53b65a91387f90296acaed3d06ea842152",
+      "content_sha256": "99e7ec50d03d4cbbeda921569dc3a8bd00a9f3ec583edad67e9796592e4d5f99",
+      "line_count": 6409,
+      "byte_count": 449695,
       "headings": [
         {
           "level": 1,
