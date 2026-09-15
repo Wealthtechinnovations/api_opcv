@@ -463,6 +463,36 @@ jobs:
             fi
 
             echo ""
+            echo "--- indices 2026-08-31 autour de 18:30 ---"
+            ILOG=/var/log/cron_indices_daily.log
+            if [ -f "$ILOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$ILOG" 2>/dev/null || true
+              grep -n -A120 -B20 -E 'Aug 31.*Starting daily index scraper|Mon Aug 31.*Starting daily index scraper|2026-08-31' "$ILOG" | tail -360 || true
+            else
+              echo "INDICES_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- EUR/USD 2026-08-27 autour de 21:30 ---"
+            ELOG=/var/log/cron_eur_usd.log
+            if [ -f "$ELOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$ELOG" 2>/dev/null || true
+              awk '
+                /CRON EUR\/USD.*2026-08-27/ {show=1}
+                show {print}
+                show && /CRON EUR\/USD TERMINE.*2026-08-27/ {exit}
+              ' "$ELOG" | tail -360 || true
+            else
+              echo "EUR_USD_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- AF-OPS-005 : refus fund_opcvm depuis dernier restart 23:32 ---"
+            journalctl -u mariadb --since "2026-09-14 23:32:32" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei "Access denied.*fund_opcvm|Aborted connection.*fund_opcvm" \
+              | tail -220 || true
+
+            echo ""
             echo "--- PM2 access markers autour des occurrences ---"
             PLOG=/root/.pm2/logs/api-monolith-out.log
             if [ -f "$PLOG" ]; then
