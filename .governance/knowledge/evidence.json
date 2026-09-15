@@ -290,6 +290,30 @@
       "provenance": "GitHub Actions run 34909181790; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit c8b99a24b1607e52c2777b81da2f5719340322d2; frontend SUIVI lot BG 94e14e0e2ffb594ea900edc0f77eafe03be87b50",
       "observed_at": "2026-09-14T23:30:50Z",
       "summary": "Representative recalc_eur_usd_daily_rate.js --dry-run on fresh processes: system malloc RSS 122,964→207,552 kB (+84,588 kB); jemalloc 126,380→210,108 kB (+83,728 kB), about -1.0% growth difference. The workload made no writes, all health probes passed, rollback restored system malloc and libjemalloc2 was removed. Short allocator behavior is therefore non-discriminant for the multi-hour multi-GiB RSS growth."
+    },
+    {
+      "id": "AF-EVD-045",
+      "type": "MARIADB_LONG_DURATION_RSS_OBSERVATION",
+      "result": "PROCESS_AGE_GROWTH_OBSERVED_NOT_CAUSAL",
+      "provenance": "GitHub Actions read-only DIAG runs 34909577475, 34912839984 and 34913106077; reports at commits df1c43323a8f2742bc4d7e1e698dd96d7e824016, acb8fda0826a735965e6847d51b72c904cf3b482 and 9029faa5b86915071465b66cdc85bfa879d25e14",
+      "observed_at": "2026-09-15T00:26:00Z",
+      "summary": "After the allocator rollback to system malloc, fresh mariadbd RSS was ~127-130 MiB around ~5 minutes uptime and ~247 MiB around ~49-52 minutes uptime, while Memory_used stayed ~450-473 MB. Six 15-second samples at ~49 minutes were flat at 246,976 kB RSS. This proves that RSS can rise with process age/workload after restart, but does not establish a linear leak, a specific workload cause, or allocator causality."
+    },
+    {
+      "id": "AF-EVD-046",
+      "type": "BATCH_TIMEOUT_CONTROL_FLOW",
+      "result": "CLIENT_TIMEOUT_HAS_NO_SERVER_CANCELLATION_HOOK",
+      "provenance": "Source inspection at API commit 9029faa5b86915071465b66cdc85bfa879d25e14: scripts/cron/cron_daily_update.sh, scripts/cron/cron_nigeria_weekly.sh and src/routes/apigestionsavequotidien.js",
+      "observed_at": "2026-09-15T00:27:00Z",
+      "summary": "Both daily and Nigeria cron run_curl helpers default to curl --max-time 300 for saveperfdatemysql batches. The saveperfdatemysql Express handler processes funds sequentially with awaited processFundmysql calls and contains no req.aborted/close handling, AbortController, cancellation token or equivalent. Therefore a client timeout does not explicitly cancel the server-side loop. This proves a cancellation/observability gap and makes overlap structurally possible; it does not by itself prove that a particular timed-out invocation continued for a specific duration."
+    },
+    {
+      "id": "AF-EVD-047",
+      "type": "MARIADB_OOM_WORKLOAD_CORRELATION",
+      "result": "SEP14_OOM_DURING_NIGERIA_RECALC_VL_AJUSTE",
+      "provenance": "GitHub Actions read-only DIAG run 34913106077; report commit 9029faa5b86915071465b66cdc85bfa879d25e14; /var/log/africafunds_nigeria_20260914.log and kernel journal",
+      "observed_at": "2026-09-14T10:04:12Z",
+      "summary": "The Monday Nigeria cron started at 10:00:01 UTC. Extraction, Nigeria NAV import and EUR/USD daily-rate recalculation completed. Step 4 recalc_vl_ajuste was actively processing funds when the kernel logged npm start invoked oom-killer at 10:04:11 and killed mariadbd at 10:04:12 with anon-rss=14,902,200 kB. recalc_vl_ajuste then failed with 'Can't add new command when connection is in closed state'; subsequent saveperf/EUR/USD/datejour steps failed with HTTP 500/ECONNREFUSED. This proves the workload context for the Sep 14 occurrence, but does not establish recalc_vl_ajuste or the Nigeria cron as the general root cause."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."

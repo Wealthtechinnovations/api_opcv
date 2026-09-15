@@ -158,14 +158,17 @@
         "AF-INC-20260817-001"
       ],
       "depends_on": [],
-      "next_action": "Poursuivre la RCA en lecture seule sur la dérive longue durée : corréler RSS/RssAnon/Private_Dirty/Memory_used et âge du processus MariaDB avec crons, batchs, timeouts, handlers Node, activité SQL et fins réelles de traitements. Les A/B allocateur courts sont terminés et non discriminants pour le phénomène de plusieurs heures. Ne pas rejouer jemalloc court, ne pas muter MariaDB tant que des preuves read-only restent accessibles.",
+      "next_action": "Continuer la RCA read-only en quantifiant les durées réelles et chevauchements des batchs saveperf/classements après curl timeout, et reconstruire pour chaque OOM le workload actif. L'occurrence du 14/09 est désormais prouvée pendant cron Nigeria étape recalc_vl_ajuste, mais ce n'est pas encore une root cause générale. Suivre en parallèle la trajectoire RSS avec l'âge du processus; aucune mutation MariaDB.",
       "phase": "RCA_PENDING",
       "evidence_refs": [
         "AF-EVD-040",
         "AF-EVD-041",
         "AF-EVD-042",
         "AF-EVD-043",
-        "AF-EVD-044"
+        "AF-EVD-044",
+        "AF-EVD-045",
+        "AF-EVD-046",
+        "AF-EVD-047"
       ]
     },
     {

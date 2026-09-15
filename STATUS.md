@@ -127,3 +127,12 @@ Le précédent candidat `PROBABLE SYSTEM_MALLOC_FRAGMENTATION_RETENTION` n'est p
 La root cause exacte est donc `UNKNOWN` sous incident `RCA_PENDING`. Les preuves post-A/B sont `AF-EVD-041` à `AF-EVD-044`; `AF-EVD-040` reste historique.
 
 Prochaine preuve : série longue durée read-only et corrélation RSS ↔ âge du processus ↔ crons ↔ batchs ↔ timeouts ↔ handlers Node ↔ activité MariaDB. Aucun quatrième A/B court n'est requis. `AF-OPS-001` reste un gate de résilience séparé.
+
+
+## AF-OPS-003 — nouvelles preuves read-only — 2026-09-15 00:26 UTC
+
+- `AF-EVD-045` : après rollback, RSS system-malloc ~127–130 MiB vers ~5 min puis ~247 MiB vers ~50 min d'uptime; plateau court ensuite. Croissance avec âge/workload observée, non causale.
+- `AF-EVD-046` : les crons `saveperfdatemysql` ont un timeout client de 300 s, tandis que la route serveur n'a aucun hook d'annulation sur déconnexion. Timeout client != preuve de fin serveur.
+- `AF-EVD-047` : le 14/09, `cron_nigeria_weekly.sh` démarre 10:00:01; import + FX terminent; l'étape 4 `recalc_vl_ajuste` est active lorsque l'OOM-killer tue `mariadbd` à 10:04:12. Le script échoue ensuite sur connexion DB fermée.
+
+Ces faits renforcent la piste workload/overlap/rétention longue durée mais **ne prouvent pas encore la root cause générale**. Incident reste `RCA_PENDING`, root cause `UNKNOWN`.

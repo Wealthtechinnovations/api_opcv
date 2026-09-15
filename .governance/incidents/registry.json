@@ -60,16 +60,19 @@
       },
       "root_cause": {
         "status": "UNKNOWN",
-        "statement": "Le mécanisme exact de la croissance multi-Gio du RSS reste non résolu. Les observations prouvent un large écart entre RSS anonyme privé et Memory_used MariaDB, et réfutent une explication suffisante par buffers/connexions. Quatre runs A/B courts glibc/jemalloc ont été exécutés et rollbackés : ils montrent des résultats dépendants du workload et ne discriminent pas causalement le phénomène réel qui se développe sur plusieurs heures.",
+        "statement": "Le mécanisme exact de la croissance multi-Gio du RSS reste non résolu. Le large écart RSS anonyme privé vs Memory_used est prouvé, les A/B allocateur courts sont non discriminants, et l'OOM du 14/09 est désormais corrélé à l'étape recalc_vl_ajuste du cron Nigeria. Les handlers saveperf n'ont pas de cancellation explicite après timeout client. Ces faits réduisent le champ de recherche mais ne prouvent pas une cause générale unique.",
         "evidence_refs": [
           "AF-EVD-012",
           "AF-EVD-040",
           "AF-EVD-041",
           "AF-EVD-042",
           "AF-EVD-043",
-          "AF-EVD-044"
+          "AF-EVD-044",
+          "AF-EVD-045",
+          "AF-EVD-046",
+          "AF-EVD-047"
         ],
-        "why_not_proven": "Les A/B allocateur courts sont terminés mais durent ~40–60 s sur des processus frais, tandis que les RSS multi-Gio apparaissent après plusieurs heures. Ils ne prouvent ni une causalité glibc ni une supériorité durable de jemalloc. La prochaine preuve doit corréler en lecture seule la croissance RSS longue durée avec âge du processus, crons, batchs, timeouts, handlers Node et activité MariaDB."
+        "why_not_proven": "Une occurrence est corrélée à recalc_vl_ajuste et le chevauchement après timeout est structurellement possible, mais les autres occurrences n'ont pas encore un workload commun prouvé et aucune série longue ne relie directement un chevauchement précis à la croissance RSS multi-Gio. Root cause reste UNKNOWN/RCA_PENDING."
       },
       "contributing_factors": [
         {
@@ -81,6 +84,16 @@
           "status": "PROVEN",
           "statement": "Le contrôle doc-drift a historiquement pu rester vert lorsque la mesure DB échouait.",
           "incident_ref": "AF-INC-20260914-001"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Pour l'occurrence du 2026-09-14, le cron Nigeria lancé à 10:00:01 était dans l'étape 4 recalc_vl_ajuste lorsque l'OOM-killer a tué mariadbd à 10:04:12. Cette corrélation décrit le workload actif de cette occurrence sans l'élever à root cause générale.",
+          "evidence_ref": "AF-EVD-047"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Les crons saveperfdatemysql utilisent curl --max-time 300 alors que la route serveur traite séquentiellement sans mécanisme explicite d'annulation sur déconnexion client; un timeout client ne constitue donc pas une preuve de fin du handler et le chevauchement est structurellement possible.",
+          "evidence_ref": "AF-EVD-046"
         }
       ],
       "corrective_actions": [
@@ -142,7 +155,7 @@
         {
           "id": "CA-004",
           "status": "OPEN",
-          "description": "Poursuivre la RCA en lecture seule sur plusieurs heures en corrélant RSS/RssAnon/Private_Dirty/Memory_used, âge du processus, crons, batchs, timeouts, handlers Node et activité SQL afin de distinguer croissance liée au temps, au workload, au chevauchement ou à la rétention post-workload.",
+          "description": "Poursuivre la RCA en lecture seule sur plusieurs heures. Les preuves nouvelles établissent un contexte workload précis pour l'OOM du 14/09 et un gap d'annulation des handlers après timeout client; il reste à mesurer les durées réelles/chevauchements et la trajectoire RSS avant de conclure sur la root cause.",
           "task_refs": [
             "AF-OPS-003"
           ],
@@ -155,7 +168,10 @@
           ],
           "rollback": "Aucune mutation production autorisée par cette action; observation read-only uniquement.",
           "verification_refs": [
-            "AF-EVD-044"
+            "AF-EVD-044",
+            "AF-EVD-045",
+            "AF-EVD-046",
+            "AF-EVD-047"
           ]
         }
       ],
@@ -179,7 +195,10 @@
         "AF-EVD-041",
         "AF-EVD-042",
         "AF-EVD-043",
-        "AF-EVD-044"
+        "AF-EVD-044",
+        "AF-EVD-045",
+        "AF-EVD-046",
+        "AF-EVD-047"
       ],
       "linked_tasks": [
         "AF-OPS-001",

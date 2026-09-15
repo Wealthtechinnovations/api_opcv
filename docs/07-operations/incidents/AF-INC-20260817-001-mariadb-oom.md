@@ -45,3 +45,20 @@ Tous les runs ont rollbacké vers l'allocateur système avec contrôles DB/API/H
 Corréler PID/uptime/RSS/RssAnon/Private_Dirty/Memory_used, crons, batchs, timeouts clients, durée réelle des handlers Node, activité SQL et chevauchements éventuels, sans présumer la cause.
 
 L'incident ne peut pas être CLOSED tant que la root cause n'est pas prouvée et qu'une corrective action n'est pas vérifiée sur une durée représentative.
+
+
+## Preuves read-only supplémentaires — 2026-09-15
+
+### Process age / RSS
+`AF-EVD-045` : après le rollback vers system malloc, le RSS est passé d'environ 127–130 MiB vers ~5 minutes d'uptime à ~247 MiB vers ~50 minutes, puis reste plat sur six échantillons de 15 secondes. Cela démontre une croissance entre ces âges, pas une loi linéaire ni une cause.
+
+### Timeout client != annulation serveur
+`AF-EVD-046` : les crons appellent `saveperfdatemysql` avec `curl --max-time 300`. La route Express traite séquentiellement les fonds avec `await processFundmysql(fund)` et n'a aucun `req.aborted`, handler `close`, `AbortController` ou mécanisme équivalent. Le client peut donc cesser d'attendre sans qu'une annulation serveur soit explicitement déclenchée. Le chevauchement est possible mais doit encore être quantifié.
+
+### OOM du 14 septembre : workload actif prouvé
+`AF-EVD-047` : `cron_nigeria_weekly.sh` démarre à 10:00:01 UTC. Les étapes extraction, import Nigeria et recalcul FX terminent. L'étape 4 `recalc_vl_ajuste` est en cours lorsque le kernel enregistre `npm start invoked oom-killer` à 10:04:11 puis tue `mariadbd` à 10:04:12 (anon-rss 14,902,200 kB). Le recalcul échoue immédiatement sur `Can't add new command when connection is in closed state`; les étapes suivantes échouent en 500/ECONNREFUSED.
+
+Cela prouve le contexte de l'occurrence du 14/09. Cela ne prouve pas que `recalc_vl_ajuste`, Nigeria ou un chevauchement soit la cause commune des six occurrences.
+
+### Prochaine discrimination
+Reconstruire le contexte workload de chaque OOM et quantifier les chevauchements réels après timeouts clients, tout en poursuivant la série RSS/uptime. Aucune mutation MariaDB n'est requise pour cette phase.
