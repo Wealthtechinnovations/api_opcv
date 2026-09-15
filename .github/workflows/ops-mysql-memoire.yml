@@ -424,6 +424,54 @@ jobs:
 
             echo ""
             echo "=============================================="
+            echo " 8. CORRELATION MULTI-INCIDENTS — READ ONLY"
+            echo "=============================================="
+
+            echo "--- kernel OOM depuis 2026-08-17 (si journal encore disponible) ---"
+            journalctl -k --since "2026-08-17 00:00:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -iE 'out of memory|oom-kill|killed process.*mariadbd|invoked oom-killer' \
+              | tail -160 || true
+
+            echo ""
+            echo "--- cron autour OOM 2026-08-27 21:40/22:00 ---"
+            journalctl -u cron --since "2026-08-27 19:45:00" --until "2026-08-27 22:10:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_daily|cron_eur|cron_nigeria|sync_production' \
+              | tail -260 || true
+            if [ -f /var/log/africafunds_daily_20260827.log ]; then
+              echo "LOG=/var/log/africafunds_daily_20260827.log"
+              grep -E '^===|^\[[0-9]+[a-z]?/[0-9]+\]|ERREUR|TERMINE|Fonds traites|fonds a traiter|HTTP' /var/log/africafunds_daily_20260827.log | tail -260 || true
+            fi
+
+            echo ""
+            echo "--- cron autour OOM 2026-08-31 18:33 ---"
+            journalctl -u cron --since "2026-08-31 18:15:00" --until "2026-08-31 18:50:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_daily|cron_eur|cron_nigeria|sync_production' \
+              | tail -220 || true
+            if [ -f /var/log/africafunds_nigeria_20260831.log ]; then
+              echo "LOG=/var/log/africafunds_nigeria_20260831.log"
+              grep -E '^===|^\[[0-9]+[a-z]?/[0-9]+\]|ERREUR|TERMINE|Fonds traites|fonds a traiter|HTTP' /var/log/africafunds_nigeria_20260831.log | tail -260 || true
+            fi
+
+            echo ""
+            echo "--- cron autour OOM 2026-09-08 20:02 ---"
+            journalctl -u cron --since "2026-09-08 19:45:00" --until "2026-09-08 20:20:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_daily|cron_eur|cron_nigeria|sync_production' \
+              | tail -220 || true
+            if [ -f /var/log/africafunds_daily_20260908.log ]; then
+              echo "LOG=/var/log/africafunds_daily_20260908.log"
+              cat /var/log/africafunds_daily_20260908.log | tail -500 || true
+            fi
+
+            echo ""
+            echo "--- PM2 access markers autour des occurrences ---"
+            PLOG=/root/.pm2/logs/api-monolith-out.log
+            if [ -f "$PLOG" ]; then
+              grep -E '\[(27/Aug/2026:21:|27/Aug/2026:22:|31/Aug/2026:18:|08/Sep/2026:19:|08/Sep/2026:20:|14/Sep/2026:09:|14/Sep/2026:10:)' "$PLOG" \
+                | grep -Ei 'saveperf|classement|perform|api/' | tail -500 || true
+            fi
+
+            echo ""
+            echo "=============================================="
             echo " FIN — aucune variable modifiee, aucun service redemarre"
             echo "=============================================="
           REMOTE
