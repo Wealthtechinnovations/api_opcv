@@ -2,7 +2,7 @@
 
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-15 00:34 UTC**
+Derniere execution : **2026-09-15 00:38 UTC**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
@@ -10,11 +10,11 @@ Declencheur : `push` — par `Wealthtechinnovations`
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        2791         200         209       14953       14593
+Mem:           17945        2728         259         209       14957       14655
 Swap:           2047         412        1635
 
 RSS actuel de mariadbd :
-  0.24 Go — demarre depuis 01:00:18
+  0.24 Go — demarre depuis 01:04:09
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
@@ -51,23 +51,23 @@ Threads_running	1
  2b. MEMORY_USED / PROC / ALLOCATEUR
 ==============================================
 Aborted_connects	6
-Connections	863
-Created_tmp_disk_tables	5269
+Connections	890
+Created_tmp_disk_tables	5276
 Created_tmp_files	4
-Created_tmp_tables	6063
+Created_tmp_tables	6089
 Max_used_connections	15
 Memory_used	472949936
 Memory_used_initial	442210192
 Open_files	94
 Open_table_definitions	400
 Open_tables	619
-Opened_files	22143
+Opened_files	22171
 Opened_table_definitions	692
 Opened_tables	626
 Threads_connected	9
 Threads_created	15
 Threads_running	1
-Uptime	3618
+Uptime	3849
 
 --- version / instrumentation ---
 10.6.23-MariaDB-0ubuntu0.22.04.1	Ubuntu 22.04
@@ -77,7 +77,7 @@ table_definition_cache	400
 version_malloc_library	system
 MARIADB_PID=2100513
 --- /proc status ---
-2100513 246632 2792664  01:00:18   24  1.3 /usr/sbin/mariadbd
+2100513 246632 2792664  01:04:09   24  1.3 /usr/sbin/mariadbd
 VmPeak:	 2923768 kB
 VmSize:	 2792664 kB
 VmRSS:	  246632 kB
@@ -88,30 +88,30 @@ VmData:	  612452 kB
 VmSwap:	       0 kB
 Threads:	24
 --- smaps_rollup ---
-Rss:              249404 kB
-Pss:              243259 kB
-Pss_Anon:         227120 kB
-Pss_File:          16139 kB
+Rss:              249416 kB
+Pss:              243270 kB
+Pss_Anon:         227132 kB
+Pss_File:          16138 kB
 Private_Clean:     15404 kB
-Private_Dirty:    227120 kB
-Anonymous:        227120 kB
+Private_Dirty:    227132 kB
+Anonymous:        227132 kB
 AnonHugePages:         0 kB
 Swap:                  0 kB
 --- pmap totals ---
 ---------------- ------- ------- ------- 
-total kB         2792668  249404  227120
+total kB         2792668  249416  227132
 --- allocator libraries ---
-	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe89ea90000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fb06d341000)
 --- systemd/cgroup memory ---
 Restart=on-abort
 Result=success
 NRestarts=0
 OOMPolicy=stop
-MemoryCurrent=258527232
+MemoryCurrent=258551808
 ActiveState=active
 SubState=running
 [memory.current]
-258527232
+258551808
 [memory.swap.current]
 0
 [memory.events]
@@ -139,7 +139,7 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 000055ac6c616000    1352    1352    1352 r---- mariadbd
 00007f3684172000    2364    2104    2104 rw---   [ anon ]
 00007f363c000000    6640    2404    2404 rw---   [ anon ]
-00007f3660000000    5352    2464    2464 rw---   [ anon ]
+00007f3660000000    5352    2476    2476 rw---   [ anon ]
 00007f3698054000    4100    4100    4100 rw---   [ anon ]
 00007f361c000000    6124    4188    4188 rw---   [ anon ]
 000055ac76043000    5884    5080    5080 rw---   [ anon ]
@@ -154,14 +154,14 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 00007f36757ff000  163840  119104  119104 rw---   [ anon ]
 
 --- top connexions par memoire ---
-866	fund_opcvm	localhost	Query	0	0.15	0.15
-209	fund_opcvm	localhost:60356	Sleep	1953	0.09	0.09
-206	fund_opcvm	localhost:60334	Sleep	1951	0.09	0.33
-205	fund_opcvm	localhost:60332	Sleep	1951	0.09	0.33
-204	fund_opcvm	localhost:60324	Sleep	1951	0.09	0.32
-46	fund_opcvm	localhost:40916	Sleep	1950	0.09	3.34
-7	fund_opcvm	localhost:48340	Sleep	4	0.09	0.12
-55	fund_opcvm	localhost:57702	Sleep	25	0.08	0.11
+893	fund_opcvm	localhost	Query	0	0.15	0.15
+209	fund_opcvm	localhost:60356	Sleep	2184	0.09	0.09
+206	fund_opcvm	localhost:60334	Sleep	2182	0.09	0.33
+205	fund_opcvm	localhost:60332	Sleep	2182	0.09	0.33
+204	fund_opcvm	localhost:60324	Sleep	2182	0.09	0.32
+46	fund_opcvm	localhost:40916	Sleep	2181	0.09	3.34
+7	fund_opcvm	localhost:48340	Sleep	5	0.09	0.12
+55	fund_opcvm	localhost:57702	Sleep	16	0.08	0.11
 
 ==============================================
  3. PLAFOND CONFIGURE, PAS RSS REEL
@@ -210,12 +210,12 @@ Sep 14 23:32:32 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database ser
 ==============================================
  5. SERIE COURTE RSS vs Memory_used
 ==============================================
-SAMPLE ts=2026-09-15T00:32:51Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
-SAMPLE ts=2026-09-15T00:33:06Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
-SAMPLE ts=2026-09-15T00:33:21Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:33:36Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:33:52Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:34:07Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:36:43Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
+SAMPLE ts=2026-09-15T00:36:58Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
+SAMPLE ts=2026-09-15T00:37:13Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900640 connections=9
+SAMPLE ts=2026-09-15T00:37:28Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:37:43Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:37:58Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
 
 ==============================================
  6. CORRELATION CRONS / RSS — 2026-09-14
@@ -2090,20 +2090,21 @@ Erreur lors de la récupération des données valLiq: ConnectionRefusedError [Se
     code: 'ECONNREFUSED',
 
 --- processus node/mysql encore vivants ---
- 928517  928318 Fri Sep  4 06:38:13 2026 10-17:56:02 node server.js
- 928551  928371 Fri Sep  4 06:38:13 2026 10-17:56:02 node --import tsx/esm server.ts
- 929244  928551 Fri Sep  4 06:38:16 2026 10-17:55:59 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
- 929356  928501 Fri Sep  4 06:38:17 2026 10-17:55:58 [node] <defunct>
-2100513       1 Mon Sep 14 23:32:31 2026    01:01:44 /usr/sbin/mariadbd
-3269585    4648 Sat Sep 12 02:12:41 2026  2-22:21:34 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3269605    4648 Sat Sep 12 02:12:43 2026  2-22:21:32 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3273968    4648 Sat Sep 12 02:20:38 2026  2-22:13:37 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
-3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:34:08 node --import tsx/esm server.ts
-3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:34:08 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
-2117834 2117459 Tue Sep 15 00:00:52 2026       33:23 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
-2121710 2117459 Tue Sep 15 00:09:16 2026       24:59 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
-2121903 2117459 Tue Sep 15 00:09:21 2026       24:54 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
-2130437 2117459 Tue Sep 15 00:20:03 2026       14:12 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
+ 928517  928318 Fri Sep  4 06:38:13 2026 10-17:59:53 node server.js
+ 928551  928371 Fri Sep  4 06:38:13 2026 10-17:59:53 node --import tsx/esm server.ts
+ 929244  928551 Fri Sep  4 06:38:16 2026 10-17:59:50 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+ 929356  928501 Fri Sep  4 06:38:17 2026 10-17:59:49 [node] <defunct>
+2100513       1 Mon Sep 14 23:32:31 2026    01:05:35 /usr/sbin/mariadbd
+3269585    4648 Sat Sep 12 02:12:41 2026  2-22:25:25 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3269605    4648 Sat Sep 12 02:12:43 2026  2-22:25:23 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3273968    4648 Sat Sep 12 02:20:38 2026  2-22:17:28 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
+3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:37:59 node --import tsx/esm server.ts
+3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:37:59 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+2117834 2117459 Tue Sep 15 00:00:52 2026       37:14 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
+2121710 2117459 Tue Sep 15 00:09:16 2026       28:50 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
+2121903 2117459 Tue Sep 15 00:09:21 2026       28:45 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
+2130437 2117459 Tue Sep 15 00:20:03 2026       18:03 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
+2139026 2117459 Tue Sep 15 00:37:29 2026       00:37 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/wealthtech.chainsolutions
 
 ==============================================
  8. CORRELATION MULTI-INCIDENTS — READ ONLY
@@ -2892,6 +2893,236 @@ ERREUR FATALE: Error: connect ECONNREFUSED 127.0.0.1:3306
 CRON EUR/USD TERMINE AVEC 3 ERREUR(S) — 2026-08-27 21:40:01
 
 --- AF-OPS-005 : refus fund_opcvm depuis dernier restart 23:32 ---
+2026-09-14T23:36:29+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:29 74 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:36:33+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:33 75 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:36:48+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:48 81 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:36:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:51 82 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:38:53+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:38:53 92 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:38:56+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:38:56 93 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+
+--- preuve stricte execution indices le 2026-08-31 18:30 ---
+28898-    [Tunindex] ECHEC: aucune source n'a retourne de valeur
+28899-    [Tunindex] ECHEC: aucune source n'a retourne de valeur
+28900-
+28901-  [NSE] NSE All Share...
+28902-
+28903-  [NSE] NSE All Share...
+28904-    [NSE] ECHEC: aucune source n'a retourne de valeur
+28905-    [NSE] ECHEC: aucune source n'a retourne de valeur
+--
+28922-
+28923-
+28924-============================================================
+28925-============================================================
+28926-SCRAPE INDICES QUOTIDIENS — Africafunds
+28927-SCRAPE INDICES QUOTIDIENS — Africafunds
+28928-Mode: EXECUTE
+28929-Mode: EXECUTE
+28930-Date cible: 2026-08-26
+28931-Date cible: 2026-08-26
+28932:Date execution: 2026-08-31T18:30:20.059Z
+28933:Date execution: 2026-08-31T18:30:20.059Z
+28934-============================================================
+28935-
+28936-============================================================
+28937-
+28938---- PHASE 1: Scraping des indices ---
+28939-
+28940---- PHASE 1: Scraping des indices ---
+28941-
+28942-  [BRVM] BRVM Composite...
+28943-  [BRVM] BRVM Composite...
+28944-    [BRVM] SUCCESS via BOC PDF (bfin): 523.91
+28945-    [BRVM] SUCCESS via BOC PDF (bfin): 523.91
+28946-
+28947-
+28948-  [MASI] MASI...
+28949-  [MASI] MASI...
+28950-    [MASI] ECHEC: aucune source n'a retourne de valeur
+28951-    [MASI] ECHEC: aucune source n'a retourne de valeur
+28952-
+28953-
+28954-  [Tunindex] Tunindex...
+28955-  [Tunindex] Tunindex...
+28956-    [Tunindex] SUCCESS via BVMT REST history: 19531.53
+28957-    [Tunindex] SUCCESS via BVMT REST history: 19531.53
+28958-
+28959-
+28960-  [NSE] NSE All Share...
+28961-  [NSE] NSE All Share...
+28962-    [NSE] SUCCESS via NGX chartdata/ASI: 238682.92
+28963-    [NSE] SUCCESS via NGX chartdata/ASI: 238682.92
+--
+29030-
+29031-
+29032-============================================================
+29033-============================================================
+29034-SCRAPE INDICES QUOTIDIENS — Africafunds
+29035-SCRAPE INDICES QUOTIDIENS — Africafunds
+29036-Mode: EXECUTE
+29037-Mode: EXECUTE
+29038-Date cible: 2026-08-27
+29039-Date cible: 2026-08-27
+29040:Date execution: 2026-08-31T18:30:35.151Z
+29041:Date execution: 2026-08-31T18:30:35.151Z
+29042-============================================================
+29043-
+29044-============================================================
+29045-
+29046---- PHASE 1: Scraping des indices ---
+29047-
+29048---- PHASE 1: Scraping des indices ---
+29049-
+29050-  [BRVM] BRVM Composite...
+29051-  [BRVM] BRVM Composite...
+29052-    [BRVM] SUCCESS via BOC PDF (bfin): 529.94
+29053-    [BRVM] SUCCESS via BOC PDF (bfin): 529.94
+29054-
+29055-
+29056-  [MASI] MASI...
+29057-  [MASI] MASI...
+29058-    [MASI] ECHEC: aucune source n'a retourne de valeur
+29059-
+29060-    [MASI] ECHEC: aucune source n'a retourne de valeur
+29061-
+29062-  [Tunindex] Tunindex...
+29063-  [Tunindex] Tunindex...
+29064-    [Tunindex] SUCCESS via BVMT REST history: 19481.18
+29065-    [Tunindex] SUCCESS via BVMT REST history: 19481.18
+29066-
+29067-  [NSE] NSE All Share...
+29068-
+29069-  [NSE] NSE All Share...
+29070-    [NSE] SUCCESS via NGX chartdata/ASI: 239156.09
+29071-    [NSE] SUCCESS via NGX chartdata/ASI: 239156.09
+--
+29138-
+29139-
+29140-============================================================
+29141-============================================================
+29142-SCRAPE INDICES QUOTIDIENS — Africafunds
+29143-SCRAPE INDICES QUOTIDIENS — Africafunds
+29144-Mode: EXECUTE
+29145-Mode: EXECUTE
+29146-Date cible: 2026-08-28
+29147-Date cible: 2026-08-28
+29148:Date execution: 2026-08-31T18:30:43.953Z
+29149:Date execution: 2026-08-31T18:30:43.953Z
+29150-============================================================
+29151-
+29152-============================================================
+29153-
+29154---- PHASE 1: Scraping des indices ---
+29155-
+29156---- PHASE 1: Scraping des indices ---
+29157-
+29158-  [BRVM] BRVM Composite...
+29159-  [BRVM] BRVM Composite...
+29160-    [BRVM] SUCCESS via BOC PDF (bfin): 530.06
+29161-    [BRVM] SUCCESS via BOC PDF (bfin): 530.06
+29162-
+29163-
+29164-  [MASI] MASI...
+29165-  [MASI] MASI...
+29166-    [MASI] ECHEC: aucune source n'a retourne de valeur
+29167-    [MASI] ECHEC: aucune source n'a retourne de valeur
+29168-
+29169-
+29170-  [Tunindex] Tunindex...
+29171-  [Tunindex] Tunindex...
+29172-    [Tunindex] SUCCESS via BVMT REST history: 19450.38
+29173-    [Tunindex] SUCCESS via BVMT REST history: 19450.38
+29174-
+29175-  [NSE] NSE All Share...
+29176-
+29177-  [NSE] NSE All Share...
+29178-    [NSE] SUCCESS via NGX chartdata/ASI (current): 241298.47
+29179-    [NSE] SUCCESS via NGX chartdata/ASI (current): 241298.47
+--
+29258-
+29259-
+29260-============================================================
+29261-============================================================
+29262-SCRAPE INDICES QUOTIDIENS — Africafunds
+29263-SCRAPE INDICES QUOTIDIENS — Africafunds
+29264-Mode: EXECUTE
+29265-Mode: EXECUTE
+29266-Date cible: 2026-08-29
+29267-Date cible: 2026-08-29
+29268:Date execution: 2026-08-31T18:30:53.080Z
+29269:Date execution: 2026-08-31T18:30:53.080Z
+29270-============================================================
+29271-
+29272-============================================================
+29273-
+29274-  ATTENTION: la date cible est un weekend — les marches sont generalement fermes.
+29275-
+29276-  ATTENTION: la date cible est un weekend — les marches sont generalement fermes.
+29277-
+29278---- PHASE 1: Scraping des indices ---
+29279-
+29280---- PHASE 1: Scraping des indices ---
+29281-
+29282-  [BRVM] BRVM Composite...
+29283-  [BRVM] BRVM Composite...
+29284-    [BRVM] ECHEC: aucune source n'a retourne de valeur
+29285-    [BRVM] ECHEC: aucune source n'a retourne de valeur
+29286-
+29287-  [MASI] MASI...
+29288-
+29289-  [MASI] MASI...
+29290-    [MASI] ECHEC: aucune source n'a retourne de valeur
+29291-    [MASI] ECHEC: aucune source n'a retourne de valeur
+29292-
+29293-  [Tunindex] Tunindex...
+29294-
+29295-  [Tunindex] Tunindex...
+29296-    [Tunindex] ECHEC: aucune source n'a retourne de valeur
+29297-    [Tunindex] ECHEC: aucune source n'a retourne de valeur
+29298-
+29299-  [NSE] NSE All Share...
+
+--- attribution temporelle refus DB 23:30-23:45 ---
+2026-09-14T23:30:01+0000 priceless-mayer CRON[2096637]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:30:01+0000 priceless-mayer CRON[2096638]: (root) CMD (/usr/bin/python3 /usr/local/bin/fix-brvm-nginx.py >> /var/log/brvm-nginx-fix.log 2>&1)
+2026-09-14T23:30:01+0000 priceless-mayer CRON[2096639]: (root) CMD (   bash -c 'sleep $((RANDOM % 60))' ; /opt/imunify360/venv/share/imunify360/scripts/check-detached.py > /dev/null 2>&1 || :)
+2026-09-14T23:30:01+0000 priceless-mayer CRON[2096640]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:31:01+0000 priceless-mayer CRON[2097337]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:31:01+0000 priceless-mayer CRON[2097336]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:32:01+0000 priceless-mayer CRON[2100180]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:32:01+0000 priceless-mayer CRON[2100181]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:33:01+0000 priceless-mayer CRON[2100930]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:33:01+0000 priceless-mayer CRON[2100931]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:34:01+0000 priceless-mayer CRON[2101334]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:34:01+0000 priceless-mayer CRON[2101335]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:35:01+0000 priceless-mayer CRON[2101746]: (root) CMD (   bash -c 'sleep $((RANDOM % 60))' ; /opt/imunify360/venv/share/imunify360/scripts/check-detached.py > /dev/null 2>&1 || :)
+2026-09-14T23:35:01+0000 priceless-mayer CRON[2101748]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:35:01+0000 priceless-mayer CRON[2101747]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:35:01+0000 priceless-mayer CRON[2101749]: (root) CMD (/usr/bin/python3 /usr/local/bin/fix-brvm-nginx.py >> /var/log/brvm-nginx-fix.log 2>&1)
+2026-09-14T23:35:01+0000 priceless-mayer CRON[2101752]: (psaadm) CMD (/opt/psa/admin/bin/php -dauto_prepend_file=sdk.php '/opt/psa/admin/plib/modules/sslit/scripts/complete-order.php')
+2026-09-14T23:36:01+0000 priceless-mayer CRON[2102302]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:36:01+0000 priceless-mayer CRON[2102303]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:37:01+0000 priceless-mayer CRON[2103869]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:37:01+0000 priceless-mayer CRON[2103870]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:38:01+0000 priceless-mayer CRON[2104447]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:38:01+0000 priceless-mayer CRON[2104448]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:39:01+0000 priceless-mayer CRON[2105805]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:39:01+0000 priceless-mayer CRON[2105806]: (root) CMD (  [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi)
+2026-09-14T23:39:01+0000 priceless-mayer CRON[2105807]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:39:01+0000 priceless-mayer CRON[2105808]: (psaadm) CMD (/opt/psa/admin/bin/php -dauto_prepend_file=sdk.php '/opt/psa/admin/plib/modules/monitoring/scripts/cloud-alerts.php')
+2026-09-14T23:40:01+0000 priceless-mayer CRON[2106211]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:40:01+0000 priceless-mayer CRON[2106210]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:40:01+0000 priceless-mayer CRON[2106213]: (root) CMD (/usr/bin/python3 /usr/local/bin/fix-brvm-nginx.py >> /var/log/brvm-nginx-fix.log 2>&1)
+2026-09-14T23:40:01+0000 priceless-mayer CRON[2106212]: (root) CMD (   bash -c 'sleep $((RANDOM % 60))' ; /opt/imunify360/venv/share/imunify360/scripts/check-detached.py > /dev/null 2>&1 || :)
+2026-09-14T23:41:01+0000 priceless-mayer CRON[2106666]: (root) CMD ([ -x /opt/psa/admin/sbin/backupmng ] && /opt/psa/admin/sbin/backupmng >/dev/null 2>&1)
+2026-09-14T23:41:01+0000 priceless-mayer CRON[2106667]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:41:01+0000 priceless-mayer CRON[2106668]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:42:01+0000 priceless-mayer CRON[2107081]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:42:01+0000 priceless-mayer CRON[2107080]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:43:01+0000 priceless-mayer CRON[2107485]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:43:01+0000 priceless-mayer CRON[2107486]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
+2026-09-14T23:44:01+0000 priceless-mayer CRON[2107894]: (root) CMD (/usr/libexec/imunify-notifier/timed-trigger)
+2026-09-14T23:44:01+0000 priceless-mayer CRON[2107893]: (root) CMD (/usr/sbin/imunify-notifier -update-cron)
 2026-09-14T23:36:29+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:29 74 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
 2026-09-14T23:36:33+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:33 75 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
 2026-09-14T23:36:48+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:48 81 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
