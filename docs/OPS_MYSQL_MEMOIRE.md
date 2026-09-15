@@ -2,7 +2,7 @@
 
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-15 00:38 UTC**
+Derniere execution : **2026-09-15 00:43 UTC**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
@@ -10,11 +10,11 @@ Declencheur : `push` — par `Wealthtechinnovations`
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        2728         259         209       14957       14655
-Swap:           2047         412        1635
+Mem:           17945        2855         185         209       14905       14529
+Swap:           2047         406        1641
 
 RSS actuel de mariadbd :
-  0.24 Go — demarre depuis 01:04:09
+  0.24 Go — demarre depuis 01:09:46
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
@@ -50,24 +50,24 @@ Threads_running	1
 ==============================================
  2b. MEMORY_USED / PROC / ALLOCATEUR
 ==============================================
-Aborted_connects	6
-Connections	890
-Created_tmp_disk_tables	5276
+Aborted_connects	29
+Connections	952
+Created_tmp_disk_tables	5282
 Created_tmp_files	4
-Created_tmp_tables	6089
+Created_tmp_tables	6116
 Max_used_connections	15
-Memory_used	472949936
+Memory_used	472949800
 Memory_used_initial	442210192
 Open_files	94
 Open_table_definitions	400
 Open_tables	619
-Opened_files	22171
+Opened_files	22195
 Opened_table_definitions	692
 Opened_tables	626
 Threads_connected	9
 Threads_created	15
 Threads_running	1
-Uptime	3849
+Uptime	4185
 
 --- version / instrumentation ---
 10.6.23-MariaDB-0ubuntu0.22.04.1	Ubuntu 22.04
@@ -77,41 +77,41 @@ table_definition_cache	400
 version_malloc_library	system
 MARIADB_PID=2100513
 --- /proc status ---
-2100513 246632 2792664  01:04:09   24  1.3 /usr/sbin/mariadbd
+2100513 246572 2792664  01:09:46   24  1.3 /usr/sbin/mariadbd
 VmPeak:	 2923768 kB
 VmSize:	 2792664 kB
-VmRSS:	  246632 kB
+VmRSS:	  246572 kB
 RssAnon:	  224684 kB
-RssFile:	   21948 kB
+RssFile:	   21888 kB
 RssShmem:	       0 kB
-VmData:	  612452 kB
+VmData:	  614732 kB
 VmSwap:	       0 kB
 Threads:	24
 --- smaps_rollup ---
-Rss:              249416 kB
-Pss:              243270 kB
-Pss_Anon:         227132 kB
-Pss_File:          16138 kB
-Private_Clean:     15404 kB
-Private_Dirty:    227132 kB
-Anonymous:        227132 kB
+Rss:              249388 kB
+Pss:              243202 kB
+Pss_Anon:         227164 kB
+Pss_File:          16038 kB
+Private_Clean:     15356 kB
+Private_Dirty:    227164 kB
+Anonymous:        227164 kB
 AnonHugePages:         0 kB
 Swap:                  0 kB
 --- pmap totals ---
 ---------------- ------- ------- ------- 
-total kB         2792668  249416  227132
+total kB         2792668  249388  227164
 --- allocator libraries ---
-	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fb06d341000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd1bf0fa000)
 --- systemd/cgroup memory ---
 Restart=on-abort
 Result=success
 NRestarts=0
 OOMPolicy=stop
-MemoryCurrent=258551808
+MemoryCurrent=258482176
 ActiveState=active
 SubState=running
 [memory.current]
-258551808
+258482176
 [memory.swap.current]
 0
 [memory.events]
@@ -134,7 +134,7 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 --- top mappings pmap par dirty kB ---
 00007f3668000000     780     540     540 rw---   [ anon ]
 00007f369947f000    1604     540     540 rw---   [ anon ]
-00007f3618000000    1796     860     860 rw---   [ anon ]
+00007f3618000000    1908     868     868 rw---   [ anon ]
 00007f3608000000    4072    1060    1060 rw---   [ anon ]
 000055ac6c616000    1352    1352    1352 r---- mariadbd
 00007f3684172000    2364    2104    2104 rw---   [ anon ]
@@ -143,7 +143,7 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 00007f3698054000    4100    4100    4100 rw---   [ anon ]
 00007f361c000000    6124    4188    4188 rw---   [ anon ]
 000055ac76043000    5884    5080    5080 rw---   [ anon ]
-00007f3620000000    6164    5240    5240 rw---   [ anon ]
+00007f3620000000    8332    5264    5264 rw---   [ anon ]
 00007f3698456000   16544    6424    6424 rw---   [ anon ]
 00007f3648000000    7336    7092    7092 rw---   [ anon ]
 00007f3654000000   10444    7588    7588 rw---   [ anon ]
@@ -154,14 +154,14 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 00007f36757ff000  163840  119104  119104 rw---   [ anon ]
 
 --- top connexions par memoire ---
-893	fund_opcvm	localhost	Query	0	0.15	0.15
-209	fund_opcvm	localhost:60356	Sleep	2184	0.09	0.09
-206	fund_opcvm	localhost:60334	Sleep	2182	0.09	0.33
-205	fund_opcvm	localhost:60332	Sleep	2182	0.09	0.33
-204	fund_opcvm	localhost:60324	Sleep	2182	0.09	0.32
-46	fund_opcvm	localhost:40916	Sleep	2181	0.09	3.34
-7	fund_opcvm	localhost:48340	Sleep	5	0.09	0.12
-55	fund_opcvm	localhost:57702	Sleep	16	0.08	0.11
+956	fund_opcvm	localhost	Query	0	0.15	0.15
+209	fund_opcvm	localhost:60356	Sleep	2521	0.09	0.09
+206	fund_opcvm	localhost:60334	Sleep	2519	0.09	0.33
+205	fund_opcvm	localhost:60332	Sleep	2518	0.09	0.33
+204	fund_opcvm	localhost:60324	Sleep	2518	0.09	0.32
+46	fund_opcvm	localhost:40916	Sleep	2518	0.09	3.34
+7	fund_opcvm	localhost:48340	Sleep	2	0.09	0.12
+55	fund_opcvm	localhost:57702	Sleep	22	0.08	0.11
 
 ==============================================
  3. PLAFOND CONFIGURE, PAS RSS REEL
@@ -210,12 +210,12 @@ Sep 14 23:32:32 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database ser
 ==============================================
  5. SERIE COURTE RSS vs Memory_used
 ==============================================
-SAMPLE ts=2026-09-15T00:36:43Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
-SAMPLE ts=2026-09-15T00:36:58Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
-SAMPLE ts=2026-09-15T00:37:13Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900640 connections=9
-SAMPLE ts=2026-09-15T00:37:28Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:37:43Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:37:58Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:42:19Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
+SAMPLE ts=2026-09-15T00:42:34Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:42:49Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900640 connections=9
+SAMPLE ts=2026-09-15T00:43:04Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:43:19Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:43:34Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471991432 connections=10
 
 ==============================================
  6. CORRELATION CRONS / RSS — 2026-09-14
@@ -2090,21 +2090,22 @@ Erreur lors de la récupération des données valLiq: ConnectionRefusedError [Se
     code: 'ECONNREFUSED',
 
 --- processus node/mysql encore vivants ---
- 928517  928318 Fri Sep  4 06:38:13 2026 10-17:59:53 node server.js
- 928551  928371 Fri Sep  4 06:38:13 2026 10-17:59:53 node --import tsx/esm server.ts
- 929244  928551 Fri Sep  4 06:38:16 2026 10-17:59:50 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
- 929356  928501 Fri Sep  4 06:38:17 2026 10-17:59:49 [node] <defunct>
-2100513       1 Mon Sep 14 23:32:31 2026    01:05:35 /usr/sbin/mariadbd
-3269585    4648 Sat Sep 12 02:12:41 2026  2-22:25:25 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3269605    4648 Sat Sep 12 02:12:43 2026  2-22:25:23 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3273968    4648 Sat Sep 12 02:20:38 2026  2-22:17:28 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
-3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:37:59 node --import tsx/esm server.ts
-3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:37:59 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
-2117834 2117459 Tue Sep 15 00:00:52 2026       37:14 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
-2121710 2117459 Tue Sep 15 00:09:16 2026       28:50 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
-2121903 2117459 Tue Sep 15 00:09:21 2026       28:45 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
-2130437 2117459 Tue Sep 15 00:20:03 2026       18:03 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
-2139026 2117459 Tue Sep 15 00:37:29 2026       00:37 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/wealthtech.chainsolutions
+ 928517  928318 Fri Sep  4 06:38:13 2026 10-18:05:29 node server.js
+ 928551  928371 Fri Sep  4 06:38:13 2026 10-18:05:29 node --import tsx/esm server.ts
+ 929244  928551 Fri Sep  4 06:38:16 2026 10-18:05:26 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+ 929356  928501 Fri Sep  4 06:38:17 2026 10-18:05:25 [node] <defunct>
+2100513       1 Mon Sep 14 23:32:31 2026    01:11:11 /usr/sbin/mariadbd
+3269585    4648 Sat Sep 12 02:12:41 2026  2-22:31:01 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3269605    4648 Sat Sep 12 02:12:43 2026  2-22:30:59 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3273968    4648 Sat Sep 12 02:20:38 2026  2-22:23:04 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
+3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:43:35 node --import tsx/esm server.ts
+3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:43:35 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+2117834 2117459 Tue Sep 15 00:00:52 2026       42:50 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
+2121903 2117459 Tue Sep 15 00:09:21 2026       34:21 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
+2130437 2117459 Tue Sep 15 00:20:03 2026       23:39 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
+2139026 2117459 Tue Sep 15 00:37:29 2026       06:13 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/wealthtech.chainsolutions
+2147303 2117459 Tue Sep 15 00:43:27 2026       00:15 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.itic4fima.chainsoluti
+2147449 2117459 Tue Sep 15 00:43:29 2026       00:13 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
 
 ==============================================
  8. CORRELATION MULTI-INCIDENTS — READ ONLY
@@ -2899,6 +2900,44 @@ CRON EUR/USD TERMINE AVEC 3 ERREUR(S) — 2026-08-27 21:40:01
 2026-09-14T23:36:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:51 82 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
 2026-09-14T23:38:53+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:38:53 92 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
 2026-09-14T23:38:56+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:38:56 93 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:40:24+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:24 919 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:40:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:27 920 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:40:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:32 921 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:40:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:37 923 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:40:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:42 924 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:40:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:47 925 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:40:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:52 927 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:40:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:57 928 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:02 930 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:07 931 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:12 932 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:17 933 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:22 934 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:27 936 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:32 937 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:37 938 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:42 939 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:47 940 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:52 941 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:41:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:57 943 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:02 944 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:07 945 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:12 947 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:17 955 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:22 961 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:27 963 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:32 964 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:37 967 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:42 968 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:47 969 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:52 972 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:42:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:57 974 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:43:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:02 975 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:43:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:07 978 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:43:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:12 980 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:43:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:17 981 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:43:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:22 984 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-15T00:43:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:27 985 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
 
 --- preuve stricte execution indices le 2026-08-31 18:30 ---
 28898-    [Tunindex] ECHEC: aucune source n'a retourne de valeur
@@ -3230,6 +3269,119 @@ CRON EUR/USD TERMINE AVEC 3 ERREUR(S) — 2026-08-27 21:40:01
 ::ffff:127.0.0.1 - - [14/Sep/2026:10:04:16 +0000] "GET /api/saveperfdateeur/601/1200 HTTP/1.1" 500 47 "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [14/Sep/2026:10:04:16 +0000] "GET /api/saveperfdateusd/1/600 HTTP/1.1" 500 47 "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [14/Sep/2026:10:04:17 +0000] "GET /api/saveperfdateusd/601/1200 HTTP/1.1" 500 47 "-" "curl/7.81.0"
+
+==============================================
+ 9. AF-OPS-005 — ATTRIBUTION CREDENTIAL (REDACTED)
+==============================================
+--- processus avec DB_USER=fund_opcvm dans l environnement initial ---
+process_env_matches=0
+
+--- fichiers .env* qui declarent DB_USER=fund_opcvm ---
+ENV_FILE path=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/.env.production.plan-b mode=644 password_matches_current=NO
+ENV_FILE path=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/.env mode=600 password_matches_current=YES
+ENV_FILE path=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/.env.production mode=644 password_matches_current=NO
+
+--- fichiers applicatifs qui referencent DB_PASSWORD (noms seulement) ---
+./STATUS.md
+./services/shared/db.js
+./scripts/monitoring/check_cron_health.js
+./scripts/governance/s2_db_rotation_detail.py
+./scripts/governance/s2_detach_tracked_env.sh
+./scripts/governance/s2_db_auth_diagnostic.py
+./scripts/governance/s2_observe.py
+./scripts/governance/s2_rotate_db_password.py
+./scripts/fix/fix_tsr_per_country.js
+./scripts/fix/fix_populate_performances_eur_usd.js
+./scripts/fix/fix_normalize_uppercase.js
+./scripts/fix/fix_nigeria_orphans_and_dupes.js
+./scripts/fix/fix_scale_break_sec.js
+./scripts/fix/fix_categories_remaining.js
+./scripts/fix/fix_vl_cleanup_all.js
+./scripts/fix/fix_nigeria_societes.js
+./scripts/fix/fix_vl_targeted.js
+./scripts/fix/fix_naira_reprise_plateau.js
+./scripts/fix/fix_database_phase2.js
+./scripts/fix/fix_vl_spikes.js
+./scripts/fix/fix_database_phase1.js
+./scripts/fix/fix_naira_depuis_source.js
+./scripts/fix/fix_datejour_sync.js
+./scripts/fix/fix_11_fonds_sans_classification.js
+./scripts/fix/fix_segments_dollars_nigeria.js
+./scripts/fix/fix_gdl_merge_1219.js
+./scripts/fix/fix_valorisations_eur_usd.js
+./scripts/fix/fix_harmonize_categories.js
+./scripts/fix/fix_nigeria_pays_casing.js
+./scripts/fix/fix_categorie_regional.js
+./scripts/fix/fix_populate_rendements.js
+./scripts/fix/fix_nigeria_fuzzy_matches.js
+./scripts/fix/fix_fundafrica_categories.js
+./scripts/fix/fix_static_data.js
+./scripts/fix/fix_cleanup_news.js
+./scripts/fix/fix_populate_performances.js
+./scripts/fix/fix_orphan_performances.js
+./scripts/migrations/create_recalc_tables.js
+./scripts/migrations/add_r2_alpha_columns.js
+./scripts/cron/cron_daily_eur_usd.sh
+./scripts/import/scrape_forex_import.js
+./scripts/import/import_vl_tunisie_cmf.js
+./scripts/import/sec_ng_xlsx_loader.py
+./scripts/import/import_vl_maroc_xlsx.js
+./scripts/import/import_vl_nigeria_sec.js
+./scripts/import/import_forex_historique.js
+./scripts/import/import_vl_uemoa.js
+./scripts/import/scrape_asfim_import.js
+./scripts/import/import_vl_maroc_2024_2026.js
+./scripts/import/import_indices_excel.js
+./scripts/import/import_vl_maroc.js
+./scripts/diag/audit_vl_anomalies.js
+./scripts/diag/diag_classement_ratios.js
+./scripts/diag/data_freshness_audit.js
+./scripts/diag/check_indref_coverage.js
+./scripts/diag/diagnostic_db.js
+./scripts/diag/check_forex_tnd.js
+./scripts/diag/check_dormant_funds_coverage.js
+./scripts/diag/ondemand/diag_devise_declaree_nigeria.js
+./scripts/diag/ondemand/diag_plateaux_nigeria.js
+./scripts/diag/ondemand/diag_cas_isoles.js
+./scripts/diag/ondemand/diag_csv_devise_sec.js
+./scripts/diag/ondemand/diag_plan_naira.js
+./scripts/diag/ondemand/diag_classements.js
+./scripts/diag/ondemand/diag_ecart_csv_base.js
+./scripts/diag/ondemand/diag_ruptures_restantes.js
+./scripts/diag/ondemand/diag_plan_dollar.js
+./scripts/diag/lot_diag_indref_eur_usd.js
+./scripts/diag/check_doc_drift.js
+./scripts/diag/compare_nigeria_excel_vs_db.js
+./scripts/scraper/diagnose_index_history.js
+./scripts/scraper/fix_index_tail.js
+./scripts/scraper/scrape_indices_daily.js
+./scripts/scraper/indref_admin.js
+./scripts/scraper/cmf_tunisie_daily.py
+./scripts/scraper/brvm_boc_daily.py
+./scripts/scraper/propagate_indref_range.js
+./scripts/scraper/bvmac_boc_daily.py
+./scripts/recalc/recalc_vl_ajuste.js
+./scripts/recalc/recalc_classement_historique.js
+./scripts/recalc/recalc_derives_par_pays.js
+./scripts/recalc/recalc_eur_usd_daily_rate.js
+./scripts/seed/lot_classement_regional_africa.js
+./scripts/seed/lot3bis_fix_classifications.js
+./scripts/seed/lot3_indice_fundafrica.js
+./scripts/seed/seed_referentiel_fundafrica.js
+./scripts/deploy/deploy_all_fixes.sh
+./scripts/deploy/sync_production.sh
+./.env.production.plan-b
+./.env.example
+./LOOP_STATE.md
+./README_DEV.md
+./src/db/sequelize.js
+./src/db/config.js
+./src/workers/worker-recalculation.js
+./src/workers/ttyd-agent.js
+./src/workers/worker-data-import.js
+./docs/08-security/SECRETS_MANAGEMENT.md
+./.env
+./.env.production
 
 ==============================================
  FIN — aucune variable modifiee, aucun service redemarre
