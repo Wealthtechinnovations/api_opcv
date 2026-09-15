@@ -387,18 +387,7 @@ jobs:
 
               PM2JSON="$(pm2 jlist 2>/dev/null || true)"
               if [ -n "$PM2JSON" ]; then
-                python3 - <<'PYPM2' "$PM2JSON"
-import json,sys
-try:
-    data=json.loads(sys.argv[1])
-except Exception:
-    data=[]
-for p in data:
-    if p.get("name")=="api-monolith":
-        env=p.get("pm2_env",{})
-        print("PM2_OUT_LOG="+str(env.get("pm_out_log_path","")))
-        print("PM2_ERR_LOG="+str(env.get("pm_err_log_path","")))
-PYPM2
+                python3 -c 'import json,sys; data=json.loads(sys.argv[1]); [print("PM2_OUT_LOG="+str(p.get("pm2_env",{}).get("pm_out_log_path",""))+"\\nPM2_ERR_LOG="+str(p.get("pm2_env",{}).get("pm_err_log_path",""))) for p in data if p.get("name")=="api-monolith"]' "$PM2JSON" || true
               fi
             fi
 
