@@ -493,6 +493,21 @@ jobs:
               | tail -220 || true
 
             echo ""
+            echo "--- preuve stricte execution indices le 2026-08-31 18:30 ---"
+            if [ -f /var/log/cron_indices_daily.log ]; then
+              grep -n -A30 -B10 -E 'Mon Aug 31 .*Starting daily index scraper|2026-08-31T18:30' /var/log/cron_indices_daily.log | tail -180 || true
+            fi
+            journalctl -u cron --since "2026-08-31 18:25:00" --until "2026-08-31 18:40:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'cron_indices_daily|sync_production|CMD' | tail -180 || true
+
+            echo ""
+            echo "--- attribution temporelle refus DB 23:30-23:45 ---"
+            journalctl -u cron --since "2026-09-14 23:30:00" --until "2026-09-14 23:45:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'africafunds|sync_production|CMD' | tail -220 || true
+            journalctl -u mariadb --since "2026-09-14 23:35:00" --until "2026-09-14 23:40:00" --no-pager -o short-iso 2>/dev/null \
+              | tail -260 || true
+
+            echo ""
             echo "--- PM2 access markers autour des occurrences ---"
             PLOG=/root/.pm2/logs/api-monolith-out.log
             if [ -f "$PLOG" ]; then
