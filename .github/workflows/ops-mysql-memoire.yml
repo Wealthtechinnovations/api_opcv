@@ -299,6 +299,25 @@ jobs:
             journalctl -u cron --since "2026-09-14 14:00:00" --until "2026-09-14 23:00:00" --no-pager -o short-iso 2>/dev/null \
               | grep -Ei 'CMD|africafunds|cron_daily|cron_tunisie|cron_brvm|cron_indices|sync_production' \
               | tail -220 || true
+            echo ""
+            echo "--- journal cron 09:55-10:10 UTC — OOM du 2026-09-14 ---"
+            journalctl -u cron --since "2026-09-14 09:55:00" --until "2026-09-14 10:10:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_nigeria|sync_production' \
+              | tail -220 || true
+
+            echo ""
+            echo "--- Nigeria lundi 10h — execution du 2026-09-14 ---"
+            NLOG=/var/log/africafunds_nigeria_20260914.log
+            if [ -f "$NLOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$NLOG" 2>/dev/null || true
+              cat "$NLOG" | tail -700 || true
+            elif [ -f /var/log/africafunds_nigeria.log ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' /var/log/africafunds_nigeria.log 2>/dev/null || true
+              tail -700 /var/log/africafunds_nigeria.log || true
+            else
+              echo "NIGERIA_LOG=ABSENT"
+            fi
+
 
             echo ""
             echo "--- daily 20h : stat + jalons uniquement ---"
@@ -385,10 +404,6 @@ jobs:
                 | grep -Ei 'status|uptime|restarts|out log path|error log path|script path|node.js version|pid' \
                 | head -80 || true
 
-              PM2JSON="$(pm2 jlist 2>/dev/null || true)"
-              if [ -n "$PM2JSON" ]; then
-                python3 -c 'import json,sys; data=json.loads(sys.argv[1]); [print("PM2_OUT_LOG="+str(p.get("pm2_env",{}).get("pm_out_log_path",""))+"\\nPM2_ERR_LOG="+str(p.get("pm2_env",{}).get("pm_err_log_path",""))) for p in data if p.get("name")=="api-monolith"]' "$PM2JSON" || true
-              fi
             fi
 
             echo ""
