@@ -517,6 +517,41 @@ jobs:
 
             echo ""
             echo "=============================================="
+            echo " 9. AF-OPS-005 — ATTRIBUTION CREDENTIAL (REDACTED)"
+            echo "=============================================="
+            echo "--- processus avec DB_USER=fund_opcvm dans l environnement initial ---"
+            PROC_MATCHES=0
+            for E in /proc/[0-9]*/environ; do
+              [ -r "$E" ] || continue
+              if tr '\0' '\n' < "$E" 2>/dev/null | grep -qx 'DB_USER=fund_opcvm'; then
+                P="$(echo "$E" | cut -d/ -f3)"
+                PV="$(tr '\0' '\n' < "$E" 2>/dev/null | sed -n 's/^DB_PASSWORD=//p' | head -1)"
+                if [ -z "$PV" ]; then PMATCH="ABSENT"; elif [ "$PV" = "$DBP" ]; then PMATCH="YES"; else PMATCH="NO"; fi
+                COMM="$(cat "/proc/$P/comm" 2>/dev/null || echo UNKNOWN)"
+                CWD="$(readlink -f "/proc/$P/cwd" 2>/dev/null || echo UNKNOWN)"
+                echo "PROCESS pid=$P comm=$COMM cwd=$CWD password_matches_current=$PMATCH"
+                PROC_MATCHES=$((PROC_MATCHES+1))
+              fi
+            done
+            echo "process_env_matches=$PROC_MATCHES"
+
+            echo ""
+            echo "--- fichiers .env* qui declarent DB_USER=fund_opcvm ---"
+            find /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr -maxdepth 4 -type f -name '.env*' -print0 2>/dev/null \
+              | while IFS= read -r -d '' F; do
+                  FU="$(grep -E '^DB_USER=' "$F" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+                  [ "$FU" = "fund_opcvm" ] || continue
+                  FP="$(grep -E '^DB_PASSWORD=' "$F" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+                  if [ -z "$FP" ]; then FMATCH="ABSENT"; elif [ "$FP" = "$DBP" ]; then FMATCH="YES"; else FMATCH="NO"; fi
+                  MODE="$(stat -c '%a' "$F" 2>/dev/null || echo UNKNOWN)"
+                  echo "ENV_FILE path=$F mode=$MODE password_matches_current=$FMATCH"
+                done
+
+            echo ""
+            echo "--- fichiers applicatifs qui referencent DB_PASSWORD (noms seulement) ---"
+            grep -RIl --exclude-dir=node_modules --exclude-dir=.git --exclude='*.log' 'DB_PASSWORD' . 2>/dev/null | head -100 || true
+            echo ""
+            echo "=============================================="
             echo " FIN — aucune variable modifiee, aucun service redemarre"
             echo "=============================================="
           REMOTE
