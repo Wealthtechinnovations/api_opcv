@@ -2,7 +2,7 @@
 
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-15 00:31 UTC**
+Derniere execution : **2026-09-15 00:34 UTC**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
@@ -10,11 +10,11 @@ Declencheur : `push` — par `Wealthtechinnovations`
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        2794         190         209       14960       14590
+Mem:           17945        2791         200         209       14953       14593
 Swap:           2047         412        1635
 
 RSS actuel de mariadbd :
-  0.23 Go — demarre depuis 57:03
+  0.24 Go — demarre depuis 01:00:18
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
@@ -51,23 +51,23 @@ Threads_running	1
  2b. MEMORY_USED / PROC / ALLOCATEUR
 ==============================================
 Aborted_connects	6
-Connections	836
-Created_tmp_disk_tables	5267
+Connections	863
+Created_tmp_disk_tables	5269
 Created_tmp_files	4
-Created_tmp_tables	6042
+Created_tmp_tables	6063
 Max_used_connections	15
 Memory_used	472949936
 Memory_used_initial	442210192
 Open_files	94
 Open_table_definitions	400
 Open_tables	619
-Opened_files	22135
+Opened_files	22143
 Opened_table_definitions	692
 Opened_tables	626
 Threads_connected	9
 Threads_created	15
 Threads_running	1
-Uptime	3422
+Uptime	3618
 
 --- version / instrumentation ---
 10.6.23-MariaDB-0ubuntu0.22.04.1	Ubuntu 22.04
@@ -77,41 +77,41 @@ table_definition_cache	400
 version_malloc_library	system
 MARIADB_PID=2100513
 --- /proc status ---
-2100513 246660 2792664     57:03   24  1.3 /usr/sbin/mariadbd
+2100513 246632 2792664  01:00:18   24  1.3 /usr/sbin/mariadbd
 VmPeak:	 2923768 kB
 VmSize:	 2792664 kB
-VmRSS:	  246660 kB
+VmRSS:	  246632 kB
 RssAnon:	  224684 kB
-RssFile:	   21976 kB
+RssFile:	   21948 kB
 RssShmem:	       0 kB
 VmData:	  612452 kB
 VmSwap:	       0 kB
 Threads:	24
 --- smaps_rollup ---
-Rss:              249340 kB
-Pss:              243031 kB
-Pss_Anon:         227028 kB
-Pss_File:          16003 kB
-Private_Clean:     15432 kB
-Private_Dirty:    227028 kB
-Anonymous:        227028 kB
+Rss:              249404 kB
+Pss:              243259 kB
+Pss_Anon:         227120 kB
+Pss_File:          16139 kB
+Private_Clean:     15404 kB
+Private_Dirty:    227120 kB
+Anonymous:        227120 kB
 AnonHugePages:         0 kB
 Swap:                  0 kB
 --- pmap totals ---
 ---------------- ------- ------- ------- 
-total kB         2792668  249340  227028
+total kB         2792668  249404  227120
 --- allocator libraries ---
-	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f6a1a198000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe89ea90000)
 --- systemd/cgroup memory ---
 Restart=on-abort
 Result=success
 NRestarts=0
 OOMPolicy=stop
-MemoryCurrent=258449408
+MemoryCurrent=258527232
 ActiveState=active
 SubState=running
 [memory.current]
-258449408
+258527232
 [memory.swap.current]
 0
 [memory.events]
@@ -134,8 +134,8 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 --- top mappings pmap par dirty kB ---
 00007f3668000000     780     540     540 rw---   [ anon ]
 00007f369947f000    1604     540     540 rw---   [ anon ]
-00007f3618000000    1796     836     836 rw---   [ anon ]
-00007f3608000000    4072    1056    1056 rw---   [ anon ]
+00007f3618000000    1796     860     860 rw---   [ anon ]
+00007f3608000000    4072    1060    1060 rw---   [ anon ]
 000055ac6c616000    1352    1352    1352 r---- mariadbd
 00007f3684172000    2364    2104    2104 rw---   [ anon ]
 00007f363c000000    6640    2404    2404 rw---   [ anon ]
@@ -154,14 +154,14 @@ ALT_ALLOCATOR_LIBRARY=ABSENT
 00007f36757ff000  163840  119104  119104 rw---   [ anon ]
 
 --- top connexions par memoire ---
-839	fund_opcvm	localhost	Query	0	0.15	0.15
-209	fund_opcvm	localhost:60356	Sleep	1758	0.09	0.09
-206	fund_opcvm	localhost:60334	Sleep	1756	0.09	0.33
-205	fund_opcvm	localhost:60332	Sleep	1755	0.09	0.33
-204	fund_opcvm	localhost:60324	Sleep	1756	0.09	0.32
-46	fund_opcvm	localhost:40916	Sleep	1755	0.09	3.34
-7	fund_opcvm	localhost:48340	Sleep	9	0.09	0.12
-55	fund_opcvm	localhost:57702	Sleep	9	0.08	0.11
+866	fund_opcvm	localhost	Query	0	0.15	0.15
+209	fund_opcvm	localhost:60356	Sleep	1953	0.09	0.09
+206	fund_opcvm	localhost:60334	Sleep	1951	0.09	0.33
+205	fund_opcvm	localhost:60332	Sleep	1951	0.09	0.33
+204	fund_opcvm	localhost:60324	Sleep	1951	0.09	0.32
+46	fund_opcvm	localhost:40916	Sleep	1950	0.09	3.34
+7	fund_opcvm	localhost:48340	Sleep	4	0.09	0.12
+55	fund_opcvm	localhost:57702	Sleep	25	0.08	0.11
 
 ==============================================
  3. PLAFOND CONFIGURE, PAS RSS REEL
@@ -210,12 +210,12 @@ Sep 14 23:32:32 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database ser
 ==============================================
  5. SERIE COURTE RSS vs Memory_used
 ==============================================
-SAMPLE ts=2026-09-15T00:29:36Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
-SAMPLE ts=2026-09-15T00:29:51Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:30:06Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:30:21Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:30:36Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900640 connections=9
-SAMPLE ts=2026-09-15T00:30:52Z rss_kb=246660 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:32:51Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
+SAMPLE ts=2026-09-15T00:33:06Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
+SAMPLE ts=2026-09-15T00:33:21Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:33:36Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:33:52Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
+SAMPLE ts=2026-09-15T00:34:07Z rss_kb=246632 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
 
 ==============================================
  6. CORRELATION CRONS / RSS — 2026-09-14
@@ -2090,20 +2090,20 @@ Erreur lors de la récupération des données valLiq: ConnectionRefusedError [Se
     code: 'ECONNREFUSED',
 
 --- processus node/mysql encore vivants ---
- 928517  928318 Fri Sep  4 06:38:13 2026 10-17:52:47 node server.js
- 928551  928371 Fri Sep  4 06:38:13 2026 10-17:52:47 node --import tsx/esm server.ts
- 929244  928551 Fri Sep  4 06:38:16 2026 10-17:52:44 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
- 929356  928501 Fri Sep  4 06:38:17 2026 10-17:52:43 [node] <defunct>
-2100513       1 Mon Sep 14 23:32:31 2026       58:29 /usr/sbin/mariadbd
-3269585    4648 Sat Sep 12 02:12:41 2026  2-22:18:19 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3269605    4648 Sat Sep 12 02:12:43 2026  2-22:18:17 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3273968    4648 Sat Sep 12 02:20:38 2026  2-22:10:22 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
-3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:30:53 node --import tsx/esm server.ts
-3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:30:53 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
-2117834 2117459 Tue Sep 15 00:00:52 2026       30:08 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
-2121710 2117459 Tue Sep 15 00:09:16 2026       21:44 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
-2121903 2117459 Tue Sep 15 00:09:21 2026       21:39 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
-2130437 2117459 Tue Sep 15 00:20:03 2026       10:57 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
+ 928517  928318 Fri Sep  4 06:38:13 2026 10-17:56:02 node server.js
+ 928551  928371 Fri Sep  4 06:38:13 2026 10-17:56:02 node --import tsx/esm server.ts
+ 929244  928551 Fri Sep  4 06:38:16 2026 10-17:55:59 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+ 929356  928501 Fri Sep  4 06:38:17 2026 10-17:55:58 [node] <defunct>
+2100513       1 Mon Sep 14 23:32:31 2026    01:01:44 /usr/sbin/mariadbd
+3269585    4648 Sat Sep 12 02:12:41 2026  2-22:21:34 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3269605    4648 Sat Sep 12 02:12:43 2026  2-22:21:32 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3273968    4648 Sat Sep 12 02:20:38 2026  2-22:13:37 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
+3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:34:08 node --import tsx/esm server.ts
+3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:34:08 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+2117834 2117459 Tue Sep 15 00:00:52 2026       33:23 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
+2121710 2117459 Tue Sep 15 00:09:16 2026       24:59 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
+2121903 2117459 Tue Sep 15 00:09:21 2026       24:54 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
+2130437 2117459 Tue Sep 15 00:20:03 2026       14:12 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
 
 ==============================================
  8. CORRELATION MULTI-INCIDENTS — READ ONLY
@@ -2478,6 +2478,426 @@ ERREUR FATALE: Error: connect ECONNREFUSED 127.0.0.1:3306
 
 === MISE A JOUR TERMINEE AVEC 9 ERREUR(S) Tue Sep  8 09:32:46 PM UTC 2026 ===
 ========================================
+
+--- indices 2026-08-31 autour de 18:30 ---
+FILE=/var/log/cron_indices_daily.log size=1122974 mtime=2026-09-14 18:31:17.659943672 +0000
+32187-
+32188---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
+32189-
+32190---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
+32191-
+32192-
+32193-============================================================
+32194:RESUME 2026-08-31
+32195-
+32196-============================================================
+32197:RESUME 2026-08-31
+32198-============================================================
+32199-============================================================
+32200-  Indices scrapes avec succes: 3/5
+32201-  Indices inseres en base: 0
+32202-  Indices scrapes avec succes: 3/5
+32203-  Indices inseres en base: 0
+32204-  Indices ignores (deja en base): 3
+32205-  Echecs de scraping: 2
+32206-  Indices ignores (deja en base): 3
+32207-  Echecs de scraping: 2
+32208-  BRVM Composite: 530.92 (via BRVM BOC PDF (bfin.brvm.org))
+32209-  BRVM Composite: 530.92 (via BRVM BOC PDF (bfin.brvm.org))
+32210-  Tunindex: 19406.31 (via BVMT REST /history)
+32211-  Tunindex: 19406.31 (via BVMT REST /history)
+32212-  NSE All Share: 244199.39 (via NGX doclib chartdata/ASI)
+32213-
+32214-  >>> MODIFICATIONS APPLIQUEES <<<
+32215-============================================================
+32216-  NSE All Share: 244199.39 (via NGX doclib chartdata/ASI)
+32217-
+32218-  >>> MODIFICATIONS APPLIQUEES <<<
+32219-============================================================
+32220-
+32221-
+32222-============================================================
+32223-============================================================
+32224-SCRAPE INDICES QUOTIDIENS — Africafunds
+32225-Mode: EXECUTE
+32226-SCRAPE INDICES QUOTIDIENS — Africafunds
+32227-Mode: EXECUTE
+32228-Date cible: 2026-09-01
+32229-Date cible: 2026-09-01
+32230-Date execution: 2026-09-04T18:30:40.495Z
+32231-Date execution: 2026-09-04T18:30:40.495Z
+32232-============================================================
+32233-
+32234-============================================================
+32235-
+32236---- PHASE 1: Scraping des indices ---
+32237-
+32238---- PHASE 1: Scraping des indices ---
+32239-
+32240-  [BRVM] BRVM Composite...
+32241-  [BRVM] BRVM Composite...
+32242-    [BRVM] SUCCESS via BOC PDF (bfin): 537.25
+32243-    [BRVM] SUCCESS via BOC PDF (bfin): 537.25
+32244-
+32245-  [MASI] MASI...
+32246-
+32247-  [MASI] MASI...
+32248-    [MASI] ECHEC: aucune source n'a retourne de valeur
+32249-    [MASI] ECHEC: aucune source n'a retourne de valeur
+32250-
+32251-  [Tunindex] Tunindex...
+32252-
+32253-  [Tunindex] Tunindex...
+32254-    [Tunindex] SUCCESS via BVMT REST history: 19585.55
+32255-    [Tunindex] SUCCESS via BVMT REST history: 19585.55
+32256-
+32257-  [NSE] NSE All Share...
+32258-
+32259-  [NSE] NSE All Share...
+32260-    [NSE] SUCCESS via NGX chartdata/ASI: 246082.63
+32261-    [NSE] SUCCESS via NGX chartdata/ASI: 246082.63
+32262-
+32263-  [MONIA] MONIA...
+32264-
+32265-  [MONIA] MONIA...
+32266-    [MONIA] ECHEC: aucune source n'a retourne de valeur
+32267-    [MONIA] ECHEC: aucune source n'a retourne de valeur
+32268-
+32269-
+32270-
+32271-  Resume scraping: 3 indices recuperes, 2 echecs
+32272-
+32273-
+32274-  Resume scraping: 3 indices recuperes, 2 echecs
+32275-
+32276---- PHASE 2: Insertion dans indice_references ---
+32277-
+32278---- PHASE 2: Insertion dans indice_references ---
+32279-
+32280-  Connexion MySQL OK
+32281-
+32282-  Connexion MySQL OK
+32283-
+32284-  [BRVM] SKIP: valeur identique deja en base (537.25)
+32285-  [BRVM] SKIP: valeur identique deja en base (537.25)
+32286-  [Tunindex] SKIP: valeur identique deja en base (19585.55)
+32287-  [Tunindex] SKIP: valeur identique deja en base (19585.55)
+32288-  [NSE] SKIP: valeur identique deja en base (246082.63)
+32289-  [NSE] SKIP: valeur identique deja en base (246082.63)
+32290-
+32291-  Resume insertion: 0 inseres, 3 ignores (deja existants)
+32292-
+32293-
+32294-  Resume insertion: 0 inseres, 3 ignores (deja existants)
+32295-
+32296---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
+32297-
+32298---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
+32299-
+32300-
+32301-============================================================
+32302-
+32303-============================================================
+32304-RESUME 2026-09-01
+32305-RESUME 2026-09-01
+32306-============================================================
+32307-============================================================
+32308-  Indices scrapes avec succes: 3/5
+32309-  Indices inseres en base: 0
+32310-  Indices scrapes avec succes: 3/5
+32311-  Indices inseres en base: 0
+32312-  Indices ignores (deja en base): 3
+32313-  Echecs de scraping: 2
+32314-  Indices ignores (deja en base): 3
+32315-  Echecs de scraping: 2
+32316-  BRVM Composite: 537.25 (via BRVM BOC PDF (bfin.brvm.org))
+32317-  BRVM Composite: 537.25 (via BRVM BOC PDF (bfin.brvm.org))
+--
+32670-============================================================
+32671-============================================================
+32672-
+32673-
+32674-============================================================
+32675-============================================================
+32676-RESUME GLOBAL BACKFILL (8 dates)
+32677-RESUME GLOBAL BACKFILL (8 dates)
+32678-  Inseres: 3 | Ignores: 14 | Echecs scraping: 23
+32679-============================================================
+32680-  Inseres: 3 | Ignores: 14 | Echecs scraping: 23
+32681-============================================================
+32682-Fri Sep  4 06:31:23 PM UTC 2026 — Daily index scraper completed successfully
+32683-Fri Sep  4 06:31:23 PM UTC 2026 — Daily index scraper completed successfully
+32684-========================================
+32685-
+32686-========================================
+32687-Mon Sep  7 06:30:01 PM UTC 2026 — Starting daily index scraper
+32688-Mon Sep  7 06:30:01 PM UTC 2026 — Starting daily index scraper
+32689-========================================
+32690:### FENETRE BACKFILL: 8 dates (2026-08-31 -> 2026-09-07) — INSERT idempotent ###
+32691-
+32692:### FENETRE BACKFILL: 8 dates (2026-08-31 -> 2026-09-07) — INSERT idempotent ###
+32693-
+32694-============================================================
+32695-SCRAPE INDICES QUOTIDIENS — Africafunds
+32696-============================================================
+32697-SCRAPE INDICES QUOTIDIENS — Africafunds
+32698-Mode: EXECUTE
+32699-Mode: EXECUTE
+32700:Date cible: 2026-08-31
+32701:Date cible: 2026-08-31
+32702-Date execution: 2026-09-07T18:30:01.349Z
+32703-Date execution: 2026-09-07T18:30:01.349Z
+32704-============================================================
+32705-
+32706-============================================================
+32707-
+32708---- PHASE 1: Scraping des indices ---
+32709-
+32710---- PHASE 1: Scraping des indices ---
+32711-
+32712-  [BRVM] BRVM Composite...
+32713-  [BRVM] BRVM Composite...
+32714-    [BRVM] SUCCESS via BOC PDF (bfin): 530.92
+32715-    [BRVM] SUCCESS via BOC PDF (bfin): 530.92
+32716-
+32717-
+32718-  [MASI] MASI...
+32719-  [MASI] MASI...
+32720-    [MASI] ECHEC: aucune source n'a retourne de valeur
+32721-    [MASI] ECHEC: aucune source n'a retourne de valeur
+32722-
+32723-
+32724-  [Tunindex] Tunindex...
+32725-  [Tunindex] Tunindex...
+32726-    [Tunindex] SUCCESS via BVMT REST history: 19406.31
+32727-    [Tunindex] SUCCESS via BVMT REST history: 19406.31
+32728-
+32729-
+32730-  [NSE] NSE All Share...
+32731-  [NSE] NSE All Share...
+32732-    [NSE] SUCCESS via NGX chartdata/ASI: 244199.39
+32733-    [NSE] SUCCESS via NGX chartdata/ASI: 244199.39
+32734-
+32735-
+32736-  [MONIA] MONIA...
+32737-  [MONIA] MONIA...
+32738-    [MONIA] ECHEC: aucune source n'a retourne de valeur
+32739-    [MONIA] ECHEC: aucune source n'a retourne de valeur
+32740-
+32741-
+32742-
+32743-  Resume scraping: 3 indices recuperes, 2 echecs
+32744-
+32745-
+32746-  Resume scraping: 3 indices recuperes, 2 echecs
+32747-
+32748---- PHASE 2: Insertion dans indice_references ---
+32749-
+32750---- PHASE 2: Insertion dans indice_references ---
+32751-
+32752-  Connexion MySQL OK
+32753-
+32754-  Connexion MySQL OK
+32755-
+32756-  [BRVM] SKIP: valeur identique deja en base (530.92)
+32757-  [BRVM] SKIP: valeur identique deja en base (530.92)
+32758-  [Tunindex] SKIP: valeur identique deja en base (19406.31)
+32759-  [Tunindex] SKIP: valeur identique deja en base (19406.31)
+32760-  [NSE] SKIP: valeur identique deja en base (244199.39)
+32761-  [NSE] SKIP: valeur identique deja en base (244199.39)
+32762-
+32763-  Resume insertion: 0 inseres, 3 ignores (deja existants)
+32764-
+32765-
+32766-  Resume insertion: 0 inseres, 3 ignores (deja existants)
+32767-
+32768---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
+32769-
+32770---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
+32771-
+32772-
+32773-============================================================
+32774-
+32775-============================================================
+32776:RESUME 2026-08-31
+32777:RESUME 2026-08-31
+32778-============================================================
+32779-============================================================
+32780-  Indices scrapes avec succes: 3/5
+32781-  Indices scrapes avec succes: 3/5
+32782-  Indices inseres en base: 0
+32783-  Indices inseres en base: 0
+32784-  Indices ignores (deja en base): 3
+32785-  Indices ignores (deja en base): 3
+32786-  Echecs de scraping: 2
+32787-  Echecs de scraping: 2
+32788-  BRVM Composite: 530.92 (via BRVM BOC PDF (bfin.brvm.org))
+32789-  BRVM Composite: 530.92 (via BRVM BOC PDF (bfin.brvm.org))
+32790-  Tunindex: 19406.31 (via BVMT REST /history)
+32791-  Tunindex: 19406.31 (via BVMT REST /history)
+32792-  NSE All Share: 244199.39 (via NGX doclib chartdata/ASI)
+32793-  NSE All Share: 244199.39 (via NGX doclib chartdata/ASI)
+32794-
+32795-  >>> MODIFICATIONS APPLIQUEES <<<
+32796-
+32797-  >>> MODIFICATIONS APPLIQUEES <<<
+32798-============================================================
+32799-============================================================
+32800-
+32801-
+32802-============================================================
+32803-============================================================
+32804-SCRAPE INDICES QUOTIDIENS — Africafunds
+32805-SCRAPE INDICES QUOTIDIENS — Africafunds
+32806-Mode: EXECUTE
+32807-Mode: EXECUTE
+32808-Date cible: 2026-09-01
+32809-Date cible: 2026-09-01
+32810-Date execution: 2026-09-07T18:30:14.919Z
+32811-Date execution: 2026-09-07T18:30:14.919Z
+32812-============================================================
+32813-
+32814-============================================================
+32815-
+32816---- PHASE 1: Scraping des indices ---
+32817-
+32818---- PHASE 1: Scraping des indices ---
+32819-
+32820-  [BRVM] BRVM Composite...
+32821-  [BRVM] BRVM Composite...
+32822-    [BRVM] SUCCESS via BOC PDF (bfin): 537.25
+32823-    [BRVM] SUCCESS via BOC PDF (bfin): 537.25
+32824-
+32825-
+32826-  [MASI] MASI...
+32827-  [MASI] MASI...
+32828-    [MASI] ECHEC: aucune source n'a retourne de valeur
+32829-    [MASI] ECHEC: aucune source n'a retourne de valeur
+32830-
+32831-  [Tunindex] Tunindex...
+32832-
+32833-  [Tunindex] Tunindex...
+32834-    [Tunindex] SUCCESS via BVMT REST history: 19585.55
+32835-    [Tunindex] SUCCESS via BVMT REST history: 19585.55
+32836-
+32837-
+32838-  [NSE] NSE All Share...
+32839-  [NSE] NSE All Share...
+32840-    [NSE] SUCCESS via NGX chartdata/ASI: 246082.63
+32841-    [NSE] SUCCESS via NGX chartdata/ASI: 246082.63
+32842-
+32843-  [MONIA] MONIA...
+32844-
+32845-  [MONIA] MONIA...
+32846-    [MONIA] ECHEC: aucune source n'a retourne de valeur
+32847-    [MONIA] ECHEC: aucune source n'a retourne de valeur
+32848-
+32849-
+32850-
+32851-  Resume scraping: 3 indices recuperes, 2 echecs
+32852-
+32853-
+32854-  Resume scraping: 3 indices recuperes, 2 echecs
+32855-
+32856---- PHASE 2: Insertion dans indice_references ---
+32857-
+32858---- PHASE 2: Insertion dans indice_references ---
+32859-
+32860-  Connexion MySQL OK
+32861-
+32862-  Connexion MySQL OK
+32863-
+32864-  [BRVM] SKIP: valeur identique deja en base (537.25)
+32865-  [BRVM] SKIP: valeur identique deja en base (537.25)
+32866-  [Tunindex] SKIP: valeur identique deja en base (19585.55)
+32867-  [Tunindex] SKIP: valeur identique deja en base (19585.55)
+32868-  [NSE] SKIP: valeur identique deja en base (246082.63)
+32869-  [NSE] SKIP: valeur identique deja en base (246082.63)
+32870-
+32871-  Resume insertion: 0 inseres, 3 ignores (deja existants)
+32872-
+32873-
+32874-  Resume insertion: 0 inseres, 3 ignores (deja existants)
+32875-
+32876---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
+32877-
+32878---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
+32879-
+32880-
+32881-============================================================
+32882-
+32883-============================================================
+32884-RESUME 2026-09-01
+32885-RESUME 2026-09-01
+32886-============================================================
+32887-============================================================
+32888-  Indices scrapes avec succes: 3/5
+32889-  Indices scrapes avec succes: 3/5
+32890-  Indices inseres en base: 0
+32891-  Indices inseres en base: 0
+32892-  Indices ignores (deja en base): 3
+32893-  Echecs de scraping: 2
+32894-  Indices ignores (deja en base): 3
+32895-  Echecs de scraping: 2
+32896-  BRVM Composite: 537.25 (via BRVM BOC PDF (bfin.brvm.org))
+32897-  BRVM Composite: 537.25 (via BRVM BOC PDF (bfin.brvm.org))
+
+--- EUR/USD 2026-08-27 autour de 21:30 ---
+FILE=/var/log/cron_eur_usd.log size=144769 mtime=2026-09-14 22:06:32.087487361 +0000
+CRON EUR/USD — 2026-08-27 21:30:01
+============================================
+--- [1/3] Performances EUR + USD ---
+ERREUR FATALE: Error: connect ECONNREFUSED 127.0.0.1:3306
+    at Object.createConnection (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/node_modules/mysql2/promise.js:253:31)
+    at run (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/fix/fix_populate_performances_eur_usd.js:324:28)
+    at Object.<anonymous> (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/fix/fix_populate_performances_eur_usd.js:369:1)
+    at Module._compile (internal/modules/cjs/loader.js:1063:30)
+    at Object.Module._extensions..js (internal/modules/cjs/loader.js:1092:10)
+    at Module.load (internal/modules/cjs/loader.js:928:32)
+    at Function.Module._load (internal/modules/cjs/loader.js:769:14)
+    at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:72:12)
+    at internal/main/run_main_module.js:17:47 {
+  code: 'ECONNREFUSED',
+  errno: -111,
+  sqlState: undefined
+}
+[1/3] ERREUR (exit code 1)
+
+--- [2/3] Classements EUR ---
+
+000
+
+[2a/3] ERREUR (HTTP 000)
+--- Classements USD ---
+
+000
+
+[2b/3] ERREUR (HTTP 000)
+
+--- [3/3] Verification ---
+(node:1154855) UnhandledPromiseRejectionWarning: Error: connect ECONNREFUSED 127.0.0.1:3306
+    at Object.createConnection (/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/node_modules/mysql2/promise.js:253:31)
+    at [eval]:5:25
+    at [eval]:11:3
+    at Script.runInThisContext (vm.js:133:18)
+    at Object.runInThisContext (vm.js:310:38)
+    at internal/process/execution.js:77:19
+    at [eval]-wrapper:6:22
+    at evalScript (internal/process/execution.js:76:60)
+    at internal/main/eval_string.js:23:3
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1154855) UnhandledPromiseRejectionWarning: Unhandled promise rejection. This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). To terminate the node process on unhandled promise rejection, use the CLI flag `--unhandled-rejections=strict` (see https://nodejs.org/api/cli.html#cli_unhandled_rejections_mode). (rejection id: 1)
+(node:1154855) [DEP0018] DeprecationWarning: Unhandled promise rejections are deprecated. In the future, promise rejections that are not handled will terminate the Node.js process with a non-zero exit code.
+
+CRON EUR/USD TERMINE AVEC 3 ERREUR(S) — 2026-08-27 21:40:01
+
+--- AF-OPS-005 : refus fund_opcvm depuis dernier restart 23:32 ---
+2026-09-14T23:36:29+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:29 74 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:36:33+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:33 75 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:36:48+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:48 81 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:36:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:51 82 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:38:53+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:38:53 92 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-14T23:38:56+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:38:56 93 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
 
 --- PM2 access markers autour des occurrences ---
 ::ffff:127.0.0.1 - - [27/Aug/2026:21:35:01 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
