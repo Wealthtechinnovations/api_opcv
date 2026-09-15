@@ -158,7 +158,7 @@
         "AF-INC-20260817-001"
       ],
       "depends_on": [],
-      "next_action": "Continuer la RCA read-only en quantifiant les durées réelles et chevauchements des batchs saveperf/classements après curl timeout, et reconstruire pour chaque OOM le workload actif. L'occurrence du 14/09 est désormais prouvée pendant cron Nigeria étape recalc_vl_ajuste, mais ce n'est pas encore une root cause générale. Suivre en parallèle la trajectoire RSS avec l'âge du processus; aucune mutation MariaDB.",
+      "next_action": "Continuer la RCA read-only avec une vraie série temporelle longue RSS avant/pendant/après les batchs. Les OOM documentés surviennent sous des workloads lourds différents; aucun job unique n'est commun. Tester le modèle accumulation/rétention MariaDB + pression finale workload sans le promouvoir à PROVEN. Corriger les attributions documentaires non prouvées ('npm start' ne prouve pas un build frontend).",
       "phase": "RCA_PENDING",
       "evidence_refs": [
         "AF-EVD-040",
@@ -168,7 +168,9 @@
         "AF-EVD-044",
         "AF-EVD-045",
         "AF-EVD-046",
-        "AF-EVD-047"
+        "AF-EVD-047",
+        "AF-EVD-048",
+        "AF-EVD-050"
       ]
     },
     {
@@ -190,7 +192,10 @@
       "incident_refs": [
         "AF-INC-20260914-002"
       ],
-      "next_action": "Améliorer la télémétrie d'attribution sans rotation/restart injustifié ; conserver l'état runtime sain tant qu'aucun défaut AfricaFunds spécifique n'est mesuré."
+      "next_action": "Attribuer en lecture seule le consommateur intermittent responsable des six Access denied fund_opcvm post-restart (23:36-23:38) en comparant processus/configs locaux sans afficher de secret. Aucun cron AfricaFunds dans cette fenêtre; ne pas re-rotater DB_PASSWORD et ne pas restart MariaDB.",
+      "evidence_refs": [
+        "AF-EVD-049"
+      ]
     },
     {
       "id": "AF-OPS-006",

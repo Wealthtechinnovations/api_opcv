@@ -62,3 +62,20 @@ Cela prouve le contexte de l'occurrence du 14/09. Cela ne prouve pas que `recalc
 
 ### Prochaine discrimination
 Reconstruire le contexte workload de chaque OOM et quantifier les chevauchements réels après timeouts clients, tout en poursuivant la série RSS/uptime. Aucune mutation MariaDB n'est requise pour cette phase.
+
+
+## Corrélation multi-incidents — 2026-09-15 00:38 UTC
+
+`AF-EVD-048` montre que les workloads actifs diffèrent :
+- 31/08 18:33 : correction/recalcul Nigeria manuelle documentée ; le scraper indices exécute également un backfill à partir de 18:30:20. Le chevauchement exact à la milliseconde de l'OOM doit être distingué de la simple concurrence de fenêtre, mais « aucun cron à cette heure » est réfuté.
+- 08/09 ~20:02 : le cron daily est dans `recalc_eur_usd_daily_rate`, environ 600/1250 fonds traités, lorsque la connexion DB tombe ; les saveperf suivants reviennent 500.
+- 14/09 10:04 : le cron Nigeria est dans `recalc_vl_ajuste` lorsque `mariadbd` est tué.
+- 27/08 21:30 : le cron EUR/USD rencontre immédiatement `ECONNREFUSED`, donc cette exécution n'est pas prouvée comme déclencheur initial.
+
+Ce tableau ne désigne aucun script unique comme root cause. Il rend au contraire nécessaire de séparer :
+1. l'accumulation/rétention RSS MariaDB avant le point critique ;
+2. le workload qui crée la pression finale ;
+3. le processus qui invoque l'OOM-killer ;
+4. la victime choisie par le kernel.
+
+`AF-EVD-050` corrige une attribution documentaire : la ligne kernel `npm start invoked oom-killer` n'identifie pas un build frontend. L'API définit `npm start = node app.js`, le frontend définit `npm start = scripts/start.sh`, tandis que son build est `npm run build`. L'invocateur exact reste à attribuer par PID/cwd si la trace existe.

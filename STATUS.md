@@ -136,3 +136,13 @@ Prochaine preuve : série longue durée read-only et corrélation RSS ↔ âge d
 - `AF-EVD-047` : le 14/09, `cron_nigeria_weekly.sh` démarre 10:00:01; import + FX terminent; l'étape 4 `recalc_vl_ajuste` est active lorsque l'OOM-killer tue `mariadbd` à 10:04:12. Le script échoue ensuite sur connexion DB fermée.
 
 Ces faits renforcent la piste workload/overlap/rétention longue durée mais **ne prouvent pas encore la root cause générale**. Incident reste `RCA_PENDING`, root cause `UNKNOWN`.
+
+
+## AF-OPS-003 / 005 — corrélation multi-incidents et auth post-restart — 2026-09-15 00:38 UTC
+
+- `AF-EVD-048` : les contextes lourds diffèrent. 31/08 = correction/recalcul Nigeria, avec scraper indices également exécuté à partir de 18:30:20 ; 08/09 = `recalc_eur_usd_daily_rate` lors de la chute DB ; 14/09 = `recalc_vl_ajuste` Nigeria. Aucun job unique n'est une condition commune prouvée.
+- 27/08 : le cron EUR/USD démarre à 21:30 avec MariaDB déjà en `ECONNREFUSED`; il ne peut donc pas être présenté comme déclencheur initial sur cette seule preuve.
+- `AF-EVD-049` : six refus exacts `fund_opcvm@localhost` apparaissent après restart, de 23:36:29 à 23:38:56, puis cessent dans la fenêtre observée jusqu'à 00:38. Aucun cron AfricaFunds à ce moment. Consommateur intermittent prouvé, identité inconnue.
+- `AF-EVD-050` : `npm start invoked oom-killer` ne prouve pas un build frontend. API et frontend ont tous deux un script `start`, et le build frontend est `npm run build`.
+
+La root cause OOM reste `UNKNOWN / RCA_PENDING`. La prochaine discrimination est une série RSS longue traversant de vrais batchs, pas un nouveau test court d'allocateur.

@@ -60,7 +60,7 @@
       },
       "root_cause": {
         "status": "UNKNOWN",
-        "statement": "Le mécanisme exact de la croissance multi-Gio du RSS reste non résolu. Le large écart RSS anonyme privé vs Memory_used est prouvé, les A/B allocateur courts sont non discriminants, et l'OOM du 14/09 est désormais corrélé à l'étape recalc_vl_ajuste du cron Nigeria. Les handlers saveperf n'ont pas de cancellation explicite après timeout client. Ces faits réduisent le champ de recherche mais ne prouvent pas une cause générale unique.",
+        "statement": "Le mécanisme exact de la croissance multi-Gio du RSS reste non résolu. L'écart RSS anonyme privé vs Memory_used est prouvé et les A/B allocateur courts sont non discriminants. La reconstruction de plusieurs OOM montre des workloads lourds différents au moment des crashes, ce qui ne soutient pas une fuite propre à un seul script. Le modèle accumulation/rétention MariaDB sur la durée + pression finale d'un workload est à tester, pas encore PROVEN.",
         "evidence_refs": [
           "AF-EVD-012",
           "AF-EVD-040",
@@ -70,9 +70,11 @@
           "AF-EVD-044",
           "AF-EVD-045",
           "AF-EVD-046",
-          "AF-EVD-047"
+          "AF-EVD-047",
+          "AF-EVD-048",
+          "AF-EVD-050"
         ],
-        "why_not_proven": "Une occurrence est corrélée à recalc_vl_ajuste et le chevauchement après timeout est structurellement possible, mais les autres occurrences n'ont pas encore un workload commun prouvé et aucune série longue ne relie directement un chevauchement précis à la croissance RSS multi-Gio. Root cause reste UNKNOWN/RCA_PENDING."
+        "why_not_proven": "Les contextes de workload diffèrent entre incidents et il manque encore une série temporelle longue montrant le RSS avant, pendant et après un batch précis. Les données actuelles ne prouvent ni l'origine de la mémoire anonyme retenue, ni un job universel, ni une causalité allocator. Le label kernel 'npm start' n'identifie pas un build frontend."
       },
       "contributing_factors": [
         {
@@ -94,6 +96,11 @@
           "status": "PROVEN",
           "statement": "Les crons saveperfdatemysql utilisent curl --max-time 300 alors que la route serveur traite séquentiellement sans mécanisme explicite d'annulation sur déconnexion client; un timeout client ne constitue donc pas une preuve de fin du handler et le chevauchement est structurellement possible.",
           "evidence_ref": "AF-EVD-046"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Trois occurrences documentées ont des contextes de charge lourde différents (correction/recalcul manuel + index backfill le 31/08, recalcul EUR/USD le 08/09, recalcul VL ajustée Nigeria le 14/09). Aucun job unique n'est actuellement prouvé comme condition commune; une pression finale liée au workload reste plausible mais la source de l'accumulation RSS demeure inconnue.",
+          "evidence_ref": "AF-EVD-048"
         }
       ],
       "corrective_actions": [
@@ -171,7 +178,9 @@
             "AF-EVD-044",
             "AF-EVD-045",
             "AF-EVD-046",
-            "AF-EVD-047"
+            "AF-EVD-047",
+            "AF-EVD-048",
+            "AF-EVD-050"
           ]
         }
       ],
@@ -198,7 +207,9 @@
         "AF-EVD-044",
         "AF-EVD-045",
         "AF-EVD-046",
-        "AF-EVD-047"
+        "AF-EVD-047",
+        "AF-EVD-048",
+        "AF-EVD-050"
       ],
       "linked_tasks": [
         "AF-OPS-001",
@@ -461,7 +472,7 @@
       "severity": "SEV2",
       "status": "RCA_PENDING",
       "first_observed_at": "2026-09-14",
-      "last_observed_at": "2026-09-14T19:30:37Z",
+      "last_observed_at": "2026-09-14T23:38:56Z",
       "recurrence": {
         "signature": "fund-opcvm-access-denied-post-rotation",
         "occurrence_count": 1,
@@ -489,18 +500,20 @@
       },
       "mechanism": {
         "status": "PROVEN",
-        "statement": "Des Access denied exacts pour fund_opcvm@localhost ont existé avant le restart MariaDB; des compteurs server-wide post-restart existent mais ne sont pas attribuables à AfricaFunds.",
+        "statement": "Six Access denied exacts pour fund_opcvm@localhost sont désormais prouvés après le restart MariaDB de 23:32:32, entre 23:36:29 et 23:38:56. Aucun nouveau refus fund_opcvm n'apparaît ensuite jusqu'au relevé 00:38; le phénomène est intermittent.",
         "evidence_refs": [
-          "AF-EVD-037"
+          "AF-EVD-037",
+          "AF-EVD-049"
         ]
       },
       "root_cause": {
         "status": "UNKNOWN",
-        "statement": "Le consommateur historique responsable et l'existence d'un défaut post-restart spécifique à AfricaFunds ne sont pas prouvés.",
+        "statement": "Un consommateur intermittent utilise encore ponctuellement un credential invalide après restart, mais son exécutable précis reste UNKNOWN. Aucun cron AfricaFunds n'est présent dans la fenêtre 23:30-23:45; le chevauchement partiel avec un diagnostic GitHub ne suffit pas à l'attribuer et ce diagnostic réussit ses propres requêtes DB avec le .env courant.",
         "evidence_refs": [
-          "AF-EVD-037"
+          "AF-EVD-037",
+          "AF-EVD-049"
         ],
-        "why_not_proven": "Télémétrie SQL d'attribution désactivée; aucun process/env/cron/workflow stale courant trouvé."
+        "why_not_proven": "GENERAL_LOG/PERFORMANCE_SCHEMA/USERSTAT sont désactivés et le journal MariaDB n'expose pas le PID client. Les refus cessent après 23:38 dans la fenêtre observée. Aucune preuve ne justifie rotation/restart."
       },
       "contributing_factors": [],
       "corrective_actions": [
@@ -519,7 +532,8 @@
           ],
           "rollback": "N/A pour diagnostic read-only.",
           "verification_refs": [
-            "AF-EVD-037"
+            "AF-EVD-037",
+            "AF-EVD-049"
           ]
         }
       ],
@@ -530,7 +544,8 @@
         }
       ],
       "evidence_refs": [
-        "AF-EVD-037"
+        "AF-EVD-037",
+        "AF-EVD-049"
       ],
       "linked_tasks": [
         "AF-OPS-005"
@@ -539,9 +554,12 @@
       "closure": {
         "criteria_met": false,
         "verified_at": null,
-        "verification_refs": [],
+        "verification_refs": [
+          "AF-EVD-049"
+        ],
         "residual_risks": [
-          "Attribution historique incomplète"
+          "Consommateur intermittent post-restart non attribué",
+          "Télémétrie MariaDB insuffisante pour mapper un refus d'authentification à un PID client"
         ]
       }
     }

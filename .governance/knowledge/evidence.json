@@ -314,6 +314,30 @@
       "provenance": "GitHub Actions read-only DIAG run 34913106077; report commit 9029faa5b86915071465b66cdc85bfa879d25e14; /var/log/africafunds_nigeria_20260914.log and kernel journal",
       "observed_at": "2026-09-14T10:04:12Z",
       "summary": "The Monday Nigeria cron started at 10:00:01 UTC. Extraction, Nigeria NAV import and EUR/USD daily-rate recalculation completed. Step 4 recalc_vl_ajuste was actively processing funds when the kernel logged npm start invoked oom-killer at 10:04:11 and killed mariadbd at 10:04:12 with anon-rss=14,902,200 kB. recalc_vl_ajuste then failed with 'Can't add new command when connection is in closed state'; subsequent saveperf/EUR/USD/datejour steps failed with HTTP 500/ECONNREFUSED. This proves the workload context for the Sep 14 occurrence, but does not establish recalc_vl_ajuste or the Nigeria cron as the general root cause."
+    },
+    {
+      "id": "AF-EVD-048",
+      "type": "MARIADB_OOM_CROSS_INCIDENT_CORRELATION",
+      "result": "HEAVY_WORKLOAD_CONTEXTS_DIFFER_NO_SINGLE_JOB_PROVEN",
+      "provenance": "GitHub Actions read-only DIAG runs 34913106077, 34913390476, 34913618802 and 34913883291; reports 9029faa5b86915071465b66cdc85bfa879d25e14, 1bbd9a60b0b4661d8227bc6bb62e1ac2b49e3f6e, 9e6a21e775de1eccd788931a4064e80524ae332b and e919d27cb8a804718b5676b6877195bf2c004d72; docs/OPS_MARIADB.md; frontend SUIVI lot BH 7164973afd0b67b6274c9f1b0326f2d0f16f7f73",
+      "observed_at": "2026-09-15T00:38:00Z",
+      "summary": "Cross-incident reconstruction shows heterogeneous heavy workload contexts. Aug31 18:33: manual Nigeria VL correction/recalculation was active and the daily index scraper also executed a backfill starting 18:30:20; kernel reports node invoked OOM-killer and mariadbd was killed at 13,763,268 kB anon RSS. Sep8 ~20:02: daily cron was in recalc_eur_usd_daily_rate around 600/1250 funds when DB reset and subsequent saveperf calls failed. Sep14 10:04: Nigeria cron was in recalc_vl_ajuste when mariadbd was killed at 14,902,200 kB anon RSS. Aug27 21:30 EUR/USD cron starts with DB already ECONNREFUSED, so it is not established as the initial trigger. These contexts disfavor a single named job as universal root cause; they support further study of accumulated DB RSS plus final workload pressure without proving that model."
+    },
+    {
+      "id": "AF-EVD-049",
+      "type": "DB_AUTH_POST_RESTART_OBSERVATION",
+      "result": "POST_RESTART_DENIALS_PROVEN_INTERMITTENT_ATTRIBUTION_UNKNOWN",
+      "provenance": "GitHub Actions read-only DIAG run 34913618802; report e919d27cb8a804718b5676b6877195bf2c004d72; MariaDB and cron journals",
+      "observed_at": "2026-09-15T00:38:00Z",
+      "summary": "After MariaDB restarted at 23:32:32 UTC, six exact Access denied events for fund_opcvm@localhost occurred at 23:36:29, 23:36:33, 23:36:48, 23:36:51, 23:38:53 and 23:38:56. No AfricaFunds cron is present in the 23:30-23:45 cron journal, and no later fund_opcvm denial appears through the 00:38 read-only observation. The first four overlap in time with DIAG run 34909577475, but that diagnostic reads the current S2 .env and successfully queried MariaDB; the final two occur after that run completed. A specific stale consumer therefore remains unproven. No password rotation or restart is justified."
+    },
+    {
+      "id": "AF-EVD-050",
+      "type": "OOM_INVOKER_ATTRIBUTION",
+      "result": "KERNEL_NPM_START_LABEL_DOES_NOT_PROVE_FRONTEND_BUILD",
+      "provenance": "Kernel journal persisted in docs/OPS_MARIADB.md plus package.json inspection of API and frontend at API e919d27cb8a804718b5676b6877195bf2c004d72 / frontend 7164973afd0b67b6274c9f1b0326f2d0f16f7f73",
+      "observed_at": "2026-09-15T00:38:00Z",
+      "summary": "The Sep14 kernel line says 'npm start invoked oom-killer'. This process label does not identify a frontend build. API package.json defines npm start as node app.js; frontend package.json defines npm start as scripts/start.sh, while the frontend build command is npm run build. Therefore 'frontend build invoked OOM' is unsupported by the available evidence. The exact invoking npm process remains unattributed unless PID/cwd/process evidence is recovered."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."

@@ -42,7 +42,7 @@ Preuves : `AF-EVD-041` à `AF-EVD-044`. `AF-EVD-040` reste la preuve historique 
 
 Poursuivre **en lecture seule** la corrélation longue durée déjà amorcée par `f082c33...` et `94ed36d...`.
 
-Mesurer et corréler PID/uptime/RSS/RssAnon/Private_Dirty/Memory_used, crons, batchs, timeouts clients, fin réelle des handlers Node, activité MariaDB et chevauchements. `AF-EVD-047` prouve que l'OOM du 14/09 survient pendant le cron Nigeria, étape `recalc_vl_ajuste`; `AF-EVD-046` prouve qu'un timeout curl ne déclenche aucune annulation explicite du handler `saveperfdatemysql`. La prochaine preuve doit quantifier la continuation/overlap réelle et vérifier si un même motif existe sur les autres OOM.
+Mesurer et corréler PID/uptime/RSS/RssAnon/Private_Dirty/Memory_used avant, pendant et après les vrais batchs. `AF-EVD-048` montre que les contextes lourds diffèrent entre 31/08, 08/09 et 14/09 : aucun job unique n'est prouvé comme cause commune. La prochaine preuve doit tester le modèle accumulation/rétention MariaDB sur la durée + pression finale du workload. `AF-EVD-050` interdit d'interpréter le label kernel `npm start` comme preuve d'un build frontend.
 
 Aucun nouvel A/B jemalloc, restart MariaDB, changement systemd, buffer, schéma ou version n'est autorisé par cette prochaine action.
 
@@ -51,3 +51,8 @@ Aucun nouvel A/B jemalloc, restart MariaDB, changement systemd, buffer, schéma 
 - `AF-OPS-001` reste `BLOCKED_HUMAN_APPROVAL` pour `Restart=on-failure` ;
 - `AF-TASK-010` reste bloquée sur les rotations fournisseur `EMAIL_PASSWORD` et `MAGIC_SECRET_KEY` ;
 - OOB host-key et GitHub native rulesets restent des gaps externes.
+
+
+### AF-OPS-005 en parallèle read-only
+
+`AF-EVD-049` prouve six `Access denied fund_opcvm@localhost` après le restart de 23:32, entre 23:36:29 et 23:38:56, puis aucun autre jusqu'au relevé 00:38. Aucun cron AfricaFunds n'apparaît dans la fenêtre. Le consommateur est intermittent et non attribué : poursuivre l'inventaire process/config avec comparaison de secrets par empreinte uniquement, sans afficher de valeur et sans rotation/restart.
