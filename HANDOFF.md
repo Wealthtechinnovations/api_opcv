@@ -69,3 +69,15 @@ Les SHA sont des checkpoints d'ouverture ; la reprise relit toujours GitHub.
 ## Production
 
 Aucun état S2 n'est supposé à partir de ce handoff. `PRODUCTION_ATTESTATION` reste à mesurer après les commits du programme.
+
+
+## Data-quality handoff — 2026-09-16
+
+Live authority: `AF-EVD-052` / `docs/ETAT_PRODUCTION_VERIFIE.md`.
+
+Do not create another backlog. Continue via:
+1. `AF-OPS-007` read-only C7/C3 preflight.
+2. `AF-OPS-009` read-only Nigeria/Tunisia freshness RCA.
+3. `AF-OPS-008` only after 007+009 validate the VL base.
+4. `AF-OPS-005` read-only attribution of stale credential files; `AF-EVD-051` proves files, not consumer.
+5. `AF-OPS-003` remains RCA_PENDING and must continue long RSS observation.

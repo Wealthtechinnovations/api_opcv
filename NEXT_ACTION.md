@@ -56,3 +56,18 @@ Aucun nouvel A/B jemalloc, restart MariaDB, changement systemd, buffer, schéma 
 ### AF-OPS-005 en parallèle read-only
 
 `AF-EVD-049` prouve six `Access denied fund_opcvm@localhost` après le restart de 23:32, entre 23:36:29 et 23:38:56, puis aucun autre jusqu'au relevé 00:38. Aucun cron AfricaFunds n'apparaît dans la fenêtre. Le consommateur est intermittent et non attribué : poursuivre l'inventaire process/config avec comparaison de secrets par empreinte uniquement, sans afficher de valeur et sans rotation/restart.
+
+
+## Data-quality operational queue — measured 2026-09-16
+
+The live production authority `docs/ETAT_PRODUCTION_VERIFIE.md` measured 6 critical failures (`AF-EVD-052`). They are not a new backlog: they map to existing requirements `AF-REQ-011..015` and are now materialized in the single governed task queue:
+
+- `AF-OPS-007` — C7/C3: mixed-scale VL series then absurd performances; read-only preflight first.
+- `AF-OPS-009` — C4: Nigeria/Tunisia VL freshness; diagnose pipelines/source availability before import.
+- `AF-OPS-008` — C2/C8: orphan/stale derived performances; dependency-gated behind VL integrity/freshness.
+
+Execution order: base VL integrity/freshness before derived performance cleanup/recalculation. Do not recalculate rankings on top of unvalidated performance data.
+
+## AF-OPS-005 update
+
+`AF-EVD-051` proves two stale credential-bearing files exist on S2 (`.env.production`, `.env.production.plan-b`) while the active `.env` matches the current DB credential. No active process/load path is yet proven to consume the stale files. Continue read-only attribution; no DB rotation/restart.

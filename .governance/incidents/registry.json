@@ -508,12 +508,13 @@
       },
       "root_cause": {
         "status": "UNKNOWN",
-        "statement": "Un consommateur intermittent utilise encore ponctuellement un credential invalide après restart, mais son exécutable précis reste UNKNOWN. Aucun cron AfricaFunds n'est présent dans la fenêtre 23:30-23:45; le chevauchement partiel avec un diagnostic GitHub ne suffit pas à l'attribuer et ce diagnostic réussit ses propres requêtes DB avec le .env courant.",
+        "statement": "Un consommateur intermittent a utilisé ponctuellement un credential invalide après restart. Deux fichiers runtime historiques (.env.production et .env.production.plan-b) contiennent un DB_PASSWORD différent du .env courant, mais aucun processus actif ni chargement explicite de ces fichiers n'est prouvé. L'identité du consommateur reste UNKNOWN.",
         "evidence_refs": [
           "AF-EVD-037",
-          "AF-EVD-049"
+          "AF-EVD-049",
+          "AF-EVD-051"
         ],
-        "why_not_proven": "GENERAL_LOG/PERFORMANCE_SCHEMA/USERSTAT sont désactivés et le journal MariaDB n'expose pas le PID client. Les refus cessent après 23:38 dans la fenêtre observée. Aucune preuve ne justifie rotation/restart."
+        "why_not_proven": "Le diagnostic redacted prouve les fichiers stale mais aucun processus actif avec DB_USER=fund_opcvm dans son environnement initial, et la recherche du repo ne montre pas de source explicite de .env.production/.env.production.plan-b. GENERAL_LOG/PERFORMANCE_SCHEMA/USERSTAT restent indisponibles pour attribuer le PID client."
       },
       "contributing_factors": [],
       "corrective_actions": [
@@ -533,7 +534,8 @@
           "rollback": "N/A pour diagnostic read-only.",
           "verification_refs": [
             "AF-EVD-037",
-            "AF-EVD-049"
+            "AF-EVD-049",
+            "AF-EVD-051"
           ]
         }
       ],
@@ -545,7 +547,8 @@
       ],
       "evidence_refs": [
         "AF-EVD-037",
-        "AF-EVD-049"
+        "AF-EVD-049",
+        "AF-EVD-051"
       ],
       "linked_tasks": [
         "AF-OPS-005"

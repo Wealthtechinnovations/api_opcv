@@ -80,3 +80,13 @@ Une priorité opérationnelle post-certification existe en parallèle dans **la 
 - prochaine preuve : corrélation longue durée read-only des batchs/crons/timeouts/handlers avec le RSS MariaDB.
 
 `AF-EVD-040` reste la preuve historique pré-A/B. `AF-OPS-001` reste un gate humain séparé. Ce n'est pas une réouverture d'`AF-TASK-011` ni une seconde queue.
+
+
+## Operational data-quality layer — 2026-09-16
+
+No second queue was created. Existing requirements `AF-REQ-011..015` remain OPEN and are executed through the canonical task queue:
+- `AF-OPS-007 = OPEN / READ_ONLY_PREFLIGHT`
+- `AF-OPS-009 = OPEN / READ_ONLY_RCA`
+- `AF-OPS-008 = OPEN / DEPENDENCY_GATED`
+
+`AF-OPS-003` remains the current operational priority. Data-quality preflights may proceed in parallel only when read-only and non-disruptive.

@@ -166,7 +166,7 @@
         "data_tests"
       ],
       "dependencies": [],
-      "note": "C7 — 15 series, facteur ~1500 (taux NGN/USD). 157 VL identifiees, correctif prepare et dry-run valide ; ecriture soumise au verrou VALIDER CORRECTION SEGMENTS NAIRA."
+      "note": "C7 — production 2026-09-16 : plusieurs séries restent à deux échelles, majoritairement Nigeria, avec au moins un cas UEMOA (FCP BRIDGE EQUILIBRE). Correctif Nigeria existant dry-run/snapshot/rollback ; ne pas extrapoler aux cas hors Nigeria."
     },
     {
       "id": "AF-REQ-012",
@@ -179,8 +179,10 @@
       "evidence_required": [
         "scripts/diag/check_doc_drift.js"
       ],
-      "dependencies": [],
-      "note": "C3 — consequence directe de C7 : la VL de reference et la VL courante ne sont pas dans la meme unite."
+      "dependencies": [
+        "AF-REQ-011"
+      ],
+      "note": "C3 — production 2026-09-16 : 1141 YTD 143958 %, 1196 YTD 9339 %, 2743 YTD 809 %. Traiter après assainissement des VL C7 puis recalcul des performances."
     },
     {
       "id": "AF-REQ-013",
@@ -193,8 +195,11 @@
       "evidence_required": [
         "scripts/monitoring/check_cron_health.js"
       ],
-      "dependencies": [],
-      "note": "C8 — MAROC 1.4 %, TUNISIE 6.1 %, UEMOA 32.4 %. VL fraiches mais performances perimees : le site affiche des chiffres plausibles et faux."
+      "dependencies": [
+        "AF-REQ-011",
+        "AF-REQ-015"
+      ],
+      "note": "C8 — production 2026-09-16 : MAROC 10/644 à jour (1,6 %), UEMOA 34/111 (30,6 %), malgré VL fraîches. Recalcul après intégrité/fraîcheur VL."
     },
     {
       "id": "AF-REQ-014",
@@ -208,8 +213,11 @@
       "evidence_required": [
         "scripts/diag/check_doc_drift.js"
       ],
-      "dependencies": [],
-      "note": "C2 — 14 fonds en local, 23 en EUR, 23 en USD. C est cette performance que l API sert."
+      "dependencies": [
+        "AF-REQ-011",
+        "AF-REQ-015"
+      ],
+      "note": "C2 — production 2026-09-16 : 14 local, 23 EUR et 23 USD dont la performance de tête porte une date sans VL. Instruction fonds par fonds avant suppression."
     },
     {
       "id": "AF-REQ-015",
@@ -223,7 +231,7 @@
         "scripts/diag/check_doc_drift.js"
       ],
       "dependencies": [],
-      "note": "C4 — NIGERIA 27 j (budget 14), TUNISIE 13 j (budget 9). CEMAC 637 j reste une ALERTE toleree : aucun pipeline."
+      "note": "C4 — production 2026-09-16 : NIGERIA 19 j (budget 14), TUNISIE 19 j (budget 9). CEMAC 643 j reste une ALERTE tolérée sans pipeline."
     },
     {
       "id": "AF-REQ-016",

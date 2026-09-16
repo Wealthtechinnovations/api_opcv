@@ -146,3 +146,19 @@ Ces faits renforcent la piste workload/overlap/rétention longue durée mais **n
 - `AF-EVD-050` : `npm start invoked oom-killer` ne prouve pas un build frontend. API et frontend ont tous deux un script `start`, et le build frontend est `npm run build`.
 
 La root cause OOM reste `UNKNOWN / RCA_PENDING`. La prochaine discrimination est une série RSS longue traversant de vrais batchs, pas un nouveau test court d'allocateur.
+
+
+## Production data-quality reconciliation — 2026-09-16 11:15 UTC
+
+`AF-EVD-052` records the current measured production state: 8/16 controls OK, 6 critical failures (C2, C3, C4.NIGERIA, C4.TUNISIE, C7, C8) and 2 alerts (C4/C6 CEMAC).
+
+These failures were already modeled as `AF-REQ-011..015`; they are now connected to canonical operational tasks:
+- `AF-OPS-007`: C7/C3, VL scale integrity before derived metrics.
+- `AF-OPS-009`: C4 Nigeria/Tunisia source/pipeline freshness.
+- `AF-OPS-008`: C2/C8 orphan/stale performances, gated by 007+009.
+
+No production data was modified by this reconciliation.
+
+## AF-OPS-005 — stale config evidence
+
+`AF-EVD-051`: active `.env` matches the current DB credential, while `.env.production` and `.env.production.plan-b` do not. No active process or explicit code path is yet proven to consume those files. Root cause remains UNKNOWN; no credential rotation/restart justified.

@@ -338,6 +338,22 @@
       "provenance": "Kernel journal persisted in docs/OPS_MARIADB.md plus package.json inspection of API and frontend at API e919d27cb8a804718b5676b6877195bf2c004d72 / frontend 7164973afd0b67b6274c9f1b0326f2d0f16f7f73",
       "observed_at": "2026-09-15T00:38:00Z",
       "summary": "The Sep14 kernel line says 'npm start invoked oom-killer'. This process label does not identify a frontend build. API package.json defines npm start as node app.js; frontend package.json defines npm start as scripts/start.sh, while the frontend build command is npm run build. Therefore 'frontend build invoked OOM' is unsupported by the available evidence. The exact invoking npm process remains unattributed unless PID/cwd/process evidence is recovered."
+    },
+    {
+      "id": "AF-EVD-051",
+      "type": "DB_AUTH_CONFIG_ATTRIBUTION",
+      "result": "STALE_CREDENTIAL_FILES_PROVEN_ACTIVE_CONSUMER_UNKNOWN",
+      "provenance": "GitHub Actions DIAG run 34914261590; docs/OPS_MYSQL_MEMOIRE.md; read-only comparison only",
+      "observed_at": "2026-09-15T00:43:50Z",
+      "summary": "Read-only redacted attribution found no active process whose initial environment contains DB_USER=fund_opcvm. Runtime api/.env matches the current DB password. Two sibling files, api/.env.production and api/.env.production.plan-b, declare fund_opcvm but their DB_PASSWORD does not match the current runtime credential. This proves stale credential-bearing files exist, not that either file caused the six post-restart Access denied events. Repository search finds no explicit runtime source/load of these files. No password value or hash was emitted."
+    },
+    {
+      "id": "AF-EVD-052",
+      "type": "MEASURED_PRODUCTION_STATE",
+      "result": "SIX_CRITICAL_DATA_QUALITY_FAILURES",
+      "provenance": "doc-drift.yml -> docs/ETAT_PRODUCTION_VERIFIE.md @ 2026-09-16 11:15 UTC; commit 6967430ef9a9f39bda158400c0a7c002f9464cf3",
+      "observed_at": "2026-09-16T11:15:00Z",
+      "summary": "Production control measured 8/16 OK, 6 critical failures and 2 alerts. Critical: C2 orphan head performances (14 local, 23 EUR, 23 USD); C3 absurd recent performances (1141 143958% YTD, 1196 9339%, 2743 809%); C4 Nigeria and Tunisia both last VL 2026-08-28 (19 days old); C7 multiple mixed-scale VL series including Nigeria and UEMOA; C8 stale derived performances despite fresh VLs (MAROC 10/644 current, UEMOA 34/111). Alerts: C4/C6 CEMAC."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."

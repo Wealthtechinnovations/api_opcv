@@ -192,9 +192,10 @@
       "incident_refs": [
         "AF-INC-20260914-002"
       ],
-      "next_action": "Attribuer en lecture seule le consommateur intermittent responsable des six Access denied fund_opcvm post-restart (23:36-23:38) en comparant processus/configs locaux sans afficher de secret. Aucun cron AfricaFunds dans cette fenêtre; ne pas re-rotater DB_PASSWORD et ne pas restart MariaDB.",
+      "next_action": "Deux fichiers runtime (.env.production et .env.production.plan-b) déclarent fund_opcvm avec un DB_PASSWORD différent du .env courant, mais aucun processus actif ne porte DB_USER=fund_opcvm dans son environnement initial et aucun consommateur précis n'est prouvé. Continuer uniquement l'attribution read-only : déterminer quels scripts/services peuvent charger ces fichiers. Ne pas re-rotater DB_PASSWORD et ne pas restart MariaDB.",
       "evidence_refs": [
-        "AF-EVD-049"
+        "AF-EVD-049",
+        "AF-EVD-051"
       ]
     },
     {
@@ -209,6 +210,56 @@
         "9f051c035e4bf72f919004f5a654ccf015f159ee"
       ],
       "next_action": "Conserver le contrat : code >=2 = mesure impossible et job rouge ; une alerte C5 ne doit jamais empêcher C2/C3/C4/C7/C8 d'être mesurés."
+    },
+    {
+      "id": "AF-OPS-007",
+      "title": "Data integrity — C7/C3 ruptures d'échelle et performances absurdes",
+      "status": "OPEN",
+      "phase": "READ_ONLY_PREFLIGHT",
+      "requirements": [
+        "AF-REQ-011",
+        "AF-REQ-012"
+      ],
+      "depends_on": [],
+      "next_action": "Rejouer le dry-run existant des segments Nigeria sans écriture, confronter son périmètre au C7 live du 2026-09-16 et séparer explicitement les cas Nigeria des anomalies hors Nigeria (dont FCP BRIDGE EQUILIBRE/UEMOA). N'exécuter aucune correction si le scope diverge. Toute écriture doit conserver snapshot, transaction, rollback et vérification C7/C3 post-write.",
+      "evidence_refs": [
+        "AF-EVD-011",
+        "AF-EVD-052"
+      ]
+    },
+    {
+      "id": "AF-OPS-008",
+      "title": "Performance integrity — C2/C8 orphelines et dérivés périmés",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "requirements": [
+        "AF-REQ-013",
+        "AF-REQ-014"
+      ],
+      "depends_on": [
+        "AF-OPS-007",
+        "AF-OPS-009"
+      ],
+      "next_action": "Instruire C2 fonds par fonds avant toute suppression. Après assainissement/fraîcheur des VL, recalculer les performances via les scripts/workflows existants, sans classements tant que les performances sources ne sont pas validées. Re-mesurer C2 et C8 avant toute clôture.",
+      "evidence_refs": [
+        "AF-EVD-011",
+        "AF-EVD-052"
+      ]
+    },
+    {
+      "id": "AF-OPS-009",
+      "title": "Data freshness — rétablir les pipelines VL Nigeria et Tunisie",
+      "status": "OPEN",
+      "phase": "READ_ONLY_RCA",
+      "requirements": [
+        "AF-REQ-015"
+      ],
+      "depends_on": [],
+      "next_action": "Diagnostiquer en lecture seule pourquoi Nigeria et Tunisie sont tous deux bloqués au 2026-08-28. Vérifier source disponible, dernier cron/import, erreurs, fichiers entrants et parseurs existants avant toute importation. Ne pas forcer un backfill ni rejouer un import tant que le périmètre source/date n'est pas prouvé.",
+      "evidence_refs": [
+        "AF-EVD-011",
+        "AF-EVD-052"
+      ]
     }
   ]
 }

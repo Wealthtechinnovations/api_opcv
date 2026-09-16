@@ -41,3 +41,8 @@ La certification de gouvernance reste fermée et son verdict reste `GOVERNED_WIT
 La priorité opérationnelle distincte est `AF-OPS-003` / `AF-INC-20260817-001`. Les A/B courts glibc/jemalloc ont été exécutés et rollbackés avec succès (runs `34908277049`, `34908496545`, `34908755786`, `34909181790`). Ils ne discriminent pas causalement la dérive RSS de plusieurs heures.
 
 La root cause exacte revient à `UNKNOWN` sous incident `RCA_PENDING`. La prochaine preuve est une corrélation longue durée read-only RSS ↔ âge du processus ↔ crons ↔ batchs ↔ timeouts ↔ handlers ↔ activité MariaDB. Aucun nouvel A/B jemalloc ou restart MariaDB n'est requis à ce stade.
+
+
+## Data-quality reconciliation — 2026-09-16
+
+The production control at 11:15 UTC remains authoritative: 8/16 OK, 6 critical failures, 2 alerts. Existing `AF-REQ-011..015` are now connected to the single task queue as `AF-OPS-007..009`. The dependency order is VL integrity/freshness first, then derived performances. This does not replace or close `AF-OPS-003`.

@@ -25,7 +25,7 @@
     "AF-OPS-003"
   ],
   "open": [],
-  "next_action": "AF-OPS-003 RCA_PENDING: collect long RSS time-series across real batch windows; cross-incident evidence shows heterogeneous heavy workloads, not one universal job. In parallel AF-OPS-005 has six intermittent post-restart fund_opcvm denials with unknown consumer; read-only attribution only.",
+  "next_action": "AF-OPS-003 remains RCA_PENDING and operational priority. In parallel: AF-OPS-005 must attribute stale DB credential consumers read-only; AF-OPS-007/009 perform read-only preflight for live data-quality failures; AF-OPS-008 is dependency-gated behind VL integrity/freshness. No second queue, no blind production write.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -45,9 +45,9 @@
     "email_password_rotation": "EXTERNAL_PROVIDER_REQUIRED",
     "magic_secret_rotation": "EXTERNAL_PROVIDER_REQUIRED",
     "final_governance_verdict": "GOVERNED_WITH_EXTERNAL_GAPS",
-    "db_access_denied_active_stale_consumer": "INTERMITTENT_CONSUMER_PROVEN_IDENTITY_UNKNOWN",
+    "db_access_denied_active_stale_consumer": "STALE_CONFIG_FILES_PROVEN_CONSUMER_IDENTITY_UNKNOWN",
     "db_access_denied_historical_attribution": "UNAVAILABLE_WITH_CURRENT_MARIADB_TELEMETRY",
-    "db_auth_latest_evidence": "AF-EVD-049",
+    "db_auth_latest_evidence": "AF-EVD-051",
     "db_access_denied_post_restart_fund_opcvm": "PROVEN_SIX_EVENTS_233629_TO_233856",
     "operational_task_status": "OPEN",
     "mariadb_oom_incident": "AF-INC-20260817-001",

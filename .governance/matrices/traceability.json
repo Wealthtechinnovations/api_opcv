@@ -112,56 +112,69 @@
       "requirement_id": "AF-REQ-011",
       "change_refs": [
         "scripts/fix/fix_segments_dollars_nigeria.js",
-        ".github/workflows/ops-fix-segments-naira.yml"
+        ".github/workflows/ops-fix-segments-naira.yml",
+        ".governance/loop/task-queue.json"
       ],
       "test_refs": [
         "scripts/diag/ondemand/diag_plateaux_nigeria.js",
         "data_tests"
       ],
       "evidence_refs": [
-        "AF-EVD-011"
+        "AF-EVD-011",
+        "AF-EVD-052"
       ]
     },
     {
       "requirement_id": "AF-REQ-012",
-      "change_refs": [],
+      "change_refs": [
+        ".governance/loop/task-queue.json"
+      ],
       "test_refs": [
         "scripts/diag/check_doc_drift.js"
       ],
       "evidence_refs": [
-        "AF-EVD-011"
+        "AF-EVD-011",
+        "AF-EVD-052"
       ]
     },
     {
       "requirement_id": "AF-REQ-013",
       "change_refs": [
-        ".github/workflows/ops-recalc-derives.yml"
+        ".github/workflows/ops-recalc-derives.yml",
+        ".governance/loop/task-queue.json"
       ],
       "test_refs": [
         "scripts/monitoring/check_cron_health.js"
       ],
       "evidence_refs": [
-        "AF-EVD-011"
+        "AF-EVD-011",
+        "AF-EVD-052"
       ]
     },
     {
       "requirement_id": "AF-REQ-014",
-      "change_refs": [],
+      "change_refs": [
+        ".governance/loop/task-queue.json"
+      ],
       "test_refs": [
         "scripts/diag/check_doc_drift.js"
       ],
       "evidence_refs": [
-        "AF-EVD-011"
+        "AF-EVD-011",
+        "AF-EVD-052"
       ]
     },
     {
       "requirement_id": "AF-REQ-015",
-      "change_refs": [],
+      "change_refs": [
+        ".governance/loop/task-queue.json"
+      ],
       "test_refs": [
         "scripts/diag/check_doc_drift.js"
       ],
       "evidence_refs": [
-        "AF-EVD-011"
+        "AF-EVD-011",
+        "AF-EVD-052"
       ]
     },
     {
