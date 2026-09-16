@@ -1,3 +1,4 @@
+# AF-OPS-009 freshness preflight refresh: 2026-09-16 — bounded extraction only, no DB import.
 # OPERATION — rejeu d extraction SEC en test, pour valider le correctif de devise.
 #
 # POURQUOI
