@@ -2,7 +2,7 @@
 
 > Genere par `ops-mysql-memoire.yml`. Lecture seule. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-15 00:43 UTC**
+Derniere execution : **2026-09-16 22:26 UTC**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
@@ -10,11 +10,11 @@ Declencheur : `push` — par `Wealthtechinnovations`
  1. MEMOIRE DE LA MACHINE
 ==============================================
                total        used        free      shared  buff/cache   available
-Mem:           17945        2855         185         209       14905       14529
-Swap:           2047         406        1641
+Mem:           17945       11089        1563         212        5292        6291
+Swap:           2047         374        1673
 
 RSS actuel de mariadbd :
-  0.24 Go — demarre depuis 01:09:46
+  8.55 Go — demarre depuis 1-22:52:16
 
 ==============================================
  2. CE QUE MARIADB S AUTORISE A CONSOMMER
@@ -43,31 +43,31 @@ table_open_cache	2000
 thread_cache_size	151
 Created_tmp_disk_tables	0
 Created_tmp_tables	0
-Max_used_connections	15
+Max_used_connections	21
 Threads_connected	9
 Threads_running	1
 
 ==============================================
  2b. MEMORY_USED / PROC / ALLOCATEUR
 ==============================================
-Aborted_connects	29
-Connections	952
-Created_tmp_disk_tables	5282
-Created_tmp_files	4
-Created_tmp_tables	6116
-Max_used_connections	15
-Memory_used	472949800
+Aborted_connects	1193
+Connections	12385
+Created_tmp_disk_tables	25009
+Created_tmp_files	20
+Created_tmp_tables	57532
+Max_used_connections	21
+Memory_used	483358304
 Memory_used_initial	442210192
-Open_files	94
-Open_table_definitions	400
-Open_tables	619
-Opened_files	22195
-Opened_table_definitions	692
-Opened_tables	626
+Open_files	98
+Open_table_definitions	478
+Open_tables	965
+Opened_files	101427
+Opened_table_definitions	808
+Opened_tables	972
 Threads_connected	9
-Threads_created	15
+Threads_created	54
 Threads_running	1
-Uptime	4185
+Uptime	168735
 
 --- version / instrumentation ---
 10.6.23-MariaDB-0ubuntu0.22.04.1	Ubuntu 22.04
@@ -77,43 +77,43 @@ table_definition_cache	400
 version_malloc_library	system
 MARIADB_PID=2100513
 --- /proc status ---
-2100513 246572 2792664  01:09:46   24  1.3 /usr/sbin/mariadbd
-VmPeak:	 2923768 kB
-VmSize:	 2792664 kB
-VmRSS:	  246572 kB
-RssAnon:	  224684 kB
-RssFile:	   21888 kB
+2100513 8961068 11772716 1-22:52:16 25 48.7 /usr/sbin/mariadbd
+VmPeak:	11901720 kB
+VmSize:	11772716 kB
+VmRSS:	 8961068 kB
+RssAnon:	 8942456 kB
+RssFile:	   18612 kB
 RssShmem:	       0 kB
-VmData:	  614732 kB
-VmSwap:	       0 kB
-Threads:	24
+VmData:	 9568824 kB
+VmSwap:	   64660 kB
+Threads:	25
 --- smaps_rollup ---
-Rss:              249388 kB
-Pss:              243202 kB
-Pss_Anon:         227164 kB
-Pss_File:          16038 kB
-Private_Clean:     15356 kB
-Private_Dirty:    227164 kB
-Anonymous:        227164 kB
+Rss:             8963316 kB
+Pss:             8956866 kB
+Pss_Anon:        8944300 kB
+Pss_File:          12566 kB
+Private_Clean:     11984 kB
+Private_Dirty:   8944268 kB
+Anonymous:       8944300 kB
 AnonHugePages:         0 kB
-Swap:                  0 kB
+Swap:              64612 kB
 --- pmap totals ---
 ---------------- ------- ------- ------- 
-total kB         2792668  249388  227164
+total kB         11772720 8963316 8944268
 --- allocator libraries ---
-	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd1bf0fa000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f1624456000)
 --- systemd/cgroup memory ---
 Restart=on-abort
 Result=success
 NRestarts=0
 OOMPolicy=stop
-MemoryCurrent=258482176
+MemoryCurrent=9202970624
 ActiveState=active
 SubState=running
 [memory.current]
-258482176
+9202970624
 [memory.swap.current]
-0
+66494464
 [memory.events]
 low 0
 high 0
@@ -132,36 +132,36 @@ always [madvise] never
 BPF_MEMLEAK_TOOL=ABSENT
 ALT_ALLOCATOR_LIBRARY=ABSENT
 --- top mappings pmap par dirty kB ---
-00007f3668000000     780     540     540 rw---   [ anon ]
-00007f369947f000    1604     540     540 rw---   [ anon ]
-00007f3618000000    1908     868     868 rw---   [ anon ]
-00007f3608000000    4072    1060    1060 rw---   [ anon ]
-000055ac6c616000    1352    1352    1352 r---- mariadbd
-00007f3684172000    2364    2104    2104 rw---   [ anon ]
-00007f363c000000    6640    2404    2404 rw---   [ anon ]
-00007f3660000000    5352    2476    2476 rw---   [ anon ]
-00007f3698054000    4100    4100    4100 rw---   [ anon ]
-00007f361c000000    6124    4188    4188 rw---   [ anon ]
-000055ac76043000    5884    5080    5080 rw---   [ anon ]
-00007f3620000000    8332    5264    5264 rw---   [ anon ]
-00007f3698456000   16544    6424    6424 rw---   [ anon ]
-00007f3648000000    7336    7092    7092 rw---   [ anon ]
-00007f3654000000   10444    7588    7588 rw---   [ anon ]
-000055ac6c831000    9060    8712    8712 rw---   [ anon ]
-00007f3664000000   10100    9172    9172 rw---   [ anon ]
-00007f3644000000   23316   10808   10808 rw---   [ anon ]
-00007f3684577000  256548   24740   24740 rw---   [ anon ]
-00007f36757ff000  163840  119104  119104 rw---   [ anon ]
+00007f33b0000000   65524   65256   65256 rw---   [ anon ]
+00007f3458000000   65524   65280   65280 rw---   [ anon ]
+00007f345c000000   65532   65284   65284 rw---   [ anon ]
+00007f33a8000000   65532   65288   65288 rw---   [ anon ]
+00007f33bc000000   65536   65304   65304 rw---   [ anon ]
+00007f3448000000   65524   65304   65304 rw---   [ anon ]
+00007f3460000000   65532   65316   65316 rw---   [ anon ]
+00007f33ac000000   65532   65388   65388 rw---   [ anon ]
+00007f3464000000   65532   65388   65388 rw---   [ anon ]
+00007f33b8000000   65520   65400   65400 rw---   [ anon ]
+00007f33c4000000   65536   65436   65436 rw---   [ anon ]
+00007f36757ff000  163840  123780  123780 rw---   [ anon ]
+00007f3470000000  131068  125116  125116 rw---   [ anon ]
+00007f3684577000  256548  125208  125208 rw---   [ anon ]
+00007f35a0000000  131060  126704  126704 rw---   [ anon ]
+00007f3398000000  131060  127456  127456 rw---   [ anon ]
+00007f3468000000  131060  129348  129348 rw---   [ anon ]
+00007f3440000000  131072  129728  129728 rw---   [ anon ]
+00007f33f8000000  131068  130372  130372 rw---   [ anon ]
+00007f3450000000  131072  130660  130660 rw---   [ anon ]
 
 --- top connexions par memoire ---
-956	fund_opcvm	localhost	Query	0	0.15	0.15
-209	fund_opcvm	localhost:60356	Sleep	2521	0.09	0.09
-206	fund_opcvm	localhost:60334	Sleep	2519	0.09	0.33
-205	fund_opcvm	localhost:60332	Sleep	2518	0.09	0.33
-204	fund_opcvm	localhost:60324	Sleep	2518	0.09	0.32
-46	fund_opcvm	localhost:40916	Sleep	2518	0.09	3.34
-7	fund_opcvm	localhost:48340	Sleep	2	0.09	0.12
-55	fund_opcvm	localhost:57702	Sleep	22	0.08	0.11
+6611	fund_opcvm	localhost:50006	Sleep	932	0.84	2.56
+12072	fund_opcvm	localhost:60124	Sleep	1293	0.65	3.72
+12070	fund_opcvm	localhost:60108	Sleep	930	0.46	3.31
+12286	fund_opcvm	localhost:40178	Sleep	786	0.37	2.09
+12287	fund_opcvm	localhost:40192	Sleep	1127	0.27	0.34
+12388	fund_opcvm	localhost	Query	0	0.15	0.15
+7	fund_opcvm	localhost:48340	Sleep	4	0.09	0.12
+55	fund_opcvm	localhost:57702	Sleep	24	0.08	0.11
 
 ==============================================
  3. PLAFOND CONFIGURE, PAS RSS REEL
@@ -210,12 +210,12 @@ Sep 14 23:32:32 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database ser
 ==============================================
  5. SERIE COURTE RSS vs Memory_used
 ==============================================
-SAMPLE ts=2026-09-15T00:42:19Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900792 connections=9
-SAMPLE ts=2026-09-15T00:42:34Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:42:49Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900640 connections=9
-SAMPLE ts=2026-09-15T00:43:04Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:43:19Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471900776 connections=9
-SAMPLE ts=2026-09-15T00:43:34Z rss_kb=246572 rssanon_kb=224684 swap_kb=0 mariadb_memory_used_bytes=471991432 connections=10
+SAMPLE ts=2026-09-16T22:24:49Z rss_kb=8961068 rssanon_kb=8942456 swap_kb=64660 mariadb_memory_used_bytes=482308968 connections=9
+SAMPLE ts=2026-09-16T22:25:04Z rss_kb=8961068 rssanon_kb=8942456 swap_kb=64660 mariadb_memory_used_bytes=482308968 connections=9
+SAMPLE ts=2026-09-16T22:25:19Z rss_kb=8961068 rssanon_kb=8942456 swap_kb=64660 mariadb_memory_used_bytes=482308816 connections=9
+SAMPLE ts=2026-09-16T22:25:34Z rss_kb=8961068 rssanon_kb=8942456 swap_kb=64660 mariadb_memory_used_bytes=482308816 connections=9
+SAMPLE ts=2026-09-16T22:25:49Z rss_kb=8961068 rssanon_kb=8942456 swap_kb=64660 mariadb_memory_used_bytes=482308816 connections=9
+SAMPLE ts=2026-09-16T22:26:04Z rss_kb=8961068 rssanon_kb=8942456 swap_kb=64660 mariadb_memory_used_bytes=482308952 connections=9
 
 ==============================================
  6. CORRELATION CRONS / RSS — 2026-09-14
@@ -837,11 +837,11 @@ performences_usds: 32931 lignes, 1243 fonds
 ========================================
 
 --- sortie cron principale redirigee ---
-FILE=/var/log/africafunds_cron.log size=1320266 mtime=2026-09-14 21:13:15.284247576 +0000
+FILE=/var/log/africafunds_cron.log size=1353012 mtime=2026-09-16 21:17:56.688849261 +0000
 === AFRICAFUNDS DAILY UPDATE ===
-=== Mon Sep 14 08:00:01 PM UTC 2026 ===
+=== Wed Sep 16 08:00:01 PM UTC 2026 ===
 ========================================
-[1/9] Scrape ASFIM VL Maroc (2026-09-09 -> 2026-09-14)...
+[1/9] Scrape ASFIM VL Maroc (2026-09-11 -> 2026-09-16)...
 ==========================================
 === RAPPORT SCRAPE & IMPORT ASFIM ===
 ==========================================
@@ -883,8 +883,8 @@ Fonds traites:    1242
 ============================================================
 === VERIFICATION FINALE ===
 ============================================================
-performences_eurs: 32698 lignes, 1243 fonds
-performences_usds: 32931 lignes, 1243 fonds
+performences_eurs: 33366 lignes, 1243 fonds
+performences_usds: 33599 lignes, 1243 fonds
 [8/9] OK
 [9a/9] Classement local...
 [9a/9] OK (HTTP 200)
@@ -892,10 +892,10 @@ performences_usds: 32931 lignes, 1243 fonds
 [9b/9] OK (HTTP 200)
 [9c/9] Classement USD...
 [9c/9] OK (HTTP 200)
-=== MISE A JOUR TERMINEE AVEC 2 ERREUR(S) Mon Sep 14 09:13:15 PM UTC 2026 ===
+=== MISE A JOUR TERMINEE AVEC 2 ERREUR(S) Wed Sep 16 09:17:56 PM UTC 2026 ===
 
 --- cron EUR/USD 21h30 : bloc du 2026-09-14 ---
-FILE=/var/log/cron_eur_usd.log size=144769 mtime=2026-09-14 22:06:32.087487361 +0000
+FILE=/var/log/cron_eur_usd.log size=146705 mtime=2026-09-16 22:06:20.777909103 +0000
 CRON EUR/USD — 2026-09-14 21:30:01
 ============================================
 --- [1/3] Performances EUR + USD ---
@@ -1143,16 +1143,15 @@ STATUT: 5 PROBLEME(S) DETECTE(S)
  7. HANDLERS BATCH API — PREUVE DE CONTINUATION
 ==============================================
 --- logs.txt processFundmysql ---
-FILE=logs.txt size=91994354 mtime=2026-09-14 22:04:43.292709001 +0000
-finish_count=1219
+FILE=logs.txt size=276091393 mtime=2026-09-16 22:11:43.754151108 +0000
+finish_count=3657
 last_finish_ids:
-finish l'ID 2883
 finish l'ID 2884
 finish l'ID 2892
+finish l'ID 1099
 finish l'ID 2896
 finish l'ID 2897
 finish l'ID 2900
-finish l'ID 1100
 finish l'ID 2901
 finish l'ID 2902
 finish l'ID 2903
@@ -1169,6 +1168,7 @@ finish l'ID 2928
 finish l'ID 2929
 finish l'ID 2930
 finish l'ID 2931
+finish l'ID 1100
 finish l'ID 1101
 finish l'ID 1102
 finish l'ID 1103
@@ -1351,7 +1351,7 @@ Erreur lors de l'appel à l'API pour le fond avec l'ID 1200
 --- PM2 api-monolith metadata ---
 │ status            │ online                                                                     │
 │ restarts          │ 169                                                                        │
-│ uptime            │ 2D                                                                         │
+│ uptime            │ 4D                                                                         │
 │ script path       │ /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js │
 │ error log path    │ /root/.pm2/logs/api-monolith-error.log                                     │
 │ out log path      │ /root/.pm2/logs/api-monolith-out.log                                       │
@@ -1361,23 +1361,7 @@ Erreur lors de l'appel à l'API pour le fond avec l'ID 1200
 
 --- PM2 logs: batch/perf/classement markers around Sep 14 ---
 LOGFILE=/root/.pm2/logs/api-monolith-out.log
-size=46484885 mtime=2026-09-15 00:24:18.875600420 +0000
-::ffff:127.0.0.1 - - [18/Aug/2026:20:49:08 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [18/Aug/2026:20:54:08 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [18/Aug/2026:21:56:27 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [18/Aug/2026:22:01:19 +0000] "GET /api/classementusd HTTP/1.1" 200 12 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:03:26 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 500 57 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:03:26 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" 500 57 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:03:27 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" 500 57 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:08:27 +0000] "GET /api/classementmysql HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:13:27 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:18:27 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:21:35:01 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:21:40:01 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [20/Aug/2026:20:04:23 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 200 44 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [20/Aug/2026:20:09:23 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [20/Aug/2026:20:14:23 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [20/Aug/2026:20:45:05 +0000] "GET /api/classementmysql HTTP/1.1" - - "-" "curl/7.81.0"
+size=48256672 mtime=2026-09-16 22:06:20.669910365 +0000
 ::ffff:127.0.0.1 - - [20/Aug/2026:20:50:05 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [20/Aug/2026:20:55:05 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [20/Aug/2026:21:57:17 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
@@ -1542,8 +1526,24 @@ size=46484885 mtime=2026-09-15 00:24:18.875600420 +0000
 ::ffff:127.0.0.1 - - [14/Sep/2026:21:13:15 +0000] "GET /api/classementusd HTTP/1.1" 200 12 "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [14/Sep/2026:22:01:31 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [14/Sep/2026:22:06:31 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:20:04:31 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 200 104 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:20:09:31 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:20:14:31 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:20:58:29 +0000] "GET /api/classementmysql HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:21:05:36 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:21:12:08 +0000] "GET /api/classementusd HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:22:00:10 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:22:05:10 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:20:04:38 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 200 104 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:20:09:38 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:20:14:38 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:21:02:46 +0000] "GET /api/classementmysql HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:21:09:41 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:21:17:56 +0000] "GET /api/classementusd HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:22:01:21 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:22:06:20 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
 LOGFILE=/root/.pm2/logs/api-monolith-error.log
-size=2610128753 mtime=2026-09-14 22:04:43.288709046 +0000
+size=2794182820 mtime=2026-09-16 22:11:43.754151108 +0000
     code: 'ECONNREFUSED',
 ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3306
   parent: Error: connect ECONNREFUSED 127.0.0.1:3306
@@ -1725,23 +1725,7 @@ Erreur lors de la récupération des données valLiq: ConnectionRefusedError [Se
   original: Error: connect ECONNREFUSED 127.0.0.1:3306
     code: 'ECONNREFUSED',
 LOGFILE=/root/.pm2/logs/api-monolith-out.log
-size=46484885 mtime=2026-09-15 00:24:18.875600420 +0000
-::ffff:127.0.0.1 - - [18/Aug/2026:20:49:08 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [18/Aug/2026:20:54:08 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [18/Aug/2026:21:56:27 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [18/Aug/2026:22:01:19 +0000] "GET /api/classementusd HTTP/1.1" 200 12 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:03:26 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 500 57 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:03:26 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" 500 57 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:03:27 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" 500 57 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:08:27 +0000] "GET /api/classementmysql HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:13:27 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:20:18:27 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:21:35:01 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [19/Aug/2026:21:40:01 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [20/Aug/2026:20:04:23 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 200 44 "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [20/Aug/2026:20:09:23 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [20/Aug/2026:20:14:23 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" - - "-" "curl/7.81.0"
-::ffff:127.0.0.1 - - [20/Aug/2026:20:45:05 +0000] "GET /api/classementmysql HTTP/1.1" - - "-" "curl/7.81.0"
+size=48256672 mtime=2026-09-16 22:06:20.669910365 +0000
 ::ffff:127.0.0.1 - - [20/Aug/2026:20:50:05 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [20/Aug/2026:20:55:05 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [20/Aug/2026:21:57:17 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
@@ -1906,8 +1890,24 @@ size=46484885 mtime=2026-09-15 00:24:18.875600420 +0000
 ::ffff:127.0.0.1 - - [14/Sep/2026:21:13:15 +0000] "GET /api/classementusd HTTP/1.1" 200 12 "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [14/Sep/2026:22:01:31 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
 ::ffff:127.0.0.1 - - [14/Sep/2026:22:06:31 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:20:04:31 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 200 104 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:20:09:31 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:20:14:31 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:20:58:29 +0000] "GET /api/classementmysql HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:21:05:36 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:21:12:08 +0000] "GET /api/classementusd HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:22:00:10 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [15/Sep/2026:22:05:10 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:20:04:38 +0000] "GET /api/saveperfdatemysql/1/600 HTTP/1.1" 200 104 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:20:09:38 +0000] "GET /api/saveperfdatemysql/601/1200 HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:20:14:38 +0000] "GET /api/saveperfdatemysql/1201/3000 HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:21:02:46 +0000] "GET /api/classementmysql HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:21:09:41 +0000] "GET /api/classementeur HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:21:17:56 +0000] "GET /api/classementusd HTTP/1.1" 200 12 "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:22:01:21 +0000] "GET /api/classementeur HTTP/1.1" - - "-" "curl/7.81.0"
+::ffff:127.0.0.1 - - [16/Sep/2026:22:06:20 +0000] "GET /api/classementusd HTTP/1.1" - - "-" "curl/7.81.0"
 LOGFILE=/root/.pm2/logs/api-monolith-error.log
-size=2610128753 mtime=2026-09-14 22:04:43.288709046 +0000
+size=2794182820 mtime=2026-09-16 22:11:43.754151108 +0000
     code: 'ECONNREFUSED',
 ConnectionRefusedError [SequelizeConnectionRefusedError]: connect ECONNREFUSED 127.0.0.1:3306
   parent: Error: connect ECONNREFUSED 127.0.0.1:3306
@@ -2090,22 +2090,21 @@ Erreur lors de la récupération des données valLiq: ConnectionRefusedError [Se
     code: 'ECONNREFUSED',
 
 --- processus node/mysql encore vivants ---
- 928517  928318 Fri Sep  4 06:38:13 2026 10-18:05:29 node server.js
- 928551  928371 Fri Sep  4 06:38:13 2026 10-18:05:29 node --import tsx/esm server.ts
- 929244  928551 Fri Sep  4 06:38:16 2026 10-18:05:26 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
- 929356  928501 Fri Sep  4 06:38:17 2026 10-18:05:25 [node] <defunct>
-2100513       1 Mon Sep 14 23:32:31 2026    01:11:11 /usr/sbin/mariadbd
-3269585    4648 Sat Sep 12 02:12:41 2026  2-22:31:01 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3269605    4648 Sat Sep 12 02:12:43 2026  2-22:30:59 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
-3273968    4648 Sat Sep 12 02:20:38 2026  2-22:23:04 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
-3351988 3351963 Sat Sep 12 05:00:07 2026  2-19:43:35 node --import tsx/esm server.ts
-3352121 3351988 Sat Sep 12 05:00:07 2026  2-19:43:35 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
-2117834 2117459 Tue Sep 15 00:00:52 2026       42:50 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
-2121903 2117459 Tue Sep 15 00:09:21 2026       34:21 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
-2130437 2117459 Tue Sep 15 00:20:03 2026       23:39 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
-2139026 2117459 Tue Sep 15 00:37:29 2026       06:13 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/wealthtech.chainsolutions
-2147303 2117459 Tue Sep 15 00:43:27 2026       00:15 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.itic4fima.chainsoluti
-2147449 2117459 Tue Sep 15 00:43:29 2026       00:13 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/stablecoin.chainsolutions
+2100513       1 Mon Sep 14 23:32:31 2026  1-22:53:47 /usr/sbin/mariadbd
+3269585    4648 Sat Sep 12 02:12:41 2026  4-20:13:37 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3269605    4648 Sat Sep 12 02:12:43 2026  4-20:13:35 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/wo
+3273968    4648 Sat Sep 12 02:20:38 2026  4-20:05:40 node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
+2885488 2884964 Wed Sep 16 00:01:06 2026    22:25:12 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/Funds.chainsolutions.fr/f
+3170977 3170830 Wed Sep 16 06:32:07 2026    15:54:11 node server.js
+3171003 3170794 Wed Sep 16 06:32:07 2026    15:54:11 node --import tsx/esm server.ts
+3171005 3170787 Wed Sep 16 06:32:07 2026    15:54:11 node --import tsx/esm server.ts
+3171661 3171003 Wed Sep 16 06:32:10 2026    15:54:08 /app/node_modules/tsx/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.27.3 --ping
+3171818 3170955 Wed Sep 16 06:32:11 2026    15:54:07 [node] <defunct>
+3555469 2884964 Wed Sep 16 20:15:49 2026    02:10:29 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/wealthtech.chainsolutions
+3593077 2884964 Wed Sep 16 21:41:09 2026       45:09 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/api.stablecoin.chainsolut
+3593474 2884964 Wed Sep 16 21:41:24 2026       44:54 Passenger NodeApp: /var/www/vhosts/fantokenafrica.club/lysfc.fantokenafrica.cl
+3606715 2884964 Wed Sep 16 22:11:31 2026       14:47 Passenger NodeApp: /var/www/vhosts/wealthtechinnovations.ci/api.pccet.wealthte
+3606943 2884964 Wed Sep 16 22:11:34 2026       14:44 Passenger NodeApp: /var/www/vhosts/chainsolutions.fr/itic4fima.chainsolutions.
 
 ==============================================
  8. CORRELATION MULTI-INCIDENTS — READ ONLY
@@ -2482,7 +2481,7 @@ ERREUR FATALE: Error: connect ECONNREFUSED 127.0.0.1:3306
 ========================================
 
 --- indices 2026-08-31 autour de 18:30 ---
-FILE=/var/log/cron_indices_daily.log size=1122974 mtime=2026-09-14 18:31:17.659943672 +0000
+FILE=/var/log/cron_indices_daily.log size=1170912 mtime=2026-09-16 18:32:03.926981889 +0000
 32187-
 32188---- PHASE 3: Propagation indRef non necessaire (aucun nouvel indice insere) ---
 32189-
@@ -2845,7 +2844,7 @@ FILE=/var/log/cron_indices_daily.log size=1122974 mtime=2026-09-14 18:31:17.6599
 32897-  BRVM Composite: 537.25 (via BRVM BOC PDF (bfin.brvm.org))
 
 --- EUR/USD 2026-08-27 autour de 21:30 ---
-FILE=/var/log/cron_eur_usd.log size=144769 mtime=2026-09-14 22:06:32.087487361 +0000
+FILE=/var/log/cron_eur_usd.log size=146705 mtime=2026-09-16 22:06:20.777909103 +0000
 CRON EUR/USD — 2026-08-27 21:30:01
 ============================================
 --- [1/3] Performances EUR + USD ---
@@ -2894,50 +2893,226 @@ ERREUR FATALE: Error: connect ECONNREFUSED 127.0.0.1:3306
 CRON EUR/USD TERMINE AVEC 3 ERREUR(S) — 2026-08-27 21:40:01
 
 --- AF-OPS-005 : refus fund_opcvm depuis dernier restart 23:32 ---
-2026-09-14T23:36:29+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:29 74 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-14T23:36:33+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:33 75 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-14T23:36:48+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:48 81 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-14T23:36:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:36:51 82 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-14T23:38:53+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:38:53 92 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-14T23:38:56+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:38:56 93 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:40:24+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:24 919 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:40:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:27 920 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:40:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:32 921 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:40:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:37 923 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:40:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:42 924 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:40:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:47 925 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:40:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:52 927 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:40:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:40:57 928 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:02 930 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:07 931 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:12 932 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:17 933 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:22 934 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:27 936 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:32 937 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:37 938 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:42 939 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:47 940 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:52 941 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:41:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:41:57 943 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:02 944 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:07 945 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:12 947 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:17 955 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:22 961 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:27 963 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:32 964 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:37 967 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:42 968 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:47 969 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:52 972 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:42:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:42:57 974 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:43:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:02 975 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:43:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:07 978 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:43:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:12 980 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:43:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:17 981 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:43:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:22 984 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
-2026-09-15T00:43:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-15  0:43:27 985 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:11:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:11:32 8276 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:11:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:11:37 8277 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:11:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:11:42 8278 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:11:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:11:47 8279 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:11:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:11:52 8280 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:11:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:11:57 8281 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:02 8282 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:07 8283 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:12 8284 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:17 8285 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:22 8286 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:27 8287 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:32 8288 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:37 8289 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:42 8291 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:47 8292 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:52 8293 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:12:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:12:57 8294 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:02 8295 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:07 8296 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:12 8297 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:17 8299 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:22 8300 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:27 8301 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:32 8302 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:37 8303 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:42 8304 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:47 8305 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:52 8306 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:13:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:13:57 8307 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:02 8308 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:07 8309 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:12 8310 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:17 8312 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:22 8313 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:27 8314 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:32 8315 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:37 8316 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:42 8317 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:47 8319 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:52 8320 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:14:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:14:57 8321 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:03+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:03 8324 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:07 8325 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:12 8327 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:17 8328 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:22 8330 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:27 8331 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:32 8332 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:37 8333 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:42 8334 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:47 8335 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:52 8336 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:15:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:15:57 8337 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:02 8338 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:07+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:07 8339 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:12 8340 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:17 8341 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:22 8342 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:27 8343 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:32 8344 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:37 8345 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:42 8346 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:47 8348 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:52 8349 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:16:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:16:57 8350 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:17:03+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:17:03 8358 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:35:03+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:35:03 8411 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:38:08+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:38:08 8417 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:38:48+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:38:48 8418 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T01:38:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  1:38:52 8425 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T02:09:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  2:09:42 8514 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T02:09:50+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  2:09:50 8515 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T02:18:31+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  2:18:31 8545 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T02:18:34+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  2:18:34 8546 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T02:19:15+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  2:19:15 8556 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T02:28:44+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  2:28:44 8577 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T02:52:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  2:52:47 8649 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T03:10:35+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  3:10:35 8714 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T03:10:38+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  3:10:38 8717 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T03:19:13+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  3:19:13 8743 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T03:28:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  3:28:42 8772 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T03:28:45+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  3:28:45 8773 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T04:25:39+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  4:25:39 8957 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T04:25:42+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  4:25:42 8960 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:31+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:31 9183 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:33+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:33 9186 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:36+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:36 9188 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:38+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:38 9190 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:41+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:41 9191 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:43+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:43 9196 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:46+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:46 9199 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:48+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:48 9200 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:51 9201 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:53+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:53 9203 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:46:56+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:46:56 9206 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:01+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:01 9209 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:05+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:05 9210 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:08+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:08 9211 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:11+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:11 9212 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:13+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:13 9215 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:16+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:16 9218 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:19+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:19 9219 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:22+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:22 9220 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:24+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:24 9221 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:28+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:28 9224 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:31+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:31 9227 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:33+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:33 9228 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:36+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:36 9229 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:38+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:38 9230 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:41+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:41 9233 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:44+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:44 9236 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T05:47:46+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  5:47:46 9237 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T06:00:17+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  6:00:17 6336 [Warning] Aborted connection 6336 to db: 'fund_opcvm' user: 'fund_opcvm' host: 'localhost' (Got timeout reading communication packets)
+2026-09-16T06:11:50+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  6:11:50 9304 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T06:11:54+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  6:11:54 9305 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T06:21:31+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  6:21:31 9364 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T06:21:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  6:21:37 9365 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T07:14:53+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  7:14:53 9660 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T07:18:01+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  7:18:01 9673 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T07:32:25+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  7:32:25 9704 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T07:39:36+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  7:39:36 9715 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T07:40:50+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  7:40:50 9722 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:15:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:15:51 9924 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:16:08+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:16:08 9928 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:16:21+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:16:21 9932 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:16:24+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:16:24 9936 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:16:49+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:16:49 9938 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:16:52+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:16:52 9939 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:16:55+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:16:55 9942 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:16:58+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:16:58 9943 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:02+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:02 9952 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:05+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:05 9955 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:08+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:08 9956 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:12 9959 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:15+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:15 9960 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:18+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:18 9963 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:21+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:21 9965 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:25+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:25 9966 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:28+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:28 9969 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:31+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:31 9970 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:34+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:34 9973 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:17:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:17:37 9975 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T08:41:21+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  8:41:21 10099 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T09:17:09+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  9:17:09 10222 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T09:48:24+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  9:48:24 10311 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T09:53:10+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  9:53:10 10321 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T09:53:13+0000 priceless-mayer mariadbd[2100513]: 2026-09-16  9:53:13 10322 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T10:02:10+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 10:02:10 10353 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T10:02:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 10:02:12 10354 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T10:29:03+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 10:29:03 10436 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T11:25:35+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 11:25:35 10568 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T11:32:37+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 11:32:37 10589 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T12:01:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 12:01:12 10642 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T12:01:16+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 12:01:16 10645 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T12:07:46+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 12:07:46 10668 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T12:12:19+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 12:12:19 10678 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T12:12:21+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 12:12:21 10679 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T12:36:21+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 12:36:21 10717 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T14:00:15+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 14:00:15 46 [Warning] Aborted connection 46 to db: 'fund_opcvm' user: 'fund_opcvm' host: 'localhost' (Got timeout reading communication packets)
+2026-09-16T14:21:15+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 14:21:15 10950 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T14:31:11+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 14:31:11 10969 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T14:49:38+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 14:49:38 10990 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T14:49:41+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 14:49:41 10993 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T14:54:05+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 14:54:05 11002 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T15:05:23+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 15:05:23 11014 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T15:27:35+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 15:27:35 11043 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T15:49:30+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 15:49:30 11098 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T15:57:16+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 15:57:16 11130 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T15:57:20+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 15:57:20 11131 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T16:39:50+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 16:39:50 11271 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T16:39:57+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 16:39:57 11274 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T16:43:00+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 16:43:00 11288 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T16:43:05+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 16:43:05 11291 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T16:45:05+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 16:45:05 11294 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T16:58:06+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 16:58:06 11328 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:00:48+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:00:48 11340 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:00:50+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:00:50 11341 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:06:48+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:06:48 11350 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:08:41+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:08:41 11360 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:12:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:12:32 11378 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:24:34+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:24:34 11430 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:25:27+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:25:27 11433 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:29:41+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:29:41 11443 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:29:53+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:29:53 11444 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:34:24+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:34:24 11450 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:49:09+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:49:09 11469 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:49:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:49:12 11472 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T17:55:43+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 17:55:43 11490 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:06:43+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:06:43 11506 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:07:33+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:07:33 11510 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:12:31+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:12:31 11516 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:13:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:13:32 11537 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:13:36+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:13:36 11538 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:18:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:18:51 11564 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:26:04+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:26:04 11576 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:40:23+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:40:23 11615 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T18:40:26+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 18:40:26 11618 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:02:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:02:32 11678 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:05:58+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:05:58 11682 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:18:55+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:18:55 11746 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:38:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:38:51 11792 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:39:41+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:39:41 11796 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:52:54+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:52:54 11824 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:52:56+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:52:56 11827 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:57:26+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:57:26 11844 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:57:29+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:57:29 11845 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T19:59:51+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 19:59:51 11852 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T20:00:00+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 20:00:00 11853 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T20:01:47+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 20:01:47 11862 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T20:05:01+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 20:05:01 11872 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T20:06:12+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 20:06:12 11876 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T20:06:16+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 20:06:16 11877 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T20:15:49+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 20:15:49 11905 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T20:25:21+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 20:25:21 11961 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T21:02:21+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 21:02:21 12079 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T21:41:08+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 21:41:08 12198 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T21:41:23+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 21:41:23 12201 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T22:11:31+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 22:11:31 12337 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
+2026-09-16T22:11:34+0000 priceless-mayer mariadbd[2100513]: 2026-09-16 22:11:34 12340 [Warning] Access denied for user 'fund_opcvm'@'localhost' (using password: YES)
 
 --- preuve stricte execution indices le 2026-08-31 18:30 ---
 28898-    [Tunindex] ECHEC: aucune source n'a retourne de valeur
@@ -3380,8 +3555,127 @@ ENV_FILE path=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/ap
 ./src/workers/ttyd-agent.js
 ./src/workers/worker-data-import.js
 ./docs/08-security/SECRETS_MANAGEMENT.md
+./docs/OPS_MYSQL_MEMOIRE.md
 ./.env
-./.env.production
+
+==============================================
+ 10. AF-OPS-009 — FRAICHEUR TUNISIE (LECTURE SEULE)
+==============================================
+--- wrapper cron Tunisie ---
+2026-09-09 19:00:15,599 | INFO | Discovered 223 CMF files
+2026-09-09 19:00:15,604 | INFO | Files to process: 0 (out of 223 discovered)
+2026-09-09 19:00:15,604 | INFO | No new NAV data to import. Done.
+  "discovered": 223,
+Wed Sep  9 07:00:15 PM UTC 2026 — CMF Tunisie import completed successfully
+Thu Sep 10 07:00:01 PM UTC 2026 — Starting CMF Tunisie daily scraper
+2026-09-10 19:00:01,600 | INFO | === CMF Tunisie Daily Scraper — PRODUCTION ===
+2026-09-10 19:00:13,948 | INFO | Discovered 223 CMF files
+2026-09-10 19:00:13,954 | INFO | Files to process: 0 (out of 223 discovered)
+2026-09-10 19:00:13,954 | INFO | No new NAV data to import. Done.
+  "discovered": 223,
+Thu Sep 10 07:00:14 PM UTC 2026 — CMF Tunisie import completed successfully
+Fri Sep 11 07:00:01 PM UTC 2026 — Starting CMF Tunisie daily scraper
+2026-09-11 19:00:02,269 | INFO | === CMF Tunisie Daily Scraper — PRODUCTION ===
+2026-09-11 19:00:14,579 | INFO | Discovered 223 CMF files
+2026-09-11 19:00:14,587 | INFO | Files to process: 0 (out of 223 discovered)
+2026-09-11 19:00:14,587 | INFO | No new NAV data to import. Done.
+  "discovered": 223,
+Fri Sep 11 07:00:14 PM UTC 2026 — CMF Tunisie import completed successfully
+Mon Sep 14 07:00:01 PM UTC 2026 — Starting CMF Tunisie daily scraper
+2026-09-14 19:00:02,478 | INFO | === CMF Tunisie Daily Scraper — PRODUCTION ===
+2026-09-14 19:00:14,012 | INFO | Discovered 222 CMF files
+2026-09-14 19:00:14,017 | INFO | Files to process: 0 (out of 222 discovered)
+2026-09-14 19:00:14,017 | INFO | No new NAV data to import. Done.
+  "discovered": 222,
+Mon Sep 14 07:00:14 PM UTC 2026 — CMF Tunisie import completed successfully
+Tue Sep 15 07:00:01 PM UTC 2026 — Starting CMF Tunisie daily scraper
+2026-09-15 19:00:02,277 | INFO | === CMF Tunisie Daily Scraper — PRODUCTION ===
+2026-09-15 19:00:15,395 | INFO | Discovered 221 CMF files
+2026-09-15 19:00:15,401 | INFO | Files to process: 0 (out of 221 discovered)
+2026-09-15 19:00:15,401 | INFO | No new NAV data to import. Done.
+  "discovered": 221,
+Tue Sep 15 07:00:15 PM UTC 2026 — CMF Tunisie import completed successfully
+Wed Sep 16 07:00:01 PM UTC 2026 — Starting CMF Tunisie daily scraper
+2026-09-16 19:00:02,257 | INFO | === CMF Tunisie Daily Scraper — PRODUCTION ===
+2026-09-16 19:00:14,812 | INFO | Discovered 220 CMF files
+2026-09-16 19:00:14,821 | INFO | Files to process: 0 (out of 220 discovered)
+2026-09-16 19:00:14,821 | INFO | No new NAV data to import. Done.
+  "discovered": 220,
+Wed Sep 16 07:00:14 PM UTC 2026 — CMF Tunisie import completed successfully
+
+--- dernier journal scraper CMF ---
+TUNISIE_LOG=data/tunisie_cmf/logs/cmf_tunisie_20260916_190002.log
+mtime=2026-09-16 19:00:14.817603265 +0000 size=1824
+2026-09-16 19:00:14,812 | INFO | Discovered 220 CMF files
+2026-09-16 19:00:14,821 | INFO | Files to process: 0 (out of 220 discovered)
+2026-09-16 19:00:14,821 | INFO | Total parsed: 0 NAV rows, 0 dividends, 0 errors
+2026-09-16 19:00:14,821 | INFO | No new NAV data to import. Done.
+
+--- fichiers CMF telecharges les plus recents ---
+2026-06-22 19:00:13.6730981750 valeurs_liquidatives_260622.xlsx
+2026-06-23 19:00:13.1839837000 valeurs_liquidatives_260623.xlsx
+2026-06-24 19:00:15.8387934150 valeurs_liquidatives_260624.xlsx
+2026-06-25 19:00:11.9723573800 valeurs_liquidatives_260625.xlsx
+2026-06-26 19:00:13.1731678220 valeurs_liquidatives_260626.xlsx
+2026-07-09 19:00:12.5145194130 valeurs_liquidatives_260709.xlsx
+2026-07-10 19:00:13.1131632140 valeurs_liquidatives_260710.xlsx
+2026-07-14 19:00:12.9323448000 valeurs_liquidatives_260714.xlsx
+2026-07-14 19:00:13.3603435820 valeurs_liquidatives_260713.xlsx
+2026-07-15 19:00:14.0987002450 valeurs_liquidatives_260715.xlsx
+2026-07-16 19:00:13.0026376870 valeurs_liquidatives_260716.xlsx
+2026-07-17 19:00:12.2911446810 valeurs_liquidatives_260717.xlsx
+2026-07-20 19:00:13.9703304860 valeurs_liquidatives_260720.xlsx
+2026-07-22 19:00:14.9129924380 valeurs_liquidatives_260722.xlsx
+2026-07-23 19:00:13.4056891160 valeurs_liquidatives_260723.xlsx
+2026-07-24 19:00:13.2350256190 valeurs_liquidatives_260724.xlsx
+2026-07-31 19:00:18.6714081930 valeurs_liquidatives_260731.xlsx
+2026-08-03 19:00:13.9568912570 valeurs_liquidatives_260803.xlsx
+2026-08-04 19:00:15.0925201900 valeurs_liquidatives_260804.xlsx
+2026-08-05 19:00:13.3420328930 valeurs_liquidatives_260805.xlsx
+2026-08-06 19:00:14.7601879990 valeurs_liquidatives_260806.xlsx
+2026-08-07 19:00:13.7577181910 valeurs_liquidatives_260807.xlsx
+2026-08-14 19:00:11.8883838220 valeurs_liquidatives_260814.xlsx
+2026-08-17 19:00:14.1050150130 valeurs_liquidatives_260817.xlsx
+2026-08-18 19:00:13.8445264530 valeurs_liquidatives_260818.xlsx
+2026-08-20 19:00:16.3812107020 valeurs_liquidatives_260820.xlsx
+2026-08-21 19:00:13.4437280560 valeurs_liquidatives_260821.xlsx
+2026-08-24 19:00:13.7120592020 valeurs_liquidatives_260824.xlsx
+2026-08-28 19:00:15.8286705590 valeurs_liquidatives_260828.xlsx
+2026-08-28 19:00:16.2406683790 valeurs_liquidatives_260826.xlsx
+
+--- audit CMF DB (si table presente) ---
+38	cmf_tunisie_20260828_190001	PRODUCTION	224	2	256	252	4	0	0	138	NULL	2026-08-28 19:00:19
+37	cmf_tunisie_20260824_190001	PRODUCTION	223	1	128	126	2	0	0	69	NULL	2026-08-24 19:00:16
+36	cmf_tunisie_20260821_190001	PRODUCTION	223	1	128	126	2	0	0	69	NULL	2026-08-21 19:00:16
+35	cmf_tunisie_20260820_190002	PRODUCTION	223	1	128	126	2	0	0	69	NULL	2026-08-20 19:00:18
+34	cmf_tunisie_20260818_190002	PRODUCTION	224	1	128	126	2	0	0	69	NULL	2026-08-18 19:00:16
+33	cmf_tunisie_20260817_190002	PRODUCTION	224	1	123	121	2	0	0	66	NULL	2026-08-17 19:00:16
+32	cmf_tunisie_20260814_190001	PRODUCTION	224	1	128	126	2	0	0	69	NULL	2026-08-14 19:00:14
+31	cmf_tunisie_20260807_190001	PRODUCTION	227	1	128	126	2	0	0	69	NULL	2026-08-07 19:00:16
+30	cmf_tunisie_20260806_190002	PRODUCTION	226	1	128	126	2	0	0	69	NULL	2026-08-06 19:00:17
+29	cmf_tunisie_20260805_190001	PRODUCTION	225	1	128	126	2	0	0	69	NULL	2026-08-05 19:00:15
+
+==============================================
+ 11. AF-OPS-005 — CHARGEURS .env.production* (NOMS/PATHS SEULEMENT)
+==============================================
+--- references repo aux fichiers stale ---
+./CORRECTIONS.md
+./STATUS.md
+./scripts/governance/s2_secret_inventory.py
+./docs/08-security/SECRETS_MANAGEMENT.md
+./docs/OPS_MYSQL_MEMOIRE.md
+./.governance/incidents/registry.json
+./.governance/knowledge/evidence.json
+./.governance/loop/task-queue.json
+./NEXT_ACTION.md
+
+--- crontab reference stale env ---
+CRON_STALE_ENV_REF=NONE
+
+--- systemd units reference stale env ---
+
+--- PM2 config files reference stale env (noms seulement) ---
+/root/.pm2/logs/api-monolith-out.log
 
 ==============================================
  FIN — aucune variable modifiee, aucun service redemarre
