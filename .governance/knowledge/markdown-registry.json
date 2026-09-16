@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "8e7ae3ee6a60756e49838381abf97648ea254a2f"
+      "head": "5eb02722ca69365486e78c624d4922e9ebe562ae"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -1510,7 +1510,8 @@
         "Terminé",
         "Actif",
         "Externes",
-        "Priorité opérationnelle pré-V2 — AF-OPS-003"
+        "Priorité opérationnelle pré-V2 — AF-OPS-003",
+        "Data-quality reconciliation — 2026-09-16"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -1526,11 +1527,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CURRENT_ITERATION.md",
-      "git_blob_sha": "d4b6c72a32078f0ac4f75b73da1fb926985bf8d7",
-      "last_validated_sha": "d4b6c72a32078f0ac4f75b73da1fb926985bf8d7",
-      "content_sha256": "4d92f37e3b57d9e0984060696ea6e88c87c06d580d634bc53579860f4d7572b6",
-      "line_count": 43,
-      "byte_count": 2133,
+      "git_blob_sha": "8f53f74745107e1050ba05018a802b71daec0d57",
+      "last_validated_sha": "8f53f74745107e1050ba05018a802b71daec0d57",
+      "content_sha256": "899b2b3632ab9cf4fcf9ecedf04b71645a2319632179077b9de904b7df4d5a47",
+      "line_count": 48,
+      "byte_count": 2499,
       "headings": [
         {
           "level": 1,
@@ -1563,6 +1564,10 @@
         {
           "level": 2,
           "text": "Priorité opérationnelle pré-V2 — AF-OPS-003"
+        },
+        {
+          "level": 2,
+          "text": "Data-quality reconciliation — 2026-09-16"
         }
       ]
     },
@@ -2357,7 +2362,8 @@
         "Baseline observée",
         "État",
         "Reprise obligatoire par tout agent",
-        "Production"
+        "Production",
+        "Data-quality handoff — 2026-09-16"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -2373,11 +2379,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "HANDOFF.md",
-      "git_blob_sha": "282db0ad0acca876dcfe66f090ffa6ace1263021",
-      "last_validated_sha": "282db0ad0acca876dcfe66f090ffa6ace1263021",
-      "content_sha256": "2b96a9a42cd7990b501ecd965cee884c52147f0258ba3546d3039778e9b7176f",
-      "line_count": 71,
-      "byte_count": 4009,
+      "git_blob_sha": "a2fefbd9b2e35446aac1dadc1dccf85932ad9e19",
+      "last_validated_sha": "a2fefbd9b2e35446aac1dadc1dccf85932ad9e19",
+      "content_sha256": "d245e0bd80b674b64e297ed9773e5f7fc4dc8bc1f3797710b73e558cdff228f1",
+      "line_count": 83,
+      "byte_count": 4502,
       "headings": [
         {
           "level": 1,
@@ -2414,6 +2420,10 @@
         {
           "level": 2,
           "text": "Production"
+        },
+        {
+          "level": 2,
+          "text": "Data-quality handoff — 2026-09-16"
         }
       ]
     },
@@ -2635,7 +2645,8 @@
         "État des lots",
         "Sécurité",
         "Prochaine étape",
-        "Couche opérationnelle post-certification"
+        "Couche opérationnelle post-certification",
+        "Operational data-quality layer — 2026-09-16"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -2651,11 +2662,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "LOOP_STATE.md",
-      "git_blob_sha": "d38290bf64d201fdecfd3805fe9ab689a4e481d8",
-      "last_validated_sha": "d38290bf64d201fdecfd3805fe9ab689a4e481d8",
-      "content_sha256": "0c81260341bc6627be41cbb262fa938f949188c5994602c87cd832a0edbab7e3",
-      "line_count": 82,
-      "byte_count": 2729,
+      "git_blob_sha": "2d5e4a02ab798186253226a99ef62e26757faaec",
+      "last_validated_sha": "2d5e4a02ab798186253226a99ef62e26757faaec",
+      "content_sha256": "84dc35ff18811e88e97c5998f30292563f3b63028eba76d2842548aed8619d37",
+      "line_count": 92,
+      "byte_count": 3180,
       "headings": [
         {
           "level": 1,
@@ -2688,6 +2699,10 @@
         {
           "level": 2,
           "text": "Couche opérationnelle post-certification"
+        },
+        {
+          "level": 2,
+          "text": "Operational data-quality layer — 2026-09-16"
         }
       ]
     },
@@ -2891,7 +2906,9 @@
         "Historique A/B à ne pas rejouer",
         "Prochaine preuve",
         "Autres blockers indépendants",
-        "AF-OPS-005 en parallèle read-only"
+        "AF-OPS-005 en parallèle read-only",
+        "Data-quality operational queue — measured 2026-09-16",
+        "AF-OPS-005 update"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -2907,11 +2924,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "e119109697dfe88878c9ee1dd3f03009d7fb4afc",
-      "last_validated_sha": "e119109697dfe88878c9ee1dd3f03009d7fb4afc",
-      "content_sha256": "29f8d167c126c21cb71a2a1f0c0a9a49953707db8d9b31ba608ee65313a65482",
-      "line_count": 58,
-      "byte_count": 2755,
+      "git_blob_sha": "93d7e857dd6815463d9e2effb16fb90dfa83da47",
+      "last_validated_sha": "93d7e857dd6815463d9e2effb16fb90dfa83da47",
+      "content_sha256": "b1c585d5aeab2e8688504405d548ac43dcfcdbb544f3ed142ca229900bf5090a",
+      "line_count": 73,
+      "byte_count": 3868,
       "headings": [
         {
           "level": 1,
@@ -2940,6 +2957,14 @@
         {
           "level": 3,
           "text": "AF-OPS-005 en parallèle read-only"
+        },
+        {
+          "level": 2,
+          "text": "Data-quality operational queue — measured 2026-09-16"
+        },
+        {
+          "level": 2,
+          "text": "AF-OPS-005 update"
         }
       ]
     },
@@ -3588,7 +3613,9 @@
         "Clôture gouvernée AF-TASK-011 — 2026-09-13 17:59 UTC",
         "AF-OPS-003 — RCA mémoire MariaDB — réconciliation post-A/B 2026-09-15",
         "AF-OPS-003 — nouvelles preuves read-only — 2026-09-15 00:26 UTC",
-        "AF-OPS-003 / 005 — corrélation multi-incidents et auth post-restart — 2026-09-15 00:38 UTC"
+        "AF-OPS-003 / 005 — corrélation multi-incidents et auth post-restart — 2026-09-15 00:38 UTC",
+        "Production data-quality reconciliation — 2026-09-16 11:15 UTC",
+        "AF-OPS-005 — stale config evidence"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3604,11 +3631,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "3613fc1b1eec4eea90e573b1aaa1f902f2a3cae2",
-      "last_validated_sha": "3613fc1b1eec4eea90e573b1aaa1f902f2a3cae2",
-      "content_sha256": "c33589e330c9f7f561ee7dff12d87485988ce0e9c0f88545df7662eaa189a22e",
-      "line_count": 148,
-      "byte_count": 10981,
+      "git_blob_sha": "469cdaf1d325c679ee6b11f8f910366a2bb25eee",
+      "last_validated_sha": "469cdaf1d325c679ee6b11f8f910366a2bb25eee",
+      "content_sha256": "dd017db49a46caaa7061b6906c05a3370a6b8710a85f9c0bdb13926b8d9d6610",
+      "line_count": 164,
+      "byte_count": 11898,
       "headings": [
         {
           "level": 1,
@@ -3669,6 +3696,14 @@
         {
           "level": 2,
           "text": "AF-OPS-003 / 005 — corrélation multi-incidents et auth post-restart — 2026-09-15 00:38 UTC"
+        },
+        {
+          "level": 2,
+          "text": "Production data-quality reconciliation — 2026-09-16 11:15 UTC"
+        },
+        {
+          "level": 2,
+          "text": "AF-OPS-005 — stale config evidence"
         }
       ]
     },
