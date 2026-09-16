@@ -2,21 +2,34 @@
 
 > Genere par `ops-fix-segments-naira.yml`. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-12 06:34 UTC**
+Derniere execution : **2026-09-16 21:46 UTC**
 Mode : **dry-run**
 Declencheur : `push` — par `Wealthtechinnovations`
 
 ```
-Commit avant mise a jour : 867d894fc ops(governance): authorize final bi-repo S2 reconciliation
+Commit avant mise a jour : be9d79e4b chore(governance): certify all current Markdown [skip ci]
 From https://github.com/Wealthtechinnovations/api_opcv
  * branch                claude/code-review-improvements-ikvuj -> FETCH_HEAD
-   867d894fc..85f556085  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
-Updating 867d894fc..85f556085
+   be9d79e4b..8895783f9  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
+Updating be9d79e4b..8895783f9
 Fast-forward
- .github/workflows/ops-fix-segments-naira.yml | 6 +++---
- .governance/knowledge/markdown-registry.json | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
-Commit retenu        : 85f556085 docs(ops): recomposer le paragraphe coupe par le commit precedent
+ .github/workflows/ops-fix-segments-naira.yml |   1 +
+ .governance/incidents/registry.json          |  13 +--
+ .governance/knowledge/evidence.json          |  16 ++++
+ .governance/knowledge/markdown-registry.json | 113 ++++++++++++++++++---------
+ .governance/knowledge/requirements.json      |  24 ++++--
+ .governance/loop/handoff.json                |   6 +-
+ .governance/loop/task-queue.json             |  55 ++++++++++++-
+ .governance/matrices/traceability.json       |  33 +++++---
+ CURRENT_ITERATION.md                         |   5 ++
+ HANDOFF.md                                   |  12 +++
+ LOOP_STATE.md                                |  10 +++
+ NEXT_ACTION.md                               |  15 ++++
+ STATUS.md                                    |  16 ++++
+ docs/DIAG_ONDEMAND.md                        |  96 +++++++++++------------
+ docs/ETAT_PRODUCTION_VERIFIE.md              |  20 ++---
+ 15 files changed, 310 insertions(+), 125 deletions(-)
+Commit retenu        : 8895783f9 chore(ops): refresh AF-OPS-007 dry-run preflight
 
 ==============================================
  1. PERIMETRE (dry-run de controle)
