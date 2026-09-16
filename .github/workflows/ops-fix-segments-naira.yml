@@ -198,6 +198,10 @@ jobs:
             # bouge depuis la mesure, on le voit AVANT d ecrire.
             node scripts/fix/fix_segments_dollars_nigeria.js || exit 4
 
+            echo ""
+            echo " 1bis. DIAGNOSTIC PLATEAUX NIGERIA (lecture seule)"
+            node scripts/diag/ondemand/diag_plateaux_nigeria.js || exit 6
+
             if [ "${MODE:-dry-run}" != "execute" ]; then
               echo ""
               echo "Mode dry-run — aucune ecriture. Fin."
