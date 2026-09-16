@@ -250,7 +250,7 @@ def discover_cmf_files(logger: logging.Logger) -> List[dict]:
             soup = BeautifulSoup(html, "html.parser")
             for a in soup.find_all("a", href=True):
                 href = a["href"]
-                if not re.search(r"valeurs_liquidatives.*\.(xlsx?)", href, re.I):
+                if not is_cmf_nav_file_href(href):
                     continue
                 url = urljoin(page_url, href)
                 if url in found:
@@ -276,16 +276,72 @@ def discover_cmf_files(logger: logging.Logger) -> List[dict]:
     return list(found.values())
 
 
+def is_cmf_nav_file_href(href: str) -> bool:
+    """Recognize historical and current CMF NAV spreadsheet naming families."""
+    if not href:
+        return False
+    clean = href.split("?", 1)[0].split("#", 1)[0]
+    filename = Path(clean).name
+    return re.match(r"^(?:valeurs_liquidatives|vl)[^/]*\.xlsx?$", filename, re.I) is not None
+
+
+_CMF_MONTHS_FR = {
+    "janvier": 1,
+    "fevrier": 2,
+    "mars": 3,
+    "avril": 4,
+    "mai": 5,
+    "juin": 6,
+    "juillet": 7,
+    "aout": 8,
+    "septembre": 9,
+    "octobre": 10,
+    "novembre": 11,
+    "decembre": 12,
+}
+
+
+def _cmf_iso_date(year: int, month: int, day: int) -> str:
+    try:
+        return date(year, month, day).isoformat()
+    except ValueError:
+        return ""
+
+
 def extract_date_from_filename(filename: str) -> str:
-    m = re.search(r"(\d{6})", filename)
+    """Decode only source-observed CMF filename date formats.
+
+    Historical files use valeurs_liquidatives_YYMMDD. Since September 2026
+    the CMF also publishes vl filenames using French month names, separated
+    DD-MM-YY / DD_MM_YYYY forms, and compact DDMMYYYY forms.
+    """
+    stem = strip_accents(Path(filename).stem).lower()
+
+    m = re.search(
+        r"(?:^|[_-])(?:du[_-]+)?(\d{1,2})[_-]+"
+        r"(janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre)"
+        r"[_-]+(\d{4})(?:$|[_-])",
+        stem,
+    )
     if m:
-        code = m.group(1)
-        yy, mm, dd = int(code[:2]), int(code[2:4]), int(code[4:6])
+        return _cmf_iso_date(int(m.group(3)), _CMF_MONTHS_FR[m.group(2)], int(m.group(1)))
+
+    m = re.search(r"(?<!\d)(\d{1,2})[-_](\d{1,2})[-_](\d{2}|\d{4})(?!\d)", stem)
+    if m:
+        dd, mm, yy = map(int, m.groups())
+        yyyy = yy if yy >= 1000 else (2000 + yy if yy < 80 else 1900 + yy)
+        return _cmf_iso_date(yyyy, mm, dd)
+
+    m = re.search(r"(?<!\d)(\d{2})(\d{2})(20\d{2})(?!\d)", stem)
+    if m:
+        return _cmf_iso_date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+
+    m = re.search(r"valeurs[_-]liquidatives[_-](\d{2})(\d{2})(\d{2})(?!\d)", stem)
+    if m:
+        yy, mm, dd = map(int, m.groups())
         yyyy = 2000 + yy if yy < 80 else 1900 + yy
-        try:
-            return date(yyyy, mm, dd).isoformat()
-        except ValueError:
-            pass
+        return _cmf_iso_date(yyyy, mm, dd)
+
     return ""
 
 
