@@ -4,7 +4,7 @@
 > Extraction de TEST, bornee, ecrivant dans `sec_ng_devise_test.csv`.
 > Ni `sec_ng_latest.csv` ni la base ne sont touches.
 
-Derniere execution : **2026-09-11 22:08 UTC**
+Derniere execution : **2026-09-16 22:23 UTC**
 
 ## Reference AVANT correctif (lot AE)
 
@@ -15,8 +15,7 @@ Etiquette USD repartie sur six ordres de grandeur, dont **238 lignes a 10^5**
 ==============================================
  1. RECUPERER LE CORRECTIF
 ==============================================
-AVERTISSEMENT: mise a jour impossible, mesure sur la version presente.
-Commit courant : d57810153 security(ssh): pin S2 host key across legacy workflows
+Commit courant : 6b00f6c3b chore(ops): refresh Nigeria source freshness dry-run
 
 Le correctif est-il bien present ?
 8
@@ -150,14 +149,14 @@ Code de sortie extraction : 0
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-09-11T22:08:17.521Z — LECTURE SEULE
+ Genere le 2026-09-16T22:23:37.718Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : sec_ng_devise_test.csv
    taille    : 1.38 Mo
-   modifie   : 2026-09-11T22:08:17.292Z (il y a 0.0 h)
+   modifie   : 2026-09-16T22:23:37.570Z (il y a 0.0 h)
    lignes    : 1102
    colonnes  : 59
 
@@ -257,5 +256,5 @@ Code de sortie extraction : 0
 
 
 Verification finale : sec_ng_latest.csv intact ?
--rw-r--r-- 1 root root 9531356 Sep  7 10:00 sec_ng_latest.csv
+-rw-r--r-- 1 root root 9831307 Sep 14 10:00 sec_ng_latest.csv
 ```
