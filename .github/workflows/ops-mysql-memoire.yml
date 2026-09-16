@@ -552,6 +552,47 @@ jobs:
             grep -RIl --exclude-dir=node_modules --exclude-dir=.git --exclude='*.log' 'DB_PASSWORD' . 2>/dev/null | head -100 || true
             echo ""
             echo "=============================================="
+            echo " 10. AF-OPS-009 — FRAICHEUR TUNISIE (LECTURE SEULE)"
+            echo "=============================================="
+            echo "--- wrapper cron Tunisie ---"
+            tail -160 /var/log/cron_tunisie.log 2>/dev/null | grep -Ei 'Starting CMF|completed successfully|FAILED|Discovered|Files to process|No new|Import committed|PRODUCTION' || true
+            echo ""
+            echo "--- dernier journal scraper CMF ---"
+            TLOG="$(find data/tunisie_cmf/logs -maxdepth 1 -type f -name 'cmf_tunisie_*.log' 2>/dev/null | sort | tail -1)"
+            if [ -n "$TLOG" ]; then
+              echo "TUNISIE_LOG=$TLOG"
+              stat -c 'mtime=%y size=%s' "$TLOG" 2>/dev/null || true
+              grep -Ei 'Discovered|Files to process|No new NAV data|Import committed|PRODUCTION_OK|Download error|Error fetching|Parsed|Fund matching|Extreme|report' "$TLOG" | tail -240 || true
+            else
+              echo "TUNISIE_LOG=ABSENT"
+            fi
+            echo ""
+            echo "--- fichiers CMF telecharges les plus recents ---"
+            find data/tunisie_cmf/downloads -maxdepth 1 -type f 2>/dev/null -printf '%TY-%Tm-%Td %TH:%TM:%TS %f\n' | sort | tail -30 || true
+            echo ""
+            echo "--- audit CMF DB (si table presente) ---"
+            Q "SELECT * FROM cmf_import_audit ORDER BY id DESC LIMIT 10;" 2>/dev/null || echo "cmf_import_audit unavailable"
+
+            echo ""
+            echo "=============================================="
+            echo " 11. AF-OPS-005 — CHARGEURS .env.production* (NOMS/PATHS SEULEMENT)"
+            echo "=============================================="
+            echo "--- references repo aux fichiers stale ---"
+            grep -RIl --exclude-dir=node_modules --exclude-dir=.git --exclude='*.log' -E '\.env\.production(\.plan-b)?' . 2>/dev/null | head -120 || true
+            echo ""
+            echo "--- crontab reference stale env ---"
+            crontab -l 2>/dev/null | grep -E '\.env\.production(\.plan-b)?' || echo "CRON_STALE_ENV_REF=NONE"
+            echo ""
+            echo "--- systemd units reference stale env ---"
+            grep -RIl -E '\.env\.production(\.plan-b)?' /etc/systemd/system /lib/systemd/system 2>/dev/null | head -80 || true
+            echo ""
+            echo "--- PM2 config files reference stale env (noms seulement) ---"
+            find /root/.pm2 -maxdepth 2 -type f 2>/dev/null -print0 | while IFS= read -r -d '' PF; do
+              if grep -qE '\.env\.production(\.plan-b)?' "$PF" 2>/dev/null; then echo "$PF"; fi
+            done | head -80
+
+            echo ""
+            echo "=============================================="
             echo " FIN — aucune variable modifiee, aucun service redemarre"
             echo "=============================================="
           REMOTE
