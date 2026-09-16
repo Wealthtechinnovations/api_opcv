@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "action": "DETACH_TRACKED_RUNTIME_ENV",
+  "confirmation": "DETACH AFRICAFUNDS TRACKED ENV",
+  "one_shot": true,
+  "preserve_exact_runtime_bytes": true,
+  "restart_services": false,
+  "authorization_basis": "explicit owner instruction in current ChatGPT session to continue end-to-end and unblock all safe blockers",
+  "preconditions_observed": {
+    "runtime_env_exists": true,
+    "runtime_env_tracked_before_git_removal": true,
+    "runtime_env_matches_git_head_before_detach": true,
+    "runtime_env_git_clean_before_detach": true,
+    "runtime_env_will_be_ignored_when_untracked": true,
+    "sensitive_nonplaceholder_key_names": [
+      "DB_PASSWORD",
+      "EMAIL_PASSWORD",
+      "JWT_SECRET",
+      "MAGIC_SECRET_KEY"
+    ]
+  },
+  "safety": {
+    "backup_before_fast_forward": true,
+    "backup_permissions": "0600",
+    "same_runtime_path_after_detach": ".env",
+    "no_value_logging": true,
+    "no_service_restart": true,
+    "db_readonly_validation": true,
+    "local_http_validation": true,
+    "force_push": false,
+    "reset_hard": false,
+    "git_clean": false
+  }
+}

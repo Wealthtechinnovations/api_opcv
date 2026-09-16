@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.3.0",
+  "product": "AfricaFunds",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "loop_id": "AF-GOV-FINAL-CERT-20260911-01",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "peer_repository": "Wealthtechinnovations/front_end_opcvm",
+  "canonical_branch": "claude/code-review-improvements-ikvuj",
+  "observed_api_sha": "ceff72e0e0dad7a7522835940a9537662b16f844",
+  "observed_frontend_sha": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
+  "head_semantics": "OBSERVED_AT_CLOSURE_NOT_SELF_REFERENTIAL",
+  "completed": [
+    "AF-TASK-001",
+    "AF-TASK-002",
+    "AF-TASK-004",
+    "AF-TASK-005",
+    "AF-TASK-006",
+    "AF-TASK-007",
+    "AF-TASK-008",
+    "AF-TASK-009",
+    "AF-TASK-011"
+  ],
+  "active": [
+    "AF-TASK-010",
+    "AF-OPS-003"
+  ],
+  "open": [],
+  "next_action": "AF-OPS-003 RCA_PENDING: collect long RSS time-series across real batch windows; cross-incident evidence shows heterogeneous heavy workloads, not one universal job. In parallel AF-OPS-005 has six intermittent post-restart fund_opcvm denials with unknown consumer; read-only attribution only.",
+  "resume_contract": {
+    "conversation_memory_required": false,
+    "discover_peer_repository": true,
+    "verify_both_default_branches": true,
+    "read_both_heads": true,
+    "read_global_suivi": true,
+    "observe_s2_if_relevant": true,
+    "work_gate_requires_context_reconstruction": true,
+    "current_operational_task": "AF-OPS-003",
+    "bridge_available_in_current_chat": false,
+    "ssh_fallback_required": true,
+    "host_key_trust_status": "TOFU_PINNED_PENDING_OOB",
+    "secret_gate": "PARTIAL_EXTERNAL_PROVIDER_GAP",
+    "ssh_fallback_proven": true,
+    "db_password_rotation": "PASS",
+    "jwt_rotation_and_revocation": "PASS",
+    "email_password_rotation": "EXTERNAL_PROVIDER_REQUIRED",
+    "magic_secret_rotation": "EXTERNAL_PROVIDER_REQUIRED",
+    "final_governance_verdict": "GOVERNED_WITH_EXTERNAL_GAPS",
+    "db_access_denied_active_stale_consumer": "INTERMITTENT_CONSUMER_PROVEN_IDENTITY_UNKNOWN",
+    "db_access_denied_historical_attribution": "UNAVAILABLE_WITH_CURRENT_MARIADB_TELEMETRY",
+    "db_auth_latest_evidence": "AF-EVD-049",
+    "db_access_denied_post_restart_fund_opcvm": "PROVEN_SIX_EVENTS_233629_TO_233856",
+    "operational_task_status": "OPEN",
+    "mariadb_oom_incident": "AF-INC-20260817-001",
+    "mariadb_root_cause_status": "UNKNOWN",
+    "mariadb_root_cause_candidate": "UNRESOLVED",
+    "mariadb_latest_evidence": "AF-EVD-050",
+    "mariadb_next_proof": "LONG_RSS_TIMESERIES_ACROSS_REAL_BATCH_WINDOWS",
+    "mariadb_mutation_authorized": false,
+    "mariadb_short_allocator_ab": "COMPLETED_NON_DISCRIMINANT_FOR_LONG_DURATION_RSS",
+    "mariadb_allocator_ab_runs": [
+      34908277049,
+      34908496545,
+      34908755786,
+      34909181790
+    ]
+  },
+  "closed_with_external_gaps": [
+    "AF-TASK-003"
+  ],
+  "latest_reobservation": {
+    "observed_at": "2026-09-14T19:30:37Z",
+    "github_api_sha": "d4d8cd9dc013cad3701593248592bb3095992042",
+    "github_frontend_sha": "53ff6ed60d96d13e74e82fad488018d6166ff871",
+    "s2_api_sha": "9f051c035e4bf72f919004f5a654ccf015f159ee",
+    "s2_frontend_sha": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
+    "s2_git_drift_scope": {
+      "api": "GitHub ahead by governance/diagnostic evidence and generated documentation only; no newer runtime code than S2",
+      "frontend": "GitHub ahead by SUIVI.md documentation only"
+    },
+    "runtime": {
+      "pm2": "ONLINE",
+      "database_connectivity": "PASS",
+      "public_http_root": 200,
+      "runtime_snapshot": "FRESH_C5_OK"
+    },
+    "db_auth_drift": {
+      "evidence_ref": "AF-EVD-037",
+      "exact_fund_opcvm_last_persisted_denial": "2026-09-14T09:47:32Z",
+      "exact_fund_opcvm_post_restart_status": "UNPROVEN",
+      "server_wide_post_restart_access_denied_errors": 12,
+      "server_wide_post_restart_aborted_connects": 12,
+      "server_wide_post_restart_aborted_connects_preauth": 0,
+      "repeated_server_wide_counter_observation": "STABLE_12_TO_12",
+      "attribution": "UNAVAILABLE_WITH_CURRENT_SQL_TELEMETRY",
+      "classification": "NO_CURRENT_AFRICAFUNDS_SPECIFIC_CLASSIFICATION_PROVEN",
+      "current_africafunds_runtime_health": "DB_PASS_PM2_ONLINE_PUBLIC_HTTP_200",
+      "mutation_performed": false
+    },
+    "task_status_preserved": {
+      "AF-TASK-011": "DONE",
+      "AF-TASK-003": "DONE_WITH_EXTERNAL_GAPS",
+      "AF-TASK-010": "BLOCKED_EXTERNAL_PROVIDER_ROTATION"
+    },
+    "final_governance_verdict": "GOVERNED_WITH_EXTERNAL_GAPS"
+  }
+}

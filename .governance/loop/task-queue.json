@@ -1,0 +1,214 @@
+{
+  "schema_version": "1.3.0",
+  "active_loop_id": "AF-GOV-FINAL-CERT-20260911-01",
+  "tasks": [
+    {
+      "id": "AF-TASK-001",
+      "title": "Intégration Regulatory Plus API",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-001",
+        "AF-REQ-002",
+        "AF-REQ-003",
+        "AF-REQ-006",
+        "AF-REQ-007",
+        "AF-REQ-010"
+      ],
+      "next_action": "Terminé ; conserver preuves et historique."
+    },
+    {
+      "id": "AF-TASK-002",
+      "title": "Intégration Regulatory Plus frontend",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-001",
+        "AF-REQ-002",
+        "AF-REQ-003",
+        "AF-REQ-006",
+        "AF-REQ-007",
+        "AF-REQ-010"
+      ],
+      "depends_on": [
+        "AF-TASK-001"
+      ],
+      "next_action": "Terminé ; conserver preuves et historique."
+    },
+    {
+      "id": "AF-TASK-003",
+      "title": "Attestation finale bi-repository de la gouvernance",
+      "status": "DONE_WITH_EXTERNAL_GAPS",
+      "depends_on": [
+        "AF-TASK-001",
+        "AF-TASK-002"
+      ],
+      "next_action": "Certification bi-repository fermée. Les actions restantes sont exclusivement les gaps externes portés par AF-TASK-010 et les contrôles externes OOB/rulesets.",
+      "closure_evidence": [
+        "AF-EVD-035",
+        "AF-EVD-036"
+      ]
+    },
+    {
+      "id": "AF-TASK-004",
+      "title": "Reconstruction de contexte et découverte croisée obligatoires",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-002"
+      ],
+      "next_action": "Terminé et prouvé : reconstruction Git-only, découverte croisée et tests Claude/ChatGPT verts."
+    },
+    {
+      "id": "AF-TASK-005",
+      "title": "Certification exhaustive de tous les Markdown courants",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-004"
+      ],
+      "next_action": "Maintenir la certification dynamique ; dernier registre observé 242/242, 0 autorité orpheline, 0 contradiction critique."
+    },
+    {
+      "id": "AF-TASK-006",
+      "title": "Observabilité S2 sans bridge MCP",
+      "status": "DONE_WITH_EXTERNAL_TRUST_GAP",
+      "depends_on": [
+        "AF-TASK-004"
+      ],
+      "next_action": "Observateur SSH sans bridge, pin TOFU, StrictHostKeyChecking et preuves live PASS. Vérification OOB du host key reste externe."
+    },
+    {
+      "id": "AF-TASK-007",
+      "title": "Fallback déploiement API/frontend et preflight GOV-006 commun",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-006"
+      ],
+      "next_action": "Guard GOV-006 partagé, fallback API/frontend observe et attestation S2 live prouvés ; mutations restent soumises à confirmation."
+    },
+    {
+      "id": "AF-TASK-008",
+      "title": "Enforcement GitHub et détection de drift",
+      "status": "DONE_WITH_EXTERNAL_GAP",
+      "depends_on": [
+        "AF-TASK-004",
+        "AF-TASK-005"
+      ],
+      "next_action": "Default/canonical branch et branch drift CI enforced. GitHub native rulesets restent absents faute de surface admin disponible."
+    },
+    {
+      "id": "AF-TASK-009",
+      "title": "Tests reprise multi-agent, bridge-down et certification finale",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-005",
+        "AF-TASK-006",
+        "AF-TASK-007",
+        "AF-TASK-008"
+      ],
+      "next_action": "Final reruns PASS : Regulatory Plus, State Coherence, Multi-Agent Resume, Secret Gate, Branch Policy API/frontend et Project Link."
+    },
+    {
+      "id": "AF-OPS-001",
+      "title": "MariaDB Restart=on-failure après OOM",
+      "status": "BLOCKED_HUMAN_APPROVAL",
+      "next_action": "Conserver jusqu'à approbation distincte ; ne pas confondre avec la certification de gouvernance."
+    },
+    {
+      "id": "AF-TASK-010",
+      "title": "Remédiation des secrets suivis sans régression runtime",
+      "status": "BLOCKED_EXTERNAL_PROVIDER_ROTATION",
+      "depends_on": [
+        "AF-TASK-006"
+      ],
+      "requirements": [
+        "AF-REQ-022"
+      ],
+      "next_action": "Runtime .env détaché de Git, DB_PASSWORD rotaté, JWT_SECRET rotaté et ancienne clé révoquée. Restent EMAIL_PASSWORD et MAGIC_SECRET_KEY à rotater dans les consoles fournisseurs externes."
+    },
+    {
+      "id": "AF-TASK-011",
+      "title": "Synchronisation finale des registres et attestation bi-repository",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-006",
+        "AF-TASK-007",
+        "AF-TASK-008",
+        "AF-TASK-009",
+        "AF-TASK-010"
+      ],
+      "next_action": "Aucune action interne restante. Conserver les preuves et ne rouvrir qu'en cas de drift mesuré.",
+      "phase": "FINAL_S2_ATTESTATION_COMPLETE",
+      "closure_evidence": [
+        "AF-EVD-035",
+        "AF-EVD-036"
+      ]
+    },
+    {
+      "id": "AF-OPS-002",
+      "title": "Gouvernance des incidents, RCA, récurrence et postmortems",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-025"
+      ],
+      "next_action": "Maintenir le registre d'incidents et son CI ; toute nouvelle action corrective doit être liée à une tâche AfricaFunds existante."
+    },
+    {
+      "id": "AF-OPS-003",
+      "title": "MariaDB — RCA des OOM répétés et durcissement de résilience",
+      "status": "OPEN",
+      "incident_refs": [
+        "AF-INC-20260817-001"
+      ],
+      "depends_on": [],
+      "next_action": "Continuer la RCA read-only avec une vraie série temporelle longue RSS avant/pendant/après les batchs. Les OOM documentés surviennent sous des workloads lourds différents; aucun job unique n'est commun. Tester le modèle accumulation/rétention MariaDB + pression finale workload sans le promouvoir à PROVEN. Corriger les attributions documentaires non prouvées ('npm start' ne prouve pas un build frontend).",
+      "phase": "RCA_PENDING",
+      "evidence_refs": [
+        "AF-EVD-040",
+        "AF-EVD-041",
+        "AF-EVD-042",
+        "AF-EVD-043",
+        "AF-EVD-044",
+        "AF-EVD-045",
+        "AF-EVD-046",
+        "AF-EVD-047",
+        "AF-EVD-048",
+        "AF-EVD-050"
+      ]
+    },
+    {
+      "id": "AF-OPS-004",
+      "title": "S2 SSH — fiabiliser les resets KEX du canal read-only",
+      "status": "DONE",
+      "incident_refs": [
+        "AF-INC-20260912-001"
+      ],
+      "next_action": "Retry read-only borné/fail-closed livré et prouvé. L'incident AF-INC-20260912-001 reste MITIGATED/RCA_PENDING tant que la cause pré-auth réseau/sshd n'est pas prouvée.",
+      "closure_evidence": [
+        "AF-EVD-039"
+      ]
+    },
+    {
+      "id": "AF-OPS-005",
+      "title": "DB auth — attribution des Access denied post-rotation",
+      "status": "OPEN",
+      "incident_refs": [
+        "AF-INC-20260914-002"
+      ],
+      "next_action": "Attribuer en lecture seule le consommateur intermittent responsable des six Access denied fund_opcvm post-restart (23:36-23:38) en comparant processus/configs locaux sans afficher de secret. Aucun cron AfricaFunds dans cette fenêtre; ne pas re-rotater DB_PASSWORD et ne pas restart MariaDB.",
+      "evidence_refs": [
+        "AF-EVD-049"
+      ]
+    },
+    {
+      "id": "AF-OPS-006",
+      "title": "Health check production — éliminer les faux verts et isoler les contrôles",
+      "status": "DONE",
+      "incident_refs": [
+        "AF-INC-20260914-001"
+      ],
+      "closure_evidence": [
+        "d58508f0d3e759b0456c1268b5105068221bfbc4",
+        "9f051c035e4bf72f919004f5a654ccf015f159ee"
+      ],
+      "next_action": "Conserver le contrat : code >=2 = mesure impossible et job rouge ; une alerte C5 ne doit jamais empêcher C2/C3/C4/C7/C8 d'être mesurés."
+    }
+  ]
+}

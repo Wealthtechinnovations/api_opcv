@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://africafunds.chainsolutions.fr/schemas/markdown-registry.schema.json",
+  "title": "AfricaFunds Markdown Registry",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_uid",
+    "project_name",
+    "repositories",
+    "summary",
+    "entries"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "project_uid": {
+      "const": "CS-AFRICAFUNDS-001"
+    },
+    "project_name": {
+      "const": "AfricaFunds"
+    },
+    "repositories": {
+      "type": "object"
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total_md_discovered",
+        "total_md_certified",
+        "by_repository",
+        "by_status",
+        "orphan_authority",
+        "unresolved_critical_contradiction",
+        "all_markdown_exploited_candidate"
+      ]
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "repository",
+          "repository_role",
+          "path",
+          "git_blob_sha",
+          "last_validated_sha",
+          "content_sha256",
+          "role",
+          "status",
+          "authority_level",
+          "canonical_authority",
+          "unique_information",
+          "consumers",
+          "read_priority",
+          "action",
+          "contradictions",
+          "duplication_risk",
+          "stale_state",
+          "security_impact",
+          "production_impact"
+        ]
+      }
+    }
+  },
+  "additionalProperties": true
+}

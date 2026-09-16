@@ -1,0 +1,610 @@
+# DIAGNOSTIC — pourquoi mariadbd occupe 13,7 Go alors que son cache est a 128 Mo.
+#
+# CE QU ON SAIT DEJA, PAR LA MESURE
+# --------------------------------
+# Journal du noyau, 2026-08-31 18:33:01 :
+#
+#   node invoked oom-killer
+#   Out of memory: Killed process 2593316 (mariadbd) anon-rss:13763268kB
+#   InnoDB: Initializing buffer pool, total size = 134217728      <- 128 Mo
+#   Mem: 17945 total
+#
+# MariaDB ne s arrete pas : le noyau le TUE. Un `node` reclame de la memoire,
+# l OOM-killer choisit la plus grosse cible, et c est la base. Quatre fois en
+# quinze jours — 17 aout, 27 aout (21:40 puis 22:00), 31 aout — toujours pendant
+# ou juste apres une charge d ecriture. Ce n est pas aleatoire.
+#
+# L ANOMALIE N EST PAS L OOM, C EST LE 13,7 Go. Avec un buffer pool de 128 Mo,
+# le cache de donnees ne peut pas expliquer cette taille. La memoire vient donc
+# d ailleurs, et il n y a que trois familles de suspects :
+#
+#   1. les buffers PAR SESSION (sort_buffer_size, join_buffer_size,
+#      read_buffer_size, tmp_table_size...) : ils sont alloues par connexion, et
+#      se multiplient donc par max_connections. Un `sort_buffer_size` genereux
+#      est inoffensif a 5 connexions et fatal a 300 ;
+#   2. les tables temporaires en memoire, quand une requete lourde en cree ;
+#   3. une fuite de la 10.6.23.
+#
+# CE WORKFLOW NE TRANCHE PAS ENTRE LES TROIS — il releve les chiffres qui
+# permettent de le faire, et calcule le PIRE CAS : ce que MariaDB s autorise a
+# consommer si toutes les connexions autorisees se servent en meme temps. Si ce
+# pire cas depasse la RAM, la cause est trouvee et le reglage suffit ; s il reste
+# modeste, alors c est la piste 3 et il faut regarder ailleurs.
+#
+# STRICTEMENT EN LECTURE SEULE. Aucune variable n est modifiee, aucun service
+# n est redemarre. Changer la configuration d une base de production est une
+# decision qui se prend sur des chiffres, pas dans un workflow declenche par un
+# push.
+#
+# Ne s execute jamais tout seul : aucun `schedule`.
+
+name: DIAG — memoire MySQL (lecture seule)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ops-mysql-memoire.yml'
+      - 'scripts/governance/s2_ssh_readonly_retry.sh'
+
+permissions:
+  # `write` pour consigner le releve dans le depot : le resume GitHub n est
+  # lisible que dans l onglet Actions, donc invisible a une session sans acces
+  # API. C est la lecon de `ops-mariadb-recover.yml`, ou le diagnostic est reste
+  # invisible pendant quatre pannes.
+  contents: write
+
+concurrency:
+  group: ops-mysql-memoire
+  cancel-in-progress: false
+
+jobs:
+  diag:
+    name: Relever les chiffres, calculer le pire cas
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH epinglee
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Relever
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          cat > /tmp/af-mariadb-memory-diag.sh <<'REMOTE'
+            set -u
+            cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api 2>/dev/null || exit 3
+
+            echo "=============================================="
+            echo " 1. MEMOIRE DE LA MACHINE"
+            echo "=============================================="
+            free -m 2>&1 || true
+            echo ""
+            echo "RSS actuel de mariadbd :"
+            ps -o rss=,etime=,cmd= -C mariadbd 2>/dev/null \
+              | awk '{printf "  %.2f Go — demarre depuis %s\n", $1/1048576, $2}' \
+              || echo "  mariadbd absent"
+
+            echo ""
+            echo "=============================================="
+            echo " 2. CE QUE MARIADB S AUTORISE A CONSOMMER"
+            echo "=============================================="
+            # Les identifiants sont lus depuis .env, jamais affiches.
+            [ -f .env ] || { echo "  .env absent — releve impossible"; exit 4; }
+            DBU=$(grep -E '^DB_USER=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+            DBN=$(grep -E '^DB_NAME=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+            DBP=$(grep -E '^DB_PASSWORD=' .env | head -1 | cut -d= -f2- | tr -d '"'"'"'')
+            [ -n "${DBU:-}" ] || { echo "  DB_USER introuvable"; exit 4; }
+            Q() { MYSQL_PWD="$DBP" mysql -N -B -u "$DBU" "${DBN:-fund_opcvm}" -e "$1" 2>&1; }
+
+            echo "--- buffers GLOBAUX (alloues une fois) ---"
+            Q "SHOW VARIABLES WHERE Variable_name IN (
+                 'innodb_buffer_pool_size','innodb_log_buffer_size',
+                 'key_buffer_size','query_cache_size','tmp_table_size',
+                 'max_heap_table_size','innodb_additional_mem_pool_size');"
+
+            echo ""
+            echo "--- buffers PAR SESSION (multiplies par le nombre de connexions) ---"
+            Q "SHOW VARIABLES WHERE Variable_name IN (
+                 'sort_buffer_size','join_buffer_size','read_buffer_size',
+                 'read_rnd_buffer_size','binlog_cache_size','thread_stack',
+                 'net_buffer_length','max_allowed_packet');"
+
+            echo ""
+            echo "--- connexions ---"
+            Q "SHOW VARIABLES WHERE Variable_name IN ('max_connections','thread_cache_size','table_open_cache');"
+            Q "SHOW STATUS WHERE Variable_name IN ('Max_used_connections','Threads_connected','Threads_running','Created_tmp_disk_tables','Created_tmp_tables');"
+
+            echo ""
+            echo "=============================================="
+            echo " 2b. MEMORY_USED / PROC / ALLOCATEUR"
+            echo "=============================================="
+            Q "SHOW GLOBAL STATUS WHERE Variable_name IN (
+                 'Memory_used','Memory_used_initial','Max_used_connections',
+                 'Threads_connected','Threads_running','Threads_created',
+                 'Connections','Aborted_connects','Created_tmp_disk_tables',
+                 'Created_tmp_tables','Created_tmp_files','Open_tables',
+                 'Opened_tables','Open_table_definitions','Opened_table_definitions',
+                 'Open_files','Opened_files','Uptime');" || true
+
+            echo ""
+            echo "--- version / instrumentation ---"
+            Q "SELECT VERSION(), @@version_comment;" || true
+            Q "SHOW VARIABLES WHERE Variable_name IN ('performance_schema','version_malloc_library','aria_pagecache_buffer_size','table_definition_cache');" || true
+
+            PID="$(pgrep -xo mariadbd 2>/dev/null || true)"
+            echo "MARIADB_PID=${PID:-ABSENT}"
+            if [ -n "${PID:-}" ]; then
+              echo "--- /proc status ---"
+              ps -o pid=,rss=,vsz=,etime=,nlwp=,%mem=,cmd= -p "$PID" 2>/dev/null || true
+              grep -E '^(VmPeak|VmSize|VmRSS|RssAnon|RssFile|RssShmem|VmData|VmSwap|Threads):' /proc/$PID/status 2>/dev/null || true
+              echo "--- smaps_rollup ---"
+              grep -E '^(Rss|Pss|Pss_Anon|Pss_File|Private_Clean|Private_Dirty|Anonymous|AnonHugePages|Swap):' /proc/$PID/smaps_rollup 2>/dev/null || true
+              echo "--- pmap totals ---"
+              pmap -x "$PID" 2>/dev/null | tail -2 || true
+              echo "--- allocator libraries ---"
+              BIN="$(readlink -f /proc/$PID/exe 2>/dev/null || true)"
+              [ -z "${BIN:-}" ] || ldd "$BIN" 2>/dev/null | grep -Ei 'jemalloc|tcmalloc|libc\.so' || true
+            fi
+
+            echo "--- systemd/cgroup memory ---"
+            systemctl show mariadb -p ActiveState -p SubState -p Result -p NRestarts -p MemoryCurrent -p MemoryPeak -p MemorySwapCurrent -p OOMPolicy -p Restart 2>/dev/null || true
+            CG="/sys/fs/cgroup/system.slice/mariadb.service"
+            if [ -d "$CG" ]; then
+              for x in memory.current memory.peak memory.swap.current memory.events memory.events.local; do
+                [ ! -r "$CG/$x" ] || { echo "[$x]"; cat "$CG/$x"; }
+              done
+            fi
+            echo "--- THP ---"
+            cat /sys/kernel/mm/transparent_hugepage/enabled 2>/dev/null || true
+
+            echo "--- outils/profiler/allocateurs disponibles ---"
+            command -v memleak-bpfcc 2>/dev/null || command -v memleak 2>/dev/null || echo "BPF_MEMLEAK_TOOL=ABSENT"
+            ldconfig -p 2>/dev/null | grep -Ei 'libjemalloc|libtcmalloc' || echo "ALT_ALLOCATOR_LIBRARY=ABSENT"
+
+            if [ -n "${PID:-}" ]; then
+              echo "--- top mappings pmap par dirty kB ---"
+              pmap -x "$PID" 2>/dev/null | awk 'NR>2 && $1 != "total" {print}' | sort -k4,4n | tail -20 || true
+            fi
+
+            echo ""
+            echo "--- top connexions par memoire ---"
+            Q "SELECT ID,LEFT(COALESCE(USER,'?'),24),LEFT(COALESCE(HOST,'?'),40),
+                      LEFT(COALESCE(COMMAND,'?'),16),TIME,
+                      ROUND(COALESCE(MEMORY_USED,0)/1048576,2),
+                      ROUND(COALESCE(MAX_MEMORY_USED,0)/1048576,2)
+                 FROM information_schema.PROCESSLIST
+                ORDER BY COALESCE(MEMORY_USED,0) DESC LIMIT 20;" || true
+
+            echo ""
+            echo "=============================================="
+            echo " 3. PLAFOND CONFIGURE, PAS RSS REEL"
+            echo "=============================================="
+            # global + (par_session x max_connections). C est ce que le serveur
+            # s autorise, pas ce qu il consomme maintenant : c est justement ce
+            # plafond qui doit tenir dans la RAM, sinon l OOM n est qu une
+            # question de charge.
+            Q "SELECT
+                 ROUND((@@innodb_buffer_pool_size + @@innodb_log_buffer_size
+                      + @@key_buffer_size + @@query_cache_size) / 1073741824, 2) AS global_Go,
+                 ROUND((@@sort_buffer_size + @@join_buffer_size + @@read_buffer_size
+                      + @@read_rnd_buffer_size + @@thread_stack + @@binlog_cache_size)
+                      / 1048576, 2) AS par_session_Mo,
+                 @@max_connections AS max_conn,
+                 ROUND(((@@innodb_buffer_pool_size + @@innodb_log_buffer_size
+                      + @@key_buffer_size + @@query_cache_size)
+                      + (@@sort_buffer_size + @@join_buffer_size + @@read_buffer_size
+                      + @@read_rnd_buffer_size + @@thread_stack + @@binlog_cache_size)
+                      * @@max_connections) / 1073741824, 2) AS pire_cas_Go,
+                 ROUND(@@max_heap_table_size / 1048576, 0) AS heap_table_Mo,
+                 ROUND(@@tmp_table_size / 1048576, 0) AS tmp_table_Mo;"
+            echo ""
+            echo "  Colonnes : global_Go | par_session_Mo | max_conn | pire_cas_Go | heap_Mo | tmp_Mo\n  Si ce plafond reste tres inferieur au RSS, ne pas conclure a une saturation de buffers."
+            echo "  Comparer pire_cas_Go a la RAM totale relevee en section 1."
+            echo "  Rappel : mariadbd a ete tue a 13,7 Go sur 17,9 Go de RAM."
+
+            echo ""
+            echo "=============================================="
+            echo " 3b. HISTORIQUE DES ARRETS — POURQUOI IL A REDEMARRE"
+            echo "=============================================="
+            # Le RSS seul ne dit pas si le service est tombe ou s il a ete
+            # redemarre proprement. Sans cette section, un uptime de 23 h se lisait
+            # aussi bien comme « stable depuis hier » que comme « tue hier ». La
+            # difference decide s il faut traiter une fuite ou n avoir rien a faire.
+            # Lecture seule : aucun service n est demarre ni arrete ici.
+            echo "--- tueries memoire (OOM) sur 14 jours ---"
+            journalctl -k --since "14 days ago" --no-pager 2>/dev/null \
+              | grep -iE "out of memory|oom-kill|killed process" | tail -15 \
+              || echo "  aucune trace OOM sur 14 jours"
+            echo ""
+            echo "--- demarrages et arrets du service sur 14 jours ---"
+            for s in mariadb mysql mysqld; do
+              if systemctl list-unit-files 2>/dev/null | grep -q "^${s}\.service"; then
+                journalctl -u "$s" --since "14 days ago" --no-pager 2>/dev/null \
+                  | grep -iE "Started|Stopped|Failed|killed|signal" | tail -20 \
+                  || echo "  journal indisponible"
+                break
+              fi
+            done
+
+            echo ""
+            echo "=============================================="
+            echo " 4. QUI CONSOMME, MAINTENANT"
+            echo "=============================================="
+            Q "SELECT COUNT(*) AS connexions, LEFT(COALESCE(USER,'?'),24) AS utilisateur
+                 FROM information_schema.PROCESSLIST GROUP BY USER ORDER BY connexions DESC;"
+
+            echo ""
+            echo "=============================================="
+            echo " 5. SERIE COURTE RSS vs Memory_used"
+            echo "=============================================="
+            PID="$(pgrep -xo mariadbd 2>/dev/null || true)"
+            i=1
+            while [ "$i" -le 6 ]; do
+              TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+              RSS_KB=0
+              ANON_KB=0
+              SWAP_KB=0
+              if [ -n "${PID:-}" ]; then
+                RSS_KB="$(awk '/^VmRSS:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+                ANON_KB="$(awk '/^RssAnon:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+                SWAP_KB="$(awk '/^VmSwap:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+              fi
+              MEM_USED="$(Q "SHOW GLOBAL STATUS LIKE 'Memory_used';" 2>/dev/null | awk '{print $2}' | tail -1)"
+              THREADS="$(Q "SHOW GLOBAL STATUS LIKE 'Threads_connected';" 2>/dev/null | awk '{print $2}' | tail -1)"
+              echo "SAMPLE ts=$TS rss_kb=${RSS_KB:-0} rssanon_kb=${ANON_KB:-0} swap_kb=${SWAP_KB:-0} mariadb_memory_used_bytes=${MEM_USED:-NA} connections=${THREADS:-NA}"
+              [ "$i" -eq 6 ] || sleep 15
+              i=$((i+1))
+            done
+
+            echo ""
+            echo "=============================================="
+            echo " 6. CORRELATION CRONS / RSS — 2026-09-14"
+            echo "=============================================="
+            echo "Fenetre : redemarrage MariaDB 14:00 UTC -> mesure RSS ~6.7 Gio a 22:49 UTC."
+            echo ""
+
+            echo "--- crontab live pertinent ---"
+            crontab -l 2>/dev/null | grep -E 'africafunds|cron_daily|cron_tunisie|cron_brvm|cron_indices|sync_production' || true
+
+            echo ""
+            echo "--- journal cron 14:00-23:00 UTC ---"
+            journalctl -u cron --since "2026-09-14 14:00:00" --until "2026-09-14 23:00:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_daily|cron_tunisie|cron_brvm|cron_indices|sync_production' \
+              | tail -220 || true
+            echo ""
+            echo "--- journal cron 09:55-10:10 UTC — OOM du 2026-09-14 ---"
+            journalctl -u cron --since "2026-09-14 09:55:00" --until "2026-09-14 10:10:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_nigeria|sync_production' \
+              | tail -220 || true
+
+            echo ""
+            echo "--- Nigeria lundi 10h — execution du 2026-09-14 ---"
+            NLOG=/var/log/africafunds_nigeria_20260914.log
+            if [ -f "$NLOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$NLOG" 2>/dev/null || true
+              cat "$NLOG" | tail -700 || true
+            elif [ -f /var/log/africafunds_nigeria.log ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' /var/log/africafunds_nigeria.log 2>/dev/null || true
+              tail -700 /var/log/africafunds_nigeria.log || true
+            else
+              echo "NIGERIA_LOG=ABSENT"
+            fi
+
+
+            echo ""
+            echo "--- daily 20h : stat + jalons uniquement ---"
+            DAILY=/var/log/africafunds_daily_20260914.log
+            if [ -f "$DAILY" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$DAILY" 2>/dev/null || true
+              grep -E '^===|^\[[0-9]+[a-z]?/[0-9]+\]|ERREUR|TERMINEE|Fonds traites|fonds a traiter|VL totales|lignes|Traites|traites' "$DAILY" \
+                | tail -260 || true
+            else
+              echo "DAILY_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- sortie cron principale redirigee ---"
+            if [ -f /var/log/africafunds_cron.log ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' /var/log/africafunds_cron.log 2>/dev/null || true
+              awk '
+                /AFRICAFUNDS DAILY UPDATE/ {buf=$0; n=1; next}
+                n>0 {buf=buf "\n" $0; n++}
+                n>0 && /MISE A JOUR TERMINEE/ {last=buf; n=0}
+                END {if (last!="") print last}
+              ' /var/log/africafunds_cron.log \
+                | grep -E '^===|^\[[0-9]+[a-z]?/[0-9]+\]|ERREUR|TERMINEE|Fonds traites|fonds a traiter|VL totales|lignes|Traites|traites' \
+                | tail -260 || true
+            else
+              echo "MAIN_CRON_REDIRECT_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- cron EUR/USD 21h30 : bloc du 2026-09-14 ---"
+            EURLOG=/var/log/cron_eur_usd.log
+            if [ -f "$EURLOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$EURLOG" 2>/dev/null || true
+              awk '
+                /CRON EUR\/USD.*2026-09-14/ {show=1}
+                show {print}
+                show && /CRON EUR\/USD TERMINE.*2026-09-14/ {exit}
+              ' "$EURLOG" | tail -220 || true
+            else
+              echo "EUR_USD_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- health 22h : bloc du 2026-09-14 ---"
+            HLOG=/var/log/africafunds_health_20260914.log
+            if [ -f "$HLOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$HLOG" 2>/dev/null || true
+              grep -E '^===|PROBLEME|ERREUR|OK|MariaDB|memoire|memory|cron|VL|performance' "$HLOG" | tail -180 || true
+            else
+              echo "HEALTH_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- MariaDB journal 14:00-23:00 UTC ---"
+            journalctl -u mariadb --since "2026-09-14 14:00:00" --until "2026-09-14 23:00:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'Started|ready|error|warning|aborted|memory|oom|killed|shutdown' \
+              | tail -180 || true
+
+            echo ""
+            echo "--- kernel OOM 14:00-23:00 UTC ---"
+            journalctl -k --since "2026-09-14 14:00:00" --until "2026-09-14 23:00:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -iE 'out of memory|oom-kill|killed process' | tail -40 || true
+
+            echo ""
+            echo "=============================================="
+            echo " 7. HANDLERS BATCH API — PREUVE DE CONTINUATION"
+            echo "=============================================="
+            echo "--- logs.txt processFundmysql ---"
+            if [ -f logs.txt ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' logs.txt 2>/dev/null || true
+              echo "finish_count=$(grep -c "finish l'ID" logs.txt 2>/dev/null || true)"
+              echo "last_finish_ids:"
+              grep "finish l'ID" logs.txt 2>/dev/null | tail -120 || true
+              echo "last_errors:"
+              grep -Ei 'erreur|error|closed state|ECONN|timeout' logs.txt 2>/dev/null | tail -80 || true
+            else
+              echo "PROCESS_FUND_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- PM2 api-monolith metadata ---"
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 describe api-monolith 2>/dev/null \
+                | grep -Ei 'status|uptime|restarts|out log path|error log path|script path|node.js version|pid' \
+                | head -80 || true
+
+            fi
+
+            echo ""
+            echo "--- PM2 logs: batch/perf/classement markers around Sep 14 ---"
+            for L in "$HOME/.pm2/logs/api-monolith-out.log" "$HOME/.pm2/logs/api-monolith-error.log" /root/.pm2/logs/api-monolith-out.log /root/.pm2/logs/api-monolith-error.log; do
+              [ -f "$L" ] || continue
+              echo "LOGFILE=$L"
+              stat -c 'size=%s mtime=%y' "$L" 2>/dev/null || true
+              grep -Ei 'saveperfdatemysql|processFundmysql|finish l.ID|classementmysql|classementeur|classementusd|Error processing fund|closed state|ECONN|timeout|performances locales' "$L" \
+                | tail -180 || true
+            done
+
+            echo ""
+            echo "--- processus node/mysql encore vivants ---"
+            ps -eo pid,ppid,lstart,etime,cmd --sort=lstart 2>/dev/null \
+              | grep -Ei 'node|mariadbd|cron_daily|saveperf|classement' \
+              | grep -v grep | tail -120 || true
+
+            echo ""
+            echo "=============================================="
+            echo " 8. CORRELATION MULTI-INCIDENTS — READ ONLY"
+            echo "=============================================="
+
+            echo "--- kernel OOM depuis 2026-08-17 (si journal encore disponible) ---"
+            journalctl -k --since "2026-08-17 00:00:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -iE 'out of memory|oom-kill|killed process.*mariadbd|invoked oom-killer' \
+              | tail -160 || true
+
+            echo ""
+            echo "--- cron autour OOM 2026-08-27 21:40/22:00 ---"
+            journalctl -u cron --since "2026-08-27 19:45:00" --until "2026-08-27 22:10:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_daily|cron_eur|cron_nigeria|sync_production' \
+              | tail -260 || true
+            if [ -f /var/log/africafunds_daily_20260827.log ]; then
+              echo "LOG=/var/log/africafunds_daily_20260827.log"
+              grep -E '^===|^\[[0-9]+[a-z]?/[0-9]+\]|ERREUR|TERMINE|Fonds traites|fonds a traiter|HTTP' /var/log/africafunds_daily_20260827.log | tail -260 || true
+            fi
+
+            echo ""
+            echo "--- cron autour OOM 2026-08-31 18:33 ---"
+            journalctl -u cron --since "2026-08-31 18:15:00" --until "2026-08-31 18:50:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_daily|cron_eur|cron_nigeria|sync_production' \
+              | tail -220 || true
+            if [ -f /var/log/africafunds_nigeria_20260831.log ]; then
+              echo "LOG=/var/log/africafunds_nigeria_20260831.log"
+              grep -E '^===|^\[[0-9]+[a-z]?/[0-9]+\]|ERREUR|TERMINE|Fonds traites|fonds a traiter|HTTP' /var/log/africafunds_nigeria_20260831.log | tail -260 || true
+            fi
+
+            echo ""
+            echo "--- cron autour OOM 2026-09-08 20:02 ---"
+            journalctl -u cron --since "2026-09-08 19:45:00" --until "2026-09-08 20:20:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'CMD|africafunds|cron_daily|cron_eur|cron_nigeria|sync_production' \
+              | tail -220 || true
+            if [ -f /var/log/africafunds_daily_20260908.log ]; then
+              echo "LOG=/var/log/africafunds_daily_20260908.log"
+              cat /var/log/africafunds_daily_20260908.log | tail -500 || true
+            fi
+
+            echo ""
+            echo "--- indices 2026-08-31 autour de 18:30 ---"
+            ILOG=/var/log/cron_indices_daily.log
+            if [ -f "$ILOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$ILOG" 2>/dev/null || true
+              grep -n -A120 -B20 -E 'Aug 31.*Starting daily index scraper|Mon Aug 31.*Starting daily index scraper|2026-08-31' "$ILOG" | tail -360 || true
+            else
+              echo "INDICES_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- EUR/USD 2026-08-27 autour de 21:30 ---"
+            ELOG=/var/log/cron_eur_usd.log
+            if [ -f "$ELOG" ]; then
+              stat -c 'FILE=%n size=%s mtime=%y' "$ELOG" 2>/dev/null || true
+              awk '
+                /CRON EUR\/USD.*2026-08-27/ {show=1}
+                show {print}
+                show && /CRON EUR\/USD TERMINE.*2026-08-27/ {exit}
+              ' "$ELOG" | tail -360 || true
+            else
+              echo "EUR_USD_LOG=ABSENT"
+            fi
+
+            echo ""
+            echo "--- AF-OPS-005 : refus fund_opcvm depuis dernier restart 23:32 ---"
+            journalctl -u mariadb --since "2026-09-14 23:32:32" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei "Access denied.*fund_opcvm|Aborted connection.*fund_opcvm" \
+              | tail -220 || true
+
+            echo ""
+            echo "--- preuve stricte execution indices le 2026-08-31 18:30 ---"
+            if [ -f /var/log/cron_indices_daily.log ]; then
+              grep -n -A30 -B10 -E 'Mon Aug 31 .*Starting daily index scraper|2026-08-31T18:30' /var/log/cron_indices_daily.log | tail -180 || true
+            fi
+            journalctl -u cron --since "2026-08-31 18:25:00" --until "2026-08-31 18:40:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'cron_indices_daily|sync_production|CMD' | tail -180 || true
+
+            echo ""
+            echo "--- attribution temporelle refus DB 23:30-23:45 ---"
+            journalctl -u cron --since "2026-09-14 23:30:00" --until "2026-09-14 23:45:00" --no-pager -o short-iso 2>/dev/null \
+              | grep -Ei 'africafunds|sync_production|CMD' | tail -220 || true
+            journalctl -u mariadb --since "2026-09-14 23:35:00" --until "2026-09-14 23:40:00" --no-pager -o short-iso 2>/dev/null \
+              | tail -260 || true
+
+            echo ""
+            echo "--- PM2 access markers autour des occurrences ---"
+            PLOG=/root/.pm2/logs/api-monolith-out.log
+            if [ -f "$PLOG" ]; then
+              grep -E '\[(27/Aug/2026:21:|27/Aug/2026:22:|31/Aug/2026:18:|08/Sep/2026:19:|08/Sep/2026:20:|14/Sep/2026:09:|14/Sep/2026:10:)' "$PLOG" \
+                | grep -Ei 'saveperf|classement|perform|api/' | tail -500 || true
+            fi
+
+            echo ""
+            echo "=============================================="
+            echo " 9. AF-OPS-005 — ATTRIBUTION CREDENTIAL (REDACTED)"
+            echo "=============================================="
+            echo "--- processus avec DB_USER=fund_opcvm dans l environnement initial ---"
+            PROC_MATCHES=0
+            for E in /proc/[0-9]*/environ; do
+              [ -r "$E" ] || continue
+              if tr '\0' '\n' < "$E" 2>/dev/null | grep -qx 'DB_USER=fund_opcvm'; then
+                P="$(echo "$E" | cut -d/ -f3)"
+                PV="$(tr '\0' '\n' < "$E" 2>/dev/null | sed -n 's/^DB_PASSWORD=//p' | head -1)"
+                if [ -z "$PV" ]; then PMATCH="ABSENT"; elif [ "$PV" = "$DBP" ]; then PMATCH="YES"; else PMATCH="NO"; fi
+                COMM="$(cat "/proc/$P/comm" 2>/dev/null || echo UNKNOWN)"
+                CWD="$(readlink -f "/proc/$P/cwd" 2>/dev/null || echo UNKNOWN)"
+                echo "PROCESS pid=$P comm=$COMM cwd=$CWD password_matches_current=$PMATCH"
+                PROC_MATCHES=$((PROC_MATCHES+1))
+              fi
+            done
+            echo "process_env_matches=$PROC_MATCHES"
+
+            echo ""
+            echo "--- fichiers .env* qui declarent DB_USER=fund_opcvm ---"
+            find /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr -maxdepth 4 -type f -name '.env*' -print0 2>/dev/null \
+              | while IFS= read -r -d '' F; do
+                  FU="$(grep -E '^DB_USER=' "$F" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+                  [ "$FU" = "fund_opcvm" ] || continue
+                  FP="$(grep -E '^DB_PASSWORD=' "$F" 2>/dev/null | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+                  if [ -z "$FP" ]; then FMATCH="ABSENT"; elif [ "$FP" = "$DBP" ]; then FMATCH="YES"; else FMATCH="NO"; fi
+                  MODE="$(stat -c '%a' "$F" 2>/dev/null || echo UNKNOWN)"
+                  echo "ENV_FILE path=$F mode=$MODE password_matches_current=$FMATCH"
+                done
+
+            echo ""
+            echo "--- fichiers applicatifs qui referencent DB_PASSWORD (noms seulement) ---"
+            grep -RIl --exclude-dir=node_modules --exclude-dir=.git --exclude='*.log' 'DB_PASSWORD' . 2>/dev/null | head -100 || true
+            echo ""
+            echo "=============================================="
+            echo " FIN — aucune variable modifiee, aucun service redemarre"
+            echo "=============================================="
+          REMOTE
+
+          AFRICAFUNDS_SSH_OPERATION_CLASS=READ_ONLY \
+            bash scripts/governance/s2_ssh_readonly_retry.sh \
+            "$SSH_USER@$HOST" 'bash -s' /tmp/af-mariadb-memory-diag.sh \
+            2>&1 | tee rapport-mem.txt
+          test -s rapport-mem.txt
+
+      - name: Publier le rapport
+        if: always()
+        run: |
+          {
+            echo "## Memoire MySQL — releve du $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo
+            echo '```'
+            cat rapport-mem.txt 2>/dev/null || echo "(aucun rapport)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Consigner le releve dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          {
+            echo "# Memoire MySQL — releve"
+            echo
+            echo "> Genere par \`ops-mysql-memoire.yml\`. Lecture seule. Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo "Declencheur : \`${{ github.event_name }}\` — par \`${{ github.actor }}\`"
+            echo
+            echo '```'
+            cat rapport-mem.txt 2>/dev/null || echo "(aucune sortie — connexion SSH impossible)"
+            echo '```'
+          } > docs/OPS_MYSQL_MEMOIRE.md
+
+          git add docs/OPS_MYSQL_MEMOIRE.md
+          if git diff --cached --quiet; then
+            echo "Releve inchange, aucun commit."
+          else
+            git commit -m "chore(ops): memoire MySQL — releve du $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : ne jamais ecraser un commit pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Releve consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
