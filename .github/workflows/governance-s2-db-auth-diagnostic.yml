@@ -70,6 +70,20 @@ jobs:
               print('- project processes:',len(p.get('project_processes',[])))
               print('- runtime .env tracked:',p.get('runtime_env',{}).get('tracked'))
               print('- runtime .env ignored:',p.get('runtime_env',{}).get('ignored'))
+              print('- stale env reference files:')
+              for row in p.get('stale_env_reference_files',[]):
+                  print('  -',row.get('path'),row.get('patterns'))
+              print('- auth error log attribution:')
+              for row in p.get('auth_error_log_attribution',[]):
+                  print('  -',row.get('path'),'count=',row.get('count_in_scanned_window'),'first=',row.get('first'),'last=',row.get('last'))
+              print('- pm2 loader contract:')
+              for row in p.get('pm2_loader_contract',[]):
+                  print('  -',row)
+              print('- systemd environment files:',p.get('systemd_environment_files',[]))
+              print('- stale env open fds:',p.get('stale_env_open_fds',[]))
+              print('- detailed project processes:')
+              for row in p.get('process_details',[]):
+                  print('  -',row)
           PY
 
       - name: Upload safe evidence
