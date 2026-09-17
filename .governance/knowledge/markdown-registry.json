@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "5eb02722ca69365486e78c624d4922e9ebe562ae"
+      "head": "1f29e0448c4971b8576a9830b0a56be6eae184ba"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "86b2c4feae85843f8a9126ecaf304e18e3ac6172"
+      "head": "3205e6c8619523150307903cdf4ed001621d0553"
     }
   },
   "summary": {
@@ -10028,9 +10028,9 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "11503f66ec9e3fa82aaba96b1ab24faf258ba16b",
-      "last_validated_sha": "11503f66ec9e3fa82aaba96b1ab24faf258ba16b",
-      "content_sha256": "277f9cfc7d9d68751e601c6cb99b33e4df541f9aa9d07739be16ca53c345f5e6",
+      "git_blob_sha": "309f3c32af7104dfabfca35f379be8fc31ab356e",
+      "last_validated_sha": "309f3c32af7104dfabfca35f379be8fc31ab356e",
+      "content_sha256": "7f04366d252c62834d781053b13b58487c2143b5222d00df41a88525296affed",
       "line_count": 1073,
       "byte_count": 70888,
       "headings": [
@@ -10199,11 +10199,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "5bd9988d41350d809cfc097649903e188b73c781",
-      "last_validated_sha": "5bd9988d41350d809cfc097649903e188b73c781",
-      "content_sha256": "b2c6b0e5efcf6375bfcba40d782556b5dce5e05213786256bb72f3b712be778c",
+      "git_blob_sha": "462e71e17de59773061797dba0eb9095552786d7",
+      "last_validated_sha": "462e71e17de59773061797dba0eb9095552786d7",
+      "content_sha256": "6169826f4f01ac6a62d6da89f8d5968d25cd3bc0b4388dd6876ba1bb5cc52d0c",
       "line_count": 62,
-      "byte_count": 4422,
+      "byte_count": 4421,
       "headings": [
         {
           "level": 1,
@@ -10239,16 +10239,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "NONE",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Mesure de la devise apres correctif d extraction",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/MESURE_DEVISE_SEC.md",
-      "git_blob_sha": "983bd8ec43467a8f66ae6ba13ab31fdb59fdfe87",
-      "last_validated_sha": "983bd8ec43467a8f66ae6ba13ab31fdb59fdfe87",
-      "content_sha256": "d7e585e4594705d45737d390b58b64d0d1972d634394072a0507af2bc70fbb87",
-      "line_count": 261,
-      "byte_count": 19146,
+      "git_blob_sha": "5241176f292a93008114d8c39fb2bcf80b79a71a",
+      "last_validated_sha": "5241176f292a93008114d8c39fb2bcf80b79a71a",
+      "content_sha256": "5229c8f3da3f5b81e92c8adbf10b4e369edee83df64046b0f02e8d4549c23df3",
+      "line_count": 260,
+      "byte_count": 19073,
       "headings": [
         {
           "level": 1,
@@ -10326,7 +10326,11 @@
       "authority_level": "CURRENT_SPECIALIZED",
       "canonical_authority": "docs/07-operations/RUNBOOK.md",
       "unique_information": [
-        "Segments en dollars vers naira — journal des operations"
+        "Segments en dollars vers naira — journal des operations",
+        "Ce que la source revele",
+        "Les plateaux, du plus long au plus court",
+        "Par fonds — ce qui resterait apres correction",
+        "Ce que cette mesure autorise"
       ],
       "consumers": [
         "CI",
@@ -10339,20 +10343,36 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "NONE",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Segments en dollars vers naira — journal des operations",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_FIX_SEGMENTS_NAIRA.md",
-      "git_blob_sha": "10fee676319663d8617fe196261459bcceace353",
-      "last_validated_sha": "10fee676319663d8617fe196261459bcceace353",
-      "content_sha256": "05d015e4dcb6f30b6328778aa04ff1f6282961d62edbdb2c660e9de9ffd474f1",
-      "line_count": 89,
-      "byte_count": 5616,
+      "git_blob_sha": "2346f4dd50e0c4a30483e7e89fbf9c95fdfb26dc",
+      "last_validated_sha": "2346f4dd50e0c4a30483e7e89fbf9c95fdfb26dc",
+      "content_sha256": "2215323c91aa8345ed00f33de7b2d040551f18965ab79ce314c9056922334881",
+      "line_count": 180,
+      "byte_count": 11805,
       "headings": [
         {
           "level": 1,
           "text": "Segments en dollars vers naira — journal des operations"
+        },
+        {
+          "level": 2,
+          "text": "Ce que la source revele"
+        },
+        {
+          "level": 2,
+          "text": "Les plateaux, du plus long au plus court"
+        },
+        {
+          "level": 2,
+          "text": "Par fonds — ce qui resterait apres correction"
+        },
+        {
+          "level": 2,
+          "text": "Ce que cette mesure autorise"
         }
       ]
     },
@@ -10431,11 +10451,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_MYSQL_MEMOIRE.md",
-      "git_blob_sha": "279938f970a46c99c0a14c06db994e37fbd6e602",
-      "last_validated_sha": "279938f970a46c99c0a14c06db994e37fbd6e602",
-      "content_sha256": "0c96f27b6a4281ac3036286e7176de812c4d57a880f64993c41bb668fb33e66c",
-      "line_count": 3389,
-      "byte_count": 238940,
+      "git_blob_sha": "79df38a7fc8f018d60f3ab089c1c99d1e315a8e4",
+      "last_validated_sha": "79df38a7fc8f018d60f3ab089c1c99d1e315a8e4",
+      "content_sha256": "f186d94d7fce67fa3be0244688963afd8dde87623a06c38435a72eea3da1a027",
+      "line_count": 3683,
+      "byte_count": 274941,
       "headings": [
         {
           "level": 1,
@@ -13295,11 +13315,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "078785bfc64d63dc7033b80be1dca643f1c28349",
-      "last_validated_sha": "078785bfc64d63dc7033b80be1dca643f1c28349",
-      "content_sha256": "968ec152a9565b57bda71a09cd32ba055350e5a680842b98b4f119af5749b44c",
-      "line_count": 6460,
-      "byte_count": 452437,
+      "git_blob_sha": "332830269fd33a5d7d21f2314d5a2a164a413dd6",
+      "last_validated_sha": "332830269fd33a5d7d21f2314d5a2a164a413dd6",
+      "content_sha256": "f5cc411ff7a3984dacd2d4c9256ff7b6b60fdb32c12b4e3cb660a5b72dac68b5",
+      "line_count": 6464,
+      "byte_count": 452995,
       "headings": [
         {
           "level": 1,
