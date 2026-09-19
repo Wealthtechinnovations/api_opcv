@@ -1,0 +1,34 @@
+name: AfricaFunds Incident Governance
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.governance/incidents/**'
+      - '.governance/loop/task-queue.json'
+      - '.governance/knowledge/evidence.json'
+      - 'docs/07-operations/INCIDENT_RESPONSE.md'
+      - 'docs/07-operations/incidents/**'
+      - 'scripts/governance/validate_incidents.py'
+      - 'scripts/governance/incident_lookup.py'
+      - 'scripts/governance/test_incident_lookup.py'
+      - '.github/workflows/governance-incidents.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          fetch-depth: 0
+      - name: Validate incident lifecycle and task/evidence links
+        run: python3 scripts/governance/validate_incidents.py
+      - name: Test known-incident lookup
+        run: python3 scripts/governance/test_incident_lookup.py

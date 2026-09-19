@@ -1,14 +1,48 @@
+// ============================================================================
+// COMPAT NODE 14.16 (la prod tourne en Node v14.16 ; des dependances de
+// node_modules ciblent Node 16/18). Shims additifs, sans effet sur Node >= 16.
+// ============================================================================
+// 1) Prefixe 'node:' pour les modules builtin (supporte a partir de Node 14.18).
+//    ethers -> @noble/hashes fait require('node:crypto') -> MODULE_NOT_FOUND en 14.16.
+const _Module = require('module');
+const _origResolve = _Module._resolveFilename;
+_Module._resolveFilename = function (request, ...rest) {
+  if (typeof request === 'string' && request.startsWith('node:')) {
+    request = request.slice(5);
+  }
+  return _origResolve.call(this, request, ...rest);
+};
+// 2) Object.hasOwn (Node 16.9+) — utilise par helmet@8.
+if (typeof Object.hasOwn !== 'function') {
+  Object.defineProperty(Object, 'hasOwn', {
+    value: (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop),
+    configurable: true, writable: true,
+  });
+}
+// 3) structuredClone (Node 17+) — filet de securite pour dependances recentes.
+if (typeof globalThis.structuredClone !== 'function') {
+  globalThis.structuredClone = (v) => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
+}
+
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const sequelize = require('./src/db/sequelize');
-const swaggerUI = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc');
+const { initClickHouse } = require('./src/db/clickhouse');
+const { startPeriodicSync } = require('./src/services/clickhouse-sync');
 
 // Initialize database
 sequelize.initDb();
+
+// Initialize ClickHouse (non-blocking — analytics features disabled if unavailable)
+initClickHouse().then((available) => {
+  if (available) {
+    const syncInterval = parseInt(process.env.CLICKHOUSE_SYNC_INTERVAL_MINUTES, 10) || 60;
+    startPeriodicSync(syncInterval);
+  }
+});
 
 const app = express();
 const port = process.env.PORT || 3005;
@@ -39,7 +73,6 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
@@ -64,6 +97,13 @@ app.set('trust proxy', 1);
 // Rate limiting global - 200 requêtes par 15 minutes par IP
 app.use(rateLimit(200, 15 * 60 * 1000));
 
+// Stricter rate limiting for auth routes — 10 attempts per 15 minutes
+const authRateLimit = rateLimit(10, 15 * 60 * 1000);
+app.use('/api/login', authRateLimit);
+app.use('/api/userlogin', authRateLimit);
+app.use('/api/forgot-password', authRateLimit);
+app.use('/api/reset-password', authRateLimit);
+
 // Logging
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
@@ -74,35 +114,123 @@ if (process.env.NODE_ENV !== 'production') {
 // ---------------------
 // Swagger Documentation
 // ---------------------
-const swaggerOptions = {
-  failOnErrors: true,
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'API OPCVM - Documentation',
-      version: '1.0.0',
-      description: 'API pour la gestion et l\'analyse de fonds OPCVM',
-    },
-    servers: [
-      {
-        url: process.env.API_BASE_URL || `http://localhost:${port}`,
+if (process.env.NODE_ENV !== 'production') {
+  const swaggerUI = require('swagger-ui-express');
+  const swaggerJsDoc = require('swagger-jsdoc');
+  const swaggerOptions = {
+    failOnErrors: true,
+    definition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'API OPCVM - Documentation',
+        version: '1.0.0',
+        description: 'API pour la gestion et l\'analyse de fonds OPCVM',
       },
-    ],
-  },
-  apis: ['./src/routes/*.js'],
-};
+      servers: [
+        {
+          url: process.env.API_BASE_URL || `http://localhost:${port}`,
+        },
+      ],
+    },
+    apis: ['./src/routes/*.js'],
+  };
 
-const specs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+  const specs = swaggerJsDoc(swaggerOptions);
+  app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
+}
 
 // ---------------------
 // Routes
 // ---------------------
+require('./src/routes/apigestionauth')(app);
 require('./src/routes/routes_vl')(app);
+require('./src/routes/routes_recalc_admin')(app);
 
-// Health check
-app.get('/health', (req, res) => {
+// Router-based route files
+app.use(require('./src/routes/apigestionfonds'));
+app.use(require('./src/routes/apigestionpays'));
+app.use(require('./src/routes/apigestionperformance'));
+app.use(require('./src/routes/apigestionquartile'));
+app.use(require('./src/routes/apigestionratios'));
+app.use(require('./src/routes/apigestionrendement'));
+app.use(require('./src/routes/apigestionsavequotidien'));
+app.use(require('./src/routes/apigestionsociete'));
+app.use(require('./src/routes/apigestionapikey'));
+
+// Analytics routes (ClickHouse-powered)
+app.use(require('./src/routes/analytics'));
+
+// Referentiel FundAfrica routes
+app.use(require('./src/routes/apigestionreferentiel'));
+
+// Module BRVM BOC (VL OPCVM UEMOA) — supervision lecture seule
+app.use(require('./src/routes/apibrvmboc'));
+
+// Health check (basic)
+app.get(['/health', '/api/health'], (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Health check (detailed) — etat complet de la plateforme
+app.get(['/health/detailed', '/api/health/detailed'], async (req, res) => {
+  const result = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    database: { status: 'unknown' },
+    clickhouse: { status: 'unknown' },
+    tables: {},
+  };
+
+  try {
+    const db = sequelize.sequelize;
+    const [tables] = await db.query(`
+      SELECT 'fond_investissements' as tbl, COUNT(*) as cnt FROM fond_investissements WHERE active = 1
+      UNION ALL SELECT 'valorisations', COUNT(*) FROM valorisations
+      UNION ALL SELECT 'performences', COUNT(*) FROM performences
+      UNION ALL SELECT 'performences_eurs', COUNT(*) FROM performences_eurs
+      UNION ALL SELECT 'performences_usds', COUNT(*) FROM performences_usds
+      UNION ALL SELECT 'classementfonds', COUNT(*) FROM classementfonds
+      UNION ALL SELECT 'classementfonds_eurs', COUNT(*) FROM classementfonds_eurs
+      UNION ALL SELECT 'classementfonds_usds', COUNT(*) FROM classementfonds_usds
+      UNION ALL SELECT 'rendements', COUNT(*) FROM rendements
+      UNION ALL SELECT 'devisedechanges', COUNT(*) FROM devisedechanges
+      UNION ALL SELECT 'societes', COUNT(*) FROM societes
+      UNION ALL SELECT 'indice_references', COUNT(*) FROM indice_references
+    `);
+    for (const row of tables) {
+      result.tables[row.tbl] = parseInt(row.cnt);
+    }
+    result.database.status = 'connected';
+
+    const [lastVlRows] = await db.query(
+      `SELECT MAX(date) as last_date, COUNT(DISTINCT fund_id) as fonds FROM valorisations WHERE date > DATE_SUB(NOW(), INTERVAL 30 DAY)`
+    );
+    const lastVl = lastVlRows[0];
+    result.database.last_vl_date = lastVl?.last_date || null;
+    result.database.fonds_with_recent_vl = parseInt(lastVl?.fonds) || 0;
+
+    // Note: classementfonds n'a pas de colonne timestamp (timestamps: false dans le modele)
+    const [lastClassementRows] = await db.query(
+      `SELECT COUNT(DISTINCT fond_id) as fonds FROM classementfonds`
+    );
+    const lastClassement = lastClassementRows[0];
+    result.database.fonds_with_classement = parseInt(lastClassement?.fonds) || 0;
+  } catch (err) {
+    result.database.status = 'error';
+    result.database.error = err.message;
+    result.status = 'degraded';
+  }
+
+  try {
+    const { isClickHouseAvailable } = require('./src/db/clickhouse');
+    result.clickhouse.status = isClickHouseAvailable() ? 'connected' : 'unavailable';
+  } catch (err) {
+    result.clickhouse.status = 'unavailable';
+  }
+
+  res.json(result);
 });
 
 // 404 handler
@@ -132,14 +260,11 @@ app.use((err, req, res, next) => {
 // Start Server
 // ---------------------
 const server = app.listen(port, () => {
-  console.log(`Serveur démarré sur le port ${port} [${process.env.NODE_ENV || 'development'}]`);
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('SIGTERM reçu. Arrêt gracieux...');
   server.close(() => {
-    console.log('Serveur arrêté.');
     process.exit(0);
   });
 });

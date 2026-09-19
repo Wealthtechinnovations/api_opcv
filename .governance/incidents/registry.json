@@ -1,0 +1,570 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "authority": "docs/07-operations/INCIDENT_RESPONSE.md",
+  "rule": "Le registre décrit les incidents; les actions exécutables vivent dans la task queue AfricaFunds existante.",
+  "incidents": [
+    {
+      "id": "AF-INC-20260817-001",
+      "title": "MariaDB — arrêts répétés et OOM-kill",
+      "primary_type": "AVAILABILITY",
+      "tags": [
+        "DATABASE",
+        "OOM",
+        "RECURRENCE",
+        "RESILIENCE"
+      ],
+      "severity": "SEV1",
+      "status": "RCA_PENDING",
+      "first_observed_at": "2026-08-17",
+      "last_observed_at": "2026-09-14T10:04:14Z",
+      "recurrence": {
+        "signature": "mariadb-service-down-or-oom-killed",
+        "occurrence_count": 6,
+        "occurrences": [
+          "2026-08-17",
+          "2026-08-27T21:40:00Z",
+          "2026-08-27T22:00:00Z",
+          "2026-08-31T18:33:00Z",
+          "2026-09-08T20:02:42Z",
+          "2026-09-14T10:04:14Z"
+        ],
+        "escalation_required": true
+      },
+      "impact": {
+        "services": [
+          "MariaDB",
+          "AfricaFunds API"
+        ],
+        "user_impact": "API indisponible/HTTP 500 lorsque la DB est morte",
+        "data_impact": "Aucune perte de donnée prouvée; opérations d'écriture doivent rester transactionnelles",
+        "financial_data_risk": "HIGH"
+      },
+      "detection": {
+        "sources": [
+          "systemd journal",
+          "kernel OOM journal",
+          "ops-mariadb-recover.yml",
+          "SUIVI.md"
+        ],
+        "blind_spot": "Absence historique d'auto-restart et d'alerte a prolongé certaines indisponibilités."
+      },
+      "mechanism": {
+        "status": "PROVEN",
+        "statement": "mariadbd accumule plusieurs Gio de mémoire anonyme privée puis a été tué par l'OOM-killer sur des occurrences documentées. Le service observé utilise Restart=on-abort; ce mode n'a pas récupéré l'oom-kill du 2026-09-14.",
+        "evidence_refs": [
+          "AF-EVD-012",
+          "AF-EVD-040",
+          "docs/OPS_MARIADB.md"
+        ]
+      },
+      "root_cause": {
+        "status": "UNKNOWN",
+        "statement": "Le mécanisme exact de la croissance multi-Gio du RSS reste non résolu. L'écart RSS anonyme privé vs Memory_used est prouvé et les A/B allocateur courts sont non discriminants. La reconstruction de plusieurs OOM montre des workloads lourds différents au moment des crashes, ce qui ne soutient pas une fuite propre à un seul script. Le modèle accumulation/rétention MariaDB sur la durée + pression finale d'un workload est à tester, pas encore PROVEN.",
+        "evidence_refs": [
+          "AF-EVD-012",
+          "AF-EVD-040",
+          "AF-EVD-041",
+          "AF-EVD-042",
+          "AF-EVD-043",
+          "AF-EVD-044",
+          "AF-EVD-045",
+          "AF-EVD-046",
+          "AF-EVD-047",
+          "AF-EVD-048",
+          "AF-EVD-050"
+        ],
+        "why_not_proven": "Les contextes de workload diffèrent entre incidents et il manque encore une série temporelle longue montrant le RSS avant, pendant et après un batch précis. Les données actuelles ne prouvent ni l'origine de la mémoire anonyme retenue, ni un job universel, ni une causalité allocator. Le label kernel 'npm start' n'identifie pas un build frontend."
+      },
+      "contributing_factors": [
+        {
+          "status": "PROVEN",
+          "statement": "La politique systemd observée est Restart=on-abort; elle n'a pas relancé MariaDB après l'oom-kill. L'absence de Restart=on-failure a transformé le crash en panne prolongée.",
+          "task_ref": "AF-OPS-001"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Le contrôle doc-drift a historiquement pu rester vert lorsque la mesure DB échouait.",
+          "incident_ref": "AF-INC-20260914-001"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Pour l'occurrence du 2026-09-14, le cron Nigeria lancé à 10:00:01 était dans l'étape 4 recalc_vl_ajuste lorsque l'OOM-killer a tué mariadbd à 10:04:12. Cette corrélation décrit le workload actif de cette occurrence sans l'élever à root cause générale.",
+          "evidence_ref": "AF-EVD-047"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Les crons saveperfdatemysql utilisent curl --max-time 300 alors que la route serveur traite séquentiellement sans mécanisme explicite d'annulation sur déconnexion client; un timeout client ne constitue donc pas une preuve de fin du handler et le chevauchement est structurellement possible.",
+          "evidence_ref": "AF-EVD-046"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Trois occurrences documentées ont des contextes de charge lourde différents (correction/recalcul manuel + index backfill le 31/08, recalcul EUR/USD le 08/09, recalcul VL ajustée Nigeria le 14/09). Aucun job unique n'est actuellement prouvé comme condition commune; une pression finale liée au workload reste plausible mais la source de l'accumulation RSS demeure inconnue.",
+          "evidence_ref": "AF-EVD-048"
+        }
+      ],
+      "corrective_actions": [
+        {
+          "id": "CA-001",
+          "status": "DONE",
+          "description": "Workflow de diagnostic puis recovery MariaDB avec collecte du journal avant action.",
+          "task_refs": [],
+          "patch_refs": [
+            ".github/workflows/ops-mariadb-recover.yml"
+          ],
+          "test_refs": [
+            "DB SELECT",
+            "local API probe"
+          ],
+          "rollback": "Aucune mutation si service déjà actif; diagnostic avant start.",
+          "verification_refs": [
+            "docs/OPS_MARIADB.md"
+          ]
+        },
+        {
+          "id": "CA-002",
+          "status": "BLOCKED_HUMAN_APPROVAL",
+          "description": "Ajouter une politique Restart=on-failure gouvernée.",
+          "task_refs": [
+            "AF-OPS-001"
+          ],
+          "patch_refs": [],
+          "test_refs": [],
+          "rollback": "Revert systemd override après snapshot de configuration.",
+          "verification_refs": []
+        },
+        {
+          "id": "CA-003",
+          "status": "DONE",
+          "description": "Exécuter et rollbacker les A/B courts glibc/jemalloc nécessaires pour tester si un effet allocateur est immédiatement discriminant sous processus frais et workloads bornés.",
+          "task_refs": [
+            "AF-OPS-003"
+          ],
+          "patch_refs": [
+            ".github/workflows/ops-mariadb-allocator-ab.yml",
+            ".github/workflows/ops-mysql-memoire.yml",
+            "docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md"
+          ],
+          "test_refs": [
+            "GitHub Actions run 34908277049",
+            "GitHub Actions run 34908496545",
+            "GitHub Actions run 34908755786",
+            "GitHub Actions run 34909181790"
+          ],
+          "rollback": "Supprimer le drop-in LD_PRELOAD, daemon-reload, redémarrer MariaDB sous allocateur system après snapshot de configuration; vérifier DB SELECT, PM2 et HTTP.",
+          "verification_refs": [
+            "AF-EVD-041",
+            "AF-EVD-042",
+            "AF-EVD-043",
+            "AF-EVD-044"
+          ]
+        },
+        {
+          "id": "CA-004",
+          "status": "OPEN",
+          "description": "Poursuivre la RCA en lecture seule sur plusieurs heures. Les preuves nouvelles établissent un contexte workload précis pour l'OOM du 14/09 et un gap d'annulation des handlers après timeout client; il reste à mesurer les durées réelles/chevauchements et la trajectoire RSS avant de conclure sur la root cause.",
+          "task_refs": [
+            "AF-OPS-003"
+          ],
+          "patch_refs": [
+            ".github/workflows/ops-mysql-memoire.yml"
+          ],
+          "test_refs": [
+            "f082c33db85ec0e76aba7def52c130f4620d8065",
+            "94ed36ddf5c1acc2829706ec04e3097debde4720"
+          ],
+          "rollback": "Aucune mutation production autorisée par cette action; observation read-only uniquement.",
+          "verification_refs": [
+            "AF-EVD-044",
+            "AF-EVD-045",
+            "AF-EVD-046",
+            "AF-EVD-047",
+            "AF-EVD-048",
+            "AF-EVD-050"
+          ]
+        }
+      ],
+      "preventive_actions": [
+        {
+          "status": "DONE",
+          "description": "Persister les diagnostics MariaDB dans Git pour conserver la série d'incidents.",
+          "patch_refs": [
+            "78639900779512020feffcf81151d1bd64e454e6"
+          ]
+        },
+        {
+          "status": "DONE",
+          "description": "Rendre la mesure production bruyante lorsqu'elle est impossible.",
+          "incident_ref": "AF-INC-20260914-001"
+        }
+      ],
+      "evidence_refs": [
+        "AF-EVD-012",
+        "AF-EVD-040",
+        "AF-EVD-041",
+        "AF-EVD-042",
+        "AF-EVD-043",
+        "AF-EVD-044",
+        "AF-EVD-045",
+        "AF-EVD-046",
+        "AF-EVD-047",
+        "AF-EVD-048",
+        "AF-EVD-050"
+      ],
+      "linked_tasks": [
+        "AF-OPS-001",
+        "AF-OPS-003"
+      ],
+      "postmortem_ref": "docs/07-operations/incidents/AF-INC-20260817-001-mariadb-oom.md",
+      "closure": {
+        "criteria_met": false,
+        "verified_at": null,
+        "verification_refs": [
+          "AF-EVD-040",
+          "AF-EVD-041",
+          "AF-EVD-042",
+          "AF-EVD-043",
+          "AF-EVD-044"
+        ],
+        "residual_risks": [
+          "Root cause exacte toujours non prouvée; les A/B allocateur courts sont non discriminants pour la dérive de plusieurs heures",
+          "MariaDB Community 10.6.23 est sur une branche 10.6 arrivée en fin de vie en juillet 2026",
+          "Restart=on-failure reste sous gate humain séparé AF-OPS-001"
+        ]
+      }
+    },
+    {
+      "id": "AF-INC-20260912-001",
+      "title": "Canal SSH S2 — resets intermittents pendant le key exchange",
+      "primary_type": "EXTERNAL_DEPENDENCY",
+      "tags": [
+        "SSH",
+        "S2",
+        "KEX",
+        "OBSERVABILITY"
+      ],
+      "severity": "SEV2",
+      "status": "MITIGATED",
+      "first_observed_at": "2026-09-12",
+      "last_observed_at": "2026-09-12",
+      "recurrence": {
+        "signature": "s2-ssh-preauth-kex-reset",
+        "occurrence_count": 3,
+        "occurrences": [
+          "probe-1",
+          "probe-2",
+          "probe-3"
+        ],
+        "sample_size": 11,
+        "escalation_required": true
+      },
+      "impact": {
+        "services": [
+          "GitHub Actions → SSH S2"
+        ],
+        "user_impact": "Certaines observations/attestations échouent avant authentification",
+        "data_impact": "Aucune mutation/data loss prouvée",
+        "financial_data_risk": "LOW"
+      },
+      "detection": {
+        "sources": [
+          "GitHub Actions",
+          "SUIVI.md lot BC"
+        ],
+        "blind_spot": "Un échec aléatoire peut rendre un contrôle indisponible sans signifier que S2 est en panne."
+      },
+      "mechanism": {
+        "status": "PROVEN",
+        "statement": "Des connexions SSH sont réinitialisées avant authentification au niveau key exchange.",
+        "evidence_refs": [
+          "Wealthtechinnovations/front_end_opcvm/SUIVI.md"
+        ]
+      },
+      "root_cause": {
+        "status": "UNKNOWN",
+        "statement": "La cause réseau/sshd amont exacte n'est pas prouvée.",
+        "evidence_refs": [],
+        "why_not_proven": "Le reset survient avant authentification et aucune attribution serveur/réseau définitive n'est disponible."
+      },
+      "contributing_factors": [],
+      "corrective_actions": [
+        {
+          "id": "CA-001",
+          "status": "DONE",
+          "description": "Ajouter un retry borné uniquement aux opérations read-only et uniquement sur erreurs pré-auth transitoires.",
+          "task_refs": [
+            "AF-OPS-004"
+          ],
+          "patch_refs": [
+            "af3cdb6a916dda39b9278d610bab5999bdaed813",
+            "f25935ed31ed35a6f9b149ec1255b6c6b6fc8c3e"
+          ],
+          "test_refs": [
+            "run 34901007513 retry contract",
+            "run 34901007464 DB auth diagnostic",
+            "run 34901007473 S2 observer",
+            "runs 34901304396/34901304405/34901304354/34901304437/34901304403 extended read-only workflows"
+          ],
+          "rollback": "Retirer le wrapper et revenir à une tentative unique.",
+          "verification_refs": [
+            "AF-EVD-039"
+          ]
+        }
+      ],
+      "preventive_actions": [
+        {
+          "status": "DONE",
+          "description": "Les principaux chemins S2 strictement read-only utilisent le wrapper borné fail-closed; les workflows de mutation ne sont volontairement pas auto-retryés."
+        },
+        {
+          "status": "OPEN",
+          "description": "Mesurer la fréquence de resets KEX dans le temps et établir la cause réseau/sshd si le phénomène persiste."
+        }
+      ],
+      "evidence_refs": [
+        "AF-EVD-039"
+      ],
+      "linked_tasks": [
+        "AF-OPS-004"
+      ],
+      "postmortem_ref": "docs/07-operations/incidents/AF-INC-20260912-001-s2-ssh-kex.md",
+      "closure": {
+        "criteria_met": false,
+        "verified_at": null,
+        "verification_refs": [
+          "AF-EVD-039"
+        ],
+        "residual_risks": [
+          "Cause pré-auth réseau/sshd toujours inconnue; mitigation de retry ne constitue pas une RCA."
+        ]
+      }
+    },
+    {
+      "id": "AF-INC-20260914-001",
+      "title": "Contrôle production faux-vert et perte globale de mesure",
+      "primary_type": "OBSERVABILITY",
+      "tags": [
+        "CI",
+        "HEALTHCHECK",
+        "FALSE_GREEN",
+        "SNAPSHOT"
+      ],
+      "severity": "SEV1",
+      "status": "CLOSED",
+      "first_observed_at": "2026-09-14T12:21:00Z",
+      "last_observed_at": "2026-09-14T14:08:52Z",
+      "recurrence": {
+        "signature": "production-control-false-assurance",
+        "occurrence_count": 2,
+        "occurrences": [
+          "ssh-pipeline-exit-masked-by-tee",
+          "C5-json-parse-aborted-all-controls"
+        ],
+        "escalation_required": true
+      },
+      "impact": {
+        "services": [
+          "doc-drift production control"
+        ],
+        "user_impact": "Une panne DB/API de ~3h56 n'a pas rendu le contrôle rouge; un snapshot corrompu pouvait ensuite supprimer tous les autres résultats",
+        "data_impact": "Aucune donnée modifiée par le contrôle",
+        "financial_data_risk": "HIGH"
+      },
+      "detection": {
+        "sources": [
+          "GitHub Actions logs",
+          "generated ETAT_PRODUCTION_VERIFIE.md",
+          "human review"
+        ],
+        "blind_spot": "Le contrôle pouvait fabriquer une certitude fausse."
+      },
+      "mechanism": {
+        "status": "PROVEN",
+        "statement": "Le pipeline ssh|tee masquait le code de sortie du contrôle et un JSON.parse C5 non isolé pouvait interrompre toute la mesure.",
+        "evidence_refs": [
+          "d58508f0d3e759b0456c1268b5105068221bfbc4",
+          "9f051c035e4bf72f919004f5a654ccf015f159ee"
+        ]
+      },
+      "root_cause": {
+        "status": "PROVEN",
+        "statement": "Deux défauts de conception du contrôle: absence de pipefail/capture RC, puis absence d'isolation d'erreur du contrôle C5.",
+        "evidence_refs": [
+          "d58508f0d3e759b0456c1268b5105068221bfbc4",
+          "9f051c035e4bf72f919004f5a654ccf015f159ee"
+        ],
+        "why_not_proven": null
+      },
+      "contributing_factors": [
+        {
+          "status": "PROVEN",
+          "statement": "Le rapport généré faisait autorité production; un faux vert avait donc un impact de gouvernance élevé."
+        }
+      ],
+      "corrective_actions": [
+        {
+          "id": "CA-001",
+          "status": "DONE",
+          "description": "Propager les codes >=2 comme mesure impossible; code 1 reste une dérive mesurée.",
+          "task_refs": [
+            "AF-OPS-006"
+          ],
+          "patch_refs": [
+            "d58508f0d3e759b0456c1268b5105068221bfbc4"
+          ],
+          "test_refs": [
+            "codes 0/1/2/3 vérifiés"
+          ],
+          "rollback": "Revert commit si le workflow ne charge pas.",
+          "verification_refs": [
+            ".github/workflows/doc-drift.yml"
+          ]
+        },
+        {
+          "id": "CA-002",
+          "status": "DONE",
+          "description": "Isoler l'échec de parsing C5 afin qu'il n'emporte pas les contrôles critiques.",
+          "task_refs": [
+            "AF-OPS-006"
+          ],
+          "patch_refs": [
+            "9f051c035e4bf72f919004f5a654ccf015f159ee"
+          ],
+          "test_refs": [
+            "snapshot frais/périmé/vide/tronqué/absent"
+          ],
+          "rollback": "Revert commit.",
+          "verification_refs": [
+            "scripts/diag/check_doc_drift.js"
+          ]
+        }
+      ],
+      "preventive_actions": [
+        {
+          "status": "DONE",
+          "description": "Documenter explicitement la sémantique des codes de sortie dans le workflow et conserver les contrôles indépendants."
+        }
+      ],
+      "evidence_refs": [],
+      "linked_tasks": [
+        "AF-OPS-006"
+      ],
+      "postmortem_ref": "docs/07-operations/incidents/AF-INC-20260914-001-healthcheck-false-green.md",
+      "closure": {
+        "criteria_met": true,
+        "verified_at": "2026-09-14T14:08:52Z",
+        "verification_refs": [
+          "d58508f0d3e759b0456c1268b5105068221bfbc4",
+          "9f051c035e4bf72f919004f5a654ccf015f159ee"
+        ],
+        "residual_risks": []
+      }
+    },
+    {
+      "id": "AF-INC-20260914-002",
+      "title": "Access denied DB après rotation — attribution incomplète",
+      "primary_type": "AUTHENTICATION",
+      "tags": [
+        "MARIADB",
+        "CREDENTIAL",
+        "TELEMETRY"
+      ],
+      "severity": "SEV2",
+      "status": "RCA_PENDING",
+      "first_observed_at": "2026-09-14",
+      "last_observed_at": "2026-09-14T23:38:56Z",
+      "recurrence": {
+        "signature": "fund-opcvm-access-denied-post-rotation",
+        "occurrence_count": 1,
+        "occurrences": [
+          "2026-09-14"
+        ],
+        "escalation_required": false
+      },
+      "impact": {
+        "services": [
+          "MariaDB auth",
+          "AfricaFunds consumers"
+        ],
+        "user_impact": "Aucun défaut AfricaFunds courant prouvé; runtime observé sain",
+        "data_impact": "Aucune perte prouvée",
+        "financial_data_risk": "MEDIUM"
+      },
+      "detection": {
+        "sources": [
+          "MariaDB journal",
+          "read-only S2 observation",
+          "GLOBAL_STATUS"
+        ],
+        "blind_spot": "GENERAL_LOG/PERFORMANCE_SCHEMA/USERSTAT indisponibles pour attribution fine."
+      },
+      "mechanism": {
+        "status": "PROVEN",
+        "statement": "Six Access denied exacts pour fund_opcvm@localhost sont désormais prouvés après le restart MariaDB de 23:32:32, entre 23:36:29 et 23:38:56. Aucun nouveau refus fund_opcvm n'apparaît ensuite jusqu'au relevé 00:38; le phénomène est intermittent.",
+        "evidence_refs": [
+          "AF-EVD-037",
+          "AF-EVD-049"
+        ]
+      },
+      "root_cause": {
+        "status": "UNKNOWN",
+        "statement": "Un consommateur intermittent a utilisé ponctuellement un credential invalide après restart. Deux fichiers runtime historiques (.env.production et .env.production.plan-b) contiennent un DB_PASSWORD différent du .env courant, mais aucun processus actif ni chargement explicite de ces fichiers n'est prouvé. L'identité du consommateur reste UNKNOWN.",
+        "evidence_refs": [
+          "AF-EVD-037",
+          "AF-EVD-049",
+          "AF-EVD-051"
+        ],
+        "why_not_proven": "Le diagnostic redacted prouve les fichiers stale mais aucun processus actif avec DB_USER=fund_opcvm dans son environnement initial, et la recherche du repo ne montre pas de source explicite de .env.production/.env.production.plan-b. GENERAL_LOG/PERFORMANCE_SCHEMA/USERSTAT restent indisponibles pour attribuer le PID client."
+      },
+      "contributing_factors": [],
+      "corrective_actions": [
+        {
+          "id": "CA-001",
+          "status": "OPEN",
+          "description": "Améliorer l'attribution future des refus sans modifier les credentials ou redémarrer sans preuve.",
+          "task_refs": [
+            "AF-OPS-005"
+          ],
+          "patch_refs": [
+            "scripts/governance/s2_observe.py"
+          ],
+          "test_refs": [
+            "read-only observation"
+          ],
+          "rollback": "N/A pour diagnostic read-only.",
+          "verification_refs": [
+            "AF-EVD-037",
+            "AF-EVD-049",
+            "AF-EVD-051"
+          ]
+        }
+      ],
+      "preventive_actions": [
+        {
+          "status": "OPEN",
+          "description": "Conserver des preuves par utilisateur/process pour les futurs refus, avec redaction stricte des secrets."
+        }
+      ],
+      "evidence_refs": [
+        "AF-EVD-037",
+        "AF-EVD-049",
+        "AF-EVD-051"
+      ],
+      "linked_tasks": [
+        "AF-OPS-005"
+      ],
+      "postmortem_ref": "docs/07-operations/incidents/AF-INC-20260914-002-db-auth-drift.md",
+      "closure": {
+        "criteria_met": false,
+        "verified_at": null,
+        "verification_refs": [
+          "AF-EVD-049"
+        ],
+        "residual_risks": [
+          "Consommateur intermittent post-restart non attribué",
+          "Télémétrie MariaDB insuffisante pour mapper un refus d'authentification à un PID client"
+        ]
+      }
+    }
+  ]
+}

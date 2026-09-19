@@ -1,0 +1,360 @@
+{
+  "schema_version": "1.0.0",
+  "product": "AfricaFunds",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "evidence": [
+    {
+      "id": "AF-EVD-001",
+      "type": "GIT_STATE",
+      "result": "OBSERVED",
+      "provenance": "GitHub branch API canonical",
+      "observed_at": "2026-09-10T04:46:00Z",
+      "sha": "cd24305db790f4c0c3f663ef1cca037978145ef6"
+    },
+    {
+      "id": "AF-EVD-002",
+      "type": "REFERENCE_GOVERNANCE",
+      "result": "OBSERVED",
+      "provenance": "chainsolutions-wealthtech/Regulatory main tree 483da3e11c30dd0b4f2a4cee114909d512a1b426",
+      "observed_at": "2026-09-10T04:46:00Z",
+      "sha": null
+    },
+    {
+      "id": "AF-EVD-011",
+      "type": "MEASURED_PRODUCTION_STATE",
+      "result": "OBSERVED",
+      "provenance": "doc-drift.yml -> docs/ETAT_PRODUCTION_VERIFIE.md",
+      "observed_at": "2026-09-10T02:02:00Z",
+      "summary": "8/16 controles OK — 6 echecs critiques (C2, C3, C4.NIGERIA, C4.TUNISIE, C7, C8), 2 alertes (C4.CEMAC, C6.CEMAC)."
+    },
+    {
+      "id": "AF-EVD-012",
+      "type": "RUNTIME_INCIDENT",
+      "result": "OBSERVED",
+      "provenance": "ops-mysql-memoire.yml -> journalctl -k / journalctl -u mariadb",
+      "observed_at": "2026-09-10T05:33:00Z",
+      "summary": "OOM-kill de mariadbd le 2026-09-08 20:02:42 a 14,6 Go RSS, declenche par un node de cron.service. Aucun redemarrage automatique : service relance le 2026-09-09 06:25:03. Indisponibilite 10 h 22."
+    },
+    {
+      "id": "AF-EVD-013",
+      "type": "GIT_STATE",
+      "result": "OBSERVED",
+      "provenance": "GitHub canonical API branch observed before governance reconciliation commit",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "584793adc956831543b4daf995a30f774fcb9453"
+    },
+    {
+      "id": "AF-EVD-014",
+      "type": "GIT_STATE",
+      "result": "OBSERVED",
+      "provenance": "GitHub canonical frontend branch observed before governance reconciliation commit",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "e2ac5996c4429910f378b1ddd8b111a08e2d96cf"
+    },
+    {
+      "id": "AF-EVD-015",
+      "type": "CI",
+      "result": "PASS",
+      "provenance": "GitHub Actions Governance Regulatory Plus on API canonical branch",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "584793adc956831543b4daf995a30f774fcb9453"
+    },
+    {
+      "id": "AF-EVD-016",
+      "type": "CI",
+      "result": "PASS",
+      "provenance": "GitHub Actions governance-contract on frontend canonical branch",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "e2ac5996c4429910f378b1ddd8b111a08e2d96cf"
+    },
+    {
+      "id": "AF-EVD-017",
+      "type": "REFERENCE_GOVERNANCE",
+      "result": "OBSERVED",
+      "provenance": "chainsolutions-wealthtech/Regulatory main current reference",
+      "observed_at": "2026-09-10T05:44:00Z",
+      "sha": "4590be6800dd3dbb5c9dde106509967082e28afc"
+    },
+    {
+      "id": "AF-EVD-018",
+      "type": "PROJECT_LINK",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Project Link Contract run 34648496692 + mirrored frontend run 34648518431",
+      "observed_at": "2026-09-11T21:16:09Z",
+      "summary": "Both repositories expose the same project identity, peer mapping and canonical/default branch contract."
+    },
+    {
+      "id": "AF-EVD-019",
+      "type": "MULTI_AGENT_RESUME",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Multi-Agent Resume Contract run 34649651106",
+      "observed_at": "2026-09-11T21:29:47Z",
+      "summary": "Claude/API, Claude/frontend, ChatGPT/API and ChatGPT/frontend reconstruct identical logical context without conversation memory."
+    },
+    {
+      "id": "AF-EVD-020",
+      "type": "MARKDOWN_CERTIFICATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Markdown Exhaustive Audit run 34648775372 + durable registry bot commit 12a418dd689f2d7ee0f72f796a7cb095d0ae54f3",
+      "observed_at": "2026-09-11T21:22:08Z",
+      "summary": "241/241 Markdown read byte-for-byte and classified: API 216, frontend 25, orphan authority 0, unresolved critical contradiction 0. Final rerun still required after later Markdown edits."
+    },
+    {
+      "id": "AF-EVD-021",
+      "type": "CI_SSH_FALLBACK",
+      "result": "BLOCKED_EXTERNAL_SECRET",
+      "provenance": "OPS S2 observer run 34648880344 and subsequent S2 wrapper/fallback runs",
+      "observed_at": "2026-09-11T21:20:31Z",
+      "summary": "S2_HOST and S2_SSH_KEY are present; S2_KNOWN_HOSTS is missing. Workflows fail before SSH/mutation by design. StrictHostKeyChecking is not weakened."
+    },
+    {
+      "id": "AF-EVD-022",
+      "type": "BRANCH_POLICY",
+      "result": "PASS_WITH_NATIVE_ENFORCEMENT_GAP",
+      "provenance": "GitHub branch inventory + Branch Policy runs 34649503793 (API) and 34649506048 (frontend)",
+      "observed_at": "2026-09-11T21:27:54Z",
+      "summary": "Each repo has 3 pre-existing branches; default/canonical branch is correct; any new branch outside baseline is detected. GitHub native rulesets remain absent."
+    },
+    {
+      "id": "AF-EVD-023",
+      "type": "SECURITY_AUDIT",
+      "result": "SECURITY_GATE",
+      "provenance": "GitHub tracked .env audit without exposing values",
+      "observed_at": "2026-09-11T21:30:00Z",
+      "summary": "Public tracked .env contains non-placeholder DB password, JWT secret, email password and Magic secret key material. Application and scripts load .env directly. Safe remediation requires runtime secret migration plus rotation before sanitizing tracked files."
+    },
+    {
+      "id": "AF-EVD-024",
+      "type": "S2_READ_ONLY_OBSERVATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions OPS — observer S2 read-only run 34651239447; attempt 2 revalidated post-JWT rollback",
+      "observed_at": "2026-09-12T02:17:44Z",
+      "summary": "SSH fallback independent of MCP is live with strict pinned host key; public /, /home, /api/getactualite and local API returned 200; DB connectivity PASS; no production mutation."
+    },
+    {
+      "id": "AF-EVD-025",
+      "type": "S2_GIT_RECONCILIATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions Reconciliation gouvernee GitHub S2 run 34651393361",
+      "observed_at": "2026-09-11T21:52:18Z",
+      "summary": "Shared GOV-006 guard reconciled API/frontend S2 without force/reset/clean and preserved API untracked artifacts."
+    },
+    {
+      "id": "AF-EVD-026",
+      "type": "S2_FALLBACK_LIVE_PROOF",
+      "result": "PASS",
+      "provenance": "Runs 34651530657 attestation, 34651530777 API fallback observe, 34651530695 frontend fallback observe",
+      "observed_at": "2026-09-11T21:53:48Z",
+      "summary": "Attestation and both deployment fallbacks use the same pinned SSH primitive and passed their safe live paths."
+    },
+    {
+      "id": "AF-EVD-027",
+      "type": "RUNTIME_SECRET_DETACH",
+      "result": "PASS",
+      "provenance": "Transactional env detach workflow + subsequent Tracked Secret Gate PASS",
+      "observed_at": "2026-09-11T21:58:00Z",
+      "summary": "Real .env removed from current Git tree, restored on S2 at same path as ignored local runtime file mode 0600; dotenv, DB and local API validated."
+    },
+    {
+      "id": "AF-EVD-028",
+      "type": "DB_PASSWORD_ROTATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Rotate DB Password run 34667014996 artifact 10288688421",
+      "observed_at": "2026-09-12T02:12:50Z",
+      "summary": "New DB password generated on S2, validated, old credential rejected, backend processes online, local API 200, no rollback."
+    },
+    {
+      "id": "AF-EVD-029",
+      "type": "JWT_ROTATION_CONTRACT",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds JWT Rotation Contract run 34667114586",
+      "observed_at": "2026-09-12T02:15:14Z",
+      "summary": "Six Jest tests prove current-key signing, previous-key transitional verification, expiry preservation, malformed-token rejection and mandatory current secret."
+    },
+    {
+      "id": "AF-EVD-030",
+      "type": "JWT_SECRET_ROTATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Rotate JWT Secret run 34667308136 artifact 10288798552",
+      "observed_at": "2026-09-12T02:19:14Z",
+      "summary": "New JWT key active, old token remained valid during transactional transition, new token rejected by old key, local API 200, no rollback."
+    },
+    {
+      "id": "AF-EVD-031",
+      "type": "JWT_COMPROMISED_KEY_REVOCATION",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Finalize JWT Rotation run 34667384549 artifact 10289224045",
+      "observed_at": "2026-09-12T02:20:43Z",
+      "summary": "Previous exposed JWT key disabled; current token valid; token signed by old key rejected; old sessions revoked; local API 200; no rollback."
+    },
+    {
+      "id": "AF-EVD-032",
+      "type": "EXTERNAL_SECRET_ROTATION_GAP",
+      "result": "BLOCKED_EXTERNAL_PROVIDER",
+      "provenance": "Repository consumer mapping + plugin capability search",
+      "observed_at": "2026-09-12T02:21:00Z",
+      "summary": "EMAIL_PASSWORD and MAGIC_SECRET_KEY remain provider-side rotations. Current tools expose neither compatible SMTP-provider credential management nor Magic secret rotation; runtime values are not printed or blanked."
+    },
+    {
+      "id": "AF-EVD-033",
+      "type": "GITHUB_NATIVE_ENFORCEMENT",
+      "result": "EXTERNAL_TOOL_GAP",
+      "provenance": "GitHub rulesets read on both repositories",
+      "observed_at": "2026-09-12T02:21:00Z",
+      "summary": "Both repositories return an empty ruleset list. Branch-policy CI is active, but the current GitHub connector exposes no administration action to create/update native rulesets."
+    },
+    {
+      "id": "AF-EVD-034",
+      "type": "FINAL_INTERNAL_GATES",
+      "result": "PASS",
+      "provenance": "Rerun attempts: Regulatory Plus 34667697672#2; State Coherence 34667674612#2; Multi-Agent Resume 34667668841#2; Tracked Secret Gate 34667096245#2; API Branch Policy 34661338979#2; frontend Branch Policy 34661457841#2; frontend Project Link 34648518431#2; final Markdown audit 34667765458",
+      "observed_at": "2026-09-12T02:30:35Z",
+      "summary": "All internal governance gates are green after the final documentation/SUIVI stabilization. Markdown registry is 242/242 with zero orphan authority and zero unresolved critical contradiction."
+    },
+    {
+      "id": "AF-EVD-035",
+      "type": "DB_AUTH_POST_ROTATION_CLASSIFICATION",
+      "result": "NO_ACTIVE_STALE_CONSUMER_OBSERVED_WITH_HISTORICAL_ATTRIBUTION_LIMIT",
+      "provenance": "Two read-only S2 observations at 2026-09-13 17:42Z and 17:56Z + process/env/cron/workflow inventory + MariaDB telemetry query",
+      "observed_at": "2026-09-13T17:56:30Z",
+      "summary": "DB connectivity PASS. Last Access denied remained 2026-09-13 17:36:56Z across two observations; no current process/env/cron/GitHub workflow with stale DB credential was found. db_readonly succeeds and db_auth_diagnostic does not authenticate. Exact historical executable cannot be reconstructed because MariaDB general_log=OFF, performance_schema=OFF and no audit/userstat plugin is active. No DB re-rotation justified."
+    },
+    {
+      "id": "AF-EVD-036",
+      "type": "FINAL_S2_RECONCILIATION_RUNTIME",
+      "result": "PASS",
+      "provenance": "GitHub Actions Reconciliation gouvernee GitHub S2 run 34773189857 artifact 10322627099",
+      "observed_at": "2026-09-13T17:59:08Z",
+      "summary": "GOV-006 fast-forwarded API to ceff72e0e0dad7a7522835940a9537662b16f844 and frontend to 55191a74c8d581adb383123ce1d9f5bea98dc267; ahead/behind 0/0, tracked clean, all API untracked preserved. api-monolith and fundafrique-frontend online; DB PASS; public root/home/API and local API all HTTP 200."
+    },
+    {
+      "id": "AF-EVD-037",
+      "type": "POST_CLOSURE_DB_AUTH_DRIFT_OBSERVATION",
+      "result": "POST_RESTART_SERVER_WIDE_AUTH_FAILURES_UNATTRIBUTED",
+      "provenance": "Read-only S2 SQL/global-status observations 2026-09-14 19:25-19:30 UTC + current GitHub/S2 reconciliation",
+      "observed_at": "2026-09-14T19:30:37Z",
+      "summary": "Exact MariaDB journal evidence proves fund_opcvm@localhost Access denied events on 2026-09-14 before the 10:04Z OOM, with the last persisted exact line at 09:47:32Z. After the 14:00Z MariaDB recovery, server-wide GLOBAL_STATUS at 19:30Z showed UPTIME=19807s, ABORTED_CONNECTS=12, ACCESS_DENIED_ERRORS=12 and ABORTED_CONNECTS_PREAUTH=0; the counters remained 12 across repeated observation. These GLOBAL_STATUS counters are server-wide and therefore do NOT prove that the post-restart failures belong to fund_opcvm. Current AfricaFunds DB SELECT connectivity passes, authenticated fund_opcvm sessions exist, PM2 processes are online, public AfricaFunds HTTP is 200, and live doc-drift reports C5 runtime snapshot fresh. USERSTAT=OFF, PERFORMANCE_SCHEMA=OFF and GENERAL_LOG=OFF, so exact post-restart per-user/process attribution is unavailable through SQL telemetry. No current STALE_CRON, STALE_PROCESS, EXTERNAL_TOOL, TRANSIENT_DIAGNOSTIC or ACTIVE_RUNTIME_DEFECT classification can be proven without the MariaDB journal/observer execution surface. No DB re-rotation, restart or runtime mutation is justified. AF-TASK-011 remains DONE and the governance verdict remains GOVERNED_WITH_EXTERNAL_GAPS unless future AfricaFunds-specific live drift is measured."
+    },
+    {
+      "id": "AF-EVD-038",
+      "type": "INCIDENT_GOVERNANCE_CONTRACT",
+      "result": "PASS",
+      "provenance": "GitHub Actions AfricaFunds Incident Governance run 34900784210 on 742dca2a3d35053e1a55db124913bb13a251c1f4",
+      "observed_at": "2026-09-14T21:48:13Z",
+      "summary": "Canonical incident registry validates 4 known incidents, linked tasks/evidence/postmortems, recurrence escalation, and fail-closed closure rule requiring a PROVEN root cause for CLOSED incidents."
+    },
+    {
+      "id": "AF-EVD-039",
+      "type": "S2_READONLY_SSH_RETRY_CONTRACT",
+      "result": "PASS",
+      "provenance": "Retry contract 34901007513; DB-auth 34901007464; S2 observer 34901007473; extended read-only runs 34901304396/34901304405/34901304354/34901304437/34901304403",
+      "observed_at": "2026-09-14T21:55:10Z",
+      "summary": "Bounded READ_ONLY SSH retry retries only approved transient pre-auth/KEX signatures, refuses auth/host-key failures, refuses replay after remote stdout, and cannot be invoked outside READ_ONLY. Live observation, attestation and diagnostics passed. Mutation workflows remain single-attempt."
+    },
+    {
+      "id": "AF-EVD-040",
+      "type": "MARIADB_MEMORY_RCA",
+      "result": "PROBABLE_SYSTEM_MALLOC_FRAGMENTATION",
+      "provenance": "GitHub Actions DIAG memoire MySQL runs 34905885999 and 34906206810; reports e7048e216655b8ec5b6745f364caa739e841e360 and 057364403c9b0869275c3c07b8928fa2d5a63cde; frontend SUIVI lot BG 9a1ff496b5280f779bc216b83b5a978a47d0a75e",
+      "observed_at": "2026-09-14T22:53:54Z",
+      "summary": "After ~8h52 uptime, mariadbd RSS=6,999,328 kB with RssAnon=6,974,948 kB and Private_Dirty≈6,976,696 kB, while MariaDB Memory_used=465,884,576 bytes and Memory_used_initial=442,210,192 bytes. Only 9 connections/18 threads are active, historical max connections=19, configured global+per-session worst case≈0.70 GiB, version_malloc_library=system, libc is linked, BPF memleak and jemalloc/tcmalloc are absent. pmap shows many nearly full anonymous 64/128 MiB mappings. Six 15-second samples were flat, so no short-term linear leak was inferred. This strongly supports system-malloc retention/fragmentation but does not prove causality without an alternative-allocator A/B."
+    },
+    {
+      "id": "AF-EVD-041",
+      "type": "MARIADB_ALLOCATOR_AB",
+      "result": "SHORT_AB_CONFOUNDED_BY_PROCESS_AGE",
+      "provenance": "GitHub Actions run 34908277049; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit 3357f5968b0d50d70d45881654dfda413f0ce155; frontend SUIVI lot BG ba1f61f0deea1b8fb27194793c6456b20ef69f7f",
+      "observed_at": "2026-09-14T23:18:53Z",
+      "summary": "Initial allocator A/B compared an ~9h-old system-malloc mariadbd (A_PRE RSS 6,999,676 kB) with a freshly restarted jemalloc process (B_PRE 124,200 kB). Its own cold control after rollback was system malloc RSS 122,732 kB, only ~1.2% below B_PRE. Therefore the apparent ~7 GiB vs ~193 MiB contrast is dominated by process age/restart and does not prove allocator causality. Rollback and DB/API/HTTP health checks passed."
+    },
+    {
+      "id": "AF-EVD-042",
+      "type": "MARIADB_ALLOCATOR_AB",
+      "result": "FRESH_PROCESS_EQUAL_LOAD_NEAR_EQUIVALENT",
+      "provenance": "GitHub Actions run 34908496545; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit 73d268d9834eb95d8a5195b217d2940b5da28494",
+      "observed_at": "2026-09-14T23:21:56Z",
+      "summary": "Fresh-process equal-load control: system malloc RSS 122,536→188,380 kB (+65,844 kB); jemalloc 126,676→190,628 kB (+63,952 kB). Both phases remained healthy and rollback restored fresh system malloc RSS 122,536 kB. This short control shows no multi-GiB allocator separation and cannot determine the multi-hour root cause."
+    },
+    {
+      "id": "AF-EVD-043",
+      "type": "MARIADB_ALLOCATOR_AB",
+      "result": "SYNTHETIC_STRESS_WORKLOAD_DEPENDENT",
+      "provenance": "GitHub Actions run 34908755786; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit 3b5537a3f459356e2a32646e7ef7ad199bc5a955; frontend SUIVI lot BG ba1f61f0deea1b8fb27194793c6456b20ef69f7f",
+      "observed_at": "2026-09-14T23:25:13Z",
+      "summary": "Bounded variable_alloc_free synthetic stress on fresh processes: system malloc RSS 122,896→196,696 kB (+73,800 kB); jemalloc 125,796→223,280 kB (+97,484 kB). Jemalloc grew more under this particular short synthetic workload, but the run lasted ~1 minute and does not establish long-duration superiority or inferiority. Rollback and health checks passed."
+    },
+    {
+      "id": "AF-EVD-044",
+      "type": "MARIADB_ALLOCATOR_AB",
+      "result": "REAL_EUR_USD_SHORT_WORKLOAD_NON_DISCRIMINANT",
+      "provenance": "GitHub Actions run 34909181790; workflow .github/workflows/ops-mariadb-allocator-ab.yml; commit c8b99a24b1607e52c2777b81da2f5719340322d2; frontend SUIVI lot BG 94e14e0e2ffb594ea900edc0f77eafe03be87b50",
+      "observed_at": "2026-09-14T23:30:50Z",
+      "summary": "Representative recalc_eur_usd_daily_rate.js --dry-run on fresh processes: system malloc RSS 122,964→207,552 kB (+84,588 kB); jemalloc 126,380→210,108 kB (+83,728 kB), about -1.0% growth difference. The workload made no writes, all health probes passed, rollback restored system malloc and libjemalloc2 was removed. Short allocator behavior is therefore non-discriminant for the multi-hour multi-GiB RSS growth."
+    },
+    {
+      "id": "AF-EVD-045",
+      "type": "MARIADB_LONG_DURATION_RSS_OBSERVATION",
+      "result": "PROCESS_AGE_GROWTH_OBSERVED_NOT_CAUSAL",
+      "provenance": "GitHub Actions read-only DIAG runs 34909577475, 34912839984 and 34913106077; reports at commits df1c43323a8f2742bc4d7e1e698dd96d7e824016, acb8fda0826a735965e6847d51b72c904cf3b482 and 9029faa5b86915071465b66cdc85bfa879d25e14",
+      "observed_at": "2026-09-15T00:26:00Z",
+      "summary": "After the allocator rollback to system malloc, fresh mariadbd RSS was ~127-130 MiB around ~5 minutes uptime and ~247 MiB around ~49-52 minutes uptime, while Memory_used stayed ~450-473 MB. Six 15-second samples at ~49 minutes were flat at 246,976 kB RSS. This proves that RSS can rise with process age/workload after restart, but does not establish a linear leak, a specific workload cause, or allocator causality."
+    },
+    {
+      "id": "AF-EVD-046",
+      "type": "BATCH_TIMEOUT_CONTROL_FLOW",
+      "result": "CLIENT_TIMEOUT_HAS_NO_SERVER_CANCELLATION_HOOK",
+      "provenance": "Source inspection at API commit 9029faa5b86915071465b66cdc85bfa879d25e14: scripts/cron/cron_daily_update.sh, scripts/cron/cron_nigeria_weekly.sh and src/routes/apigestionsavequotidien.js",
+      "observed_at": "2026-09-15T00:27:00Z",
+      "summary": "Both daily and Nigeria cron run_curl helpers default to curl --max-time 300 for saveperfdatemysql batches. The saveperfdatemysql Express handler processes funds sequentially with awaited processFundmysql calls and contains no req.aborted/close handling, AbortController, cancellation token or equivalent. Therefore a client timeout does not explicitly cancel the server-side loop. This proves a cancellation/observability gap and makes overlap structurally possible; it does not by itself prove that a particular timed-out invocation continued for a specific duration."
+    },
+    {
+      "id": "AF-EVD-047",
+      "type": "MARIADB_OOM_WORKLOAD_CORRELATION",
+      "result": "SEP14_OOM_DURING_NIGERIA_RECALC_VL_AJUSTE",
+      "provenance": "GitHub Actions read-only DIAG run 34913106077; report commit 9029faa5b86915071465b66cdc85bfa879d25e14; /var/log/africafunds_nigeria_20260914.log and kernel journal",
+      "observed_at": "2026-09-14T10:04:12Z",
+      "summary": "The Monday Nigeria cron started at 10:00:01 UTC. Extraction, Nigeria NAV import and EUR/USD daily-rate recalculation completed. Step 4 recalc_vl_ajuste was actively processing funds when the kernel logged npm start invoked oom-killer at 10:04:11 and killed mariadbd at 10:04:12 with anon-rss=14,902,200 kB. recalc_vl_ajuste then failed with 'Can't add new command when connection is in closed state'; subsequent saveperf/EUR/USD/datejour steps failed with HTTP 500/ECONNREFUSED. This proves the workload context for the Sep 14 occurrence, but does not establish recalc_vl_ajuste or the Nigeria cron as the general root cause."
+    },
+    {
+      "id": "AF-EVD-048",
+      "type": "MARIADB_OOM_CROSS_INCIDENT_CORRELATION",
+      "result": "HEAVY_WORKLOAD_CONTEXTS_DIFFER_NO_SINGLE_JOB_PROVEN",
+      "provenance": "GitHub Actions read-only DIAG runs 34913106077, 34913390476, 34913618802 and 34913883291; reports 9029faa5b86915071465b66cdc85bfa879d25e14, 1bbd9a60b0b4661d8227bc6bb62e1ac2b49e3f6e, 9e6a21e775de1eccd788931a4064e80524ae332b and e919d27cb8a804718b5676b6877195bf2c004d72; docs/OPS_MARIADB.md; frontend SUIVI lot BH 7164973afd0b67b6274c9f1b0326f2d0f16f7f73",
+      "observed_at": "2026-09-15T00:38:00Z",
+      "summary": "Cross-incident reconstruction shows heterogeneous heavy workload contexts. Aug31 18:33: manual Nigeria VL correction/recalculation was active and the daily index scraper also executed a backfill starting 18:30:20; kernel reports node invoked OOM-killer and mariadbd was killed at 13,763,268 kB anon RSS. Sep8 ~20:02: daily cron was in recalc_eur_usd_daily_rate around 600/1250 funds when DB reset and subsequent saveperf calls failed. Sep14 10:04: Nigeria cron was in recalc_vl_ajuste when mariadbd was killed at 14,902,200 kB anon RSS. Aug27 21:30 EUR/USD cron starts with DB already ECONNREFUSED, so it is not established as the initial trigger. These contexts disfavor a single named job as universal root cause; they support further study of accumulated DB RSS plus final workload pressure without proving that model."
+    },
+    {
+      "id": "AF-EVD-049",
+      "type": "DB_AUTH_POST_RESTART_OBSERVATION",
+      "result": "POST_RESTART_DENIALS_PROVEN_INTERMITTENT_ATTRIBUTION_UNKNOWN",
+      "provenance": "GitHub Actions read-only DIAG run 34913618802; report e919d27cb8a804718b5676b6877195bf2c004d72; MariaDB and cron journals",
+      "observed_at": "2026-09-15T00:38:00Z",
+      "summary": "After MariaDB restarted at 23:32:32 UTC, six exact Access denied events for fund_opcvm@localhost occurred at 23:36:29, 23:36:33, 23:36:48, 23:36:51, 23:38:53 and 23:38:56. No AfricaFunds cron is present in the 23:30-23:45 cron journal, and no later fund_opcvm denial appears through the 00:38 read-only observation. The first four overlap in time with DIAG run 34909577475, but that diagnostic reads the current S2 .env and successfully queried MariaDB; the final two occur after that run completed. A specific stale consumer therefore remains unproven. No password rotation or restart is justified."
+    },
+    {
+      "id": "AF-EVD-050",
+      "type": "OOM_INVOKER_ATTRIBUTION",
+      "result": "KERNEL_NPM_START_LABEL_DOES_NOT_PROVE_FRONTEND_BUILD",
+      "provenance": "Kernel journal persisted in docs/OPS_MARIADB.md plus package.json inspection of API and frontend at API e919d27cb8a804718b5676b6877195bf2c004d72 / frontend 7164973afd0b67b6274c9f1b0326f2d0f16f7f73",
+      "observed_at": "2026-09-15T00:38:00Z",
+      "summary": "The Sep14 kernel line says 'npm start invoked oom-killer'. This process label does not identify a frontend build. API package.json defines npm start as node app.js; frontend package.json defines npm start as scripts/start.sh, while the frontend build command is npm run build. Therefore 'frontend build invoked OOM' is unsupported by the available evidence. The exact invoking npm process remains unattributed unless PID/cwd/process evidence is recovered."
+    },
+    {
+      "id": "AF-EVD-051",
+      "type": "DB_AUTH_CONFIG_ATTRIBUTION",
+      "result": "STALE_CREDENTIAL_FILES_PROVEN_ACTIVE_CONSUMER_UNKNOWN",
+      "provenance": "GitHub Actions DIAG run 34914261590; docs/OPS_MYSQL_MEMOIRE.md; read-only comparison only",
+      "observed_at": "2026-09-15T00:43:50Z",
+      "summary": "Read-only redacted attribution found no active process whose initial environment contains DB_USER=fund_opcvm. Runtime api/.env matches the current DB password. Two sibling files, api/.env.production and api/.env.production.plan-b, declare fund_opcvm but their DB_PASSWORD does not match the current runtime credential. This proves stale credential-bearing files exist, not that either file caused the six post-restart Access denied events. Repository search finds no explicit runtime source/load of these files. No password value or hash was emitted."
+    },
+    {
+      "id": "AF-EVD-052",
+      "type": "MEASURED_PRODUCTION_STATE",
+      "result": "SIX_CRITICAL_DATA_QUALITY_FAILURES",
+      "provenance": "doc-drift.yml -> docs/ETAT_PRODUCTION_VERIFIE.md @ 2026-09-16 11:15 UTC; commit 6967430ef9a9f39bda158400c0a7c002f9464cf3",
+      "observed_at": "2026-09-16T11:15:00Z",
+      "summary": "Production control measured 8/16 OK, 6 critical failures and 2 alerts. Critical: C2 orphan head performances (14 local, 23 EUR, 23 USD); C3 absurd recent performances (1141 143958% YTD, 1196 9339%, 2743 809%); C4 Nigeria and Tunisia both last VL 2026-08-28 (19 days old); C7 multiple mixed-scale VL series including Nigeria and UEMOA; C8 stale derived performances despite fresh VLs (MAROC 10/644 current, UEMOA 34/111). Alerts: C4/C6 CEMAC."
+    }
+  ],
+  "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
+}

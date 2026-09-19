@@ -1,0 +1,28 @@
+name: Governance Regulatory Plus
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+  pull_request:
+    branches:
+      - claude/code-review-improvements-ikvuj
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate AfricaFunds governed knowledge
+        run: python3 scripts/governance/validate_regulatory_plus.py
+      - name: Ensure no empty governance markdown
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' f; do
+            test -s "$f" || { echo "Empty governance file: $f"; exit 1; }
+          done < <(find docs/01-governance docs/09-loop docs/10-ai -type f -name '*.md' -print0)

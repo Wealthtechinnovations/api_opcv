@@ -1,0 +1,43 @@
+# CODE_REVIEW — api_opcv (Backend)
+
+> **Doc canonique** : `../front_end_opcvm/CODE_REVIEW.md` (audit unifie, items #1 a #31).
+> Ce fichier liste les points specifiques backend et renvoie a l'audit complet.
+
+## Corrige recemment (cote API)
+- #52 ClickHouse resilience (incident saturation disque serveur) → flag CLICKHOUSE_ENABLED,
+  coupe-circuit sync (N echecs), request_timeout 30s, lecture VL paginee keyset (`b815153`)
+- #29 Classement national local vide → MAX(date)/fond (`6644682`)
+- #30 Totaux EUR/USD gonfles → keepLatestPerFund() (`6644682`)
+- #25 routes_vl.js .catch() (`5b70838`)
+- #22 Auth JWT routes admin (`5540d95`)
+- #23 valLiq/valLiqdev 404 (`bb03081`)
+
+## Corrige LOT 1-3 (2026-06-17/18)
+- **#54** Rankings null/Infinity dans `ranking.service.js` → guard division par zero + null handling
+- **#55** Moyennes par categorie vides dans `apigestionsavequotidien.js` → fix calcul (25 moyennes verifiees)
+- **#56** Inconsistance transactionnelle 3 routes classement (`e3d8fec`) :
+  - `destroy()` dans transaction, `findOne()/save()/create()` hors transaction → 27 operations corrigees
+  - Null guards ajoutes sur `rankingData`
+  - Verifie: 3545+3579+3579 classements, fond 866 rank3Mois=86/300 OK
+
+## Dette technique backend ouverte
+- #2 Index UNIQUE valorisations(fund_id, date)
+- #5 apigestionsavequotidien.js monolithique (~1800 l) — extraction en cours (ranking.service.js)
+- #53 Code mort ClickHouse dans apigestionsavequotidien.js (inerte, CLICKHOUSE_ENABLED=false)
+- #15 INSERT ClickHouse batch non parametres (risque faible, donnees internes)
+- #27 ClickHouse performance_historique jamais peuple
+- ~~#31 UEMOA indRef~~ RESOLU T15c: 22%→**100%** (111/111 fonds, 33830/33830 VL). TUNISIE 24% EUR/USD (attente fichier). CEMAC 0% (sourcer BVMAC).
+- ~~#32~~ CORRIGE T17: routes_vl.js 10 lignes multiplication→division (updateValues + uploadsfilevl)
+- ~~#33~~ CORRIGE ET DEPLOYE T15c: import_indices_excel.js step4 multiplication→division `f6d7cb2`
+
+## Audit securite 2026-06-13
+- ~~#42~~ CORRIGE: Route ClickHouse /api/classementquartile/:id crash ReferenceError → 410 Gone
+- ~~#43~~ CORRIGE: Path traversal multer filename → path.basename()
+- #44 Routes POST sans authenticate (ajoutVL, uploadsfilevl, postfond, updatefond) — a corriger apres validation Eric
+- ~~#45~~ CORRIGE: CSV formula injection (uploadsfilevl/indice) — sanitizeCellValue/Row, commit `277ae47`
+      (statut redresse le 2026-08-12 : ce fichier le listait encore comme ouvert alors que le doc
+       canonique le donne corrige depuis le 2026-06-26)
+- ~~#46~~ CORRIGE: Promise chains sans .catch() + guard headersSent, 11 routes apigestionperformance.js,
+      commit `89cabd4` (meme redressement de statut le 2026-08-12)
+
+Voir l'audit complet et l'historique dans `../front_end_opcvm/CODE_REVIEW.md`.

@@ -1,0 +1,174 @@
+name: Reconciliation gouvernee GitHub S2
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "observe ou reconcile"
+        required: true
+        default: observe
+        type: choice
+        options: [observe, reconcile]
+      confirmation:
+        description: "RECONCILE AFRICAFUNDS S2"
+        required: false
+        default: ""
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/governance-s2-reconcile.yml'
+      - 'scripts/governance/s2_git_guard.sh'
+      - 'scripts/governance/prepare_s2_ssh.sh'
+      - '.governance/ssh/s2_known_hosts.tofu'
+      - '.governance/ops/s2-reconcile-request.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: governance-s2-reconcile
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout canonical governance
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          fetch-depth: 2
+
+      - name: Resolve safe action
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          REQUESTED: ${{ inputs.action }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+          GITHUB_SHA_VALUE: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          ACTION="observe"
+          AUTH_SOURCE="NONE"
+
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            ACTION="${REQUESTED:-observe}"
+            AUTH_SOURCE="WORKFLOW_DISPATCH"
+            if [ "$ACTION" = "reconcile" ] && [ "$CONFIRMATION" != "RECONCILE AFRICAFUNDS S2" ]; then
+              echo "::error::reconciliation confirmation phrase missing"
+              exit 3
+            fi
+          elif git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA_VALUE" \
+              | grep -Fxq '.governance/ops/s2-reconcile-request.json'; then
+            test -s .governance/ops/s2-reconcile-request.json
+            python3 - <<'PY'
+          import json
+          p=json.load(open('.governance/ops/s2-reconcile-request.json',encoding='utf-8'))
+          assert p['schema_version']=='1.0.0'
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['action']=='RECONCILE_BOTH'
+          assert p['confirmation']=='RECONCILE AFRICAFUNDS S2'
+          assert p['one_shot'] is True
+          assert p['preserve_untracked'] is True
+          assert p['expected_frontend_sha']
+          print('VERSIONED_RECONCILIATION_REQUEST=PASS')
+          PY
+            ACTION="reconcile"
+            AUTH_SOURCE="VERSIONED_ONE_SHOT_REQUEST"
+          fi
+
+          case "$ACTION" in observe|reconcile) ;; *) echo "::error::invalid action"; exit 2;; esac
+          echo "action=$ACTION" >> "$GITHUB_OUTPUT"
+          echo "auth_source=$AUTH_SOURCE" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare strict pinned SSH
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: GOV-006 preflight — observe both repositories
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- observe both' \
+            < scripts/governance/s2_git_guard.sh | tee reconciliation-preflight.txt
+
+      - name: Reconcile both repositories through shared guard
+        if: steps.mode.outputs.action == 'reconcile'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- reconcile both' \
+            < scripts/governance/s2_git_guard.sh | tee reconciliation-result.txt
+
+      - name: Measure complete S2 state after operation
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+          ACTION: ${{ steps.mode.outputs.action }}
+          GITHUB_SHA_VALUE: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' < scripts/governance/s2_observe.py > S2_OBSERVATION.json
+          python3 -m json.tool S2_OBSERVATION.json >/dev/null
+          python3 - <<'PY'
+          import json, os
+          p=json.load(open('S2_OBSERVATION.json',encoding='utf-8'))
+          if os.environ['ACTION']=='reconcile':
+              assert p['git']['api']['head']==os.environ['GITHUB_SHA_VALUE'], (
+                  p['git']['api']['head'], os.environ['GITHUB_SHA_VALUE'])
+              req=json.load(open('.governance/ops/s2-reconcile-request.json',encoding='utf-8'))
+              assert p['git']['frontend']['head']==req['expected_frontend_sha'], (
+                  p['git']['frontend']['head'], req['expected_frontend_sha'])
+              assert p['git']['api']['tracked_dirty']==[]
+              assert p['git']['frontend']['tracked_dirty']==[]
+              print('GOV006_RECONCILIATION=PASS')
+          else:
+              print('GOV006_OBSERVATION=PASS')
+          PY
+
+      - name: Publish evidence
+        if: always()
+        run: |
+          {
+            echo "## GOV-006 — ${{ steps.mode.outputs.action }}"
+            echo "Authorization: ${{ steps.mode.outputs.auth_source }}"
+            for f in reconciliation-preflight.txt reconciliation-result.txt; do
+              if [ -f "$f" ]; then
+                echo
+                echo "### $f"
+                echo '~~~text'
+                tail -200 "$f"
+                echo '~~~'
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload observation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-s2-reconciliation-evidence
+          path: S2_OBSERVATION.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
