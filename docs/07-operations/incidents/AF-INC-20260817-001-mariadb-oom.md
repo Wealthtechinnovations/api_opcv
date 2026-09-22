@@ -79,3 +79,22 @@ Ce tableau ne désigne aucun script unique comme root cause. Il rend au contrair
 4. la victime choisie par le kernel.
 
 `AF-EVD-050` corrige une attribution documentaire : la ligne kernel `npm start invoked oom-killer` n'identifie pas un build frontend. L'API définit `npm start = node app.js`, le frontend définit `npm start = scripts/start.sh`, tandis que son build est `npm run build`. L'invocateur exact reste à attribuer par PID/cwd si la trace existe.
+
+
+---
+
+## Mise à jour 2026-09-22 — 7e OOM prouvé
+
+Le diagnostic read-only `scripts/diag/ondemand/diag_mariadb_incident_timeline.js`, exécuté via le workflow existant `doc-drift.yml` (run `35776765338`), prouve une nouvelle récurrence :
+
+- `2026-09-21 10:02:23 UTC` : systemd indique que `mariadb.service` a été frappé par l'OOM-killer ;
+- kernel : `mariadbd` PID `2100513` tué avec `anon-rss=15054704 kB` ;
+- `2026-09-21 10:02:25 UTC` : service en échec `oom-kill` ;
+- `2026-09-22 06:25:02 UTC` : MariaDB redevient `ready for connections` ;
+- politique observée : `Restart=on-abort`, `NRestarts=0`.
+
+Une reconstruction à partir des runs read-only `34909577475`, `34913390476`, `34914261590` et `35157538491` établit aussi une trajectoire multi-heure : RSS ~127-130 MB quelques minutes après redémarrage, ~247 MB après environ une heure, puis ~8.55 GiB après ~46 h 52, presque entièrement anonyme/privé, alors que `Memory_used` MariaDB reste autour de 450-482 MB.
+
+**Conclusion bornée :** accumulation RSS anonyme/privée multi-heure = PROVEN ; 7e OOM = PROVEN ; root cause exacte = UNKNOWN. La proximité du cron Nigeria avec l'OOM du 21/09 est factuelle mais ne suffit pas à attribuer la cause au cron ou à un sous-traitement précis.
+
+Preuves structurées : `AF-EVD-053`, `AF-EVD-054`. Prochaine étape : série temporelle read-only périodique autour des batchs réels, sans nouvelle mutation MariaDB.
