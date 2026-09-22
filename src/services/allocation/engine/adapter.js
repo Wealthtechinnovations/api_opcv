@@ -109,6 +109,8 @@ function validatePreparedData(prepared) {
     }
   }
 
+  assertCovariancePositiveSemidefinite(normalizedSigma);
+
   if (prepared.quality && prepared.quality.status && prepared.quality.status !== 'PASS') {
     fail('DATA_QUALITY_NOT_PASS', 'Le moteur refuse des donnees dont le quality gate n est pas PASS.', {
       status: prepared.quality.status,
@@ -127,6 +129,55 @@ function validatePreparedData(prepared) {
       as_of: null,
     },
   };
+}
+
+function assertCovariancePositiveSemidefinite(sigma) {
+  const n = sigma.length;
+  const lower = Array.from({ length: n }, () => Array(n).fill(0));
+  let scale = 0;
+  for (let i = 0; i < n; i += 1) {
+    for (let j = 0; j < n; j += 1) {
+      scale = Math.max(scale, Math.abs(sigma[i][j]));
+    }
+  }
+  const tolerance = Math.max(1e-14, scale * 1e-10);
+
+  // Semidefinite Cholesky/LDL-style factorization. A zero diagonal pivot is
+  // acceptable only when the corresponding residual off-diagonal terms are
+  // also numerically zero.
+  for (let i = 0; i < n; i += 1) {
+    for (let j = 0; j <= i; j += 1) {
+      let residual = sigma[i][j];
+      for (let k = 0; k < j; k += 1) {
+        residual -= lower[i][k] * lower[j][k];
+      }
+
+      if (i === j) {
+        if (residual < -tolerance) {
+          fail('COVARIANCE_NOT_PSD', 'La matrice de covariance n est pas semi-definie positive.', {
+            pivot: i,
+            residual,
+            tolerance,
+          });
+        }
+        lower[i][j] = residual > tolerance ? Math.sqrt(residual) : 0;
+      } else if (lower[j][j] > tolerance) {
+        lower[i][j] = residual / lower[j][j];
+      } else {
+        if (Math.abs(residual) > tolerance) {
+          fail('COVARIANCE_NOT_PSD', 'La matrice de covariance n est pas semi-definie positive.', {
+            row: i,
+            column: j,
+            residual,
+            tolerance,
+          });
+        }
+        lower[i][j] = 0;
+      }
+    }
+  }
+
+  return true;
 }
 
 function normalizeWeights(weights, n) {
@@ -573,6 +624,7 @@ module.exports = {
   DEFERRED_STRATEGIES,
   AllocationEngineError,
   validatePreparedData,
+  assertCovariancePositiveSemidefinite,
   normalizeWeights,
   portfolioMetrics,
   buildUniformWeightConstraints,
