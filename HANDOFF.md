@@ -5,10 +5,12 @@
 - `AF-OPS-003 = OPEN / POST_FIX_VALIDATION` ;
 - A/B courts terminés et rollbackés : `34908277049`, `34908496545`, `34908755786`, `34909181790` ;
 - root cause exacte de la dérive multi-Gio : `UNKNOWN` ;
-- prochaine preuve : corrélation longue durée read-only RSS ↔ crons ↔ batchs ↔ timeouts ↔ handlers ↔ MariaDB ;
+- correctif protocolaire `execute() -> query()` : RED→GREEN, déployé GOV-006, preuves `AF-EVD-058..060` ;
+- prochaine preuve MariaDB : vrais batchs post-fix avec comparaison RSS/RssAnon/Private_Dirty + `Com_stmt_*` + équivalence des sorties ;
 - `AF-OPS-001` reste sous gate humain séparé ;
-- `AF-TASK-010` reste la tâche de gouvernance externe bloquée sur fournisseurs externes ;\n- `AF-TASK-024 = IN_PROGRESS / PROJECTION_DRIFT_RED` répare uniquement les projections de continuité et possède un claim non chevauchant avec `AF-TASK-017`.
-
+- `AF-TASK-010` reste la tâche de gouvernance externe bloquée sur fournisseurs externes ;
+- `AF-TASK-025 = IN_PROGRESS / GENERATOR_DETERMINISM_GREEN` construit le générateur observe-only des projections ;
+- claim `AF-TASK-025` non chevauchant avec `AF-TASK-017`.
 
 ## Point de reprise courant — clôture 2026-09-13
 

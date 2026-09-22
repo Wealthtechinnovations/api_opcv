@@ -73,18 +73,32 @@ La root cause exacte reste **UNKNOWN**. La prochaine preuve n'est plus de recons
 
 ## Programme Directeur — anti-régression actif
 
-Le Programme Directeur est désormais protégé par un contrat machine-checkable **hard-fail** qui ne vérifie que des invariants déjà normatifs : deux repositories / un produit, tuple `FUND_STATE`, queue unique, single-writer, interdiction nouvelle branche/force-push/history rewrite, reconstruction de contexte, projection de la priorité opérationnelle, `SUIVI.md` global frontend, ordre AF-OPS-007/009 → AF-OPS-008, gates live Allocation AF-OPS-007/008/009, unicité des preuves et absence de second registre de claims.
+Le Programme Directeur est protégé par deux contrats machine-checkable :
 
-Preuve : `AF-EVD-063`, run Programme Director `35793007081 = SUCCESS`.\n\n```text\nanti_regression_contract = ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY\nprojection_drift_detector = OBSERVE_ONLY_RED_BASELINE\n```
+```text
+anti_regression_contract = ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY
+projection_drift_contract = FAIL_CLOSED_CURRENT_PROJECTIONS
+```
 
-Le même run observe actuellement :
+Preuves : `AF-EVD-063`, `AF-EVD-064`.
 
-- `AF-TASK-017 = IN_PROGRESS` ;
-- exactement **1 claim actif** sur les surfaces Allocation contraintes ;
+État courant Programme Directeur :
+
+- `AF-TASK-025 = IN_PROGRESS / GENERATOR_DETERMINISM_GREEN` ;
+- preuve générateur : `AF-EVD-065`, run `35798266486 = SUCCESS` ;
+- deux générations indépendantes sur les mêmes autorités structurées : byte-for-byte identiques ;
+- `repository_write_performed = false` ;
+- 6 vues candidates à des blocs gérés ;
+- prochaine preuve : simulation d'insertion/remplacement des blocs gérés **en mémoire seulement**, avec diff borné et idempotence avant tout write-back Git.
+
+Claims actifs :
+
+- `AF-TASK-017` — Allocation constraint engine ;
+- `AF-TASK-025` — Programme Director projection generator ;
 - `conflict_count = 0` ;
-- aucune paire d'écriture parallèle n'est certifiée tant qu'une seconde tâche active avec claim non chevauchant n'existe pas.
+- paire `AF-TASK-017 ↔ AF-TASK-025` certifiée non chevauchante.
 
-Toute nouvelle écriture doit donc préserver les surfaces revendiquées par `AF-TASK-017`. Les travaux strictement read-only peuvent continuer sur d'autres surfaces.
+Toute écriture doit rester strictement dans les surfaces claimées. Un chevauchement ferme le gate.
 
 ## Autres blockers indépendants
 

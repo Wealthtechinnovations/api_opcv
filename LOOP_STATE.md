@@ -27,10 +27,10 @@ Preuves de clôture : `AF-EVD-035`, `AF-EVD-036`. Verdict : `GOVERNED_WITH_EXTER
 
 ```text
 AF-OPS-003 = OPEN / POST_FIX_VALIDATION
-AF-TASK-024 = IN_PROGRESS / PROJECTION_DRIFT_RED
+AF-TASK-025 = IN_PROGRESS / GENERATOR_DETERMINISM_GREEN
 ```
 
-La boucle de certification historique reste fermée avec gaps externes. La priorité opérationnelle est projetée séparément. Le claim `AF-TASK-024` est borné aux surfaces gouvernance et ne chevauche pas `AF-TASK-017`.
+La boucle de certification historique reste fermée avec gaps externes. La priorité opérationnelle est projetée séparément. Le claim `AF-TASK-025` est borné aux surfaces gouvernance et ne chevauche pas `AF-TASK-017`.
 
 ### Historique conservé
 
