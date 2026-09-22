@@ -156,6 +156,7 @@ app.use(require('./src/routes/apigestionrendement'));
 app.use(require('./src/routes/apigestionsavequotidien'));
 app.use(require('./src/routes/apigestionsociete'));
 app.use(require('./src/routes/apigestionapikey'));
+app.use(require('./src/routes/apigestionallocation'));
 
 // Analytics routes (ClickHouse-powered)
 app.use(require('./src/routes/analytics'));
