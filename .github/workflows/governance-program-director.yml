@@ -7,6 +7,7 @@ on:
     paths:
       - 'scripts/governance/program_orchestrator.py'
       - 'scripts/governance/program_event_ledger.py'
+      - 'scripts/governance/program_gap_harvester.py'
       - '.governance/project.json'
       - '.governance/loop/task-queue.json'
       - '.governance/loop/state.json'
@@ -65,6 +66,15 @@ jobs:
             --output out/program-events.json \
             | tee out/program-events.log
 
+      - name: Harvest candidate gaps read-only
+        run: |
+          set -euo pipefail
+          python3 api/scripts/governance/program_gap_harvester.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/program-gaps.json \
+            | tee out/program-gaps.log
+
       - name: Publish programme summary
         if: always()
         run: |
@@ -116,6 +126,18 @@ jobs:
               print("### Latest programme events")
               for row in events.get("latest_events",[])[-12:]:
                   print("-",row.get("at"),row.get("kind"),row.get("ref"),row.get("result") or row.get("summary"))
+
+          gp=Path("out/program-gaps.json")
+          if gp.exists():
+              gaps=json.loads(gp.read_text(encoding="utf-8"))
+              print()
+              print("### Gap harvester")
+              print("- task creation performed:",gaps.get("task_creation_performed"))
+              print("- candidates:",gaps.get("candidate_count"))
+              print("- possible existing task matches:",gaps.get("candidate_with_possible_existing_task"))
+              print("- unmatched candidates:",gaps.get("candidate_without_possible_existing_task"))
+              for row in gaps.get("inventory",[]):
+                  print("- inventory",row.get("role"),row)
           PY
 
       - name: Upload derived programme state
