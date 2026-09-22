@@ -634,7 +634,11 @@
           "AF-OPS-009"
         ],
         "production_deployed": false
-      }
+      },
+      "residual_gaps": [
+        "LIVE_DATA_CERTIFICATION_REMAINS_GATED_BY_AF-OPS-007_008_009",
+        "FX_PREHISTORY_LOOKAHEAD_GUARD_REQUIRED_BEFORE_BACKTEST_OR_LIVE_CERTIFICATION"
+      ]
     },
     {
       "id": "AF-TASK-015",
@@ -812,7 +816,8 @@
       "scope": [
         "Ajouter backtest hors-échantillon et walk-forward sans look-ahead bias.",
         "Gérer rebalancement périodique ou par seuil, turnover, frais/transaction costs et impact des frais de gestion lorsque disponibles.",
-        "Comparer à benchmarks valides et scénarios historiques."
+        "Comparer à benchmarks valides et scénarios historiques.",
+        "Interdire tout look-ahead FX : aucune date antérieure au premier taux disponible ne peut utiliser rétrospectivement ce futur taux."
       ],
       "acceptance_criteria": [
         "Les résultats in-sample et out-of-sample sont séparés.",
