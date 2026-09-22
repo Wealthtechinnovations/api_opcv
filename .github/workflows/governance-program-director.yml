@@ -11,6 +11,7 @@ on:
       - 'scripts/governance/program_surface_claims.py'
       - 'scripts/governance/program_invariants.py'
       - 'scripts/governance/program_projection_drift.py'
+      - 'scripts/governance/program_projection_generator.py'
       - '.governance/project.json'
       - '.governance/loop/task-queue.json'
       - '.governance/loop/state.json'
@@ -109,6 +110,23 @@ jobs:
             --output out/program-projection-drift.json \
             | tee out/program-projection-drift.log
 
+      - name: Generate projection candidates twice observe-only
+        run: |
+          set -euo pipefail
+          python3 api/scripts/governance/program_projection_generator.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/program-projection-generator-a.json \
+            > out/program-projection-generator-a.log
+          python3 api/scripts/governance/program_projection_generator.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/program-projection-generator-b.json \
+            > out/program-projection-generator-b.log
+          cmp -s out/program-projection-generator-a.json out/program-projection-generator-b.json
+          cp out/program-projection-generator-a.json out/program-projection-generator.json
+          echo "PROJECTION_GENERATOR_DETERMINISM=PASS"
+
       - name: Publish programme summary
         if: always()
         run: |
@@ -206,6 +224,17 @@ jobs:
               print("- projection drift count:",drift.get("projection_drift_count"))
               for row in drift.get("projection_drifts",[]):
                   print("-",row.get("projection"),"missing",row.get("missing_tokens"))
+
+          pg=Path("out/program-projection-generator.json")
+          if pg.exists():
+              gen=json.loads(pg.read_text(encoding="utf-8"))
+              print()
+              print("### Projection generator")
+              print("- mode:",gen.get("mode"))
+              print("- repository write performed:",gen.get("repository_write_performed"))
+              print("- input sha256:",gen.get("input_sha256"))
+              print("- writeback candidates:",gen.get("writeback_candidate_count"))
+              print("- exact managed blocks present:",gen.get("exact_present_count"))
           PY
 
       - name: Upload derived programme state
