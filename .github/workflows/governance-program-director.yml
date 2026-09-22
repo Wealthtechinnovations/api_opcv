@@ -1,0 +1,112 @@
+name: AfricaFunds Programme Director
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/governance/program_orchestrator.py'
+      - '.governance/project.json'
+      - '.governance/loop/task-queue.json'
+      - '.governance/loop/state.json'
+      - '.governance/loop/handoff.json'
+      - '.governance/knowledge/evidence.json'
+      - '.governance/incidents/registry.json'
+      - '.github/workflows/governance-program-director.yml'
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-programme-director
+  cancel-in-progress: false
+
+jobs:
+  derive:
+    name: Derive current AfricaFunds programme state
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout API triggering SHA
+        uses: actions/checkout@v4
+        with:
+          path: api
+          fetch-depth: 1
+
+      - name: Checkout frontend canonical branch
+        uses: actions/checkout@v4
+        with:
+          repository: Wealthtechinnovations/front_end_opcvm
+          ref: claude/code-review-improvements-ikvuj
+          path: frontend
+          fetch-depth: 1
+          token: ${{ github.token }}
+
+      - name: Derive programme state read-only
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          python3 api/scripts/governance/program_orchestrator.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/program-director.json \
+            | tee out/program-director.log
+
+      - name: Publish programme summary
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+
+          p=Path("out/program-director.json")
+          print("## AfricaFunds Programme Director")
+          print()
+          print("- mode: DERIVED_READ_ONLY")
+          print("- task authority: .governance/loop/task-queue.json")
+          print("- second queue created: NO")
+          if not p.exists():
+              print("- result: NO_REPORT")
+              raise SystemExit(0)
+          data=json.loads(p.read_text(encoding="utf-8"))
+          integ=data.get("integrity",{})
+          print("- integrity:",integ.get("status"))
+          fs=data.get("fund_state",{})
+          print("- API SHA:",fs.get("API_SHA"))
+          print("- frontend SHA:",fs.get("FRONTEND_SHA"))
+          op=data.get("operational_priority",{})
+          print("- operational priority:",op.get("task_id"),op.get("phase"),op.get("status"))
+          print("- ready:",", ".join(data.get("ready",[])) or "none")
+          print("- running:",", ".join(data.get("running",[])) or "none")
+          print("- waiting for evidence:",", ".join(data.get("waiting_for_evidence",[])) or "none")
+          print("- blocked count:",len(data.get("blocked",[])))
+          print("- parallel candidates (dependency-only):",", ".join(data.get("parallel_candidates_dependency_only",[])) or "none")
+          print()
+          print("### Dependency waves")
+          for row in data.get("dependency_waves",[]):
+              print("- wave",row.get("wave"),":",", ".join(row.get("task_ids",[])))
+          if integ.get("errors"):
+              print()
+              print("### Errors")
+              for e in integ["errors"]:
+                  print("-",e)
+          if integ.get("warnings"):
+              print()
+              print("### Warnings")
+              for e in integ["warnings"]:
+                  print("-",e)
+          PY
+
+      - name: Upload derived programme state
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-programme-director-${{ github.run_id }}
+          path: |
+            out/program-director.json
+            out/program-director.log
+          if-no-files-found: warn
+          retention-days: 30
