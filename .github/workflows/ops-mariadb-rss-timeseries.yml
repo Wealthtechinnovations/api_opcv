@@ -7,7 +7,10 @@ on:
     - cron: '17 * * * *'
     # Encadre le cron Nigeria du lundi 10:00 UTC, deja proche de deux OOM.
     - cron: '55 9 * * 1'
-    - cron: '5 10 * * 1'
+    - cron: '1,3,5 10 * * 1'
+    # Encadre le daily update de 20:00 UTC en semaine.
+    - cron: '55 19 * * 1-5'
+    - cron: '1,3,5 20 * * 1-5'
   push:
     branches:
       - claude/code-review-improvements-ikvuj
@@ -87,6 +90,10 @@ jobs:
           TMP_TABLES=NA
           TMP_DISK_TABLES=NA
           MARIADB_UPTIME=NA
+          PREPARED_STMT_COUNT=NA
+          COM_STMT_PREPARE=NA
+          COM_STMT_EXECUTE=NA
+          COM_STMT_CLOSE=NA
           if [ -f .env ]; then
             DBU="$(grep -E '^DB_USER=' .env | head -1 | cut -d= -f2- | tr -d '\"' || true)"
             DBN="$(grep -E '^DB_NAME=' .env | head -1 | cut -d= -f2- | tr -d '\"' || true)"
@@ -100,12 +107,16 @@ jobs:
               TMP_TABLES="$(Q "SHOW GLOBAL STATUS LIKE 'Created_tmp_tables';" | awk '{print $2}' | tail -1 || true)"
               TMP_DISK_TABLES="$(Q "SHOW GLOBAL STATUS LIKE 'Created_tmp_disk_tables';" | awk '{print $2}' | tail -1 || true)"
               MARIADB_UPTIME="$(Q "SHOW GLOBAL STATUS LIKE 'Uptime';" | awk '{print $2}' | tail -1 || true)"
+              PREPARED_STMT_COUNT="$(Q "SHOW GLOBAL STATUS LIKE 'Prepared_stmt_count';" | awk '{print $2}' | tail -1 || true)"
+              COM_STMT_PREPARE="$(Q "SHOW GLOBAL STATUS LIKE 'Com_stmt_prepare';" | awk '{print $2}' | tail -1 || true)"
+              COM_STMT_EXECUTE="$(Q "SHOW GLOBAL STATUS LIKE 'Com_stmt_execute';" | awk '{print $2}' | tail -1 || true)"
+              COM_STMT_CLOSE="$(Q "SHOW GLOBAL STATUS LIKE 'Com_stmt_close';" | awk '{print $2}' | tail -1 || true)"
               echo '--- processlist grouped, query text excluded ---'
               Q "SELECT COALESCE(COMMAND,'?'),COALESCE(STATE,'?'),COUNT(*) FROM information_schema.PROCESSLIST GROUP BY COMMAND,STATE ORDER BY COUNT(*) DESC;" || true
             fi
           fi
 
-          echo "AF_RSS_SAMPLE ts=$TS mariadb_status=RUNNING pid=$PID process_uptime_s=${ETIMES:-0} rss_kb=${RSS_KB:-0} rssanon_kb=${ANON_KB:-0} private_dirty_kb=${DIRTY_KB:-0} swap_kb=${SWAP_KB:-0} cgroup_memory_bytes=${CG_CURRENT:-NA} mariadb_memory_used_bytes=${MEM_USED:-NA} mariadb_uptime_s=${MARIADB_UPTIME:-NA} threads_connected=${THREADS_CONNECTED:-NA} threads_running=${THREADS_RUNNING:-NA} connections_total=${CONNECTIONS:-NA} tmp_tables=${TMP_TABLES:-NA} tmp_disk_tables=${TMP_DISK_TABLES:-NA}"
+          echo "AF_RSS_SAMPLE ts=$TS mariadb_status=RUNNING pid=$PID process_uptime_s=${ETIMES:-0} rss_kb=${RSS_KB:-0} rssanon_kb=${ANON_KB:-0} private_dirty_kb=${DIRTY_KB:-0} swap_kb=${SWAP_KB:-0} cgroup_memory_bytes=${CG_CURRENT:-NA} mariadb_memory_used_bytes=${MEM_USED:-NA} mariadb_uptime_s=${MARIADB_UPTIME:-NA} prepared_stmt_count=${PREPARED_STMT_COUNT:-NA} com_stmt_prepare=${COM_STMT_PREPARE:-NA} com_stmt_execute=${COM_STMT_EXECUTE:-NA} com_stmt_close=${COM_STMT_CLOSE:-NA} threads_connected=${THREADS_CONNECTED:-NA} threads_running=${THREADS_RUNNING:-NA} connections_total=${CONNECTIONS:-NA} tmp_tables=${TMP_TABLES:-NA} tmp_disk_tables=${TMP_DISK_TABLES:-NA}"
 
           echo '--- cron commands last 70 minutes ---'
           journalctl -u cron --since '70 minutes ago' --no-pager -o short-iso 2>/dev/null | grep -E 'CRON.*CMD.*(africafunds|fundafrica|cron_|sync_production)' | tail -80 || true
