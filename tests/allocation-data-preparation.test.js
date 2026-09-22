@@ -6,6 +6,7 @@ const {
   normalizeRiskFree,
   prepareAllocationData,
 } = require('../src/services/allocation/data/preparation');
+const { createAllocationDataProvider } = require('../src/services/allocation/data/provider');
 
 function isoDate(date) {
   return date.toISOString().slice(0, 10);
@@ -312,3 +313,90 @@ describe('Allocation data preparation — quality gates', () => {
     });
   });
 });
+
+describe('Allocation data provider — Fund Master et fenetre SQL', () => {
+  const Op = {
+    in: Symbol('in'),
+    gte: Symbol('gte'),
+    lte: Symbol('lte'),
+  };
+
+  test('charge Fund Master actif et valorisations sans limit=500', async () => {
+    const calls = { funds: null, valuations: null };
+
+    const fundModel = {
+      findAll: jest.fn(async options => {
+        calls.funds = options;
+        return [
+          { id: 1, nom_fond: 'Fund 1', active: 1, periodicite: 'Mensuelle', dev_libelle: 'XOF' },
+          { id: 2, nom_fond: 'Fund 2', active: 1, periodicite: 'Mensuelle', dev_libelle: 'XOF' },
+        ];
+      }),
+    };
+
+    const valuationModel = {
+      findAll: jest.fn(async options => {
+        calls.valuations = options;
+        return [
+          { fund_id: 1, date: '2025-01-31', value: 100, vl_ajuste: 100 },
+          { fund_id: 2, date: '2025-01-31', value: 200, vl_ajuste: 200 },
+        ];
+      }),
+    };
+
+    const provider = createAllocationDataProvider({
+      fundModel,
+      valuationModel,
+      Op,
+    });
+
+    const result = await provider.load({
+      fundIds: [2, 1, 2],
+      dateFrom: '2024-01-01',
+      dateTo: '2025-12-31',
+    });
+
+    expect(calls.funds.where.active).toBe(1);
+    expect(calls.funds.where.id[Op.in]).toEqual([2, 1]);
+    expect(calls.funds.limit).toBeUndefined();
+
+    expect(calls.valuations.where.fund_id[Op.in]).toEqual([2, 1]);
+    expect(calls.valuations.where.date[Op.gte]).toBe('2024-01-01');
+    expect(calls.valuations.where.date[Op.lte]).toBe('2025-12-31');
+    expect(calls.valuations.limit).toBeUndefined();
+    expect(calls.valuations.order).toEqual([
+      ['fund_id', 'ASC'],
+      ['date', 'ASC'],
+    ]);
+
+    expect(result.funds.map(fund => fund.id)).toEqual([2, 1]);
+    expect(result.valuations_by_fund['1']).toHaveLength(1);
+    expect(result.valuations_by_fund['2']).toHaveLength(1);
+    expect(result.query_contract.no_limit_500).toBe(true);
+    expect(result.query_contract.limit).toBeNull();
+  });
+
+  test('refuse un fonds absent ou inactif du Fund Master', async () => {
+    const provider = createAllocationDataProvider({
+      fundModel: {
+        findAll: jest.fn(async () => [
+          { id: 1, active: 1 },
+        ]),
+      },
+      valuationModel: {
+        findAll: jest.fn(async () => []),
+      },
+      Op,
+    });
+
+    await expect(provider.loadFundMaster([1, 2])).rejects.toEqual(expect.objectContaining({
+      errors: expect.arrayContaining([
+        expect.objectContaining({
+          code: 'FUND_NOT_ACTIVE_OR_MISSING',
+          meta: { fund_ids: [2] },
+        }),
+      ]),
+    }));
+  });
+});
+
