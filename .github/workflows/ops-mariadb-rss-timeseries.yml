@@ -1,0 +1,136 @@
+name: DIAG — MariaDB RSS time series (read-only)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Baseline horaire, volontairement décalee des heures pleines.
+    - cron: '17 * * * *'
+    # Encadre le cron Nigeria du lundi 10:00 UTC, deja proche de deux OOM.
+    - cron: '55 9 * * 1'
+    - cron: '5 10 * * 1'
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/ops-mariadb-rss-timeseries.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ops-mariadb-rss-timeseries
+  cancel-in-progress: false
+
+jobs:
+  sample:
+    name: Sample MariaDB RSS without mutation
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets SSH
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$HOST" || { echo '::error::S2_HOST missing'; exit 10; }
+          test -n "$KEY" || { echo '::error::S2_SSH_KEY missing'; exit 11; }
+
+      - name: Preparer SSH epingle
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Echantillonner MariaDB
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          cat > /tmp/af-mariadb-rss-sample.sh <<'REMOTE'
+          set -u
+          cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api || exit 3
+          TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          echo "AF_RSS_OBSERVATION ts=$TS operation=READ_ONLY"
+          systemctl show mariadb -p ActiveState -p SubState -p Result -p NRestarts -p Restart -p ExecMainPID -p ExecMainStartTimestamp -p MemoryCurrent 2>/dev/null || true
+          PID="$(pgrep -xo mariadbd 2>/dev/null || true)"
+          if [ -z "${PID:-}" ]; then
+            echo "AF_RSS_SAMPLE ts=$TS mariadb_status=ABSENT"
+            echo '--- service events last 90 minutes ---'
+            journalctl -u mariadb --since '90 minutes ago' --no-pager -o short-iso 2>/dev/null | tail -80 || true
+            echo '--- kernel OOM last 90 minutes ---'
+            journalctl -k --since '90 minutes ago' --no-pager -o short-iso 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' | tail -40 || true
+            exit 20
+          fi
+
+          RSS_KB="$(awk '/^VmRSS:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+          ANON_KB="$(awk '/^RssAnon:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+          SWAP_KB="$(awk '/^VmSwap:/ {print $2}' /proc/$PID/status 2>/dev/null || echo 0)"
+          DIRTY_KB="$(awk '/^Private_Dirty:/ {print $2}' /proc/$PID/smaps_rollup 2>/dev/null || echo 0)"
+          ETIMES="$(ps -o etimes= -p "$PID" 2>/dev/null | tr -d ' ' || echo 0)"
+          CG_CURRENT="$(cat /sys/fs/cgroup/system.slice/mariadb.service/memory.current 2>/dev/null || echo NA)"
+
+          MEM_USED=NA
+          THREADS_CONNECTED=NA
+          THREADS_RUNNING=NA
+          CONNECTIONS=NA
+          TMP_TABLES=NA
+          TMP_DISK_TABLES=NA
+          MARIADB_UPTIME=NA
+          if [ -f .env ]; then
+            DBU="$(grep -E '^DB_USER=' .env | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+            DBN="$(grep -E '^DB_NAME=' .env | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+            DBP="$(grep -E '^DB_PASSWORD=' .env | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+            if [ -n "${DBU:-}" ] && [ -n "${DBP:-}" ]; then
+              Q() { MYSQL_PWD="$DBP" mysql -N -B -u "$DBU" "${DBN:-fund_opcvm}" -e "$1" 2>/dev/null; }
+              MEM_USED="$(Q "SHOW GLOBAL STATUS LIKE 'Memory_used';" | awk '{print $2}' | tail -1 || true)"
+              THREADS_CONNECTED="$(Q "SHOW GLOBAL STATUS LIKE 'Threads_connected';" | awk '{print $2}' | tail -1 || true)"
+              THREADS_RUNNING="$(Q "SHOW GLOBAL STATUS LIKE 'Threads_running';" | awk '{print $2}' | tail -1 || true)"
+              CONNECTIONS="$(Q "SHOW GLOBAL STATUS LIKE 'Connections';" | awk '{print $2}' | tail -1 || true)"
+              TMP_TABLES="$(Q "SHOW GLOBAL STATUS LIKE 'Created_tmp_tables';" | awk '{print $2}' | tail -1 || true)"
+              TMP_DISK_TABLES="$(Q "SHOW GLOBAL STATUS LIKE 'Created_tmp_disk_tables';" | awk '{print $2}' | tail -1 || true)"
+              MARIADB_UPTIME="$(Q "SHOW GLOBAL STATUS LIKE 'Uptime';" | awk '{print $2}' | tail -1 || true)"
+              echo '--- processlist grouped, query text excluded ---'
+              Q "SELECT COALESCE(COMMAND,'?'),COALESCE(STATE,'?'),COUNT(*) FROM information_schema.PROCESSLIST GROUP BY COMMAND,STATE ORDER BY COUNT(*) DESC;" || true
+            fi
+          fi
+
+          echo "AF_RSS_SAMPLE ts=$TS mariadb_status=RUNNING pid=$PID process_uptime_s=${ETIMES:-0} rss_kb=${RSS_KB:-0} rssanon_kb=${ANON_KB:-0} private_dirty_kb=${DIRTY_KB:-0} swap_kb=${SWAP_KB:-0} cgroup_memory_bytes=${CG_CURRENT:-NA} mariadb_memory_used_bytes=${MEM_USED:-NA} mariadb_uptime_s=${MARIADB_UPTIME:-NA} threads_connected=${THREADS_CONNECTED:-NA} threads_running=${THREADS_RUNNING:-NA} connections_total=${CONNECTIONS:-NA} tmp_tables=${TMP_TABLES:-NA} tmp_disk_tables=${TMP_DISK_TABLES:-NA}"
+
+          echo '--- cron commands last 70 minutes ---'
+          journalctl -u cron --since '70 minutes ago' --no-pager -o short-iso 2>/dev/null | grep -E 'CRON.*CMD.*(africafunds|fundafrica|cron_|sync_production)' | tail -80 || true
+          echo '--- recent MariaDB lifecycle/OOM signals ---'
+          journalctl -u mariadb --since '70 minutes ago' --no-pager -o short-iso 2>/dev/null | grep -iE 'Started|Stopped|Failed|killed|oom|ready for connections' | tail -60 || true
+          journalctl -k --since '70 minutes ago' --no-pager -o short-iso 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' | tail -40 || true
+          echo '--- latest cron log mtimes ---'
+          find /var/log -maxdepth 1 -type f \( -name 'africafunds_nigeria*.log' -o -name 'africafunds_daily*.log' -o -name 'cron_eur_usd.log' -o -name 'cron_tunisie.log' -o -name 'cron_brvm.log' -o -name 'cron_indices_daily.log' \) -printf '%TY-%Tm-%TdT%TH:%TM:%TSZ %s %f\n' 2>/dev/null | sort | tail -20 || true
+          echo 'AF_RSS_OBSERVATION_END mutation=NONE'
+          REMOTE
+
+          AFRICAFUNDS_SSH_OPERATION_CLASS=READ_ONLY \
+            bash scripts/governance/s2_ssh_readonly_retry.sh \
+              "$SSH_USER@$HOST" 'bash -s' /tmp/af-mariadb-rss-sample.sh \
+              | tee mariadb-rss-sample.txt
+
+      - name: Conserver la preuve de run
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mariadb-rss-sample-${{ github.run_id }}
+          path: mariadb-rss-sample.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
