@@ -38,7 +38,9 @@ jobs:
         run: npm ci --ignore-scripts
 
       - name: Syntax check allocation data preparation
-        run: node --check src/services/allocation/data/preparation.js
+        run: |
+          node --check src/services/allocation/data/preparation.js
+          node --check src/services/allocation/data/provider.js
 
       - name: Run deterministic allocation data tests
         run: npx jest tests/allocation-data-preparation.test.js --runInBand --forceExit
