@@ -50,6 +50,14 @@ def main():
 
     director=queue.get("programme_director") or {}
     claims=queue.get("surface_claims_contract") or {}
+    programme_tasks=[
+        t for t in queue.get("tasks",[])
+        if t.get("program")=="PROGRAMME_DIRECTOR" and t.get("status")=="IN_PROGRESS"
+    ]
+    programme_tasks.sort(key=lambda t:t.get("id",""))
+    programme=programme_tasks[-1] if programme_tasks else {}
+    programme_id=programme.get("id")
+    programme_phase=programme.get("phase")
 
     checks=[]
 
@@ -68,23 +76,24 @@ def main():
     check("NEXT_ACTION",api/"NEXT_ACTION.md",next_text,[
         op_id,
         op_phase,
+        programme_id,
         director.get("anti_regression_contract"),
     ])
 
     cur_text=(api/"CURRENT_ITERATION.md").read_text(encoding="utf-8",errors="replace")
     cur_current=current_section(cur_text,["### Historique conservé"])
-    check("CURRENT_ITERATION",api/"CURRENT_ITERATION.md",cur_current,[op_id,op_phase])
+    check("CURRENT_ITERATION",api/"CURRENT_ITERATION.md",cur_current,[op_id,op_phase,programme_id,programme_phase])
 
     loop_text=(api/"LOOP_STATE.md").read_text(encoding="utf-8",errors="replace")
     loop_current=current_section(loop_text,["### Historique conservé"])
-    check("LOOP_STATE",api/"LOOP_STATE.md",loop_current,[op_id,op_phase])
+    check("LOOP_STATE",api/"LOOP_STATE.md",loop_current,[op_id,op_phase,programme_id,programme_phase])
 
     handoff_text=(api/"HANDOFF.md").read_text(encoding="utf-8",errors="replace")
     handoff_current=current_section(handoff_text,["## Point de reprise courant — clôture","### Historique conservé"])
-    check("HANDOFF",api/"HANDOFF.md",handoff_current,[op_id,op_phase])
+    check("HANDOFF",api/"HANDOFF.md",handoff_current,[op_id,op_phase,programme_id])
 
     status_text=(api/"STATUS.md").read_text(encoding="utf-8",errors="replace")
-    check("STATUS",api/"STATUS.md",status_text,[op_id,op_phase])
+    check("STATUS",api/"STATUS.md",status_text,[op_id,op_phase,programme_id])
 
     suivi_text=(front/"SUIVI.md").read_text(encoding="utf-8",errors="replace")
     suivi_current=current_section(suivi_text,["\n## POINT DE REPRISE COURANT — 2026-09-22 — AF-OPS-003 RCA resserrée"])
@@ -92,7 +101,7 @@ def main():
         op_id,
         op_phase,
         "AF-EVD-063",
-        "active_claim_count = 1",
+        programme_id,
     ])
 
     # Machine-readable handoff must agree with the queue before prose is trusted.
