@@ -130,7 +130,7 @@ jobs:
           for LOG in "/var/log/africafunds_daily_${TODAY}.log" "/var/log/africafunds_nigeria_${TODAY}.log" /var/log/cron_eur_usd.log; do
             if [ -r "$LOG" ]; then
               echo "### $LOG"
-              tail -35 "$LOG" 2>/dev/null || true
+              tail -160 "$LOG" 2>/dev/null || true
             fi
           done
           echo '--- recent MariaDB lifecycle/OOM signals ---'
