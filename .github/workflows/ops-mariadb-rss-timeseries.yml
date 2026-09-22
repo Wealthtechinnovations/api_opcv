@@ -109,6 +109,19 @@ jobs:
 
           echo '--- cron commands last 70 minutes ---'
           journalctl -u cron --since '70 minutes ago' --no-pager -o short-iso 2>/dev/null | grep -E 'CRON.*CMD.*(africafunds|fundafrica|cron_|sync_production)' | tail -80 || true
+          echo '--- active AfricaFunds batch/process inventory ---'
+          ps -eo pid=,ppid=,etimes=,rss=,cmd= 2>/dev/null \
+            | grep -E '(cron_daily_update|cron_nigeria_weekly|cron_daily_eur_usd|recalc_|saveperf|classement|processFundmysql|node app\.js|npm start)' \
+            | grep -vE '(grep -E|af-mariadb-rss-sample)' \
+            | tail -80 || true
+          echo '--- tails des journaux de batch actifs/recents ---'
+          TODAY="$(date -u '+%Y%m%d')"
+          for LOG in "/var/log/africafunds_daily_${TODAY}.log" "/var/log/africafunds_nigeria_${TODAY}.log" /var/log/cron_eur_usd.log; do
+            if [ -r "$LOG" ]; then
+              echo "### $LOG"
+              tail -35 "$LOG" 2>/dev/null || true
+            fi
+          done
           echo '--- recent MariaDB lifecycle/OOM signals ---'
           journalctl -u mariadb --since '70 minutes ago' --no-pager -o short-iso 2>/dev/null | grep -iE 'Started|Stopped|Failed|killed|oom|ready for connections' | tail -60 || true
           journalctl -k --since '70 minutes ago' --no-pager -o short-iso 2>/dev/null | grep -iE 'out of memory|oom-kill|killed process' | tail -40 || true
