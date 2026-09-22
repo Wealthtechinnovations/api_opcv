@@ -612,6 +612,148 @@ def cross_vhost_db_forensics():
         "secret_values_exposed": False,
     }
 
+
+def allocation_runtime():
+    """Read-only evidence for AF-TASK-012 Allocation / Robot Advisor runtime mapping."""
+    target_ports = (3005, 5000, 5001, 7001)
+    listeners = []
+    ss = run(["ss", "-ltnp"], timeout=10) if shutil.which("ss") else {"code": 127, "stdout": "", "stderr": "ss unavailable"}
+    if ss["code"] == 0:
+        for line in ss["stdout"].splitlines():
+            if not any(re.search(rf":{port}\b", line) for port in target_ports):
+                continue
+            pids = sorted({int(pid) for pid in re.findall(r"pid=(\d+)", line)})
+            processes = []
+            for pid in pids:
+                proc = Path(f"/proc/{pid}")
+                try:
+                    cwd = os.readlink(proc / "cwd")
+                except Exception:
+                    cwd = None
+                try:
+                    exe = os.readlink(proc / "exe")
+                except Exception:
+                    exe = None
+                try:
+                    comm = (proc / "comm").read_text(encoding="utf-8", errors="ignore").strip()
+                except Exception:
+                    comm = None
+                try:
+                    cmdline = (proc / "cmdline").read_bytes().replace(b"\0", b" ").decode("utf-8", errors="ignore").strip()
+                except Exception:
+                    cmdline = ""
+                try:
+                    cgroup = (proc / "cgroup").read_text(encoding="utf-8", errors="ignore").strip()
+                except Exception:
+                    cgroup = ""
+                processes.append({
+                    "pid": pid,
+                    "comm": comm,
+                    "cwd": cwd,
+                    "exe": exe,
+                    "cmdline": sanitize(cmdline)[:1200],
+                    "cgroup": sanitize(cgroup)[:1200],
+                })
+            listeners.append({
+                "listener": sanitize(line)[:1600],
+                "processes": processes,
+            })
+
+    frontend_python_urls = []
+    for env_path in [
+        FRONT / ".env",
+        FRONT / ".env.local",
+        FRONT / ".env.production",
+        FRONT / ".env.production.local",
+        FRONT / ".env.production.plan-b",
+    ]:
+        if not env_path.exists() or not env_path.is_file():
+            continue
+        try:
+            for line in env_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+                text = line.strip()
+                if not text or text.startswith("#") or "=" not in text:
+                    continue
+                key, value = text.split("=", 1)
+                if key.strip() == "NEXT_PUBLIC_PYTHON_API_URL":
+                    frontend_python_urls.append({
+                        "path": str(env_path),
+                        "value": sanitize(value.strip().strip("\"'"))[:500],
+                    })
+        except Exception as exc:
+            frontend_python_urls.append({
+                "path": str(env_path),
+                "error": f"{type(exc).__name__}: {exc}",
+            })
+
+    nginx_matches = []
+    nginx_roots = [
+        Path("/var/www/vhosts/system/africafunds.chainsolutions.fr/conf"),
+        Path("/etc/nginx"),
+    ]
+    inspected = 0
+    for root in nginx_roots:
+        if not root.exists():
+            continue
+        try:
+            candidates = sorted(p for p in root.rglob("*") if p.is_file())
+        except Exception:
+            continue
+        for path in candidates:
+            if inspected >= 350:
+                break
+            inspected += 1
+            try:
+                if path.stat().st_size > 2_000_000:
+                    continue
+                lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
+            except Exception:
+                continue
+            for i, line in enumerate(lines):
+                low = line.lower()
+                target_proxy = "proxy_pass" in low and any(f":{port}" in low for port in target_ports)
+                if "/python" not in low and not target_proxy:
+                    continue
+                start = max(0, i - 2)
+                end = min(len(lines), i + 8)
+                snippet = "\n".join(sanitize(x)[:900] for x in lines[start:end])
+                nginx_matches.append({
+                    "path": str(path),
+                    "line": i + 1,
+                    "snippet": snippet[:7000],
+                })
+                if len(nginx_matches) >= 40:
+                    break
+            if len(nginx_matches) >= 40:
+                break
+        if len(nginx_matches) >= 40:
+            break
+
+    probes = [
+        http_probe("https://africafunds.chainsolutions.fr/python/efficient-frontier"),
+        http_probe("http://127.0.0.1:5000/efficient-frontier"),
+        http_probe("http://127.0.0.1:5001/efficient-frontier"),
+        http_probe("http://127.0.0.1:7001/efficient-frontier"),
+        http_probe("http://127.0.0.1:3005/api/robotadvisor/fonds"),
+    ]
+
+    return {
+        "target_task": "AF-TASK-012",
+        "listeners": listeners,
+        "frontend_python_urls": frontend_python_urls,
+        "nginx_matches": nginx_matches,
+        "http_get_probes": probes,
+        "probe_semantics": {
+            "efficient_frontier_405": "HTTP endpoint exists but GET is not allowed; compatible with a POST-only route.",
+            "efficient_frontier_404": "No matching GET route at the probed target; does not by itself prove process absence.",
+            "robotadvisor_404": "Monolith does not expose the historical route at this path.",
+            "robotadvisor_500": "Historical route may be mounted but the intentionally incomplete read-only GET lacks required ids.",
+        },
+        "read_only": True,
+        "production_mutation_performed": False,
+        "secret_values_exposed": False,
+    }
+
 def runtime_snapshot():
     p = Path("/var/lib/fundafrica/runtime/PRODUCTION_STATE.json")
     out = {"path": str(p), "exists": p.exists()}
@@ -657,6 +799,7 @@ def main():
         "db_credential_consumers_inventory": db_credential_consumers_inventory(),
         "duplicate_env_inventory": duplicate_env_inventory(),
         "cross_vhost_db_forensics": cross_vhost_db_forensics(),
+        "allocation_runtime": allocation_runtime(),
         "http": [
             http_probe("https://africafunds.chainsolutions.fr/"),
             http_probe("https://africafunds.chainsolutions.fr/home"),
