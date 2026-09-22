@@ -251,7 +251,7 @@ describe('Allocation data preparation — covariance', () => {
 });
 
 describe('Allocation data preparation — quality gates', () => {
-  test('une base GBP est bloquee tant que le FX engine explicite n existe pas', () => {
+  test('une base non native exige sa paire FX historique explicite', () => {
     const funds = [
       { id: 1, periodicite: 'Mensuelle' },
       { id: 2, periodicite: 'Mensuelle' },
@@ -264,11 +264,52 @@ describe('Allocation data preparation — quality gates', () => {
       }),
       funds,
       valuations_by_fund: { 1: rows, 2: rows },
+      fx_rows: [],
     })).toThrow(expect.objectContaining({
       errors: expect.arrayContaining([
-        expect.objectContaining({ code: 'BASE_CURRENCY_REQUIRES_FX_ENGINE' }),
+        expect.objectContaining({
+          code: 'FX_PAIR_REQUIRED',
+          meta: { pair: 'EUR/GBP' },
+        }),
       ]),
     }));
+  });
+
+  test('convertit une base MAD via la paire EUR/MAD existante', () => {
+    const funds = [
+      { id: 1, periodicite: 'Mensuelle' },
+      { id: 2, periodicite: 'Mensuelle' },
+    ];
+    const rowsA = monthlyRows({ count: 48, monthlyReturn: 0.01 });
+    const rowsB = monthlyRows({ count: 48, monthlyReturn: 0.005 });
+
+    const fxRows = [];
+    for (const row of rowsA) {
+      fxRows.push({
+        paire: 'EUR/MAD',
+        date: row.date,
+        value: 10 + fxRows.length * 0.001,
+      });
+    }
+
+    const prepared = prepareAllocationData({
+      request: request({
+        universe: { base_currency: 'MAD' },
+      }),
+      funds,
+      valuations_by_fund: { 1: rowsA, 2: rowsB },
+      fx_rows: fxRows,
+    });
+
+    expect(prepared.universe.base_currency).toBe('MAD');
+    expect(prepared.provenance.conversion_mode).toBe('EUR_CROSS');
+    expect(prepared.provenance.fx).toEqual({
+      pair: 'EUR/MAD',
+      type: 'HISTORICAL_DEVISedechanges',
+    });
+    expect(prepared.statistics.returns_matrix[0]).toHaveLength(
+      prepared.quality.return_observations
+    );
   });
 
   test('un historique trop court est bloque avant optimisation', () => {
