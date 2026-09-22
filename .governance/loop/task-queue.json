@@ -465,8 +465,8 @@
       "id": "AF-TASK-013",
       "program_id": "AF-ALLOC-001",
       "title": "Allocation — contrat API canonique, validation d'entrée, authentification et ownership",
-      "status": "IN_PROGRESS",
-      "phase": "API_CONTRACT_IMPLEMENTATION",
+      "status": "DONE",
+      "phase": "API_CONTRACT_STABLE",
       "depends_on": [
         "AF-TASK-012"
       ],
@@ -480,7 +480,7 @@
         "Les routes de sauvegarde/simulation appliquent authentification et contrôle d'ownership adaptés.",
         "Les anciennes routes restent compatibles tant que la migration n'est pas certifiée."
       ],
-      "next_action": "Finaliser le contrat V2 Node/JavaScript et ses tests de validation/ownership; ne brancher aucun solveur avant GREEN.",
+      "next_action": "AF-TASK-016 peut désormais consommer le contrat V2 stable; les pages legacy seront migrées progressivement sans réactivation des anciens solveurs.",
       "stream": "PRODUCT",
       "program": "ALLOCATION",
       "priority": "P1",
@@ -504,7 +504,7 @@
       "python_policy": "LEGACY_REFERENCE_ONLY_NOT_RUNTIME",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
-        "status": "ACTIVE",
+        "status": "RELEASED",
         "claimed_at": "2026-09-22T21:55:00Z",
         "base_api_sha": "3ae4446fd8dda0fb4df2b090157d5e74333186d2",
         "base_frontend_sha": "4700665bce1fafd8e0a4b9fa86d2fa4e598e1b90",
@@ -523,7 +523,8 @@
           "tests/allocation-simulation.test.js",
           "src/lib/allocation.ts",
           ".github/workflows/governance-allocation-client.yml"
-        ]
+        ],
+        "released_at": "2026-09-22T22:18:00Z"
       },
       "touched_surfaces": [
         "src/services/allocation/contract.js",
@@ -536,14 +537,24 @@
         "tests/allocation-simulation.test.js",
         "src/lib/allocation.ts",
         ".github/workflows/governance-allocation-client.yml"
-      ]
+      ],
+      "completed_at": "2026-09-22T22:18:00Z",
+      "completion_evidence": {
+        "api_contract_workflow_run_id": 35791124146,
+        "api_contract_conclusion": "success",
+        "frontend_contract_workflow_run_id": 35791446456,
+        "frontend_contract_conclusion": "success",
+        "implementation_language": "NODE_JAVASCRIPT",
+        "python_runtime_used": false,
+        "production_deployed": false
+      }
     },
     {
       "id": "AF-TASK-014",
       "program_id": "AF-ALLOC-001",
       "title": "Allocation — moteur canonique de préparation des données quantitatives",
-      "status": "IN_PROGRESS",
-      "phase": "DATA_PREPARATION_IMPLEMENTATION",
+      "status": "DONE_WITH_EXTERNAL_GAPS",
+      "phase": "DATA_PREPARATION_CONTRACT_STABLE",
       "depends_on": [
         "AF-TASK-012"
       ],
@@ -565,7 +576,7 @@
         "La certification sur données live reste bloquée par les gaps pertinents de AF-OPS-007/008/009.",
         "Les unités rendement/volatilité/covariance/taux sans risque sont cohérentes et testées."
       ],
-      "next_action": "Construire le Data Preparation Engine Node/JavaScript avec horizons explicites, resampling par période, Total Return LOCAL/EUR/USD, qualité, rendements et covariance testés; aucun limit=500.",
+      "next_action": "AF-TASK-016 peut utiliser le moteur déterministe; la certification live reste explicitement conditionnée aux gates AF-OPS-007/008/009.",
       "stream": "PRODUCT",
       "program": "ALLOCATION",
       "priority": "P1",
@@ -589,7 +600,7 @@
       "python_policy": "NO_PYTHON_RUNTIME_ENGINE",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
-        "status": "ACTIVE",
+        "status": "RELEASED",
         "claimed_at": "2026-09-22T22:07:00Z",
         "base_api_sha": "5cedf146dd418a5cb842d90e27b5f70d37c15327",
         "base_frontend_sha": "4700665bce1fafd8e0a4b9fa86d2fa4e598e1b90",
@@ -600,13 +611,30 @@
           "src/services/allocation/data/**",
           "tests/allocation-data-preparation.test.js",
           ".github/workflows/governance-allocation-data.yml"
-        ]
+        ],
+        "released_at": "2026-09-22T22:18:00Z"
       },
       "touched_surfaces": [
         "src/services/allocation/data/**",
         "tests/allocation-data-preparation.test.js",
         ".github/workflows/governance-allocation-data.yml"
-      ]
+      ],
+      "completed_at": "2026-09-22T22:18:00Z",
+      "completion_evidence": {
+        "data_preparation_workflow_run_id": 35791298711,
+        "data_preparation_conclusion": "success",
+        "implementation_language": "NODE_JAVASCRIPT",
+        "fund_master_reused": true,
+        "valuation_table_reused": true,
+        "forex_service_reused": true,
+        "no_limit_500": true,
+        "live_certification_gates": [
+          "AF-OPS-007",
+          "AF-OPS-008",
+          "AF-OPS-009"
+        ],
+        "production_deployed": false
+      }
     },
     {
       "id": "AF-TASK-015",
@@ -634,8 +662,8 @@
       "id": "AF-TASK-016",
       "program_id": "AF-ALLOC-001",
       "title": "Allocation — adapter canonique et stratégies d'optimisation multi-méthodes",
-      "status": "OPEN",
-      "phase": "DEPENDENCY_GATED",
+      "status": "IN_PROGRESS",
+      "phase": "CANONICAL_NODE_ENGINE_IMPLEMENTATION",
       "depends_on": [
         "AF-TASK-013",
         "AF-TASK-014"
@@ -652,9 +680,29 @@
         "Chaque stratégie a des entrées/sorties communes et des tests déterministes.",
         "Les erreurs de convergence et matrices invalides produisent des warnings/erreurs structurés, jamais un résultat silencieux."
       ],
-      "next_action": "Implémenter d'abord l'adapter et les baselines Equal Weight/GMV/ERC avec tests avant d'élargir les stratégies.",
+      "next_action": "Construire l'adapter Node/JavaScript autour de portfolio-allocation@0.0.11, avec sorties communes, métriques déterministes et tests pour Equal Weight, Inverse Vol, GMV, ERC, Max Diversification, Max Sharpe, Mean-Variance et Minimum Correlation.",
       "implementation_language": "NODE_JAVASCRIPT",
-      "python_policy": "NO_PYTHON_RUNTIME_ENGINE"
+      "python_policy": "NO_PYTHON_RUNTIME_ENGINE",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-22T22:18:00Z",
+        "base_api_sha": "3fb7cf5833f8983ef14f7e50db362cdc44e2bf60",
+        "base_frontend_sha": "bb6e9b7a85a3484b6318a785b8452eeb4440da28",
+        "repository_roles": [
+          "API"
+        ],
+        "touched_surfaces": [
+          "src/services/allocation/engine/**",
+          "tests/allocation-engine.test.js",
+          ".github/workflows/governance-allocation-engine.yml"
+        ]
+      },
+      "touched_surfaces": [
+        "src/services/allocation/engine/**",
+        "tests/allocation-engine.test.js",
+        ".github/workflows/governance-allocation-engine.yml"
+      ]
     },
     {
       "id": "AF-TASK-017",
