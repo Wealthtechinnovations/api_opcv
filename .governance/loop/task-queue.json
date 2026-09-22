@@ -513,12 +513,14 @@
         ],
         "touched_surfaces": [
           "src/services/allocation/**",
-          "tests/allocation-contract.test.js"
+          "tests/allocation-contract.test.js",
+          ".github/workflows/governance-allocation-contract.yml"
         ]
       },
       "touched_surfaces": [
         "src/services/allocation/**",
-        "tests/allocation-contract.test.js"
+        "tests/allocation-contract.test.js",
+        ".github/workflows/governance-allocation-contract.yml"
       ]
     },
     {
