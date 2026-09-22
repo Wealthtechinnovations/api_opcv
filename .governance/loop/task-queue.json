@@ -1025,8 +1025,8 @@
     {
       "id": "AF-TASK-025",
       "title": "Programme Directeur — générateur déterministe des projections humaines",
-      "status": "IN_PROGRESS",
-      "phase": "GENERATOR_DETERMINISM_GREEN",
+      "status": "DONE",
+      "phase": "GENERATOR_AND_SIMULATION_GREEN",
       "depends_on": [
         "AF-TASK-024"
       ],
@@ -1064,13 +1064,127 @@
         "PROJECTION_GENERATOR_IDEMPOTENCE"
       ],
       "next_transition": "GENERATOR_GREEN_THEN_WRITEBACK_GATE_REVIEW",
-      "next_action": "Simuler l'insertion/remplacement des blocs gérés dans des copies en mémoire uniquement, prouver diff borné et idempotence, sans write-back Git.",
+      "next_action": "AF-TASK-026 : préparer le write-back initial des blocs gérés avec preconditions exactes et rollback Git naturel, sans production/runtime.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
-        "status": "ACTIVE",
+        "status": "RELEASED",
         "claimed_at": "2026-09-22T22:45:00Z",
         "base_api_sha": "c6c0cbfac4ddbaf057d5c975457ec1b6d7507cf0",
         "base_frontend_sha": "c253c7ff379cd58d07d7b660c5517d2e3f859ec6",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ],
+        "released_at": "2026-09-22T23:43:39Z"
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ],
+      "progress_evidence": {
+        "generator_run_id": 35798266486,
+        "generator_determinism": "PASS",
+        "repository_write_performed": false,
+        "input_sha256": "f3edbd134b6b56b55216834e0db74f38638828d3f545fa5ba04d4b9f28d3c92e",
+        "writeback_candidate_count": 6,
+        "exact_present_count": 0,
+        "full_artifact_id": 10724234585,
+        "archived_file_count": 17,
+        "evidence_ref": "AF-EVD-065"
+      },
+      "completed_at": "2026-09-22T23:43:39Z",
+      "completion_evidence": {
+        "generator_run_id": 35798266486,
+        "generator_determinism": "PASS",
+        "repository_write_performed": false,
+        "input_sha256": "f3edbd134b6b56b55216834e0db74f38638828d3f545fa5ba04d4b9f28d3c92e",
+        "writeback_candidate_count": 6,
+        "exact_present_count": 0,
+        "full_artifact_id": 10724234585,
+        "archived_file_count": 17,
+        "evidence_ref": "AF-EVD-066",
+        "writeback_simulation_run_id": 35798774337,
+        "writeback_simulation_artifact_id": 10725017142,
+        "projection_count": 6,
+        "outside_content_preserved": true,
+        "second_apply_idempotent": true,
+        "marker_counts_valid": true
+      }
+    },
+    {
+      "id": "AF-TASK-026",
+      "title": "Programme Directeur — gate de write-back des blocs gérés",
+      "status": "IN_PROGRESS",
+      "phase": "WRITEBACK_GATE_PREFLIGHT",
+      "depends_on": [
+        "AF-TASK-025"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Préparer l'insertion initiale des blocs PROGRAMME_DIRECTOR dans les six vues courantes uniquement.",
+        "Recalculer les blocs depuis les autorités structurées au HEAD live immédiatement avant write.",
+        "Refuser le write si HEAD/API/frontend, marqueurs, contenu hors bloc ou claims ont dérivé.",
+        "Ne jamais réécrire les sections historiques ni déployer S2 pour cette évolution documentaire."
+      ],
+      "acceptance_criteria": [
+        "AF-EVD-065 et AF-EVD-066 prouvent déterminisme, diff borné et idempotence.",
+        "Les deux HEAD sont revalidés immédiatement avant chaque commit logique.",
+        "Le write-back ne modifie que l'insertion/remplacement d'un bloc borné par deux marqueurs uniques.",
+        "Le premier write-back est suivi d'un rerun Programme Director fail-closed et d'un second dry-run idempotent.",
+        "Tout conflit de claim ferme le gate."
+      ],
+      "definition_of_ready": [
+        "AF-TASK-025 DONE.",
+        "Projection drift fail-closed GREEN.",
+        "Writeback simulation PASS sur 6 vues.",
+        "Claims task-local actifs et sans conflit."
+      ],
+      "definition_of_done": [
+        "Managed blocks présents exactement une fois dans les 6 vues.",
+        "Outside-managed content inchangé par rapport au preflight.",
+        "Programme Director GREEN après write-back.",
+        "Second generator/simulator run indique exact managed blocks présents et writeback idempotent.",
+        "Checkpoint global SUIVI conserve l'historique."
+      ],
+      "evidence_required": [
+        "WRITEBACK_PREFLIGHT_EXACT_HEADS",
+        "INITIAL_MANAGED_BLOCK_INSERTION",
+        "POST_WRITEBACK_FAIL_CLOSED_GREEN",
+        "POST_WRITEBACK_IDEMPOTENCE"
+      ],
+      "next_transition": "MANAGED_BLOCKS_ACTIVE",
+      "next_action": "Réaligner les projections sur AF-TASK-026, rerun generator+simulator au nouvel état, puis effectuer seulement l'insertion bornée si tous les gates restent verts.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-22T23:44:30Z",
+        "base_api_sha": "03b0ff3c8dbba9c518f5564047afd44e19e72375",
+        "base_frontend_sha": "c4caa665f2add337824bb5d9c41b460a7da9fffa",
         "repository_roles": [
           "API",
           "FRONTEND"
@@ -1101,18 +1215,7 @@
         "HANDOFF.md",
         "STATUS.md",
         "SUIVI.md"
-      ],
-      "progress_evidence": {
-        "generator_run_id": 35798266486,
-        "generator_determinism": "PASS",
-        "repository_write_performed": false,
-        "input_sha256": "f3edbd134b6b56b55216834e0db74f38638828d3f545fa5ba04d4b9f28d3c92e",
-        "writeback_candidate_count": 6,
-        "exact_present_count": 0,
-        "full_artifact_id": 10724234585,
-        "archived_file_count": 17,
-        "evidence_ref": "AF-EVD-065"
-      }
+      ]
     }
   ],
   "programme_director": {
@@ -1164,11 +1267,15 @@
     "projection_drift_latest_evidence": "AF-EVD-064",
     "projection_drift_count": 0,
     "projection_machine_drift_count": 0,
-    "projection_generator": "ACTIVE_OBSERVE_ONLY_DETERMINISM_GREEN",
+    "projection_generator": "DONE_OBSERVE_ONLY_AF-TASK-025",
     "projection_generator_latest_run_id": 35798266486,
     "projection_generator_latest_evidence": "AF-EVD-065",
     "projection_generator_repository_write": false,
-    "projection_generator_candidate_count": 6
+    "projection_generator_candidate_count": 6,
+    "projection_writeback_simulation": "PASS_AF-EVD-066",
+    "projection_writeback_simulation_run_id": 35798774337,
+    "projection_writeback_simulation_repository_write": false,
+    "projection_writeback_gate": "ACTIVE_PREFLIGHT_AF-TASK-026"
   },
   "surface_claims_contract": {
     "mode": "OBSERVE_ONLY",
@@ -1176,11 +1283,11 @@
     "no_second_claim_registry": true,
     "validator": "scripts/governance/program_surface_claims.py",
     "workflow": ".github/workflows/governance-program-director.yml",
-    "latest_green_run_id": 35793007081,
-    "latest_evidence_ref": "AF-EVD-063",
-    "active_claim_count": 1,
+    "latest_green_run_id": 35798774337,
+    "latest_evidence_ref": "AF-EVD-066",
+    "active_claim_count": 2,
     "conflict_count": 0,
-    "surface_certified_parallel_pairs": 0,
+    "surface_certified_parallel_pairs": 1,
     "current_enforcement": "ADVISORY_ONLY_NO_WRITE_BLOCK",
     "task_local_claim_fields": [
       "owner",
@@ -1196,7 +1303,14 @@
     "release_rule": "CLAIMS_MUST_BE_RELEASED_OR_RECONCILED_AFTER_TASK_WRITE_COMPLETION",
     "parallel_certification_rule": "DEPENDENCY_CHECK_PLUS_NON_OVERLAPPING_ACTIVE_SURFACE_CLAIMS_REQUIRED",
     "active_claim_task_ids": [
-      "AF-TASK-017"
+      "AF-TASK-017",
+      "AF-TASK-026"
+    ],
+    "certified_parallel_pairs": [
+      [
+        "AF-TASK-017",
+        "AF-TASK-026"
+      ]
     ]
   }
 }
