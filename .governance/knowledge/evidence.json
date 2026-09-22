@@ -354,6 +354,30 @@
       "provenance": "doc-drift.yml -> docs/ETAT_PRODUCTION_VERIFIE.md @ 2026-09-16 11:15 UTC; commit 6967430ef9a9f39bda158400c0a7c002f9464cf3",
       "observed_at": "2026-09-16T11:15:00Z",
       "summary": "Production control measured 8/16 OK, 6 critical failures and 2 alerts. Critical: C2 orphan head performances (14 local, 23 EUR, 23 USD); C3 absurd recent performances (1141 143958% YTD, 1196 9339%, 2743 809%); C4 Nigeria and Tunisia both last VL 2026-08-28 (19 days old); C7 multiple mixed-scale VL series including Nigeria and UEMOA; C8 stale derived performances despite fresh VLs (MAROC 10/644 current, UEMOA 34/111). Alerts: C4/C6 CEMAC."
+    },
+    {
+      "id": "AF-EVD-053",
+      "type": "MARIADB_OOM_RECURRENCE",
+      "result": "SEVENTH_DOCUMENTED_OCCURRENCE_PROVEN_20260921",
+      "provenance": "GitHub Actions doc-drift run 35776765338; generated docs/DIAG_ONDEMAND.md commit 1bc0d3789587daf42abf338300d25842ddd662f9; systemd and kernel journals read-only",
+      "observed_at": "2026-09-22T19:56:00Z",
+      "summary": "A new MariaDB OOM is proven on 2026-09-21. systemd records mariadb.service killed by the OOM killer at 10:02:23 UTC, main process exit SIGKILL at 10:02:25 and result oom-kill. Kernel records mariadbd PID 2100513 killed with anon-rss 15054704 kB. MariaDB did not become ready again until 2026-09-22 06:25:02 UTC under Restart=on-abort. The Nigeria weekly cron was active in the same time window, but the exact substep that applied final pressure is not yet proven and is not promoted to root cause."
+    },
+    {
+      "id": "AF-EVD-054",
+      "type": "MARIADB_LONG_DURATION_RSS_TRAJECTORY",
+      "result": "MULTI_HOUR_ANONYMOUS_RSS_ACCUMULATION_PROVEN_CAUSE_UNKNOWN",
+      "provenance": "GitHub Actions read-only DIAG runs 34909577475, 34913390476, 34914261590 and 35157538491; jobs 104193841067, 104205639436, 104208331546 and 105000429647",
+      "observed_at": "2026-09-22T19:56:00Z",
+      "summary": "Existing read-only runs reconstruct a long-duration trajectory after the Sep14 allocator rollback: at MariaDB uptime ~3m26s RSS was ~127-130 MB with RssAnon ~103-106 MB and Memory_used ~450-452 MB; at ~57-69 min RSS was ~247 MB with RssAnon ~225 MB and Memory_used ~472 MB; at ~46h52m RSS was 8961068 kB (~8.55 GiB), RssAnon 8942456 kB and Private_Dirty 8944268 kB while MariaDB Memory_used remained ~482 MB with 9 connections. This proves multi-hour anonymous/private RSS accumulation and a widening RSS-vs-Memory_used gap, but does not identify the allocator, query, batch or internal MariaDB subsystem responsible."
+    },
+    {
+      "id": "AF-EVD-055",
+      "type": "MEASURED_PRODUCTION_STATE",
+      "result": "FOUR_CRITICAL_DATA_QUALITY_FAILURES_FRESHNESS_WITHIN_BUDGET",
+      "provenance": "doc-drift.yml run 35776765338 -> docs/ETAT_PRODUCTION_VERIFIE.md @ 2026-09-22 19:56 UTC; commit 1bc0d3789587daf42abf338300d25842ddd662f9",
+      "observed_at": "2026-09-22T19:56:00Z",
+      "summary": "Production control measured 10/16 OK, 4 critical failures and 2 alerts. Nigeria freshness is within budget with latest VL 2026-09-11 (11 days / 14-day budget); Tunisia is current through 2026-09-22; UEMOA through 2026-09-21; Morocco through 2026-09-17. Critical failures remain C2 orphan head performances, C3 absurd recent performances, C7 mixed-scale VL series and C8 stale derived performances. CEMAC freshness and benchmark coverage remain alerts. This supersedes AF-EVD-052 only for current-state decisions; AF-EVD-052 remains immutable historical evidence."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
