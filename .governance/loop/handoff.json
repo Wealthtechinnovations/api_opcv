@@ -25,7 +25,7 @@
     "AF-OPS-003"
   ],
   "open": [],
-  "next_action": "AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director is now GREEN/read-only with chronology and gap discovery derived from the existing authorities; no second queue and no automatic task creation. Observe the next real post-fix step-3/4 batch, compare memory/Com_stmt_* and outputs, then RCA confidence review. In parallel only dependency-level candidates are known; do not claim file-surface parallel safety until governed surface claims exist.",
+  "next_action": "AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director, chronology, gap discovery and observe-only surface-claim validation are active in the existing queue. Surface claims currently have no active claims and no conflicts; they are advisory-only and MUST NOT be treated as certified parallel safety until real task claims are populated. Continue post-fix MariaDB evidence collection; read-only AF-OPS-005/007/009 can progress subject to live write-surface checks.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -79,7 +79,11 @@
     "programme_director_chronology": "ACTIVE_DERIVED_EVENT_LEDGER_62_TEMPORAL_EVENTS",
     "programme_director_gap_harvester": "ACTIVE_READ_ONLY_125_CANDIDATES_NO_AUTO_TASK_CREATION",
     "programme_director_parallel_safety": "DEPENDENCY_ONLY_NOT_FILE_SURFACE_CERTIFIED",
-    "programme_director_surface_claims": "PLANNED_NOT_YET_ACTIVE"
+    "programme_director_surface_claims": "ACTIVE_OBSERVE_ONLY_AF-EVD-062",
+    "programme_director_surface_claims_enforcement": "ADVISORY_ONLY_NO_WRITE_BLOCK",
+    "programme_director_active_surface_claim_count": 0,
+    "programme_director_surface_conflict_count": 0,
+    "programme_director_surface_parallel_pairs": 0
   },
   "closed_with_external_gaps": [
     "AF-TASK-003"
