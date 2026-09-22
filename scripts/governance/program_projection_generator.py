@@ -85,7 +85,7 @@ def main():
         "surface_claim_enforcement":claims.get("current_enforcement"),
         "active_claims":active_claims,
         "handoff_next_action":handoff.get("next_action"),
-        "latest_programme_evidence":director.get("projection_drift_latest_evidence") or director.get("anti_regression_latest_evidence") or director.get("latest_evidence_ref"),
+        "latest_programme_evidence":director.get("projection_writeback_simulation_evidence") or director.get("projection_generator_latest_evidence") or director.get("projection_drift_latest_evidence") or director.get("anti_regression_latest_evidence") or director.get("latest_evidence_ref"),
     }
 
     generated={

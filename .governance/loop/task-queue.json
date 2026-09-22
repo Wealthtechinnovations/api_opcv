@@ -1275,7 +1275,8 @@
     "projection_writeback_simulation": "PASS_AF-EVD-066",
     "projection_writeback_simulation_run_id": 35798774337,
     "projection_writeback_simulation_repository_write": false,
-    "projection_writeback_gate": "ACTIVE_PREFLIGHT_AF-TASK-026"
+    "projection_writeback_gate": "ACTIVE_PREFLIGHT_AF-TASK-026",
+    "projection_writeback_simulation_evidence": "AF-EVD-066"
   },
   "surface_claims_contract": {
     "mode": "OBSERVE_ONLY",

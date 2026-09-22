@@ -295,5 +295,7 @@ jobs:
             out/program-projection-generator-b.json
             out/program-projection-generator-a.log
             out/program-projection-generator-b.log
+            out/program-projection-writeback-sim.json
+            out/program-projection-writeback-sim.log
           if-no-files-found: warn
           retention-days: 30
