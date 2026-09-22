@@ -925,6 +925,89 @@
         "Production vérifiée seulement après déploiement explicitement autorisé et contrôles runtime."
       ],
       "next_action": "Ne démarrer qu'après certification fonctionnelle des lots précédents ; préparer un plan de migration/rollback avant toute dépréciation."
+    },
+    {
+      "id": "AF-TASK-024",
+      "title": "Programme Directeur — automatisation chronologique, projections et anti-régression",
+      "status": "IN_PROGRESS",
+      "phase": "PROJECTION_DRIFT_RED",
+      "depends_on": [
+        "AF-TASK-005"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Conserver task-queue/state/handoff/evidence/incidents comme autorités structurées existantes.",
+        "Dériver READY/BLOCKED/WAITING/waves, chronologie, gap candidates et claims sans seconde queue.",
+        "Détecter puis éliminer le drift des projections humaines courantes sans réécrire l'historique.",
+        "Hard-fail uniquement les invariants et projections déjà gouvernés après preuve RED->GREEN."
+      ],
+      "acceptance_criteria": [
+        "Aucune seconde queue, seconde gouvernance, seconde mémoire ou second registre de claims.",
+        "Programme Director, chronology, gap harvester, surface claims et anti-regression contracts GREEN.",
+        "CURRENT_ITERATION/LOOP_STATE/HANDOFF/STATUS/NEXT_ACTION current sections match structured operational priority.",
+        "Historical sections remain preserved.",
+        "Parallel writes are certified only for non-overlapping active claims."
+      ],
+      "definition_of_ready": [
+        "Programme Director derived read-only pipeline exists and is GREEN.",
+        "AF-EVD-061..063 persist orchestration, claims and anti-regression evidence.",
+        "Projection drift detector has produced an observe-only RED baseline."
+      ],
+      "definition_of_done": [
+        "Projection drift count is zero on current human views.",
+        "Projection detector is promoted to fail-closed only after GREEN.",
+        "Multi-agent claims remain task-local in the single queue.",
+        "Global frontend SUIVI checkpoint reflects the programme state.",
+        "No production deployment is implied by governance-only commits."
+      ],
+      "evidence_required": [
+        "PROJECTION_DRIFT_RED_BASELINE",
+        "PROJECTION_DRIFT_GREEN",
+        "NON_OVERLAPPING_MULTI_AGENT_CLAIMS",
+        "PROGRAMME_DIRECTOR_FULL_GREEN"
+      ],
+      "next_transition": "PROJECTION_DRIFT_GREEN_THEN_FAIL_CLOSED",
+      "next_action": "Repair only current human projection sections from structured authorities, preserve history, prove drift=0, then make projection drift fail-closed.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-22T22:38:30Z",
+        "base_api_sha": "743ab3f95943a7af3d414294cc1e4ea2b6256649",
+        "base_frontend_sha": "c253c7ff379cd58d07d7b660c5517d2e3f859ec6",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ]
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ]
     }
   ],
   "programme_director": {
