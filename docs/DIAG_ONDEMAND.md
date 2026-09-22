@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-09-22 11:20 UTC**
+Derniere execution : **2026-09-22 19:56 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-09-22 11:18:09 UTC — LECTURE SEULE
+Mesure le 2026-09-22 19:54:46 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -78,7 +78,7 @@ Mesure le 2026-09-22 11:18:09 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-09-22 11:19:03 UTC — LECTURE SEULE
+Mesure le 2026-09-22 19:55:39 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -86,16 +86,16 @@ Mesure le 2026-09-22 11:19:03 UTC — LECTURE SEULE
   classementfonds_eurs        3637 lignes — aucune colonne de date
   classementfonds_usds        3637 lignes — aucune colonne de date
   performences               77907 lignes — updated_at max = aucune (?)
-  performences_eurs          34280 lignes — date max = Fri Sep 18 2026 00: (4.5 j)
-  performences_usds          34513 lignes — date max = Fri Sep 18 2026 00: (4.5 j)
+  performences_eurs          34280 lignes — date max = Fri Sep 18 2026 00: (4.8 j)
+  performences_usds          34513 lignes — date max = Fri Sep 18 2026 00: (4.8 j)
 
 ## B. Retard des performances par pays
 
   pays        fonds  a jour      %  retard moy.  retard max
   ---------- ------ ------- ------ ------------ -----------
+  TUNISIE       131       5  3.8 %      111.9 j       127 j
   MAROC         640      18  2.8 %      110.7 j       125 j
-  TUNISIE       131       6  4.6 %      108.1 j       123 j
-  UEMOA         109      37 33.9 %       32.2 j       265 j
+  UEMOA         109      37 33.9 %       33.5 j       265 j
   NIGERIA       320     297 92.8 %        7.7 j       665 j
   CEMAC          34      34 100.0 %        0.0 j         0 j
 
@@ -119,14 +119,14 @@ Mesure le 2026-09-22 11:19:03 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260921.log     25.3 h  ECHEC — 8 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260921.log       13.8 h  ECHEC — 11 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     13.7 h  ECHEC — 3 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     16.3 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        15.8 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               16.8 h  OK  (reserve : Echecs scraping: 25)
-  cron_health_check      tous les j 22:00     africafunds_health_20260921.log      13.3 h  aucun marqueur de fin
-  sync_production        toutes les heures    sync_production.log                   0.3 h  aucun marqueur de fin
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260921.log     33.9 h  ECHEC — 8 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260921.log       22.4 h  ECHEC — 11 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     22.3 h  ECHEC — 3 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      0.9 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         0.4 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                1.4 h  OK  (reserve : Echecs scraping: 23)
+  cron_health_check      tous les j 22:00     africafunds_health_20260921.log      21.9 h  aucun marqueur de fin
+  sync_production        toutes les heures    sync_production.log                   0.9 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -194,13 +194,13 @@ Mesure le 2026-09-22 11:19:03 UTC — LECTURE SEULE
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
   | ============================================
-  | SNAPSHOT PRODUCTION — 2026-09-22 11:00:01
+  | SNAPSHOT PRODUCTION — 2026-09-22 19:00:01
   | ============================================
   | --- Generation du snapshot base de donnees ---
-  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44835 octets)
+  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44825 octets)
   |   -> Git non modifie: aucun add/commit/push
   | ============================================
-  | SNAPSHOT TERMINE — 2026-09-22 11:00:16
+  | SNAPSHOT TERMINE — 2026-09-22 19:00:16
   | ============================================
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
@@ -214,14 +214,14 @@ Mesure le 2026-09-22 11:19:03 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-09-22T11:19:08.587Z — LECTURE SEULE
+ Genere le 2026-09-22T19:55:43.975Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 9.95 Mo
-   modifie   : 2026-09-21T10:00:32.286Z (il y a 25.3 h)
+   modifie   : 2026-09-21T10:00:32.286Z (il y a 33.9 h)
    lignes    : 7942
    colonnes  : 59
 
@@ -324,7 +324,7 @@ Mesure le 2026-09-22 11:19:03 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-09-22 11:19:09 UTC — LECTURE SEULE
+Mesure le 2026-09-22 19:55:44 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 332
   etiquette CONFORME au contenu : 122
@@ -484,7 +484,7 @@ Fonds Nigeria examines : 332
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-09-22 11:19:15 UTC — LECTURE SEULE
+Mesure le 2026-09-22 19:55:50 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -676,17 +676,17 @@ VL Nigeria en base : 77466
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : 385ac26f5 — chore(governance): certify all current Markdown [skip ci]
+  HEAD : d017a4a87 — feat(ops): trace recent MariaDB outage timeline read-only
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  169  depuis 249.0 h
-    fundafrique-frontend     online     redemarrages   48  depuis 891.2 h
-    worker-recalculation     online     redemarrages    3  depuis 249.1 h
-    worker-data-import       online     redemarrages    3  depuis 249.1 h
+    api-monolith             online     redemarrages  169  depuis 257.6 h
+    fundafrique-frontend     online     redemarrages   48  depuis 899.8 h
+    worker-recalculation     online     redemarrages    3  depuis 257.7 h
+    worker-data-import       online     redemarrages    3  depuis 257.7 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -700,10 +700,141 @@ VL Nigeria en base : 77466
   30 18 * * 1-5 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_indices_daily.sh >> /var/log/cron_indices_daily.log 2>&1
 
 
+########## scripts/diag/ondemand/diag_mariadb_incident_timeline.js ##########
+
+=== MARIADB — TIMELINE INCIDENTS RECENTS (LECTURE SEULE) ===
+Mesure le 2026-09-22T19:55:55.475Z
+
+
+--- etat systemd courant ---
+Restart=on-abort
+Result=success
+NRestarts=0
+ExecMainStartTimestamp=Tue 2026-09-22 06:25:02 UTC
+ExecMainPID=3041009
+MemoryCurrent=512860160
+ActiveState=active
+SubState=running
+StateChangeTimestamp=Tue 2026-09-22 06:25:02 UTC
+ActiveEnterTimestamp=Tue 2026-09-22 06:25:02 UTC
+
+--- processus mariadbd courant ---
+MARIADB_PROCESS pid=3041009 uptime_s=48654 rss_kb=468032 rssanon_kb=449608 private_dirty_kb=450572 swap_kb=0
+
+--- listener TCP 3306 courant ---
+LISTEN 0      80                                       127.0.0.1:3306       0.0.0.0:*    users:(("mariadbd",pid=3041009,fd=19))
+
+--- mariadb.service — evenements significatifs sur 14 jours ---
+2026-09-14T10:04:11+0000 priceless-mayer systemd[1]: mariadb.service: A process of this unit has been killed by the OOM killer.
+2026-09-14T10:04:14+0000 priceless-mayer systemd[1]: mariadb.service: Main process exited, code=killed, status=9/KILL
+2026-09-14T10:04:14+0000 priceless-mayer systemd[1]: mariadb.service: Failed with result 'oom-kill'.
+2026-09-14T14:00:30+0000 priceless-mayer mariadbd[1784030]: 2026-09-14 14:00:30 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T14:00:30+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:19:32+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:19:33+0000 priceless-mayer mariadbd[1784030]: 2026-09-14 23:19:33 0 [Note] InnoDB: Shutdown completed; log sequence number 52759760624; transaction id 20362661
+2026-09-14T23:19:33+0000 priceless-mayer mariadbd[1784030]: 2026-09-14 23:19:33 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:19:33+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:19:33+0000 priceless-mayer mariadbd[2072500]: 2026-09-14 23:19:33 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:19:34+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:20:01+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:20:02+0000 priceless-mayer mariadbd[2072500]: 2026-09-14 23:20:02 0 [Note] InnoDB: Shutdown completed; log sequence number 52759760636; transaction id 20362660
+2026-09-14T23:20:02+0000 priceless-mayer mariadbd[2072500]: 2026-09-14 23:20:02 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:20:02+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:20:02+0000 priceless-mayer mariadbd[2073040]: 2026-09-14 23:20:02 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:20:02+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:21:49+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:21:50+0000 priceless-mayer mariadbd[2073040]: 2026-09-14 23:21:50 0 [Note] InnoDB: Shutdown completed; log sequence number 52759760648; transaction id 20362737
+2026-09-14T23:21:50+0000 priceless-mayer mariadbd[2073040]: 2026-09-14 23:21:50 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:21:50+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:21:50+0000 priceless-mayer mariadbd[2074495]: 2026-09-14 23:21:50 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:21:50+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:22:46+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:22:46+0000 priceless-mayer mariadbd[2074495]: 2026-09-14 23:22:46 0 [Note] InnoDB: Shutdown completed; log sequence number 52759760660; transaction id 20362744
+2026-09-14T23:22:46+0000 priceless-mayer mariadbd[2074495]: 2026-09-14 23:22:46 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:22:46+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:22:47+0000 priceless-mayer mariadbd[2081909]: 2026-09-14 23:22:47 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:22:47+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:23:30+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:23:30+0000 priceless-mayer mariadbd[2081909]: 2026-09-14 23:23:30 0 [Note] InnoDB: Shutdown completed; log sequence number 52759760672; transaction id 20362710
+2026-09-14T23:23:30+0000 priceless-mayer mariadbd[2081909]: 2026-09-14 23:23:30 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:23:30+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:23:31+0000 priceless-mayer mariadbd[2084083]: 2026-09-14 23:23:31 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:23:31+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:25:06+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:25:07+0000 priceless-mayer mariadbd[2084083]: 2026-09-14 23:25:07 0 [Note] InnoDB: Shutdown completed; log sequence number 52759760684; transaction id 20362673
+2026-09-14T23:25:07+0000 priceless-mayer mariadbd[2084083]: 2026-09-14 23:25:07 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:25:07+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:25:07+0000 priceless-mayer mariadbd[2085213]: 2026-09-14 23:25:07 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:25:07+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:26:25+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:26:25+0000 priceless-mayer mariadbd[2085213]: 2026-09-14 23:26:25 0 [Note] InnoDB: Shutdown completed; log sequence number 52759760696; transaction id 20362671
+2026-09-14T23:26:25+0000 priceless-mayer mariadbd[2085213]: 2026-09-14 23:26:25 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:26:25+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:26:25+0000 priceless-mayer mariadbd[2091380]: 2026-09-14 23:26:25 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:26:25+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:27:31+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:27:31+0000 priceless-mayer mariadbd[2091380]: 2026-09-14 23:27:31 0 [Note] InnoDB: Shutdown completed; log sequence number 52759760708; transaction id 20362657
+2026-09-14T23:27:31+0000 priceless-mayer mariadbd[2091380]: 2026-09-14 23:27:31 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:27:31+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:27:31+0000 priceless-mayer mariadbd[2095248]: 2026-09-14 23:27:31 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:27:31+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:30:43+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:30:43+0000 priceless-mayer mariadbd[2095248]: 2026-09-14 23:30:43 0 [Note] InnoDB: Shutdown completed; log sequence number 52759761703; transaction id 20362700
+2026-09-14T23:30:43+0000 priceless-mayer mariadbd[2095248]: 2026-09-14 23:30:43 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:30:43+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:30:43+0000 priceless-mayer mariadbd[2097037]: 2026-09-14 23:30:43 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:30:43+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:31:43+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:31:43+0000 priceless-mayer mariadbd[2097037]: 2026-09-14 23:31:43 0 [Note] InnoDB: Shutdown completed; log sequence number 52759762498; transaction id 20362709
+2026-09-14T23:31:43+0000 priceless-mayer mariadbd[2097037]: 2026-09-14 23:31:43 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:31:43+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:31:44+0000 priceless-mayer mariadbd[2099901]: 2026-09-14 23:31:44 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:31:44+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-14T23:32:31+0000 priceless-mayer systemd[1]: Stopping MariaDB 10.6.23 database server...
+2026-09-14T23:32:32+0000 priceless-mayer mariadbd[2099901]: 2026-09-14 23:32:32 0 [Note] InnoDB: Shutdown completed; log sequence number 52759762510; transaction id 20362716
+2026-09-14T23:32:32+0000 priceless-mayer mariadbd[2099901]: 2026-09-14 23:32:32 0 [Note] /usr/sbin/mariadbd: Shutdown complete
+2026-09-14T23:32:32+0000 priceless-mayer systemd[1]: Stopped MariaDB 10.6.23 database server.
+2026-09-14T23:32:32+0000 priceless-mayer mariadbd[2100513]: 2026-09-14 23:32:32 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-14T23:32:32+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+2026-09-21T10:02:23+0000 priceless-mayer systemd[1]: mariadb.service: A process of this unit has been killed by the OOM killer.
+2026-09-21T10:02:25+0000 priceless-mayer systemd[1]: mariadb.service: Main process exited, code=killed, status=9/KILL
+2026-09-21T10:02:25+0000 priceless-mayer systemd[1]: mariadb.service: Failed with result 'oom-kill'.
+2026-09-22T06:25:02+0000 priceless-mayer mariadbd[3041009]: 2026-09-22  6:25:02 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-22T06:25:02+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+
+--- kernel — OOM sur 14 jours ---
+2026-09-14T10:04:11+0000 priceless-mayer kernel: npm start invoked oom-killer: gfp_mask=0x1100cca(GFP_HIGHUSER_MOVABLE), order=0, oom_score_adj=0
+2026-09-14T10:04:12+0000 priceless-mayer kernel: oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=user.slice,mems_allowed=0,global_oom,task_memcg=/system.slice/mariadb.service,task=mariadbd,pid=1256690,uid=113
+2026-09-14T10:04:12+0000 priceless-mayer kernel: Out of memory: Killed process 1256690 (mariadbd) total-vm:19512460kB, anon-rss:14902200kB, file-rss:0kB, shmem-rss:0kB, UID:113 pgtables:33628kB oom_score_adj:0
+2026-09-21T10:02:23+0000 priceless-mayer kernel: npm start invoked oom-killer: gfp_mask=0x1100cca(GFP_HIGHUSER_MOVABLE), order=0, oom_score_adj=0
+2026-09-21T10:02:23+0000 priceless-mayer kernel: oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=user.slice,mems_allowed=0,global_oom,task_memcg=/system.slice/mariadb.service,task=mariadbd,pid=2100513,uid=113
+2026-09-21T10:02:23+0000 priceless-mayer kernel: Out of memory: Killed process 2100513 (mariadbd) total-vm:19569132kB, anon-rss:15054704kB, file-rss:0kB, shmem-rss:0kB, UID:113 pgtables:34252kB oom_score_adj:0
+
+--- fenetre cible 2026-09-21 09:30 -> 2026-09-22 11:30 — service ---
+2026-09-21T10:02:23+0000 priceless-mayer systemd[1]: mariadb.service: A process of this unit has been killed by the OOM killer.
+2026-09-21T10:02:25+0000 priceless-mayer systemd[1]: mariadb.service: Main process exited, code=killed, status=9/KILL
+2026-09-21T10:02:25+0000 priceless-mayer systemd[1]: mariadb.service: Failed with result 'oom-kill'.
+2026-09-22T06:25:02+0000 priceless-mayer mariadbd[3041009]: 2026-09-22  6:25:02 0 [Note] /usr/sbin/mariadbd: ready for connections.
+2026-09-22T06:25:02+0000 priceless-mayer systemd[1]: Started MariaDB 10.6.23 database server.
+
+--- fenetre cible 2026-09-21 09:30 -> 2026-09-22 11:30 — kernel OOM ---
+2026-09-21T10:02:23+0000 priceless-mayer kernel: npm start invoked oom-killer: gfp_mask=0x1100cca(GFP_HIGHUSER_MOVABLE), order=0, oom_score_adj=0
+2026-09-21T10:02:23+0000 priceless-mayer kernel: oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=user.slice,mems_allowed=0,global_oom,task_memcg=/system.slice/mariadb.service,task=mariadbd,pid=2100513,uid=113
+2026-09-21T10:02:23+0000 priceless-mayer kernel: Out of memory: Killed process 2100513 (mariadbd) total-vm:19569132kB, anon-rss:15054704kB, file-rss:0kB, shmem-rss:0kB, UID:113 pgtables:34252kB oom_score_adj:0
+
+=== CLASSIFICATION BORNEE DE LA FENETRE 21/09 ===
+SEP21_MARIADB_OOM_PROVEN=YES
+SEP21_KERNEL_OOM_PRESENT=YES
+SEP21_MARIADB_SERVICE_FAILURE_PRESENT=YES
+SEP21_MARIADB_START_OR_READY_PRESENT=YES
+
+=== FIN — AUCUNE MUTATION ===
+
+
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-09-22 11:19:20 UTC — LECTURE SEULE
+Mesure le 2026-09-22 19:55:56 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -772,7 +903,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-09-22 11:19:25 UTC — LECTURE SEULE
+Mesure le 2026-09-22 19:56:00 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
@@ -875,7 +1006,7 @@ Ruptures d echelle Nigeria encore en base : 139
 ########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-09-22 11:19:30 UTC — LECTURE SEULE
+Mesure le 2026-09-22 19:56:06 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -966,7 +1097,7 @@ Mesure le 2026-09-22 11:19:30 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-09-22 11:19:35 UTC — LECTURE SEULE
+Mesure le 2026-09-22 19:56:11 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 146 ligne(s) sur 64 fonds

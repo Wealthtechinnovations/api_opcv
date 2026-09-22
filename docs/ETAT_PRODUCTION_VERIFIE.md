@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-09-22 11:20 UTC**
+Derniere verification : **2026-09-22 19:56 UTC**
 
 ```
 
@@ -24,15 +24,15 @@ Derniere verification : **2026-09-22 11:20 UTC**
 [OK   ] C4.NIGERIA   Fraicheur VL NIGERIA (budget 14 j)
              derniere VL Fri Sep 11, soit 11 j
 [OK   ] C4.TUNISIE   Fraicheur VL TUNISIE (budget 9 j)
-             derniere VL Fri Sep 18, soit 4 j
+             derniere VL Tue Sep 22, soit 0 j
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
-             derniere VL Thu Sep 17, soit 5 j
+             derniere VL Mon Sep 21, soit 1 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-09-22T11:00, soit 0.3 h
+             runtime: genere le 2026-09-22T19:00, soit 0.9 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1540x [1.09 .. 1685] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1535x [1.00 .. 1535] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1534x [100.00 .. 153355] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1532x [10.65 .. 16317] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1525x [1.03 .. 1568] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1511x [114.47 .. 172934] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1498x [1.05 .. 1566] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1495x [1.15 .. 1719] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1464x [1.09 .. 1593] | [2770] CFG AM FIXED INCOME DOLLAR FUN (NIGERIA/USD) 1447x [106.08 .. 153504] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1427x [1.18 .. 1684] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182]
 [ECHEC] C8           Les performances suivent les VL
-             MAROC : 8/644 a jour (1.2 %), retard moyen 110.7 j | TUNISIE : 6/131 a jour (4.6 %), retard moyen 108.1 j | UEMOA : 35/111 a jour (31.5 %), retard moyen 32.2 j — VL fraiches mais performances perimees : le site affiche des chiffres plausibles et faux
+             MAROC : 8/644 a jour (1.2 %), retard moyen 110.7 j | TUNISIE : 5/131 a jour (3.8 %), retard moyen 111.9 j | UEMOA : 35/111 a jour (31.5 %), retard moyen 33.5 j — VL fraiches mais performances perimees : le site affiche des chiffres plausibles et faux
 [ALERTE] C6.CEMAC     Couverture indRef CEMAC
              0.0 % (2134 VL sans benchmark sur 2134)
 [OK   ] C6.MAROC     Couverture indRef MAROC
@@ -40,9 +40,9 @@ Derniere verification : **2026-09-22 11:20 UTC**
 [OK   ] C6.NIGERIA   Couverture indRef NIGERIA
              100.0 % (0 VL sans benchmark sur 78050)
 [OK   ] C6.TUNISIE   Couverture indRef TUNISIE
-             100.0 % (0 VL sans benchmark sur 310083)
+             100.0 % (0 VL sans benchmark sur 310335)
 [OK   ] C6.UEMOA     Couverture indRef UEMOA
-             100.0 % (0 VL sans benchmark sur 47992)
+             100.0 % (0 VL sans benchmark sur 48013)
 
 10/16 controles OK — 4 echec(s) critique(s), 2 alerte(s).
 
