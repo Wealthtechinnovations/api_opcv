@@ -34,9 +34,9 @@ jobs:
     timeout-minutes: 8
     steps:
       - name: Recuperer le depot
+        # Sans ref forcee : sur push, Actions checkout le SHA declencheur exact.
+        # Sur schedule/workflow_dispatch, il checkout le commit associe au run.
         uses: actions/checkout@v4
-        with:
-          ref: claude/code-review-improvements-ikvuj
 
       - name: Verifier le contrat SQL des recalculs massifs
         run: |
