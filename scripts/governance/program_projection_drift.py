@@ -117,7 +117,7 @@ def main():
     result={
         "schema_version":"0.1.0",
         "project_uid":PROJECT_UID,
-        "mode":"OBSERVE_ONLY",
+        "mode":"FAIL_CLOSED_CURRENT_PROJECTIONS",
         "authority":"STRUCTURED_STATE_ONLY_HUMAN_PROJECTIONS_ARE_VIEWS",
         "operational_priority":{
             "task_id":op_id,
@@ -129,15 +129,15 @@ def main():
         "projection_drifts":drift,
         "machine_checks":machine,
         "machine_drift_count":len(machine_drift),
-        "integrity":"PASS" if not machine_drift else "FAIL",
-        "next_rule":"Repair current human projection sections from structured authorities, preserve historical sections, then promote this detector from OBSERVE_ONLY to fail-closed for current projections.",
+        "integrity":"PASS" if not machine_drift and not drift else "FAIL",
+        "next_rule":"Current human projections are fail-closed against structured authorities; repair drift without rewriting historical sections before merging further governance projection changes.",
     }
 
     out=Path(a.output)
     out.parent.mkdir(parents=True,exist_ok=True)
     out.write_text(json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps(result,ensure_ascii=False,indent=2))
-    raise SystemExit(1 if machine_drift else 0)
+    raise SystemExit(1 if machine_drift or drift else 0)
 
 if __name__=="__main__":
     main()

@@ -100,7 +100,7 @@ jobs:
             --output out/program-invariants.json \
             | tee out/program-invariants.log
 
-      - name: Detect human projection drift observe-only
+      - name: Enforce human projection alignment fail-closed
         run: |
           set -euo pipefail
           python3 api/scripts/governance/program_projection_drift.py \
