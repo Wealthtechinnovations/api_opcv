@@ -266,6 +266,290 @@
         "AF-EVD-055",
         "AF-EVD-053"
       ]
+    },
+    {
+      "id": "AF-TASK-012",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation / Robot Advisor — cartographie runtime et certification de l'existant",
+      "status": "OPEN",
+      "phase": "READ_ONLY_DISCOVERY",
+      "depends_on": [],
+      "scope": [
+        "Cartographier routes_vl_robotadvisor.js, services/analytics/routes.js, efficient_frontier.py, effi.py, src/classes/advisor.js, gateway, frontend Robot Advisor et modèles DB associés.",
+        "Identifier par preuve le chemin réellement actif : monolithe, analytics-service, service Python éventuel, variables d'environnement et routes réellement servies.",
+        "Classifier chaque implémentation CANONICAL_CANDIDATE, REFERENCE_VALIDATION, LEGACY_ACTIVE, LEGACY_INACTIVE ou PROTOTYPE sans suppression."
+      ],
+      "acceptance_criteria": [
+        "Aucune mutation runtime, DB ou production pendant la cartographie.",
+        "Un seul diagramme de flux réel frontend -> API/gateway -> moteur -> DB est établi avec preuves.",
+        "Toute inconnue runtime reste UNKNOWN/NON_VERIFIE et n'est pas déduite du code seul.",
+        "Aucun nouveau moteur, service, branche ou file parallèle n'est créé."
+      ],
+      "next_action": "Exécuter l'audit read-only du chemin d'allocation réellement actif, puis désigner explicitement les candidats canonique/référence/legacy avant toute modification de calcul."
+    },
+    {
+      "id": "AF-TASK-013",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — contrat API canonique, validation d'entrée, authentification et ownership",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-012"
+      ],
+      "scope": [
+        "Définir un contrat versionné unique pour univers, paramètres, contraintes, résultats, warnings et erreurs.",
+        "Réconcilier le drift frontend param_data/constraint_data avec les contrats Node/Python historiques.",
+        "Distinguer lecture publique éventuelle, calcul authentifié, sauvegarde et accès propriétaire aux simulations."
+      ],
+      "acceptance_criteria": [
+        "Frontend et backend partagent un contrat testé ; aucune ambiguïté number[]/objet ou structure de portefeuille.",
+        "Les routes de sauvegarde/simulation appliquent authentification et contrôle d'ownership adaptés.",
+        "Les anciennes routes restent compatibles tant que la migration n'est pas certifiée."
+      ],
+      "next_action": "Après AF-TASK-012, spécifier le contrat V2 backward-compatible et ses tests de contrat avant de modifier les écrans ou solveurs."
+    },
+    {
+      "id": "AF-TASK-014",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — moteur canonique de préparation des données quantitatives",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-012"
+      ],
+      "related_operational_gates": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ],
+      "scope": [
+        "Remplacer limit=500 par horizons explicites 1Y/3Y/5Y/MAX ou date_from/date_to.",
+        "Normaliser calendriers et fréquences journalière/hebdomadaire/mensuelle sans intersection stricte naïve.",
+        "Construire séries de Total Return lorsque distributions/dividendes sont disponibles.",
+        "Gérer devise de base et conversions FX cohérentes LOCAL/EUR/USD et autres devises supportées.",
+        "Formaliser estimateurs de rendements attendus, covariance, shrinkage, taux sans risque et qualité minimale des données."
+      ],
+      "acceptance_criteria": [
+        "Chaque série utilisée par l'optimiseur possède fréquence, devise, horizon, cutoff et méthodologie explicites.",
+        "Aucune donnée anormale connue ne peut être silencieusement absorbée par le solveur.",
+        "La certification sur données live reste bloquée par les gaps pertinents de AF-OPS-007/008/009.",
+        "Les unités rendement/volatilité/covariance/taux sans risque sont cohérentes et testées."
+      ],
+      "next_action": "Concevoir le Data Preparation Contract et ses fixtures déterministes ; ne pas certifier les runs live avant les gates de qualité/fraîcheur pertinentes."
+    },
+    {
+      "id": "AF-TASK-015",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — persistance normalisée, provenance et reproductibilité des runs",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014"
+      ],
+      "scope": [
+        "Remplacer progressivement les chaînes fond_ids/poids par un modèle normalisé compatible avec l'historique.",
+        "Persister moteur/version, univers, share classes, snapshot VL/FX, cutoff, fréquence, estimateurs, contraintes, résultats, métriques et warnings.",
+        "Conserver les tables historiques tant que migration et rollback ne sont pas prouvés."
+      ],
+      "acceptance_criteria": [
+        "Un run peut être rejoué à paramètres et snapshot identiques.",
+        "Aucune migration destructive des simulations historiques.",
+        "Chaque résultat présenté peut être relié à sa provenance de données et à la version du moteur."
+      ],
+      "next_action": "Après contrats data/API, proposer le schéma additif de run d'optimisation et la stratégie de migration sans altération des simulations historiques."
+    },
+    {
+      "id": "AF-TASK-016",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — adapter canonique et stratégies d'optimisation multi-méthodes",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014"
+      ],
+      "scope": [
+        "Encapsuler portfolio-allocation derrière un adapter AfricaFunds au lieu d'appels dispersés.",
+        "Conserver Mean-Variance / Efficient Frontier et ajouter Equal Weight, Inverse Volatility, Global Minimum Variance, Equal Risk Contribution, Risk Budgeting, Maximum Diversification, Maximum Sharpe et Minimum Correlation.",
+        "Préparer Minimum Tracking Error et autres méthodes uniquement lorsqu'un benchmark valide existe.",
+        "Ne jamais présenter une méthode comme universellement optimale."
+      ],
+      "acceptance_criteria": [
+        "Une seule surface métier appelle les solveurs.",
+        "Chaque stratégie a des entrées/sorties communes et des tests déterministes.",
+        "Les erreurs de convergence et matrices invalides produisent des warnings/erreurs structurés, jamais un résultat silencieux."
+      ],
+      "next_action": "Implémenter d'abord l'adapter et les baselines Equal Weight/GMV/ERC avec tests avant d'élargir les stratégies."
+    },
+    {
+      "id": "AF-TASK-017",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — moteur de contraintes AfricaFunds",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014",
+        "AF-TASK-016"
+      ],
+      "scope": [
+        "Séparer strictement contraintes de rendement et contraintes de poids.",
+        "Gérer nombre min/max de fonds, poids min/max par fonds, catégorie/asset class, SGO, pays/région, devise, SRRI et liquidité/fréquence.",
+        "Préparer les contraintes qualité/DDQ et mandat institutionnel comme filtres/contraintes versionnés.",
+        "Détecter les jeux de contraintes infaisables avant appel solveur."
+      ],
+      "acceptance_criteria": [
+        "La confusion historique min_return/max_return utilisés comme bornes de poids est éliminée.",
+        "Les contraintes sont validées, nommées et persistées.",
+        "Un problème infaisable retourne une explication exploitable sans produire de faux portefeuille."
+      ],
+      "next_action": "Construire le modèle de contraintes canonique et un feasibility pre-check avant de migrer les contraintes UI existantes."
+    },
+    {
+      "id": "AF-TASK-018",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — validation numérique, cross-engine et non-régression quantitative",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-016",
+        "AF-TASK-017"
+      ],
+      "scope": [
+        "Créer jeux de référence : 1/N, actifs identiques, covariance diagonale, cas GMV, ERC, bornes et contraintes infaisables.",
+        "Comparer les résultats de l'adapter canonique à une implémentation de référence indépendante, notamment SciPy lorsque pertinente.",
+        "Définir tolérances numériques, invariants somme des poids, bornes, risque/rendement et convergence."
+      ],
+      "acceptance_criteria": [
+        "Aucune stratégie ne passe en production sans tests numériques indépendants.",
+        "Les divergences JS/Python sont expliquées ou bloquantes.",
+        "Les résultats historiques encore supportés disposent de tests de non-régression adaptés."
+      ],
+      "next_action": "Construire le corpus de fixtures et les tests RED->GREEN après stabilisation des adapters/contraintes."
+    },
+    {
+      "id": "AF-TASK-019",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — backtesting, walk-forward, rebalancement et coûts",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-014",
+        "AF-TASK-016",
+        "AF-TASK-018"
+      ],
+      "scope": [
+        "Ajouter backtest hors-échantillon et walk-forward sans look-ahead bias.",
+        "Gérer rebalancement périodique ou par seuil, turnover, frais/transaction costs et impact des frais de gestion lorsque disponibles.",
+        "Comparer à benchmarks valides et scénarios historiques."
+      ],
+      "acceptance_criteria": [
+        "Les résultats in-sample et out-of-sample sont séparés.",
+        "Le moteur interdit l'utilisation de données futures.",
+        "Les hypothèses de coûts et rebalancement sont visibles et persistées."
+      ],
+      "next_action": "Après validation numérique, définir le protocole walk-forward et les métriques de backtest avant toute UI prospective."
+    },
+    {
+      "id": "AF-TASK-020",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — analytics portefeuille, contribution au risque et explicabilité",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-018"
+      ],
+      "scope": [
+        "Calculer performance, volatilité, Sharpe, Sortino, drawdown, VaR/Expected Shortfall selon conventions validées.",
+        "Ajouter contribution au risque par fonds et agrégations SGO/pays/devise/catégorie/asset class/SRRI.",
+        "Ajouter concentration, nombre effectif de positions, diversification ratio et analyses de sensibilité/stabilité des poids.",
+        "Expliquer les principaux déterminants et contraintes actives sans fabriquer une causalité non prouvée."
+      ],
+      "acceptance_criteria": [
+        "Chaque métrique affiche sa période, devise et méthodologie.",
+        "Les contributions au risque somment correctement au risque portefeuille selon la méthode choisie.",
+        "L'explicabilité distingue faits, contraintes actives et analyse de sensibilité."
+      ],
+      "next_action": "Réutiliser d'abord les analytics AfricaFunds/portfolio-analytics existants et identifier précisément les fonctions manquantes avant tout nouveau calcul."
+    },
+    {
+      "id": "AF-TASK-021",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — Portfolio Lab frontend V2 et comparaison multi-stratégies",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-020"
+      ],
+      "scope": [
+        "Faire évoluer les écrans Robot Advisor existants sans créer une troisième UI.",
+        "Parcours : univers -> données/horizon/devise -> stratégie -> contraintes -> résultats -> comparaison -> sauvegarde.",
+        "Comparer plusieurs stratégies côte à côte et enrichir la frontière efficiente interactive.",
+        "Factoriser la duplication investor/portfolio conformément à la dette frontend existante."
+      ],
+      "acceptance_criteria": [
+        "Les routes/URLs historiques restent fonctionnelles ou redirigées de façon compatible.",
+        "Aucune duplication supplémentaire investor/portfolio.",
+        "Les résultats UI sont reliés au run_id, aux hypothèses, warnings et provenance."
+      ],
+      "next_action": "Après stabilisation API, construire la migration progressive des deux pages advisor existantes vers des composants partagés."
+    },
+    {
+      "id": "AF-TASK-022",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — Model Portfolios, Mandate Engine et reporting institutionnel",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-015",
+        "AF-TASK-017",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021"
+      ],
+      "scope": [
+        "Construire des profils/modèles versionnés sans les présenter comme conseil personnalisé automatique.",
+        "Transformer un mandat institutionnel en univers éligible + contraintes machine-readable.",
+        "Exporter rapports Excel/PDF avec composition, risque, performance, contraintes, provenance, avertissements et historique de version."
+      ],
+      "acceptance_criteria": [
+        "Chaque modèle/mandat est versionné et reproductible.",
+        "Les contraintes institutionnelles sont traçables jusqu'aux résultats.",
+        "Les exports reprennent exactement les hypothèses du run et non des calculs recomposés côté frontend."
+      ],
+      "next_action": "Définir les objets Model Portfolio et Mandate uniquement après que run provenance, constraints et backtests sont stables."
+    },
+    {
+      "id": "AF-TASK-023",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — rollout canonique, observabilité et retrait gouverné du legacy",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-018",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021",
+        "AF-TASK-022"
+      ],
+      "scope": [
+        "Déployer par feature flags/migration compatible, mesurer durée, convergence, erreurs et qualité des inputs.",
+        "Comparer ancien/nouveau chemin sur jeux historiques et utilisateurs pilotes avant bascule.",
+        "Retirer advisor.js, effi.py, duplications Node/Python ou routes mortes uniquement après preuve d'inactivité/équivalence et fenêtre de rollback."
+      ],
+      "acceptance_criteria": [
+        "Aucun legacy n'est supprimé sur simple présomption.",
+        "Le rollback est documenté et testé avant bascule canonique.",
+        "Le moteur final possède une seule autorité runtime et une implémentation de référence clairement séparée.",
+        "Production vérifiée seulement après déploiement explicitement autorisé et contrôles runtime."
+      ],
+      "next_action": "Ne démarrer qu'après certification fonctionnelle des lots précédents ; préparer un plan de migration/rollback avant toute dépréciation."
     }
   ]
 }
