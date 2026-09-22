@@ -509,7 +509,8 @@
         "base_api_sha": "3ae4446fd8dda0fb4df2b090157d5e74333186d2",
         "base_frontend_sha": "4700665bce1fafd8e0a4b9fa86d2fa4e598e1b90",
         "repository_roles": [
-          "API"
+          "API",
+          "FRONTEND"
         ],
         "touched_surfaces": [
           "src/services/allocation/contract.js",
@@ -519,7 +520,9 @@
           "src/routes/apigestionallocation.js",
           "app.js",
           "src/services/allocation/simulations.js",
-          "tests/allocation-simulation.test.js"
+          "tests/allocation-simulation.test.js",
+          "src/lib/allocation.ts",
+          ".github/workflows/governance-allocation-client.yml"
         ]
       },
       "touched_surfaces": [
@@ -530,7 +533,9 @@
         "src/routes/apigestionallocation.js",
         "app.js",
         "src/services/allocation/simulations.js",
-        "tests/allocation-simulation.test.js"
+        "tests/allocation-simulation.test.js",
+        "src/lib/allocation.ts",
+        ".github/workflows/governance-allocation-client.yml"
       ]
     },
     {
