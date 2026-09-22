@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "a2eac00ff2d34f44abfa4023f3942999cde71272"
+      "head": "a1af56223ec80945e2952745f0a21712df62cdfd"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "8a60e34b55e7d535946d516d88e5cf6f7792ba30"
+      "head": "4f02757e24a97c8da1d7aed1dc51209111117ce7"
     }
   },
   "summary": {
@@ -1504,6 +1504,7 @@
       "canonical_authority": "CURRENT_ITERATION.md",
       "unique_information": [
         "CURRENT_ITERATION — AfricaFunds API",
+        "Projection gérée — itération courante",
         "AF-GOV-FINAL-CERT-20260911-01 — CLOSED_WITH_EXTERNAL_GAPS",
         "Priorité opérationnelle courante — Programme Directeur",
         "Historique conservé",
@@ -1528,15 +1529,19 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CURRENT_ITERATION.md",
-      "git_blob_sha": "1f159cf852898187625024f0673f6dd2283c7ef4",
-      "last_validated_sha": "1f159cf852898187625024f0673f6dd2283c7ef4",
-      "content_sha256": "3974078e6745d6b666dc8900ee8bae824c2bd4f31e97ce0240fff53bd6df6d4c",
-      "line_count": 57,
-      "byte_count": 3084,
+      "git_blob_sha": "d56f5cc893354e7a611d00cd2cdd692b15b426d2",
+      "last_validated_sha": "d56f5cc893354e7a611d00cd2cdd692b15b426d2",
+      "content_sha256": "943860642975c518c61cd38d506d7bfb3bb7262f36dfb2c2d58606f6d841702e",
+      "line_count": 69,
+      "byte_count": 3436,
       "headings": [
         {
           "level": 1,
           "text": "CURRENT_ITERATION — AfricaFunds API"
+        },
+        {
+          "level": 3,
+          "text": "Projection gérée — itération courante"
         },
         {
           "level": 2,
@@ -2360,6 +2365,7 @@
       "canonical_authority": "HANDOFF.md",
       "unique_information": [
         "HANDOFF — AfricaFunds API",
+        "Projection gérée — handoff",
         "Reprise opérationnelle actuelle — AF-OPS-003",
         "Point de reprise courant — clôture 2026-09-13",
         "Historique conservé",
@@ -2384,15 +2390,19 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "HANDOFF.md",
-      "git_blob_sha": "0acaf29b787bd2fbb46b436415a1b062701f3b22",
-      "last_validated_sha": "0acaf29b787bd2fbb46b436415a1b062701f3b22",
-      "content_sha256": "e089d39aef3cccf7883dad040ce52a7fbb71f119c246ecf821d72bb190e998d3",
-      "line_count": 85,
-      "byte_count": 4691,
+      "git_blob_sha": "50a473b54b55d3060df0f71be9040165fe5d9f3c",
+      "last_validated_sha": "50a473b54b55d3060df0f71be9040165fe5d9f3c",
+      "content_sha256": "7bcdcba3b6ca5fefeeaa12069c849ae8b4ec4ec4ebae97e5365fbb57827a767b",
+      "line_count": 96,
+      "byte_count": 5422,
       "headings": [
         {
           "level": 1,
           "text": "HANDOFF — AfricaFunds API"
+        },
+        {
+          "level": 3,
+          "text": "Projection gérée — handoff"
         },
         {
           "level": 2,
@@ -2644,6 +2654,7 @@
       "canonical_authority": "LOOP_STATE.md",
       "unique_information": [
         "LOOP_STATE — AfricaFunds API",
+        "Projection gérée — état de boucle",
         "État courant — clôture interne",
         "Priorité opérationnelle actuelle",
         "Historique conservé",
@@ -2663,20 +2674,24 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "LOOP_STATE — AfricaFunds API",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "LOOP_STATE.md",
-      "git_blob_sha": "cb3725eac66d8bfc1fcdd1c04b39fca01a8ab793",
-      "last_validated_sha": "cb3725eac66d8bfc1fcdd1c04b39fca01a8ab793",
-      "content_sha256": "258ebfa3c16b6706f4f728274c52b090efccf8ffe67ab2e50bc45b69281dc87c",
-      "line_count": 101,
-      "byte_count": 3609,
+      "git_blob_sha": "30b42651d7118b2e46bf6ed96f442c70a7785c1f",
+      "last_validated_sha": "30b42651d7118b2e46bf6ed96f442c70a7785c1f",
+      "content_sha256": "5d4f9cf58c4cd16b38ebeea584c57219d14df08168074fdfcbb38c51338cfcb8",
+      "line_count": 112,
+      "byte_count": 3917,
       "headings": [
         {
           "level": 1,
           "text": "LOOP_STATE — AfricaFunds API"
+        },
+        {
+          "level": 3,
+          "text": "Projection gérée — état de boucle"
         },
         {
           "level": 2,
@@ -2911,6 +2926,7 @@
       "canonical_authority": "NEXT_ACTION.md",
       "unique_information": [
         "NEXT_ACTION — AfricaFunds API",
+        "Projection gérée — prochaine action",
         "Priorité opérationnelle pré-V2 — AF-OPS-003",
         "Ce qui est prouvé",
         "Historique A/B à ne pas rejouer",
@@ -2938,15 +2954,19 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "a149754b8433beb5c24c84aa56da3781a9a450fd",
-      "last_validated_sha": "a149754b8433beb5c24c84aa56da3781a9a450fd",
-      "content_sha256": "f9e0475dc496316976966ff2b087555ec37218bfd11bbfb514ff1d59d5a070b4",
-      "line_count": 118,
-      "byte_count": 8002,
+      "git_blob_sha": "b2a04a8ecf2d8ad75b16be917c4ab8d40d15e6c5",
+      "last_validated_sha": "b2a04a8ecf2d8ad75b16be917c4ab8d40d15e6c5",
+      "content_sha256": "fa7a9dfcb6aa509908aae81b34adef8e9b83203f4b38b4ddfdfe18a2d460df1c",
+      "line_count": 129,
+      "byte_count": 8704,
       "headings": [
         {
           "level": 1,
           "text": "NEXT_ACTION — AfricaFunds API"
+        },
+        {
+          "level": 3,
+          "text": "Projection gérée — prochaine action"
         },
         {
           "level": 2,
@@ -3630,6 +3650,7 @@
       "canonical_authority": "STATUS.md",
       "unique_information": [
         "STATUS — AfricaFunds API",
+        "Projection gérée — statut",
         "Baseline historique Regulatory Plus",
         "Gouvernance actuelle",
         "Checkpoint Git réobservé pendant la réconciliation du 2026-09-10",
@@ -3662,15 +3683,19 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "e518f0755ceacc3a9e3f76fa4cb3f5e04879280e",
-      "last_validated_sha": "e518f0755ceacc3a9e3f76fa4cb3f5e04879280e",
-      "content_sha256": "7f5655224fd71f98036584b86c6fcaad92873e6d78c67cb1a2d5c244988416df",
-      "line_count": 175,
-      "byte_count": 12534,
+      "git_blob_sha": "a185c468c2e4fc13a72666976a843cd0a9ff31c9",
+      "last_validated_sha": "a185c468c2e4fc13a72666976a843cd0a9ff31c9",
+      "content_sha256": "6b2b8a2e2c52104a2ea48024435abc0cb1bf9c2c236a66f967e770d8b5c9acd6",
+      "line_count": 187,
+      "byte_count": 12925,
       "headings": [
         {
           "level": 1,
           "text": "STATUS — AfricaFunds API"
+        },
+        {
+          "level": 3,
+          "text": "Projection gérée — statut"
         },
         {
           "level": 2,
@@ -13321,6 +13346,7 @@
       "canonical_authority": "SUIVI.md",
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
+        "Projection gérée — checkpoint global",
         "POINT DE REPRISE COURANT — 2026-09-22 — Programme Directeur actif / AF-OPS-003 POST_FIX_VALIDATION",
         "Continuité préservée",
         "AF-OPS-003 — correctif déployé, RCA en validation post-fix",
@@ -13338,8 +13364,7 @@
         "Candidat prepared statements — non encore causalement prouvé",
         "Etat data live mesuré",
         "Prochaine action gouvernée",
-        "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée",
-        "Verdict de la boucle de gouvernance"
+        "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13355,15 +13380,19 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "e4d92a50a9229b12e83f4cff665dc5c3df43dd40",
-      "last_validated_sha": "e4d92a50a9229b12e83f4cff665dc5c3df43dd40",
-      "content_sha256": "89a9b9747421f957b0f2ee1493f4588c772d8621a3fa78ab4b254b59c74d3c00",
-      "line_count": 6851,
-      "byte_count": 476823,
+      "git_blob_sha": "b2d4ccd5b7ee3e1d34eab0419d5664e75b1d43b7",
+      "last_validated_sha": "b2d4ccd5b7ee3e1d34eab0419d5664e75b1d43b7",
+      "content_sha256": "325ce228d83e0de92910f3db712fa6dc9a3185a95cf9e5baec8255ac6f93db90",
+      "line_count": 6864,
+      "byte_count": 477217,
       "headings": [
         {
           "level": 1,
           "text": "Carnet de suivi - Africafunds (Fundafrique)"
+        },
+        {
+          "level": 3,
+          "text": "Projection gérée — checkpoint global"
         },
         {
           "level": 2,
@@ -13516,10 +13545,6 @@
         {
           "level": 2,
           "text": "4. DECISIONS UTILISATEUR — **DEJA TRANCHEES LE 2026-07-14, JAMAIS EXECUTEES**"
-        },
-        {
-          "level": 2,
-          "text": "5. REGLES PERMANENTES — RAPPEL DES PLUS ENGAGEANTES"
         }
       ]
     },
