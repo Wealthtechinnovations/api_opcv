@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "62367374e0493da1c55f3ac098d0e2ae49c3a9bf"
+      "head": "5868f3d982c46b8e37e45cb063e518c20c244559"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "986bb29310705b33f940bb85774348347ef8ef7d"
+      "head": "dcd8e5a79b27d93b66723884727f55ec2ffc9944"
     }
   },
   "summary": {
@@ -2907,6 +2907,7 @@
         "Nouvelle récurrence et trajectoire longue prouvées",
         "Prochaine preuve",
         "Fenêtre du saut RSS désormais resserrée",
+        "Correctif protocolaire déployé — validation post-fix",
         "Autres blockers indépendants",
         "AF-OPS-005 en parallèle read-only",
         "Data-quality operational queue — measured 2026-09-22",
@@ -2926,11 +2927,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "f9ba1ba4fb163795c90bf9fe85977b80979d0eb6",
-      "last_validated_sha": "f9ba1ba4fb163795c90bf9fe85977b80979d0eb6",
-      "content_sha256": "3a396d3b8b1af5d1d788f1394290bf770b7488de74f68bed60deea2760733d6b",
-      "line_count": 90,
-      "byte_count": 5816,
+      "git_blob_sha": "0113c295489a723f59282b26dcb26fb9a7af5dc6",
+      "last_validated_sha": "0113c295489a723f59282b26dcb26fb9a7af5dc6",
+      "content_sha256": "8db20be1fc257894760626a03b8bf94bf29ba4c4cec0db00cb8c7adcdfad9b02",
+      "line_count": 98,
+      "byte_count": 7143,
       "headings": [
         {
           "level": 1,
@@ -2959,6 +2960,10 @@
         {
           "level": 3,
           "text": "Fenêtre du saut RSS désormais resserrée"
+        },
+        {
+          "level": 3,
+          "text": "Correctif protocolaire déployé — validation post-fix"
         },
         {
           "level": 2,
@@ -10043,11 +10048,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "15939ef2db6a031e2b2698371f54dafb8a80af68",
-      "last_validated_sha": "15939ef2db6a031e2b2698371f54dafb8a80af68",
-      "content_sha256": "98baff2d95e133dffd21a65ad3a838aa8aa0154e1a11c43789c942b712d55cc2",
-      "line_count": 1198,
-      "byte_count": 83750,
+      "git_blob_sha": "6c8fb793544f001c5033c8297fe5d60feea942d6",
+      "last_validated_sha": "6c8fb793544f001c5033c8297fe5d60feea942d6",
+      "content_sha256": "3fa147f810efa715842429038f840b3cfe8bf65cd653ff8ecc2a276d7b84e3db",
+      "line_count": 1225,
+      "byte_count": 85130,
       "headings": [
         {
           "level": 1,
@@ -10214,11 +10219,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "ff6d6d3e4be0067a9a0142bfbcce21cfb03a299f",
-      "last_validated_sha": "ff6d6d3e4be0067a9a0142bfbcce21cfb03a299f",
-      "content_sha256": "6d031b56a60f9b776cac613d642b64b9694e79dd1924a49901205c5f3427024d",
+      "git_blob_sha": "bfdf9b90f599cbf57c7f05a3167e79e9e42ba05b",
+      "last_validated_sha": "bfdf9b90f599cbf57c7f05a3167e79e9e42ba05b",
+      "content_sha256": "f99d39e0fd4d0d77c603b319781d0e4f4e0bdb1edab06a71f708fd9f4c16e89d",
       "line_count": 62,
-      "byte_count": 4476,
+      "byte_count": 4477,
       "headings": [
         {
           "level": 1,
@@ -13296,6 +13301,13 @@
       "canonical_authority": "SUIVI.md",
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
+        "POINT DE REPRISE COURANT — 2026-09-22 — AF-OPS-003 RCA resserrée",
+        "Gouvernance et travaux concurrents préservés",
+        "7e OOM MariaDB désormais prouvé",
+        "Trajectoire longue et saut du daily update",
+        "Candidat prepared statements — non encore causalement prouvé",
+        "Etat data live mesuré",
+        "Prochaine action gouvernée",
         "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée",
         "Verdict de la boucle de gouvernance",
         "Preuve GitHub ↔ S2 mesurée",
@@ -13307,14 +13319,7 @@
         "Loop Engineering / gouvernance",
         "Canal serveur sans MCP",
         "Remédiation secrets exécutée",
-        "Gaps externes qui empêchent FULLY_GOVERNED",
-        "Prochaine action unique",
-        "BACKLOG CONSOLIDE UNIQUE — etabli le 2026-08-12",
-        "1. ETAT REEL DE LA PLATEFORME (verifie PROD le 2026-08-12)",
-        "2. BACKLOG CONSOLIDE — CE QUI RESTE VRAIMENT A FAIRE",
-        "P1 — Bloquant (donnee fausse affichee, ou perte de visibilite)",
-        "P2 — Important (integrite, securite, exploitation)",
-        "P3 — Dette technique et surveillance"
+        "Gaps externes qui empêchent FULLY_GOVERNED"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13325,20 +13330,48 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "45ac8990d1589650764cfeab62f09b362f5f627f",
-      "last_validated_sha": "45ac8990d1589650764cfeab62f09b362f5f627f",
-      "content_sha256": "cd1125e428a54b8bd8ccdf75715c15db87303a7b5eaa496a3be677678a848344",
-      "line_count": 6515,
-      "byte_count": 456541,
+      "git_blob_sha": "d97efd8bc56b8b46981030c2392307434b1f01eb",
+      "last_validated_sha": "d97efd8bc56b8b46981030c2392307434b1f01eb",
+      "content_sha256": "6ee33623f1836d8ea47d5cd7161c9153d59e7779edf68d129213e572b6ef7796",
+      "line_count": 6618,
+      "byte_count": 463698,
       "headings": [
         {
           "level": 1,
           "text": "Carnet de suivi - Africafunds (Fundafrique)"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-09-22 — AF-OPS-003 RCA resserrée"
+        },
+        {
+          "level": 3,
+          "text": "Gouvernance et travaux concurrents préservés"
+        },
+        {
+          "level": 3,
+          "text": "7e OOM MariaDB désormais prouvé"
+        },
+        {
+          "level": 3,
+          "text": "Trajectoire longue et saut du daily update"
+        },
+        {
+          "level": 3,
+          "text": "Candidat prepared statements — non encore causalement prouvé"
+        },
+        {
+          "level": 3,
+          "text": "Etat data live mesuré"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine action gouvernée"
         },
         {
           "level": 2,
@@ -13467,34 +13500,6 @@
         {
           "level": 4,
           "text": "Donnees statiques peuplees:"
-        },
-        {
-          "level": 4,
-          "text": "Corrections ORM Sequelize:"
-        },
-        {
-          "level": 4,
-          "text": "Corrections nommage societes:"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Fix pages summary-eur/summary-usd + routes API mortes"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Script Phase 2 enrichissement statique (cree, pas encore execute)"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Fix classement EUR/USD ecrivant dans la mauvaise table"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Ajout batch endpoints performance EUR/USD"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-15 - Fix country-panel anomalies (endpoint URL incorrect)"
         }
       ]
     },
