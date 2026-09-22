@@ -458,6 +458,14 @@
       "provenance": "GitHub Actions AfricaFunds Programme Director run 35798266486 at API 2bff515301a2006d07844cfebe81c6b433a3939e; artifact 10724234585",
       "observed_at": "2026-09-22T23:37:12Z",
       "summary": "The projection generator ran twice against the same structured authorities and produced byte-identical JSON (PROJECTION_GENERATOR_DETERMINISM=PASS). repository_write_performed=false. input_sha256=f3edbd134b6b56b55216834e0db74f38638828d3f545fa5ba04d4b9f28d3c92e. Six managed projection blocks are candidates because no managed block markers exist yet in NEXT_ACTION, CURRENT_ITERATION, LOOP_STATE, HANDOFF, STATUS or frontend SUIVI. The full Programme Director artifact now archives 17 files including surface claims, invariants, projection drift and generator outputs. No repository write-back was performed by the generator."
+    },
+    {
+      "id": "AF-EVD-066",
+      "type": "PROGRAMME_DIRECTOR_WRITEBACK_SIMULATION",
+      "result": "SIX_PROJECTIONS_BOUNDED_IDEMPOTENT_ZERO_WRITE",
+      "provenance": "GitHub Actions AfricaFunds Programme Director run 35798774337 at API 0e24897daa75af886229589fc02905cfd55143e6; artifact 10725017142",
+      "observed_at": "2026-09-22T23:43:39Z",
+      "summary": "The managed projection write-back simulator completed PASS for all six views (NEXT_ACTION, CURRENT_ITERATION, LOOP_STATE, HANDOFF, STATUS, frontend SUIVI). projection_count=6, repository_write_performed=false, all_marker_counts_valid=true, all_outside_content_preserved=true, all_second_apply_idempotent=true, error_count=0. Each first application is a bounded INSERT because no managed markers exist yet; the second application is byte-identical and becomes REPLACE mode. The simulation does not authorize Git write-back; a separate governed write-back gate is required."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
