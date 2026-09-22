@@ -417,6 +417,49 @@ describe('Allocation data provider — Fund Master et fenetre SQL', () => {
     expect(result.query_contract.limit).toBeNull();
   });
 
+  test('charge les paires FX dans la meme fenetre sans limite arbitraire', async () => {
+    const calls = { fx: null };
+
+    const provider = createAllocationDataProvider({
+      fundModel: {
+        findAll: jest.fn(async () => [
+          { id: 1, active: 1 },
+          { id: 2, active: 1 },
+        ]),
+      },
+      valuationModel: {
+        findAll: jest.fn(async () => []),
+      },
+      fxModel: {
+        findAll: jest.fn(async options => {
+          calls.fx = options;
+          return [
+            { paire: 'EUR/MAD', date: '2025-01-02', value: 10.8 },
+            { paire: 'EUR/MAD', date: '2025-01-03', value: 0 },
+          ];
+        }),
+      },
+      Op,
+    });
+
+    const result = await provider.load({
+      fundIds: [1, 2],
+      dateFrom: '2025-01-01',
+      dateTo: '2025-12-31',
+      fxPairs: ['eur/mad', 'EUR/MAD'],
+    });
+
+    expect(calls.fx.where.paire[Op.in]).toEqual(['EUR/MAD']);
+    expect(calls.fx.where.date[Op.gte]).toBe('2025-01-01');
+    expect(calls.fx.where.date[Op.lte]).toBe('2025-12-31');
+    expect(calls.fx.limit).toBeUndefined();
+    expect(result.fx_rows).toEqual([
+      { paire: 'EUR/MAD', date: '2025-01-02', value: 10.8 },
+    ]);
+    expect(result.query_contract.forex_table).toBe('devisedechanges');
+    expect(result.query_contract.fx_pairs).toEqual(['EUR/MAD']);
+  });
+
   test('refuse un fonds absent ou inactif du Fund Master', async () => {
     const provider = createAllocationDataProvider({
       fundModel: {
