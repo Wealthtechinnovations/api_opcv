@@ -9,11 +9,11 @@ La seule tâche gouvernée restante est `AF-TASK-010 = BLOCKED_EXTERNAL_PROVIDER
 ### Priorité opérationnelle courante — Programme Directeur
 
 - `AF-OPS-003 = OPEN / POST_FIX_VALIDATION` reste la priorité opérationnelle runtime ;
-- root cause MariaDB exacte : `UNKNOWN` ; correctif protocolaire déployé, validation post-fix en attente de vrais batchs ;
-- `AF-TASK-025 = IN_PROGRESS / GENERATOR_DETERMINISM_GREEN` porte le générateur observe-only des projections ;
+- `AF-TASK-026 = IN_PROGRESS / WRITEBACK_GATE_PREFLIGHT` porte le gate d'insertion initiale des blocs gérés ;
+- preuves amont `AF-EVD-065..066` : déterminisme + simulation idempotente zéro-write ;
 - `AF-TASK-017 = IN_PROGRESS` garde son claim Allocation séparé ;
-- paire `AF-TASK-017 ↔ AF-TASK-025` certifiée non chevauchante ;
-- aucune mutation S2/DB n'est impliquée par ce lot gouvernance.
+- paire `AF-TASK-017 ↔ AF-TASK-026` certifiée non chevauchante ;
+- aucun write-back n'est autorisé si HEAD, claims, marqueurs ou contenu hors bloc dérivent.
 
 ### Historique conservé
 

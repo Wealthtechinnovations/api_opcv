@@ -3,14 +3,14 @@
 ## Reprise opérationnelle actuelle — AF-OPS-003
 
 - `AF-OPS-003 = OPEN / POST_FIX_VALIDATION` ;
-- A/B courts terminés et rollbackés : `34908277049`, `34908496545`, `34908755786`, `34909181790` ;
-- root cause exacte de la dérive multi-Gio : `UNKNOWN` ;
+- root cause MariaDB exacte : `UNKNOWN` ;
 - correctif protocolaire `execute() -> query()` : RED→GREEN, déployé GOV-006, preuves `AF-EVD-058..060` ;
-- prochaine preuve MariaDB : vrais batchs post-fix avec comparaison RSS/RssAnon/Private_Dirty + `Com_stmt_*` + équivalence des sorties ;
+- prochaine preuve MariaDB : vrais batchs post-fix avec RSS/RssAnon/Private_Dirty + `Com_stmt_*` + équivalence des sorties ;
 - `AF-OPS-001` reste sous gate humain séparé ;
-- `AF-TASK-010` reste la tâche de gouvernance externe bloquée sur fournisseurs externes ;
-- `AF-TASK-025 = IN_PROGRESS / GENERATOR_DETERMINISM_GREEN` construit le générateur observe-only des projections ;
-- claim `AF-TASK-025` non chevauchant avec `AF-TASK-017`.
+- `AF-TASK-010` reste bloquée sur fournisseurs externes ;
+- `AF-TASK-026 = IN_PROGRESS / WRITEBACK_GATE_PREFLIGHT` ;
+- générateur déterministe `AF-EVD-065`, simulation idempotente zéro-write `AF-EVD-066` ;
+- claims actifs non chevauchants : `AF-TASK-017` et `AF-TASK-026`.
 
 ## Point de reprise courant — clôture 2026-09-13
 

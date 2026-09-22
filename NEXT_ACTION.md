@@ -73,32 +73,23 @@ La root cause exacte reste **UNKNOWN**. La prochaine preuve n'est plus de recons
 
 ## Programme Directeur — anti-régression actif
 
-Le Programme Directeur est protégé par deux contrats machine-checkable :
+Le Programme Directeur reste protégé par :
 
 ```text
 anti_regression_contract = ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY
 projection_drift_contract = FAIL_CLOSED_CURRENT_PROJECTIONS
 ```
 
-Preuves : `AF-EVD-063`, `AF-EVD-064`.
+État courant :
 
-État courant Programme Directeur :
-
-- `AF-TASK-025 = IN_PROGRESS / GENERATOR_DETERMINISM_GREEN` ;
-- preuve générateur : `AF-EVD-065`, run `35798266486 = SUCCESS` ;
-- deux générations indépendantes sur les mêmes autorités structurées : byte-for-byte identiques ;
-- `repository_write_performed = false` ;
-- 6 vues candidates à des blocs gérés ;
-- prochaine preuve : simulation d'insertion/remplacement des blocs gérés **en mémoire seulement**, avec diff borné et idempotence avant tout write-back Git.
-
-Claims actifs :
-
-- `AF-TASK-017` — Allocation constraint engine ;
-- `AF-TASK-025` — Programme Director projection generator ;
+- `AF-TASK-026 = IN_PROGRESS / WRITEBACK_GATE_PREFLIGHT` ;
+- preuves amont : `AF-EVD-065` (générateur déterministe) et `AF-EVD-066` (simulation 6/6 idempotente, zéro write) ;
+- claims actifs : `AF-TASK-017` + `AF-TASK-026` ;
 - `conflict_count = 0` ;
-- paire `AF-TASK-017 ↔ AF-TASK-025` certifiée non chevauchante.
+- paire `AF-TASK-017 ↔ AF-TASK-026` certifiée non chevauchante ;
+- aucune écriture S2/runtime/DB impliquée.
 
-Toute écriture doit rester strictement dans les surfaces claimées. Un chevauchement ferme le gate.
+Prochaine action Programme Directeur : rerun generator + simulator sur les HEAD exacts et l'état `AF-TASK-026`, vérifier marqueurs/claims/contenu hors bloc, puis seulement insérer les blocs gérés si tous les gates restent verts.
 
 ## Autres blockers indépendants
 

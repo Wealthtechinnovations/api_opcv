@@ -68,12 +68,12 @@ Ces échecs restent tracés dans les exigences/preuves gouvernées et ne sont pa
 
 ```text
 AF-OPS-003 = OPEN / POST_FIX_VALIDATION
-AF-TASK-025 = IN_PROGRESS / GENERATOR_DETERMINISM_GREEN
+AF-TASK-026 = IN_PROGRESS / WRITEBACK_GATE_PREFLIGHT
 anti_regression_contract = ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY
 projection_drift_contract = FAIL_CLOSED_CURRENT_PROJECTIONS
 ```
 
-Le Programme Directeur dérive la continuité depuis les autorités structurées existantes. Il ne crée ni seconde queue ni seconde mémoire. Le claim `AF-TASK-025` ne chevauche pas le claim Allocation `AF-TASK-017`. La preuve de déterminisme du générateur est `AF-EVD-065` ; aucun write-back Git n'est encore autorisé.
+Le Programme Directeur reste dérivé des autorités structurées existantes, sans seconde queue. `AF-EVD-065` prouve le générateur déterministe ; `AF-EVD-066` prouve la simulation 6/6 bornée et idempotente sans write. Les claims `AF-TASK-017` et `AF-TASK-026` sont non chevauchants ; tout drift ferme le gate avant insertion réelle.
 
 ## Incident opérationnel prioritaire
 
