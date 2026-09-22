@@ -63,7 +63,7 @@
       },
       "root_cause": {
         "status": "UNKNOWN",
-        "statement": "Le mécanisme exact de la croissance multi-Gio du RSS reste non résolu. La trajectoire reconstruite prouve désormais une accumulation anonyme/privée sur plusieurs dizaines d'heures avec Memory_used MariaDB presque stable, et un nouvel OOM est prouvé le 2026-09-21. Les A/B allocateur courts restent non discriminants et les contextes de workload varient entre incidents. Le modèle accumulation/rétention MariaDB sur la durée + pression finale d'un workload est renforcé comme modèle à tester, pas PROVEN comme root cause.",
+        "statement": "Le mécanisme exact de la croissance multi-Gio du RSS reste non résolu, mais la zone de déclenchement est désormais fortement resserrée. Le 22/09, MariaDB passe de 468032 kB à 7240796 kB de RSS entre 19:55:55 et 20:03:21 pendant cron_daily_update; avant les performances, les étapes 3/4 réécrivent respectivement 994766 et 995370 VL. Les deux scripts utilisent des UPDATE CASE dynamiques via mysql2 execute(), qui prépare/cache le SQL par texte exact. Ce mécanisme est un candidat prioritaire à tester; il n'est pas encore PROVEN comme root cause.",
         "evidence_refs": [
           "AF-EVD-012",
           "AF-EVD-040",
@@ -77,9 +77,11 @@
           "AF-EVD-048",
           "AF-EVD-050",
           "AF-EVD-053",
-          "AF-EVD-054"
+          "AF-EVD-054",
+          "AF-EVD-056",
+          "AF-EVD-057"
         ],
-        "why_not_proven": "La trajectoire longue prouve l'accumulation mais manque encore de résolution intermédiaire autour des vrais batchs pour attribuer les sauts de RSS. Les données actuelles ne prouvent ni l'origine interne de la mémoire anonyme retenue, ni un job universel, ni une causalité allocator. Le cron Nigeria est temporellement proche de l'OOM du 21/09, mais son sous-traitement exact au moment du kill n'est pas encore prouvé."
+        "why_not_proven": "La mesure avant/après prouve que le saut massif se produit dans la fenêtre des étapes 1-4 et que les deux recalculs massifs 3/4 sont exécutés avant que le RSS atteigne ~7.24 GiB. Il manque encore des échantillons de Prepared_stmt_count/Com_stmt_* pendant chacune des étapes 3 et 4 pour les départager et attribuer causalement le saut à la préparation/cache des statements plutôt qu'à une autre allocation interne liée aux UPDATE massifs."
       },
       "contributing_factors": [
         {
@@ -111,6 +113,16 @@
           "status": "PROVEN",
           "statement": "Le 2026-09-21, MariaDB a subi un nouvel OOM à 10:02:23 UTC pendant la fenêtre du cron Nigeria hebdomadaire; mariadbd PID 2100513 a été tué à 15 054 704 kB d'anon-rss. La proximité temporelle est prouvée, l'étape exacte du cron qui appliquait la pression finale ne l'est pas.",
           "evidence_ref": "AF-EVD-053"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Le 2026-09-22, cron_daily_update démarre à 20:00:01. MariaDB était à 468032 kB RSS à 19:55:55 et atteint 7240796 kB à 20:03:21. Dans cet intervalle, le journal prouve l'achèvement des recalculs EUR/USD (994766 VL) puis VL ajustées (995370 VL). Les étapes de performances qui suivent n'expliquent pas le saut initial.",
+          "evidence_ref": "AF-EVD-056"
+        },
+        {
+          "status": "PROVEN",
+          "statement": "Les deux recalculs massifs construisent des SQL UPDATE CASE variables et les passent à mysql2 execute(); le contrat mysql2 met en cache les prepared statements par SQL exact. Le pattern de risque est prouvé dans le code, sa causalité mémoire reste à mesurer.",
+          "evidence_ref": "AF-EVD-057"
         }
       ],
       "corrective_actions": [
@@ -172,7 +184,7 @@
         {
           "id": "CA-004",
           "status": "OPEN",
-          "description": "Poursuivre la RCA en lecture seule avec échantillonnage longue durée. La trajectoire 14/09→16/09 prouve une accumulation RSS anonyme/privée de ~127 MB à ~8.55 GiB en ~47 h alors que Memory_used reste ~450-482 MB; l'OOM du 21/09 confirme la récurrence. Il reste à mesurer les paliers avant/pendant/après les batchs pour attribuer le mécanisme.",
+          "description": "Poursuivre la RCA sans mutation en séparant les étapes 3 et 4 du daily update. Le saut 468 MB -> 7.24 GiB est capturé entre 19:55 et 20:03 pendant les recalculs massifs EUR/USD et VL ajustées. Le sampler horaire/ciblé doit mesurer Prepared_stmt_count et Com_stmt_prepare/execute/close à 19:55 puis 20:01/20:03/20:05, et autour du cron Nigeria, avant toute correction.",
           "task_refs": [
             "AF-OPS-003"
           ],
@@ -192,7 +204,9 @@
             "AF-EVD-048",
             "AF-EVD-050",
             "AF-EVD-053",
-            "AF-EVD-054"
+            "AF-EVD-054",
+            "AF-EVD-056",
+            "AF-EVD-057"
           ]
         }
       ],
@@ -223,7 +237,9 @@
         "AF-EVD-048",
         "AF-EVD-050",
         "AF-EVD-053",
-        "AF-EVD-054"
+        "AF-EVD-054",
+        "AF-EVD-056",
+        "AF-EVD-057"
       ],
       "linked_tasks": [
         "AF-OPS-001",
