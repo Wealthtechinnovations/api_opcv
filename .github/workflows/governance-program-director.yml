@@ -12,6 +12,7 @@ on:
       - 'scripts/governance/program_invariants.py'
       - 'scripts/governance/program_projection_drift.py'
       - 'scripts/governance/program_projection_generator.py'
+      - 'scripts/governance/program_projection_writeback_simulator.py'
       - '.governance/project.json'
       - '.governance/loop/task-queue.json'
       - '.governance/loop/state.json'
@@ -138,6 +139,16 @@ jobs:
           print("PROJECTION_GENERATOR_EXACT_PRESENT="+str(d.get("exact_present_count")))
           PY
 
+      - name: Simulate managed projection writeback in memory
+        run: |
+          set -euo pipefail
+          python3 api/scripts/governance/program_projection_writeback_simulator.py \
+            --api-root api \
+            --frontend-root frontend \
+            --generator-json out/program-projection-generator.json \
+            --output out/program-projection-writeback-sim.json \
+            | tee out/program-projection-writeback-sim.log
+
       - name: Publish programme summary
         if: always()
         run: |
@@ -246,6 +257,19 @@ jobs:
               print("- input sha256:",gen.get("input_sha256"))
               print("- writeback candidates:",gen.get("writeback_candidate_count"))
               print("- exact managed blocks present:",gen.get("exact_present_count"))
+
+          sp=Path("out/program-projection-writeback-sim.json")
+          if sp.exists():
+              sim=json.loads(sp.read_text(encoding="utf-8"))
+              print()
+              print("### Projection writeback simulation")
+              print("- mode:",sim.get("mode"))
+              print("- integrity:",sim.get("integrity"))
+              print("- repository write performed:",sim.get("repository_write_performed"))
+              print("- projections:",sim.get("projection_count"))
+              print("- outside content preserved:",sim.get("all_outside_content_preserved"))
+              print("- second apply idempotent:",sim.get("all_second_apply_idempotent"))
+              print("- marker counts valid:",sim.get("all_marker_counts_valid"))
           PY
 
       - name: Upload derived programme state
