@@ -17,7 +17,7 @@ MariaDB — RCA des OOM répétés
 status = OPEN
 phase = RCA_PENDING
 incident = AF-INC-20260817-001
-latest evidence = AF-EVD-054
+latest evidence = AF-EVD-057
 ```
 
 ### Ce qui est prouvé
@@ -48,6 +48,18 @@ Ces faits **prouvent l'accumulation multi-heure**, pas sa cause exacte. Le cron 
 ### Prochaine preuve
 
 Instrumenter **en lecture seule** une série temporelle périodique suffisamment fine pour corréler PID/uptime/RSS/RssAnon/Private_Dirty/Memory_used avec START/END/timeouts des vrais batchs. L'objectif est de localiser les paliers de croissance, sans restart, sans nouvel A/B jemalloc et sans mutation MariaDB. `AF-EVD-050` interdit toujours d'interpréter le label kernel `npm start` comme preuve d'un build frontend.
+
+### Fenêtre du saut RSS désormais resserrée
+
+`AF-EVD-056` prouve un saut de `468032 kB` RSS à 19:55:55 UTC vers `7240796 kB` à 20:03:21 UTC le 22/09, alors que `cron_daily_update` démarre à 20:00:01. Avant les endpoints de performances, le journal prouve :
+
+- étape 3 : `recalc_eur_usd_daily_rate.js` — **994766 VL** recalculées ;
+- étape 4 : `recalc_vl_ajuste.js` — **995370 VL** recalculées ;
+- étape 5 puis 6 : le RSS reste ensuite autour de 7.21–7.24 GiB.
+
+`AF-EVD-057` prouve que ces deux moteurs génèrent des `UPDATE ... CASE` dont le texte varie et les exécutent via `mysql2.execute()`. Le contrat mysql2 prépare/cache les statements par SQL exact ; ce pattern est donc un candidat prioritaire, **pas encore une root cause prouvée**.
+
+Le sampler gouverné `.github/workflows/ops-mariadb-rss-timeseries.yml` mesure désormais `Prepared_stmt_count`, `Com_stmt_prepare`, `Com_stmt_execute`, `Com_stmt_close`, RSS/RssAnon/Private_Dirty et les batchs actifs. Il tourne chaque heure et autour de 20:00 ainsi que du cron Nigeria du lundi. La prochaine preuve doit départager étape 3 et étape 4.
 
 Aucun nouvel A/B jemalloc, restart MariaDB, changement systemd, buffer, schéma ou version n'est autorisé par cette prochaine action.
 
