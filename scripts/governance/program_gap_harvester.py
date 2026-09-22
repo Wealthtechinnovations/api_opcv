@@ -14,7 +14,7 @@ import re
 from pathlib import Path
 
 PROJECT_UID = "CS-AFRICAFUNDS-001"
-TEXT_EXTENSIONS = {".js",".jsx",".ts",".tsx",".py",".sh",".sql",".yml",".yaml",".json",".md"}
+TEXT_EXTENSIONS = {".js",".jsx",".ts",".tsx",".py",".sh",".sql",".yml",".yaml",".json",".md"}\nMARKER_EXTENSIONS = {".js",".jsx",".ts",".tsx",".py",".sh",".sql",".yml",".yaml"}
 EXCLUDED_PARTS = {".git","node_modules","dist","build","coverage",".cache",".next","vendor"}
 MARKER = re.compile(r"\b(TODO|FIXME|HACK|XXX)\b[:\s-]*(.*)", re.IGNORECASE)
 
@@ -87,6 +87,8 @@ def keyword_match(text, qtext):
 def harvest(root: Path, role: str, qtext: str):
     rows=[]
     for p in iter_files(root):
+        if p.suffix.lower() not in MARKER_EXTENSIONS:
+            continue
         try:
             txt=p.read_text(encoding="utf-8",errors="ignore")
         except Exception:
