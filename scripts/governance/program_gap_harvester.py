@@ -14,7 +14,8 @@ import re
 from pathlib import Path
 
 PROJECT_UID = "CS-AFRICAFUNDS-001"
-TEXT_EXTENSIONS = {".js",".jsx",".ts",".tsx",".py",".sh",".sql",".yml",".yaml",".json",".md"}\nMARKER_EXTENSIONS = {".js",".jsx",".ts",".tsx",".py",".sh",".sql",".yml",".yaml"}
+TEXT_EXTENSIONS = {".js",".jsx",".ts",".tsx",".py",".sh",".sql",".yml",".yaml",".json",".md"}
+MARKER_EXTENSIONS = {".js",".jsx",".ts",".tsx",".py",".sh",".sql",".yml",".yaml"}
 EXCLUDED_PARTS = {".git","node_modules","dist","build","coverage",".cache",".next","vendor"}
 MARKER = re.compile(r"\b(TODO|FIXME|HACK|XXX)\b[:\s-]*(.*)", re.IGNORECASE)
 
