@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "4219249269dcd08c72ebff08b8bf3db4ed44cfab"
+      "head": "6effef4a78ca26893d0155db0076f60d1222544b"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -9994,10 +9994,25 @@
       "canonical_authority": "docs/DIAG_ONDEMAND.md",
       "unique_information": [
         "Diagnostics a la demande — sortie de production",
+        "A. Fonds dont la rupture n est pas un taux de change",
+        "B. Les 25 lignes sans provenance, en detail",
+        "C. Ruptures hors Nigeria — quelles chaines d import ?",
+        "A. Tables de classement",
+        "B. Retard des performances par pays",
+        "C. Le classement suit-il les performances actuelles ?",
         "A. Etat du CSV",
         "B. Devise emise, fonds en devise etrangere contre les autres",
         "C. Echantillon des lignes de fonds en devise etrangere",
-        "D. Confrontation au referentiel (dev_libelle en base)"
+        "D. Confrontation au referentiel (dev_libelle en base)",
+        "E. L etiquette de devise correspond-elle a l echelle ?",
+        "F. Ce que cela implique pour l etape 0",
+        "Etiquette en desaccord avec le contenu de `value`",
+        "Indetermines — a NE PAS basculer automatiquement (200 avec VL)",
+        "Les 28 fonds declares USD — les deux taux, cote a cote",
+        "Consequence mesuree",
+        "A. Appariement",
+        "B. Nature des ecarts",
+        "C. Changements d echelle — ce qu une correction ecrirait"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10013,15 +10028,39 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "d16114f4df276b0fc504a48e2974b25f1a2d032a",
-      "last_validated_sha": "d16114f4df276b0fc504a48e2974b25f1a2d032a",
-      "content_sha256": "52519956be2daa9f1a9bc417795cebb5837bce9dd431f986e557630d6da526f5",
-      "line_count": 322,
-      "byte_count": 17907,
+      "git_blob_sha": "022c9047b1fa6cdb935793eaa6ab90af36c2ac59",
+      "last_validated_sha": "022c9047b1fa6cdb935793eaa6ab90af36c2ac59",
+      "content_sha256": "5c320f40d1d2f07486e69c763311f3ae00f013f92e058680d093dee25d42bae0",
+      "line_count": 1067,
+      "byte_count": 71138,
       "headings": [
         {
           "level": 1,
           "text": "Diagnostics a la demande — sortie de production"
+        },
+        {
+          "level": 2,
+          "text": "A. Fonds dont la rupture n est pas un taux de change"
+        },
+        {
+          "level": 2,
+          "text": "B. Les 25 lignes sans provenance, en detail"
+        },
+        {
+          "level": 2,
+          "text": "C. Ruptures hors Nigeria — quelles chaines d import ?"
+        },
+        {
+          "level": 2,
+          "text": "A. Tables de classement"
+        },
+        {
+          "level": 2,
+          "text": "B. Retard des performances par pays"
+        },
+        {
+          "level": 2,
+          "text": "C. Le classement suit-il les performances actuelles ?"
         },
         {
           "level": 2,
@@ -10038,6 +10077,102 @@
         {
           "level": 2,
           "text": "D. Confrontation au referentiel (dev_libelle en base)"
+        },
+        {
+          "level": 2,
+          "text": "E. L etiquette de devise correspond-elle a l echelle ?"
+        },
+        {
+          "level": 2,
+          "text": "F. Ce que cela implique pour l etape 0"
+        },
+        {
+          "level": 2,
+          "text": "Etiquette en desaccord avec le contenu de `value`"
+        },
+        {
+          "level": 2,
+          "text": "Indetermines — a NE PAS basculer automatiquement (200 avec VL)"
+        },
+        {
+          "level": 2,
+          "text": "Les 28 fonds declares USD — les deux taux, cote a cote"
+        },
+        {
+          "level": 2,
+          "text": "Consequence mesuree"
+        },
+        {
+          "level": 2,
+          "text": "A. Appariement"
+        },
+        {
+          "level": 2,
+          "text": "B. Nature des ecarts"
+        },
+        {
+          "level": 2,
+          "text": "C. Changements d echelle — ce qu une correction ecrirait"
+        },
+        {
+          "level": 2,
+          "text": "D. Devise que l extracteur corrige attribue a ces mesures"
+        },
+        {
+          "level": 2,
+          "text": "Devise emise par l extracteur, par annee (fonds concernes seulement)"
+        },
+        {
+          "level": 2,
+          "text": "Cout par fonds (les 30 plus exposes)"
+        },
+        {
+          "level": 2,
+          "text": "Total"
+        },
+        {
+          "level": 2,
+          "text": "A. Ce que la source permet"
+        },
+        {
+          "level": 2,
+          "text": "B. Et ce que la correction produirait"
+        },
+        {
+          "level": 2,
+          "text": "C. Detail (50 premieres)"
+        },
+        {
+          "level": 2,
+          "text": "D. Ruptures que le naira source NE resout pas"
+        },
+        {
+          "level": 2,
+          "text": "Ce que la source revele"
+        },
+        {
+          "level": 2,
+          "text": "Les plateaux, du plus long au plus court"
+        },
+        {
+          "level": 2,
+          "text": "Par fonds — ce qui resterait apres correction"
+        },
+        {
+          "level": 2,
+          "text": "Ce que cette mesure autorise"
+        },
+        {
+          "level": 2,
+          "text": "Repartition par pays et lot d insertion"
+        },
+        {
+          "level": 2,
+          "text": "Detail (60 premieres)"
+        },
+        {
+          "level": 2,
+          "text": "Provenance"
         }
       ]
     },
@@ -10064,11 +10199,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "d6f9f68facb26eaefc8c996f50a4df2188209357",
-      "last_validated_sha": "d6f9f68facb26eaefc8c996f50a4df2188209357",
-      "content_sha256": "cd1fbd93b4ad9a31b3fac428a11aa0a043b53e41f520d5773a4fe9a75ae74379",
-      "line_count": 22,
-      "byte_count": 938,
+      "git_blob_sha": "d60e19b371ff3908c717b6018a0efb659206261a",
+      "last_validated_sha": "d60e19b371ff3908c717b6018a0efb659206261a",
+      "content_sha256": "f9ea08f2c0d68988bf0aeb48620c67fd0d6a5b67733b0f532b795aca481224da",
+      "line_count": 62,
+      "byte_count": 4476,
       "headings": [
         {
           "level": 1,
