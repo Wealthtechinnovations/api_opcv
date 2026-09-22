@@ -10,6 +10,7 @@ on:
       - 'scripts/governance/program_gap_harvester.py'
       - 'scripts/governance/program_surface_claims.py'
       - 'scripts/governance/program_invariants.py'
+      - 'scripts/governance/program_projection_drift.py'
       - '.governance/project.json'
       - '.governance/loop/task-queue.json'
       - '.governance/loop/state.json'
@@ -93,6 +94,15 @@ jobs:
             --frontend-root frontend \
             --output out/program-invariants.json \
             | tee out/program-invariants.log
+
+      - name: Detect human projection drift observe-only
+        run: |
+          set -euo pipefail
+          python3 api/scripts/governance/program_projection_drift.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/program-projection-drift.json \
+            | tee out/program-projection-drift.log
 
       - name: Publish programme summary
         if: always()
@@ -180,6 +190,17 @@ jobs:
               print("- errors:",invariants.get("error_count"))
               print("- warnings:",invariants.get("warning_count"))
               print("- operational priority:",invariants.get("operational_priority"))
+
+          dp=Path("out/program-projection-drift.json")
+          if dp.exists():
+              drift=json.loads(dp.read_text(encoding="utf-8"))
+              print()
+              print("### Human projection drift")
+              print("- mode:",drift.get("mode"))
+              print("- machine integrity:",drift.get("integrity"))
+              print("- projection drift count:",drift.get("projection_drift_count"))
+              for row in drift.get("projection_drifts",[]):
+                  print("-",row.get("projection"),"missing",row.get("missing_tokens"))
           PY
 
       - name: Upload derived programme state
