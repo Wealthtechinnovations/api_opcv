@@ -17,6 +17,11 @@ on:
       - '.governance/loop/handoff.json'
       - '.governance/knowledge/evidence.json'
       - '.governance/incidents/registry.json'
+      - 'NEXT_ACTION.md'
+      - 'CURRENT_ITERATION.md'
+      - 'LOOP_STATE.md'
+      - 'HANDOFF.md'
+      - 'STATUS.md'
       - '.github/workflows/governance-program-director.yml'
   schedule:
     - cron: '23 * * * *'
