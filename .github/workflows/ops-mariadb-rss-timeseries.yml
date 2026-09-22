@@ -16,6 +16,9 @@ on:
       - claude/code-review-improvements-ikvuj
     paths:
       - '.github/workflows/ops-mariadb-rss-timeseries.yml'
+      - 'scripts/diag/ondemand/diag_recalc_sql_protocol_contract.js'
+      - 'scripts/recalc/recalc_eur_usd_daily_rate.js'
+      - 'scripts/recalc/recalc_vl_ajuste.js'
 
 permissions:
   contents: read
@@ -34,6 +37,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier le contrat SQL des recalculs massifs
+        run: |
+          set -euo pipefail
+          node scripts/diag/ondemand/diag_recalc_sql_protocol_contract.js
 
       - name: Verifier les secrets SSH
         env:
