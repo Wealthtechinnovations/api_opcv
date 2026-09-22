@@ -158,7 +158,7 @@
         "AF-INC-20260817-001"
       ],
       "depends_on": [],
-      "next_action": "Continuer la RCA read-only avec une vraie série temporelle longue RSS avant/pendant/après les batchs. Les OOM documentés surviennent sous des workloads lourds différents; aucun job unique n'est commun. Tester le modèle accumulation/rétention MariaDB + pression finale workload sans le promouvoir à PROVEN. Corriger les attributions documentaires non prouvées ('npm start' ne prouve pas un build frontend).",
+      "next_action": "Instrumenter la prochaine preuve read-only sous forme de série temporelle périodique RSS/RssAnon/Private_Dirty/Memory_used autour des vrais batchs. Le 7e OOM est prouvé le 2026-09-21 et une accumulation ~127 MB -> ~8.55 GiB en ~47 h est déjà reconstruite; il faut maintenant localiser les paliers de croissance sans restart, sans nouvel A/B et sans mutation MariaDB.",
       "phase": "RCA_PENDING",
       "evidence_refs": [
         "AF-EVD-040",
@@ -170,7 +170,9 @@
         "AF-EVD-046",
         "AF-EVD-047",
         "AF-EVD-048",
-        "AF-EVD-050"
+        "AF-EVD-050",
+        "AF-EVD-053",
+        "AF-EVD-054"
       ]
     },
     {
@@ -224,7 +226,8 @@
       "next_action": "Rejouer le dry-run existant des segments Nigeria sans écriture, confronter son périmètre au C7 live du 2026-09-16 et séparer explicitement les cas Nigeria des anomalies hors Nigeria (dont FCP BRIDGE EQUILIBRE/UEMOA). N'exécuter aucune correction si le scope diverge. Toute écriture doit conserver snapshot, transaction, rollback et vérification C7/C3 post-write.",
       "evidence_refs": [
         "AF-EVD-011",
-        "AF-EVD-052"
+        "AF-EVD-052",
+        "AF-EVD-055"
       ]
     },
     {
@@ -243,7 +246,8 @@
       "next_action": "Instruire C2 fonds par fonds avant toute suppression. Après assainissement/fraîcheur des VL, recalculer les performances via les scripts/workflows existants, sans classements tant que les performances sources ne sont pas validées. Re-mesurer C2 et C8 avant toute clôture.",
       "evidence_refs": [
         "AF-EVD-011",
-        "AF-EVD-052"
+        "AF-EVD-052",
+        "AF-EVD-055"
       ]
     },
     {
@@ -255,10 +259,12 @@
         "AF-REQ-015"
       ],
       "depends_on": [],
-      "next_action": "Diagnostiquer en lecture seule pourquoi Nigeria et Tunisie sont tous deux bloqués au 2026-08-28. Vérifier source disponible, dernier cron/import, erreurs, fichiers entrants et parseurs existants avant toute importation. Ne pas forcer un backfill ni rejouer un import tant que le périmètre source/date n'est pas prouvé.",
+      "next_action": "La fraîcheur C4 Nigeria/Tunisie est de nouveau dans le budget au 2026-09-22 (Nigeria VL 2026-09-11; Tunisie VL 2026-09-22). Ne pas backfiller. Maintenir la tâche OPEN pour fiabiliser le pipeline: le cron Nigeria du 21/09 a extrait des artefacts frais puis ses étapes aval ont échoué après l'OOM MariaDB; le cron Tunisie est sain. Vérifier le prochain cycle Nigeria et séparer disponibilité DB, extraction source et calculs dérivés.",
       "evidence_refs": [
         "AF-EVD-011",
-        "AF-EVD-052"
+        "AF-EVD-052",
+        "AF-EVD-055",
+        "AF-EVD-053"
       ]
     }
   ]
