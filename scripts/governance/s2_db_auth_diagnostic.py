@@ -329,6 +329,96 @@ def stale_env_open_fds():
     return rows[:100]
 
 
+def _denial_datetimes(rows):
+    out=[]
+    for line in rows:
+        m=re.match(r"^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})[+-]",line)
+        if not m:
+            continue
+        out.append(datetime.fromisoformat(m.group(1)).replace(tzinfo=timezone.utc))
+    return out
+
+def http_context_for_denials(rows):
+    """Correlate DB denials with vhost access logs. IPs and query strings are never emitted."""
+    denial_times=_denial_datetimes(rows)
+    roots=[
+        Path("/var/www/vhosts/system/africafunds.chainsolutions.fr/logs"),
+        Path("/var/www/vhosts/chainsolutions.fr/logs"),
+    ]
+    files=[]
+    for root in roots:
+        if not root.exists():
+            continue
+        try:
+            files.extend(p for p in root.glob("*access*") if p.is_file())
+        except Exception:
+            continue
+
+    counts={}
+    used=[]
+    for p in sorted(set(files),key=lambda x:str(x))[:60]:
+        used.append(str(p))
+        try:
+            size=p.stat().st_size
+            with p.open("rb") as fh:
+                fh.seek(max(0,size-20_000_000))
+                txt=fh.read().decode("utf-8",errors="ignore")
+        except Exception:
+            continue
+        for line in txt.splitlines():
+            tm=re.search(r"\\[([0-9]{2}/[A-Za-z]{3}/[0-9]{4}:[0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{4})\\]",line)
+            if not tm:
+                continue
+            try:
+                stamp=datetime.strptime(tm.group(1),"%d/%b/%Y:%H:%M:%S %z").astimezone(timezone.utc)
+            except Exception:
+                continue
+            if not any(abs((stamp-d).total_seconds()) <= 2 for d in denial_times):
+                continue
+            req=re.search(r'"([A-Z]+) ([^ ]+) [^"]*" ([0-9]{3})',line)
+            if not req:
+                continue
+            method,target,status=req.groups()
+            path=target.split("?",1)[0][:300]
+            key=(stamp.strftime("%Y-%m-%dT%H:%M:%SZ"),method,path,status)
+            counts[key]=counts.get(key,0)+1
+
+    matches=[
+        {"timestamp_utc":k[0],"method":k[1],"path":k[2],"status":k[3],"count":v}
+        for k,v in sorted(counts.items())
+    ]
+    return {
+        "candidate_log_files":used,
+        "matches_within_2s":matches[-300:],
+        "client_ips_exposed":False,
+        "query_strings_exposed":False,
+    }
+
+def journal_context_for_denials(rows):
+    denial_times=_denial_datetimes(rows)
+    out={"cron":[],"ssh_publickey":[]}
+    for unit,key,pattern in [
+        ("cron","cron",None),
+        ("ssh","ssh_publickey","Accepted publickey"),
+        ("sshd","ssh_publickey","Accepted publickey"),
+    ]:
+        code,stdout,stderr=run(["journalctl","-u",unit,"--since",datetime.now(timezone.utc).strftime("%Y-%m-%d 00:00:00"),"--no-pager","-o","short-iso"],timeout=25)
+        if code!=0:
+            continue
+        for line in stdout.splitlines():
+            if pattern and pattern not in line:
+                continue
+            m=re.match(r"^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})[+-]",line)
+            if not m:
+                continue
+            stamp=datetime.fromisoformat(m.group(1)).replace(tzinfo=timezone.utc)
+            if not any(abs((stamp-d).total_seconds()) <= 10 for d in denial_times):
+                continue
+            safe=re.sub(r" from \\S+ port \\d+"," from REDACTED port REDACTED",sanitize(line))
+            if safe not in out[key]:
+                out[key].append(safe[:900])
+    return out
+
 def mtime(path):
     p=Path(path)
     if not p.exists(): return None
@@ -349,6 +439,8 @@ report={
     "today_access_denied_count":len(today_denied),
     "today_access_denied_lines":today_denied[-200:],
     "today_access_denied_summary":summarize_denials(today_denied),
+    "today_http_context":http_context_for_denials(today_denied),
+    "today_journal_context":journal_context_for_denials(today_denied),
     "root_project_cron_lines":cron_lines(),
     "pm2":pm2_rows(),
     "project_processes":project_processes(),
