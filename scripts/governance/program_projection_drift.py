@@ -50,12 +50,13 @@ def main():
 
     director=queue.get("programme_director") or {}
     claims=queue.get("surface_claims_contract") or {}
-    programme_tasks=[
+    programme_all=[
         t for t in queue.get("tasks",[])
-        if t.get("program")=="PROGRAMME_DIRECTOR" and t.get("status")=="IN_PROGRESS"
+        if t.get("program")=="PROGRAMME_DIRECTOR" and t.get("id")
     ]
-    programme_tasks.sort(key=lambda t:t.get("id",""))
-    programme=programme_tasks[-1] if programme_tasks else {}
+    programme_all.sort(key=lambda t:t.get("id",""))
+    programme_active=[t for t in programme_all if t.get("status")=="IN_PROGRESS"]
+    programme=programme_active[-1] if programme_active else (programme_all[-1] if programme_all else {})
     programme_id=programme.get("id")
     programme_phase=programme.get("phase")
 
