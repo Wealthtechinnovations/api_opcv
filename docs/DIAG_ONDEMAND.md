@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-09-22 20:15 UTC**
+Derniere execution : **2026-09-22 20:19 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-09-22 20:13:22 UTC — LECTURE SEULE
+Mesure le 2026-09-22 20:16:47 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -78,22 +78,22 @@ Mesure le 2026-09-22 20:13:22 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-09-22 20:14:22 UTC — LECTURE SEULE
+Mesure le 2026-09-22 20:17:45 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
   classementfonds             3620 lignes — aucune colonne de date
   classementfonds_eurs        3637 lignes — aucune colonne de date
   classementfonds_usds        3637 lignes — aucune colonne de date
-  performences               77912 lignes — updated_at max = aucune (?)
-  performences_eurs          34280 lignes — date max = Fri Sep 18 2026 00: (4.8 j)
+  performences               77952 lignes — updated_at max = aucune (?)
+  performences_eurs          34350 lignes — date max = Mon Sep 21 2026 00: (1.8 j)
   performences_usds          34513 lignes — date max = Fri Sep 18 2026 00: (4.8 j)
 
 ## B. Retard des performances par pays
 
   pays        fonds  a jour      %  retard moy.  retard max
   ---------- ------ ------- ------ ------------ -----------
-  MAROC         640      18  2.8 %      115.8 j       129 j
+  MAROC         640      18  2.8 %      115.6 j       129 j
   TUNISIE       131       5  3.8 %      111.9 j       127 j
   UEMOA         109      37 33.9 %       33.5 j       265 j
   NIGERIA       320     297 92.8 %        7.7 j       665 j
@@ -101,7 +101,7 @@ Mesure le 2026-09-22 20:14:22 UTC — LECTURE SEULE
 
 ## C. Le classement suit-il les performances actuelles ?
 
-  OBLIGATIONS MAROC                strict  108/300  (36.0 %) · rho  0.690 · top10 3/10 · ex aequo 1
+  OBLIGATIONS MAROC                strict  107/300  (35.7 %) · rho  0.690 · top10 3/10 · ex aequo 1
                                    DIVERGE — le classement ne reflete pas les performances en base
   DIVERSIFIE MAROC                 strict   18/141  (12.8 %) · rho  0.210 · top10 6/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
@@ -119,14 +119,14 @@ Mesure le 2026-09-22 20:14:22 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260921.log     34.2 h  ECHEC — 8 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260922.log        0.1 h  aucun marqueur de fin
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260921.log     34.3 h  ECHEC — 8 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260922.log        0.0 h  aucun marqueur de fin
   cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     22.6 h  ECHEC — 3 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      1.2 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         0.7 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                1.7 h  OK  (reserve : Echecs scraping: 23)
-  cron_health_check      tous les j 22:00     africafunds_health_20260921.log      22.2 h  aucun marqueur de fin
-  sync_production        toutes les heures    sync_production.log                   0.2 h  aucun marqueur de fin
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      1.3 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         0.8 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                1.8 h  OK  (reserve : Echecs scraping: 23)
+  cron_health_check      tous les j 22:00     africafunds_health_20260921.log      22.3 h  aucun marqueur de fin
+  sync_production        toutes les heures    sync_production.log                   0.3 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -148,20 +148,20 @@ Mesure le 2026-09-22 20:14:22 UTC — LECTURE SEULE
   | ========================================
 
 --- cron_daily_update (aucun marqueur de fin) — /var/log/africafunds_daily_20260922.log
-  | Erreurs:                   0
-  | Verification globale:
-  |   Total VL (value > 0):     1039403
-  |   Avec vl_ajuste > 0:       1039331
-  |   Avec vl_ajuste_EUR > 0:   999388
-  |   Avec vl_ajuste_USD > 0:   999388
-  |   Avec dividende > 0:       854
-  | Termine.
-  | [4/9] OK
   | [5/9] Recalcul performances locale (fonds 1-600)...
   | {"message":"Performances locales: 25/25 fonds traites, 0 erreur(s)","total":25,"traites":25,"erreurs":0}[5/9] OK (HTTP 200)
   | [6/9] Recalcul performances locale (fonds 601-1200)...
   | [6/9] ERREUR (HTTP 000)
   | [7/9] Recalcul performances locale (fonds 1201-3000)...
+  | [7/9] ERREUR (HTTP 000)
+  | [8/9] Recalcul performances EUR/USD...
+  | Connecte a la base fund_opcvm
+  | Options: devise=BOTH, pays=TOUS, force=false
+  | 1250 fonds actifs a traiter
+  | ============================================================
+  | === EUR — table: performences_eurs ===
+  | ============================================================
+  |   [100/1250] SG NOVA (MAROC) EUR date=2026-09-21
 
 --- cron_daily_eur_usd (ECHEC — 3 erreur(s)) — /var/log/cron_eur_usd.log
   | (node:1342010) UnhandledPromiseRejectionWarning: Error: connect ECONNREFUSED 127.0.0.1:3306
@@ -214,14 +214,14 @@ Mesure le 2026-09-22 20:14:22 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-09-22T20:14:27.630Z — LECTURE SEULE
+ Genere le 2026-09-22T20:17:50.940Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 9.95 Mo
-   modifie   : 2026-09-21T10:00:32.286Z (il y a 34.2 h)
+   modifie   : 2026-09-21T10:00:32.286Z (il y a 34.3 h)
    lignes    : 7942
    colonnes  : 59
 
@@ -324,7 +324,7 @@ Mesure le 2026-09-22 20:14:22 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-09-22 20:14:28 UTC — LECTURE SEULE
+Mesure le 2026-09-22 20:17:51 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 332
   etiquette CONFORME au contenu : 122
@@ -484,7 +484,7 @@ Fonds Nigeria examines : 332
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-09-22 20:14:35 UTC — LECTURE SEULE
+Mesure le 2026-09-22 20:17:57 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -676,17 +676,17 @@ VL Nigeria en base : 77466
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : c67d15fdb — feat(ops): quantify prepared statement pressure read-only
+  HEAD : 1b4d9715c — fix(ops): load runtime env in prepared statement diagnostic
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  169  depuis 257.9 h
-    fundafrique-frontend     online     redemarrages   48  depuis 900.1 h
-    worker-recalculation     online     redemarrages    3  depuis 258.0 h
-    worker-data-import       online     redemarrages    3  depuis 258.0 h
+    api-monolith             online     redemarrages  169  depuis 258.0 h
+    fundafrique-frontend     online     redemarrages   48  depuis 900.2 h
+    worker-recalculation     online     redemarrages    3  depuis 258.1 h
+    worker-data-import       online     redemarrages    3  depuis 258.1 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -703,7 +703,7 @@ VL Nigeria en base : 77466
 ########## scripts/diag/ondemand/diag_mariadb_incident_timeline.js ##########
 
 === MARIADB — TIMELINE INCIDENTS RECENTS (LECTURE SEULE) ===
-Mesure le 2026-09-22T20:14:42.086Z
+Mesure le 2026-09-22T20:18:03.373Z
 
 
 --- etat systemd courant ---
@@ -712,14 +712,14 @@ Result=success
 NRestarts=0
 ExecMainStartTimestamp=Tue 2026-09-22 06:25:02 UTC
 ExecMainPID=3041009
-MemoryCurrent=7432691712
+MemoryCurrent=7433576448
 ActiveState=active
 SubState=running
 StateChangeTimestamp=Tue 2026-09-22 06:25:02 UTC
 ActiveEnterTimestamp=Tue 2026-09-22 06:25:02 UTC
 
 --- processus mariadbd courant ---
-MARIADB_PROCESS pid=3041009 uptime_s=49780 rss_kb=7209636 rssanon_kb=7194036 private_dirty_kb=7195256 swap_kb=52732
+MARIADB_PROCESS pid=3041009 uptime_s=49982 rss_kb=7210400 rssanon_kb=7194652 private_dirty_kb=7196020 swap_kb=52724
 
 --- listener TCP 3306 courant ---
 LISTEN 0      80                                       127.0.0.1:3306       0.0.0.0:*    users:(("mariadbd",pid=3041009,fd=19))
@@ -834,7 +834,7 @@ SEP21_MARIADB_START_OR_READY_PRESENT=YES
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-09-22 20:14:42 UTC — LECTURE SEULE
+Mesure le 2026-09-22 20:18:03 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -903,7 +903,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-09-22 20:14:48 UTC — LECTURE SEULE
+Mesure le 2026-09-22 20:18:08 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
@@ -1006,7 +1006,7 @@ Ruptures d echelle Nigeria encore en base : 139
 ########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-09-22 20:14:53 UTC — LECTURE SEULE
+Mesure le 2026-09-22 20:18:13 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -1095,12 +1095,28 @@ Mesure le 2026-09-22 20:14:53 UTC — LECTURE SEULE
 
 
 ########## scripts/diag/ondemand/diag_recalc_prepared_stmt_pressure.js ##########
-READ_ONLY_DIAG_ERROR=Access denied for user 'fund_opcvm'@'localhost' (using password: NO)
+
+=== PREPARED STATEMENT PRESSURE — READ ONLY ===
+Mesure: 2026-09-22T20:18:19.842Z
+STEP3_RECALC_EUR_USD funds=1249 vl_rows=994766 dynamic_update_statements=2607 batch_size=500
+STEP4_RECALC_VL_AJUSTE funds=1250 vl_rows=995370 dynamic_update_statements=5710 batch_size=200
+COMBINED_DYNAMIC_UPDATE_STATEMENTS=8317
+MYSQL_MAX_PREPARED_STMT_COUNT=16382
+MYSQL_PERFORMANCE_SCHEMA=OFF
+MYSQL_PREPARED_STMT_COUNT_NOW=13
+MYSQL_COM_STMT_PREPARE_SINCE_RESTART=8422
+MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=14829
+MYSQL_COM_STMT_CLOSE_SINCE_RESTART=0
+MYSQL_MEMORY_USED_NOW=480395952
+MYSQL_UPTIME=50004
+PREPARE_MINUS_THEORETICAL_DYNAMIC=105
+NOTE=Step3 count is an upper geometry bound before currency/rate skips; current daily log reported 1249 funds and 994766 VL actually processed. Step4 geometry is exact for active-fund row batches. Com_stmt_prepare is server-global and cumulative, so numerical proximity is evidence for correlation, not causal identity.
+MUTATION=NONE
 
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-09-22 20:14:59 UTC — LECTURE SEULE
+Mesure le 2026-09-22 20:18:27 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 146 ligne(s) sur 64 fonds
