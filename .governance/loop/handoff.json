@@ -25,7 +25,7 @@
     "AF-OPS-003"
   ],
   "open": [],
-  "next_action": "AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director, chronology, gap discovery and observe-only surface-claim validation are active in the existing queue. Surface claims currently have no active claims and no conflicts; they are advisory-only and MUST NOT be treated as certified parallel safety until real task claims are populated. Continue post-fix MariaDB evidence collection; read-only AF-OPS-005/007/009 can progress subject to live write-surface checks.",
+  "next_action": "AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director now hard-fails existing continuity/non-regression invariants and currently sees one active Allocation surface claim on AF-TASK-017 with zero conflict. Preserve that claimed surface. Continue MariaDB post-fix evidence read-only and other read-only AF-OPS work only on non-conflicting surfaces; do not certify parallel writes unless active task claims are non-overlapping.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -81,9 +81,14 @@
     "programme_director_parallel_safety": "DEPENDENCY_ONLY_NOT_FILE_SURFACE_CERTIFIED",
     "programme_director_surface_claims": "ACTIVE_OBSERVE_ONLY_AF-EVD-062",
     "programme_director_surface_claims_enforcement": "ADVISORY_ONLY_NO_WRITE_BLOCK",
-    "programme_director_active_surface_claim_count": 0,
+    "programme_director_active_surface_claim_count": 1,
     "programme_director_surface_conflict_count": 0,
-    "programme_director_surface_parallel_pairs": 0
+    "programme_director_surface_parallel_pairs": 0,
+    "programme_director_anti_regression": "ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_AF-EVD-063",
+    "programme_director_anti_regression_run_id": 35793007081,
+    "programme_director_active_surface_claim_tasks": [
+      "AF-TASK-017"
+    ]
   },
   "closed_with_external_gaps": [
     "AF-TASK-003"
