@@ -61,6 +61,7 @@ function normalizeIds(fundIds) {
 function createAllocationDataProvider({
   fundModel,
   valuationModel,
+  fxModel = null,
   Op,
 }) {
   if (!fundModel || typeof fundModel.findAll !== 'function') {
@@ -129,12 +130,64 @@ function createAllocationDataProvider({
     return grouped;
   }
 
-  async function load({ fundIds, dateFrom = null, dateTo = null }) {
+  async function loadFxRows({ pairs = [], dateFrom = null, dateTo = null }) {
+    const normalizedPairs = [...new Set((pairs || []).map(pair => String(pair).trim().toUpperCase()))]
+      .filter(Boolean);
+
+    if (!normalizedPairs.length) return [];
+    if (!fxModel || typeof fxModel.findAll !== 'function') {
+      throw new AllocationDataError(issue(
+        'fx',
+        'FX_MODEL_REQUIRED',
+        'Le modele devisedechanges est requis pour charger les paires FX.',
+        { pairs: normalizedPairs }
+      ));
+    }
+
+    for (const pair of normalizedPairs) {
+      if (!/^[A-Z]{3}\/[A-Z]{3}$/.test(pair)) {
+        throw new AllocationDataError(issue(
+          'fx.pairs',
+          'INVALID_FX_PAIR',
+          'Chaque paire FX doit utiliser le format AAA/BBB.',
+          { pair }
+        ));
+      }
+    }
+
+    const date = {};
+    if (dateFrom) date[Op.gte] = dateFrom;
+    if (dateTo) date[Op.lte] = dateTo;
+
+    const where = {
+      paire: { [Op.in]: normalizedPairs },
+    };
+    if (dateFrom || dateTo) where.date = date;
+
+    const rows = await fxModel.findAll({
+      attributes: ['paire', 'date', 'value'],
+      where,
+      order: [
+        ['paire', 'ASC'],
+        ['date', 'ASC'],
+      ],
+      raw: true,
+    });
+
+    return (rows || []).filter(row => Number(row.value) > 0);
+  }
+
+  async function load({ fundIds, dateFrom = null, dateTo = null, fxPairs = [] }) {
     const ids = normalizeIds(fundIds);
-    const [funds, valuationsByFund] = await Promise.all([
+    const [funds, valuationsByFund, fxRows] = await Promise.all([
       loadFundMaster(ids),
       loadValuations({
         fundIds: ids,
+        dateFrom,
+        dateTo,
+      }),
+      loadFxRows({
+        pairs: fxPairs,
         dateFrom,
         dateTo,
       }),
@@ -143,9 +196,12 @@ function createAllocationDataProvider({
     return {
       funds,
       valuations_by_fund: valuationsByFund,
+      fx_rows: fxRows,
       query_contract: {
         fund_master_table: 'fond_investissements',
         valuation_table: 'valorisations',
+        forex_table: 'devisedechanges',
+        fx_pairs: [...new Set((fxPairs || []).map(pair => String(pair).trim().toUpperCase()).filter(Boolean))],
         active_only: true,
         explicit_date_window: Boolean(dateFrom || dateTo),
         limit: null,
@@ -157,6 +213,7 @@ function createAllocationDataProvider({
   return {
     loadFundMaster,
     loadValuations,
+    loadFxRows,
     load,
   };
 }
