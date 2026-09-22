@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "709516d465ed53650eb9bff7c4f874df5569efc0"
+      "head": "ace2d5d6fc623071080fd2c84d9d45185de55eb9"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -2904,10 +2904,11 @@
         "Priorité opérationnelle pré-V2 — AF-OPS-003",
         "Ce qui est prouvé",
         "Historique A/B à ne pas rejouer",
+        "Nouvelle récurrence et trajectoire longue prouvées",
         "Prochaine preuve",
         "Autres blockers indépendants",
         "AF-OPS-005 en parallèle read-only",
-        "Data-quality operational queue — measured 2026-09-16",
+        "Data-quality operational queue — measured 2026-09-22",
         "AF-OPS-005 update"
       ],
       "consumers": [
@@ -2924,11 +2925,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "93d7e857dd6815463d9e2effb16fb90dfa83da47",
-      "last_validated_sha": "93d7e857dd6815463d9e2effb16fb90dfa83da47",
-      "content_sha256": "b1c585d5aeab2e8688504405d548ac43dcfcdbb544f3ed142ca229900bf5090a",
-      "line_count": 73,
-      "byte_count": 3868,
+      "git_blob_sha": "6c9d1910c07a922a06820a9c8eaa65cf22e98e65",
+      "last_validated_sha": "6c9d1910c07a922a06820a9c8eaa65cf22e98e65",
+      "content_sha256": "af532bcda9587da2e0e23ba1e50283b1818403e1f582de51a2acc5c8456d85f8",
+      "line_count": 78,
+      "byte_count": 4694,
       "headings": [
         {
           "level": 1,
@@ -2948,6 +2949,10 @@
         },
         {
           "level": 3,
+          "text": "Nouvelle récurrence et trajectoire longue prouvées"
+        },
+        {
+          "level": 3,
           "text": "Prochaine preuve"
         },
         {
@@ -2960,7 +2965,7 @@
         },
         {
           "level": 2,
-          "text": "Data-quality operational queue — measured 2026-09-16"
+          "text": "Data-quality operational queue — measured 2026-09-22"
         },
         {
           "level": 2,
@@ -7421,7 +7426,8 @@
         "Timeout client != annulation serveur",
         "OOM du 14 septembre : workload actif prouvé",
         "Prochaine discrimination",
-        "Corrélation multi-incidents — 2026-09-15 00:38 UTC"
+        "Corrélation multi-incidents — 2026-09-15 00:38 UTC",
+        "Mise à jour 2026-09-22 — 7e OOM prouvé"
       ],
       "consumers": [
         "CI",
@@ -7439,11 +7445,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/07-operations/incidents/AF-INC-20260817-001-mariadb-oom.md",
-      "git_blob_sha": "5f068cef90661516da4df8311694a4b3839cccad",
-      "last_validated_sha": "5f068cef90661516da4df8311694a4b3839cccad",
-      "content_sha256": "a40d6a690b8877b4d7231241114ba866d094b9a33a9171ecb0d3c8b79b9c6d06",
-      "line_count": 81,
-      "byte_count": 6210,
+      "git_blob_sha": "8ff5b1ffde1194d3d7a13c9213b487f96fd0bba1",
+      "last_validated_sha": "8ff5b1ffde1194d3d7a13c9213b487f96fd0bba1",
+      "content_sha256": "35105248cde479fb0c5f5349a251ff74fe821ea71a1bb68da718791ec6841c8f",
+      "line_count": 100,
+      "byte_count": 7639,
       "headings": [
         {
           "level": 1,
@@ -7508,6 +7514,10 @@
         {
           "level": 2,
           "text": "Corrélation multi-incidents — 2026-09-15 00:38 UTC"
+        },
+        {
+          "level": 2,
+          "text": "Mise à jour 2026-09-22 — 7e OOM prouvé"
         }
       ]
     },
@@ -10028,11 +10038,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "022c9047b1fa6cdb935793eaa6ab90af36c2ac59",
-      "last_validated_sha": "022c9047b1fa6cdb935793eaa6ab90af36c2ac59",
-      "content_sha256": "5c320f40d1d2f07486e69c763311f3ae00f013f92e058680d093dee25d42bae0",
-      "line_count": 1067,
-      "byte_count": 71138,
+      "git_blob_sha": "15939ef2db6a031e2b2698371f54dafb8a80af68",
+      "last_validated_sha": "15939ef2db6a031e2b2698371f54dafb8a80af68",
+      "content_sha256": "98baff2d95e133dffd21a65ad3a838aa8aa0154e1a11c43789c942b712d55cc2",
+      "line_count": 1198,
+      "byte_count": 83750,
       "headings": [
         {
           "level": 1,
@@ -10199,9 +10209,9 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "d60e19b371ff3908c717b6018a0efb659206261a",
-      "last_validated_sha": "d60e19b371ff3908c717b6018a0efb659206261a",
-      "content_sha256": "f9ea08f2c0d68988bf0aeb48620c67fd0d6a5b67733b0f532b795aca481224da",
+      "git_blob_sha": "ff6d6d3e4be0067a9a0142bfbcce21cfb03a299f",
+      "last_validated_sha": "ff6d6d3e4be0067a9a0142bfbcce21cfb03a299f",
+      "content_sha256": "6d031b56a60f9b776cac613d642b64b9694e79dd1924a49901205c5f3427024d",
       "line_count": 62,
       "byte_count": 4476,
       "headings": [
