@@ -512,29 +512,29 @@
           "API"
         ],
         "touched_surfaces": [
-          "src/services/allocation/**",
+          "src/services/allocation/contract.js",
           "tests/allocation-contract.test.js",
+          "tests/allocation-route.test.js",
           ".github/workflows/governance-allocation-contract.yml",
           "src/routes/apigestionallocation.js",
-          "app.js",
-          "tests/allocation-route.test.js"
+          "app.js"
         ]
       },
       "touched_surfaces": [
-        "src/services/allocation/**",
+        "src/services/allocation/contract.js",
         "tests/allocation-contract.test.js",
+        "tests/allocation-route.test.js",
         ".github/workflows/governance-allocation-contract.yml",
         "src/routes/apigestionallocation.js",
-        "app.js",
-        "tests/allocation-route.test.js"
+        "app.js"
       ]
     },
     {
       "id": "AF-TASK-014",
       "program_id": "AF-ALLOC-001",
       "title": "Allocation — moteur canonique de préparation des données quantitatives",
-      "status": "OPEN",
-      "phase": "DEPENDENCY_GATED",
+      "status": "IN_PROGRESS",
+      "phase": "DATA_PREPARATION_IMPLEMENTATION",
       "depends_on": [
         "AF-TASK-012"
       ],
@@ -556,7 +556,7 @@
         "La certification sur données live reste bloquée par les gaps pertinents de AF-OPS-007/008/009.",
         "Les unités rendement/volatilité/covariance/taux sans risque sont cohérentes et testées."
       ],
-      "next_action": "Concevoir le Data Preparation Contract et ses fixtures déterministes ; ne pas certifier les runs live avant les gates de qualité/fraîcheur pertinentes.",
+      "next_action": "Construire le Data Preparation Engine Node/JavaScript avec horizons explicites, resampling par période, Total Return LOCAL/EUR/USD, qualité, rendements et covariance testés; aucun limit=500.",
       "stream": "PRODUCT",
       "program": "ALLOCATION",
       "priority": "P1",
@@ -575,7 +575,29 @@
         "DATA_PREPARATION_FIXTURES",
         "FUND_MASTER_REUSE_PROOF"
       ],
-      "next_transition": "DATA_PREPARATION_CONTRACT_STABLE"
+      "next_transition": "DATA_PREPARATION_CONTRACT_STABLE",
+      "implementation_language": "NODE_JAVASCRIPT",
+      "python_policy": "NO_PYTHON_RUNTIME_ENGINE",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-22T22:07:00Z",
+        "base_api_sha": "5cedf146dd418a5cb842d90e27b5f70d37c15327",
+        "base_frontend_sha": "4700665bce1fafd8e0a4b9fa86d2fa4e598e1b90",
+        "repository_roles": [
+          "API"
+        ],
+        "touched_surfaces": [
+          "src/services/allocation/data/**",
+          "tests/allocation-data-preparation.test.js",
+          ".github/workflows/governance-allocation-data.yml"
+        ]
+      },
+      "touched_surfaces": [
+        "src/services/allocation/data/**",
+        "tests/allocation-data-preparation.test.js",
+        ".github/workflows/governance-allocation-data.yml"
+      ]
     },
     {
       "id": "AF-TASK-015",
