@@ -15,9 +15,9 @@ La priorité opérationnelle distincte reste :
 AF-OPS-003
 MariaDB — RCA des OOM répétés
 status = OPEN
-phase = RCA_PENDING
+phase = POST_FIX_VALIDATION
 incident = AF-INC-20260817-001
-latest evidence = AF-EVD-057
+latest evidence = AF-EVD-060
 ```
 
 ### Ce qui est prouvé
@@ -59,9 +59,17 @@ Instrumenter **en lecture seule** une série temporelle périodique suffisamment
 
 `AF-EVD-057` prouve que ces deux moteurs génèrent des `UPDATE ... CASE` dont le texte varie et les exécutent via `mysql2.execute()`. Le contrat mysql2 prépare/cache les statements par SQL exact ; ce pattern est donc un candidat prioritaire, **pas encore une root cause prouvée**.
 
-Le sampler gouverné `.github/workflows/ops-mariadb-rss-timeseries.yml` mesure désormais `Prepared_stmt_count`, `Com_stmt_prepare`, `Com_stmt_execute`, `Com_stmt_close`, RSS/RssAnon/Private_Dirty et les batchs actifs. Il tourne chaque heure et autour de 20:00 ainsi que du cron Nigeria du lundi. La prochaine preuve doit départager étape 3 et étape 4.
+Le sampler gouverné `.github/workflows/ops-mariadb-rss-timeseries.yml` mesure `Prepared_stmt_count`, `Com_stmt_prepare`, `Com_stmt_execute`, `Com_stmt_close`, RSS/RssAnon/Private_Dirty et les batchs actifs. La phase exploratoire a depuis produit un contrat RED, un correctif protocolaire minimal et un GREEN exact-SHA ; la consigne historique « départager avant correction » est donc supersédée par la validation post-correctif ci-dessous.
 
 Aucun nouvel A/B jemalloc, restart MariaDB, changement systemd, buffer, schéma ou version n'est autorisé par cette prochaine action.
+
+### Correctif protocolaire déployé — validation post-fix
+
+- `AF-EVD-058` : contrat **RED → FIX → GREEN exact-SHA**. Les deux `UPDATE ... CASE` entièrement matérialisés des étapes 3/4 utilisent désormais `connection.query()`; les vrais SELECT paramétrés restent `connection.execute()`. Aucun calcul financier, batch size, schéma ou transaction n'a été changé.
+- `AF-EVD-059` : déploiement gouverné **GOV-006 PASS** ; API S2 réconciliée à `84c3e4fe06c4282f0ab1f09a95962c6fb49c1ef3`, frontend à `dcd8e5a79b27d93b66723884727f55ec2ffc9944`, sans restart MariaDB ni mutation DB.
+- `AF-EVD-060` : attestation post-déploiement : branche canonique, tracked dirty = 0, contrat SQL toujours GREEN.
+
+La root cause exacte reste **UNKNOWN**. La prochaine preuve n'est plus de reconstruire le même correctif : elle consiste à observer de vrais recalculs **avec le code corrigé**, comparer RSS/RssAnon/Private_Dirty et `Com_stmt_*` au baseline pré-fix, vérifier l'équivalence des sorties métier, puis effectuer une RCA confidence review. Une disparition ou réduction répétable du saut mémoire renforcerait fortement la causalité ; une persistance imposerait de poursuivre la RCA sans forcer la conclusion.
 
 ## Autres blockers indépendants
 
