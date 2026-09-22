@@ -418,6 +418,14 @@
       "provenance": "RSS sampler post-deploy run 35782555062 attempt 2 + GOV-006 run 35782727724",
       "observed_at": "2026-09-22T20:50:53Z",
       "summary": "Post-deployment read-only attestation observed S2 API HEAD 84c3e4fe06c4282f0ab1f09a95962c6fb49c1ef3 on canonical branch claude/code-review-improvements-ikvuj with tracked dirty count 0, and the SQL protocol contract remained GREEN. This proves deployment and checkout integrity; it does not yet prove that the memory-growth root cause is eliminated. The next proof must compare RSS/RssAnon/Private_Dirty and Com_stmt_* during real post-fix recalculation cycles."
+    },
+    {
+      "id": "AF-EVD-061",
+      "type": "PROGRAMME_DIRECTOR_VALIDATION",
+      "result": "READ_ONLY_ORCHESTRATION_CHRONOLOGY_GAP_DISCOVERY_GREEN",
+      "provenance": "GitHub Actions AfricaFunds Programme Director run 35787836771 at API 8913e9ec951669d1966f8ca2425633fbd8e41661; artifact 10720254555",
+      "observed_at": "2026-09-22T21:38:36Z",
+      "summary": "The additive Programme Director completed GREEN in DERIVED_READ_ONLY mode. Integrity checks report no dependency cycles, missing dependencies, or dangling evidence refs and preserve AF-OPS-003 as POST_FIX_VALIDATION operational priority. The derived chronology contains 62 temporal events while five historical non-temporal incident markers are kept outside time ordering. The read-only Gap Harvester inventories 589 API and 584 frontend text files and emits 125 heuristic source-marker candidates (2 with possible existing-task matches, 123 unmatched). task_creation_performed=false: none of these candidates is an official gap or task until verified and deduplicated against the single governed queue. No production mutation, second queue, new branch or automatic task creation occurred."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
