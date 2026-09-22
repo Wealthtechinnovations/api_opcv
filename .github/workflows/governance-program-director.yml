@@ -9,6 +9,7 @@ on:
       - 'scripts/governance/program_event_ledger.py'
       - 'scripts/governance/program_gap_harvester.py'
       - 'scripts/governance/program_surface_claims.py'
+      - 'scripts/governance/program_invariants.py'
       - '.governance/project.json'
       - '.governance/loop/task-queue.json'
       - '.governance/loop/state.json'
@@ -83,6 +84,15 @@ jobs:
             --api-root api \
             --output out/program-surface-claims.json \
             | tee out/program-surface-claims.log
+
+      - name: Enforce existing anti-regression invariants
+        run: |
+          set -euo pipefail
+          python3 api/scripts/governance/program_invariants.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/program-invariants.json \
+            | tee out/program-invariants.log
 
       - name: Publish programme summary
         if: always()
@@ -159,6 +169,17 @@ jobs:
               print("- conflicts:",claims.get("conflict_count"))
               print("- certified parallel pairs:",len(claims.get("surface_certified_parallel_pairs",[])))
               print("- advisories:",len(claims.get("advisories",[])))
+
+          ip=Path("out/program-invariants.json")
+          if ip.exists():
+              invariants=json.loads(ip.read_text(encoding="utf-8"))
+              print()
+              print("### Anti-regression invariants")
+              print("- mode:",invariants.get("mode"))
+              print("- integrity:",invariants.get("integrity"))
+              print("- errors:",invariants.get("error_count"))
+              print("- warnings:",invariants.get("warning_count"))
+              print("- operational priority:",invariants.get("operational_priority"))
           PY
 
       - name: Upload derived programme state
