@@ -951,7 +951,26 @@
     "gap_harvester_possible_existing_task_matches": 2,
     "gap_harvester_unmatched_candidates": 123,
     "candidate_status": "DISCOVERED_CANDIDATE_NOT_TASK_UNTIL_VERIFIED_AND_DEDUPED",
-    "latest_surface_claims_evidence": "AF-EVD-062"
+    "latest_surface_claims_evidence": "AF-EVD-062",
+    "anti_regression_contract": "ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY",
+    "anti_regression_validator": "scripts/governance/program_invariants.py",
+    "anti_regression_latest_green_run_id": 35793007081,
+    "anti_regression_latest_evidence": "AF-EVD-063",
+    "anti_regression_scope": [
+      "ONE_PRODUCT_TWO_REPOSITORIES",
+      "FUND_STATE_TUPLE",
+      "SINGLE_QUEUE",
+      "SINGLE_WRITER",
+      "NO_NEW_BRANCH",
+      "NO_FORCE_PUSH_OR_HISTORY_REWRITE",
+      "CONTEXT_RECONSTRUCTION",
+      "NEXT_ACTION_OPERATIONAL_PROJECTION",
+      "FRONTEND_GLOBAL_SUIVI",
+      "DATA_QUALITY_DEPENDENCY_ORDER",
+      "ALLOCATION_LIVE_DATA_GATES",
+      "EVIDENCE_ID_UNIQUENESS",
+      "NO_SECOND_CLAIM_REGISTRY"
+    ]
   },
   "surface_claims_contract": {
     "mode": "OBSERVE_ONLY",
@@ -959,9 +978,9 @@
     "no_second_claim_registry": true,
     "validator": "scripts/governance/program_surface_claims.py",
     "workflow": ".github/workflows/governance-program-director.yml",
-    "latest_green_run_id": 35788502090,
-    "latest_evidence_ref": "AF-EVD-062",
-    "active_claim_count": 0,
+    "latest_green_run_id": 35793007081,
+    "latest_evidence_ref": "AF-EVD-063",
+    "active_claim_count": 1,
     "conflict_count": 0,
     "surface_certified_parallel_pairs": 0,
     "current_enforcement": "ADVISORY_ONLY_NO_WRITE_BLOCK",
@@ -977,6 +996,9 @@
     "overlap_policy": "CONSERVATIVE_STATIC_PREFIX_OVERLAP",
     "enforcement_transition_rule": "DO_NOT_ENFORCE_UNTIL_REAL_CLAIMS_ARE_POPULATED_AND_CONFLICT_FREE_IN_GREEN_RUNS",
     "release_rule": "CLAIMS_MUST_BE_RELEASED_OR_RECONCILED_AFTER_TASK_WRITE_COMPLETION",
-    "parallel_certification_rule": "DEPENDENCY_CHECK_PLUS_NON_OVERLAPPING_ACTIVE_SURFACE_CLAIMS_REQUIRED"
+    "parallel_certification_rule": "DEPENDENCY_CHECK_PLUS_NON_OVERLAPPING_ACTIVE_SURFACE_CLAIMS_REQUIRED",
+    "active_claim_task_ids": [
+      "AF-TASK-017"
+    ]
   }
 }
