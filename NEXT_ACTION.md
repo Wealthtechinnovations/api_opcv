@@ -71,6 +71,21 @@ Aucun nouvel A/B jemalloc, restart MariaDB, changement systemd, buffer, schéma 
 
 La root cause exacte reste **UNKNOWN**. La prochaine preuve n'est plus de reconstruire le même correctif : elle consiste à observer de vrais recalculs **avec le code corrigé**, comparer RSS/RssAnon/Private_Dirty et `Com_stmt_*` au baseline pré-fix, vérifier l'équivalence des sorties métier, puis effectuer une RCA confidence review. Une disparition ou réduction répétable du saut mémoire renforcerait fortement la causalité ; une persistance imposerait de poursuivre la RCA sans forcer la conclusion.
 
+## Programme Directeur — anti-régression actif
+
+Le Programme Directeur est désormais protégé par un contrat machine-checkable **hard-fail** qui ne vérifie que des invariants déjà normatifs : deux repositories / un produit, tuple `FUND_STATE`, queue unique, single-writer, interdiction nouvelle branche/force-push/history rewrite, reconstruction de contexte, projection de la priorité opérationnelle, `SUIVI.md` global frontend, ordre AF-OPS-007/009 → AF-OPS-008, gates live Allocation AF-OPS-007/008/009, unicité des preuves et absence de second registre de claims.
+
+Preuve : `AF-EVD-063`, run Programme Director `35793007081 = SUCCESS`.
+
+Le même run observe actuellement :
+
+- `AF-TASK-017 = IN_PROGRESS` ;
+- exactement **1 claim actif** sur les surfaces Allocation contraintes ;
+- `conflict_count = 0` ;
+- aucune paire d'écriture parallèle n'est certifiée tant qu'une seconde tâche active avec claim non chevauchant n'existe pas.
+
+Toute nouvelle écriture doit donc préserver les surfaces revendiquées par `AF-TASK-017`. Les travaux strictement read-only peuvent continuer sur d'autres surfaces.
+
 ## Autres blockers indépendants
 
 - `AF-OPS-001` reste `BLOCKED_HUMAN_APPROVAL` pour `Restart=on-failure` ;
