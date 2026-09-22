@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "5868f3d982c46b8e37e45cb063e518c20c244559"
+      "head": "dab0285fe7030a7ed361db90f301e0d2b408567e"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "dcd8e5a79b27d93b66723884727f55ec2ffc9944"
+      "head": "bb6e9b7a85a3484b6318a785b8452eeb4440da28"
     }
   },
   "summary": {
@@ -13301,6 +13301,14 @@
       "canonical_authority": "SUIVI.md",
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
+        "POINT DE REPRISE COURANT — 2026-09-22 — Programme Directeur actif / AF-OPS-003 POST_FIX_VALIDATION",
+        "Continuité préservée",
+        "AF-OPS-003 — correctif déployé, RCA en validation post-fix",
+        "Programme Directeur AfricaFunds — actif en lecture seule",
+        "Chronologie dérivée / event ledger",
+        "Gap Harvester — découverte uniquement, aucune création automatique",
+        "Ordre de marche conservé",
+        "Claims de surfaces multi-agent — OBSERVE_ONLY actif",
         "POINT DE REPRISE COURANT — 2026-09-22 — AF-OPS-003 RCA resserrée",
         "Gouvernance et travaux concurrents préservés",
         "7e OOM MariaDB désormais prouvé",
@@ -13311,15 +13319,7 @@
         "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée",
         "Verdict de la boucle de gouvernance",
         "Preuve GitHub ↔ S2 mesurée",
-        "Refus MariaDB post-rotation — classification",
-        "Gaps externes conservés",
-        "Prochaine action",
-        "POINT DE REPRISE COURANT — AF-GOV-FINAL-CERT / AF-TASK-011",
-        "Produit et Git",
-        "Loop Engineering / gouvernance",
-        "Canal serveur sans MCP",
-        "Remédiation secrets exécutée",
-        "Gaps externes qui empêchent FULLY_GOVERNED"
+        "Refus MariaDB post-rotation — classification"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13330,20 +13330,52 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "d97efd8bc56b8b46981030c2392307434b1f01eb",
-      "last_validated_sha": "d97efd8bc56b8b46981030c2392307434b1f01eb",
-      "content_sha256": "6ee33623f1836d8ea47d5cd7161c9153d59e7779edf68d129213e572b6ef7796",
-      "line_count": 6618,
-      "byte_count": 463698,
+      "git_blob_sha": "bc85f2f0dcdb98722127ad05552c498c474d3cd8",
+      "last_validated_sha": "bc85f2f0dcdb98722127ad05552c498c474d3cd8",
+      "content_sha256": "e4e0f0a796533fb34a0f8d000182473d39e9dde3c3a903e96d861c36dafd9567",
+      "line_count": 6730,
+      "byte_count": 469836,
       "headings": [
         {
           "level": 1,
           "text": "Carnet de suivi - Africafunds (Fundafrique)"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-09-22 — Programme Directeur actif / AF-OPS-003 POST_FIX_VALIDATION"
+        },
+        {
+          "level": 3,
+          "text": "Continuité préservée"
+        },
+        {
+          "level": 3,
+          "text": "AF-OPS-003 — correctif déployé, RCA en validation post-fix"
+        },
+        {
+          "level": 3,
+          "text": "Programme Directeur AfricaFunds — actif en lecture seule"
+        },
+        {
+          "level": 3,
+          "text": "Chronologie dérivée / event ledger"
+        },
+        {
+          "level": 3,
+          "text": "Gap Harvester — découverte uniquement, aucune création automatique"
+        },
+        {
+          "level": 3,
+          "text": "Ordre de marche conservé"
+        },
+        {
+          "level": 3,
+          "text": "Claims de surfaces multi-agent — OBSERVE_ONLY actif"
         },
         {
           "level": 2,
@@ -13468,38 +13500,6 @@
         {
           "level": 2,
           "text": "Architecture"
-        },
-        {
-          "level": 2,
-          "text": "Panels utilisateur"
-        },
-        {
-          "level": 2,
-          "text": "Points valides et deployes"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-14 - Correction reconstruction portefeuille investisseur"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-14 - Correction 404 panel societe de gestion"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-14 - Amelioration detection anomalies VL"
-        },
-        {
-          "level": 3,
-          "text": "2026-05-14 - PHASE 1 Base de donnees: Audit + Corrections fondamentales"
-        },
-        {
-          "level": 4,
-          "text": "Resultats Phase 1:"
-        },
-        {
-          "level": 4,
-          "text": "Donnees statiques peuplees:"
         }
       ]
     },
