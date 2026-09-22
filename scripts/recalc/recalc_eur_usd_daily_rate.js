@@ -336,7 +336,10 @@ async function run() {
         const caseIndRefUSD = chunk.map(u => `WHEN ${u.id} THEN ${u.indRef_USD === null ? 'NULL' : u.indRef_USD}`).join(' ');
 
         try {
-          await conn.execute(`
+          // SQL entierement materialise et unique par batch : utiliser le
+          // protocole texte evite de preparer/cacher des milliers de statements
+          // differents sans changer le SQL ni les resultats financiers.
+          await conn.query(`
             UPDATE valorisations SET
               value_EUR = CASE id ${caseEUR} END,
               value_USD = CASE id ${caseUSD} END,
