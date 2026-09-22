@@ -662,8 +662,8 @@
       "id": "AF-TASK-016",
       "program_id": "AF-ALLOC-001",
       "title": "Allocation — adapter canonique et stratégies d'optimisation multi-méthodes",
-      "status": "IN_PROGRESS",
-      "phase": "CANONICAL_NODE_ENGINE_IMPLEMENTATION",
+      "status": "DONE",
+      "phase": "CANONICAL_NODE_ENGINE_STABLE",
       "depends_on": [
         "AF-TASK-013",
         "AF-TASK-014"
@@ -680,12 +680,12 @@
         "Chaque stratégie a des entrées/sorties communes et des tests déterministes.",
         "Les erreurs de convergence et matrices invalides produisent des warnings/erreurs structurés, jamais un résultat silencieux."
       ],
-      "next_action": "Construire l'adapter Node/JavaScript autour de portfolio-allocation@0.0.11, avec sorties communes, métriques déterministes et tests pour Equal Weight, Inverse Vol, GMV, ERC, Max Diversification, Max Sharpe, Mean-Variance et Minimum Correlation.",
+      "next_action": "AF-TASK-017 : compiler et vérifier les contraintes AfricaFunds avant de les transmettre au moteur Node.",
       "implementation_language": "NODE_JAVASCRIPT",
       "python_policy": "NO_PYTHON_RUNTIME_ENGINE",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
-        "status": "ACTIVE",
+        "status": "RELEASED",
         "claimed_at": "2026-09-22T22:18:00Z",
         "base_api_sha": "3fb7cf5833f8983ef14f7e50db362cdc44e2bf60",
         "base_frontend_sha": "bb6e9b7a85a3484b6318a785b8452eeb4440da28",
@@ -696,20 +696,46 @@
           "src/services/allocation/engine/**",
           "tests/allocation-engine.test.js",
           ".github/workflows/governance-allocation-engine.yml"
-        ]
+        ],
+        "released_at": "2026-09-22T22:25:00Z"
       },
       "touched_surfaces": [
         "src/services/allocation/engine/**",
         "tests/allocation-engine.test.js",
         ".github/workflows/governance-allocation-engine.yml"
-      ]
+      ],
+      "completed_at": "2026-09-22T22:25:00Z",
+      "completion_evidence": {
+        "workflow_run_id": 35792117985,
+        "conclusion": "success",
+        "tested_head": "dab0285fe7030a7ed361db90f301e0d2b408567e",
+        "solver": "portfolio-allocation",
+        "solver_version": "0.0.11",
+        "implementation_language": "NODE_JAVASCRIPT",
+        "python_runtime_used": false,
+        "strategies_certified": [
+          "EQUAL_WEIGHT",
+          "INVERSE_VOLATILITY",
+          "GLOBAL_MINIMUM_VARIANCE",
+          "EQUAL_RISK_CONTRIBUTION",
+          "RISK_BUDGETING",
+          "MAXIMUM_DIVERSIFICATION",
+          "MAXIMUM_SHARPE",
+          "MEAN_VARIANCE",
+          "MINIMUM_CORRELATION"
+        ],
+        "deferred_prerequisite_strategies": {
+          "MINIMUM_TRACKING_ERROR": "BENCHMARK_RETURNS_REQUIRED"
+        },
+        "production_deployed": false
+      }
     },
     {
       "id": "AF-TASK-017",
       "program_id": "AF-ALLOC-001",
       "title": "Allocation — moteur de contraintes AfricaFunds",
-      "status": "OPEN",
-      "phase": "DEPENDENCY_GATED",
+      "status": "IN_PROGRESS",
+      "phase": "CONSTRAINT_ENGINE_IMPLEMENTATION",
       "depends_on": [
         "AF-TASK-013",
         "AF-TASK-014",
@@ -726,7 +752,29 @@
         "Les contraintes sont validées, nommées et persistées.",
         "Un problème infaisable retourne une explication exploitable sans produire de faux portefeuille."
       ],
-      "next_action": "Construire le modèle de contraintes canonique et un feasibility pre-check avant de migrer les contraintes UI existantes."
+      "next_action": "Construire un compilateur de contraintes Node/JavaScript basé sur le Fund Master, avec feasibility pre-check pour poids/nombre de fonds/catégorie/SGO/pays-région/devise/SRRI/liquidité-fréquence; aucun solveur n'est appelé si le mandat est infaisable.",
+      "implementation_language": "NODE_JAVASCRIPT",
+      "python_policy": "NO_PYTHON_RUNTIME_ENGINE",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-22T22:25:00Z",
+        "base_api_sha": "9c7813d770a286fc85194b97e0a607b060cf4683",
+        "base_frontend_sha": "bb6e9b7a85a3484b6318a785b8452eeb4440da28",
+        "repository_roles": [
+          "API"
+        ],
+        "touched_surfaces": [
+          "src/services/allocation/constraints/**",
+          "tests/allocation-constraints.test.js",
+          ".github/workflows/governance-allocation-constraints.yml"
+        ]
+      },
+      "touched_surfaces": [
+        "src/services/allocation/constraints/**",
+        "tests/allocation-constraints.test.js",
+        ".github/workflows/governance-allocation-constraints.yml"
+      ]
     },
     {
       "id": "AF-TASK-018",
