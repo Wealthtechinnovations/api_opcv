@@ -378,6 +378,22 @@
       "provenance": "doc-drift.yml run 35776765338 -> docs/ETAT_PRODUCTION_VERIFIE.md @ 2026-09-22 19:56 UTC; commit 1bc0d3789587daf42abf338300d25842ddd662f9",
       "observed_at": "2026-09-22T19:56:00Z",
       "summary": "Production control measured 10/16 OK, 4 critical failures and 2 alerts. Nigeria freshness is within budget with latest VL 2026-09-11 (11 days / 14-day budget); Tunisia is current through 2026-09-22; UEMOA through 2026-09-21; Morocco through 2026-09-17. Critical failures remain C2 orphan head performances, C3 absurd recent performances, C7 mixed-scale VL series and C8 stale derived performances. CEMAC freshness and benchmark coverage remain alerts. This supersedes AF-EVD-052 only for current-state decisions; AF-EVD-052 remains immutable historical evidence."
+    },
+    {
+      "id": "AF-EVD-056",
+      "type": "MARIADB_RSS_WORKLOAD_CORRELATION",
+      "result": "DAILY_RECALC_WINDOW_CORRELATES_WITH_6_77_GIB_RSS_JUMP",
+      "provenance": "doc-drift run 35776765338 at 2026-09-22T19:55:55Z + RSS sampler runs 35777740702/35777856903/35778223875/35778385728 + cron_daily_update log 2026-09-22",
+      "observed_at": "2026-09-22T20:09:14Z",
+      "summary": "MariaDB PID 3041009 measured 468032 kB RSS / 449608 kB RssAnon at 19:55:55 UTC, before cron_daily_update. The cron started 20:00:01. By 20:03:21 RSS was 7240796 kB / RssAnon 7224924 kB, a +6772764 kB RSS jump in about 7m26s. The daily log proves that before the performance endpoints it completed step 3 recalc_eur_usd_daily_rate over 994766 VL and step 4 recalc_vl_ajuste over 995370 VL, both with zero reported errors. At 20:04-20:09 saveperfdatemysql was active but RSS stayed around 7.21-7.24 GiB, so the large jump had already occurred in the step 1-4 window. The data proves a high-amplitude workload-correlated jump but does not yet separate step 3 from step 4."
+    },
+    {
+      "id": "AF-EVD-057",
+      "type": "MARIADB_PREPARED_STATEMENT_RISK",
+      "result": "DYNAMIC_EXECUTE_CACHE_PATTERN_PROVEN_CAUSALITY_PENDING",
+      "provenance": "api_opcv package-lock mysql2 3.11.3; scripts/recalc/recalc_eur_usd_daily_rate.js and scripts/recalc/recalc_vl_ajuste.js; mysql2 official prepared-statement contract",
+      "observed_at": "2026-09-22T20:09:14Z",
+      "summary": "Both massive daily recalculation scripts build UPDATE ... CASE SQL with row ids and values interpolated into the SQL text and execute each changing SQL string with mysql2 connection.execute(). mysql2 execute() prepares and caches statements per exact SQL text with an LRU cache; default maxPreparedStatements is 16000. Current MariaDB status after the recalculation shows Prepared_stmt_count=2 but cumulative Com_stmt_prepare=8389 and Com_stmt_close=0 since the 06:25 restart. This code pattern is a verified prepared-statement-cache risk and fits transient allocation followed by retained RSS, but causality is not proven until counters are sampled while steps 3/4 are active."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
