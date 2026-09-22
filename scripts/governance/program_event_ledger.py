@@ -44,7 +44,9 @@ def norm_time(value):
     if value is None:
         return None
     value = str(value).strip()
-    if len(value) == 10 and value[4] == "-" and value[7] == "-":
+    if not re.match(r"^\\d{4}-\\d{2}-\\d{2}(?:T.*)?$", value):
+        return None
+    if len(value) == 10:
         return value + "T00:00:00Z"
     return value
 
@@ -89,6 +91,13 @@ def main():
         for occurrence in recurrence.get("occurrences", []) or []:
             at = norm_time(occurrence)
             if not at:
+                non_temporal_incident_markers.append({
+                    "kind": "INCIDENT_MARKER",
+                    "source": ".governance/incidents/registry.json",
+                    "ref": iid,
+                    "marker": str(occurrence),
+                    "severity": incident.get("severity"),
+                })
                 continue
             events.append({
                 "at": at,
@@ -128,6 +137,7 @@ def main():
         },
         "event_count": len(events),
         "latest_events": events[-250:],
+        "non_temporal_incident_markers": non_temporal_incident_markers,
     }
 
     out = Path(a.output)
