@@ -517,7 +517,9 @@
           "tests/allocation-route.test.js",
           ".github/workflows/governance-allocation-contract.yml",
           "src/routes/apigestionallocation.js",
-          "app.js"
+          "app.js",
+          "src/services/allocation/simulations.js",
+          "tests/allocation-simulation.test.js"
         ]
       },
       "touched_surfaces": [
@@ -526,7 +528,9 @@
         "tests/allocation-route.test.js",
         ".github/workflows/governance-allocation-contract.yml",
         "src/routes/apigestionallocation.js",
-        "app.js"
+        "app.js",
+        "src/services/allocation/simulations.js",
+        "tests/allocation-simulation.test.js"
       ]
     },
     {
