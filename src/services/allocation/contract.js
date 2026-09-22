@@ -84,13 +84,18 @@ function compactRange(min, max) {
   return out;
 }
 
-function validateRange(range, path, errors, options = {}) {
-  if (!range) return;
+function normalizeRange(range, path, errors, options = {}) {
+  if (!range) return null;
   const min = toFinite(range.min, `${path}.min`, errors, options);
   const max = toFinite(range.max, `${path}.max`, errors, options);
   if (min !== null && max !== null && min > max) {
     errors.push(issue(path, 'MIN_GREATER_THAN_MAX', 'La borne minimale ne peut pas dépasser la borne maximale.'));
   }
+  return compactRange(min, max) || null;
+}
+
+function validateRange(range, path, errors, options = {}) {
+  normalizeRange(range, path, errors, options);
 }
 
 function normalizeFundIds(values, errors, path = 'universe.fund_ids') {
@@ -210,8 +215,8 @@ function normalizeCanonical(input) {
       errors.push(issue('constraints.categories', 'INVALID_CATEGORIES', 'categories doit être un objet indexé par catégorie.'));
     } else {
       for (const [name, range] of Object.entries(constraints.categories)) {
-        validateRange(range, `constraints.categories.${name}`, errors, { min: 0, max: 1 });
-        categories[name] = range;
+        const normalizedRange = normalizeRange(range, `constraints.categories.${name}`, errors, { min: 0, max: 1 });
+        if (normalizedRange) categories[name] = normalizedRange;
       }
     }
   }
@@ -226,14 +231,18 @@ function normalizeCanonical(input) {
         if (normalizedCode === 'LOCAL') {
           errors.push(issue(`constraints.currencies.${code}`, 'LOCAL_NOT_ALLOWED_AS_EXPOSURE_BUCKET', 'Utiliser un code devise explicite pour une contrainte d’exposition.'));
         }
-        validateRange(range, `constraints.currencies.${code}`, errors, { min: 0, max: 1 });
-        currencies[normalizedCode] = range;
+        const normalizedRange = normalizeRange(range, `constraints.currencies.${code}`, errors, { min: 0, max: 1 });
+        if (normalizedRange) currencies[normalizedCode] = normalizedRange;
       }
     }
   }
 
   const output = input.output || {};
   const frontierPoints = toInteger(output.frontier_points ?? 100, 'output.frontier_points', errors, { min: 2, max: 5000 });
+  const baseCurrency = normalizeCurrency(universe.base_currency, 'universe.base_currency', errors);
+  const simulationId = isBlank(input.simulation_id)
+    ? null
+    : toInteger(input.simulation_id, 'simulation_id', errors, { min: 1 });
 
   if (errors.length) throw new AllocationContractError(errors);
 
@@ -249,7 +258,7 @@ function normalizeCanonical(input) {
       },
       universe: {
         fund_ids: fundIds,
-        base_currency: normalizeCurrency(universe.base_currency, 'universe.base_currency', errors),
+        base_currency: baseCurrency,
       },
       data: {
         horizon,
@@ -284,9 +293,7 @@ function normalizeCanonical(input) {
       output: {
         frontier_points: frontierPoints === null ? 100 : frontierPoints,
       },
-      simulation_id: isBlank(input.simulation_id)
-        ? null
-        : toInteger(input.simulation_id, 'simulation_id', errors, { min: 1 }),
+      simulation_id: simulationId,
     },
   };
 }
@@ -379,6 +386,9 @@ function normalizeLegacy(input) {
   }
 
   const frontierPoints = toInteger(params.num_portfolio, 'param_data.num_portfolio', errors, { min: 2, max: 5000 });
+  const simulationId = isBlank(input.simulation_id)
+    ? null
+    : toInteger(input.simulation_id, 'simulation_id', errors, { min: 1 });
 
   if (errors.length) throw new AllocationContractError(errors);
 
@@ -420,9 +430,7 @@ function normalizeLegacy(input) {
       output: {
         frontier_points: frontierPoints === null ? 100 : frontierPoints,
       },
-      simulation_id: isBlank(input.simulation_id)
-        ? null
-        : toInteger(input.simulation_id, 'simulation_id', errors, { min: 1 }),
+      simulation_id: simulationId,
     },
   };
 }
