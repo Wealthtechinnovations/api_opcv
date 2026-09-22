@@ -158,8 +158,8 @@
         "AF-INC-20260817-001"
       ],
       "depends_on": [],
-      "next_action": "Laisser le sampler read-only gouverné mesurer les compteurs prepared statements autour des prochains recalculs: baseline 19:55, puis 20:01/20:03/20:05 en semaine, et 09:55 puis 10:01/10:03/10:05 le lundi. La fenêtre du saut est resserrée sur les étapes 3/4 du daily update (994766 + 995370 VL). Ne corriger ni mysql2 ni les scripts tant que la causalité step3/step4 n'est pas discriminée.",
-      "phase": "RCA_PENDING",
+      "next_action": "Le correctif protocolaire execute()->query des deux UPDATE dynamiques massifs est RED->GREEN et déployé par GOV-006. Ne pas le rejouer et ne pas restart MariaDB. Mesurer les prochains vrais passages étape 3/4 avec le sampler gouverné; comparer RSS/RssAnon/Private_Dirty, Prepared_stmt_count et Com_stmt_* au baseline pré-fix, vérifier l'équivalence des sorties, puis seulement réévaluer le niveau de confiance RCA.",
+      "phase": "POST_FIX_VALIDATION",
       "evidence_refs": [
         "AF-EVD-040",
         "AF-EVD-041",
@@ -174,8 +174,36 @@
         "AF-EVD-053",
         "AF-EVD-054",
         "AF-EVD-056",
-        "AF-EVD-057"
-      ]
+        "AF-EVD-057",
+        "AF-EVD-058",
+        "AF-EVD-059",
+        "AF-EVD-060"
+      ],
+      "stream": "OPS",
+      "program": "PRODUCTION_STABILITY",
+      "priority": "P0",
+      "execution_mode": "AUTO_READ_ONLY_POST_FIX_VALIDATION",
+      "definition_of_ready": [
+        "Seventh OOM and long-duration anonymous/private RSS growth are persisted as evidence.",
+        "High-amplitude Sep22 RSS jump is bounded to daily-update step 3/4 window.",
+        "SQL protocol regression contract exists and exact-SHA GREEN is proven.",
+        "Validated fix is deployed through GOV-006 with clean S2 checkout attestation."
+      ],
+      "definition_of_done": [
+        "Observe at least one real post-fix daily recalculation window with RSS/RssAnon/Private_Dirty and Com_stmt_* counters.",
+        "Observe an independent confirmation cycle or persist contradictory evidence before causal closure.",
+        "Verify financial/data outputs remain equivalent under the protocol-only change.",
+        "Update incident root-cause confidence without promoting causality beyond the evidence.",
+        "Persist evidence, queue/state/handoff and global SUIVI checkpoint."
+      ],
+      "evidence_required": [
+        "POST_FIX_REAL_BATCH_MEMORY_COMPARISON",
+        "POST_FIX_PREPARED_STATEMENT_COUNTER_COMPARISON",
+        "POST_FIX_DATA_OUTPUT_EQUIVALENCE",
+        "RCA_CONFIDENCE_REVIEW"
+      ],
+      "next_transition": "RCA_CONFIDENCE_REVIEW",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST"
     },
     {
       "id": "AF-OPS-004",
@@ -200,7 +228,27 @@
       "evidence_refs": [
         "AF-EVD-049",
         "AF-EVD-051"
-      ]
+      ],
+      "stream": "OPS",
+      "program": "SECURITY_RUNTIME_IDENTITY",
+      "priority": "P1",
+      "execution_mode": "AUTO_READ_ONLY",
+      "definition_of_ready": [
+        "Current runtime .env credential is known-valid and remains untracked/ignored.",
+        "Stale credential-bearing files are proven without exposing secret values.",
+        "DB-auth diagnostic is available read-only."
+      ],
+      "definition_of_done": [
+        "Attribute remaining relevant Access denied bursts to timestamp -> process/PID/cwd -> loader -> credential source, or persist bounded evidence that attribution is impossible with available telemetry.",
+        "Separate diagnostic-generated failures from production consumers.",
+        "Perform no password rotation, restart or secret disclosure as part of attribution."
+      ],
+      "evidence_required": [
+        "TIMESTAMPED_DB_AUTH_ATTRIBUTION",
+        "SAFE_CONSUMER_IDENTITY_EVIDENCE"
+      ],
+      "next_transition": "RCA_CONFIDENCE_REVIEW",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST"
     },
     {
       "id": "AF-OPS-006",
@@ -230,7 +278,27 @@
         "AF-EVD-011",
         "AF-EVD-052",
         "AF-EVD-055"
-      ]
+      ],
+      "stream": "DATA",
+      "program": "DATA_QUALITY",
+      "priority": "P1",
+      "execution_mode": "AUTO_READ_ONLY_PREFLIGHT",
+      "definition_of_ready": [
+        "Live C7/C3 failures are measured and persisted.",
+        "Existing Nigeria dry-run tooling is identified.",
+        "Cross-country anomalies are kept in scope."
+      ],
+      "definition_of_done": [
+        "Classify each in-scope scale break by country/fund/provenance.",
+        "Prove correction scope before any data write.",
+        "If a write is later authorized, preserve snapshot, transaction, rollback and post-write C7/C3 checks."
+      ],
+      "evidence_required": [
+        "C7_CASE_CLASSIFICATION",
+        "C3_POST_INTEGRITY_REMEASUREMENT"
+      ],
+      "next_transition": "GOVERNED_DATA_CORRECTION_OR_RESIDUAL_GAP",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST"
     },
     {
       "id": "AF-OPS-008",
@@ -250,7 +318,26 @@
         "AF-EVD-011",
         "AF-EVD-052",
         "AF-EVD-055"
-      ]
+      ],
+      "stream": "DATA",
+      "program": "DATA_QUALITY",
+      "priority": "P1",
+      "execution_mode": "GOVERNED_CODE_OR_DATA_CHANGE_AFTER_DEPENDENCIES",
+      "definition_of_ready": [
+        "AF-OPS-007 data integrity dependency is satisfied.",
+        "AF-OPS-009 freshness dependency is satisfied."
+      ],
+      "definition_of_done": [
+        "Investigate C2 orphan performances fund-by-fund before deletion.",
+        "Recalculate derived performances only from validated/fresh VL.",
+        "Re-measure C2/C8 and only then allow ranking recalculation."
+      ],
+      "evidence_required": [
+        "C2_ATTRIBUTION",
+        "C8_POST_RECALC_VALIDATION"
+      ],
+      "next_transition": "PERFORMANCE_LAYER_CERTIFIED",
+      "parallel_policy": "DEPENDENCY_GATED"
     },
     {
       "id": "AF-OPS-009",
@@ -267,7 +354,26 @@
         "AF-EVD-052",
         "AF-EVD-055",
         "AF-EVD-053"
-      ]
+      ],
+      "stream": "DATA",
+      "program": "DATA_QUALITY",
+      "priority": "P1",
+      "execution_mode": "AUTO_READ_ONLY_RCA",
+      "definition_of_ready": [
+        "Current C4 freshness is measured.",
+        "Nigeria/Tunisia source, cron and import evidence are available."
+      ],
+      "definition_of_done": [
+        "Verify scheduled Nigeria and Tunisia cycles distinguish source acquisition, DB availability and downstream derivation.",
+        "Do not backfill when freshness is already within budget.",
+        "Persist any recurring reliability failure with exact pipeline stage."
+      ],
+      "evidence_required": [
+        "NEXT_SCHEDULED_PIPELINE_CYCLE",
+        "C4_REMEASUREMENT"
+      ],
+      "next_transition": "PIPELINE_RELIABILITY_CONFIRMED_OR_FIX_REQUIRED",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST"
     },
     {
       "id": "AF-TASK-012",
@@ -374,7 +480,26 @@
         "Les routes de sauvegarde/simulation appliquent authentification et contrôle d'ownership adaptés.",
         "Les anciennes routes restent compatibles tant que la migration n'est pas certifiée."
       ],
-      "next_action": "Après AF-TASK-012, spécifier le contrat V2 backward-compatible et ses tests de contrat avant de modifier les écrans ou solveurs."
+      "next_action": "Après AF-TASK-012, spécifier le contrat V2 backward-compatible et ses tests de contrat avant de modifier les écrans ou solveurs.",
+      "stream": "PRODUCT",
+      "program": "ALLOCATION",
+      "priority": "P1",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST",
+      "definition_of_ready": [
+        "AF-TASK-012 runtime cartography is DONE.",
+        "Canonical API surface and legacy behavior are identified."
+      ],
+      "definition_of_done": [
+        "Backward-compatible canonical request contract validated by tests.",
+        "Authentication and ownership rules are explicit and regression-tested.",
+        "No legacy consumer is silently broken."
+      ],
+      "evidence_required": [
+        "ALLOCATION_API_CONTRACT_TESTS",
+        "AUTH_OWNERSHIP_TESTS"
+      ],
+      "next_transition": "API_CONTRACT_STABLE"
     },
     {
       "id": "AF-TASK-014",
@@ -403,7 +528,26 @@
         "La certification sur données live reste bloquée par les gaps pertinents de AF-OPS-007/008/009.",
         "Les unités rendement/volatilité/covariance/taux sans risque sont cohérentes et testées."
       ],
-      "next_action": "Concevoir le Data Preparation Contract et ses fixtures déterministes ; ne pas certifier les runs live avant les gates de qualité/fraîcheur pertinentes."
+      "next_action": "Concevoir le Data Preparation Contract et ses fixtures déterministes ; ne pas certifier les runs live avant les gates de qualité/fraîcheur pertinentes.",
+      "stream": "PRODUCT",
+      "program": "ALLOCATION",
+      "priority": "P1",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST",
+      "definition_of_ready": [
+        "AF-TASK-012 runtime cartography is DONE.",
+        "Fund/data-quality dependencies are explicitly identified before live certification."
+      ],
+      "definition_of_done": [
+        "Deterministic Data Preparation Contract and fixtures exist.",
+        "Fund Master data is reused rather than duplicated.",
+        "Live runs remain gated by relevant data-quality/freshness controls."
+      ],
+      "evidence_required": [
+        "DATA_PREPARATION_FIXTURES",
+        "FUND_MASTER_REUSE_PROOF"
+      ],
+      "next_transition": "DATA_PREPARATION_CONTRACT_STABLE"
     },
     {
       "id": "AF-TASK-015",
@@ -619,5 +763,18 @@
       ],
       "next_action": "Ne démarrer qu'après certification fonctionnelle des lots précédents ; préparer un plan de migration/rollback avant toute dépréciation."
     }
-  ]
+  ],
+  "programme_director": {
+    "mode": "DERIVED_READ_ONLY",
+    "single_queue_authority": ".governance/loop/task-queue.json",
+    "no_second_queue": true,
+    "orchestrator": "scripts/governance/program_orchestrator.py",
+    "workflow": ".github/workflows/governance-program-director.yml",
+    "first_green_run_id": 35786506758,
+    "dependency_engine": "ACTIVE_READ_ONLY",
+    "parallel_safety": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST",
+    "chronology": "DERIVED_FROM_EVIDENCE_INCIDENTS_AND_GIT_NEXT_INCREMENT",
+    "gap_harvester": "PLANNED_AFTER_READ_ONLY_ORCHESTRATOR_STABILIZATION",
+    "multi_agent_surface_claims": "PLANNED_AFTER_READ_ONLY_ORCHESTRATOR_STABILIZATION"
+  }
 }
