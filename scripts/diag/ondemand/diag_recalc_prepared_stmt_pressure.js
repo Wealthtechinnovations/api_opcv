@@ -9,7 +9,7 @@
  */
 'use strict';
 
-require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.env') });
 const mysql = require('mysql2/promise');
 
 const DB_CONFIG = {
