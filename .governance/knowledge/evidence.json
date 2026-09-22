@@ -394,6 +394,30 @@
       "provenance": "api_opcv package-lock mysql2 3.11.3; scripts/recalc/recalc_eur_usd_daily_rate.js and scripts/recalc/recalc_vl_ajuste.js; mysql2 official prepared-statement contract",
       "observed_at": "2026-09-22T20:09:14Z",
       "summary": "Both massive daily recalculation scripts build UPDATE ... CASE SQL with row ids and values interpolated into the SQL text and execute each changing SQL string with mysql2 connection.execute(). mysql2 execute() prepares and caches statements per exact SQL text with an LRU cache; default maxPreparedStatements is 16000. Current MariaDB status after the recalculation shows Prepared_stmt_count=2 but cumulative Com_stmt_prepare=8389 and Com_stmt_close=0 since the 06:25 restart. This code pattern is a verified prepared-statement-cache risk and fits transient allocation followed by retained RSS, but causality is not proven until counters are sampled while steps 3/4 are active."
+    },
+    {
+      "id": "AF-EVD-058",
+      "type": "MARIADB_SQL_PROTOCOL_FIX_VALIDATION",
+      "result": "RED_FIX_GREEN_EXACT_SHA_PROVEN",
+      "provenance": "GitHub Actions RSS contract run 35782268252 (expected RED) + commits 226341d88ee9ee5c64962ceeff26eafda4a6f63e and 1f4f13db2b5e6d60f0959a38cab12bfdd566efb4 + exact-SHA GREEN run 35782456689 at 3371a076e9311d6d321cbcdd2505a74aacd16512",
+      "observed_at": "2026-09-22T20:46:40Z",
+      "summary": "The regression contract first failed as expected with both massive step-3 and step-4 dynamic UPDATE paths classified EXECUTE_PREPARED. The only runtime SQL transport change then switched the fully materialized dynamic UPDATE statements in recalc_eur_usd_daily_rate.js and recalc_vl_ajuste.js from mysql2 connection.execute() to connection.query(); parameterized SELECT statements remain execute(). Exact-triggering-SHA run 35782456689 passed with STEP3=QUERY_TEXT, STEP4=QUERY_TEXT and parameterized_select_execute_preserved=YES. No financial formula, batch size, schema, transaction or source-data rule was changed."
+    },
+    {
+      "id": "AF-EVD-059",
+      "type": "GOVERNED_PRODUCTION_DEPLOYMENT",
+      "result": "AF_OPS_003_SQL_PROTOCOL_FIX_DEPLOYED_GOV006_PASS",
+      "provenance": "GOV-006 reconciliation run 35782727724 at API request commit 84c3e4fe06c4282f0ab1f09a95962c6fb49c1ef3",
+      "observed_at": "2026-09-22T20:50:46Z",
+      "summary": "The existing governed GitHub-to-S2 reconciliation path deployed the validated AF-OPS-003 SQL protocol correction. GOV-006 completed successfully with API S2 reconciled to 84c3e4fe06c4282f0ab1f09a95962c6fb49c1ef3 and frontend S2 to dcd8e5a79b27d93b66723884727f55ec2ffc9944. The request preserved untracked runtime/business data, used fast-forward guards and explicitly required no MariaDB restart and no database mutation."
+    },
+    {
+      "id": "AF-EVD-060",
+      "type": "POST_DEPLOYMENT_ATTESTATION",
+      "result": "S2_CHECKOUT_CLEAN_SQL_PROTOCOL_CONTRACT_GREEN",
+      "provenance": "RSS sampler post-deploy run 35782555062 attempt 2 + GOV-006 run 35782727724",
+      "observed_at": "2026-09-22T20:50:53Z",
+      "summary": "Post-deployment read-only attestation observed S2 API HEAD 84c3e4fe06c4282f0ab1f09a95962c6fb49c1ef3 on canonical branch claude/code-review-improvements-ikvuj with tracked dirty count 0, and the SQL protocol contract remained GREEN. This proves deployment and checkout integrity; it does not yet prove that the memory-growth root cause is eliminated. The next proof must compare RSS/RssAnon/Private_Dirty and Com_stmt_* during real post-fix recalculation cycles."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
