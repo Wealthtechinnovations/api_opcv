@@ -107,7 +107,7 @@ function createAllocationDataProvider({
     const where = {
       fund_id: { [Op.in]: ids },
     };
-    if (Object.keys(date).length) where.date = date;
+    if (dateFrom || dateTo) where.date = date;
 
     const rows = await valuationModel.findAll({
       attributes: [...VALUATION_ATTRIBUTES],
