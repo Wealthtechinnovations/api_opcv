@@ -442,6 +442,14 @@
       "provenance": "GitHub Actions AfricaFunds Programme Director run 35793007081 at API 30fee622a02d8e996e121e9b8391a3bf6ea7bd16 with frontend 198441af894f921917916532cf4bfd4ead94d8b5",
       "observed_at": "2026-09-22T22:33:37Z",
       "summary": "The Programme Director completed GREEN with the hard-fail existing-invariants contract enabled. The invariant validator passed product identity, two-repository FUND_STATE, single queue, single writer, no-new-branch/force-push/history-rewrite markers, context reconstruction, NEXT_ACTION operational projection, frontend-only global SUIVI, AF-OPS-007/009 -> AF-OPS-008 data dependency order, structured Allocation live-data gates AF-OPS-007/008/009, evidence-id uniqueness and no-second-claim-registry rules. The surface-claim validator simultaneously observed exactly one ACTIVE claim: AF-TASK-017 owned by ChatGPT-GPT-5.6-Sol on API surfaces src/services/allocation/constraints/**, tests/allocation-constraints.test.js and .github/workflows/governance-allocation-constraints.yml; conflict_count=0 and no parallel pair is certified because only one active claim exists. No production mutation or Allocation surface write was performed by the governance lot."
+    },
+    {
+      "id": "AF-EVD-064",
+      "type": "PROGRAMME_DIRECTOR_PROJECTION_DRIFT_RED_GREEN",
+      "result": "FIVE_DRIFTS_REPAIRED_ZERO_DRIFT_FAIL_CLOSED_GREEN",
+      "provenance": "Programme Director RED run 35793411310; projection repair commit 27eff9c72e6cebaee1f119d3dcb4eac564630453; projection-trigger commit 7db1ac70c7a860517c277d304c0d0572dd4146b7; observe-only GREEN run 35793783965; fail-closed commit eb5e8871087d97de09daf072bca27424bcae60d6; fail-closed GREEN run 35793931323",
+      "observed_at": "2026-09-22T22:44:20Z",
+      "summary": "The observe-only projection detector first measured five stale human views: NEXT_ACTION lacked the machine anti-regression mode token; CURRENT_ITERATION and LOOP_STATE lacked the current AF-OPS-003/POST_FIX_VALIDATION projection; HANDOFF and STATUS still projected pre-fix RCA wording. GLOBAL_SUIVI already passed. The five current sections were repaired atomically in commit 27eff9c7 while historical sections were preserved. Programme Director triggers were extended to those projection files. Observe-only run 35793783965 then measured projection_drift_count=0 and machine_drift_count=0. The detector was promoted to FAIL_CLOSED_CURRENT_PROJECTIONS and exact run 35793931323 passed with projection_drift_count=0, machine_drift_count=0 and overall integrity PASS. The same run observed two active non-overlapping claims AF-TASK-017 and AF-TASK-024 with conflict_count=0 and a certified parallel pair."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
