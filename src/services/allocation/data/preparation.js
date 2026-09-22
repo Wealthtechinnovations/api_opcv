@@ -1,5 +1,7 @@
 'use strict';
 
+const { buildRateIndex, getRate, FIXED_RATES } = require('../../forex.service');
+
 const PREPARATION_VERSION = '1.0.0';
 
 const PERIODS_PER_YEAR = Object.freeze({
@@ -200,18 +202,71 @@ function resolveValueField(returnMethod, baseCurrency) {
   if (!VALUE_FIELDS[method]) {
     throw new AllocationDataError(issue('data.return_method', 'UNSUPPORTED_RETURN_METHOD', 'Methodes supportees: TOTAL_RETURN, NAV.'));
   }
-  if (!SUPPORTED_BASE_CURRENCIES.includes(currency)) {
+
+  if (SUPPORTED_BASE_CURRENCIES.includes(currency)) {
+    return {
+      return_method: method,
+      base_currency: currency,
+      value_field: VALUE_FIELDS[method][currency],
+      conversion_mode: 'DIRECT',
+      fx_pair: null,
+    };
+  }
+
+  if (!/^[A-Z]{3}$/.test(currency)) {
     throw new AllocationDataError(issue(
       'universe.base_currency',
-      'BASE_CURRENCY_REQUIRES_FX_ENGINE',
-      'La preparation native couvre LOCAL, EUR et USD. Toute autre devise requiert le futur FX engine explicite.',
+      'INVALID_BASE_CURRENCY',
+      'La devise de base doit etre LOCAL ou un code ISO 4217 sur 3 lettres.',
       { base_currency: currency }
     ));
   }
+
+  // AfricaFunds stocke deja une serie EUR par VL. Pour une autre devise cible,
+  // on repart de cette serie et on applique la paire EUR/<TARGET> historique.
   return {
     return_method: method,
     base_currency: currency,
-    value_field: VALUE_FIELDS[method][currency],
+    value_field: VALUE_FIELDS[method].EUR,
+    conversion_mode: 'EUR_CROSS',
+    fx_pair: `EUR/${currency}`,
+  };
+}
+
+function buildValueResolver(valueSpec, fxRows = []) {
+  if (valueSpec.conversion_mode === 'DIRECT') {
+    return {
+      resolve(row) {
+        return asFinite(row[valueSpec.value_field]);
+      },
+      fx_source: null,
+    };
+  }
+
+  const pair = valueSpec.fx_pair;
+  const fixedRate = FIXED_RATES[pair] || null;
+  const index = fixedRate ? null : buildRateIndex(fxRows || [], pair);
+
+  if (!fixedRate && (!index || index.dates.length === 0)) {
+    throw new AllocationDataError(issue(
+      'fx_rows',
+      'FX_PAIR_REQUIRED',
+      `Aucune serie FX disponible pour ${pair}.`,
+      { pair }
+    ));
+  }
+
+  return {
+    resolve(row) {
+      const eurValue = asFinite(row[valueSpec.value_field]);
+      if (eurValue === null || eurValue <= 0) return null;
+      const rate = fixedRate || getRate(index, row.date);
+      if (!rate || !Number.isFinite(Number(rate)) || Number(rate) <= 0) return null;
+      return eurValue * Number(rate);
+    },
+    fx_source: fixedRate
+      ? { pair, type: 'FIXED_RATE', value: fixedRate }
+      : { pair, type: 'HISTORICAL_DEVISedechanges' },
   };
 }
 
@@ -241,6 +296,7 @@ function normalizeFundSeries({
   rows,
   frequency,
   valueField,
+  valueResolver,
   window,
 }) {
   const warnings = [];
@@ -263,7 +319,7 @@ function normalizeFundSeries({
     if (window.date_from && row.date < window.date_from) continue;
     if (row.date > window.date_to) continue;
 
-    const value = asFinite(row[valueField]);
+    const value = valueResolver(row);
     if (value === null || value <= 0) {
       rejectedRows += 1;
       continue;
@@ -401,6 +457,7 @@ function prepareAllocationData({
   request,
   funds,
   valuations_by_fund,
+  fx_rows,
   covariance,
   risk_free,
 }) {
@@ -423,6 +480,7 @@ function prepareAllocationData({
     request.data && request.data.return_method,
     request.universe.base_currency
   );
+  const valueResolver = buildValueResolver(valueSpec, fx_rows || []);
 
   const availableCutoff = latestAvailableCutoff(orderedFunds, valuations_by_fund || {});
   const window = resolveWindow(request.data || {}, availableCutoff);
@@ -432,6 +490,7 @@ function prepareAllocationData({
     rows: (valuations_by_fund || {})[String(fund.id)] || (valuations_by_fund || {})[fund.id] || [],
     frequency,
     valueField: valueSpec.value_field,
+    valueResolver: valueResolver.resolve,
     window,
   }));
 
@@ -537,6 +596,8 @@ function prepareAllocationData({
       value_field: valueSpec.value_field,
       base_currency: valueSpec.base_currency,
       return_method: valueSpec.return_method,
+      conversion_mode: valueSpec.conversion_mode,
+      fx: valueResolver.fx_source,
       no_limit_500: true,
       exact_date_intersection_used: false,
       period_level_alignment: true,
@@ -556,6 +617,7 @@ module.exports = {
   resolveWindow,
   periodKey,
   resolveValueField,
+  buildValueResolver,
   covarianceMatrix,
   normalizeRiskFree,
   prepareAllocationData,
