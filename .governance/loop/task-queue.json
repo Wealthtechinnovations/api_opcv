@@ -1026,7 +1026,7 @@
       "id": "AF-TASK-025",
       "title": "Programme Directeur — générateur déterministe des projections humaines",
       "status": "IN_PROGRESS",
-      "phase": "GENERATOR_OBSERVE_ONLY",
+      "phase": "GENERATOR_DETERMINISM_GREEN",
       "depends_on": [
         "AF-TASK-024"
       ],
@@ -1064,7 +1064,7 @@
         "PROJECTION_GENERATOR_IDEMPOTENCE"
       ],
       "next_transition": "GENERATOR_GREEN_THEN_WRITEBACK_GATE_REVIEW",
-      "next_action": "Construire le générateur observe-only, produire les vues attendues à partir de queue/state/handoff/evidence et comparer sans écrire.",
+      "next_action": "Simuler l'insertion/remplacement des blocs gérés dans des copies en mémoire uniquement, prouver diff borné et idempotence, sans write-back Git.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
         "status": "ACTIVE",
@@ -1101,7 +1101,18 @@
         "HANDOFF.md",
         "STATUS.md",
         "SUIVI.md"
-      ]
+      ],
+      "progress_evidence": {
+        "generator_run_id": 35798266486,
+        "generator_determinism": "PASS",
+        "repository_write_performed": false,
+        "input_sha256": "f3edbd134b6b56b55216834e0db74f38638828d3f545fa5ba04d4b9f28d3c92e",
+        "writeback_candidate_count": 6,
+        "exact_present_count": 0,
+        "full_artifact_id": 10724234585,
+        "archived_file_count": 17,
+        "evidence_ref": "AF-EVD-065"
+      }
     }
   ],
   "programme_director": {
@@ -1153,7 +1164,11 @@
     "projection_drift_latest_evidence": "AF-EVD-064",
     "projection_drift_count": 0,
     "projection_machine_drift_count": 0,
-    "projection_generator": "PLANNED_OBSERVE_ONLY_AF-TASK-025"
+    "projection_generator": "ACTIVE_OBSERVE_ONLY_DETERMINISM_GREEN",
+    "projection_generator_latest_run_id": 35798266486,
+    "projection_generator_latest_evidence": "AF-EVD-065",
+    "projection_generator_repository_write": false,
+    "projection_generator_candidate_count": 6
   },
   "surface_claims_contract": {
     "mode": "OBSERVE_ONLY",
