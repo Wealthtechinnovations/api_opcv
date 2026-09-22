@@ -1,5 +1,16 @@
 # LOOP_STATE — AfricaFunds API
 
+<!-- PROGRAMME_DIRECTOR:BEGIN -->
+### Projection gérée — état de boucle
+
+- loop_id: `AF-GOV-FINAL-CERT-20260911-01`
+- governance_current_task: `AF-TASK-010`
+- operational_priority: `AF-OPS-003`
+- operational_phase: `POST_FIX_VALIDATION`
+- programme_task: `AF-TASK-026`
+
+<!-- PROGRAMME_DIRECTOR:END -->
+
 ## État courant — clôture interne
 
 > Boucle : `AF-GOV-FINAL-CERT-20260911-01`  

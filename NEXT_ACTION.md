@@ -1,5 +1,16 @@
 # NEXT_ACTION — AfricaFunds API
 
+<!-- PROGRAMME_DIRECTOR:BEGIN -->
+### Projection gérée — prochaine action
+
+- operational_priority: `AF-OPS-003`
+- status: `OPEN`
+- phase: `POST_FIX_VALIDATION`
+- next_action: `Le correctif protocolaire execute()->query des deux UPDATE dynamiques massifs est RED->GREEN et déployé par GOV-006. Ne pas le rejouer et ne pas restart MariaDB. Mesurer les prochains vrais passages étape 3/4 avec le sampler gouverné; comparer RSS/RssAnon/Private_Dirty, Prepared_stmt_count et Com_stmt_* au baseline pré-fix, vérifier l'équivalence des sorties, puis seulement réévaluer le niveau de confiance RCA.`
+- anti_regression: `ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY`
+
+<!-- PROGRAMME_DIRECTOR:END -->
+
 ## Priorité opérationnelle pré-V2 — AF-OPS-003
 
 La boucle de certification de gouvernance reste fermée :

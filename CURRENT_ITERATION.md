@@ -1,5 +1,17 @@
 # CURRENT_ITERATION — AfricaFunds API
 
+<!-- PROGRAMME_DIRECTOR:BEGIN -->
+### Projection gérée — itération courante
+
+- operational_priority: `AF-OPS-003`
+- operational_phase: `POST_FIX_VALIDATION`
+- programme_task: `AF-TASK-026`
+- programme_status: `IN_PROGRESS`
+- programme_phase: `WRITEBACK_GATE_PREFLIGHT`
+- active_claims: `AF-TASK-017, AF-TASK-026`
+
+<!-- PROGRAMME_DIRECTOR:END -->
+
 ## AF-GOV-FINAL-CERT-20260911-01 — CLOSED_WITH_EXTERNAL_GAPS
 
 `AF-TASK-011` est terminée et `AF-TASK-003` est fermée avec gaps externes. L'état interne attendu est atteint sans nouvelle branche, sans suppression d'untracked, sans rotation DB supplémentaire et sans correction opportuniste des anomalies métier C2/C3/C4/C7/C8.

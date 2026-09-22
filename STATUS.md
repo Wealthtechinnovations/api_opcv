@@ -1,5 +1,17 @@
 # STATUS — AfricaFunds API
 
+<!-- PROGRAMME_DIRECTOR:BEGIN -->
+### Projection gérée — statut
+
+- operational_priority: `AF-OPS-003`
+- operational_phase: `POST_FIX_VALIDATION`
+- programme_task: `AF-TASK-026`
+- anti_regression: `ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY`
+- projection_drift: `ACTIVE_FAIL_CLOSED_CURRENT_PROJECTIONS`
+- claim_enforcement: `ADVISORY_ONLY_NO_WRITE_BLOCK`
+
+<!-- PROGRAMME_DIRECTOR:END -->
+
 > Nature : photographie courante, complémentaire au `SUIVI.md` global.
 > Statut : `APPLICABLE`.
 > Règle : les SHA inscrits ici sont des **checkpoints observés**. Le commit qui met à jour ce fichier avance nécessairement le HEAD ; toute nouvelle écriture doit donc réobserver GitHub au lieu de supposer que ce fichier contient le HEAD auto-référentiel du commit courant.
