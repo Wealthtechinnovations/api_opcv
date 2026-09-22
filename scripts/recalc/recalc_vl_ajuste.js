@@ -156,7 +156,10 @@ async function run() {
       }
 
       try {
-        await conn.execute(`
+        // SQL entierement materialise et unique par batch : utiliser le
+        // protocole texte evite de preparer/cacher des milliers de statements
+        // differents sans changer le SQL ni les resultats financiers.
+        await conn.query(`
           UPDATE valorisations SET
             vl_ajuste = CASE id ${cases_ajuste.join(' ')} END,
             vl_ajuste_EUR = CASE id ${cases_eur.join(' ')} END,
