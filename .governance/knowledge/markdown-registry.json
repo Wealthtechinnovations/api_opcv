@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "dab0285fe7030a7ed361db90f301e0d2b408567e"
+      "head": "ad80149b2d6064ca98a4b93e80d3232cfee96ab2"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "bb6e9b7a85a3484b6318a785b8452eeb4440da28"
+      "head": "198441af894f921917916532cf4bfd4ead94d8b5"
     }
   },
   "summary": {
@@ -2908,6 +2908,7 @@
         "Prochaine preuve",
         "Fenêtre du saut RSS désormais resserrée",
         "Correctif protocolaire déployé — validation post-fix",
+        "Programme Directeur — anti-régression actif",
         "Autres blockers indépendants",
         "AF-OPS-005 en parallèle read-only",
         "Data-quality operational queue — measured 2026-09-22",
@@ -2927,11 +2928,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "0113c295489a723f59282b26dcb26fb9a7af5dc6",
-      "last_validated_sha": "0113c295489a723f59282b26dcb26fb9a7af5dc6",
-      "content_sha256": "8db20be1fc257894760626a03b8bf94bf29ba4c4cec0db00cb8c7adcdfad9b02",
-      "line_count": 98,
-      "byte_count": 7143,
+      "git_blob_sha": "84fe3ed5e87b5828a50e35c8fd5c1a4d3d0f9c5c",
+      "last_validated_sha": "84fe3ed5e87b5828a50e35c8fd5c1a4d3d0f9c5c",
+      "content_sha256": "280f3e040d8dd598586d416ef91ed89318aa28dceac0cef89c848f10dbd1bece",
+      "line_count": 113,
+      "byte_count": 8262,
       "headings": [
         {
           "level": 1,
@@ -2964,6 +2965,10 @@
         {
           "level": 3,
           "text": "Correctif protocolaire déployé — validation post-fix"
+        },
+        {
+          "level": 2,
+          "text": "Programme Directeur — anti-régression actif"
         },
         {
           "level": 2,
@@ -13335,11 +13340,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "bc85f2f0dcdb98722127ad05552c498c474d3cd8",
-      "last_validated_sha": "bc85f2f0dcdb98722127ad05552c498c474d3cd8",
-      "content_sha256": "e4e0f0a796533fb34a0f8d000182473d39e9dde3c3a903e96d861c36dafd9567",
-      "line_count": 6730,
-      "byte_count": 469836,
+      "git_blob_sha": "4414afacebce17cbc5e1c63d7961c49e05b21e10",
+      "last_validated_sha": "4414afacebce17cbc5e1c63d7961c49e05b21e10",
+      "content_sha256": "f40678f20d2ec91fb512715bc5569f110afbd6705249e2b15574dfa1aa940665",
+      "line_count": 6811,
+      "byte_count": 474436,
       "headings": [
         {
           "level": 1,
