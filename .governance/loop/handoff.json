@@ -25,7 +25,7 @@
     "AF-OPS-003"
   ],
   "open": [],
-  "next_action": "AF-OPS-003 is POST_FIX_VALIDATION. The execute()->query protocol-only fix is RED->GREEN and deployed through GOV-006; do not replay the fix or restart MariaDB. Observe the next real step-3/4 recalculation windows with the governed sampler, compare memory and Com_stmt_* against pre-fix evidence, verify output equivalence, then perform RCA confidence review. AF-OPS-005/007/009 may progress read-only in parallel subject to surface conflict checks; AF-OPS-008 stays dependency-gated.",
+  "next_action": "AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director is now GREEN/read-only with chronology and gap discovery derived from the existing authorities; no second queue and no automatic task creation. Observe the next real post-fix step-3/4 batch, compare memory/Com_stmt_* and outputs, then RCA confidence review. In parallel only dependency-level candidates are known; do not claim file-surface parallel safety until governed surface claims exist.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -73,8 +73,13 @@
     "mariadb_prepared_statement_candidate": "CODE_PATTERN_PROVEN_CAUSALITY_PENDING",
     "mariadb_sql_protocol_fix": "DEPLOYED_GOV006_AF-EVD-059",
     "mariadb_post_deploy_attestation": "PASS_AF-EVD-060",
-    "programme_director": "GREEN_RUN_35786506758_DERIVED_READ_ONLY",
-    "programme_director_single_queue": true
+    "programme_director": "GREEN_RUN_35787836771_DERIVED_READ_ONLY",
+    "programme_director_single_queue": true,
+    "programme_director_latest_evidence": "AF-EVD-061",
+    "programme_director_chronology": "ACTIVE_DERIVED_EVENT_LEDGER_62_TEMPORAL_EVENTS",
+    "programme_director_gap_harvester": "ACTIVE_READ_ONLY_125_CANDIDATES_NO_AUTO_TASK_CREATION",
+    "programme_director_parallel_safety": "DEPENDENCY_ONLY_NOT_FILE_SURFACE_CERTIFIED",
+    "programme_director_surface_claims": "PLANNED_NOT_YET_ACTIVE"
   },
   "closed_with_external_gaps": [
     "AF-TASK-003"
