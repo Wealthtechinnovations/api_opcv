@@ -180,13 +180,12 @@ def main():
     # Allocation live certification must remain gated by data-quality dependencies.
     t14=task_map.get("AF-TASK-014") or {}
     if t14.get("status")=="DONE_WITH_EXTERNAL_GAPS":
-        text_blob=" ".join([
-            str(t14.get("next_action","")),
-            " ".join(t14.get("definition_of_done") or []),
-        ])
+        declared_gates=set(t14.get("related_operational_gates") or [])
+        completion=t14.get("completion_evidence") or {}
+        declared_gates.update(completion.get("live_certification_gates") or [])
         require(
             errors,
-            all(x in text_blob for x in ("AF-OPS-007","AF-OPS-008","AF-OPS-009")),
+            {"AF-OPS-007","AF-OPS-008","AF-OPS-009"}.issubset(declared_gates),
             "ALLOCATION_LIVE_DATA_GATE_DRIFT",
         )
 
