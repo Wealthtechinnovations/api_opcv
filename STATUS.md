@@ -64,6 +64,16 @@ Source : `docs/ETAT_PRODUCTION_VERIFIE.md` (autorité `production_measured_state
 
 Ces échecs restent tracés dans les exigences/preuves gouvernées et ne sont pas masqués par la réussite des CI documentaires.
 
+## Programme Directeur / priorité opérationnelle actuelle
+
+```text
+AF-OPS-003 = OPEN / POST_FIX_VALIDATION
+AF-TASK-024 = IN_PROGRESS / PROJECTION_DRIFT_RED
+anti_regression_contract = ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY
+```
+
+Le Programme Directeur dérive la continuité depuis les autorités structurées existantes. Il ne crée ni seconde queue ni seconde mémoire. Le claim `AF-TASK-024` ne chevauche pas le claim Allocation `AF-TASK-017`.
+
 ## Incident opérationnel prioritaire
 
 `AF-EVD-012` documente l’OOM-kill de `mariadbd` du 2026-09-08 à 20:02:42 et l’absence de redémarrage automatique pendant environ 10 h 22.

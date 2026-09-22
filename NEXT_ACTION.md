@@ -75,7 +75,7 @@ La root cause exacte reste **UNKNOWN**. La prochaine preuve n'est plus de recons
 
 Le Programme Directeur est désormais protégé par un contrat machine-checkable **hard-fail** qui ne vérifie que des invariants déjà normatifs : deux repositories / un produit, tuple `FUND_STATE`, queue unique, single-writer, interdiction nouvelle branche/force-push/history rewrite, reconstruction de contexte, projection de la priorité opérationnelle, `SUIVI.md` global frontend, ordre AF-OPS-007/009 → AF-OPS-008, gates live Allocation AF-OPS-007/008/009, unicité des preuves et absence de second registre de claims.
 
-Preuve : `AF-EVD-063`, run Programme Director `35793007081 = SUCCESS`.
+Preuve : `AF-EVD-063`, run Programme Director `35793007081 = SUCCESS`.\n\n```text\nanti_regression_contract = ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY\nprojection_drift_detector = OBSERVE_ONLY_RED_BASELINE\n```
 
 Le même run observe actuellement :
 

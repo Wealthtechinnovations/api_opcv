@@ -23,6 +23,15 @@ AF-TASK-011 DONE
 
 Preuves de clôture : `AF-EVD-035`, `AF-EVD-036`. Verdict : `GOVERNED_WITH_EXTERNAL_GAPS`.
 
+### Priorité opérationnelle actuelle
+
+```text
+AF-OPS-003 = OPEN / POST_FIX_VALIDATION
+AF-TASK-024 = IN_PROGRESS / PROJECTION_DRIFT_RED
+```
+
+La boucle de certification historique reste fermée avec gaps externes. La priorité opérationnelle est projetée séparément. Le claim `AF-TASK-024` est borné aux surfaces gouvernance et ne chevauche pas `AF-TASK-017`.
+
 ### Historique conservé
 
 > Boucle : `AF-GOV-FINAL-CERT-20260911-01`
