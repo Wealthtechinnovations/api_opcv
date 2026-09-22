@@ -6,6 +6,7 @@ on:
       - claude/code-review-improvements-ikvuj
     paths:
       - 'scripts/governance/program_orchestrator.py'
+      - 'scripts/governance/program_event_ledger.py'
       - '.governance/project.json'
       - '.governance/loop/task-queue.json'
       - '.governance/loop/state.json'
@@ -55,6 +56,15 @@ jobs:
             --output out/program-director.json \
             | tee out/program-director.log
 
+      - name: Build derived chronological ledger
+        run: |
+          set -euo pipefail
+          python3 api/scripts/governance/program_event_ledger.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/program-events.json \
+            | tee out/program-events.log
+
       - name: Publish programme summary
         if: always()
         run: |
@@ -98,6 +108,14 @@ jobs:
               print("### Warnings")
               for e in integ["warnings"]:
                   print("-",e)
+
+          ep=Path("out/program-events.json")
+          if ep.exists():
+              events=json.loads(ep.read_text(encoding="utf-8"))
+              print()
+              print("### Latest programme events")
+              for row in events.get("latest_events",[])[-12:]:
+                  print("-",row.get("at"),row.get("kind"),row.get("ref"),row.get("result") or row.get("summary"))
           PY
 
       - name: Upload derived programme state
@@ -108,5 +126,7 @@ jobs:
           path: |
             out/program-director.json
             out/program-director.log
+            out/program-events.json
+            out/program-events.log
           if-no-files-found: warn
           retention-days: 30
