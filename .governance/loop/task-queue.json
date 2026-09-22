@@ -929,8 +929,8 @@
     {
       "id": "AF-TASK-024",
       "title": "Programme Directeur — automatisation chronologique, projections et anti-régression",
-      "status": "IN_PROGRESS",
-      "phase": "PROJECTION_DRIFT_RED",
+      "status": "DONE",
+      "phase": "PROJECTION_DRIFT_FAIL_CLOSED",
       "depends_on": [
         "AF-TASK-005"
       ],
@@ -970,12 +970,106 @@
         "PROGRAMME_DIRECTOR_FULL_GREEN"
       ],
       "next_transition": "PROJECTION_DRIFT_GREEN_THEN_FAIL_CLOSED",
-      "next_action": "Repair only current human projection sections from structured authorities, preserve history, prove drift=0, then make projection drift fail-closed.",
+      "next_action": "AF-TASK-025 : générer déterministement les sections courantes des projections en observe-only avant toute écriture automatique.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "RELEASED",
+        "claimed_at": "2026-09-22T22:38:30Z",
+        "base_api_sha": "743ab3f95943a7af3d414294cc1e4ea2b6256649",
+        "base_frontend_sha": "c253c7ff379cd58d07d7b660c5517d2e3f859ec6",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ],
+        "released_at": "2026-09-22T22:44:20Z"
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ],
+      "completed_at": "2026-09-22T22:44:20Z",
+      "completion_evidence": {
+        "red_run_id": 35793411310,
+        "red_projection_drift_count": 5,
+        "atomic_projection_repair_commit": "27eff9c72e6cebaee1f119d3dcb4eac564630453",
+        "green_observe_run_id": 35793783965,
+        "green_projection_drift_count": 0,
+        "fail_closed_commit": "eb5e8871087d97de09daf072bca27424bcae60d6",
+        "fail_closed_green_run_id": 35793931323,
+        "evidence_ref": "AF-EVD-064",
+        "historical_sections_preserved": true
+      }
+    },
+    {
+      "id": "AF-TASK-025",
+      "title": "Programme Directeur — générateur déterministe des projections humaines",
+      "status": "IN_PROGRESS",
+      "phase": "GENERATOR_OBSERVE_ONLY",
+      "depends_on": [
+        "AF-TASK-024"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Dériver les sections courantes de NEXT_ACTION/CURRENT_ITERATION/LOOP_STATE/HANDOFF/STATUS et un snippet SUIVI depuis les autorités structurées.",
+        "Commencer en observe-only : générer des artefacts et comparer, sans écrire automatiquement dans Git.",
+        "Préserver intégralement les sections historiques et éviter toute autorité parallèle.",
+        "N'autoriser une écriture idempotente qu'après sorties stables, diff borné et fail-closed GREEN."
+      ],
+      "acceptance_criteria": [
+        "Le générateur produit des sorties déterministes pour un même FUND_STATE.",
+        "Aucune sortie générée ne contient de SHA auto-référentiel supposé.",
+        "Les sections historiques ne sont jamais régénérées ni supprimées.",
+        "Le Programme Director compare généré vs actuel et expose un diff borné.",
+        "Aucune écriture automatique tant que le mode reste GENERATOR_OBSERVE_ONLY."
+      ],
+      "definition_of_ready": [
+        "AF-TASK-024 DONE / projection drift fail-closed.",
+        "AF-EVD-064 persiste le RED->GREEN des projections.",
+        "Claims multi-agent task-local opérationnels et non chevauchants."
+      ],
+      "definition_of_done": [
+        "Generator observe-only GREEN et déterministe.",
+        "Expected projection artifacts produits et comparés aux vues courantes.",
+        "Idempotence prouvée sur reruns.",
+        "Write-back éventuel séparé derrière un gate gouverné explicite."
+      ],
+      "evidence_required": [
+        "PROJECTION_GENERATOR_DETERMINISM",
+        "PROJECTION_GENERATOR_DIFF_BOUND",
+        "PROJECTION_GENERATOR_IDEMPOTENCE"
+      ],
+      "next_transition": "GENERATOR_GREEN_THEN_WRITEBACK_GATE_REVIEW",
+      "next_action": "Construire le générateur observe-only, produire les vues attendues à partir de queue/state/handoff/evidence et comparer sans écrire.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
         "status": "ACTIVE",
-        "claimed_at": "2026-09-22T22:38:30Z",
-        "base_api_sha": "743ab3f95943a7af3d414294cc1e4ea2b6256649",
+        "claimed_at": "2026-09-22T22:45:00Z",
+        "base_api_sha": "c6c0cbfac4ddbaf057d5c975457ec1b6d7507cf0",
         "base_frontend_sha": "c253c7ff379cd58d07d7b660c5517d2e3f859ec6",
         "repository_roles": [
           "API",
@@ -1053,7 +1147,13 @@
       "ALLOCATION_LIVE_DATA_GATES",
       "EVIDENCE_ID_UNIQUENESS",
       "NO_SECOND_CLAIM_REGISTRY"
-    ]
+    ],
+    "projection_drift_contract": "ACTIVE_FAIL_CLOSED_CURRENT_PROJECTIONS",
+    "projection_drift_latest_green_run_id": 35793931323,
+    "projection_drift_latest_evidence": "AF-EVD-064",
+    "projection_drift_count": 0,
+    "projection_machine_drift_count": 0,
+    "projection_generator": "PLANNED_OBSERVE_ONLY_AF-TASK-025"
   },
   "surface_claims_contract": {
     "mode": "OBSERVE_ONLY",
