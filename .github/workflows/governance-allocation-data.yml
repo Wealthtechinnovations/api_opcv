@@ -1,0 +1,44 @@
+name: Allocation Data Preparation
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'src/services/allocation/data/**'
+      - 'tests/allocation-data-preparation.test.js'
+      - '.github/workflows/governance-allocation-data.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: allocation-data-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  data-preparation:
+    name: Validate Node quantitative data preparation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+    steps:
+      - name: Checkout canonical API
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies without package scripts
+        run: npm ci --ignore-scripts
+
+      - name: Syntax check allocation data preparation
+        run: node --check src/services/allocation/data/preparation.js
+
+      - name: Run deterministic allocation data tests
+        run: npx jest tests/allocation-data-preparation.test.js --runInBand --forceExit
