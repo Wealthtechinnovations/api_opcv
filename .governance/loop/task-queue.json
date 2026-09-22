@@ -465,8 +465,8 @@
       "id": "AF-TASK-013",
       "program_id": "AF-ALLOC-001",
       "title": "Allocation — contrat API canonique, validation d'entrée, authentification et ownership",
-      "status": "OPEN",
-      "phase": "DEPENDENCY_GATED",
+      "status": "IN_PROGRESS",
+      "phase": "API_CONTRACT_IMPLEMENTATION",
       "depends_on": [
         "AF-TASK-012"
       ],
@@ -480,7 +480,7 @@
         "Les routes de sauvegarde/simulation appliquent authentification et contrôle d'ownership adaptés.",
         "Les anciennes routes restent compatibles tant que la migration n'est pas certifiée."
       ],
-      "next_action": "Après AF-TASK-012, spécifier le contrat V2 backward-compatible et ses tests de contrat avant de modifier les écrans ou solveurs.",
+      "next_action": "Finaliser le contrat V2 Node/JavaScript et ses tests de validation/ownership; ne brancher aucun solveur avant GREEN.",
       "stream": "PRODUCT",
       "program": "ALLOCATION",
       "priority": "P1",
@@ -499,7 +499,27 @@
         "ALLOCATION_API_CONTRACT_TESTS",
         "AUTH_OWNERSHIP_TESTS"
       ],
-      "next_transition": "API_CONTRACT_STABLE"
+      "next_transition": "API_CONTRACT_STABLE",
+      "implementation_language": "NODE_JAVASCRIPT",
+      "python_policy": "LEGACY_REFERENCE_ONLY_NOT_RUNTIME",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-22T21:55:00Z",
+        "base_api_sha": "3ae4446fd8dda0fb4df2b090157d5e74333186d2",
+        "base_frontend_sha": "4700665bce1fafd8e0a4b9fa86d2fa4e598e1b90",
+        "repository_roles": [
+          "API"
+        ],
+        "touched_surfaces": [
+          "src/services/allocation/**",
+          "tests/allocation-contract.test.js"
+        ]
+      },
+      "touched_surfaces": [
+        "src/services/allocation/**",
+        "tests/allocation-contract.test.js"
+      ]
     },
     {
       "id": "AF-TASK-014",
@@ -582,6 +602,7 @@
         "AF-TASK-014"
       ],
       "scope": [
+        "Implémenter le moteur canonique en Node/JavaScript dans le monolithe AfricaFunds ; Python n'est pas une cible runtime.",
         "Encapsuler portfolio-allocation derrière un adapter AfricaFunds au lieu d'appels dispersés.",
         "Conserver Mean-Variance / Efficient Frontier et ajouter Equal Weight, Inverse Volatility, Global Minimum Variance, Equal Risk Contribution, Risk Budgeting, Maximum Diversification, Maximum Sharpe et Minimum Correlation.",
         "Préparer Minimum Tracking Error et autres méthodes uniquement lorsqu'un benchmark valide existe.",
@@ -592,7 +613,9 @@
         "Chaque stratégie a des entrées/sorties communes et des tests déterministes.",
         "Les erreurs de convergence et matrices invalides produisent des warnings/erreurs structurés, jamais un résultat silencieux."
       ],
-      "next_action": "Implémenter d'abord l'adapter et les baselines Equal Weight/GMV/ERC avec tests avant d'élargir les stratégies."
+      "next_action": "Implémenter d'abord l'adapter et les baselines Equal Weight/GMV/ERC avec tests avant d'élargir les stratégies.",
+      "implementation_language": "NODE_JAVASCRIPT",
+      "python_policy": "NO_PYTHON_RUNTIME_ENGINE"
     },
     {
       "id": "AF-TASK-017",
