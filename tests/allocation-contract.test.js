@@ -5,6 +5,8 @@ const {
   getAuthenticatedUserId,
   buildCapabilities,
 } = require('../src/services/allocation/contract');
+const { authenticate } = require('../src/middleware/auth');
+const { signJwt } = require('../src/lib/jwt-rotation');
 
 describe('AfricaFunds Allocation Contract V2', () => {
   test('normalise un payload canonique sans melanger rendement, risque et poids', () => {
@@ -217,6 +219,76 @@ describe('AfricaFunds Allocation Contract V2', () => {
       errors: expect.arrayContaining([
         expect.objectContaining({ code: 'INVALID_CURRENCY' }),
       ]),
+    }));
+  });
+
+
+
+  test('derive le meme owner apres authentification JWT reelle', () => {
+    process.env.JWT_SECRET = 'allocation-contract-' + 'x'.repeat(64);
+    delete process.env.JWT_SECRET_PREVIOUS;
+
+    const token = signJwt({
+      id: 77,
+      email: 'investor@example.test',
+      role: 'investisseur',
+      typeusers_id: 1,
+    }, { expiresIn: '5m' });
+
+    const req = {
+      headers: { authorization: `Bearer ${token}` },
+    };
+    const response = {
+      statusCode: null,
+      payload: null,
+      status(code) {
+        this.statusCode = code;
+        return this;
+      },
+      json(payload) {
+        this.payload = payload;
+        return this;
+      },
+    };
+
+    let nextCalled = false;
+    authenticate(req, response, () => {
+      nextCalled = true;
+    });
+
+    expect(nextCalled).toBe(true);
+    expect(response.statusCode).toBeNull();
+    expect(req.user.id).toBe(77);
+    expect(getAuthenticatedUserId(req)).toBe(77);
+
+    delete process.env.JWT_SECRET;
+    delete process.env.JWT_SECRET_PREVIOUS;
+  });
+
+  test('refuse une requete allocation sans Bearer JWT', () => {
+    const req = { headers: {} };
+    const response = {
+      statusCode: null,
+      payload: null,
+      status(code) {
+        this.statusCode = code;
+        return this;
+      },
+      json(payload) {
+        this.payload = payload;
+        return this;
+      },
+    };
+
+    let nextCalled = false;
+    authenticate(req, response, () => {
+      nextCalled = true;
+    });
+
+    expect(nextCalled).toBe(false);
+    expect(response.statusCode).toBe(401);
+    expect(response.payload).toEqual(expect.objectContaining({
+      error: expect.stringMatching(/Token/),
     }));
   });
 
