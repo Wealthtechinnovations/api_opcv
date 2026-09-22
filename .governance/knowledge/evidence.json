@@ -426,6 +426,14 @@
       "provenance": "GitHub Actions AfricaFunds Programme Director run 35787836771 at API 8913e9ec951669d1966f8ca2425633fbd8e41661; artifact 10720254555",
       "observed_at": "2026-09-22T21:38:36Z",
       "summary": "The additive Programme Director completed GREEN in DERIVED_READ_ONLY mode. Integrity checks report no dependency cycles, missing dependencies, or dangling evidence refs and preserve AF-OPS-003 as POST_FIX_VALIDATION operational priority. The derived chronology contains 62 temporal events while five historical non-temporal incident markers are kept outside time ordering. The read-only Gap Harvester inventories 589 API and 584 frontend text files and emits 125 heuristic source-marker candidates (2 with possible existing-task matches, 123 unmatched). task_creation_performed=false: none of these candidates is an official gap or task until verified and deduplicated against the single governed queue. No production mutation, second queue, new branch or automatic task creation occurred."
+    },
+    {
+      "id": "AF-EVD-062",
+      "type": "PROGRAMME_DIRECTOR_SURFACE_CLAIMS_VALIDATION",
+      "result": "OBSERVE_ONLY_SURFACE_CLAIM_CONTRACT_GREEN_NO_ACTIVE_CLAIMS",
+      "provenance": "GitHub Actions AfricaFunds Programme Director run 35788502090 at API b32a60e311d409c5f6c9bbd94a2ad65cd91169d9",
+      "observed_at": "2026-09-22T21:45:28Z",
+      "summary": "The additive multi-agent surface-claim validator completed GREEN in OBSERVE_ONLY mode. Claims, when introduced, are defined task-locally in the existing task queue; no second claim registry or lock system exists. The validation observed 0 active claims, 0 surface conflicts and therefore 0 surface-certified parallel pairs. Write-capable open tasks without claims are advisory findings only at this stage; no existing work is blocked. The mechanism is ready to detect overlapping claimed file surfaces before any future enforcement is considered."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
