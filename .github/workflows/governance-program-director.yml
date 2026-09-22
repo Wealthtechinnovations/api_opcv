@@ -8,6 +8,7 @@ on:
       - 'scripts/governance/program_orchestrator.py'
       - 'scripts/governance/program_event_ledger.py'
       - 'scripts/governance/program_gap_harvester.py'
+      - 'scripts/governance/program_surface_claims.py'
       - '.governance/project.json'
       - '.governance/loop/task-queue.json'
       - '.governance/loop/state.json'
@@ -75,6 +76,14 @@ jobs:
             --output out/program-gaps.json \
             | tee out/program-gaps.log
 
+      - name: Validate multi-agent surface claims observe-only
+        run: |
+          set -euo pipefail
+          python3 api/scripts/governance/program_surface_claims.py \
+            --api-root api \
+            --output out/program-surface-claims.json \
+            | tee out/program-surface-claims.log
+
       - name: Publish programme summary
         if: always()
         run: |
@@ -138,6 +147,18 @@ jobs:
               print("- unmatched candidates:",gaps.get("candidate_without_possible_existing_task"))
               for row in gaps.get("inventory",[]):
                   print("- inventory",row.get("role"),row)
+
+          cp=Path("out/program-surface-claims.json")
+          if cp.exists():
+              claims=json.loads(cp.read_text(encoding="utf-8"))
+              print()
+              print("### Multi-agent surface claims")
+              print("- mode:",claims.get("mode"))
+              print("- integrity:",claims.get("integrity"))
+              print("- active claims:",claims.get("active_claim_count"))
+              print("- conflicts:",claims.get("conflict_count"))
+              print("- certified parallel pairs:",len(claims.get("surface_certified_parallel_pairs",[])))
+              print("- advisories:",len(claims.get("advisories",[])))
           PY
 
       - name: Upload derived programme state
