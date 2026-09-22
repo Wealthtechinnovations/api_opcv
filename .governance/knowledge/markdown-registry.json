@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "27eff9c72e6cebaee1f119d3dcb4eac564630453"
+      "head": "642a9e9f4c42934736fd190d72d69f431232fe47"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "c253c7ff379cd58d07d7b660c5517d2e3f859ec6"
+      "head": "c4caa665f2add337824bb5d9c41b460a7da9fffa"
     }
   },
   "summary": {
@@ -1528,11 +1528,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CURRENT_ITERATION.md",
-      "git_blob_sha": "c0b093aa6e306c7521b00f6c362b7cf010426297",
-      "last_validated_sha": "c0b093aa6e306c7521b00f6c362b7cf010426297",
-      "content_sha256": "6d5c4c046e2efedeaccdda3ddde8f342b03af6b717c4350ba9851c881291eff7",
-      "line_count": 56,
-      "byte_count": 3073,
+      "git_blob_sha": "ce866b3816e5dd94d773e6c57d2d68b2ba210406",
+      "last_validated_sha": "ce866b3816e5dd94d773e6c57d2d68b2ba210406",
+      "content_sha256": "da0609554077a84e48f8f77a75009cb60d759953cc0da8c617e7c63298904c8e",
+      "line_count": 57,
+      "byte_count": 3092,
       "headings": [
         {
           "level": 1,
@@ -2384,11 +2384,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "HANDOFF.md",
-      "git_blob_sha": "66161a1763567ae04f5455e4dd5c72e3af17729d",
-      "last_validated_sha": "66161a1763567ae04f5455e4dd5c72e3af17729d",
-      "content_sha256": "fd8f8c31afa30f43ef81d626d9bea5f819f4813e75e4309be3353cc9fec6bae5",
-      "line_count": 83,
-      "byte_count": 4671,
+      "git_blob_sha": "d455c997f61ab11836eab261beb5aae56b103854",
+      "last_validated_sha": "d455c997f61ab11836eab261beb5aae56b103854",
+      "content_sha256": "761be91dba78494f0fad395e2a3c7c4c5f57c12f3d8be6957f1c33665f1a31c3",
+      "line_count": 85,
+      "byte_count": 4809,
       "headings": [
         {
           "level": 1,
@@ -2668,11 +2668,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "LOOP_STATE.md",
-      "git_blob_sha": "9efb67103592ea14d685db5e0c33cbca40784c16",
-      "last_validated_sha": "9efb67103592ea14d685db5e0c33cbca40784c16",
-      "content_sha256": "8bdadf8baa21ff713d98dc91e0b560fa6a0c869c4d0adff986428000525c6251",
+      "git_blob_sha": "5a6198b515bc7ba5606ec79a22d4998330424d42",
+      "last_validated_sha": "5a6198b515bc7ba5606ec79a22d4998330424d42",
+      "content_sha256": "7f6536b63be8038e60b4225726b4975c41b9160fe52d93e114bb0964961a6f96",
       "line_count": 101,
-      "byte_count": 3546,
+      "byte_count": 3553,
       "headings": [
         {
           "level": 1,
@@ -2938,11 +2938,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "11d2f673102f4a623e3695e18fccac9b27539b37",
-      "last_validated_sha": "11d2f673102f4a623e3695e18fccac9b27539b37",
-      "content_sha256": "4bbbbed7680a4e7cb6b1ffe40d27e5c1c30874ca67b057c8d73f0d646640fd94",
-      "line_count": 113,
-      "byte_count": 8403,
+      "git_blob_sha": "cc95c3be7ce6ebf33f30835a56b965da13f2ff1d",
+      "last_validated_sha": "cc95c3be7ce6ebf33f30835a56b965da13f2ff1d",
+      "content_sha256": "8ae20921ac24e5a7b7645324d7b211e64c1610a6154a4db5b9df0cf290ae61a5",
+      "line_count": 127,
+      "byte_count": 8293,
       "headings": [
         {
           "level": 1,
@@ -3662,11 +3662,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "44e73585ee2e8c83f5b8e4789345c6f591dbed4f",
-      "last_validated_sha": "44e73585ee2e8c83f5b8e4789345c6f591dbed4f",
-      "content_sha256": "ce51cc20eb7f996af61e0874fb584f173bbe8c3cce51345ae2ff08023f226438",
-      "line_count": 174,
-      "byte_count": 12349,
+      "git_blob_sha": "ee1af8c69b36deb940e8cfaa793bc29ae4c19801",
+      "last_validated_sha": "ee1af8c69b36deb940e8cfaa793bc29ae4c19801",
+      "content_sha256": "c80c8ce5b6a282818e7da0e5c1d3973234088cb2d65039b1567d68b6bf9cc732",
+      "line_count": 175,
+      "byte_count": 12523,
       "headings": [
         {
           "level": 1,
@@ -13330,6 +13330,7 @@
         "Ordre de marche conservé",
         "Claims de surfaces multi-agent — OBSERVE_ONLY actif",
         "Contrat anti-régression machine-checkable — ACTIF",
+        "Générateur déterministe des projections — observe-only",
         "POINT DE REPRISE COURANT — 2026-09-22 — AF-OPS-003 RCA resserrée",
         "Gouvernance et travaux concurrents préservés",
         "7e OOM MariaDB désormais prouvé",
@@ -13338,8 +13339,7 @@
         "Etat data live mesuré",
         "Prochaine action gouvernée",
         "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée",
-        "Verdict de la boucle de gouvernance",
-        "Preuve GitHub ↔ S2 mesurée"
+        "Verdict de la boucle de gouvernance"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13355,11 +13355,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "5f2e656aee268fb6106f6b49f80af095768d3571",
-      "last_validated_sha": "5f2e656aee268fb6106f6b49f80af095768d3571",
-      "content_sha256": "ca329bb4b7c928cd21dd8b73d22444f89f7f72e7b0290b03484e6bd12b7d5b64",
-      "line_count": 6837,
-      "byte_count": 476014,
+      "git_blob_sha": "2da6de8dc825020c9c055e3d83410fe9907670f4",
+      "last_validated_sha": "2da6de8dc825020c9c055e3d83410fe9907670f4",
+      "content_sha256": "0418cd2e681335b981ec1162bf1260c0094cce474aa3b5666ae6c8d50ce064a5",
+      "line_count": 6851,
+      "byte_count": 476761,
       "headings": [
         {
           "level": 1,
@@ -13400,6 +13400,10 @@
         {
           "level": 3,
           "text": "Contrat anti-régression machine-checkable — ACTIF"
+        },
+        {
+          "level": 3,
+          "text": "Générateur déterministe des projections — observe-only"
         },
         {
           "level": 2,
@@ -13516,10 +13520,6 @@
         {
           "level": 2,
           "text": "5. REGLES PERMANENTES — RAPPEL DES PLUS ENGAGEANTES"
-        },
-        {
-          "level": 2,
-          "text": "6. PLAN D'EXECUTION RECOMMANDE"
         }
       ]
     },
