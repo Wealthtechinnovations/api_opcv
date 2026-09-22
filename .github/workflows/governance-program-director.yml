@@ -126,6 +126,17 @@ jobs:
           cmp -s out/program-projection-generator-a.json out/program-projection-generator-b.json
           cp out/program-projection-generator-a.json out/program-projection-generator.json
           echo "PROJECTION_GENERATOR_DETERMINISM=PASS"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("out/program-projection-generator.json")
+          d=json.loads(p.read_text(encoding="utf-8"))
+          print("PROJECTION_GENERATOR_MODE="+str(d.get("mode")))
+          print("PROJECTION_GENERATOR_WRITE_PERFORMED="+str(d.get("repository_write_performed")))
+          print("PROJECTION_GENERATOR_INPUT_SHA256="+str(d.get("input_sha256")))
+          print("PROJECTION_GENERATOR_WRITEBACK_CANDIDATES="+str(d.get("writeback_candidate_count")))
+          print("PROJECTION_GENERATOR_EXACT_PRESENT="+str(d.get("exact_present_count")))
+          PY
 
       - name: Publish programme summary
         if: always()
@@ -249,5 +260,16 @@ jobs:
             out/program-events.log
             out/program-gaps.json
             out/program-gaps.log
+            out/program-surface-claims.json
+            out/program-surface-claims.log
+            out/program-invariants.json
+            out/program-invariants.log
+            out/program-projection-drift.json
+            out/program-projection-drift.log
+            out/program-projection-generator.json
+            out/program-projection-generator-a.json
+            out/program-projection-generator-b.json
+            out/program-projection-generator-a.log
+            out/program-projection-generator-b.log
           if-no-files-found: warn
           retention-days: 30
