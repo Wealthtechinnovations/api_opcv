@@ -273,8 +273,8 @@
       "id": "AF-TASK-012",
       "program_id": "AF-ALLOC-001",
       "title": "Allocation / Robot Advisor — cartographie runtime et certification de l'existant",
-      "status": "OPEN",
-      "phase": "READ_ONLY_DISCOVERY",
+      "status": "DONE",
+      "phase": "RUNTIME_CARTOGRAPHY_CERTIFIED",
       "depends_on": [],
       "scope": [
         "Cartographier routes_vl_robotadvisor.js, services/analytics/routes.js, efficient_frontier.py, effi.py, src/classes/advisor.js, gateway, frontend Robot Advisor et modèles DB associés.",
@@ -287,7 +287,73 @@
         "Toute inconnue runtime reste UNKNOWN/NON_VERIFIE et n'est pas déduite du code seul.",
         "Aucun nouveau moteur, service, branche ou file parallèle n'est créé."
       ],
-      "next_action": "Exécuter l'audit read-only du chemin d'allocation réellement actif, puis désigner explicitement les candidats canonique/référence/legacy avant toute modification de calcul."
+      "next_action": "AF-TASK-013 : définir et tester un contrat API canonique backward-compatible, avec validation, authentification et ownership, avant de raccorder un solveur.",
+      "observed_fund_state": {
+        "github_api_head_at_runtime_probe": "a7c08727db03f090aff3bfb3485911e1b27c3625",
+        "github_frontend_head_at_runtime_probe": "713d16f56740a7fa368ab9a0b705561e087e1bf2",
+        "s2_api_head": "1b4d9715ca0fb886bd698723a45584751b72859f",
+        "s2_frontend_head": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
+        "runtime_observed_at": "2026-09-22T20:41:47Z",
+        "production_mutation_performed": false
+      },
+      "runtime_evidence": {
+        "observer_commit": "a7c08727db03f090aff3bfb3485911e1b27c3625",
+        "workflow_run_id": 35781935658,
+        "workflow_conclusion": "success",
+        "artifact_id": 10718462823,
+        "artifact_digest": "sha256:b3dc6765039e50f7c7d597797aa90f7db7a7d9c0ce7be97d668edb288d4b3a74"
+      },
+      "runtime_findings": [
+        "Production exécute api-monolith sur le port 3005 et fundafrique-frontend ; aucun analytics-service AfricaFunds n'est actif.",
+        "Le app.js exact du SHA S2 ne monte ni routes_vl_robotadvisor.js ni apigestionrobotadvisor.js.",
+        "Le frontend déployé contient les appels historiques /api/robotadvisor/fonds et /python/efficient-frontier.",
+        "NEXT_PUBLIC_PYTHON_API_URL runtime pointe vers https://africafunds.chainsolutions.fr/python.",
+        "Aucun listener n'existe sur 127.0.0.1:5000 ; le probe /python/efficient-frontier retourne HTTP 404.",
+        "Les listeners Python 5001 et 7001 appartiennent respectivement à /opt/pdfsvc et /opt/xlsconv et ne sont pas des moteurs AfricaFunds.",
+        "Le vhost Nginx AfricaFunds expose /api vers 127.0.0.1:3005 mais aucune location/proxy /python n'a été observée.",
+        "Le contrat frontend Frontière Efficiente fund_data/param_data/constraint_data diverge du contrat plat de src/routes/efficient_frontier.py.",
+        "Le chemin Node historique exige ids mais le handler frontend Minweight ne les envoie pas.",
+        "Aucun moteur d'allocation existant n'est actuellement une autorité runtime active."
+      ],
+      "classifications": [
+        {
+          "component": "src/routes/routes_vl_robotadvisor.js",
+          "classification": "LEGACY_INACTIVE",
+          "reason": "Présent sur S2 mais non monté par app.js ; contient l'ancien moteur portfolio-allocation et la persistence simulation."
+        },
+        {
+          "component": "services/analytics/routes.js",
+          "classification": "LEGACY_INACTIVE",
+          "reason": "Copie/migration vers microservice analytics ; architecture microservices explicitement non activée en production."
+        },
+        {
+          "component": "src/routes/efficient_frontier.py",
+          "classification": "LEGACY_INACTIVE",
+          "reason": "Aucun listener 5000, aucun proxy /python, endpoint public 404 et contrat incompatible avec le frontend actuel."
+        },
+        {
+          "component": "src/routes/effi.py",
+          "classification": "PROTOTYPE",
+          "reason": "Implémentation Python ancienne non référencée par un chemin de démarrage/routage actif."
+        },
+        {
+          "component": "src/classes/advisor.js",
+          "classification": "PROTOTYPE",
+          "reason": "Classe expérimentale non reliée au runtime et solveur incomplet."
+        },
+        {
+          "component": "frontend Robot Advisor investor/portfolio",
+          "classification": "LEGACY_ACTIVE",
+          "reason": "Sources présentes dans le checkout frontend déployé et process frontend actif, mais intégration backend/optimiseur cassée ; activité de la route UI compilée individuellement non attestée."
+        }
+      ],
+      "canonicalization_decision": {
+        "existing_engine_canonical_as_is": false,
+        "canonical_candidate": "NONE_AS_IS",
+        "reference_validation_candidate": "NONE_AS_IS",
+        "target_principle": "Réutiliser les algorithmes éprouvables de portfolio-allocation derrière une surface métier AfricaFunds dans l'architecture monolithe actuelle ; construire/rectifier une implémentation indépendante de référence seulement pour validation numérique.",
+        "prohibited_shortcut": "Ne pas réactiver aveuglément routes_vl_robotadvisor.js, services/analytics, efficient_frontier.py ou effi.py."
+      }
     },
     {
       "id": "AF-TASK-013",
