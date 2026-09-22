@@ -772,9 +772,21 @@
     "workflow": ".github/workflows/governance-program-director.yml",
     "first_green_run_id": 35786506758,
     "dependency_engine": "ACTIVE_READ_ONLY",
-    "parallel_safety": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST",
-    "chronology": "DERIVED_FROM_EVIDENCE_INCIDENTS_AND_GIT_NEXT_INCREMENT",
-    "gap_harvester": "PLANNED_AFTER_READ_ONLY_ORCHESTRATOR_STABILIZATION",
-    "multi_agent_surface_claims": "PLANNED_AFTER_READ_ONLY_ORCHESTRATOR_STABILIZATION"
+    "parallel_safety": "DEPENDENCY_ONLY_NOT_FILE_SURFACE_CERTIFIED",
+    "chronology": "ACTIVE_DERIVED_EVENT_LEDGER",
+    "gap_harvester": "ACTIVE_READ_ONLY_CANDIDATE_DISCOVERY",
+    "multi_agent_surface_claims": "PLANNED_NOT_YET_ACTIVE",
+    "latest_green_run_id": 35787836771,
+    "latest_green_head": "8913e9ec951669d1966f8ca2425633fbd8e41661",
+    "latest_evidence_ref": "AF-EVD-061",
+    "chronology_event_count": 62,
+    "non_temporal_incident_markers_separated": 5,
+    "gap_harvester_task_creation": "FORBIDDEN_AUTOMATIC",
+    "gap_harvester_scanned_api_text_files": 589,
+    "gap_harvester_scanned_frontend_text_files": 584,
+    "gap_harvester_candidate_count": 125,
+    "gap_harvester_possible_existing_task_matches": 2,
+    "gap_harvester_unmatched_candidates": 123,
+    "candidate_status": "DISCOVERED_CANDIDATE_NOT_TASK_UNTIL_VERIFIED_AND_DEDUPED"
   }
 }
