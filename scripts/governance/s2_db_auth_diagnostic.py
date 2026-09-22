@@ -37,7 +37,7 @@ def summarize_denials(rows):
             no += 1
         else:
             unknown += 1
-        m=re.match(r"^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})[+-]",line)
+        m=re.match(r"^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})[+-]",line)
         if not m:
             continue
         stamp=datetime.fromisoformat(m.group(1)).replace(tzinfo=timezone.utc)
