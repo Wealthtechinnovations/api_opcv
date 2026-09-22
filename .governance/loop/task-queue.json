@@ -772,10 +772,10 @@
     "workflow": ".github/workflows/governance-program-director.yml",
     "first_green_run_id": 35786506758,
     "dependency_engine": "ACTIVE_READ_ONLY",
-    "parallel_safety": "DEPENDENCY_ONLY_NOT_FILE_SURFACE_CERTIFIED",
+    "parallel_safety": "DEPENDENCY_ONLY_UNTIL_REAL_ACTIVE_SURFACE_CLAIMS_ARE_POPULATED",
     "chronology": "ACTIVE_DERIVED_EVENT_LEDGER",
     "gap_harvester": "ACTIVE_READ_ONLY_CANDIDATE_DISCOVERY",
-    "multi_agent_surface_claims": "PLANNED_NOT_YET_ACTIVE",
+    "multi_agent_surface_claims": "ACTIVE_OBSERVE_ONLY_NO_ENFORCEMENT",
     "latest_green_run_id": 35787836771,
     "latest_green_head": "8913e9ec951669d1966f8ca2425633fbd8e41661",
     "latest_evidence_ref": "AF-EVD-061",
@@ -787,6 +787,33 @@
     "gap_harvester_candidate_count": 125,
     "gap_harvester_possible_existing_task_matches": 2,
     "gap_harvester_unmatched_candidates": 123,
-    "candidate_status": "DISCOVERED_CANDIDATE_NOT_TASK_UNTIL_VERIFIED_AND_DEDUPED"
+    "candidate_status": "DISCOVERED_CANDIDATE_NOT_TASK_UNTIL_VERIFIED_AND_DEDUPED",
+    "latest_surface_claims_evidence": "AF-EVD-062"
+  },
+  "surface_claims_contract": {
+    "mode": "OBSERVE_ONLY",
+    "storage": "TASK_LOCAL_IN_SINGLE_QUEUE",
+    "no_second_claim_registry": true,
+    "validator": "scripts/governance/program_surface_claims.py",
+    "workflow": ".github/workflows/governance-program-director.yml",
+    "latest_green_run_id": 35788502090,
+    "latest_evidence_ref": "AF-EVD-062",
+    "active_claim_count": 0,
+    "conflict_count": 0,
+    "surface_certified_parallel_pairs": 0,
+    "current_enforcement": "ADVISORY_ONLY_NO_WRITE_BLOCK",
+    "task_local_claim_fields": [
+      "owner",
+      "status",
+      "claimed_at",
+      "base_api_sha",
+      "base_frontend_sha",
+      "repository_roles",
+      "touched_surfaces"
+    ],
+    "overlap_policy": "CONSERVATIVE_STATIC_PREFIX_OVERLAP",
+    "enforcement_transition_rule": "DO_NOT_ENFORCE_UNTIL_REAL_CLAIMS_ARE_POPULATED_AND_CONFLICT_FREE_IN_GREEN_RUNS",
+    "release_rule": "CLAIMS_MUST_BE_RELEASED_OR_RECONCILED_AFTER_TASK_WRITE_COMPLETION",
+    "parallel_certification_rule": "DEPENDENCY_CHECK_PLUS_NON_OVERLAPPING_ACTIVE_SURFACE_CLAIMS_REQUIRED"
   }
 }
