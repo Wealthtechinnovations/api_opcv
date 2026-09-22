@@ -18,13 +18,70 @@ def run(cmd,cwd=None,timeout=20):
 def sanitize(s):
     return SENSITIVE.sub(lambda m:m.group(1)+"=REDACTED",s)
 
-def journal():
-    code,out,err=run(["journalctl","-u","mariadb","--since","2026-09-12 00:00:00","--no-pager","-o","short-iso"],timeout=30)
+def journal_since(since):
+    code,out,err=run(["journalctl","-u","mariadb","--since",since,"--no-pager","-o","short-iso"],timeout=30)
     rows=[]
     for line in out.splitlines():
         if PAT.search(line):
             rows.append(line[:240])
     return rows
+
+def summarize_denials(rows):
+    yes=no=unknown=0
+    by_hour={}
+    parsed=[]
+    for line in rows:
+        if "(using password: YES)" in line:
+            yes += 1
+        elif "(using password: NO)" in line:
+            no += 1
+        else:
+            unknown += 1
+        m=re.match(r"^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})[+-]",line)
+        if not m:
+            continue
+        stamp=datetime.fromisoformat(m.group(1)).replace(tzinfo=timezone.utc)
+        parsed.append((stamp,line))
+        hour=stamp.strftime("%Y-%m-%dT%H:00Z")
+        by_hour[hour]=by_hour.get(hour,0)+1
+
+    bursts=[]
+    current=[]
+    for item in parsed:
+        if not current or (item[0]-current[-1][0]).total_seconds() <= 10:
+            current.append(item)
+        else:
+            if len(current) >= 2:
+                bursts.append(current)
+            current=[item]
+    if len(current) >= 2:
+        bursts.append(current)
+
+    burst_rows=[]
+    for burst in bursts[-30:]:
+        by_pw={"YES":0,"NO":0,"UNKNOWN":0}
+        for _,line in burst:
+            if "(using password: YES)" in line:
+                by_pw["YES"]+=1
+            elif "(using password: NO)" in line:
+                by_pw["NO"]+=1
+            else:
+                by_pw["UNKNOWN"]+=1
+        burst_rows.append({
+            "start_utc":burst[0][0].isoformat(),
+            "end_utc":burst[-1][0].isoformat(),
+            "count":len(burst),
+            "using_password":by_pw,
+        })
+
+    return {
+        "count":len(rows),
+        "using_password_yes":yes,
+        "using_password_no":no,
+        "using_password_unknown":unknown,
+        "by_hour_utc":dict(sorted(by_hour.items())),
+        "bursts_le_10s_gap":burst_rows,
+    }
 
 def cron_lines():
     rows=[]
@@ -277,11 +334,21 @@ def mtime(path):
     if not p.exists(): return None
     return datetime.fromtimestamp(p.stat().st_mtime,timezone.utc).isoformat()
 
+historical_denied=journal_since("2026-09-12 00:00:00")
+today_start=datetime.now(timezone.utc).strftime("%Y-%m-%d 00:00:00")
+today_denied=journal_since(today_start)
+
 report={
-    "schema_version":"1.0.0",
+    "schema_version":"1.1.0",
     "project_uid":"CS-AFRICAFUNDS-001",
-    "mariadb_access_denied_fund_opcvm_localhost":journal(),
-    "access_denied_count":len(journal()),
+    "mariadb_access_denied_fund_opcvm_localhost":historical_denied[-200:],
+    "access_denied_count":len(historical_denied),
+    "access_denied_window_start_utc":"2026-09-12T00:00:00Z",
+    "access_denied_count_semantics":"HISTORICAL_SINCE_WINDOW_START_NOT_SINCE_MIDNIGHT",
+    "today_window_start_utc":today_start.replace(" ","T")+"Z",
+    "today_access_denied_count":len(today_denied),
+    "today_access_denied_lines":today_denied[-200:],
+    "today_access_denied_summary":summarize_denials(today_denied),
     "root_project_cron_lines":cron_lines(),
     "pm2":pm2_rows(),
     "project_processes":project_processes(),

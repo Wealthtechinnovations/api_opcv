@@ -23,8 +23,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: claude/code-review-improvements-ikvuj
+        # Sur push, valider le SHA déclencheur exact. Sur dispatch,
+        # Actions utilise le commit associé au run.
 
       - name: Prepare strict pinned SSH
         env:
@@ -64,7 +64,13 @@ jobs:
           pth=pathlib.Path('S2_DB_AUTH_DIAGNOSTIC.json')
           if pth.exists() and pth.stat().st_size > 0:
               p=json.loads(pth.read_text())
-              print('- access denied count since midnight:',p.get('access_denied_count'))
+              print('- historical access denied count since 2026-09-12 UTC:',p.get('access_denied_count'))
+              print('- historical count semantics:',p.get('access_denied_count_semantics'))
+              print('- today UTC access denied count:',p.get('today_access_denied_count'))
+              s=p.get('today_access_denied_summary',{})
+              print('- today using password YES/NO:',s.get('using_password_yes'),s.get('using_password_no'))
+              print('- today counts by hour UTC:',s.get('by_hour_utc'))
+              print('- today bursts (<=10s gap):',s.get('bursts_le_10s_gap'))
               print('- PM2 parse:',p.get('pm2',{}).get('parse'))
               print('- root project cron lines:',len(p.get('root_project_cron_lines',[])))
               print('- project processes:',len(p.get('project_processes',[])))
