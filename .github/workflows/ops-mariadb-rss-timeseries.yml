@@ -73,6 +73,10 @@ jobs:
           cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api || exit 3
           TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
           echo "AF_RSS_OBSERVATION ts=$TS operation=READ_ONLY"
+          echo "S2_GIT_HEAD=$(git rev-parse HEAD 2>/dev/null || echo UNKNOWN)"
+          echo "S2_GIT_BRANCH=$(git branch --show-current 2>/dev/null || echo UNKNOWN)"
+          TRACKED_DIRTY="$(git status --porcelain --untracked-files=no 2>/dev/null | wc -l | tr -d ' ')"
+          echo "S2_GIT_TRACKED_DIRTY_COUNT=${TRACKED_DIRTY:-UNKNOWN}"
           systemctl show mariadb -p ActiveState -p SubState -p Result -p NRestarts -p Restart -p ExecMainPID -p ExecMainStartTimestamp -p MemoryCurrent 2>/dev/null || true
           PID="$(pgrep -xo mariadbd 2>/dev/null || true)"
           if [ -z "${PID:-}" ]; then
