@@ -434,6 +434,14 @@
       "provenance": "GitHub Actions AfricaFunds Programme Director run 35788502090 at API b32a60e311d409c5f6c9bbd94a2ad65cd91169d9",
       "observed_at": "2026-09-22T21:45:28Z",
       "summary": "The additive multi-agent surface-claim validator completed GREEN in OBSERVE_ONLY mode. Claims, when introduced, are defined task-locally in the existing task queue; no second claim registry or lock system exists. The validation observed 0 active claims, 0 surface conflicts and therefore 0 surface-certified parallel pairs. Write-capable open tasks without claims are advisory findings only at this stage; no existing work is blocked. The mechanism is ready to detect overlapping claimed file surfaces before any future enforcement is considered."
+    },
+    {
+      "id": "AF-EVD-063",
+      "type": "PROGRAMME_DIRECTOR_ANTI_REGRESSION_AND_ACTIVE_CLAIM_VALIDATION",
+      "result": "ANTI_REGRESSION_PASS_ONE_ACTIVE_ALLOCATION_CLAIM_ZERO_CONFLICT",
+      "provenance": "GitHub Actions AfricaFunds Programme Director run 35793007081 at API 30fee622a02d8e996e121e9b8391a3bf6ea7bd16 with frontend 198441af894f921917916532cf4bfd4ead94d8b5",
+      "observed_at": "2026-09-22T22:33:37Z",
+      "summary": "The Programme Director completed GREEN with the hard-fail existing-invariants contract enabled. The invariant validator passed product identity, two-repository FUND_STATE, single queue, single writer, no-new-branch/force-push/history-rewrite markers, context reconstruction, NEXT_ACTION operational projection, frontend-only global SUIVI, AF-OPS-007/009 -> AF-OPS-008 data dependency order, structured Allocation live-data gates AF-OPS-007/008/009, evidence-id uniqueness and no-second-claim-registry rules. The surface-claim validator simultaneously observed exactly one ACTIVE claim: AF-TASK-017 owned by ChatGPT-GPT-5.6-Sol on API surfaces src/services/allocation/constraints/**, tests/allocation-constraints.test.js and .github/workflows/governance-allocation-constraints.yml; conflict_count=0 and no parallel pair is certified because only one active claim exists. No production mutation or Allocation surface write was performed by the governance lot."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
