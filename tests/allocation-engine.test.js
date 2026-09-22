@@ -316,12 +316,25 @@ describe('Canonical Node allocation engine', () => {
     expect(metrics.volatility_annualized).toBeCloseTo(Math.sqrt(variance), 12);
   });
 
-  test('wraps solver failures as structured AfricaFunds errors', () => {
+  test('rejects a truly non-PSD covariance before calling the solver', () => {
     expect(() => runAllocationStrategy({
       request: request('GLOBAL_MINIMUM_VARIANCE'),
       prepared: prepared({
+        sigma: [[0.04, 0.03], [0.03, 0.01]],
+      }),
+    })).toThrow(expect.objectContaining({
+      code: 'COVARIANCE_NOT_PSD',
+    }));
+  });
+
+  test('accepts a zero covariance matrix as PSD instead of fabricating an error', () => {
+    const result = runAllocationStrategy({
+      request: request('EQUAL_WEIGHT'),
+      prepared: prepared({
         sigma: [[0, 0], [0, 0]],
       }),
-    })).toThrow(AllocationEngineError);
+    });
+    expect(weights(result)).toEqual([0.5, 0.5]);
+    expect(result.metrics.volatility_annualized).toBe(0);
   });
 });
