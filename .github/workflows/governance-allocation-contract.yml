@@ -5,9 +5,11 @@ on:
     branches:
       - claude/code-review-improvements-ikvuj
     paths:
-      - 'src/services/allocation/**'
+      - 'src/services/allocation/contract.js'
+      - 'src/services/allocation/simulations.js'
       - 'tests/allocation-contract.test.js'
       - 'tests/allocation-route.test.js'
+      - 'tests/allocation-simulation.test.js'
       - 'src/routes/apigestionallocation.js'
       - 'app.js'
       - '.github/workflows/governance-allocation-contract.yml'
@@ -43,8 +45,9 @@ jobs:
       - name: Syntax check allocation contract
         run: |
           node --check src/services/allocation/contract.js
+          node --check src/services/allocation/simulations.js
           node --check src/routes/apigestionallocation.js
           node --check app.js
 
-      - name: Run allocation contract and route tests
-        run: npx jest tests/allocation-contract.test.js tests/allocation-route.test.js --runInBand --forceExit
+      - name: Run allocation contract, route and ownership tests
+        run: npx jest tests/allocation-contract.test.js tests/allocation-route.test.js tests/allocation-simulation.test.js --runInBand --forceExit
