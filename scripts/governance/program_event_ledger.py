@@ -71,6 +71,7 @@ def main():
         raise SystemExit("PROJECT_UID_DRIFT")
 
     events = []
+    non_temporal_incident_markers = []
     evidence_items = evidence.get("evidence") or evidence.get("items") or []
     for item in evidence_items:
         at = norm_time(item.get("observed_at"))
