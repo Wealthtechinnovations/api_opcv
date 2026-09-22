@@ -42,5 +42,5 @@
   "final_verdict": "GOVERNED_WITH_EXTERNAL_GAPS",
   "operational_priority_task_id": "AF-OPS-003",
   "operational_priority_status": "OPEN",
-  "operational_priority_reason": "A seventh OOM is proven and the Sep22 daily update now narrows the high-amplitude RSS jump to the massive step 3/4 recalculation window: 468032 kB RSS at 19:55:55 -> 7240796 kB at 20:03:21 after 994766 EUR/USD and 995370 adjusted-NAV row recalculations. Dynamic mysql2 execute() prepared-statement caching is a code-level risk candidate, not yet causal proof. Await targeted read-only counters before any fix."
+  "operational_priority_reason": "AF-OPS-003 is now POST_FIX_VALIDATION: the protocol-only execute()->query correction for the two massive dynamic UPDATE paths is RED->GREEN, deployed through GOV-006 and attested clean on S2 (AF-EVD-058..060). Root cause remains unclosed. Next proof is real post-fix batch comparison of RSS/RssAnon/Private_Dirty and Com_stmt_* plus output equivalence; no MariaDB restart or new allocator A/B."
 }
