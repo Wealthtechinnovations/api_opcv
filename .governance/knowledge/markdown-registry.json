@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "ad80149b2d6064ca98a4b93e80d3232cfee96ab2"
+      "head": "27eff9c72e6cebaee1f119d3dcb4eac564630453"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "198441af894f921917916532cf4bfd4ead94d8b5"
+      "head": "c253c7ff379cd58d07d7b660c5517d2e3f859ec6"
     }
   },
   "summary": {
@@ -1505,6 +1505,7 @@
       "unique_information": [
         "CURRENT_ITERATION — AfricaFunds API",
         "AF-GOV-FINAL-CERT-20260911-01 — CLOSED_WITH_EXTERNAL_GAPS",
+        "Priorité opérationnelle courante — Programme Directeur",
         "Historique conservé",
         "AF-GOV-FINAL-CERT-20260911-01 — FINAL_ATTESTATION",
         "Terminé",
@@ -1527,11 +1528,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CURRENT_ITERATION.md",
-      "git_blob_sha": "8f53f74745107e1050ba05018a802b71daec0d57",
-      "last_validated_sha": "8f53f74745107e1050ba05018a802b71daec0d57",
-      "content_sha256": "899b2b3632ab9cf4fcf9ecedf04b71645a2319632179077b9de904b7df4d5a47",
-      "line_count": 48,
-      "byte_count": 2499,
+      "git_blob_sha": "c0b093aa6e306c7521b00f6c362b7cf010426297",
+      "last_validated_sha": "c0b093aa6e306c7521b00f6c362b7cf010426297",
+      "content_sha256": "6d5c4c046e2efedeaccdda3ddde8f342b03af6b717c4350ba9851c881291eff7",
+      "line_count": 56,
+      "byte_count": 3073,
       "headings": [
         {
           "level": 1,
@@ -1540,6 +1541,10 @@
         {
           "level": 2,
           "text": "AF-GOV-FINAL-CERT-20260911-01 — CLOSED_WITH_EXTERNAL_GAPS"
+        },
+        {
+          "level": 3,
+          "text": "Priorité opérationnelle courante — Programme Directeur"
         },
         {
           "level": 3,
@@ -2379,11 +2384,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "HANDOFF.md",
-      "git_blob_sha": "a2fefbd9b2e35446aac1dadc1dccf85932ad9e19",
-      "last_validated_sha": "a2fefbd9b2e35446aac1dadc1dccf85932ad9e19",
-      "content_sha256": "d245e0bd80b674b64e297ed9773e5f7fc4dc8bc1f3797710b73e558cdff228f1",
+      "git_blob_sha": "66161a1763567ae04f5455e4dd5c72e3af17729d",
+      "last_validated_sha": "66161a1763567ae04f5455e4dd5c72e3af17729d",
+      "content_sha256": "fd8f8c31afa30f43ef81d626d9bea5f819f4813e75e4309be3353cc9fec6bae5",
       "line_count": 83,
-      "byte_count": 4502,
+      "byte_count": 4671,
       "headings": [
         {
           "level": 1,
@@ -2640,6 +2645,7 @@
       "unique_information": [
         "LOOP_STATE — AfricaFunds API",
         "État courant — clôture interne",
+        "Priorité opérationnelle actuelle",
         "Historique conservé",
         "Checkpoint observé",
         "État des lots",
@@ -2662,11 +2668,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "LOOP_STATE.md",
-      "git_blob_sha": "2d5e4a02ab798186253226a99ef62e26757faaec",
-      "last_validated_sha": "2d5e4a02ab798186253226a99ef62e26757faaec",
-      "content_sha256": "84dc35ff18811e88e97c5998f30292563f3b63028eba76d2842548aed8619d37",
-      "line_count": 92,
-      "byte_count": 3180,
+      "git_blob_sha": "9efb67103592ea14d685db5e0c33cbca40784c16",
+      "last_validated_sha": "9efb67103592ea14d685db5e0c33cbca40784c16",
+      "content_sha256": "8bdadf8baa21ff713d98dc91e0b560fa6a0c869c4d0adff986428000525c6251",
+      "line_count": 101,
+      "byte_count": 3546,
       "headings": [
         {
           "level": 1,
@@ -2675,6 +2681,10 @@
         {
           "level": 2,
           "text": "État courant — clôture interne"
+        },
+        {
+          "level": 3,
+          "text": "Priorité opérationnelle actuelle"
         },
         {
           "level": 3,
@@ -2928,11 +2938,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "84fe3ed5e87b5828a50e35c8fd5c1a4d3d0f9c5c",
-      "last_validated_sha": "84fe3ed5e87b5828a50e35c8fd5c1a4d3d0f9c5c",
-      "content_sha256": "280f3e040d8dd598586d416ef91ed89318aa28dceac0cef89c848f10dbd1bece",
+      "git_blob_sha": "11d2f673102f4a623e3695e18fccac9b27539b37",
+      "last_validated_sha": "11d2f673102f4a623e3695e18fccac9b27539b37",
+      "content_sha256": "4bbbbed7680a4e7cb6b1ffe40d27e5c1c30874ca67b057c8d73f0d646640fd94",
       "line_count": 113,
-      "byte_count": 8262,
+      "byte_count": 8403,
       "headings": [
         {
           "level": 1,
@@ -3624,6 +3634,7 @@
         "Gouvernance actuelle",
         "Checkpoint Git réobservé pendant la réconciliation du 2026-09-10",
         "État production mesuré au 2026-09-10 02:02 UTC",
+        "Programme Directeur / priorité opérationnelle actuelle",
         "Incident opérationnel prioritaire",
         "Écarts de gouvernance ouverts",
         "Règle de reprise",
@@ -3651,11 +3662,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "469cdaf1d325c679ee6b11f8f910366a2bb25eee",
-      "last_validated_sha": "469cdaf1d325c679ee6b11f8f910366a2bb25eee",
-      "content_sha256": "dd017db49a46caaa7061b6906c05a3370a6b8710a85f9c0bdb13926b8d9d6610",
-      "line_count": 164,
-      "byte_count": 11898,
+      "git_blob_sha": "44e73585ee2e8c83f5b8e4789345c6f591dbed4f",
+      "last_validated_sha": "44e73585ee2e8c83f5b8e4789345c6f591dbed4f",
+      "content_sha256": "ce51cc20eb7f996af61e0874fb584f173bbe8c3cce51345ae2ff08023f226438",
+      "line_count": 174,
+      "byte_count": 12349,
       "headings": [
         {
           "level": 1,
@@ -3676,6 +3687,10 @@
         {
           "level": 2,
           "text": "État production mesuré au 2026-09-10 02:02 UTC"
+        },
+        {
+          "level": 2,
+          "text": "Programme Directeur / priorité opérationnelle actuelle"
         },
         {
           "level": 2,
@@ -13314,6 +13329,7 @@
         "Gap Harvester — découverte uniquement, aucune création automatique",
         "Ordre de marche conservé",
         "Claims de surfaces multi-agent — OBSERVE_ONLY actif",
+        "Contrat anti-régression machine-checkable — ACTIF",
         "POINT DE REPRISE COURANT — 2026-09-22 — AF-OPS-003 RCA resserrée",
         "Gouvernance et travaux concurrents préservés",
         "7e OOM MariaDB désormais prouvé",
@@ -13323,8 +13339,7 @@
         "Prochaine action gouvernée",
         "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée",
         "Verdict de la boucle de gouvernance",
-        "Preuve GitHub ↔ S2 mesurée",
-        "Refus MariaDB post-rotation — classification"
+        "Preuve GitHub ↔ S2 mesurée"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13340,11 +13355,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "4414afacebce17cbc5e1c63d7961c49e05b21e10",
-      "last_validated_sha": "4414afacebce17cbc5e1c63d7961c49e05b21e10",
-      "content_sha256": "f40678f20d2ec91fb512715bc5569f110afbd6705249e2b15574dfa1aa940665",
-      "line_count": 6811,
-      "byte_count": 474436,
+      "git_blob_sha": "5f2e656aee268fb6106f6b49f80af095768d3571",
+      "last_validated_sha": "5f2e656aee268fb6106f6b49f80af095768d3571",
+      "content_sha256": "ca329bb4b7c928cd21dd8b73d22444f89f7f72e7b0290b03484e6bd12b7d5b64",
+      "line_count": 6837,
+      "byte_count": 476014,
       "headings": [
         {
           "level": 1,
@@ -13381,6 +13396,10 @@
         {
           "level": 3,
           "text": "Claims de surfaces multi-agent — OBSERVE_ONLY actif"
+        },
+        {
+          "level": 3,
+          "text": "Contrat anti-régression machine-checkable — ACTIF"
         },
         {
           "level": 2,
@@ -13501,10 +13520,6 @@
         {
           "level": 2,
           "text": "6. PLAN D'EXECUTION RECOMMANDE"
-        },
-        {
-          "level": 2,
-          "text": "Architecture"
         }
       ]
     },
