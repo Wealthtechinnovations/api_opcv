@@ -150,5 +150,7 @@ jobs:
             out/program-director.log
             out/program-events.json
             out/program-events.log
+            out/program-gaps.json
+            out/program-gaps.log
           if-no-files-found: warn
           retention-days: 30
