@@ -94,6 +94,8 @@ def main():
             ("operational_priority",snapshot["operational_priority_task_id"]),
             ("status",snapshot["operational_status"]),
             ("phase",snapshot["operational_phase"]),
+            ("programme_task",snapshot["programme_task_id"]),
+            ("programme_phase",snapshot["programme_phase"]),
             ("next_action",snapshot["operational_next_action"]),
             ("anti_regression",snapshot["anti_regression_contract"]),
         ]),
