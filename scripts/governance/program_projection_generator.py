@@ -113,6 +113,7 @@ def main():
             ("operational_priority",snapshot["operational_priority_task_id"]),
             ("operational_phase",snapshot["operational_phase"]),
             ("programme_task",snapshot["programme_task_id"]),
+            ("programme_phase",snapshot["programme_phase"]),
         ]),
         "HANDOFF.md":block("Projection gérée — handoff",[
             ("operational_priority",snapshot["operational_priority_task_id"]),
