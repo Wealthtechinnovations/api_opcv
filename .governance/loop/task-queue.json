@@ -1410,12 +1410,12 @@
     "parallel_certification_rule": "DEPENDENCY_CHECK_PLUS_NON_OVERLAPPING_ACTIVE_SURFACE_CLAIMS_REQUIRED",
     "active_claim_task_ids": [
       "AF-TASK-017",
-      "AF-TASK-026"
+      "AF-TASK-027"
     ],
     "certified_parallel_pairs": [
       [
         "AF-TASK-017",
-        "AF-TASK-026"
+        "AF-TASK-027"
       ]
     ]
   }

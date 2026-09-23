@@ -25,7 +25,7 @@
     "AF-OPS-003"
   ],
   "open": [],
-  "next_action": "AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director AF-TASK-026 is in WRITEBACK_GATE_PREFLIGHT after deterministic generator and zero-write idempotence simulation PASS. Active non-overlapping claims: AF-TASK-017 Allocation and AF-TASK-026 governance; conflict_count=0. Realign current projections to AF-TASK-026, rerun generator+simulator, and insert managed blocks only if exact-head/preflight gates remain GREEN. No S2/runtime mutation.",
+  "next_action": "AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director AF-TASK-027 is IN_PROGRESS / WRITEBACK_ENGINE_DRY_RUN. Active non-overlapping claims: AF-TASK-017 Allocation and AF-TASK-027 governance; conflict_count=0. Realign managed projections to AF-TASK-027, then prove writeback engine HEAD-mismatch RED, dry-run PASS and temp-worktree apply/idempotence GREEN. No automatic Git push and no S2/runtime mutation.",
   "resume_contract": {
     "conversation_memory_required": false,
     "discover_peer_repository": true,
@@ -88,13 +88,15 @@
     "programme_director_anti_regression_run_id": 35793007081,
     "programme_director_active_surface_claim_tasks": [
       "AF-TASK-017",
-      "AF-TASK-026"
+      "AF-TASK-027"
     ],
     "programme_director_projection_drift": "ACTIVE_FAIL_CLOSED_AF-EVD-064",
     "programme_director_projection_generator": "DONE_OBSERVE_ONLY_AF-EVD-065",
     "programme_director_projection_writeback_simulation": "PASS_AF-EVD-066",
-    "programme_director_current_task": "AF-TASK-026",
-    "programme_director_current_phase": "WRITEBACK_GATE_PREFLIGHT"
+    "programme_director_current_task": "AF-TASK-027",
+    "programme_director_current_phase": "WRITEBACK_ENGINE_DRY_RUN",
+    "programme_director_projection_writeback": "DONE_INITIAL_BLOCKS_AF-EVD-067",
+    "programme_director_projection_writeback_engine": "IN_PROGRESS_DRY_RUN_AF-TASK-027"
   },
   "closed_with_external_gaps": [
     "AF-TASK-003"
