@@ -13,6 +13,7 @@ on:
       - 'scripts/governance/program_projection_drift.py'
       - 'scripts/governance/program_projection_generator.py'
       - 'scripts/governance/program_projection_writeback_simulator.py'
+      - 'scripts/governance/program_projection_writeback.py'
       - '.governance/project.json'
       - '.governance/loop/task-queue.json'
       - '.governance/loop/state.json'
@@ -149,6 +150,99 @@ jobs:
             --output out/program-projection-writeback-sim.json \
             | tee out/program-projection-writeback-sim.log
 
+      - name: Test governed projection writeback engine
+        run: |
+          set -euo pipefail
+          API_SHA="$(git -C api rev-parse HEAD)"
+          FRONT_SHA="$(git -C frontend rev-parse HEAD)"
+
+          set +e
+          python3 api/scripts/governance/program_projection_writeback.py \
+            --api-root api \
+            --frontend-root frontend \
+            --generator-json out/program-projection-generator.json \
+            --expected-api-sha 0000000000000000000000000000000000000000 \
+            --expected-frontend-sha "$FRONT_SHA" \
+            --task-id AF-TASK-027 \
+            --output out/program-writeback-head-mismatch.json \
+            > out/program-writeback-head-mismatch.log 2>&1
+          mismatch_rc=$?
+          set -e
+          test "$mismatch_rc" -ne 0
+          python3 - <<'PY'
+          import json
+          d=json.load(open("out/program-writeback-head-mismatch.json",encoding="utf-8"))
+          assert "API_HEAD_MISMATCH" in d.get("errors",[]), d
+          print("WRITEBACK_ENGINE_HEAD_MISMATCH_RED=PASS")
+          PY
+
+          python3 api/scripts/governance/program_projection_writeback.py \
+            --api-root api \
+            --frontend-root frontend \
+            --generator-json out/program-projection-generator.json \
+            --expected-api-sha "$API_SHA" \
+            --expected-frontend-sha "$FRONT_SHA" \
+            --task-id AF-TASK-027 \
+            --output out/program-writeback-dry-run.json \
+            > out/program-writeback-dry-run.log
+
+          python3 - <<'PY'
+          import json
+          d=json.load(open("out/program-writeback-dry-run.json",encoding="utf-8"))
+          assert d["integrity"]=="PASS", d
+          assert d["mode"]=="DRY_RUN_ONLY", d
+          assert d["files_written_count"]==0, d
+          assert d["repository_git_push_performed"] is False, d
+          assert d["runtime_deploy_performed"] is False, d
+          print("WRITEBACK_ENGINE_DRY_RUN=PASS")
+          PY
+
+          TMP="$(mktemp -d)"
+          trap 'git -C api worktree remove --force "$TMP/api" >/dev/null 2>&1 || true; git -C frontend worktree remove --force "$TMP/frontend" >/dev/null 2>&1 || true; rm -rf "$TMP"' EXIT
+          git -C api worktree add --detach "$TMP/api" "$API_SHA" >/dev/null
+          git -C frontend worktree add --detach "$TMP/frontend" "$FRONT_SHA" >/dev/null
+
+          python3 "$TMP/api/scripts/governance/program_projection_writeback.py" \
+            --api-root "$TMP/api" \
+            --frontend-root "$TMP/frontend" \
+            --generator-json "$GITHUB_WORKSPACE/out/program-projection-generator.json" \
+            --expected-api-sha "$API_SHA" \
+            --expected-frontend-sha "$FRONT_SHA" \
+            --task-id AF-TASK-027 \
+            --output out/program-writeback-apply-a.json \
+            --apply \
+            > out/program-writeback-apply-a.log
+
+          python3 "$TMP/api/scripts/governance/program_projection_writeback.py" \
+            --api-root "$TMP/api" \
+            --frontend-root "$TMP/frontend" \
+            --generator-json "$GITHUB_WORKSPACE/out/program-projection-generator.json" \
+            --expected-api-sha "$API_SHA" \
+            --expected-frontend-sha "$FRONT_SHA" \
+            --task-id AF-TASK-027 \
+            --output out/program-writeback-apply-b.json \
+            --apply \
+            > out/program-writeback-apply-b.log
+
+          python3 - <<'PY'
+          import json
+          a=json.load(open("out/program-writeback-apply-a.json",encoding="utf-8"))
+          b=json.load(open("out/program-writeback-apply-b.json",encoding="utf-8"))
+          assert a["integrity"]=="PASS", a
+          assert a["mode"]=="APPLY_LOCAL_ONLY", a
+          assert a["projection_count"]==6, a
+          assert a["all_outside_content_preserved"] is True, a
+          assert a["all_markers_valid"] is True, a
+          assert a["repository_git_push_performed"] is False, a
+          assert a["runtime_deploy_performed"] is False, a
+          assert b["integrity"]=="PASS", b
+          assert b["changed_count"]==0, b
+          assert b["files_written_count"]==0, b
+          assert b["all_second_apply_idempotent"] is True, b
+          print("WRITEBACK_ENGINE_TEMP_APPLY_GREEN=PASS")
+          print("WRITEBACK_ENGINE_IDEMPOTENCE=PASS")
+          PY
+
       - name: Publish programme summary
         if: always()
         run: |
@@ -270,6 +364,17 @@ jobs:
               print("- outside content preserved:",sim.get("all_outside_content_preserved"))
               print("- second apply idempotent:",sim.get("all_second_apply_idempotent"))
               print("- marker counts valid:",sim.get("all_marker_counts_valid"))
+
+          ep=Path("out/program-writeback-dry-run.json")
+          if ep.exists():
+              eng=json.loads(ep.read_text(encoding="utf-8"))
+              print()
+              print("### Governed writeback engine")
+              print("- dry-run integrity:",eng.get("integrity"))
+              print("- dry-run changed count:",eng.get("changed_count"))
+              print("- files written:",eng.get("files_written_count"))
+              print("- git push performed:",eng.get("repository_git_push_performed"))
+              print("- runtime deploy performed:",eng.get("runtime_deploy_performed"))
           PY
 
       - name: Upload derived programme state
