@@ -474,6 +474,14 @@
       "provenance": "Managed projection insertion commits API a1af56223ec80945e2952745f0a21712df62cdfd and frontend 4f02757e24a97c8da1d7aed1dc51209111117ce7; Programme Director run 35799858948 at API 6d787057f664930ab1a32a0544fc2f857edf797e; artifact 10725606774",
       "observed_at": "2026-09-22T23:57:56Z",
       "summary": "Post-writeback validation completed GREEN after managed PROGRAMME_DIRECTOR blocks were inserted into NEXT_ACTION, CURRENT_ITERATION, LOOP_STATE, HANDOFF, STATUS and frontend SUIVI. Generator input_sha256=8cd845f6e106c4a2dbf98d870533df64f490c7ca2b71136526ede9dc7f6d42ee; exact_present_count=6 and writeback_candidate_count=0. The zero-write simulator reports projection_count=6, integrity=PASS, all_outside_content_preserved=true, all_second_apply_idempotent=true, all_marker_counts_valid=true, error_count=0. Projection drift remains fail-closed PASS with drift_count=0. Surface claims report AF-TASK-017 and AF-TASK-026 active, conflict_count=0, certified non-overlapping pair. This closes the initial bounded write-back gate without any S2/runtime mutation."
+    },
+    {
+      "id": "AF-EVD-068",
+      "type": "PROGRAMME_DIRECTOR_GOVERNED_WRITEBACK_ENGINE",
+      "result": "HEAD_MISMATCH_RED_DRY_RUN_GREEN_TEMP_APPLY_6_OF_6_IDEMPOTENT_NO_PUSH_NO_DEPLOY",
+      "provenance": "AfricaFunds Programme Director run 35802877077 at API e08a973e0d700dc22dce9609a00da96cd204492e; artifact 10725938994",
+      "observed_at": "2026-09-23T00:38:00Z",
+      "summary": "The governed local managed-projection writeback engine is fully validated. Deliberately wrong API expected SHA fails with API_HEAD_MISMATCH and writes nothing. Correct-head dry-run passes over six projections with changed_count=0, files_written_count=0, git push=false and runtime deploy=false. In detached temporary API/frontend worktrees, all six managed blocks were deliberately replaced with a stale fixture; --apply then repaired exactly 6/6 files with changed_count=6 and files_written_count=6 while preserving all outside-managed content and valid unique markers. A second --apply was byte-idempotent with changed_count=0/files_written_count=0. Generator exact_present_count=6/writeback_candidate_count=0, projection drift=0, invariants PASS and surface claims PASS with AF-TASK-017/027 non-overlapping. No repository push or S2/runtime mutation was performed by the engine."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."

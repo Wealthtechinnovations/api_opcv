@@ -1236,8 +1236,8 @@
     {
       "id": "AF-TASK-027",
       "title": "Programme Directeur — moteur gouverné de maintenance des blocs gérés",
-      "status": "IN_PROGRESS",
-      "phase": "WRITEBACK_ENGINE_DRY_RUN",
+      "status": "DONE",
+      "phase": "WRITEBACK_ENGINE_GREEN",
       "depends_on": [
         "AF-TASK-026"
       ],
@@ -1279,10 +1279,10 @@
         "WRITEBACK_ENGINE_IDEMPOTENCE"
       ],
       "next_transition": "MANUAL_WRITEBACK_WORKFLOW_GATE_REVIEW",
-      "next_action": "Construire le moteur de writeback local en dry-run par défaut et le tester uniquement sur copies temporaires avant tout workflow d'application.",
+      "next_action": "AF-TASK-028 : construire un workflow manuel gouverné de maintenance des projections, workflow_dispatch seulement, confirmation explicite et exact-head preconditions.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
-        "status": "ACTIVE",
+        "status": "RELEASED",
         "claimed_at": "2026-09-22T23:59:00Z",
         "base_api_sha": "8516b93d9f8d0e8b658ca197a0e24b750a2697ce",
         "base_frontend_sha": "4f02757e24a97c8da1d7aed1dc51209111117ce7",
@@ -1302,11 +1302,119 @@
           "HANDOFF.md",
           "STATUS.md",
           "SUIVI.md"
+        ],
+        "released_at": "2026-09-23T00:38:00Z"
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ],
+      "completed_at": "2026-09-23T00:38:00Z",
+      "completion_evidence": {
+        "run_id": 35802877077,
+        "artifact_id": 10725938994,
+        "evidence_ref": "AF-EVD-068",
+        "head_mismatch_red": true,
+        "dry_run_green": true,
+        "temp_workspace_apply_changed_count": 6,
+        "temp_workspace_apply_files_written_count": 6,
+        "second_apply_changed_count": 0,
+        "second_apply_files_written_count": 0,
+        "outside_content_preserved": true,
+        "marker_counts_valid": true,
+        "git_push_performed": false,
+        "runtime_deploy_performed": false
+      }
+    },
+    {
+      "id": "AF-TASK-028",
+      "title": "Programme Directeur — workflow manuel gouverné de maintenance des projections",
+      "status": "IN_PROGRESS",
+      "phase": "MANUAL_WRITEBACK_WORKFLOW_PREFLIGHT",
+      "depends_on": [
+        "AF-TASK-027"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Créer un workflow_dispatch dédié ; aucun schedule, aucun push-trigger d'application.",
+        "Exiger confirmation explicite, expected API SHA et expected frontend SHA.",
+        "Régénérer et simuler avant application, puis utiliser le moteur local validé.",
+        "Refuser tout HEAD mismatch, claim conflict, marker drift ou invariant/projection failure.",
+        "Ne modifier que les blocs PROGRAMME_DIRECTOR ; préserver tout contenu hors bloc.",
+        "Aucun déploiement S2/runtime et aucun force push/history rewrite.",
+        "Le mode dry-run doit être la valeur par défaut ; apply doit rester une action manuelle explicite."
+      ],
+      "acceptance_criteria": [
+        "Workflow limité à workflow_dispatch.",
+        "Confirmation exacte requise avant apply.",
+        "Inputs expected_api_sha et expected_frontend_sha obligatoires.",
+        "Dry-run exécutable sans permission contents:write.",
+        "Apply utilise des permissions minimales, revalide les deux HEAD immédiatement avant commit/push et refuse tout drift.",
+        "Aucun commit n'est créé si les six blocs sont déjà exacts.",
+        "Les commits API et frontend restent séparés et attestés ; aucune notion de SHA unique.",
+        "Aucun S2/GOV-006 n'est déclenché par ce workflow."
+      ],
+      "definition_of_ready": [
+        "AF-TASK-027 DONE / writeback engine GREEN.",
+        "AF-EVD-068 prouve mismatch RED, dry-run GREEN, temp apply 6/6 et idempotence.",
+        "Claims task-local et fail-closed projection/invariants opérationnels."
+      ],
+      "definition_of_done": [
+        "Workflow manuel syntaxiquement/contractuellement GREEN.",
+        "Dry-run manuel ou CI-equivalent prouvé sans mutation.",
+        "Apply path protégé par confirmation/exact-head/recheck/claim guards.",
+        "No-change path prouvé sans commit.",
+        "Aucune application automatique activée."
+      ],
+      "evidence_required": [
+        "MANUAL_WORKFLOW_CONTRACT",
+        "MANUAL_WORKFLOW_DRY_RUN",
+        "MANUAL_WORKFLOW_HEAD_RECHECK",
+        "MANUAL_WORKFLOW_NO_CHANGE_NO_COMMIT"
+      ],
+      "next_transition": "MANUAL_WRITEBACK_READY_NO_AUTO_APPLY",
+      "next_action": "Construire le workflow_dispatch manuel en dry-run par défaut, avec confirmation exacte et expected HEADs ; prouver ses gates sans déclencher de write-back automatique.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-23T00:39:00Z",
+        "base_api_sha": "e08a973e0d700dc22dce9609a00da96cd204492e",
+        "base_frontend_sha": "21a61fd17c72fd93f478768ae00c543ef175ba32",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".github/workflows/governance-programme-projection-writeback.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
         ]
       },
       "touched_surfaces": [
         "scripts/governance/program_*.py",
         ".github/workflows/governance-program-director.yml",
+        ".github/workflows/governance-programme-projection-writeback.yml",
         ".governance/loop/task-queue.json",
         ".governance/loop/handoff.json",
         ".governance/knowledge/evidence.json",
@@ -1381,7 +1489,10 @@
     "projection_writeback_latest_evidence": "AF-EVD-067",
     "projection_writeback_exact_present_count": 6,
     "projection_writeback_candidate_count": 0,
-    "projection_writeback_engine": "IN_PROGRESS_DRY_RUN_AF-TASK-027"
+    "projection_writeback_engine": "DONE_GREEN_AF-EVD-068",
+    "projection_writeback_engine_latest_run_id": 35802877077,
+    "projection_writeback_engine_latest_evidence": "AF-EVD-068",
+    "manual_projection_writeback_workflow": "IN_PROGRESS_PREFLIGHT_AF-TASK-028"
   },
   "surface_claims_contract": {
     "mode": "OBSERVE_ONLY",
@@ -1410,12 +1521,12 @@
     "parallel_certification_rule": "DEPENDENCY_CHECK_PLUS_NON_OVERLAPPING_ACTIVE_SURFACE_CLAIMS_REQUIRED",
     "active_claim_task_ids": [
       "AF-TASK-017",
-      "AF-TASK-027"
+      "AF-TASK-028"
     ],
     "certified_parallel_pairs": [
       [
         "AF-TASK-017",
-        "AF-TASK-027"
+        "AF-TASK-028"
       ]
     ]
   }
