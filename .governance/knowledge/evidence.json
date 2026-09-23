@@ -466,6 +466,14 @@
       "provenance": "GitHub Actions AfricaFunds Programme Director run 35798774337 at API 0e24897daa75af886229589fc02905cfd55143e6; artifact 10725017142",
       "observed_at": "2026-09-22T23:43:39Z",
       "summary": "The managed projection write-back simulator completed PASS for all six views (NEXT_ACTION, CURRENT_ITERATION, LOOP_STATE, HANDOFF, STATUS, frontend SUIVI). projection_count=6, repository_write_performed=false, all_marker_counts_valid=true, all_outside_content_preserved=true, all_second_apply_idempotent=true, error_count=0. Each first application is a bounded INSERT because no managed markers exist yet; the second application is byte-identical and becomes REPLACE mode. The simulation does not authorize Git write-back; a separate governed write-back gate is required."
+    },
+    {
+      "id": "AF-EVD-067",
+      "type": "PROGRAMME_DIRECTOR_MANAGED_BLOCKS_POST_WRITE_VALIDATION",
+      "result": "SIX_MANAGED_BLOCKS_EXACT_IDEMPOTENT_OUTSIDE_CONTENT_PRESERVED",
+      "provenance": "Managed projection insertion commits API a1af56223ec80945e2952745f0a21712df62cdfd and frontend 4f02757e24a97c8da1d7aed1dc51209111117ce7; Programme Director run 35799858948 at API 6d787057f664930ab1a32a0544fc2f857edf797e; artifact 10725606774",
+      "observed_at": "2026-09-22T23:57:56Z",
+      "summary": "Post-writeback validation completed GREEN after managed PROGRAMME_DIRECTOR blocks were inserted into NEXT_ACTION, CURRENT_ITERATION, LOOP_STATE, HANDOFF, STATUS and frontend SUIVI. Generator input_sha256=8cd845f6e106c4a2dbf98d870533df64f490c7ca2b71136526ede9dc7f6d42ee; exact_present_count=6 and writeback_candidate_count=0. The zero-write simulator reports projection_count=6, integrity=PASS, all_outside_content_preserved=true, all_second_apply_idempotent=true, all_marker_counts_valid=true, error_count=0. Projection drift remains fail-closed PASS with drift_count=0. Surface claims report AF-TASK-017 and AF-TASK-026 active, conflict_count=0, certified non-overlapping pair. This closes the initial bounded write-back gate without any S2/runtime mutation."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
