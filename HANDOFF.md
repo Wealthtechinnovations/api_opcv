@@ -5,9 +5,9 @@
 
 - operational_priority: `AF-OPS-003`
 - operational_phase: `POST_FIX_VALIDATION`
-- programme_task: `AF-TASK-026`
-- active_claims: `AF-TASK-017, AF-TASK-026`
-- handoff_next_action: `AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director AF-TASK-026 is in WRITEBACK_GATE_PREFLIGHT after deterministic generator and zero-write idempotence simulation PASS. Active non-overlapping claims: AF-TASK-017 Allocation and AF-TASK-026 governance; conflict_count=0. Realign current projections to AF-TASK-026, rerun generator+simulator, and insert managed blocks only if exact-head/preflight gates remain GREEN. No S2/runtime mutation.`
+- programme_task: `AF-TASK-027`
+- active_claims: `AF-TASK-017, AF-TASK-027`
+- handoff_next_action: `AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director AF-TASK-027 is IN_PROGRESS / WRITEBACK_ENGINE_DRY_RUN. Active non-overlapping claims: AF-TASK-017 Allocation and AF-TASK-027 governance; conflict_count=0. Realign managed projections to AF-TASK-027, then prove writeback engine HEAD-mismatch RED, dry-run PASS and temp-worktree apply/idempotence GREEN. No automatic Git push and no S2/runtime mutation.`
 
 <!-- PROGRAMME_DIRECTOR:END -->
 

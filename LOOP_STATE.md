@@ -7,7 +7,8 @@
 - governance_current_task: `AF-TASK-010`
 - operational_priority: `AF-OPS-003`
 - operational_phase: `POST_FIX_VALIDATION`
-- programme_task: `AF-TASK-026`
+- programme_task: `AF-TASK-027`
+- programme_phase: `WRITEBACK_ENGINE_DRY_RUN`
 
 <!-- PROGRAMME_DIRECTOR:END -->
 
