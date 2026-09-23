@@ -202,6 +202,31 @@ jobs:
           git -C api worktree add --detach "$TMP/api" "$API_SHA" >/dev/null
           git -C frontend worktree add --detach "$TMP/frontend" "$FRONT_SHA" >/dev/null
 
+          python3 - "$TMP/api" "$TMP/frontend" <<'PY'
+          import sys
+          from pathlib import Path
+          api=Path(sys.argv[1])
+          front=Path(sys.argv[2])
+          begin="<!-- PROGRAMME_DIRECTOR:BEGIN -->"
+          end="<!-- PROGRAMME_DIRECTOR:END -->"
+          files=[
+              api/"NEXT_ACTION.md",
+              api/"CURRENT_ITERATION.md",
+              api/"LOOP_STATE.md",
+              api/"HANDOFF.md",
+              api/"STATUS.md",
+              front/"SUIVI.md",
+          ]
+          stale=begin+"\n### Projection gérée — stale test fixture\n\n- stale: `YES`\n\n"+end
+          for p in files:
+              text=p.read_text(encoding="utf-8")
+              assert text.count(begin)==1 and text.count(end)==1, p
+              s=text.index(begin)
+              e=text.index(end,s)+len(end)
+              p.write_text(text[:s]+stale+text[e:],encoding="utf-8")
+          print("WRITEBACK_ENGINE_TEMP_STALE_FIXTURE=PASS")
+          PY
+
           python3 "$TMP/api/scripts/governance/program_projection_writeback.py" \
             --api-root "$TMP/api" \
             --frontend-root "$TMP/frontend" \
@@ -231,6 +256,8 @@ jobs:
           assert a["integrity"]=="PASS", a
           assert a["mode"]=="APPLY_LOCAL_ONLY", a
           assert a["projection_count"]==6, a
+          assert a["changed_count"]==6, a
+          assert a["files_written_count"]==6, a
           assert a["all_outside_content_preserved"] is True, a
           assert a["all_markers_valid"] is True, a
           assert a["repository_git_push_performed"] is False, a
