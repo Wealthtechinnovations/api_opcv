@@ -402,5 +402,13 @@ jobs:
             out/program-projection-generator-b.log
             out/program-projection-writeback-sim.json
             out/program-projection-writeback-sim.log
+            out/program-writeback-head-mismatch.json
+            out/program-writeback-head-mismatch.log
+            out/program-writeback-dry-run.json
+            out/program-writeback-dry-run.log
+            out/program-writeback-apply-a.json
+            out/program-writeback-apply-a.log
+            out/program-writeback-apply-b.json
+            out/program-writeback-apply-b.log
           if-no-files-found: warn
           retention-days: 30
