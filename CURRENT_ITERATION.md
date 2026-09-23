@@ -5,10 +5,10 @@
 
 - operational_priority: `AF-OPS-003`
 - operational_phase: `POST_FIX_VALIDATION`
-- programme_task: `AF-TASK-027`
+- programme_task: `AF-TASK-028`
 - programme_status: `IN_PROGRESS`
-- programme_phase: `WRITEBACK_ENGINE_DRY_RUN`
-- active_claims: `AF-TASK-017, AF-TASK-027`
+- programme_phase: `MANUAL_WRITEBACK_WORKFLOW_PREFLIGHT`
+- active_claims: `AF-TASK-017, AF-TASK-028`
 
 <!-- PROGRAMME_DIRECTOR:END -->
 
