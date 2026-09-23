@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "7ae79fdde108418ae2b02c20631a9762a577cf46"
+      "head": "96d761a6b4d35ec15878f7552edfcf821a7c9b86"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -2390,11 +2390,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "HANDOFF.md",
-      "git_blob_sha": "b7b0464cae3cbf0fc02f0e8f0cd0c85bc4a8af64",
-      "last_validated_sha": "b7b0464cae3cbf0fc02f0e8f0cd0c85bc4a8af64",
-      "content_sha256": "5e309492a9acf7a35d31e924a559d55ca0eff9fbc241dded46ecb0ddbf06fa8a",
+      "git_blob_sha": "153e97f5a29cf1224161cf8817772a18d47860e1",
+      "last_validated_sha": "153e97f5a29cf1224161cf8817772a18d47860e1",
+      "content_sha256": "8b0646b13ff4d4d1c4322205e860b3dee95eeeae098872eaeb9c3e2b585d9aed",
       "line_count": 96,
-      "byte_count": 5387,
+      "byte_count": 5375,
       "headings": [
         {
           "level": 1,
