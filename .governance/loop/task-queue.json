@@ -1136,8 +1136,8 @@
     {
       "id": "AF-TASK-026",
       "title": "Programme Directeur — gate de write-back des blocs gérés",
-      "status": "IN_PROGRESS",
-      "phase": "WRITEBACK_GATE_PREFLIGHT",
+      "status": "DONE",
+      "phase": "MANAGED_BLOCKS_ACTIVE",
       "depends_on": [
         "AF-TASK-025"
       ],
@@ -1178,13 +1178,114 @@
         "POST_WRITEBACK_IDEMPOTENCE"
       ],
       "next_transition": "MANAGED_BLOCKS_ACTIVE",
-      "next_action": "Réaligner les projections sur AF-TASK-026, rerun generator+simulator au nouvel état, puis effectuer seulement l'insertion bornée si tous les gates restent verts.",
+      "next_action": "AF-TASK-027 : construire un moteur de maintenance des blocs gérés avec dry-run par défaut, apply explicite, exact-head preconditions et zéro auto-push implicite.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
-        "status": "ACTIVE",
+        "status": "RELEASED",
         "claimed_at": "2026-09-22T23:44:30Z",
         "base_api_sha": "03b0ff3c8dbba9c518f5564047afd44e19e72375",
         "base_frontend_sha": "c4caa665f2add337824bb5d9c41b460a7da9fffa",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ],
+        "released_at": "2026-09-22T23:57:56Z"
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ],
+      "completed_at": "2026-09-22T23:57:56Z",
+      "completion_evidence": {
+        "managed_api_commit": "a1af56223ec80945e2952745f0a21712df62cdfd",
+        "managed_frontend_commit": "4f02757e24a97c8da1d7aed1dc51209111117ce7",
+        "post_write_validation_run_id": 35799858948,
+        "post_write_artifact_id": 10725606774,
+        "generator_input_sha256": "8cd845f6e106c4a2dbf98d870533df64f490c7ca2b71136526ede9dc7f6d42ee",
+        "exact_present_count": 6,
+        "writeback_candidate_count": 0,
+        "projection_drift_count": 0,
+        "outside_content_preserved": true,
+        "second_apply_idempotent": true,
+        "marker_counts_valid": true,
+        "evidence_ref": "AF-EVD-067"
+      }
+    },
+    {
+      "id": "AF-TASK-027",
+      "title": "Programme Directeur — moteur gouverné de maintenance des blocs gérés",
+      "status": "IN_PROGRESS",
+      "phase": "WRITEBACK_ENGINE_DRY_RUN",
+      "depends_on": [
+        "AF-TASK-026"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Construire un moteur local de maintenance des blocs PROGRAMME_DIRECTOR à partir du générateur déterministe.",
+        "Dry-run obligatoire par défaut ; aucun write sans --apply explicite.",
+        "Exiger expected API_HEAD + FRONTEND_HEAD et refuser si l'un a dérivé.",
+        "Limiter les mutations aux blocs bornés par marqueurs uniques ; contenu hors bloc byte-identical.",
+        "Ne jamais pousser Git, déployer S2 ou muter runtime depuis le moteur lui-même.",
+        "Préparer ensuite un workflow manuel séparé avec confirmation explicite si le moteur est prouvé."
+      ],
+      "acceptance_criteria": [
+        "Dry-run indique précisément quels fichiers changeraient et leurs hashes avant/après.",
+        "Deux applications locales successives sont idempotentes.",
+        "Apply refuse HEAD mismatch, marqueurs invalides, bloc dupliqué ou conflit de claim.",
+        "Contenu hors blocs gérés reste byte-identical.",
+        "Le moteur ne contient aucune primitive git push/update-ref/deploy."
+      ],
+      "definition_of_ready": [
+        "AF-TASK-026 DONE / six managed blocks active.",
+        "AF-EVD-067 confirme 6/6 blocs exacts, drift=0 et simulation idempotente.",
+        "Surface claims non chevauchants."
+      ],
+      "definition_of_done": [
+        "Writeback engine dry-run GREEN sur les six vues.",
+        "Apply testé uniquement dans un workspace temporaire/checkout jetable.",
+        "Exact-head mismatch test RED et valid-head test GREEN.",
+        "Idempotence et outside-content preservation prouvées.",
+        "Aucun repository write automatique n'est activé."
+      ],
+      "evidence_required": [
+        "WRITEBACK_ENGINE_DRY_RUN",
+        "WRITEBACK_ENGINE_HEAD_MISMATCH_RED",
+        "WRITEBACK_ENGINE_TEMP_WORKSPACE_APPLY_GREEN",
+        "WRITEBACK_ENGINE_IDEMPOTENCE"
+      ],
+      "next_transition": "MANUAL_WRITEBACK_WORKFLOW_GATE_REVIEW",
+      "next_action": "Construire le moteur de writeback local en dry-run par défaut et le tester uniquement sur copies temporaires avant tout workflow d'application.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-22T23:59:00Z",
+        "base_api_sha": "8516b93d9f8d0e8b658ca197a0e24b750a2697ce",
+        "base_frontend_sha": "4f02757e24a97c8da1d7aed1dc51209111117ce7",
         "repository_roles": [
           "API",
           "FRONTEND"
@@ -1275,8 +1376,12 @@
     "projection_writeback_simulation": "PASS_AF-EVD-066",
     "projection_writeback_simulation_run_id": 35798774337,
     "projection_writeback_simulation_repository_write": false,
-    "projection_writeback_gate": "ACTIVE_PREFLIGHT_AF-TASK-026",
-    "projection_writeback_simulation_evidence": "AF-EVD-066"
+    "projection_writeback_gate": "DONE_INITIAL_MANAGED_BLOCKS_AF-EVD-067",
+    "projection_writeback_simulation_evidence": "AF-EVD-066",
+    "projection_writeback_latest_evidence": "AF-EVD-067",
+    "projection_writeback_exact_present_count": 6,
+    "projection_writeback_candidate_count": 0,
+    "projection_writeback_engine": "IN_PROGRESS_DRY_RUN_AF-TASK-027"
   },
   "surface_claims_contract": {
     "mode": "OBSERVE_ONLY",
