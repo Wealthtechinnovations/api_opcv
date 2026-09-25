@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "81bd4c33063c4a4e0dcf956693a1b73370559ec1"
+      "head": "548681876bb2f14fa480045767ce5691c9a6aa5d"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "969ccf176ae82cb4b6e467542cca834185391205"
+      "head": "94d56f7e075563085d345563721a15a0be06337f"
     }
   },
   "summary": {
@@ -13380,11 +13380,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "ed57c48a616b0e697f07e93e58053a8d8d565c12",
-      "last_validated_sha": "ed57c48a616b0e697f07e93e58053a8d8d565c12",
-      "content_sha256": "436c593c8efb24bbc7763f9e6019cfd556f001d2b5f329064b3ac3779bf6dffc",
-      "line_count": 6971,
-      "byte_count": 482881,
+      "git_blob_sha": "bdd6910837adbe1ce69abda030e2203cfde31852",
+      "last_validated_sha": "bdd6910837adbe1ce69abda030e2203cfde31852",
+      "content_sha256": "693ef53dad3c95a435ad0dfb1bdbc83231eb777719b4e5a4c3c42709ad6130de",
+      "line_count": 7056,
+      "byte_count": 487515,
       "headings": [
         {
           "level": 1,
