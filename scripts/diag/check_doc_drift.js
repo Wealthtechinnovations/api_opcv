@@ -275,6 +275,49 @@ async function main() {
         pct >= 95, `${pct.toFixed(1)} % (${r.sans} VL sans benchmark sur ${r.total})`);
     }
 
+    // C9 — couverture benchmark des VL RECENTES.
+    //
+    // Pourquoi ce controle existe, alors que C6 mesure deja la couverture indRef :
+    // parce que C6 la mesure sur TOUT l historique, et qu un denominateur de
+    // plusieurs centaines de milliers de VL rend l arrivee de donnees neuves
+    // invisible. Mesure du 2026-09-25 : entre le 22 aout et le 25 septembre,
+    // 8 609 VL marocaines sont entrees et 8 609 etaient sans benchmark — 100,0 %
+    // sur chacun des treize intervalles releves, sans une exception, et sans
+    // aucun rattrapage a posteriori. Pendant ces 34 jours C6.MAROC est reste
+    // [OK], de 98,3 % a 97,9 %, et il lui aurait fallu ~54 jours de plus pour
+    // franchir le seuil de 95 %. Un pipeline de benchmark integralement casse
+    // serait donc reste invisible ~88 jours au controle cense le voir.
+    //
+    // La lecon est celle deja payee deux fois (seuils C4, perimetre C2) : un
+    // invariant mesure sur le mauvais perimetre n est pas un invariant. C9 ne
+    // remplace pas C6 et ne modifie rien : il regarde la meme colonne sur une
+    // fenetre de 30 jours, la ou le defaut est observable.
+    //
+    // Severite AVERTISSEMENT, alignee sur C6 : ce controle decrit une qualite de
+    // donnee, pas une indisponibilite. Enveloppe dans un try/catch pour la meme
+    // raison que C5 : un controle de second rang ne doit jamais pouvoir
+    // empecher les controles CRITIQUE de rendre leur verdict.
+    try {
+      const [recent] = await conn.execute(`
+        SELECT f.pays, COUNT(*) AS total,
+               SUM(CASE WHEN v.indRef IS NULL THEN 1 ELSE 0 END) AS sans
+          FROM valorisations v JOIN fond_investissements f ON f.id = v.fund_id
+         WHERE v.date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+         GROUP BY f.pays`);
+      for (const r of recent) {
+        const total = Number(r.total); const sans = Number(r.sans);
+        if (total < 30) continue;   // trop peu de VL neuves pour conclure
+        const pct = 100 * (total - sans) / total;
+        record(`C9.${r.pays}`, 'AVERTISSEMENT', `Couverture indRef des VL recentes ${r.pays} (30 j)`,
+          pct >= 95,
+          `${pct.toFixed(1)} % (${sans} VL sans benchmark sur ${total} entrees en 30 j)`
+            + (pct < 95 ? ' — les VL neuves arrivent sans benchmark ; C6 ne peut pas le voir, son denominateur est tout l historique.' : ''));
+      }
+    } catch (err) {
+      record('C9', 'AVERTISSEMENT', 'Couverture indRef des VL recentes', false,
+        `controle non evalue : ${err.message}. Les autres controles restent valides.`);
+    }
+
     // Rendu
     if (json) {
       console.log(JSON.stringify({ generated_at: new Date().toISOString(), results }, null, 2));
