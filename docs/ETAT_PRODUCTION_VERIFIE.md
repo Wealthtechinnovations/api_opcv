@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-09-25 11:35 UTC**
+Derniere verification : **2026-09-25 13:48 UTC**
 
 ```
 
@@ -28,7 +28,7 @@ Derniere verification : **2026-09-25 11:35 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Wed Sep 23, soit 2 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-09-25T11:00, soit 0.5 h
+             runtime: genere le 2026-09-25T13:00, soit 0.8 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1540x [1.09 .. 1685] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1535x [1.00 .. 1535] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1534x [100.00 .. 153355] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1532x [10.65 .. 16317] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1525x [1.03 .. 1568] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1511x [114.47 .. 172934] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1498x [1.05 .. 1566] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1495x [1.15 .. 1719] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1464x [1.09 .. 1593] | [2770] CFG AM FIXED INCOME DOLLAR FUN (NIGERIA/USD) 1447x [106.08 .. 153504] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1427x [1.18 .. 1684] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182]
 [ECHEC] C8           Les performances suivent les VL
@@ -43,8 +43,16 @@ Derniere verification : **2026-09-25 11:35 UTC**
              100.0 % (0 VL sans benchmark sur 310461)
 [OK   ] C6.UEMOA     Couverture indRef UEMOA
              100.0 % (0 VL sans benchmark sur 48068)
+[ALERTE] C9.MAROC     Couverture indRef des VL recentes MAROC (30 j)
+             0.0 % (7676 VL sans benchmark sur 7676 entrees en 30 j) — les VL neuves arrivent sans benchmark ; C6 ne peut pas le voir, son denominateur est tout l historique.
+[OK   ] C9.NIGERIA   Couverture indRef des VL recentes NIGERIA (30 j)
+             100.0 % (0 VL sans benchmark sur 69 entrees en 30 j)
+[OK   ] C9.TUNISIE   Couverture indRef des VL recentes TUNISIE (30 j)
+             100.0 % (0 VL sans benchmark sur 2520 entrees en 30 j)
+[OK   ] C9.UEMOA     Couverture indRef des VL recentes UEMOA (30 j)
+             100.0 % (0 VL sans benchmark sur 420 entrees en 30 j)
 
-10/16 controles OK — 4 echec(s) critique(s), 2 alerte(s).
+13/20 controles OK — 4 echec(s) critique(s), 3 alerte(s).
 
 Un echec critique signifie que la production contredit ce que la
 documentation affirme. Corriger la production OU corriger le document,
