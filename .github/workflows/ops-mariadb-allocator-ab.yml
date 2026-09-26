@@ -1,0 +1,280 @@
+name: AF-OPS-003 — MariaDB allocator A/B (one-shot governed)
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ops-mariadb-allocator-ab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: af-ops-003-mariadb-allocator-ab
+  cancel-in-progress: false
+
+jobs:
+  ab:
+    name: glibc vs jemalloc — controlled reversible A/B
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[allocator-ab-authorized]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout canonical branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          fetch-depth: 0
+
+      - name: Prepare pinned SSH
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Execute reversible allocator A/B on S2
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+
+          cat > /tmp/af_allocator_ab.sh <<'REMOTE'
+          set -euo pipefail
+
+          PROJECT=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+          DROPIN_DIR=/etc/systemd/system/mariadb.service.d
+          DROPIN=$DROPIN_DIR/africafunds-allocator-ab.conf
+          TS="$(date -u +%Y%m%dT%H%M%SZ)"
+          EVIDENCE_DIR="/var/lib/fundafrica/governance/allocator-ab/$TS"
+          SWITCHED=0
+          PKG_WAS_INSTALLED=0
+
+          mkdir -p "$EVIDENCE_DIR"
+          cd "$PROJECT"
+
+          if [ -e "$DROPIN" ]; then
+            echo "ABORT: existing AfricaFunds allocator A/B drop-in already present"
+            exit 20
+          fi
+
+          cleanup() {
+            rc=$?
+            set +e
+            echo "CLEANUP_BEGIN rc=$rc"
+            if [ "$SWITCHED" -eq 1 ]; then
+              rm -f "$DROPIN"
+              systemctl daemon-reload
+              systemctl restart mariadb
+              sleep 5
+            fi
+            if ! systemctl is-active --quiet mariadb; then
+              systemctl start mariadb
+              sleep 5
+            fi
+            if [ "$PKG_WAS_INSTALLED" -eq 0 ] && dpkg-query -W -f='${Status}' libjemalloc2 2>/dev/null | grep -q "install ok installed"; then
+              export DEBIAN_FRONTEND=noninteractive
+              apt-get remove -y libjemalloc2 >/dev/null 2>&1 || true
+            fi
+            echo "CLEANUP_MARIADB=$(systemctl is-active mariadb 2>/dev/null || true)"
+            echo "CLEANUP_END"
+            exit "$rc"
+          }
+          trap cleanup EXIT
+
+          echo "=============================================="
+          echo "AF-OPS-003 ALLOCATOR A/B — PRECHECK"
+          echo "=============================================="
+          echo "observed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "host=$(hostname)"
+          echo "branch=$(git branch --show-current)"
+          echo "head=$(git rev-parse HEAD)"
+          systemctl is-active mariadb
+
+          echo "--- sensitive jobs ---"
+          ACTIVE="$(
+            ps -eo pid=,args= | awk '
+              /scripts\/cron\// || /scripts\/fix\// || /scripts\/import\// || /scripts\/recalc\// || /scripts\/scraper\// {
+                if ($0 !~ /af_allocator_ab/ && $0 !~ /grep/ && $0 !~ /awk/) print
+              }'
+          )"
+          if [ -n "$ACTIVE" ]; then
+            echo "$ACTIVE"
+            echo "ABORT: sensitive AfricaFunds job active"
+            exit 21
+          fi
+          echo "active_sensitive_jobs=0"
+
+          [ -f .env ] || { echo "ABORT: runtime .env absent"; exit 22; }
+          envval() {
+            python3 -c 'import sys,pathlib; k=sys.argv[1]; lines=pathlib.Path(".env").read_text(encoding="utf-8").splitlines(); vals=[x.split("=",1)[1].strip() for x in lines if x.strip() and not x.lstrip().startswith("#") and "=" in x and x.split("=",1)[0]==k]; v=vals[0] if vals else ""; print(v.strip(chr(34)).strip(chr(39)))' "$1"
+          }
+          DBU="$(envval DB_USER)"
+          DBN="$(envval DB_NAME)"
+          DBP="$(envval DB_PASSWORD)"
+          [ -n "${DBU:-}" ] || { echo "ABORT: DB_USER absent"; exit 23; }
+          DBN="${DBN:-fund_opcvm}"
+
+          Q() {
+            MYSQL_PWD="$DBP" mysql -N -B -u "$DBU" "$DBN" -e "$1"
+          }
+
+          health() {
+            local label="$1"
+            local db api public_root public_api
+            db="$(Q "SELECT 1;" 2>/dev/null | tail -1 || true)"
+            api="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 http://localhost:3005/api/getactualite || true)"
+            public_root="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 https://africafunds.chainsolutions.fr/ || true)"
+            public_api="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 https://africafunds.chainsolutions.fr/api/getactualite || true)"
+            echo "HEALTH label=$label mariadb=$(systemctl is-active mariadb 2>/dev/null || true) db_select=$db local_api=$api public_root=$public_root public_api=$public_api"
+            [ "$db" = "1" ] && [ "$api" = "200" ] && [ "$public_root" = "200" ] && [ "$public_api" = "200" ]
+          }
+
+          capture() {
+            local label="$1"
+            local pid rss anon swap vmsize private_dirty mem_used mem_initial conn threads tmp tmpdisk uptime
+            pid="$(pgrep -xo mariadbd)"
+            rss="$(awk '/^VmRSS:/ {print $2}' /proc/$pid/status)"
+            anon="$(awk '/^RssAnon:/ {print $2}' /proc/$pid/status)"
+            swap="$(awk '/^VmSwap:/ {print $2}' /proc/$pid/status)"
+            vmsize="$(awk '/^VmSize:/ {print $2}' /proc/$pid/status)"
+            private_dirty="$(awk '/^Private_Dirty:/ {print $2}' /proc/$pid/smaps_rollup 2>/dev/null || echo 0)"
+            mem_used="$(Q "SHOW GLOBAL STATUS LIKE 'Memory_used';" | awk '{print $2}' | tail -1)"
+            mem_initial="$(Q "SHOW GLOBAL STATUS LIKE 'Memory_used_initial';" | awk '{print $2}' | tail -1)"
+            conn="$(Q "SHOW GLOBAL STATUS LIKE 'Threads_connected';" | awk '{print $2}' | tail -1)"
+            threads="$(awk '/^Threads:/ {print $2}' /proc/$pid/status)"
+            tmp="$(Q "SHOW GLOBAL STATUS LIKE 'Created_tmp_tables';" | awk '{print $2}' | tail -1)"
+            tmpdisk="$(Q "SHOW GLOBAL STATUS LIKE 'Created_tmp_disk_tables';" | awk '{print $2}' | tail -1)"
+            uptime="$(Q "SHOW GLOBAL STATUS LIKE 'Uptime';" | awk '{print $2}' | tail -1)"
+            echo "METRIC label=$label ts=$(date -u +%Y-%m-%dT%H:%M:%SZ) pid=$pid rss_kb=$rss rssanon_kb=$anon private_dirty_kb=$private_dirty vmsize_kb=$vmsize swap_kb=$swap memory_used_bytes=$mem_used memory_initial_bytes=$mem_initial connections=$conn threads=$threads tmp_tables=$tmp tmp_disk_tables=$tmpdisk uptime_s=$uptime"
+          }
+
+          workload() {
+            local label="$1"
+            local logfile="/tmp/recalc-eur-usd-$label.log"
+            local timefile="/tmp/recalc-eur-usd-$label.time"
+            echo "WORKLOAD_BEGIN label=$label kind=recalc_eur_usd_daily_rate_dry_run"
+            /usr/bin/time -v -o "$timefile"               node scripts/recalc/recalc_eur_usd_daily_rate.js --dry-run               >"$logfile" 2>&1
+            echo "--- workload summary $label ---"
+            grep -E 'MODE DRY-RUN|fonds a traiter|Fonds traites|VL totales|vlTotal|entrees forex|erreur|ERREUR' "$logfile" | tail -40 || true
+            grep -E 'Elapsed \(wall clock\) time|Maximum resident set size|User time|System time' "$timefile" || true
+            echo "WORKLOAD_END label=$label exit=0"
+          }
+
+          echo "--- snapshot original config ---"
+          systemctl cat mariadb > "$EVIDENCE_DIR/systemctl-cat-before.txt" 2>&1 || true
+          systemctl show mariadb -p Restart -p OOMPolicy -p Environment -p ActiveState -p SubState > "$EVIDENCE_DIR/systemctl-show-before.txt" 2>&1 || true
+          cp /etc/mysql/mariadb.conf.d/50-server.cnf "$EVIDENCE_DIR/50-server.cnf" 2>/dev/null || true
+
+          if dpkg-query -W -f='${Status}' libjemalloc2 2>/dev/null | grep -q "install ok installed"; then
+            PKG_WAS_INSTALLED=1
+          fi
+          echo "jemalloc_preinstalled=$PKG_WAS_INSTALLED"
+
+          echo "=============================================="
+          echo "A — SYSTEM MALLOC (FRESH PROCESS)"
+          echo "=============================================="
+          systemctl restart mariadb
+          sleep 6
+          health "A_PRE"
+          PID_A="$(pgrep -xo mariadbd)"
+          if grep -F "libjemalloc" /proc/$PID_A/maps >/dev/null 2>&1; then
+            echo "ABORT: jemalloc unexpectedly loaded during A"
+            exit 26
+          fi
+          capture "A_PRE"
+          workload "A"
+          sleep 30
+          capture "A_POST"
+          health "A_POST"
+
+          echo "=============================================="
+          echo "INSTALL / SWITCH TO JEMALLOC"
+          echo "=============================================="
+          if [ "$PKG_WAS_INSTALLED" -eq 0 ]; then
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update -qq
+            apt-get install -y --no-install-recommends libjemalloc2
+          fi
+
+          JEMALLOC_PATH="$(dpkg -L libjemalloc2 | grep -E '/libjemalloc\.so\.2$' | head -1)"
+          [ -n "$JEMALLOC_PATH" ] && [ -f "$JEMALLOC_PATH" ] || { echo "ABORT: jemalloc library path not found"; exit 24; }
+          echo "jemalloc_path=$JEMALLOC_PATH"
+
+          mkdir -p "$DROPIN_DIR"
+          printf '[Service]\nEnvironment="LD_PRELOAD=%s"\n' "$JEMALLOC_PATH" > "$DROPIN"
+          chmod 0644 "$DROPIN"
+          SWITCHED=1
+          systemctl daemon-reload
+          systemctl restart mariadb
+          sleep 6
+          health "B_PRE"
+
+          PID="$(pgrep -xo mariadbd)"
+          if ! grep -F "$JEMALLOC_PATH" /proc/$PID/maps >/dev/null; then
+            echo "ABORT: jemalloc not mapped in mariadbd"
+            exit 25
+          fi
+          echo "jemalloc_loaded=1"
+
+          echo "=============================================="
+          echo "B — JEMALLOC"
+          echo "=============================================="
+          capture "B_PRE"
+          workload "B"
+          sleep 30
+          capture "B_POST"
+          health "B_POST"
+
+          echo "=============================================="
+          echo "ROLLBACK TO ORIGINAL SYSTEM MALLOC"
+          echo "=============================================="
+          rm -f "$DROPIN"
+          systemctl daemon-reload
+          systemctl restart mariadb
+          sleep 6
+          SWITCHED=0
+          health "ROLLBACK"
+          capture "ROLLBACK"
+
+          if [ "$PKG_WAS_INSTALLED" -eq 0 ]; then
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get remove -y libjemalloc2
+          fi
+
+          echo "AB_TEST_COMPLETED=1"
+          echo "EVIDENCE_DIR=$EVIDENCE_DIR"
+          trap - EXIT
+          REMOTE
+
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes               -o ServerAliveInterval=30 -o ServerAliveCountMax=20               "$SSH_USER@$HOST" 'bash -s' < /tmp/af_allocator_ab.sh               2>&1 | tee allocator-ab-report.txt
+
+      - name: Publish report summary
+        if: always()
+        run: |
+          {
+            echo "## AF-OPS-003 — allocator A/B"
+            echo
+            echo '~~~text'
+            cat allocator-ab-report.txt 2>/dev/null || echo "(no report)"
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload immutable A/B evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-mariadb-allocator-ab
+          path: allocator-ab-report.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy /tmp/af_allocator_ab.sh

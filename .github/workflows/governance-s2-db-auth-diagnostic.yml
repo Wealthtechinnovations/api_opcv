@@ -1,0 +1,106 @@
+name: AfricaFunds DB Auth Diagnostic
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/governance/s2_db_auth_diagnostic.py'
+      - 'scripts/governance/s2_ssh_readonly_retry.sh'
+      - '.github/workflows/governance-s2-db-auth-diagnostic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-db-auth-diagnostic
+  cancel-in-progress: false
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        # Sur push, valider le SHA déclencheur exact. Sur dispatch,
+        # Actions utilise le commit associé au run.
+
+      - name: Prepare strict pinned SSH
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Diagnose stale DB authentication read-only
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          AFRICAFUNDS_SSH_OPERATION_CLASS=READ_ONLY \
+            bash scripts/governance/s2_ssh_readonly_retry.sh \
+            "$SSH_USER@$HOST" 'python3 -' scripts/governance/s2_db_auth_diagnostic.py \
+            > S2_DB_AUTH_DIAGNOSTIC.json
+          test -s S2_DB_AUTH_DIAGNOSTIC.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('S2_DB_AUTH_DIAGNOSTIC.json',encoding='utf-8'))
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['safety']['read_only'] is True
+          assert p['safety']['secret_values_exposed'] is False
+          assert p['safety']['database_modified'] is False
+          print('S2_DB_AUTH_DIAGNOSTIC=PASS')
+          PY
+
+      - name: Publish safe summary
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json,pathlib
+          print('## AfricaFunds — stale DB authentication diagnostic')
+          pth=pathlib.Path('S2_DB_AUTH_DIAGNOSTIC.json')
+          if pth.exists() and pth.stat().st_size > 0:
+              p=json.loads(pth.read_text())
+              print('- historical access denied count since 2026-09-12 UTC:',p.get('access_denied_count'))
+              print('- historical count semantics:',p.get('access_denied_count_semantics'))
+              print('- today UTC access denied count:',p.get('today_access_denied_count'))
+              s=p.get('today_access_denied_summary',{})
+              print('- today using password YES/NO:',s.get('using_password_yes'),s.get('using_password_no'))
+              print('- today counts by hour UTC:',s.get('by_hour_utc'))
+              print('- today bursts (<=10s gap):',s.get('bursts_le_10s_gap'))
+              print('- PM2 parse:',p.get('pm2',{}).get('parse'))
+              print('- root project cron lines:',len(p.get('root_project_cron_lines',[])))
+              print('- project processes:',len(p.get('project_processes',[])))
+              print('- runtime .env tracked:',p.get('runtime_env',{}).get('tracked'))
+              print('- runtime .env ignored:',p.get('runtime_env',{}).get('ignored'))
+              print('- stale env reference files:')
+              for row in p.get('stale_env_reference_files',[]):
+                  print('  -',row.get('path'),row.get('patterns'))
+              print('- auth error log attribution:')
+              for row in p.get('auth_error_log_attribution',[]):
+                  print('  -',row.get('path'),'count=',row.get('count_in_scanned_window'),'first=',row.get('first'),'last=',row.get('last'))
+              print('- pm2 loader contract:')
+              for row in p.get('pm2_loader_contract',[]):
+                  print('  -',row)
+              print('- systemd environment files:',p.get('systemd_environment_files',[]))
+              print('- stale env open fds:',p.get('stale_env_open_fds',[]))
+              print('- detailed project processes:')
+              for row in p.get('process_details',[]):
+                  print('  -',row)
+          PY
+
+      - name: Upload safe evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-db-auth-diagnostic
+          path: S2_DB_AUTH_DIAGNOSTIC.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
