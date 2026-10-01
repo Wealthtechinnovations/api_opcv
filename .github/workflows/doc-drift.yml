@@ -265,9 +265,32 @@ jobs:
             git commit -m "chore(diag): etat de production verifie $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
             # Rebase avant push : le workflow ne doit jamais ecraser un commit
             # pousse entre-temps.
-            git pull --rebase origin claude/code-review-improvements-ikvuj || true
-            git push origin HEAD:claude/code-review-improvements-ikvuj
-            echo "Rapport consigne dans le depot."
+            #
+            # Pourquoi une boucle de reprise, et non un seul push : le
+            # 2026-09-30 a 12:18 UTC la mesure a reussi et la publication a
+            # echoue sur « remote: fatal error in commit_refs / [remote
+            # rejected] (failure) » — une erreur serveur GitHub, pas un
+            # non-fast-forward. Resultat : aucun rapport consigne ce jour-la,
+            # et un trou d un jour dans la source de verite n°1, alors que la
+            # production avait bel et bien ete mesuree. Une mesure obtenue puis
+            # perdue a la publication est la pire des issues : on paie le cout
+            # du controle sans en garder la trace.
+            PUSH_OK=0
+            for TENTATIVE in 1 2 3 4; do
+              git pull --rebase origin claude/code-review-improvements-ikvuj || true
+              if git push origin HEAD:claude/code-review-improvements-ikvuj; then
+                PUSH_OK=1
+                echo "Rapport consigne dans le depot (tentative ${TENTATIVE})."
+                break
+              fi
+              ATTENTE=$((2 ** TENTATIVE))
+              echo "::warning::Publication du rapport refusee (tentative ${TENTATIVE}/4). Nouvelle tentative dans ${ATTENTE}s."
+              sleep "${ATTENTE}"
+            done
+            if [ "$PUSH_OK" -ne 1 ]; then
+              echo "::error::La mesure a reussi mais le rapport n a pas pu etre consigne apres 4 tentatives. docs/ETAT_PRODUCTION_VERIFIE.md garde sa date precedente : lire cette date avant de s y fier."
+              exit 1
+            fi
           fi
 
       - name: Effacer la cle SSH
