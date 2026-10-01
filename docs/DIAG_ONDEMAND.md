@@ -4,13 +4,13 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-10-01 12:52 UTC**
+Derniere execution : **2026-10-01 18:55 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-10-01 12:50:11 UTC — LECTURE SEULE
+Mesure le 2026-10-01 18:53:46 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -78,7 +78,7 @@ Mesure le 2026-10-01 12:50:11 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-10-01 12:51:05 UTC — LECTURE SEULE
+Mesure le 2026-10-01 18:54:38 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -86,8 +86,8 @@ Mesure le 2026-10-01 12:51:05 UTC — LECTURE SEULE
   classementfonds_eurs        3638 lignes — aucune colonne de date
   classementfonds_usds        3638 lignes — aucune colonne de date
   performences               80842 lignes — updated_at max = aucune (?)
-  performences_eurs          38003 lignes — date max = Wed Sep 30 2026 00: (1.5 j)
-  performences_usds          38236 lignes — date max = Wed Sep 30 2026 00: (1.5 j)
+  performences_eurs          38003 lignes — date max = Wed Sep 30 2026 00: (1.8 j)
+  performences_usds          38236 lignes — date max = Wed Sep 30 2026 00: (1.8 j)
 
 ## B. Retard des performances par pays
 
@@ -101,7 +101,7 @@ Mesure le 2026-10-01 12:51:05 UTC — LECTURE SEULE
 
 ## C. Le classement suit-il les performances actuelles ?
 
-  OBLIGATIONS MAROC                strict  110/300  (36.7 %) · rho  0.696 · top10 3/10 · ex aequo 1
+  OBLIGATIONS MAROC                strict  108/300  (36.0 %) · rho  0.696 · top10 3/10 · ex aequo 1
                                    DIVERGE — le classement ne reflete pas les performances en base
   DIVERSIFIE MAROC                 strict   18/141  (12.8 %) · rho  0.210 · top10 6/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
@@ -109,8 +109,8 @@ Mesure le 2026-10-01 12:51:05 UTC — LECTURE SEULE
                                    DIVERGE — le classement ne reflete pas les performances en base
   OBLIGATIONS NIGERIA              strict   12/87   (13.8 %) · rho  0.831 · top10 4/10 · ex aequo 2
                                    DIVERGE — le classement ne reflete pas les performances en base
-  MONETAIRE MAROC                  strict   44/70   (62.9 %) · rho  0.978 · top10 8/10 · ex aequo 0
-                                   PROCHE — permutations locales, a instruire
+  DIVERSIFIE TUNISIE               strict    3/70   (4.3 %) · rho  0.428 · top10 3/10 · ex aequo 0
+                                   DIVERGE — le classement ne reflete pas les performances en base
 
 
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
@@ -119,14 +119,14 @@ Mesure le 2026-10-01 12:51:05 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260928.log      3.1 j  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20260930.log       15.5 h  ECHEC — 2 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     14.8 h  ECHEC — 2 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     17.8 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        17.3 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               18.3 h  OK  (reserve : Echecs scraping: 24)
-  cron_health_check      tous les j 22:00     africafunds_health_20260930.log      14.9 h  ECHEC — 4 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   0.8 h  aucun marqueur de fin
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260928.log      3.4 j  ECHEC — 1 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20260930.log       21.6 h  ECHEC — 2 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     20.8 h  ECHEC — 2 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     23.9 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        23.4 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                0.4 h  OK  (reserve : Echecs scraping: 23)
+  cron_health_check      tous les j 22:00     africafunds_health_20260930.log      20.9 h  ECHEC — 4 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.9 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -200,13 +200,13 @@ Mesure le 2026-10-01 12:51:05 UTC — LECTURE SEULE
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
   | ============================================
-  | SNAPSHOT PRODUCTION — 2026-10-01 12:00:01
+  | SNAPSHOT PRODUCTION — 2026-10-01 18:00:01
   | ============================================
   | --- Generation du snapshot base de donnees ---
-  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44785 octets)
+  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44774 octets)
   |   -> Git non modifie: aucun add/commit/push
   | ============================================
-  | SNAPSHOT TERMINE — 2026-10-01 12:00:15
+  | SNAPSHOT TERMINE — 2026-10-01 18:00:15
   | ============================================
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
@@ -220,14 +220,14 @@ Mesure le 2026-10-01 12:51:05 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-10-01T12:51:10.876Z — LECTURE SEULE
+ Genere le 2026-10-01T18:54:43.988Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 10.24 Mo
-   modifie   : 2026-09-28T10:00:32.486Z (il y a 74.8 h)
+   modifie   : 2026-09-28T10:00:32.486Z (il y a 80.9 h)
    lignes    : 8169
    colonnes  : 59
 
@@ -330,7 +330,7 @@ Mesure le 2026-10-01 12:51:05 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-10-01 12:51:11 UTC — LECTURE SEULE
+Mesure le 2026-10-01 18:54:44 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 332
   etiquette CONFORME au contenu : 122
@@ -490,7 +490,7 @@ Fonds Nigeria examines : 332
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-10-01 12:51:16 UTC — LECTURE SEULE
+Mesure le 2026-10-01 18:54:50 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -682,17 +682,17 @@ VL Nigeria en base : 77466
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : 32f2d8847 — chore(governance): certify all current Markdown [skip ci]
+  HEAD : 6dce0cbe9 — fix(ci): reprise bornee du push de rapport dans doc-drift
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  169  depuis 466.5 h
-    fundafrique-frontend     online     redemarrages   48  depuis 1108.7 h
-    worker-recalculation     online     redemarrages    3  depuis 466.6 h
-    worker-data-import       online     redemarrages    3  depuis 466.6 h
+    api-monolith             online     redemarrages  169  depuis 472.6 h
+    fundafrique-frontend     online     redemarrages   48  depuis 1114.8 h
+    worker-recalculation     online     redemarrages    3  depuis 472.7 h
+    worker-data-import       online     redemarrages    3  depuis 472.7 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -709,7 +709,7 @@ VL Nigeria en base : 77466
 ########## scripts/diag/ondemand/diag_mariadb_incident_timeline.js ##########
 
 === MARIADB — TIMELINE INCIDENTS RECENTS (LECTURE SEULE) ===
-Mesure le 2026-10-01T12:51:22.232Z
+Mesure le 2026-10-01T18:54:55.713Z
 
 
 --- etat systemd courant ---
@@ -718,14 +718,14 @@ Result=success
 NRestarts=0
 ExecMainStartTimestamp=Tue 2026-09-22 06:25:02 UTC
 ExecMainPID=3041009
-MemoryCurrent=5145997312
+MemoryCurrent=5145657344
 ActiveState=active
 SubState=running
 StateChangeTimestamp=Tue 2026-09-22 06:25:02 UTC
 ActiveEnterTimestamp=Tue 2026-09-22 06:25:02 UTC
 
 --- processus mariadbd courant ---
-MARIADB_PROCESS pid=3041009 uptime_s=800780 rss_kb=4937128 rssanon_kb=4923820 private_dirty_kb=4924804 swap_kb=1627172
+MARIADB_PROCESS pid=3041009 uptime_s=822594 rss_kb=4938284 rssanon_kb=4924976 private_dirty_kb=4925924 swap_kb=1627232
 
 --- listener TCP 3306 courant ---
 LISTEN 0      80                                       127.0.0.1:3306       0.0.0.0:*    users:(("mariadbd",pid=3041009,fd=19))
@@ -766,7 +766,7 @@ SEP21_MARIADB_START_OR_READY_PRESENT=YES
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-10-01 12:51:22 UTC — LECTURE SEULE
+Mesure le 2026-10-01 18:54:56 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -835,7 +835,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-10-01 12:51:27 UTC — LECTURE SEULE
+Mesure le 2026-10-01 18:55:00 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
@@ -938,7 +938,7 @@ Ruptures d echelle Nigeria encore en base : 139
 ########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-10-01 12:51:31 UTC — LECTURE SEULE
+Mesure le 2026-10-01 18:55:06 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -1029,19 +1029,19 @@ Mesure le 2026-10-01 12:51:31 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_recalc_prepared_stmt_pressure.js ##########
 
 === PREPARED STATEMENT PRESSURE — READ ONLY ===
-Mesure: 2026-10-01T12:51:36.714Z
+Mesure: 2026-10-01T18:55:11.158Z
 STEP3_RECALC_EUR_USD funds=1249 vl_rows=997818 dynamic_update_statements=2610 batch_size=500
 STEP4_RECALC_VL_AJUSTE funds=1250 vl_rows=998422 dynamic_update_statements=5721 batch_size=200
 COMBINED_DYNAMIC_UPDATE_STATEMENTS=8331
 MYSQL_MAX_PREPARED_STMT_COUNT=16382
 MYSQL_PERFORMANCE_SCHEMA=OFF
-MYSQL_PREPARED_STMT_COUNT_NOW=20
-MYSQL_COM_STMT_PREPARE_SINCE_RESTART=9161
-MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=349333
+MYSQL_PREPARED_STMT_COUNT_NOW=16
+MYSQL_COM_STMT_PREPARE_SINCE_RESTART=9188
+MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=350676
 MYSQL_COM_STMT_CLOSE_SINCE_RESTART=2
-MYSQL_MEMORY_USED_NOW=482431712
-MYSQL_UPTIME=800801
-PREPARE_MINUS_THEORETICAL_DYNAMIC=830
+MYSQL_MEMORY_USED_NOW=481983888
+MYSQL_UPTIME=822616
+PREPARE_MINUS_THEORETICAL_DYNAMIC=857
 NOTE=Step3 count is an upper geometry bound before currency/rate skips; current daily log reported 1249 funds and 994766 VL actually processed. Step4 geometry is exact for active-fund row batches. Com_stmt_prepare is server-global and cumulative, so numerical proximity is evidence for correlation, not causal identity.
 MUTATION=NONE
 
@@ -1056,7 +1056,7 @@ CONTRACT=GREEN
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-10-01 12:51:43 UTC — LECTURE SEULE
+Mesure le 2026-10-01 18:55:18 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 146 ligne(s) sur 64 fonds
