@@ -1,0 +1,1533 @@
+{
+  "schema_version": "1.3.0",
+  "active_loop_id": "AF-GOV-FINAL-CERT-20260911-01",
+  "tasks": [
+    {
+      "id": "AF-TASK-001",
+      "title": "Intégration Regulatory Plus API",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-001",
+        "AF-REQ-002",
+        "AF-REQ-003",
+        "AF-REQ-006",
+        "AF-REQ-007",
+        "AF-REQ-010"
+      ],
+      "next_action": "Terminé ; conserver preuves et historique."
+    },
+    {
+      "id": "AF-TASK-002",
+      "title": "Intégration Regulatory Plus frontend",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-001",
+        "AF-REQ-002",
+        "AF-REQ-003",
+        "AF-REQ-006",
+        "AF-REQ-007",
+        "AF-REQ-010"
+      ],
+      "depends_on": [
+        "AF-TASK-001"
+      ],
+      "next_action": "Terminé ; conserver preuves et historique."
+    },
+    {
+      "id": "AF-TASK-003",
+      "title": "Attestation finale bi-repository de la gouvernance",
+      "status": "DONE_WITH_EXTERNAL_GAPS",
+      "depends_on": [
+        "AF-TASK-001",
+        "AF-TASK-002"
+      ],
+      "next_action": "Certification bi-repository fermée. Les actions restantes sont exclusivement les gaps externes portés par AF-TASK-010 et les contrôles externes OOB/rulesets.",
+      "closure_evidence": [
+        "AF-EVD-035",
+        "AF-EVD-036"
+      ]
+    },
+    {
+      "id": "AF-TASK-004",
+      "title": "Reconstruction de contexte et découverte croisée obligatoires",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-002"
+      ],
+      "next_action": "Terminé et prouvé : reconstruction Git-only, découverte croisée et tests Claude/ChatGPT verts."
+    },
+    {
+      "id": "AF-TASK-005",
+      "title": "Certification exhaustive de tous les Markdown courants",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-004"
+      ],
+      "next_action": "Maintenir la certification dynamique ; dernier registre observé 242/242, 0 autorité orpheline, 0 contradiction critique."
+    },
+    {
+      "id": "AF-TASK-006",
+      "title": "Observabilité S2 sans bridge MCP",
+      "status": "DONE_WITH_EXTERNAL_TRUST_GAP",
+      "depends_on": [
+        "AF-TASK-004"
+      ],
+      "next_action": "Observateur SSH sans bridge, pin TOFU, StrictHostKeyChecking et preuves live PASS. Vérification OOB du host key reste externe."
+    },
+    {
+      "id": "AF-TASK-007",
+      "title": "Fallback déploiement API/frontend et preflight GOV-006 commun",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-006"
+      ],
+      "next_action": "Guard GOV-006 partagé, fallback API/frontend observe et attestation S2 live prouvés ; mutations restent soumises à confirmation."
+    },
+    {
+      "id": "AF-TASK-008",
+      "title": "Enforcement GitHub et détection de drift",
+      "status": "DONE_WITH_EXTERNAL_GAP",
+      "depends_on": [
+        "AF-TASK-004",
+        "AF-TASK-005"
+      ],
+      "next_action": "Default/canonical branch et branch drift CI enforced. GitHub native rulesets restent absents faute de surface admin disponible."
+    },
+    {
+      "id": "AF-TASK-009",
+      "title": "Tests reprise multi-agent, bridge-down et certification finale",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-005",
+        "AF-TASK-006",
+        "AF-TASK-007",
+        "AF-TASK-008"
+      ],
+      "next_action": "Final reruns PASS : Regulatory Plus, State Coherence, Multi-Agent Resume, Secret Gate, Branch Policy API/frontend et Project Link."
+    },
+    {
+      "id": "AF-OPS-001",
+      "title": "MariaDB Restart=on-failure après OOM",
+      "status": "BLOCKED_HUMAN_APPROVAL",
+      "next_action": "Conserver jusqu'à approbation distincte ; ne pas confondre avec la certification de gouvernance."
+    },
+    {
+      "id": "AF-TASK-010",
+      "title": "Remédiation des secrets suivis sans régression runtime",
+      "status": "BLOCKED_EXTERNAL_PROVIDER_ROTATION",
+      "depends_on": [
+        "AF-TASK-006"
+      ],
+      "requirements": [
+        "AF-REQ-022"
+      ],
+      "next_action": "Runtime .env détaché de Git, DB_PASSWORD rotaté, JWT_SECRET rotaté et ancienne clé révoquée. Restent EMAIL_PASSWORD et MAGIC_SECRET_KEY à rotater dans les consoles fournisseurs externes."
+    },
+    {
+      "id": "AF-TASK-011",
+      "title": "Synchronisation finale des registres et attestation bi-repository",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-006",
+        "AF-TASK-007",
+        "AF-TASK-008",
+        "AF-TASK-009",
+        "AF-TASK-010"
+      ],
+      "next_action": "Aucune action interne restante. Conserver les preuves et ne rouvrir qu'en cas de drift mesuré.",
+      "phase": "FINAL_S2_ATTESTATION_COMPLETE",
+      "closure_evidence": [
+        "AF-EVD-035",
+        "AF-EVD-036"
+      ]
+    },
+    {
+      "id": "AF-OPS-002",
+      "title": "Gouvernance des incidents, RCA, récurrence et postmortems",
+      "status": "DONE",
+      "requirements": [
+        "AF-REQ-025"
+      ],
+      "next_action": "Maintenir le registre d'incidents et son CI ; toute nouvelle action corrective doit être liée à une tâche AfricaFunds existante."
+    },
+    {
+      "id": "AF-OPS-003",
+      "title": "MariaDB — RCA des OOM répétés et durcissement de résilience",
+      "status": "OPEN",
+      "incident_refs": [
+        "AF-INC-20260817-001"
+      ],
+      "depends_on": [],
+      "next_action": "Le correctif protocolaire execute()->query des deux UPDATE dynamiques massifs est RED->GREEN et déployé par GOV-006. Ne pas le rejouer et ne pas restart MariaDB. Mesurer les prochains vrais passages étape 3/4 avec le sampler gouverné; comparer RSS/RssAnon/Private_Dirty, Prepared_stmt_count et Com_stmt_* au baseline pré-fix, vérifier l'équivalence des sorties, puis seulement réévaluer le niveau de confiance RCA.",
+      "phase": "POST_FIX_VALIDATION",
+      "evidence_refs": [
+        "AF-EVD-040",
+        "AF-EVD-041",
+        "AF-EVD-042",
+        "AF-EVD-043",
+        "AF-EVD-044",
+        "AF-EVD-045",
+        "AF-EVD-046",
+        "AF-EVD-047",
+        "AF-EVD-048",
+        "AF-EVD-050",
+        "AF-EVD-053",
+        "AF-EVD-054",
+        "AF-EVD-056",
+        "AF-EVD-057",
+        "AF-EVD-058",
+        "AF-EVD-059",
+        "AF-EVD-060"
+      ],
+      "stream": "OPS",
+      "program": "PRODUCTION_STABILITY",
+      "priority": "P0",
+      "execution_mode": "AUTO_READ_ONLY_POST_FIX_VALIDATION",
+      "definition_of_ready": [
+        "Seventh OOM and long-duration anonymous/private RSS growth are persisted as evidence.",
+        "High-amplitude Sep22 RSS jump is bounded to daily-update step 3/4 window.",
+        "SQL protocol regression contract exists and exact-SHA GREEN is proven.",
+        "Validated fix is deployed through GOV-006 with clean S2 checkout attestation."
+      ],
+      "definition_of_done": [
+        "Observe at least one real post-fix daily recalculation window with RSS/RssAnon/Private_Dirty and Com_stmt_* counters.",
+        "Observe an independent confirmation cycle or persist contradictory evidence before causal closure.",
+        "Verify financial/data outputs remain equivalent under the protocol-only change.",
+        "Update incident root-cause confidence without promoting causality beyond the evidence.",
+        "Persist evidence, queue/state/handoff and global SUIVI checkpoint."
+      ],
+      "evidence_required": [
+        "POST_FIX_REAL_BATCH_MEMORY_COMPARISON",
+        "POST_FIX_PREPARED_STATEMENT_COUNTER_COMPARISON",
+        "POST_FIX_DATA_OUTPUT_EQUIVALENCE",
+        "RCA_CONFIDENCE_REVIEW"
+      ],
+      "next_transition": "RCA_CONFIDENCE_REVIEW",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST"
+    },
+    {
+      "id": "AF-OPS-004",
+      "title": "S2 SSH — fiabiliser les resets KEX du canal read-only",
+      "status": "DONE",
+      "incident_refs": [
+        "AF-INC-20260912-001"
+      ],
+      "next_action": "Retry read-only borné/fail-closed livré et prouvé. L'incident AF-INC-20260912-001 reste MITIGATED/RCA_PENDING tant que la cause pré-auth réseau/sshd n'est pas prouvée.",
+      "closure_evidence": [
+        "AF-EVD-039"
+      ]
+    },
+    {
+      "id": "AF-OPS-005",
+      "title": "DB auth — attribution des Access denied post-rotation",
+      "status": "OPEN",
+      "incident_refs": [
+        "AF-INC-20260914-002"
+      ],
+      "next_action": "Deux fichiers runtime (.env.production et .env.production.plan-b) déclarent fund_opcvm avec un DB_PASSWORD différent du .env courant, mais aucun processus actif ne porte DB_USER=fund_opcvm dans son environnement initial et aucun consommateur précis n'est prouvé. Continuer uniquement l'attribution read-only : déterminer quels scripts/services peuvent charger ces fichiers. Ne pas re-rotater DB_PASSWORD et ne pas restart MariaDB.",
+      "evidence_refs": [
+        "AF-EVD-049",
+        "AF-EVD-051"
+      ],
+      "stream": "OPS",
+      "program": "SECURITY_RUNTIME_IDENTITY",
+      "priority": "P1",
+      "execution_mode": "AUTO_READ_ONLY",
+      "definition_of_ready": [
+        "Current runtime .env credential is known-valid and remains untracked/ignored.",
+        "Stale credential-bearing files are proven without exposing secret values.",
+        "DB-auth diagnostic is available read-only."
+      ],
+      "definition_of_done": [
+        "Attribute remaining relevant Access denied bursts to timestamp -> process/PID/cwd -> loader -> credential source, or persist bounded evidence that attribution is impossible with available telemetry.",
+        "Separate diagnostic-generated failures from production consumers.",
+        "Perform no password rotation, restart or secret disclosure as part of attribution."
+      ],
+      "evidence_required": [
+        "TIMESTAMPED_DB_AUTH_ATTRIBUTION",
+        "SAFE_CONSUMER_IDENTITY_EVIDENCE"
+      ],
+      "next_transition": "RCA_CONFIDENCE_REVIEW",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST"
+    },
+    {
+      "id": "AF-OPS-006",
+      "title": "Health check production — éliminer les faux verts et isoler les contrôles",
+      "status": "DONE",
+      "incident_refs": [
+        "AF-INC-20260914-001"
+      ],
+      "closure_evidence": [
+        "d58508f0d3e759b0456c1268b5105068221bfbc4",
+        "9f051c035e4bf72f919004f5a654ccf015f159ee"
+      ],
+      "next_action": "Conserver le contrat : code >=2 = mesure impossible et job rouge ; une alerte C5 ne doit jamais empêcher C2/C3/C4/C7/C8 d'être mesurés."
+    },
+    {
+      "id": "AF-OPS-007",
+      "title": "Data integrity — C7/C3 ruptures d'échelle et performances absurdes",
+      "status": "OPEN",
+      "phase": "READ_ONLY_PREFLIGHT",
+      "requirements": [
+        "AF-REQ-011",
+        "AF-REQ-012"
+      ],
+      "depends_on": [],
+      "next_action": "Rejouer le dry-run existant des segments Nigeria sans écriture, confronter son périmètre au C7 live du 2026-09-16 et séparer explicitement les cas Nigeria des anomalies hors Nigeria (dont FCP BRIDGE EQUILIBRE/UEMOA). N'exécuter aucune correction si le scope diverge. Toute écriture doit conserver snapshot, transaction, rollback et vérification C7/C3 post-write.",
+      "evidence_refs": [
+        "AF-EVD-011",
+        "AF-EVD-052",
+        "AF-EVD-055"
+      ],
+      "stream": "DATA",
+      "program": "DATA_QUALITY",
+      "priority": "P1",
+      "execution_mode": "AUTO_READ_ONLY_PREFLIGHT",
+      "definition_of_ready": [
+        "Live C7/C3 failures are measured and persisted.",
+        "Existing Nigeria dry-run tooling is identified.",
+        "Cross-country anomalies are kept in scope."
+      ],
+      "definition_of_done": [
+        "Classify each in-scope scale break by country/fund/provenance.",
+        "Prove correction scope before any data write.",
+        "If a write is later authorized, preserve snapshot, transaction, rollback and post-write C7/C3 checks."
+      ],
+      "evidence_required": [
+        "C7_CASE_CLASSIFICATION",
+        "C3_POST_INTEGRITY_REMEASUREMENT"
+      ],
+      "next_transition": "GOVERNED_DATA_CORRECTION_OR_RESIDUAL_GAP",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST"
+    },
+    {
+      "id": "AF-OPS-008",
+      "title": "Performance integrity — C2/C8 orphelines et dérivés périmés",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "requirements": [
+        "AF-REQ-013",
+        "AF-REQ-014"
+      ],
+      "depends_on": [
+        "AF-OPS-007",
+        "AF-OPS-009"
+      ],
+      "next_action": "Instruire C2 fonds par fonds avant toute suppression. Après assainissement/fraîcheur des VL, recalculer les performances via les scripts/workflows existants, sans classements tant que les performances sources ne sont pas validées. Re-mesurer C2 et C8 avant toute clôture.",
+      "evidence_refs": [
+        "AF-EVD-011",
+        "AF-EVD-052",
+        "AF-EVD-055"
+      ],
+      "stream": "DATA",
+      "program": "DATA_QUALITY",
+      "priority": "P1",
+      "execution_mode": "GOVERNED_CODE_OR_DATA_CHANGE_AFTER_DEPENDENCIES",
+      "definition_of_ready": [
+        "AF-OPS-007 data integrity dependency is satisfied.",
+        "AF-OPS-009 freshness dependency is satisfied."
+      ],
+      "definition_of_done": [
+        "Investigate C2 orphan performances fund-by-fund before deletion.",
+        "Recalculate derived performances only from validated/fresh VL.",
+        "Re-measure C2/C8 and only then allow ranking recalculation."
+      ],
+      "evidence_required": [
+        "C2_ATTRIBUTION",
+        "C8_POST_RECALC_VALIDATION"
+      ],
+      "next_transition": "PERFORMANCE_LAYER_CERTIFIED",
+      "parallel_policy": "DEPENDENCY_GATED"
+    },
+    {
+      "id": "AF-OPS-009",
+      "title": "Data freshness — rétablir les pipelines VL Nigeria et Tunisie",
+      "status": "OPEN",
+      "phase": "READ_ONLY_RCA",
+      "requirements": [
+        "AF-REQ-015"
+      ],
+      "depends_on": [],
+      "next_action": "La fraîcheur C4 Nigeria/Tunisie est de nouveau dans le budget au 2026-09-22 (Nigeria VL 2026-09-11; Tunisie VL 2026-09-22). Ne pas backfiller. Maintenir la tâche OPEN pour fiabiliser le pipeline: le cron Nigeria du 21/09 a extrait des artefacts frais puis ses étapes aval ont échoué après l'OOM MariaDB; le cron Tunisie est sain. Vérifier le prochain cycle Nigeria et séparer disponibilité DB, extraction source et calculs dérivés.",
+      "evidence_refs": [
+        "AF-EVD-011",
+        "AF-EVD-052",
+        "AF-EVD-055",
+        "AF-EVD-053"
+      ],
+      "stream": "DATA",
+      "program": "DATA_QUALITY",
+      "priority": "P1",
+      "execution_mode": "AUTO_READ_ONLY_RCA",
+      "definition_of_ready": [
+        "Current C4 freshness is measured.",
+        "Nigeria/Tunisia source, cron and import evidence are available."
+      ],
+      "definition_of_done": [
+        "Verify scheduled Nigeria and Tunisia cycles distinguish source acquisition, DB availability and downstream derivation.",
+        "Do not backfill when freshness is already within budget.",
+        "Persist any recurring reliability failure with exact pipeline stage."
+      ],
+      "evidence_required": [
+        "NEXT_SCHEDULED_PIPELINE_CYCLE",
+        "C4_REMEASUREMENT"
+      ],
+      "next_transition": "PIPELINE_RELIABILITY_CONFIRMED_OR_FIX_REQUIRED",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST"
+    },
+    {
+      "id": "AF-TASK-012",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation / Robot Advisor — cartographie runtime et certification de l'existant",
+      "status": "DONE",
+      "phase": "RUNTIME_CARTOGRAPHY_CERTIFIED",
+      "depends_on": [],
+      "scope": [
+        "Cartographier routes_vl_robotadvisor.js, services/analytics/routes.js, efficient_frontier.py, effi.py, src/classes/advisor.js, gateway, frontend Robot Advisor et modèles DB associés.",
+        "Identifier par preuve le chemin réellement actif : monolithe, analytics-service, service Python éventuel, variables d'environnement et routes réellement servies.",
+        "Classifier chaque implémentation CANONICAL_CANDIDATE, REFERENCE_VALIDATION, LEGACY_ACTIVE, LEGACY_INACTIVE ou PROTOTYPE sans suppression."
+      ],
+      "acceptance_criteria": [
+        "Aucune mutation runtime, DB ou production pendant la cartographie.",
+        "Un seul diagramme de flux réel frontend -> API/gateway -> moteur -> DB est établi avec preuves.",
+        "Toute inconnue runtime reste UNKNOWN/NON_VERIFIE et n'est pas déduite du code seul.",
+        "Aucun nouveau moteur, service, branche ou file parallèle n'est créé."
+      ],
+      "next_action": "AF-TASK-013 : définir et tester un contrat API canonique backward-compatible, avec validation, authentification et ownership, avant de raccorder un solveur.",
+      "observed_fund_state": {
+        "github_api_head_at_runtime_probe": "a7c08727db03f090aff3bfb3485911e1b27c3625",
+        "github_frontend_head_at_runtime_probe": "713d16f56740a7fa368ab9a0b705561e087e1bf2",
+        "s2_api_head": "1b4d9715ca0fb886bd698723a45584751b72859f",
+        "s2_frontend_head": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
+        "runtime_observed_at": "2026-09-22T20:41:47Z",
+        "production_mutation_performed": false
+      },
+      "runtime_evidence": {
+        "observer_commit": "a7c08727db03f090aff3bfb3485911e1b27c3625",
+        "workflow_run_id": 35781935658,
+        "workflow_conclusion": "success",
+        "artifact_id": 10718462823,
+        "artifact_digest": "sha256:b3dc6765039e50f7c7d597797aa90f7db7a7d9c0ce7be97d668edb288d4b3a74"
+      },
+      "runtime_findings": [
+        "Production exécute api-monolith sur le port 3005 et fundafrique-frontend ; aucun analytics-service AfricaFunds n'est actif.",
+        "Le app.js exact du SHA S2 ne monte ni routes_vl_robotadvisor.js ni apigestionrobotadvisor.js.",
+        "Le frontend déployé contient les appels historiques /api/robotadvisor/fonds et /python/efficient-frontier.",
+        "NEXT_PUBLIC_PYTHON_API_URL runtime pointe vers https://africafunds.chainsolutions.fr/python.",
+        "Aucun listener n'existe sur 127.0.0.1:5000 ; le probe /python/efficient-frontier retourne HTTP 404.",
+        "Les listeners Python 5001 et 7001 appartiennent respectivement à /opt/pdfsvc et /opt/xlsconv et ne sont pas des moteurs AfricaFunds.",
+        "Le vhost Nginx AfricaFunds expose /api vers 127.0.0.1:3005 mais aucune location/proxy /python n'a été observée.",
+        "Le contrat frontend Frontière Efficiente fund_data/param_data/constraint_data diverge du contrat plat de src/routes/efficient_frontier.py.",
+        "Le chemin Node historique exige ids mais le handler frontend Minweight ne les envoie pas.",
+        "Aucun moteur d'allocation existant n'est actuellement une autorité runtime active."
+      ],
+      "classifications": [
+        {
+          "component": "src/routes/routes_vl_robotadvisor.js",
+          "classification": "LEGACY_INACTIVE",
+          "reason": "Présent sur S2 mais non monté par app.js ; contient l'ancien moteur portfolio-allocation et la persistence simulation."
+        },
+        {
+          "component": "services/analytics/routes.js",
+          "classification": "LEGACY_INACTIVE",
+          "reason": "Copie/migration vers microservice analytics ; architecture microservices explicitement non activée en production."
+        },
+        {
+          "component": "src/routes/efficient_frontier.py",
+          "classification": "LEGACY_INACTIVE",
+          "reason": "Aucun listener 5000, aucun proxy /python, endpoint public 404 et contrat incompatible avec le frontend actuel."
+        },
+        {
+          "component": "src/routes/effi.py",
+          "classification": "PROTOTYPE",
+          "reason": "Implémentation Python ancienne non référencée par un chemin de démarrage/routage actif."
+        },
+        {
+          "component": "src/classes/advisor.js",
+          "classification": "PROTOTYPE",
+          "reason": "Classe expérimentale non reliée au runtime et solveur incomplet."
+        },
+        {
+          "component": "frontend Robot Advisor investor/portfolio",
+          "classification": "LEGACY_ACTIVE",
+          "reason": "Sources présentes dans le checkout frontend déployé et process frontend actif, mais intégration backend/optimiseur cassée ; activité de la route UI compilée individuellement non attestée."
+        }
+      ],
+      "canonicalization_decision": {
+        "existing_engine_canonical_as_is": false,
+        "canonical_candidate": "NONE_AS_IS",
+        "reference_validation_candidate": "NONE_AS_IS",
+        "target_principle": "Réutiliser les algorithmes éprouvables de portfolio-allocation derrière une surface métier AfricaFunds dans l'architecture monolithe actuelle ; construire/rectifier une implémentation indépendante de référence seulement pour validation numérique.",
+        "prohibited_shortcut": "Ne pas réactiver aveuglément routes_vl_robotadvisor.js, services/analytics, efficient_frontier.py ou effi.py."
+      }
+    },
+    {
+      "id": "AF-TASK-013",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — contrat API canonique, validation d'entrée, authentification et ownership",
+      "status": "DONE",
+      "phase": "API_CONTRACT_STABLE",
+      "depends_on": [
+        "AF-TASK-012"
+      ],
+      "scope": [
+        "Définir un contrat versionné unique pour univers, paramètres, contraintes, résultats, warnings et erreurs.",
+        "Réconcilier le drift frontend param_data/constraint_data avec les contrats Node/Python historiques.",
+        "Distinguer lecture publique éventuelle, calcul authentifié, sauvegarde et accès propriétaire aux simulations."
+      ],
+      "acceptance_criteria": [
+        "Frontend et backend partagent un contrat testé ; aucune ambiguïté number[]/objet ou structure de portefeuille.",
+        "Les routes de sauvegarde/simulation appliquent authentification et contrôle d'ownership adaptés.",
+        "Les anciennes routes restent compatibles tant que la migration n'est pas certifiée."
+      ],
+      "next_action": "AF-TASK-016 peut désormais consommer le contrat V2 stable; les pages legacy seront migrées progressivement sans réactivation des anciens solveurs.",
+      "stream": "PRODUCT",
+      "program": "ALLOCATION",
+      "priority": "P1",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST",
+      "definition_of_ready": [
+        "AF-TASK-012 runtime cartography is DONE.",
+        "Canonical API surface and legacy behavior are identified."
+      ],
+      "definition_of_done": [
+        "Backward-compatible canonical request contract validated by tests.",
+        "Authentication and ownership rules are explicit and regression-tested.",
+        "No legacy consumer is silently broken."
+      ],
+      "evidence_required": [
+        "ALLOCATION_API_CONTRACT_TESTS",
+        "AUTH_OWNERSHIP_TESTS"
+      ],
+      "next_transition": "API_CONTRACT_STABLE",
+      "implementation_language": "NODE_JAVASCRIPT",
+      "python_policy": "LEGACY_REFERENCE_ONLY_NOT_RUNTIME",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "RELEASED",
+        "claimed_at": "2026-09-22T21:55:00Z",
+        "base_api_sha": "3ae4446fd8dda0fb4df2b090157d5e74333186d2",
+        "base_frontend_sha": "4700665bce1fafd8e0a4b9fa86d2fa4e598e1b90",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "src/services/allocation/contract.js",
+          "tests/allocation-contract.test.js",
+          "tests/allocation-route.test.js",
+          ".github/workflows/governance-allocation-contract.yml",
+          "src/routes/apigestionallocation.js",
+          "app.js",
+          "src/services/allocation/simulations.js",
+          "tests/allocation-simulation.test.js",
+          "src/lib/allocation.ts",
+          ".github/workflows/governance-allocation-client.yml"
+        ],
+        "released_at": "2026-09-22T22:18:00Z"
+      },
+      "touched_surfaces": [
+        "src/services/allocation/contract.js",
+        "tests/allocation-contract.test.js",
+        "tests/allocation-route.test.js",
+        ".github/workflows/governance-allocation-contract.yml",
+        "src/routes/apigestionallocation.js",
+        "app.js",
+        "src/services/allocation/simulations.js",
+        "tests/allocation-simulation.test.js",
+        "src/lib/allocation.ts",
+        ".github/workflows/governance-allocation-client.yml"
+      ],
+      "completed_at": "2026-09-22T22:18:00Z",
+      "completion_evidence": {
+        "api_contract_workflow_run_id": 35791124146,
+        "api_contract_conclusion": "success",
+        "frontend_contract_workflow_run_id": 35791446456,
+        "frontend_contract_conclusion": "success",
+        "implementation_language": "NODE_JAVASCRIPT",
+        "python_runtime_used": false,
+        "production_deployed": false
+      }
+    },
+    {
+      "id": "AF-TASK-014",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — moteur canonique de préparation des données quantitatives",
+      "status": "DONE_WITH_EXTERNAL_GAPS",
+      "phase": "DATA_PREPARATION_CONTRACT_STABLE",
+      "depends_on": [
+        "AF-TASK-012"
+      ],
+      "related_operational_gates": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ],
+      "scope": [
+        "Remplacer limit=500 par horizons explicites 1Y/3Y/5Y/MAX ou date_from/date_to.",
+        "Normaliser calendriers et fréquences journalière/hebdomadaire/mensuelle sans intersection stricte naïve.",
+        "Construire séries de Total Return lorsque distributions/dividendes sont disponibles.",
+        "Gérer devise de base et conversions FX cohérentes LOCAL/EUR/USD et autres devises supportées.",
+        "Formaliser estimateurs de rendements attendus, covariance, shrinkage, taux sans risque et qualité minimale des données."
+      ],
+      "acceptance_criteria": [
+        "Chaque série utilisée par l'optimiseur possède fréquence, devise, horizon, cutoff et méthodologie explicites.",
+        "Aucune donnée anormale connue ne peut être silencieusement absorbée par le solveur.",
+        "La certification sur données live reste bloquée par les gaps pertinents de AF-OPS-007/008/009.",
+        "Les unités rendement/volatilité/covariance/taux sans risque sont cohérentes et testées."
+      ],
+      "next_action": "AF-TASK-016 peut utiliser le moteur déterministe; la certification live reste explicitement conditionnée aux gates AF-OPS-007/008/009.",
+      "stream": "PRODUCT",
+      "program": "ALLOCATION",
+      "priority": "P1",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "parallel_policy": "DEPENDENCY_ONLY_UNTIL_SURFACE_CLAIMS_EXIST",
+      "definition_of_ready": [
+        "AF-TASK-012 runtime cartography is DONE.",
+        "Fund/data-quality dependencies are explicitly identified before live certification."
+      ],
+      "definition_of_done": [
+        "Deterministic Data Preparation Contract and fixtures exist.",
+        "Fund Master data is reused rather than duplicated.",
+        "Live runs remain gated by relevant data-quality/freshness controls."
+      ],
+      "evidence_required": [
+        "DATA_PREPARATION_FIXTURES",
+        "FUND_MASTER_REUSE_PROOF"
+      ],
+      "next_transition": "DATA_PREPARATION_CONTRACT_STABLE",
+      "implementation_language": "NODE_JAVASCRIPT",
+      "python_policy": "NO_PYTHON_RUNTIME_ENGINE",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "RELEASED",
+        "claimed_at": "2026-09-22T22:07:00Z",
+        "base_api_sha": "5cedf146dd418a5cb842d90e27b5f70d37c15327",
+        "base_frontend_sha": "4700665bce1fafd8e0a4b9fa86d2fa4e598e1b90",
+        "repository_roles": [
+          "API"
+        ],
+        "touched_surfaces": [
+          "src/services/allocation/data/**",
+          "tests/allocation-data-preparation.test.js",
+          ".github/workflows/governance-allocation-data.yml"
+        ],
+        "released_at": "2026-09-22T22:18:00Z"
+      },
+      "touched_surfaces": [
+        "src/services/allocation/data/**",
+        "tests/allocation-data-preparation.test.js",
+        ".github/workflows/governance-allocation-data.yml"
+      ],
+      "completed_at": "2026-09-22T22:18:00Z",
+      "completion_evidence": {
+        "data_preparation_workflow_run_id": 35791298711,
+        "data_preparation_conclusion": "success",
+        "implementation_language": "NODE_JAVASCRIPT",
+        "fund_master_reused": true,
+        "valuation_table_reused": true,
+        "forex_service_reused": true,
+        "no_limit_500": true,
+        "live_certification_gates": [
+          "AF-OPS-007",
+          "AF-OPS-008",
+          "AF-OPS-009"
+        ],
+        "production_deployed": false
+      },
+      "residual_gaps": [
+        "LIVE_DATA_CERTIFICATION_REMAINS_GATED_BY_AF-OPS-007_008_009",
+        "FX_PREHISTORY_LOOKAHEAD_GUARD_REQUIRED_BEFORE_BACKTEST_OR_LIVE_CERTIFICATION"
+      ]
+    },
+    {
+      "id": "AF-TASK-015",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — persistance normalisée, provenance et reproductibilité des runs",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014"
+      ],
+      "scope": [
+        "Remplacer progressivement les chaînes fond_ids/poids par un modèle normalisé compatible avec l'historique.",
+        "Persister moteur/version, univers, share classes, snapshot VL/FX, cutoff, fréquence, estimateurs, contraintes, résultats, métriques et warnings.",
+        "Conserver les tables historiques tant que migration et rollback ne sont pas prouvés."
+      ],
+      "acceptance_criteria": [
+        "Un run peut être rejoué à paramètres et snapshot identiques.",
+        "Aucune migration destructive des simulations historiques.",
+        "Chaque résultat présenté peut être relié à sa provenance de données et à la version du moteur."
+      ],
+      "next_action": "Après contrats data/API, proposer le schéma additif de run d'optimisation et la stratégie de migration sans altération des simulations historiques."
+    },
+    {
+      "id": "AF-TASK-016",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — adapter canonique et stratégies d'optimisation multi-méthodes",
+      "status": "DONE",
+      "phase": "CANONICAL_NODE_ENGINE_STABLE",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014"
+      ],
+      "scope": [
+        "Implémenter le moteur canonique en Node/JavaScript dans le monolithe AfricaFunds ; Python n'est pas une cible runtime.",
+        "Encapsuler portfolio-allocation derrière un adapter AfricaFunds au lieu d'appels dispersés.",
+        "Conserver Mean-Variance / Efficient Frontier et ajouter Equal Weight, Inverse Volatility, Global Minimum Variance, Equal Risk Contribution, Risk Budgeting, Maximum Diversification, Maximum Sharpe et Minimum Correlation.",
+        "Préparer Minimum Tracking Error et autres méthodes uniquement lorsqu'un benchmark valide existe.",
+        "Ne jamais présenter une méthode comme universellement optimale."
+      ],
+      "acceptance_criteria": [
+        "Une seule surface métier appelle les solveurs.",
+        "Chaque stratégie a des entrées/sorties communes et des tests déterministes.",
+        "Les erreurs de convergence et matrices invalides produisent des warnings/erreurs structurés, jamais un résultat silencieux."
+      ],
+      "next_action": "AF-TASK-017 : compiler et vérifier les contraintes AfricaFunds avant de les transmettre au moteur Node.",
+      "implementation_language": "NODE_JAVASCRIPT",
+      "python_policy": "NO_PYTHON_RUNTIME_ENGINE",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "RELEASED",
+        "claimed_at": "2026-09-22T22:18:00Z",
+        "base_api_sha": "3fb7cf5833f8983ef14f7e50db362cdc44e2bf60",
+        "base_frontend_sha": "bb6e9b7a85a3484b6318a785b8452eeb4440da28",
+        "repository_roles": [
+          "API"
+        ],
+        "touched_surfaces": [
+          "src/services/allocation/engine/**",
+          "tests/allocation-engine.test.js",
+          ".github/workflows/governance-allocation-engine.yml"
+        ],
+        "released_at": "2026-09-22T22:25:00Z"
+      },
+      "touched_surfaces": [
+        "src/services/allocation/engine/**",
+        "tests/allocation-engine.test.js",
+        ".github/workflows/governance-allocation-engine.yml"
+      ],
+      "completed_at": "2026-09-22T22:25:00Z",
+      "completion_evidence": {
+        "workflow_run_id": 35792117985,
+        "conclusion": "success",
+        "tested_head": "dab0285fe7030a7ed361db90f301e0d2b408567e",
+        "solver": "portfolio-allocation",
+        "solver_version": "0.0.11",
+        "implementation_language": "NODE_JAVASCRIPT",
+        "python_runtime_used": false,
+        "strategies_certified": [
+          "EQUAL_WEIGHT",
+          "INVERSE_VOLATILITY",
+          "GLOBAL_MINIMUM_VARIANCE",
+          "EQUAL_RISK_CONTRIBUTION",
+          "RISK_BUDGETING",
+          "MAXIMUM_DIVERSIFICATION",
+          "MAXIMUM_SHARPE",
+          "MEAN_VARIANCE",
+          "MINIMUM_CORRELATION"
+        ],
+        "deferred_prerequisite_strategies": {
+          "MINIMUM_TRACKING_ERROR": "BENCHMARK_RETURNS_REQUIRED"
+        },
+        "production_deployed": false
+      }
+    },
+    {
+      "id": "AF-TASK-017",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — moteur de contraintes AfricaFunds",
+      "status": "IN_PROGRESS",
+      "phase": "CONSTRAINT_ENGINE_IMPLEMENTATION",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014",
+        "AF-TASK-016"
+      ],
+      "scope": [
+        "Séparer strictement contraintes de rendement et contraintes de poids.",
+        "Gérer nombre min/max de fonds, poids min/max par fonds, catégorie/asset class, SGO, pays/région, devise, SRRI et liquidité/fréquence.",
+        "Préparer les contraintes qualité/DDQ et mandat institutionnel comme filtres/contraintes versionnés.",
+        "Détecter les jeux de contraintes infaisables avant appel solveur."
+      ],
+      "acceptance_criteria": [
+        "La confusion historique min_return/max_return utilisés comme bornes de poids est éliminée.",
+        "Les contraintes sont validées, nommées et persistées.",
+        "Un problème infaisable retourne une explication exploitable sans produire de faux portefeuille."
+      ],
+      "next_action": "Construire un compilateur de contraintes Node/JavaScript basé sur le Fund Master, avec feasibility pre-check pour poids/nombre de fonds/catégorie/SGO/pays-région/devise/SRRI/liquidité-fréquence; aucun solveur n'est appelé si le mandat est infaisable.",
+      "implementation_language": "NODE_JAVASCRIPT",
+      "python_policy": "NO_PYTHON_RUNTIME_ENGINE",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-22T22:25:00Z",
+        "base_api_sha": "9c7813d770a286fc85194b97e0a607b060cf4683",
+        "base_frontend_sha": "bb6e9b7a85a3484b6318a785b8452eeb4440da28",
+        "repository_roles": [
+          "API"
+        ],
+        "touched_surfaces": [
+          "src/services/allocation/constraints/**",
+          "tests/allocation-constraints.test.js",
+          ".github/workflows/governance-allocation-constraints.yml"
+        ]
+      },
+      "touched_surfaces": [
+        "src/services/allocation/constraints/**",
+        "tests/allocation-constraints.test.js",
+        ".github/workflows/governance-allocation-constraints.yml"
+      ]
+    },
+    {
+      "id": "AF-TASK-018",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — validation numérique, cross-engine et non-régression quantitative",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-016",
+        "AF-TASK-017"
+      ],
+      "scope": [
+        "Créer jeux de référence : 1/N, actifs identiques, covariance diagonale, cas GMV, ERC, bornes et contraintes infaisables.",
+        "Comparer les résultats de l'adapter canonique à une implémentation de référence indépendante, notamment SciPy lorsque pertinente.",
+        "Définir tolérances numériques, invariants somme des poids, bornes, risque/rendement et convergence."
+      ],
+      "acceptance_criteria": [
+        "Aucune stratégie ne passe en production sans tests numériques indépendants.",
+        "Les divergences JS/Python sont expliquées ou bloquantes.",
+        "Les résultats historiques encore supportés disposent de tests de non-régression adaptés."
+      ],
+      "next_action": "Construire le corpus de fixtures et les tests RED->GREEN après stabilisation des adapters/contraintes."
+    },
+    {
+      "id": "AF-TASK-019",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — backtesting, walk-forward, rebalancement et coûts",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-014",
+        "AF-TASK-016",
+        "AF-TASK-018"
+      ],
+      "scope": [
+        "Ajouter backtest hors-échantillon et walk-forward sans look-ahead bias.",
+        "Gérer rebalancement périodique ou par seuil, turnover, frais/transaction costs et impact des frais de gestion lorsque disponibles.",
+        "Comparer à benchmarks valides et scénarios historiques.",
+        "Interdire tout look-ahead FX : aucune date antérieure au premier taux disponible ne peut utiliser rétrospectivement ce futur taux."
+      ],
+      "acceptance_criteria": [
+        "Les résultats in-sample et out-of-sample sont séparés.",
+        "Le moteur interdit l'utilisation de données futures.",
+        "Les hypothèses de coûts et rebalancement sont visibles et persistées."
+      ],
+      "next_action": "Après validation numérique, définir le protocole walk-forward et les métriques de backtest avant toute UI prospective."
+    },
+    {
+      "id": "AF-TASK-020",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — analytics portefeuille, contribution au risque et explicabilité",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-018"
+      ],
+      "scope": [
+        "Calculer performance, volatilité, Sharpe, Sortino, drawdown, VaR/Expected Shortfall selon conventions validées.",
+        "Ajouter contribution au risque par fonds et agrégations SGO/pays/devise/catégorie/asset class/SRRI.",
+        "Ajouter concentration, nombre effectif de positions, diversification ratio et analyses de sensibilité/stabilité des poids.",
+        "Expliquer les principaux déterminants et contraintes actives sans fabriquer une causalité non prouvée."
+      ],
+      "acceptance_criteria": [
+        "Chaque métrique affiche sa période, devise et méthodologie.",
+        "Les contributions au risque somment correctement au risque portefeuille selon la méthode choisie.",
+        "L'explicabilité distingue faits, contraintes actives et analyse de sensibilité."
+      ],
+      "next_action": "Réutiliser d'abord les analytics AfricaFunds/portfolio-analytics existants et identifier précisément les fonctions manquantes avant tout nouveau calcul."
+    },
+    {
+      "id": "AF-TASK-021",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — Portfolio Lab frontend V2 et comparaison multi-stratégies",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-020"
+      ],
+      "scope": [
+        "Faire évoluer les écrans Robot Advisor existants sans créer une troisième UI.",
+        "Parcours : univers -> données/horizon/devise -> stratégie -> contraintes -> résultats -> comparaison -> sauvegarde.",
+        "Comparer plusieurs stratégies côte à côte et enrichir la frontière efficiente interactive.",
+        "Factoriser la duplication investor/portfolio conformément à la dette frontend existante."
+      ],
+      "acceptance_criteria": [
+        "Les routes/URLs historiques restent fonctionnelles ou redirigées de façon compatible.",
+        "Aucune duplication supplémentaire investor/portfolio.",
+        "Les résultats UI sont reliés au run_id, aux hypothèses, warnings et provenance."
+      ],
+      "next_action": "Après stabilisation API, construire la migration progressive des deux pages advisor existantes vers des composants partagés."
+    },
+    {
+      "id": "AF-TASK-022",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — Model Portfolios, Mandate Engine et reporting institutionnel",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-015",
+        "AF-TASK-017",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021"
+      ],
+      "scope": [
+        "Construire des profils/modèles versionnés sans les présenter comme conseil personnalisé automatique.",
+        "Transformer un mandat institutionnel en univers éligible + contraintes machine-readable.",
+        "Exporter rapports Excel/PDF avec composition, risque, performance, contraintes, provenance, avertissements et historique de version."
+      ],
+      "acceptance_criteria": [
+        "Chaque modèle/mandat est versionné et reproductible.",
+        "Les contraintes institutionnelles sont traçables jusqu'aux résultats.",
+        "Les exports reprennent exactement les hypothèses du run et non des calculs recomposés côté frontend."
+      ],
+      "next_action": "Définir les objets Model Portfolio et Mandate uniquement après que run provenance, constraints et backtests sont stables."
+    },
+    {
+      "id": "AF-TASK-023",
+      "program_id": "AF-ALLOC-001",
+      "title": "Allocation — rollout canonique, observabilité et retrait gouverné du legacy",
+      "status": "OPEN",
+      "phase": "DEPENDENCY_GATED",
+      "depends_on": [
+        "AF-TASK-018",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021",
+        "AF-TASK-022"
+      ],
+      "scope": [
+        "Déployer par feature flags/migration compatible, mesurer durée, convergence, erreurs et qualité des inputs.",
+        "Comparer ancien/nouveau chemin sur jeux historiques et utilisateurs pilotes avant bascule.",
+        "Retirer advisor.js, effi.py, duplications Node/Python ou routes mortes uniquement après preuve d'inactivité/équivalence et fenêtre de rollback."
+      ],
+      "acceptance_criteria": [
+        "Aucun legacy n'est supprimé sur simple présomption.",
+        "Le rollback est documenté et testé avant bascule canonique.",
+        "Le moteur final possède une seule autorité runtime et une implémentation de référence clairement séparée.",
+        "Production vérifiée seulement après déploiement explicitement autorisé et contrôles runtime."
+      ],
+      "next_action": "Ne démarrer qu'après certification fonctionnelle des lots précédents ; préparer un plan de migration/rollback avant toute dépréciation."
+    },
+    {
+      "id": "AF-TASK-024",
+      "title": "Programme Directeur — automatisation chronologique, projections et anti-régression",
+      "status": "DONE",
+      "phase": "PROJECTION_DRIFT_FAIL_CLOSED",
+      "depends_on": [
+        "AF-TASK-005"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Conserver task-queue/state/handoff/evidence/incidents comme autorités structurées existantes.",
+        "Dériver READY/BLOCKED/WAITING/waves, chronologie, gap candidates et claims sans seconde queue.",
+        "Détecter puis éliminer le drift des projections humaines courantes sans réécrire l'historique.",
+        "Hard-fail uniquement les invariants et projections déjà gouvernés après preuve RED->GREEN."
+      ],
+      "acceptance_criteria": [
+        "Aucune seconde queue, seconde gouvernance, seconde mémoire ou second registre de claims.",
+        "Programme Director, chronology, gap harvester, surface claims et anti-regression contracts GREEN.",
+        "CURRENT_ITERATION/LOOP_STATE/HANDOFF/STATUS/NEXT_ACTION current sections match structured operational priority.",
+        "Historical sections remain preserved.",
+        "Parallel writes are certified only for non-overlapping active claims."
+      ],
+      "definition_of_ready": [
+        "Programme Director derived read-only pipeline exists and is GREEN.",
+        "AF-EVD-061..063 persist orchestration, claims and anti-regression evidence.",
+        "Projection drift detector has produced an observe-only RED baseline."
+      ],
+      "definition_of_done": [
+        "Projection drift count is zero on current human views.",
+        "Projection detector is promoted to fail-closed only after GREEN.",
+        "Multi-agent claims remain task-local in the single queue.",
+        "Global frontend SUIVI checkpoint reflects the programme state.",
+        "No production deployment is implied by governance-only commits."
+      ],
+      "evidence_required": [
+        "PROJECTION_DRIFT_RED_BASELINE",
+        "PROJECTION_DRIFT_GREEN",
+        "NON_OVERLAPPING_MULTI_AGENT_CLAIMS",
+        "PROGRAMME_DIRECTOR_FULL_GREEN"
+      ],
+      "next_transition": "PROJECTION_DRIFT_GREEN_THEN_FAIL_CLOSED",
+      "next_action": "AF-TASK-025 : générer déterministement les sections courantes des projections en observe-only avant toute écriture automatique.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "RELEASED",
+        "claimed_at": "2026-09-22T22:38:30Z",
+        "base_api_sha": "743ab3f95943a7af3d414294cc1e4ea2b6256649",
+        "base_frontend_sha": "c253c7ff379cd58d07d7b660c5517d2e3f859ec6",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ],
+        "released_at": "2026-09-22T22:44:20Z"
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ],
+      "completed_at": "2026-09-22T22:44:20Z",
+      "completion_evidence": {
+        "red_run_id": 35793411310,
+        "red_projection_drift_count": 5,
+        "atomic_projection_repair_commit": "27eff9c72e6cebaee1f119d3dcb4eac564630453",
+        "green_observe_run_id": 35793783965,
+        "green_projection_drift_count": 0,
+        "fail_closed_commit": "eb5e8871087d97de09daf072bca27424bcae60d6",
+        "fail_closed_green_run_id": 35793931323,
+        "evidence_ref": "AF-EVD-064",
+        "historical_sections_preserved": true
+      }
+    },
+    {
+      "id": "AF-TASK-025",
+      "title": "Programme Directeur — générateur déterministe des projections humaines",
+      "status": "DONE",
+      "phase": "GENERATOR_AND_SIMULATION_GREEN",
+      "depends_on": [
+        "AF-TASK-024"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Dériver les sections courantes de NEXT_ACTION/CURRENT_ITERATION/LOOP_STATE/HANDOFF/STATUS et un snippet SUIVI depuis les autorités structurées.",
+        "Commencer en observe-only : générer des artefacts et comparer, sans écrire automatiquement dans Git.",
+        "Préserver intégralement les sections historiques et éviter toute autorité parallèle.",
+        "N'autoriser une écriture idempotente qu'après sorties stables, diff borné et fail-closed GREEN."
+      ],
+      "acceptance_criteria": [
+        "Le générateur produit des sorties déterministes pour un même FUND_STATE.",
+        "Aucune sortie générée ne contient de SHA auto-référentiel supposé.",
+        "Les sections historiques ne sont jamais régénérées ni supprimées.",
+        "Le Programme Director compare généré vs actuel et expose un diff borné.",
+        "Aucune écriture automatique tant que le mode reste GENERATOR_OBSERVE_ONLY."
+      ],
+      "definition_of_ready": [
+        "AF-TASK-024 DONE / projection drift fail-closed.",
+        "AF-EVD-064 persiste le RED->GREEN des projections.",
+        "Claims multi-agent task-local opérationnels et non chevauchants."
+      ],
+      "definition_of_done": [
+        "Generator observe-only GREEN et déterministe.",
+        "Expected projection artifacts produits et comparés aux vues courantes.",
+        "Idempotence prouvée sur reruns.",
+        "Write-back éventuel séparé derrière un gate gouverné explicite."
+      ],
+      "evidence_required": [
+        "PROJECTION_GENERATOR_DETERMINISM",
+        "PROJECTION_GENERATOR_DIFF_BOUND",
+        "PROJECTION_GENERATOR_IDEMPOTENCE"
+      ],
+      "next_transition": "GENERATOR_GREEN_THEN_WRITEBACK_GATE_REVIEW",
+      "next_action": "AF-TASK-026 : préparer le write-back initial des blocs gérés avec preconditions exactes et rollback Git naturel, sans production/runtime.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "RELEASED",
+        "claimed_at": "2026-09-22T22:45:00Z",
+        "base_api_sha": "c6c0cbfac4ddbaf057d5c975457ec1b6d7507cf0",
+        "base_frontend_sha": "c253c7ff379cd58d07d7b660c5517d2e3f859ec6",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ],
+        "released_at": "2026-09-22T23:43:39Z"
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ],
+      "progress_evidence": {
+        "generator_run_id": 35798266486,
+        "generator_determinism": "PASS",
+        "repository_write_performed": false,
+        "input_sha256": "f3edbd134b6b56b55216834e0db74f38638828d3f545fa5ba04d4b9f28d3c92e",
+        "writeback_candidate_count": 6,
+        "exact_present_count": 0,
+        "full_artifact_id": 10724234585,
+        "archived_file_count": 17,
+        "evidence_ref": "AF-EVD-065"
+      },
+      "completed_at": "2026-09-22T23:43:39Z",
+      "completion_evidence": {
+        "generator_run_id": 35798266486,
+        "generator_determinism": "PASS",
+        "repository_write_performed": false,
+        "input_sha256": "f3edbd134b6b56b55216834e0db74f38638828d3f545fa5ba04d4b9f28d3c92e",
+        "writeback_candidate_count": 6,
+        "exact_present_count": 0,
+        "full_artifact_id": 10724234585,
+        "archived_file_count": 17,
+        "evidence_ref": "AF-EVD-066",
+        "writeback_simulation_run_id": 35798774337,
+        "writeback_simulation_artifact_id": 10725017142,
+        "projection_count": 6,
+        "outside_content_preserved": true,
+        "second_apply_idempotent": true,
+        "marker_counts_valid": true
+      }
+    },
+    {
+      "id": "AF-TASK-026",
+      "title": "Programme Directeur — gate de write-back des blocs gérés",
+      "status": "DONE",
+      "phase": "MANAGED_BLOCKS_ACTIVE",
+      "depends_on": [
+        "AF-TASK-025"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Préparer l'insertion initiale des blocs PROGRAMME_DIRECTOR dans les six vues courantes uniquement.",
+        "Recalculer les blocs depuis les autorités structurées au HEAD live immédiatement avant write.",
+        "Refuser le write si HEAD/API/frontend, marqueurs, contenu hors bloc ou claims ont dérivé.",
+        "Ne jamais réécrire les sections historiques ni déployer S2 pour cette évolution documentaire."
+      ],
+      "acceptance_criteria": [
+        "AF-EVD-065 et AF-EVD-066 prouvent déterminisme, diff borné et idempotence.",
+        "Les deux HEAD sont revalidés immédiatement avant chaque commit logique.",
+        "Le write-back ne modifie que l'insertion/remplacement d'un bloc borné par deux marqueurs uniques.",
+        "Le premier write-back est suivi d'un rerun Programme Director fail-closed et d'un second dry-run idempotent.",
+        "Tout conflit de claim ferme le gate."
+      ],
+      "definition_of_ready": [
+        "AF-TASK-025 DONE.",
+        "Projection drift fail-closed GREEN.",
+        "Writeback simulation PASS sur 6 vues.",
+        "Claims task-local actifs et sans conflit."
+      ],
+      "definition_of_done": [
+        "Managed blocks présents exactement une fois dans les 6 vues.",
+        "Outside-managed content inchangé par rapport au preflight.",
+        "Programme Director GREEN après write-back.",
+        "Second generator/simulator run indique exact managed blocks présents et writeback idempotent.",
+        "Checkpoint global SUIVI conserve l'historique."
+      ],
+      "evidence_required": [
+        "WRITEBACK_PREFLIGHT_EXACT_HEADS",
+        "INITIAL_MANAGED_BLOCK_INSERTION",
+        "POST_WRITEBACK_FAIL_CLOSED_GREEN",
+        "POST_WRITEBACK_IDEMPOTENCE"
+      ],
+      "next_transition": "MANAGED_BLOCKS_ACTIVE",
+      "next_action": "AF-TASK-027 : construire un moteur de maintenance des blocs gérés avec dry-run par défaut, apply explicite, exact-head preconditions et zéro auto-push implicite.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "RELEASED",
+        "claimed_at": "2026-09-22T23:44:30Z",
+        "base_api_sha": "03b0ff3c8dbba9c518f5564047afd44e19e72375",
+        "base_frontend_sha": "c4caa665f2add337824bb5d9c41b460a7da9fffa",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ],
+        "released_at": "2026-09-22T23:57:56Z"
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ],
+      "completed_at": "2026-09-22T23:57:56Z",
+      "completion_evidence": {
+        "managed_api_commit": "a1af56223ec80945e2952745f0a21712df62cdfd",
+        "managed_frontend_commit": "4f02757e24a97c8da1d7aed1dc51209111117ce7",
+        "post_write_validation_run_id": 35799858948,
+        "post_write_artifact_id": 10725606774,
+        "generator_input_sha256": "8cd845f6e106c4a2dbf98d870533df64f490c7ca2b71136526ede9dc7f6d42ee",
+        "exact_present_count": 6,
+        "writeback_candidate_count": 0,
+        "projection_drift_count": 0,
+        "outside_content_preserved": true,
+        "second_apply_idempotent": true,
+        "marker_counts_valid": true,
+        "evidence_ref": "AF-EVD-067"
+      }
+    },
+    {
+      "id": "AF-TASK-027",
+      "title": "Programme Directeur — moteur gouverné de maintenance des blocs gérés",
+      "status": "DONE",
+      "phase": "WRITEBACK_ENGINE_GREEN",
+      "depends_on": [
+        "AF-TASK-026"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Construire un moteur local de maintenance des blocs PROGRAMME_DIRECTOR à partir du générateur déterministe.",
+        "Dry-run obligatoire par défaut ; aucun write sans --apply explicite.",
+        "Exiger expected API_HEAD + FRONTEND_HEAD et refuser si l'un a dérivé.",
+        "Limiter les mutations aux blocs bornés par marqueurs uniques ; contenu hors bloc byte-identical.",
+        "Ne jamais pousser Git, déployer S2 ou muter runtime depuis le moteur lui-même.",
+        "Préparer ensuite un workflow manuel séparé avec confirmation explicite si le moteur est prouvé."
+      ],
+      "acceptance_criteria": [
+        "Dry-run indique précisément quels fichiers changeraient et leurs hashes avant/après.",
+        "Deux applications locales successives sont idempotentes.",
+        "Apply refuse HEAD mismatch, marqueurs invalides, bloc dupliqué ou conflit de claim.",
+        "Contenu hors blocs gérés reste byte-identical.",
+        "Le moteur ne contient aucune primitive git push/update-ref/deploy."
+      ],
+      "definition_of_ready": [
+        "AF-TASK-026 DONE / six managed blocks active.",
+        "AF-EVD-067 confirme 6/6 blocs exacts, drift=0 et simulation idempotente.",
+        "Surface claims non chevauchants."
+      ],
+      "definition_of_done": [
+        "Writeback engine dry-run GREEN sur les six vues.",
+        "Apply testé uniquement dans un workspace temporaire/checkout jetable.",
+        "Exact-head mismatch test RED et valid-head test GREEN.",
+        "Idempotence et outside-content preservation prouvées.",
+        "Aucun repository write automatique n'est activé."
+      ],
+      "evidence_required": [
+        "WRITEBACK_ENGINE_DRY_RUN",
+        "WRITEBACK_ENGINE_HEAD_MISMATCH_RED",
+        "WRITEBACK_ENGINE_TEMP_WORKSPACE_APPLY_GREEN",
+        "WRITEBACK_ENGINE_IDEMPOTENCE"
+      ],
+      "next_transition": "MANUAL_WRITEBACK_WORKFLOW_GATE_REVIEW",
+      "next_action": "AF-TASK-028 : construire un workflow manuel gouverné de maintenance des projections, workflow_dispatch seulement, confirmation explicite et exact-head preconditions.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "RELEASED",
+        "claimed_at": "2026-09-22T23:59:00Z",
+        "base_api_sha": "8516b93d9f8d0e8b658ca197a0e24b750a2697ce",
+        "base_frontend_sha": "4f02757e24a97c8da1d7aed1dc51209111117ce7",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ],
+        "released_at": "2026-09-23T00:38:00Z"
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ],
+      "completed_at": "2026-09-23T00:38:00Z",
+      "completion_evidence": {
+        "run_id": 35802877077,
+        "artifact_id": 10725938994,
+        "evidence_ref": "AF-EVD-068",
+        "head_mismatch_red": true,
+        "dry_run_green": true,
+        "temp_workspace_apply_changed_count": 6,
+        "temp_workspace_apply_files_written_count": 6,
+        "second_apply_changed_count": 0,
+        "second_apply_files_written_count": 0,
+        "outside_content_preserved": true,
+        "marker_counts_valid": true,
+        "git_push_performed": false,
+        "runtime_deploy_performed": false
+      }
+    },
+    {
+      "id": "AF-TASK-028",
+      "title": "Programme Directeur — workflow manuel gouverné de maintenance des projections",
+      "status": "IN_PROGRESS",
+      "phase": "MANUAL_WRITEBACK_WORKFLOW_PREFLIGHT",
+      "depends_on": [
+        "AF-TASK-027"
+      ],
+      "stream": "GOVERNANCE",
+      "program": "PROGRAMME_DIRECTOR",
+      "priority": "P0",
+      "execution_mode": "GOVERNED_CODE_CHANGE",
+      "scope": [
+        "Créer un workflow_dispatch dédié ; aucun schedule, aucun push-trigger d'application.",
+        "Exiger confirmation explicite, expected API SHA et expected frontend SHA.",
+        "Régénérer et simuler avant application, puis utiliser le moteur local validé.",
+        "Refuser tout HEAD mismatch, claim conflict, marker drift ou invariant/projection failure.",
+        "Ne modifier que les blocs PROGRAMME_DIRECTOR ; préserver tout contenu hors bloc.",
+        "Aucun déploiement S2/runtime et aucun force push/history rewrite.",
+        "Le mode dry-run doit être la valeur par défaut ; apply doit rester une action manuelle explicite."
+      ],
+      "acceptance_criteria": [
+        "Workflow limité à workflow_dispatch.",
+        "Confirmation exacte requise avant apply.",
+        "Inputs expected_api_sha et expected_frontend_sha obligatoires.",
+        "Dry-run exécutable sans permission contents:write.",
+        "Apply utilise des permissions minimales, revalide les deux HEAD immédiatement avant commit/push et refuse tout drift.",
+        "Aucun commit n'est créé si les six blocs sont déjà exacts.",
+        "Les commits API et frontend restent séparés et attestés ; aucune notion de SHA unique.",
+        "Aucun S2/GOV-006 n'est déclenché par ce workflow."
+      ],
+      "definition_of_ready": [
+        "AF-TASK-027 DONE / writeback engine GREEN.",
+        "AF-EVD-068 prouve mismatch RED, dry-run GREEN, temp apply 6/6 et idempotence.",
+        "Claims task-local et fail-closed projection/invariants opérationnels."
+      ],
+      "definition_of_done": [
+        "Workflow manuel syntaxiquement/contractuellement GREEN.",
+        "Dry-run manuel ou CI-equivalent prouvé sans mutation.",
+        "Apply path protégé par confirmation/exact-head/recheck/claim guards.",
+        "No-change path prouvé sans commit.",
+        "Aucune application automatique activée."
+      ],
+      "evidence_required": [
+        "MANUAL_WORKFLOW_CONTRACT",
+        "MANUAL_WORKFLOW_DRY_RUN",
+        "MANUAL_WORKFLOW_HEAD_RECHECK",
+        "MANUAL_WORKFLOW_NO_CHANGE_NO_COMMIT"
+      ],
+      "next_transition": "MANUAL_WRITEBACK_READY_NO_AUTO_APPLY",
+      "next_action": "Construire le workflow_dispatch manuel en dry-run par défaut, avec confirmation exacte et expected HEADs ; prouver ses gates sans déclencher de write-back automatique.",
+      "claim": {
+        "owner": "ChatGPT-GPT-5.6-Sol",
+        "status": "ACTIVE",
+        "claimed_at": "2026-09-23T00:39:00Z",
+        "base_api_sha": "e08a973e0d700dc22dce9609a00da96cd204492e",
+        "base_frontend_sha": "21a61fd17c72fd93f478768ae00c543ef175ba32",
+        "repository_roles": [
+          "API",
+          "FRONTEND"
+        ],
+        "touched_surfaces": [
+          "scripts/governance/program_*.py",
+          ".github/workflows/governance-program-director.yml",
+          ".github/workflows/governance-programme-projection-writeback.yml",
+          ".governance/loop/task-queue.json",
+          ".governance/loop/handoff.json",
+          ".governance/knowledge/evidence.json",
+          "NEXT_ACTION.md",
+          "CURRENT_ITERATION.md",
+          "LOOP_STATE.md",
+          "HANDOFF.md",
+          "STATUS.md",
+          "SUIVI.md"
+        ]
+      },
+      "touched_surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".github/workflows/governance-programme-projection-writeback.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ]
+    }
+  ],
+  "programme_director": {
+    "mode": "DERIVED_READ_ONLY",
+    "single_queue_authority": ".governance/loop/task-queue.json",
+    "no_second_queue": true,
+    "orchestrator": "scripts/governance/program_orchestrator.py",
+    "workflow": ".github/workflows/governance-program-director.yml",
+    "first_green_run_id": 35786506758,
+    "dependency_engine": "ACTIVE_READ_ONLY",
+    "parallel_safety": "DEPENDENCY_ONLY_UNTIL_REAL_ACTIVE_SURFACE_CLAIMS_ARE_POPULATED",
+    "chronology": "ACTIVE_DERIVED_EVENT_LEDGER",
+    "gap_harvester": "ACTIVE_READ_ONLY_CANDIDATE_DISCOVERY",
+    "multi_agent_surface_claims": "ACTIVE_OBSERVE_ONLY_NO_ENFORCEMENT",
+    "latest_green_run_id": 35787836771,
+    "latest_green_head": "8913e9ec951669d1966f8ca2425633fbd8e41661",
+    "latest_evidence_ref": "AF-EVD-061",
+    "chronology_event_count": 62,
+    "non_temporal_incident_markers_separated": 5,
+    "gap_harvester_task_creation": "FORBIDDEN_AUTOMATIC",
+    "gap_harvester_scanned_api_text_files": 589,
+    "gap_harvester_scanned_frontend_text_files": 584,
+    "gap_harvester_candidate_count": 125,
+    "gap_harvester_possible_existing_task_matches": 2,
+    "gap_harvester_unmatched_candidates": 123,
+    "candidate_status": "DISCOVERED_CANDIDATE_NOT_TASK_UNTIL_VERIFIED_AND_DEDUPED",
+    "latest_surface_claims_evidence": "AF-EVD-062",
+    "anti_regression_contract": "ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY",
+    "anti_regression_validator": "scripts/governance/program_invariants.py",
+    "anti_regression_latest_green_run_id": 35793007081,
+    "anti_regression_latest_evidence": "AF-EVD-063",
+    "anti_regression_scope": [
+      "ONE_PRODUCT_TWO_REPOSITORIES",
+      "FUND_STATE_TUPLE",
+      "SINGLE_QUEUE",
+      "SINGLE_WRITER",
+      "NO_NEW_BRANCH",
+      "NO_FORCE_PUSH_OR_HISTORY_REWRITE",
+      "CONTEXT_RECONSTRUCTION",
+      "NEXT_ACTION_OPERATIONAL_PROJECTION",
+      "FRONTEND_GLOBAL_SUIVI",
+      "DATA_QUALITY_DEPENDENCY_ORDER",
+      "ALLOCATION_LIVE_DATA_GATES",
+      "EVIDENCE_ID_UNIQUENESS",
+      "NO_SECOND_CLAIM_REGISTRY"
+    ],
+    "projection_drift_contract": "ACTIVE_FAIL_CLOSED_CURRENT_PROJECTIONS",
+    "projection_drift_latest_green_run_id": 35793931323,
+    "projection_drift_latest_evidence": "AF-EVD-064",
+    "projection_drift_count": 0,
+    "projection_machine_drift_count": 0,
+    "projection_generator": "DONE_OBSERVE_ONLY_AF-TASK-025",
+    "projection_generator_latest_run_id": 35798266486,
+    "projection_generator_latest_evidence": "AF-EVD-065",
+    "projection_generator_repository_write": false,
+    "projection_generator_candidate_count": 6,
+    "projection_writeback_simulation": "PASS_AF-EVD-066",
+    "projection_writeback_simulation_run_id": 35798774337,
+    "projection_writeback_simulation_repository_write": false,
+    "projection_writeback_gate": "DONE_INITIAL_MANAGED_BLOCKS_AF-EVD-067",
+    "projection_writeback_simulation_evidence": "AF-EVD-066",
+    "projection_writeback_latest_evidence": "AF-EVD-067",
+    "projection_writeback_exact_present_count": 6,
+    "projection_writeback_candidate_count": 0,
+    "projection_writeback_engine": "DONE_GREEN_AF-EVD-068",
+    "projection_writeback_engine_latest_run_id": 35802877077,
+    "projection_writeback_engine_latest_evidence": "AF-EVD-068",
+    "manual_projection_writeback_workflow": "IN_PROGRESS_PREFLIGHT_AF-TASK-028"
+  },
+  "surface_claims_contract": {
+    "mode": "OBSERVE_ONLY",
+    "storage": "TASK_LOCAL_IN_SINGLE_QUEUE",
+    "no_second_claim_registry": true,
+    "validator": "scripts/governance/program_surface_claims.py",
+    "workflow": ".github/workflows/governance-program-director.yml",
+    "latest_green_run_id": 35798774337,
+    "latest_evidence_ref": "AF-EVD-066",
+    "active_claim_count": 2,
+    "conflict_count": 0,
+    "surface_certified_parallel_pairs": 1,
+    "current_enforcement": "ADVISORY_ONLY_NO_WRITE_BLOCK",
+    "task_local_claim_fields": [
+      "owner",
+      "status",
+      "claimed_at",
+      "base_api_sha",
+      "base_frontend_sha",
+      "repository_roles",
+      "touched_surfaces"
+    ],
+    "overlap_policy": "CONSERVATIVE_STATIC_PREFIX_OVERLAP",
+    "enforcement_transition_rule": "DO_NOT_ENFORCE_UNTIL_REAL_CLAIMS_ARE_POPULATED_AND_CONFLICT_FREE_IN_GREEN_RUNS",
+    "release_rule": "CLAIMS_MUST_BE_RELEASED_OR_RECONCILED_AFTER_TASK_WRITE_COMPLETION",
+    "parallel_certification_rule": "DEPENDENCY_CHECK_PLUS_NON_OVERLAPPING_ACTIVE_SURFACE_CLAIMS_REQUIRED",
+    "active_claim_task_ids": [
+      "AF-TASK-017",
+      "AF-TASK-028"
+    ],
+    "certified_parallel_pairs": [
+      [
+        "AF-TASK-017",
+        "AF-TASK-028"
+      ]
+    ]
+  }
+}

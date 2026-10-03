@@ -1,0 +1,27 @@
+name: AfricaFunds S2 Read-only SSH Retry Contract
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - 'scripts/governance/s2_ssh_readonly_retry.sh'
+      - 'scripts/governance/test_s2_ssh_readonly_retry.sh'
+      - '.github/workflows/ops-s2-observe.yml'
+      - '.github/workflows/governance-s2-db-auth-diagnostic.yml'
+      - '.github/workflows/governance-s2-readonly-ssh-retry.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+      - name: Prove bounded fail-closed retry semantics
+        run: bash scripts/governance/test_s2_ssh_readonly_retry.sh

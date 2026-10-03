@@ -2,9 +2,11 @@
 /node_modules
 
 # Environment variables (NEVER commit secrets)
+# Historical tracked env files are handled by SECURITY_GATE; ignore rules alone
+# do not untrack them. New env variants must never enter Git.
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 uploads/.env.local
 
 # Logs
@@ -30,6 +32,26 @@ efficient_frontier.png
 *copy*.js
 *.rar
 
+# CMF Tunisie scraper data (downloads, staging, logs)
+/data/tunisie_cmf/downloads/
+/data/tunisie_cmf/staging/
+/data/tunisie_cmf/logs/
+
+# BRVM BOC scraper data (PDF, rapports, logs)
+/data/brvm_boc/pdf/
+/data/brvm_boc/reports/
+/data/brvm_boc/logs/
+
+# BVMAC BOC scraper data (PDF, rapports, logs) — CEMAC
+/data/bvmac_boc/pdf/
+/data/bvmac_boc/reports/
+/data/bvmac_boc/logs/
+
+# SEC Nigeria XLSX loader — rapports/logs seulement (le classeur source EST versionne :
+# c'est la source de verite officielle 2011-2026 dont le serveur a besoin)
+/data/sec_ng_xlsx/reports/
+/data/sec_ng_xlsx/logs/
+
 # OS files
 .DS_Store
 Thumbs.db
@@ -37,3 +59,5 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+logs/
+__pycache__/

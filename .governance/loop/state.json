@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.3.0",
+  "loop_id": "AF-GOV-FINAL-CERT-20260911-01",
+  "stage": "CLOSED_WITH_EXTERNAL_GAPS",
+  "current_task_id": "AF-TASK-010",
+  "parent_task_id": "AF-TASK-003",
+  "observed_api_sha": "ceff72e0e0dad7a7522835940a9537662b16f844",
+  "observed_frontend_sha": "38a5120677ec76dcc65b5d799a5f24f8ce236328",
+  "head_semantics": "OBSERVED_AT_CLOSURE_NOT_SELF_REFERENTIAL",
+  "next_action": "AF-TASK-010 reste bloquée sur rotations fournisseurs EMAIL_PASSWORD et MAGIC_SECRET_KEY. Les gaps OOB host-key et GitHub native rulesets restent externes; toute reprise doit réobserver GitHub et S2.",
+  "blockers": [
+    "EMAIL_PASSWORD_PROVIDER_ROTATION_REQUIRED",
+    "MAGIC_SECRET_KEY_PROVIDER_ROTATION_REQUIRED",
+    "S2_HOST_KEY_OOB_VERIFICATION_PENDING",
+    "GITHUB_NATIVE_RULESETS_UNAVAILABLE_VIA_CURRENT_CONNECTOR"
+  ],
+  "proof_refs": [
+    "AF-EVD-018",
+    "AF-EVD-019",
+    "AF-EVD-020",
+    "AF-EVD-022",
+    "AF-EVD-024",
+    "AF-EVD-025",
+    "AF-EVD-026",
+    "AF-EVD-027",
+    "AF-EVD-028",
+    "AF-EVD-029",
+    "AF-EVD-030",
+    "AF-EVD-031",
+    "AF-EVD-034",
+    "AF-EVD-035",
+    "AF-EVD-036"
+  ],
+  "rules": {
+    "context_reconstruction_before_work": "REQUIRED",
+    "cross_repo_discovery": "REQUIRED",
+    "new_branch_creation": "FORBIDDEN",
+    "single_writer": "REQUIRED",
+    "verify_both_heads_before_write": "REQUIRED",
+    "no_blind_work": "REQUIRED"
+  },
+  "final_verdict": "GOVERNED_WITH_EXTERNAL_GAPS",
+  "operational_priority_task_id": "AF-OPS-003",
+  "operational_priority_status": "OPEN",
+  "operational_priority_reason": "AF-OPS-003 is now POST_FIX_VALIDATION: the protocol-only execute()->query correction for the two massive dynamic UPDATE paths is RED->GREEN, deployed through GOV-006 and attested clean on S2 (AF-EVD-058..060). Root cause remains unclosed. Next proof is real post-fix batch comparison of RSS/RssAnon/Private_Dirty and Com_stmt_* plus output equivalence; no MariaDB restart or new allocator A/B."
+}

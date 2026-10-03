@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "action": "RECONCILE_BOTH",
+  "confirmation": "RECONCILE AFRICAFUNDS S2",
+  "one_shot": true,
+  "request_id": "AF-OPS-003-MYSQL2-TEXT-PROTOCOL-RECONCILE-20260922T2048Z",
+  "preserve_untracked": true,
+  "authorization_basis": "owner instruction to continue governed AfricaFunds work end-to-end; deploy AF-OPS-003 tested non-regressive SQL transport correction through existing GOV-006",
+  "preconditions": {
+    "api_head_before_request": "38d6e06fa1df8a119b8c7f6b7c7e9e903c1c36fc",
+    "frontend_expected_sha": "dcd8e5a79b27d93b66723884727f55ec2ffc9944",
+    "s2_api_observed_sha": "c41bb7932be9b70b1c01444eb004bc900dac62c2",
+    "s2_api_branch": "claude/code-review-improvements-ikvuj",
+    "s2_api_tracked_dirty_count": 0,
+    "api_delta_from_s2": "AHEAD_7_BEHIND_0_BEFORE_REQUEST",
+    "rss_sql_contract_red_run": "35782268252_EXPECTED_RED",
+    "rss_sql_contract_green_run": "35782456689_PASS_EXACT_SHA",
+    "regulatory_plus": "PASS_RUN_35782554990",
+    "runtime_patch_scope": [
+      "scripts/recalc/recalc_eur_usd_daily_rate.js execute->query only for fully materialized dynamic UPDATE",
+      "scripts/recalc/recalc_vl_ajuste.js execute->query only for fully materialized dynamic UPDATE"
+    ],
+    "no_formula_change": true,
+    "no_batch_size_change": true,
+    "no_database_mutation_during_deploy": true,
+    "no_mariadb_restart": true,
+    "preserve_untracked": true
+  },
+  "expected_frontend_sha": "dcd8e5a79b27d93b66723884727f55ec2ffc9944",
+  "safety": {
+    "force_push": false,
+    "reset_hard": false,
+    "git_clean": false,
+    "delete_untracked": false,
+    "arbitrary_shell": false,
+    "backup_snapshot_only_commits": true,
+    "fast_forward_frontend_only": true
+  },
+  "previous_request_id": "AF-TASK-011-FINAL-POSTDOC-RECONCILE-20260913T1806Z"
+}

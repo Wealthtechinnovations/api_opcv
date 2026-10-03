@@ -1,0 +1,158 @@
+name: governance-contract
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '00_START_HERE.md'
+      - 'AGENTS.md'
+      - 'GOVERNANCE.md'
+      - 'SOURCE_OF_TRUTH.md'
+      - 'LOOP_ENGINEERING.md'
+      - 'SUIVI.md'
+      - 'docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md'
+      - 'docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md'
+      - 'docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md'
+      - 'docs/evidence/GOV-006_EVIDENCE_2026-09-10.json'
+      - '.github/workflows/governance-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: governance-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  governance-contract:
+    name: AfricaFunds governance contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout canonical state
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Verify local governance and cross-repository mirror
+        shell: bash
+        env:
+          CURRENT_REPOSITORY: ${{ github.repository }}
+          CURRENT_REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import time
+          import urllib.parse
+          import urllib.request
+
+          branch = 'claude/code-review-improvements-ikvuj'
+          current_repo = os.environ['CURRENT_REPOSITORY']
+          current_ref = os.environ['CURRENT_REF_NAME']
+          repos = {
+              'Wealthtechinnovations/api_opcv': 'Wealthtechinnovations/front_end_opcvm',
+              'Wealthtechinnovations/front_end_opcvm': 'Wealthtechinnovations/api_opcv',
+          }
+          mirror_files = [
+              '00_START_HERE.md',
+              'AGENTS.md',
+              'GOVERNANCE.md',
+              'SOURCE_OF_TRUTH.md',
+              'LOOP_ENGINEERING.md',
+              'docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md',
+              'docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md',
+              'docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md',
+              'docs/evidence/GOV-006_EVIDENCE_2026-09-10.json',
+          ]
+
+          if current_repo not in repos:
+              raise SystemExit(f'Unexpected repository: {current_repo}')
+          if current_ref != branch:
+              raise SystemExit(f'Unexpected branch: {current_ref}; expected {branch}')
+
+          peer_repo = repos[current_repo]
+
+          def local_blob(path):
+              return subprocess.check_output(['git', 'show', f'HEAD:{path}'])
+
+          for path in mirror_files:
+              data = local_blob(path)
+              if not data.strip():
+                  raise SystemExit(f'Empty governance file: {path}')
+
+          start_here = local_blob('00_START_HERE.md').decode('utf-8')
+          if 'LOOP_ENGINEERING.md' not in start_here:
+              raise SystemExit('00_START_HERE.md does not require LOOP_ENGINEERING.md')
+          if 'GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md' not in start_here:
+              raise SystemExit('00_START_HERE.md does not require GOV-006 reconciliation context')
+          if branch not in start_here:
+              raise SystemExit('00_START_HERE.md does not declare the canonical branch')
+
+          source_of_truth = local_blob('SOURCE_OF_TRUTH.md').decode('utf-8')
+          if '/var/lib/fundafrica/runtime/PRODUCTION_STATE.json' not in source_of_truth:
+              raise SystemExit('SOURCE_OF_TRUTH.md does not declare the runtime snapshot authority')
+
+          governance = local_blob('GOVERNANCE.md').decode('utf-8')
+          if 'RUNTIME_GIT_COMMITS = FORBIDDEN' not in governance:
+              raise SystemExit('GOVERNANCE.md does not forbid runtime-generated Git commits')
+
+          if current_repo.endswith('/api_opcv'):
+              suivi = local_blob('SUIVI.md').decode('utf-8', errors='replace')
+              if 'front_end_opcvm/SUIVI.md' not in suivi:
+                  raise SystemExit('api_opcv/SUIVI.md must remain a pointer to front_end_opcvm/SUIVI.md')
+          else:
+              suivi = local_blob('SUIVI.md')
+              if len(suivi.strip()) < 100:
+                  raise SystemExit('front_end_opcvm/SUIVI.md does not look like the canonical operational memory')
+
+          def fetch_peer(path):
+              quoted_ref = urllib.parse.quote(branch, safe='')
+              quoted_path = '/'.join(urllib.parse.quote(part, safe='') for part in path.split('/'))
+              url = f'https://api.github.com/repos/{peer_repo}/contents/{quoted_path}?ref={quoted_ref}'
+              req = urllib.request.Request(url, headers={
+                  'Accept': 'application/vnd.github+json',
+                  'User-Agent': 'AfricaFunds-governance-contract',
+              })
+              with urllib.request.urlopen(req, timeout=20) as response:
+                  payload = json.load(response)
+              return base64.b64decode(payload['content'])
+
+          mismatches = []
+          # Mirrored writes are sequential across two repositories. Retry briefly
+          # so the first repository does not fail only because its peer commit is
+          # still being created.
+          for attempt in range(1, 7):
+              mismatches = []
+              for path in mirror_files:
+                  local = local_blob(path)
+                  peer = fetch_peer(path)
+                  if local != peer:
+                      mismatches.append({
+                          'path': path,
+                          'local_sha256': hashlib.sha256(local).hexdigest(),
+                          'peer_sha256': hashlib.sha256(peer).hexdigest(),
+                      })
+              if not mismatches:
+                  break
+              if attempt < 6:
+                  print(f'Mirror not synchronized yet (attempt {attempt}/6): {mismatches}')
+                  time.sleep(10)
+
+          if mismatches:
+              raise SystemExit('Cross-repository governance drift: ' + json.dumps(mismatches, indent=2))
+
+          print('AfricaFunds governance contract: PASS')
+          print('Repository:', current_repo)
+          print('Peer:', peer_repo)
+          print('Canonical branch:', branch)
+          print('Mirrored files checked:', len(mirror_files))
+          print('Local HEAD:', subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip())
+          PY

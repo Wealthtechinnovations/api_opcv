@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "africafunds/evidence.schema.json",
+  "type": "object",
+  "required": ["id", "type", "result", "provenance", "observed_at"],
+  "properties": {
+    "id": {"type": "string"},
+    "type": {"type": "string"},
+    "result": {"enum": ["PASS", "FAIL", "PARTIAL", "OBSERVED", "NOT_APPLICABLE"]},
+    "provenance": {"type": "string"},
+    "observed_at": {"type": "string"},
+    "sha": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}

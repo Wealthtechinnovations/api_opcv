@@ -31,18 +31,23 @@ app.use(helmet({
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
   process.env.SITE_BASE_URL || 'http://localhost:3000',
-];
+  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : []),
+].filter((v, i, a) => a.indexOf(v) === i);
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    // Allow requests with no origin only in non-production (local dev/testing)
+    if (!origin && process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Origin', 'Authorization', 'X-Requested-With', 'Content-Type', 'Accept', 'x-api-key'],
+  credentials: true,
 }));
 
 // Trust proxy (for rate limiting behind reverse proxy)
@@ -68,34 +73,36 @@ for (const [serviceKey, service] of Object.entries(services)) {
 // ---------------------
 // Swagger UI - Gateway-level API docs
 // ---------------------
-const swaggerUI = require('swagger-ui-express');
+if (process.env.NODE_ENV !== 'production') {
+  const swaggerUI = require('swagger-ui-express');
 
-const gatewaySwaggerSpec = {
-  openapi: '3.0.0',
-  info: {
-    title: 'API OPCVM Gateway',
-    version: '1.0.0',
-    description: 'API Gateway for the OPCVM microservices architecture. Routes requests to the appropriate backend service.',
-  },
-  servers: [
-    { url: process.env.API_BASE_URL || `http://localhost:${port}` },
-  ],
-  paths: {
-    '/health': {
-      get: {
-        summary: 'Aggregated health check for all services',
-        tags: ['Gateway'],
-        responses: {
-          200: { description: 'All services healthy' },
-          503: { description: 'One or more services unhealthy' },
+  const gatewaySwaggerSpec = {
+    openapi: '3.0.0',
+    info: {
+      title: 'API OPCVM Gateway',
+      version: '1.0.0',
+      description: 'API Gateway for the OPCVM microservices architecture. Routes requests to the appropriate backend service.',
+    },
+    servers: [
+      { url: process.env.API_BASE_URL || `http://localhost:${port}` },
+    ],
+    paths: {
+      '/health': {
+        get: {
+          summary: 'Aggregated health check for all services',
+          tags: ['Gateway'],
+          responses: {
+            200: { description: 'All services healthy' },
+            503: { description: 'One or more services unhealthy' },
+          },
         },
       },
     },
-  },
-  tags: Object.values(services).map((s) => ({ name: s.name, description: `Proxied to ${s.url}` })),
-};
+    tags: Object.values(services).map((s) => ({ name: s.name, description: `Proxied to ${s.url}` })),
+  };
 
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(gatewaySwaggerSpec));
+  app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(gatewaySwaggerSpec));
+}
 
 // ---------------------
 // Health aggregator
@@ -151,7 +158,6 @@ for (const [serviceKey, service] of Object.entries(services)) {
         // Forward Authorization header (already in the original request)
         // http-proxy-middleware forwards all headers by default,
         // but we log routing for observability
-        console.log(`[Gateway] ${req.method} ${req.originalUrl} -> ${service.name} (${service.url})`);
       },
       error: (err, req, res) => {
         console.error(`[Gateway] Proxy error for ${service.name}:`, err.message);
@@ -200,18 +206,13 @@ app.use((err, req, res, next) => {
 // Start Server
 // ---------------------
 const server = app.listen(port, () => {
-  console.log(`[Gateway] API Gateway started on port ${port} [${process.env.NODE_ENV || 'development'}]`);
-  console.log(`[Gateway] Routing to ${Object.keys(services).length} services:`);
   for (const [key, service] of Object.entries(services)) {
-    console.log(`  - ${service.name}: ${service.url} (${service.routes.length} routes)`);
   }
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('[Gateway] SIGTERM received. Shutting down gracefully...');
   server.close(() => {
-    console.log('[Gateway] Server stopped.');
     process.exit(0);
   });
 });

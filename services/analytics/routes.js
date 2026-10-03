@@ -282,7 +282,6 @@ router.get('/api/wordexemple', async (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename=output.docx');
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.send(buffer);
-    console.log('Document cr\u00e9\u00e9 avec succ\u00e8s !');
   } catch (error) {
     console.error('Erreur lors du traitement du template Word :', error);
     res.status(500).json({ error: 'Erreur lors du traitement du template Word.' });
@@ -685,7 +684,6 @@ router.get('/api/robotadvisor/fonds', async (req, res) => {
       return sousTableau.flatMap((element) => element);
     });
 
-    console.log(tableauConcatene);
     const tableauTransforme = [];
     for (let i = 0; i < tableauConcatene[0].length; i++) {
       const colonne = [];
@@ -727,7 +725,6 @@ router.get('/api/robotadvisor/fonds', async (req, res) => {
     }
 
     const portfolios = PortfolioAllocation.meanVarianceEfficientFrontierPortfolios(meanReturns, covMatrix, opt);
-    console.log(portfolios);
 
     // Filter portfolios based on constraints
     const filteredPortfolios = portfolios.filter(portfolio => {
@@ -737,13 +734,7 @@ router.get('/api/robotadvisor/fonds', async (req, res) => {
         portfolioVolatility >= minVolatility && portfolioVolatility <= maxVolatility;
     });
 
-    console.log('Portefeuilles efficients filtr\u00e9s :');
     filteredPortfolios.forEach((portfolio, index) => {
-      console.log(`Portefeuille ${index + 1}:`);
-      console.log('Poids:', portfolio[0]);
-      console.log('Rendement:', portfolio[1]);
-      console.log('Volatilit\u00e9:', portfolio[2]);
-      console.log('------------');
     });
 
     res.json({

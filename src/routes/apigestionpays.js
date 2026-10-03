@@ -9,7 +9,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const fs = require('fs');
-const cron = require('node-cron');
 const _ = require('lodash');
 const path = require('path');
 const express = require('express');
@@ -17,7 +16,7 @@ const router = express.Router();
 
 const app = express();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Set your upload directory
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 const PortfolioAnalytics = require('portfolio-analytics');
 const ss = require('simple-statistics')
 const socktrader = require('@socktrader/indicators');
@@ -35,28 +34,27 @@ const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const { Image } = require('docxtemplater');
 const puppeteer = require('puppeteer');
-const ImageModule = require('docxtemplater-image-module').ImageModule;
+const ImageModule = require('docxtemplater-image-module-free');
 const { Op } = require('sequelize'); // Ajout de l'importation de Op
 
 const findCategoryByFundId = async (fundId) => {
-  // Implémentez ici la logique pour récupérer la catégorie à partir de l'identifiant du fond
-  // Par exemple, vous pouvez exécuter une requête SQL pour obtenir la catégorie à partir de l'identifiant du fond
+  try {
+    const categoryQuery = `
+          SELECT categorie_globale
+          FROM fond_investissements
+          WHERE id = :fundId
+      `;
 
-  // Exemple fictif de requête SQL
-  const categoryQuery = `
-        SELECT categorie_globale
-        FROM fond_investissements
-        WHERE id = :fundId
-    `;
+    const [result] = await sequelize.query(categoryQuery, {
+      replacements: { fundId: fundId },
+      type: sequelize.QueryTypes.SELECT
+    });
 
-  // Exécutez la requête SQL avec le paramètre fundId
-  const [result] = await sequelize.query(categoryQuery, {
-    replacements: { fundId: fundId },
-    type: sequelize.QueryTypes.SELECT
-  });
-
-  // Retournez la catégorie extraite de la requête
-  return result.categorie_globale;
+    return result?.categorie_globale || null;
+  } catch (error) {
+    console.error('Erreur findCategoryByFundId:', error);
+    return null;
+  }
 };
 
 router.get('/api/getpaysidmeta/:id', (req, res) => {
@@ -88,6 +86,9 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
       where: { pays: req.params.id }
     })
       .then(async response => {
+        if (!response) {
+          return res.status(404).json({ code: 404, error: 'Pays non trouvé.' });
+        }
         // Récupération des informations de base de la société
         const societeData = {
           nom: response.pays,
@@ -155,7 +156,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             type: sequelize.QueryTypes.SELECT
           });
 
-          latestDate = result5.latestDate;
+          latestDate = result5?.latestDate || null;
 
           const latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_EUR, YEAR(valorisations.date) AS year
@@ -238,7 +239,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             type: sequelize.QueryTypes.SELECT
           });
 
-          latestDate = result5.latestDate;
+          latestDate = result5?.latestDate || null;
 
           const latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net_USD, YEAR(valorisations.date) AS year
@@ -321,7 +322,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             type: sequelize.QueryTypes.SELECT
           });
 
-          latestDate = result5.latestDate;
+          latestDate = result5?.latestDate || null;
 
           const latestValorisationsQuery = `
           SELECT valorisations.fund_id, valorisations.actif_net, YEAR(valorisations.date) AS year
@@ -387,6 +388,9 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
       where: { pays: req.params.id }
     })
       .then(async response => {
+        if (!response) {
+          return res.status(404).json({ code: 404, error: 'Pays non trouvé.' });
+        }
         // Récupération des informations de base de la société
         const societeData = {
           nom: response.pays,
@@ -449,7 +453,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
               sumActifNetByCategory[category] = 0;
             }
             if (actif_net_EUR !== '#N/A') {
-              totalfondscompose += totalfondscompose;
+              totalfondscompose += 1;
               sumActifNetByCategory[category] += parseFloat(actif_net_EUR);
             }
 
@@ -493,7 +497,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             }
 
             if (actif_net_USD !== '#N/A') {
-              totalfondscompose += totalfondscompose;
+              totalfondscompose += 1;
 
               sumActifNetByCategory[category] += parseFloat(actif_net_USD);
             }
@@ -537,7 +541,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
             }
 
             if (actif_net !== '#N/A') {
-              totalfondscompose += totalfondscompose;
+              totalfondscompose += 1;
               sumActifNetByCategory[category] += parseFloat(actif_net);
             }
           }
@@ -566,6 +570,7 @@ router.get('/api/getpaysidmeta/:id', (req, res) => {
  
 
 router.post('/api/listesociete', async (req, res) => {
+  try {
   const formData = req.body.formData;
   const selectedValues = req.query.query;
   const selectedpays = req.query.selectedpays; // Corrected variable name
@@ -590,7 +595,6 @@ router.post('/api/listesociete', async (req, res) => {
     whereClause.pays = selectedpays; // Filtrer par la catégorie globale si elle est renseignée
   } else {
     // Gérer le cas où selectedpays n'est pas défini
-    console.log("selectedpays n'est pas défini");
     // Ou effectuer une autre action appropriée, comme attribuer une valeur par défaut à whereClause.pays
   }
 
@@ -645,9 +649,14 @@ router.post('/api/listesociete', async (req, res) => {
     code: 200,
     data: { societes: resultats }
   });
+  } catch (error) {
+    console.error('Erreur /api/listesociete:', error.message);
+    res.status(500).json({ code: 500, message: 'Erreur serveur' });
+  }
 });
 
 router.post('/api/listeproduitpayssociete/:id', async (req, res) => {
+  try {
   const formData = req.body.formData;
   const selectedValues = req.query.query;
   const selectedCategorie = req.query.selectedcategorie; // Corrected variable name
@@ -658,66 +667,51 @@ router.post('/api/listeproduitpayssociete/:id', async (req, res) => {
     valuesArray = selectedValues.split(',');
   }
 
-  let whereClause = { pays: req.params.id }; // Utilisation de let au lieu de const
+  let whereClause = {};
 
   if (valuesArray) {
     whereClause = {
       [Op.or]: valuesArray.map(value => ({
-        id: value // Créer une condition pour chaque valeur dans valuesArray
+        id: value
       }))
     };
+  } else {
+    whereClause = sequelize.where(sequelize.fn('LOWER', sequelize.col('pays')), req.params.id.toLowerCase());
   }
 
+  let conditions = [whereClause];
   if (typeof selectedCategorie !== 'undefined') {
-    whereClause.categorie_globale = selectedCategorie; // Filtrer par la catégorie globale si elle est renseignée
+    conditions.push(sequelize.where(sequelize.fn('LOWER', sequelize.col('categorie_globale')), selectedCategorie.toLowerCase()));
   }
 
   const funds = await fond.findAll({
     where: {
-      [Op.and]: [whereClause] // Utiliser Op.and pour combiner les conditions
+      [Op.and]: conditions
     },
-    limit: 500
+    // Le Maroc compte 644 fonds actifs (2026-08) : un plafond de 500 tronquait
+    // la liste et la colonne Date de la page pays. Filtree par pays (ou par ids
+    // selectionnes), 5000 borne largement sans charger toute la base.
+    limit: 5000
   });
 
+  const fundIds = funds.map(f => f.id);
+  const allPerformances = fundIds.length > 0 ? await performences.findAll({
+    where: { fond_id: fundIds },
+    order: [['date', 'DESC']],
+  }) : [];
+  const perfMap = {};
+  allPerformances.forEach(p => {
+    if (!perfMap[p.fond_id]) perfMap[p.fond_id] = p;
+  });
 
-  const fundsWithAllData = await Promise.all(funds.map(async (fund) => {
-    try {
-      const fundData = await fond.findByPk(fund.id);
-
-      if (!fundData) {
-        return { error: `Aucun élément trouvé pour l'ID ${fund.id}` };
-      }
-
-      // Create an array of promises for the external API calls
-      const promessesPerformances = performences.findOne({
-        where: {
-          fond_id: fund.id,
-        },
-        order: [
-          ['date', 'DESC']
-        ]
-      })
-        .catch((error) => {
-          console.error('Erreur lors de la recherche des performances :', error);
-          return { error: 'Erreur lors de la recherche des performances.' };
-        });
-
-      // Use Promise.all to wait for all queries to finish
-      const [performanceResults] = await Promise.all([promessesPerformances]);
-
-      // Combine data from both sources
-      const fundCombinedData = {
-        id: fund.id,
-        fundData: fundData.toJSON(),
-        performanceData: performanceResults.toJSON(),
-      };
-
-      return fundCombinedData;
-    } catch (error) {
-      console.error('Erreur lors de la recherche des données :', error);
-      return { error: 'Une erreur est survenue lors de la récupération des données.' };
-    }
-  }));
+  const fundsWithAllData = funds.map(fund => {
+    const perf = perfMap[fund.id] || null;
+    return {
+      id: fund.id,
+      fundData: fund.toJSON(),
+      performanceData: perf ? perf.toJSON() : null,
+    };
+  });
 
 
 
@@ -729,8 +723,13 @@ router.post('/api/listeproduitpayssociete/:id', async (req, res) => {
     code: 200,
     data: { funds: resultats }
   });
+  } catch (error) {
+    console.error('Erreur /api/listeproduitpayssociete:', error.message);
+    res.status(500).json({ code: 500, message: 'Erreur serveur' });
+  }
 });
 router.post('/api/listesocietepays/:id', async (req, res) => {
+  try {
   const formData = req.body.formData;
   const selectedValues = req.query.query;
   const selectedpays = req.query.selectedpays; // Corrected variable name
@@ -741,29 +740,27 @@ router.post('/api/listesocietepays/:id', async (req, res) => {
     valuesArray = selectedValues.split(',');
   }
 
-  let whereClause = { pays: req.params.id }; // Utilisation de let au lieu de const
+  let whereClause;
 
   if (valuesArray) {
     whereClause = {
       [Op.or]: valuesArray.map(value => ({
-        nom: value // Créer une condition pour chaque valeur dans valuesArray
+        nom: value
       }))
     };
+  } else {
+    whereClause = sequelize.where(sequelize.fn('LOWER', sequelize.col('pays')), req.params.id.toLowerCase());
   }
 
-
-
   const societes = await societe.findAll({
-    where: whereClause, // Pas besoin d'encapsuler dans Op.and, oùClause est déjà un objet
+    where: whereClause,
     limit: 500
   });
 
-  // Pour stocker les résultats finaux
   let resultats = [];
 
-  // Boucle à travers chaque société pour obtenir le nombre de fonds et la somme des actifs nets
   for (const soc of societes) {
-    const nombreFonds = await fond.count({ where: { societe_gestion: soc.nom } });
+    const nombreFonds = await fond.count({ where: sequelize.where(sequelize.fn('LOWER', sequelize.col('societe_gestion')), soc.nom.toLowerCase()) });
     //   const fonds = await fond.findAll({ where: { societe_gestion: soc.nom } });
     let sommeActifNet = 0;
 
@@ -802,6 +799,10 @@ router.post('/api/listesocietepays/:id', async (req, res) => {
     code: 200,
     data: { societes: resultats }
   });
+  } catch (error) {
+    console.error('Erreur /api/listesocietepays:', error.message);
+    res.status(500).json({ code: 500, message: 'Erreur serveur' });
+  }
 });
 
   module.exports = router;
