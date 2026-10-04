@@ -1,62 +1,71 @@
 /**
- * Quelle source MASI est reellement joignable depuis S2 ?
+ * Quelle source MASI est reellement joignable depuis S2 — et pourquoi pas ?
  *
  * POURQUOI. `diag_source_masi.js` a tranche le 2026-10-04 : l API medias24 que
- * `scrapeMASI` interroge rend **403 Cloudflare a Node ET a curl depuis le
- * serveur**. Changer de client HTTP ne corrigera rien ; il faut une autre
- * source. Sans MASI, aucune VL marocaine ne peut porter de benchmark, et la
- * regle du projet est explicite : ne jamais inventer une valeur d indice.
+ * `scrapeMASI` interroge rend 403 Cloudflare a Node ET a curl depuis le
+ * serveur. Changer de client HTTP ne corrigera rien ; il faut une autre source,
+ * et la regle du projet interdit d inventer une valeur d indice.
  *
- * Ce script ne choisit pas la source : il mesure lesquelles repondent depuis
- * S2, avec quel type de contenu, et si un niveau MASI plausible y figure. Le
- * choix viendra apres, sur ces chiffres, et la source retenue devra etre
- * autoritative — bourse de Casablanca ou regulateur — pas un agregateur.
+ * CORRECTION D INSTRUMENT. La premiere version de ce script enveloppait curl
+ * dans `execFileSync`, qui LEVE des que curl sort en code non nul. Quatre
+ * candidats sur six ont donc rendu « Command failed » en avalant le code de
+ * sortie et stderr — c est a dire en avalant la cause. Un instrument qui perd
+ * la raison de l echec ne mesure rien. On passe par `spawnSync`, qui ne leve
+ * pas, et on imprime le code curl et stderr.
  *
- * Il imprime aussi les chemins `/api/` trouves dans le HTML officiel : le site
- * de la bourse est une application a rendu client, son API interne est donc
- * l endroit ou chercher une serie historique plutot qu une page a parser.
+ * HYPOTHESE TESTEE EN PLUS. Les quatre muets (casablanca-bourse.com, ammc.ma)
+ * publient des enregistrements AAAA ; bkam.ma et medias24, qui ont repondu,
+ * sont joignables en IPv4. Une sortie IPv6 cassee sur S2 produirait exactement
+ * ce partage. Chaque URL est donc tentee deux fois : telle quelle, puis forcee
+ * en IPv4 (`-4`). Si `-4` passe la ou le defaut echoue, la panne n est pas
+ * marocaine mais reseau, et elle touche potentiellement d autres scrapers.
  *
- * MASI cote autour de 20 000 points en 2026 ; `scrapeMASI` ne retient d ailleurs
- * que les valeurs > 1000. Un nombre a quatre chiffres trouve dans une page est
- * plus probablement un MASI20 future ou un volume : ce script signale les
- * candidats, il ne conclut pas a leur place.
- *
- * LECTURE SEULE. Aucune ecriture. Requetes GET sortantes vers des sites
- * publics de donnees de marche.
+ * LECTURE SEULE. Aucune ecriture. Requetes GET vers des sites publics.
  *
  * USAGE  node scripts/diag/ondemand/diag_sources_masi_alternatives.js
  */
-const { execFileSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
 const CANDIDATES = [
-  ['bourse de Casablanca — accueil FR', 'https://www.casablanca-bourse.com/fr'],
-  ['bourse de Casablanca — indices',    'https://www.casablanca-bourse.com/fr/live-market/marche-actions/indices'],
-  ['bourse de Casablanca — api proxy',  'https://www.casablanca-bourse.com/api/proxy/fr/api/bourse/dashboard/index_dashboard'],
-  ['AMMC',                              'https://www.ammc.ma/'],
-  ['Bank Al-Maghrib',                   'https://www.bkam.ma/'],
-  ['medias24 (temoin, 403 attendu)',    'https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json'],
+  ['bourse de Casablanca — accueil',   'https://www.casablanca-bourse.com/'],
+  ['bourse de Casablanca — indices',   'https://www.casablanca-bourse.com/fr/live-market/marche-actions/indices'],
+  ['AMMC',                             'https://www.ammc.ma/'],
+  ['Bank Al-Maghrib',                  'https://www.bkam.ma/'],
+  ['medias24 (temoin, 403 attendu)',   'https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json'],
 ];
 
-function fetchCurl(url) {
-  try {
-    const out = execFileSync('curl', [
-      '-sL', '--max-time', '25',
-      '-w', '\\n@@META@@%{http_code}|%{content_type}|%{size_download}',
-      '-H', `User-Agent: ${UA}`, url,
-    ], { encoding: 'utf8', maxBuffer: 12 * 1024 * 1024 });
-    const i = out.lastIndexOf('@@META@@');
-    const [statut, ctype, taille] = out.slice(i + 8).split('|');
-    return { statut: Number(statut), ctype: (ctype || '').split(';')[0], taille: Number(taille), corps: out.slice(0, i) };
-  } catch (e) {
-    return { statut: null, erreur: e.message, corps: '', ctype: '', taille: 0 };
+// Les codes de sortie de curl disent la nature de la panne, la ou « Command
+// failed » ne dit rien du tout.
+const SENS_CURL = {
+  5: 'proxy introuvable', 6: 'hote non resolu', 7: 'connexion impossible',
+  28: 'delai depasse', 35: 'echec de la poignee de main TLS',
+  56: 'reception interrompue', 60: 'certificat non verifiable',
+};
+
+function appel(url, forcerIPv4) {
+  const args = ['-sS', '--max-time', '25', '-L',
+    '-w', '@@META@@%{http_code}|%{content_type}|%{size_download}|%{remote_ip}',
+    '-H', `User-Agent: ${UA}`];
+  if (forcerIPv4) args.push('-4');
+  args.push(url);
+  const r = spawnSync('curl', args, { encoding: 'utf8', maxBuffer: 12 * 1024 * 1024 });
+  const sortie = r.stdout || '';
+  const i = sortie.lastIndexOf('@@META@@');
+  if (i < 0) {
+    return { code: r.status, erreur: (r.stderr || '').trim().slice(0, 200), corps: '' };
   }
+  const [statut, ctype, taille, ip] = sortie.slice(i + 8).split('|');
+  return {
+    code: r.status, statut: Number(statut), ctype: (ctype || '').split(';')[0],
+    taille: Number(taille), ip, corps: sortie.slice(0, i),
+    erreur: (r.stderr || '').trim().slice(0, 200),
+  };
 }
 
 const cloudflare = c => /just a moment|cf-browser-verification|challenge-platform/i.test(c);
 
-// Nombres au format marocain (20 456,78 / 20456.78) proches du mot MASI.
 function candidatsMASI(corps) {
   const trouves = [];
   const re = /MASI[^0-9]{0,80}([0-9]{1,3}(?:[  .,][0-9]{3})*(?:[.,][0-9]{1,2})?)/gi;
@@ -73,8 +82,24 @@ function cheminsApi(corps) {
   const s = new Set();
   const re = /["'`](\/[a-z0-9_\-/]*api[a-z0-9_\-/]*)["'`]/gi;
   let m;
-  while ((m = re.exec(corps)) !== null && s.size < 12) s.add(m[1]);
+  while ((m = re.exec(corps)) !== null && s.size < 10) s.add(m[1]);
   return [...s];
+}
+
+function rendre(etiquette, r) {
+  if (r.statut === undefined) {
+    const sens = SENS_CURL[r.code] ? ` — ${SENS_CURL[r.code]}` : '';
+    console.log(`  ${etiquette} : ECHEC curl code ${r.code}${sens}`);
+    if (r.erreur) console.log(`      stderr : ${r.erreur}`);
+    return;
+  }
+  console.log(`  ${etiquette} : HTTP ${r.statut} | ${r.ctype || '-'} | ${r.taille} o | ip ${r.ip || '-'}`);
+  if (!r.corps) return;
+  if (cloudflare(r.corps)) { console.log('      → interstitielle Cloudflare : inutilisable par script'); return; }
+  const c = candidatsMASI(r.corps);
+  console.log(`      → candidats « MASI + nombre > 1000 » : ${c.length ? c.join(' | ') : 'aucun'}`);
+  const a = cheminsApi(r.corps);
+  if (a.length) console.log(`      → chemins /api/ : ${a.join(' ')}`);
 }
 
 (async () => {
@@ -82,25 +107,16 @@ function cheminsApi(corps) {
   console.log(`Mesure le ${new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC — LECTURE SEULE\n`);
 
   for (const [nom, url] of CANDIDATES) {
-    const r = fetchCurl(url);
     console.log(`## ${nom}`);
     console.log(`  ${url}`);
-    console.log(`  statut ${r.statut ?? 'aucune reponse'}${r.erreur ? ` (${r.erreur})` : ''} | ${r.ctype || '-'} | ${r.taille} o`);
-    if (r.corps) {
-      if (cloudflare(r.corps)) {
-        console.log('  → interstitielle Cloudflare : source inutilisable par script');
-      } else {
-        const c = candidatsMASI(r.corps);
-        console.log(`  → candidats « MASI + nombre > 1000 » : ${c.length ? c.join(' | ') : 'aucun'}`);
-        const a = cheminsApi(r.corps);
-        if (a.length) console.log(`  → chemins /api/ dans la page : ${a.join(' ')}`);
-      }
-    }
+    rendre('defaut ', appel(url, false));
+    rendre('en IPv4', appel(url, true));
     console.log('');
   }
+
   console.log('Rappel : la source retenue devra etre autoritative et fournir une');
-  console.log('SERIE datee, pas un seul cours instantane — `propagateIndRef` apparie');
-  console.log('une date de VL a une date d indice a +/- 7 jours.');
+  console.log('SERIE datee, pas un cours instantane — `propagateIndRef` apparie une');
+  console.log('date de VL a une date d indice a +/- 7 jours.');
   console.log('\n=== FIN — aucune ecriture effectuee ===');
 })().catch(e => {
   console.error(`Erreur fatale : ${e.message}`);
