@@ -138,22 +138,33 @@ const j = x => {
     // ------------------------------------------------------------------
     console.log('\n## C. Table source `indice_references` — l import des indices vit-il ?\n');
     const [c] = await conn.query(`
-      SELECT COALESCE(i.nom_indice, i.id_indice) AS indice,
-             MAX(i.date)                         AS derniere,
-             COUNT(*)                            AS total,
-             SUM(CASE WHEN i.date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS sur_30j
-        FROM indice_references i
-       GROUP BY COALESCE(i.nom_indice, i.id_indice)
-       ORDER BY derniere DESC`);
+      SELECT x.indice, x.derniere, x.total, x.sur_30j,
+             (SELECT i2.valeur FROM indice_references i2
+               WHERE COALESCE(i2.nom_indice, i2.id_indice) = x.indice
+                 AND i2.date = x.derniere
+               LIMIT 1) AS valeur
+        FROM (
+          SELECT COALESCE(i.nom_indice, i.id_indice) AS indice,
+                 MAX(i.date)                         AS derniere,
+                 COUNT(*)                            AS total,
+                 SUM(CASE WHEN i.date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) AS sur_30j
+            FROM indice_references i
+           GROUP BY COALESCE(i.nom_indice, i.id_indice)
+        ) x
+       ORDER BY x.derniere DESC`);
     if (!c.length) {
       console.log('  Table vide.');
     } else {
-      console.log('  indice                          derniere valeur   age     lignes/30j   total');
-      console.log('  ------------------------------  ---------------   -----   ----------   -----');
+      // La VALEUR de la derniere observation est indispensable : une source de
+      // remplacement doit etre coherente avec la serie deja stockee, sinon on
+      // raccorde deux echelles differentes et le benchmark devient faux.
+      console.log('  indice                          derniere date     valeur          age     lignes/30j   total');
+      console.log('  ------------------------------  --------------    ------------    -----   ----------   -----');
       for (const r of c) {
         const d = j(r.derniere);
         const age = d === '?' ? '?' : Math.round((Date.now() - new Date(d)) / 86400000) + ' j';
-        console.log(`  ${String(r.indice).slice(0, 30).padEnd(30)}  ${d.padEnd(15)}   ${String(age).padEnd(5)}   ${String(r.sur_30j).padEnd(10)}   ${r.total}`);
+        const v = r.valeur === null || r.valeur === undefined ? '-' : Number(r.valeur).toFixed(2);
+        console.log(`  ${String(r.indice).slice(0, 30).padEnd(30)}  ${d.padEnd(14)}    ${v.padEnd(12)}    ${String(age).padEnd(5)}   ${String(r.sur_30j).padEnd(10)}   ${r.total}`);
       }
     }
 

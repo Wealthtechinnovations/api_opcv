@@ -101,16 +101,36 @@ const cloudflare = c =>
   /<title>\s*just a moment/i.test(c) ||
   (c.length < 20000 && /cf-browser-verification|cf_chl_opt|challenge-platform/i.test(c));
 
+// QUATRIEME CORRECTION. Cette fonction ne cherchait le nombre qu APRES le mot
+// et refusait tout chiffre intercalaire. African Markets ecrit
+// « 17,303.69 -276.00 ( -1.57% ) MASI INDEX » : la valeur PRECEDE le libelle et
+// en est separee par d autres nombres. La sonde annoncait donc « aucun
+// candidat » sur la seule page qui portait la donnee. On prend desormais une
+// fenetre de 120 caracteres de chaque cote et on garde tous les nombres dans
+// l ordre de grandeur d un indice, sans presumer du sens de lecture.
 function candidatsMASI(corps) {
-  const trouves = [];
-  const re = /MASI[^0-9]{0,80}([0-9]{1,3}(?:[  .,][0-9]{3})*(?:[.,][0-9]{1,2})?)/gi;
+  const texte = corps.replace(/<[^>]+>/g, ' ').replace(/&nbsp;?/gi, ' ').replace(/\s+/g, ' ');
+  // « 17,303.69 » anglo-saxon comme « 17 303,69 » marocain : on retire les
+  // separateurs de milliers quels qu ils soient, puis on fixe le point decimal.
+  const normaliser = brut => Number(
+    brut.replace(/[  ](?=\d{3}\b)/g, '')
+        .replace(/,(?=\d{3}\b)/g, '')
+        .replace(/\.(?=\d{3}\b)/g, '')
+        .replace(',', '.'));
+  const vus = new Set();
+  const re = /MASI/gi;
   let m;
-  while ((m = re.exec(corps)) !== null && trouves.length < 5) {
-    const brut = m[1];
-    const norm = Number(brut.replace(/[  .](?=[0-9]{3}\b)/g, '').replace(',', '.'));
-    if (Number.isFinite(norm) && norm > 1000) trouves.push(`${brut} (→ ${norm})`);
+  while ((m = re.exec(texte)) !== null && vus.size < 6) {
+    const fenetre = texte.slice(Math.max(0, m.index - 120), m.index + 120);
+    const nombres = fenetre.match(/\d{1,3}(?:[  .,]\d{3})+(?:[.,]\d{1,2})?/g) || [];
+    for (const brut of nombres) {
+      const v = normaliser(brut);
+      // Un indice boursier marocain se compte en milliers de points ; au-dela
+      // de dix millions on a ramasse un volume ou une capitalisation.
+      if (Number.isFinite(v) && v > 1000 && v < 1e7) vus.add(`${brut} (→ ${v})`);
+    }
   }
-  return trouves;
+  return [...vus];
 }
 
 function cheminsApi(corps) {
