@@ -141,6 +141,7 @@ Toute session Claude, ChatGPT, Codex ou autre agent doit commencer par les autor
 | Capacité | Canal nominal | Fallback GitHub Actions / SSH | Mutation |
 |---|---|---|---|
 | état Git API + frontend, PM2, services, HTTP, DB read-only, ressources, cron, runtime | bridge | `ops-s2-observe.yml` | non |
+| diagnostic base de donnees **lecture seule** a la demande | bridge | `scripts/diag/ondemand/*.js` + `doc-drift.yml` (declencheur `push`, **sans dispatch**) → sortie commitee dans `docs/DIAG_ONDEMAND.md` | non, SELECT uniquement par convention |
 | attestation GitHub ↔ S2 ↔ runtime | bridge | `governance-s2-attestation.yml` | non |
 | réconciliation Git S2 | outils gouvernés bridge | `governance-s2-reconcile.yml` + `scripts/governance/s2_git_guard.sh` | oui, confirmation explicite |
 | déploiement/restart API | `deploy_project_s2 project=api_opcv` | `ops-deploy-api.yml` | oui, confirmation explicite |

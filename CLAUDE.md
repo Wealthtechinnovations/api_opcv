@@ -247,6 +247,68 @@ A chaque reprise de session ou nouvelle tache, Claude doit :
 
 Ce fichier NE DOIT PAS etre modifie manuellement. Il est genere automatiquement.
 
+## Regle obligatoire — Moyens d acces reels : ne jamais travailler a l aveugle
+
+**« Pas d acces » n est jamais une conclusion valable sans un test date du jour.**
+
+Cette regle existe parce que l inverse a coute plusieurs semaines : une session a
+tenu pour acquis que `workflow_dispatch` repondait HTTP 403 « depuis le 16
+septembre », l a repete a chaque reprise comme un fait, et n a plus rien instruit
+sur le serveur pendant tout ce temps. Mesure du 2026-10-04 17:32 UTC : le
+dispatch **fonctionne** (`doc-drift.yml` lance, run 37220907030). Le blocage
+n existait plus ; seule la croyance subsistait. Une capacite declaree
+indisponible sans test du jour est une capacite abandonnee, pas une capacite
+absente.
+
+### Les quatre canaux, et la commande qui prouve chacun
+
+Avant d annoncer qu une tache est bloquee, executer le test correspondant et
+citer son resultat. Le test coute quelques secondes ; la croyance coute des
+semaines.
+
+| Canal | Portee | Test de disponibilite |
+|---|---|---|
+| **GitHub** | lecture/ecriture depot, runs, PR, dispatch | `gh api user --jq .login` |
+| **API de production** | lecture seule, toutes routes publiques | `curl -s -o /dev/null -w '%{http_code}' https://africafunds.chainsolutions.fr/api/valLiq/1141` |
+| **Base de donnees de production** | **lecture seule (SELECT)**, via le canal a la demande ci-dessous | voir `docs/DIAG_ONDEMAND.md` et sa date de derniere execution |
+| **Shell S2** | commandes bornees et tracees, jamais de shell arbitraire | `gh api -X POST .../actions/workflows/<w>.yml/dispatches -f ref=<branche>` |
+
+Le conteneur de session **n a pas** de client `mysql`, pas de binaire `ssh` et
+aucune cle dans `~/.ssh` : verifie le 2026-10-04. L acces serveur et base passe
+donc entierement par GitHub Actions, qui detient `S2_HOST`, `S2_USER` et
+`S2_SSH_KEY`. Ce n est pas une degradation : c est l architecture gouvernee
+voulue, tracee et bornee. La matrice des capacites par canal est dans
+`MCP_AUTONOMY.md` — ne pas la recopier ici.
+
+### Canal de diagnostic a la demande — le plus sous-utilise
+
+Tout script Node depose dans `scripts/diag/ondemand/` et pousse sur la branche
+canonique est execute **sur la production, contre la base reelle**, et sa sortie
+revient dans le depot par commit dans `docs/DIAG_ONDEMAND.md`.
+
+Mecanique, verifiee le 2026-10-04 : le chemin `scripts/diag/ondemand/**` est un
+declencheur `push` de `doc-drift.yml` ; l etape de controle fait un
+`git pull --rebase` du depot de production, puis l etape suivante execute
+`node` sur chaque script present. **Aucun `workflow_dispatch` n est necessaire** :
+ce canal reste donc ouvert meme si le dispatch est refuse.
+
+Contrat a respecter :
+- **SELECT uniquement.** Ces scripts ne doivent jamais ecrire en base. La
+  convention est la seule garantie : rien ne l empeche techniquement.
+- Sortie lisible, horodatee, avec la mention `LECTURE SEULE`.
+- Une question par script, repondue par des chiffres, pas par de la prose.
+
+C est par la qu on repond a « pourquoi l import Nigeria est muet », « pourquoi
+les VL marocaines arrivent sans benchmark », « le niveau du benchmark est-il
+bien celui du jour ou une recopie de la veille » — sans attendre personne.
+
+### Ce que l autorisation d acces ne couvre pas
+
+Lire n est pas muter. Les workflows `ops-*` qui ecrivent en base, deploient ou
+redemarrent un service gardent leur `confirmation` explicite et leur phrase de
+validation. Un acces retrouve n est pas une approbation : les gates de la
+section « Regle de securite pour les taches sensibles » restent entieres.
+
 ## Protocole anti-compactage, anti-limite et anti-taches inachevees
 
 ### 1. Principe general
