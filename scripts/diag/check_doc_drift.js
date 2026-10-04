@@ -318,6 +318,55 @@ async function main() {
         `controle non evalue : ${err.message}. Les autres controles restent valides.`);
     }
 
+    // C10 — FRAICHEUR de l indice de reference, pas seulement sa presence.
+    //
+    // Mesure du 2026-10-04 qui justifie ce controle. C6 et C9 ne demandent
+    // qu une chose a `indRef` : ne pas etre NULL. Aucun des deux ne regarde la
+    // DATE de l indice. Consequence mesuree ce jour-la : `MASI` n avait plus
+    // aucune valeur dans `indice_references` depuis le 2026-07-31 — 66 jours —
+    // et les VL marocaines etaient sans benchmark depuis le 2026-08-06, la
+    // semaine du 03/08 marquant la bascule (64,5 % puis 0,0 %). Pendant ces
+    // deux mois, `cron_indices_daily` a rendu le verdict **OK** avec la reserve
+    // « Echecs scraping: 24 », et C6.MAROC est reste [OK] a 97,6 %.
+    //
+    // Un fonds compare a un indice immobile affiche une surperformance qui
+    // n existe pas. C est pire qu une case vide : la case vide se voit, le
+    // chiffre faux se lit comme une donnee.
+    //
+    // Le controle porte sur la table SOURCE, parce que c est la que la panne
+    // commence et que c est le seul endroit ou elle est visible avant d avoir
+    // contamine les VL. Seuls les indices vivants — alimentes dans les 400
+    // derniers jours — sont juges : la table conserve des series arretees
+    // depuis 2023 qui ne sont plus alimentees par personne et dont l alerte
+    // serait du bruit permanent. Severite AVERTISSEMENT, alignee sur C6 et C9 ;
+    // try/catch comme C5 et C9 depuis le lot BF.
+    try {
+      const [idx] = await conn.execute(`
+        SELECT COALESCE(i.nom_indice, i.id_indice) AS indice,
+               MAX(i.date) AS derniere,
+               DATEDIFF(CURDATE(), MAX(i.date)) AS age
+          FROM indice_references i
+         GROUP BY COALESCE(i.nom_indice, i.id_indice)
+        HAVING age <= 400
+         ORDER BY age DESC`);
+      for (const r of idx) {
+        const age = Number(r.age);
+        // Les indices boursiers cotent les jours ouvres : une semaine de marge
+        // couvre un week-end prolonge sans masquer un arret reel.
+        record(`C10.${r.indice}`, 'AVERTISSEMENT', `Fraicheur de l indice ${r.indice}`,
+          age <= 8,
+          `derniere valeur le ${String(r.derniere).slice(0, 10)}, soit ${age} j`
+            + (age > 8 ? ' — l indice n est plus alimente ; les VL de ce pays partiront sans benchmark et C6 restera vert pendant des mois.' : ''));
+      }
+      if (!idx.length) {
+        record('C10', 'AVERTISSEMENT', 'Fraicheur des indices de reference', false,
+          'aucun indice alimente dans les 400 derniers jours — la table source est morte.');
+      }
+    } catch (err) {
+      record('C10', 'AVERTISSEMENT', 'Fraicheur des indices de reference', false,
+        `controle non evalue : ${err.message}. Les autres controles restent valides.`);
+    }
+
     // Rendu
     if (json) {
       console.log(JSON.stringify({ generated_at: new Date().toISOString(), results }, null, 2));
