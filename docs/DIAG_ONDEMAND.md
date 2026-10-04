@@ -4,12 +4,12 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-10-04 18:33 UTC**
+Derniere execution : **2026-10-04 18:37 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_benchmark_fraicheur.js ##########
 === FRAICHEUR DU BENCHMARK ET VITALITE DE LA SOURCE NIGERIANE ===
-Mesure le 2026-10-04 18:31:07 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:35:16 UTC — LECTURE SEULE
 
 ## A. Derniere VL vs derniere VL portant un benchmark
 
@@ -108,7 +108,7 @@ Mesure le 2026-10-04 18:31:07 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-10-04 18:31:15 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:35:25 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -176,7 +176,7 @@ Mesure le 2026-10-04 18:31:15 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-10-04 18:32:15 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:36:21 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -217,14 +217,14 @@ Mesure le 2026-10-04 18:32:15 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260928.log      6.3 j  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20261002.log       45.1 h  ECHEC — 2 erreur(s)
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260928.log      6.4 j  ECHEC — 1 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20261002.log       45.2 h  ECHEC — 2 erreur(s)
   cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     20.5 h  ECHEC — 2 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     47.5 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        47.0 h  OK
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     47.6 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        47.1 h  OK
   cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                2.0 j  OK  (reserve : Echecs scraping: 24)
-  cron_health_check      tous les j 22:00     africafunds_health_20261003.log      20.5 h  ECHEC — 4 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   0.5 h  aucun marqueur de fin
+  cron_health_check      tous les j 22:00     africafunds_health_20261003.log      20.6 h  ECHEC — 4 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.6 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -318,14 +318,14 @@ Mesure le 2026-10-04 18:32:15 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-10-04T18:32:23.417Z — LECTURE SEULE
+ Genere le 2026-10-04T18:36:27.995Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 10.24 Mo
-   modifie   : 2026-09-28T10:00:32.486Z (il y a 152.5 h)
+   modifie   : 2026-09-28T10:00:32.486Z (il y a 152.6 h)
    lignes    : 8169
    colonnes  : 59
 
@@ -428,7 +428,7 @@ Mesure le 2026-10-04 18:32:15 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-10-04 18:32:24 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:36:28 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 332
   etiquette CONFORME au contenu : 122
@@ -588,7 +588,7 @@ Fonds Nigeria examines : 332
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-10-04 18:32:29 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:36:34 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -780,17 +780,17 @@ VL Nigeria en base : 77466
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : cdbdbb83b — feat(diag): tour 2 — chercher une source MASI joignable ET a serie datee
+  HEAD : e80f33052 — fix(diag): le detecteur Cloudflare ecartait la seule source joignable
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  169  depuis 544.2 h
-    fundafrique-frontend     online     redemarrages   48  depuis 1186.4 h
-    worker-recalculation     online     redemarrages    3  depuis 544.3 h
-    worker-data-import       online     redemarrages    3  depuis 544.3 h
+    api-monolith             online     redemarrages  169  depuis 544.3 h
+    fundafrique-frontend     online     redemarrages   48  depuis 1186.5 h
+    worker-recalculation     online     redemarrages    3  depuis 544.4 h
+    worker-data-import       online     redemarrages    3  depuis 544.4 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -807,7 +807,7 @@ VL Nigeria en base : 77466
 ########## scripts/diag/ondemand/diag_mariadb_incident_timeline.js ##########
 
 === MARIADB — TIMELINE INCIDENTS RECENTS (LECTURE SEULE) ===
-Mesure le 2026-10-04T18:32:35.311Z
+Mesure le 2026-10-04T18:36:42.217Z
 
 
 --- etat systemd courant ---
@@ -816,14 +816,14 @@ Result=success
 NRestarts=0
 ExecMainStartTimestamp=Tue 2026-09-22 06:25:02 UTC
 ExecMainPID=3041009
-MemoryCurrent=5015216128
+MemoryCurrent=5015195648
 ActiveState=active
 SubState=running
 StateChangeTimestamp=Tue 2026-09-22 06:25:02 UTC
 ActiveEnterTimestamp=Tue 2026-09-22 06:25:02 UTC
 
 --- processus mariadbd courant ---
-MARIADB_PROCESS pid=3041009 uptime_s=1080453 rss_kb=4821304 rssanon_kb=4808464 private_dirty_kb=4809656 swap_kb=1802384
+MARIADB_PROCESS pid=3041009 uptime_s=1080700 rss_kb=4821256 rssanon_kb=4808416 private_dirty_kb=4809620 swap_kb=1802384
 
 --- listener TCP 3306 courant ---
 LISTEN 0      80                                       127.0.0.1:3306       0.0.0.0:*    users:(("mariadbd",pid=3041009,fd=19))
@@ -864,7 +864,7 @@ SEP21_MARIADB_START_OR_READY_PRESENT=YES
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-10-04 18:32:35 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:36:42 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -933,7 +933,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-10-04 18:32:40 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:36:47 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
@@ -1036,7 +1036,7 @@ Ruptures d echelle Nigeria encore en base : 139
 ########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-10-04 18:32:45 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:36:52 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -1127,19 +1127,19 @@ Mesure le 2026-10-04 18:32:45 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_recalc_prepared_stmt_pressure.js ##########
 
 === PREPARED STATEMENT PRESSURE — READ ONLY ===
-Mesure: 2026-10-04T18:32:51.790Z
+Mesure: 2026-10-04T18:36:56.868Z
 STEP3_RECALC_EUR_USD funds=1249 vl_rows=998584 dynamic_update_statements=2610 batch_size=500
 STEP4_RECALC_VL_AJUSTE funds=1250 vl_rows=999188 dynamic_update_statements=5721 batch_size=200
 COMBINED_DYNAMIC_UPDATE_STATEMENTS=8331
 MYSQL_MAX_PREPARED_STMT_COUNT=16382
 MYSQL_PERFORMANCE_SCHEMA=OFF
 MYSQL_PREPARED_STMT_COUNT_NOW=13
-MYSQL_COM_STMT_PREPARE_SINCE_RESTART=9497
-MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=451961
+MYSQL_COM_STMT_PREPARE_SINCE_RESTART=9510
+MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=451979
 MYSQL_COM_STMT_CLOSE_SINCE_RESTART=4
 MYSQL_MEMORY_USED_NOW=481900536
-MYSQL_UPTIME=1080477
-PREPARE_MINUS_THEORETICAL_DYNAMIC=1166
+MYSQL_UPTIME=1080722
+PREPARE_MINUS_THEORETICAL_DYNAMIC=1179
 NOTE=Step3 count is an upper geometry bound before currency/rate skips; current daily log reported 1249 funds and 994766 VL actually processed. Step4 geometry is exact for active-fund row batches. Com_stmt_prepare is server-global and cumulative, so numerical proximity is evidence for correlation, not causal identity.
 MUTATION=NONE
 
@@ -1154,7 +1154,7 @@ CONTRACT=GREEN
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-10-04 18:32:59 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:37:04 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 146 ligne(s) sur 64 fonds
@@ -1254,7 +1254,7 @@ TOTAL : 146 ligne(s) sur 64 fonds
 
 ########## scripts/diag/ondemand/diag_source_masi.js ##########
 === SOURCE MASI — POURQUOI LE SCRAPING ECHOUE ===
-Mesure le 2026-10-04 18:33:35 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:37:38 UTC — LECTURE SEULE
 URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
 
 ## A. Client HTTPS de Node — celui que `scrapeMASI` utilise aujourd hui
@@ -1274,18 +1274,19 @@ URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=j
 
 ########## scripts/diag/ondemand/diag_sources_masi_alternatives.js ##########
 === SOURCES MASI ALTERNATIVES — CE QUI REPOND DEPUIS S2 ===
-Mesure le 2026-10-04 18:33:36 UTC — LECTURE SEULE
+Mesure le 2026-10-04 18:37:38 UTC — LECTURE SEULE
 
 ## Bank Al-Maghrib — marche boursier (avec Referer)
   https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-boursier
-  reponse : HTTP 403 | text/html | 919 o | ip 3.160.39.38
+  reponse : HTTP 403 | text/html | 919 o | ip 3.160.39.72
       → candidats « MASI + nombre > 1000 » : aucun
       → serie datee : aucune date reperable — source inutilisable telle quelle
 
 ## African Markets — Bourse de Casablanca
   https://www.african-markets.com/en/stock-markets/bvc
-  reponse : HTTP 200 | text/html | 557930 o | ip 172.67.205.222
-      → interstitielle Cloudflare : inutilisable par script
+  reponse : HTTP 200 | text/html | 557935 o | ip 104.21.42.129
+      → candidats « MASI + nombre > 1000 » : aucun
+      → serie datee : 2715 date(s) ISO dans la page, la plus recente 2026-10-02
 
 ## Yahoo Finance — serie MASI.CS
   https://query1.finance.yahoo.com/v8/finance/chart/MASI.CS?range=1mo&interval=1d
@@ -1295,19 +1296,19 @@ Mesure le 2026-10-04 18:33:36 UTC — LECTURE SEULE
 
 ## Yahoo Finance — serie ^MASI
   https://query1.finance.yahoo.com/v8/finance/chart/%5EMASI?range=1mo&interval=1d
-  reponse : HTTP 429 | text/html | 19 o | ip 87.248.119.251
+  reponse : HTTP 429 | text/html | 19 o | ip 87.248.119.252
       → candidats « MASI + nombre > 1000 » : aucun
       → serie datee : aucune date reperable — source inutilisable telle quelle
 
 ## Stooq — serie quotidienne masi
   https://stooq.com/q/d/l/?s=masi&i=d
-  reponse : HTTP 200 | text/html | 796 o | ip 159.69.202.225
+  reponse : HTTP 200 | text/html | 796 o | ip 78.47.47.99
       → candidats « MASI + nombre > 1000 » : aucun
       → serie datee : aucune date reperable — source inutilisable telle quelle
 
 ## medias24 (temoin)
   https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
-  reponse : HTTP 403 | text/html | 5854 o | ip 172.67.72.247
+  reponse : HTTP 403 | text/html | 5854 o | ip 104.26.9.61
       → interstitielle Cloudflare : inutilisable par script
 
 Rappel : la source retenue devra etre autoritative et fournir une
