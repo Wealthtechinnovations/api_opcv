@@ -143,6 +143,25 @@ function serieDatee(corps) {
   return 'aucune date reperable — source inutilisable telle quelle';
 }
 
+// Quand l extracteur ne trouve pas de niveau, c est souvent lui qui a tort et
+// non la page. On imprime donc le texte reel autour du mot, balises retirees :
+// c est la seule facon de savoir si la valeur est la et sous quelle forme.
+function contexteMASI(corps) {
+  const texte = corps
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;?/gi, ' ')
+    .replace(/\s+/g, ' ');
+  const sorties = [];
+  const re = /MASI/gi;
+  let m;
+  while ((m = re.exec(texte)) !== null && sorties.length < 4) {
+    sorties.push(texte.slice(Math.max(0, m.index - 60), m.index + 150).trim());
+  }
+  return sorties;
+}
+
 function rendre(etiquette, r) {
   if (r.statut === undefined) {
     const sens = SENS_CURL[r.code] ? ` — ${SENS_CURL[r.code]}` : '';
@@ -158,6 +177,11 @@ function rendre(etiquette, r) {
   const a = cheminsApi(r.corps);
   if (a.length) console.log(`      → chemins /api/ : ${a.join(' ')}`);
   console.log(`      → serie datee : ${serieDatee(r.corps)}`);
+  const ctx = contexteMASI(r.corps);
+  if (ctx.length) {
+    console.log('      → ce que la page dit autour du mot MASI :');
+    for (const x of ctx) console.log(`          « ${x} »`);
+  }
 }
 
 (async () => {
