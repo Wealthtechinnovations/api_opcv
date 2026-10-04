@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "946eb652167fbcda4f32fd999fc57d5a5996814c"
+      "head": "286ffdaf6bdfed2b728cfc092008c85533b884b4"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "046bcbabce2d09683f21bc95c4f90ae7f16fc977"
+      "head": "99671cdfb16617030d3e0f7cf0f72c0c6920ead4"
     }
   },
   "summary": {
@@ -10075,6 +10075,11 @@
       "canonical_authority": "docs/DIAG_ONDEMAND.md",
       "unique_information": [
         "Diagnostics a la demande — sortie de production",
+        "A. Derniere VL vs derniere VL portant un benchmark",
+        "B. Le niveau du benchmark varie-t-il ? (90 derniers jours)",
+        "C. Table source `indice_references` — l import des indices vit-il ?",
+        "D. Maroc — a quelle semaine l ecriture du benchmark a-t-elle cesse ?",
+        "E. Nigeria — la SEC publie-t-elle plus recent que notre base ?",
         "A. Fonds dont la rupture n est pas un taux de change",
         "B. Les 25 lignes sans provenance, en detail",
         "C. Ruptures hors Nigeria — quelles chaines d import ?",
@@ -10088,12 +10093,7 @@
         "E. L etiquette de devise correspond-elle a l echelle ?",
         "F. Ce que cela implique pour l etape 0",
         "Etiquette en desaccord avec le contenu de `value`",
-        "Indetermines — a NE PAS basculer automatiquement (200 avec VL)",
-        "Les 28 fonds declares USD — les deux taux, cote a cote",
-        "Consequence mesuree",
-        "A. Appariement",
-        "B. Nature des ecarts",
-        "C. Changements d echelle — ce qu une correction ecrirait"
+        "Indetermines — a NE PAS basculer automatiquement (200 avec VL)"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10109,15 +10109,35 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "69255c543890549586b46f053a98029ab0e2682c",
-      "last_validated_sha": "69255c543890549586b46f053a98029ab0e2682c",
-      "content_sha256": "becd10370823a0f8d0b594a3d5dc47908a9f5c277be63c32e2f5ac41e78ab029",
-      "line_count": 1157,
-      "byte_count": 75477,
+      "git_blob_sha": "a747640d32150f0e2dd62f0c13ffc95ff0211c6a",
+      "last_validated_sha": "a747640d32150f0e2dd62f0c13ffc95ff0211c6a",
+      "content_sha256": "b5abcba731d3725a809e8b4f10c100a3c800b381c815b14f3ba2715d2435c6cf",
+      "line_count": 1323,
+      "byte_count": 83801,
       "headings": [
         {
           "level": 1,
           "text": "Diagnostics a la demande — sortie de production"
+        },
+        {
+          "level": 2,
+          "text": "A. Derniere VL vs derniere VL portant un benchmark"
+        },
+        {
+          "level": 2,
+          "text": "B. Le niveau du benchmark varie-t-il ? (90 derniers jours)"
+        },
+        {
+          "level": 2,
+          "text": "C. Table source `indice_references` — l import des indices vit-il ?"
+        },
+        {
+          "level": 2,
+          "text": "D. Maroc — a quelle semaine l ecriture du benchmark a-t-elle cesse ?"
+        },
+        {
+          "level": 2,
+          "text": "E. Nigeria — la SEC publie-t-elle plus recent que notre base ?"
         },
         {
           "level": 2,
@@ -10280,11 +10300,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "3cea1df36a35a705ee34381f04301bce3a605744",
-      "last_validated_sha": "3cea1df36a35a705ee34381f04301bce3a605744",
-      "content_sha256": "32633b4298b5b7fa1f0fd14310ef407eb38017a95c1ab3a328c826aee51f4a44",
-      "line_count": 70,
-      "byte_count": 5133,
+      "git_blob_sha": "92b80442323d4f69e225f99c93d942887b282178",
+      "last_validated_sha": "92b80442323d4f69e225f99c93d942887b282178",
+      "content_sha256": "bb6e96a5a3cfa0265e9021562a408e4ef3adfd66e3c4f59074ab098429823a2b",
+      "line_count": 80,
+      "byte_count": 5908,
       "headings": [
         {
           "level": 1,
@@ -12798,11 +12818,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "MCP_AUTONOMY.md",
-      "git_blob_sha": "9e361dd0d2f93293fe77a6d9eec3a9e24ccaca66",
-      "last_validated_sha": "9e361dd0d2f93293fe77a6d9eec3a9e24ccaca66",
-      "content_sha256": "a2bc2050524d284e81994cab399e73f80b308f6385fcf542dfd6d958e8be6d59",
-      "line_count": 155,
-      "byte_count": 7258,
+      "git_blob_sha": "9786b71f07346eb19c58612b9b4f9189ef365021",
+      "last_validated_sha": "9786b71f07346eb19c58612b9b4f9189ef365021",
+      "content_sha256": "0f112a8fa4bb8e13955f1ef373431170d11bd6faceca6c10e00899013587a68f",
+      "line_count": 156,
+      "byte_count": 7507,
       "headings": [
         {
           "level": 1,
@@ -13396,11 +13416,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "ddf1e71911d57f41f6b834806b152d60b826bab2",
-      "last_validated_sha": "ddf1e71911d57f41f6b834806b152d60b826bab2",
-      "content_sha256": "28c647fa7d0f70ddd6f40df646dda30d00b2043ffdc767c62365c4f5da252793",
-      "line_count": 7251,
-      "byte_count": 498652,
+      "git_blob_sha": "5dcece2bc4fd4fce1ddf307e8ece84e04caa0e79",
+      "last_validated_sha": "5dcece2bc4fd4fce1ddf307e8ece84e04caa0e79",
+      "content_sha256": "8559143e848acf9afecf537a9ec455cd648a0e27a4a598a1affc4b9afa484a7e",
+      "line_count": 7443,
+      "byte_count": 508400,
       "headings": [
         {
           "level": 1,
