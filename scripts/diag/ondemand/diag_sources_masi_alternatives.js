@@ -90,7 +90,16 @@ function appel(url, forcerIPv4, entetes = []) {
   };
 }
 
-const cloudflare = c => /just a moment|cf-browser-verification|challenge-platform/i.test(c);
+// TROISIEME CORRECTION D INSTRUMENT. Ce detecteur cherchait « challenge-platform »
+// n importe ou dans la page — or Cloudflare injecte ce script dans les pages
+// LEGITIMES qu il sert. African Markets, qui rend HTTP 200 et 558 Ko de HTML
+// reel, a donc ete classe « interstitielle inutilisable » et la seule piste
+// joignable a ete ecartee par l outil, pas par la mesure. Une page de defi
+// pese quelques kilo-octets et s intitule « Just a moment » : on exige donc
+// soit ce titre, soit la conjonction d un corps minuscule et d un marqueur.
+const cloudflare = c =>
+  /<title>\s*just a moment/i.test(c) ||
+  (c.length < 20000 && /cf-browser-verification|cf_chl_opt|challenge-platform/i.test(c));
 
 function candidatsMASI(corps) {
   const trouves = [];
