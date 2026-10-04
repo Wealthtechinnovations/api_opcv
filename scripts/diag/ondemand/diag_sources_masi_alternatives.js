@@ -45,20 +45,29 @@ const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Geck
 //
 // `entetes` ajoute les en-tetes que le depot emploie deja pour franchir un WAF
 // (`curlGetText(page, ['-H', 'Referer: ...'])` pour bkam.ma).
+// Tour 3. Acquis des tours precedents, mesures depuis S2 : medias24 et bkam.ma
+// rendent 403, casablanca-bourse.com et ammc.ma ne repondent pas du tout,
+// Yahoo brid en 429, Stooq ne connait pas le symbole. African Markets rend 200
+// et porte le DERNIER niveau date (17 303,69 au 02-Oct-2026), coherent avec les
+// 17 843,70 stockes au 31/07 — soit -3,03 % quand la page affiche -5,44 % sur
+// 3 mois.
+//
+// Il manque l HISTORIQUE, et il manque quelle que soit la source retenue : sans
+// serie, pas de rattrapage du 06/08 au 02/10. Ce tour cherche donc des couples
+// date+valeur sur deux mois, pas un cours instantane.
 const CANDIDATES = [
-  ['Bank Al-Maghrib — marche boursier (avec Referer)',
-   'https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-boursier',
-   ['-H', 'Referer: https://www.bkam.ma/', '-H', 'Accept-Language: fr-FR,fr;q=0.9']],
-  ['African Markets — Bourse de Casablanca',
-   'https://www.african-markets.com/en/stock-markets/bvc', []],
-  ['Yahoo Finance — serie MASI.CS',
-   'https://query1.finance.yahoo.com/v8/finance/chart/MASI.CS?range=1mo&interval=1d', []],
-  ['Yahoo Finance — serie ^MASI',
-   'https://query1.finance.yahoo.com/v8/finance/chart/%5EMASI?range=1mo&interval=1d', []],
-  ['Stooq — serie quotidienne masi',
-   'https://stooq.com/q/d/l/?s=masi&i=d', []],
-  ['medias24 (temoin)',
-   'https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json', []],
+  ['African Markets — page indices',
+   'https://www.african-markets.com/en/stock-markets/bvc/indices', []],
+  ['African Markets — donnees de marche',
+   'https://www.african-markets.com/en/stock-markets/bvc/market-data', []],
+  ['FT — historique MASI:CAS',
+   'https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS', []],
+  ['WSJ — historique MASI',
+   'https://www.wsj.com/market-data/quotes/index/MA/MASI/historical-prices', []],
+  ['Stooq — symbole marocain alternatif',
+   'https://stooq.com/q/d/l/?s=%5Emasi&i=d', []],
+  ['Yahoo — nouvelle tentative MASI.CS',
+   'https://query2.finance.yahoo.com/v8/finance/chart/MASI.CS?range=3mo&interval=1d', []],
 ];
 
 // Les codes de sortie de curl disent la nature de la panne, la ou « Command
