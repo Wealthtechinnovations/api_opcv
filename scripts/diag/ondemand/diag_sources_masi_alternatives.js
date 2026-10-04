@@ -13,6 +13,15 @@
  * la raison de l echec ne mesure rien. On passe par `spawnSync`, qui ne leve
  * pas, et on imprime le code curl et stderr.
  *
+ * DEUXIEME CORRECTION D INSTRUMENT. Le marqueur de cette sonde s appelait
+ * « @@META@@ ». curl traite un `-w` qui commence par `@` comme un NOM DE
+ * FICHIER a lire : l option sortait en erreur 26, stdout restait vide, et la
+ * sonde affichait « ECHEC curl code 0 » pour les deux hotes qui repondaient
+ * reellement. Reproduit en local avant correction, et le marqueur verifie sur
+ * un cas CONNU — l API de production, HTTP 200 — avant d etre cru sur un cas
+ * inconnu. Deux pannes d instrument de suite sur la meme sonde : c est la
+ * lecon a retenir, un outil neuf se verifie sur du connu d abord.
+ *
  * HYPOTHESE TESTEE EN PLUS. Les quatre muets (casablanca-bourse.com, ammc.ma)
  * publient des enregistrements AAAA ; bkam.ma et medias24, qui ont repondu,
  * sont joignables en IPv4. Une sortie IPv6 cassee sur S2 produirait exactement
@@ -46,13 +55,13 @@ const SENS_CURL = {
 
 function appel(url, forcerIPv4) {
   const args = ['-sS', '--max-time', '25', '-L',
-    '-w', '@@META@@%{http_code}|%{content_type}|%{size_download}|%{remote_ip}',
+    '-w', '\nZZMETAZZ%{http_code}|%{content_type}|%{size_download}|%{remote_ip}',
     '-H', `User-Agent: ${UA}`];
   if (forcerIPv4) args.push('-4');
   args.push(url);
   const r = spawnSync('curl', args, { encoding: 'utf8', maxBuffer: 12 * 1024 * 1024 });
   const sortie = r.stdout || '';
-  const i = sortie.lastIndexOf('@@META@@');
+  const i = sortie.lastIndexOf('ZZMETAZZ');
   if (i < 0) {
     return { code: r.status, erreur: (r.stderr || '').trim().slice(0, 200), corps: '' };
   }
