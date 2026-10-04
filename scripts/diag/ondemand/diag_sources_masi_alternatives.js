@@ -37,12 +37,28 @@ const { spawnSync } = require('child_process');
 
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
+// Tour 2. Le tour 1 a etabli que casablanca-bourse.com et ammc.ma ne repondent
+// pas du tout depuis S2 (code 28, timeout, identique en IPv4), que bkam.ma rend
+// un 403 de WAF depuis une IP CloudFront et que medias24 est derriere
+// Cloudflare. On cherche donc maintenant ce qui est joignable ET fournit une
+// SERIE DATEE, seule forme utilisable par `propagateIndRef`.
+//
+// `entetes` ajoute les en-tetes que le depot emploie deja pour franchir un WAF
+// (`curlGetText(page, ['-H', 'Referer: ...'])` pour bkam.ma).
 const CANDIDATES = [
-  ['bourse de Casablanca — accueil',   'https://www.casablanca-bourse.com/'],
-  ['bourse de Casablanca — indices',   'https://www.casablanca-bourse.com/fr/live-market/marche-actions/indices'],
-  ['AMMC',                             'https://www.ammc.ma/'],
-  ['Bank Al-Maghrib',                  'https://www.bkam.ma/'],
-  ['medias24 (temoin, 403 attendu)',   'https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json'],
+  ['Bank Al-Maghrib — marche boursier (avec Referer)',
+   'https://www.bkam.ma/Marches/Principaux-indicateurs/Marche-boursier',
+   ['-H', 'Referer: https://www.bkam.ma/', '-H', 'Accept-Language: fr-FR,fr;q=0.9']],
+  ['African Markets — Bourse de Casablanca',
+   'https://www.african-markets.com/en/stock-markets/bvc', []],
+  ['Yahoo Finance — serie MASI.CS',
+   'https://query1.finance.yahoo.com/v8/finance/chart/MASI.CS?range=1mo&interval=1d', []],
+  ['Yahoo Finance — serie ^MASI',
+   'https://query1.finance.yahoo.com/v8/finance/chart/%5EMASI?range=1mo&interval=1d', []],
+  ['Stooq — serie quotidienne masi',
+   'https://stooq.com/q/d/l/?s=masi&i=d', []],
+  ['medias24 (temoin)',
+   'https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json', []],
 ];
 
 // Les codes de sortie de curl disent la nature de la panne, la ou « Command
@@ -53,11 +69,12 @@ const SENS_CURL = {
   56: 'reception interrompue', 60: 'certificat non verifiable',
 };
 
-function appel(url, forcerIPv4) {
+function appel(url, forcerIPv4, entetes = []) {
   const args = ['-sS', '--max-time', '25', '-L',
     '-w', '\nZZMETAZZ%{http_code}|%{content_type}|%{size_download}|%{remote_ip}',
     '-H', `User-Agent: ${UA}`];
   if (forcerIPv4) args.push('-4');
+  args.push(...entetes);
   args.push(url);
   const r = spawnSync('curl', args, { encoding: 'utf8', maxBuffer: 12 * 1024 * 1024 });
   const sortie = r.stdout || '';
@@ -95,6 +112,28 @@ function cheminsApi(corps) {
   return [...s];
 }
 
+// Une source n est utilisable que si elle porte des COUPLES date+valeur. On
+// reconnait trois formes : le JSON de Yahoo (timestamp + close), un CSV a
+// colonnes Date/Close, et du HTML portant des dates ISO.
+function serieDatee(corps) {
+  try {
+    const j = JSON.parse(corps);
+    const res = j?.chart?.result?.[0];
+    if (res?.timestamp?.length) {
+      const ts = res.timestamp;
+      const q = res.indicators?.quote?.[0]?.close || [];
+      const iso = e => new Date(e * 1000).toISOString().slice(0, 10);
+      return `JSON Yahoo — ${ts.length} points, dernier ${iso(ts[ts.length - 1])} = ${q[q.length - 1]}`;
+    }
+    if (j?.chart?.error) return `JSON Yahoo en erreur — ${JSON.stringify(j.chart.error).slice(0, 120)}`;
+  } catch { /* pas du JSON : on continue */ }
+  const lignes = corps.split(/\r?\n/).filter(l => /^\d{4}-\d{2}-\d{2},/.test(l));
+  if (lignes.length) return `CSV date,valeur — ${lignes.length} lignes, derniere « ${lignes[lignes.length - 1].slice(0, 60)} »`;
+  const isos = corps.match(/\b20[12][0-9]-[01][0-9]-[0-3][0-9]\b/g);
+  if (isos && isos.length) return `${isos.length} date(s) ISO dans la page, la plus recente ${isos.sort().slice(-1)[0]}`;
+  return 'aucune date reperable — source inutilisable telle quelle';
+}
+
 function rendre(etiquette, r) {
   if (r.statut === undefined) {
     const sens = SENS_CURL[r.code] ? ` — ${SENS_CURL[r.code]}` : '';
@@ -109,17 +148,17 @@ function rendre(etiquette, r) {
   console.log(`      → candidats « MASI + nombre > 1000 » : ${c.length ? c.join(' | ') : 'aucun'}`);
   const a = cheminsApi(r.corps);
   if (a.length) console.log(`      → chemins /api/ : ${a.join(' ')}`);
+  console.log(`      → serie datee : ${serieDatee(r.corps)}`);
 }
 
 (async () => {
   console.log('=== SOURCES MASI ALTERNATIVES — CE QUI REPOND DEPUIS S2 ===');
   console.log(`Mesure le ${new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC — LECTURE SEULE\n`);
 
-  for (const [nom, url] of CANDIDATES) {
+  for (const [nom, url, entetes] of CANDIDATES) {
     console.log(`## ${nom}`);
     console.log(`  ${url}`);
-    rendre('defaut ', appel(url, false));
-    rendre('en IPv4', appel(url, true));
+    rendre('reponse', appel(url, false, entetes || []));
     console.log('');
   }
 
