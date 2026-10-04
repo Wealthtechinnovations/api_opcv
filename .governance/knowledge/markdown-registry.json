@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "8b286688a83cb3591800ed9f55e099c27f3d2bd6"
+      "head": "946eb652167fbcda4f32fd999fc57d5a5996814c"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -1051,7 +1051,7 @@
         "Gouvernance documentaire",
         "Regle obligatoire — La mesure prime sur la prose",
         "Regle obligatoire — Lecture du snapshot production avant toute action",
-        "Protocole anti-compactage, anti-limite et anti-taches inachevees"
+        "Regle obligatoire — Moyens d acces reels : ne jamais travailler a l aveugle"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -1067,11 +1067,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CLAUDE.md",
-      "git_blob_sha": "7715827af83c267c4ea2b6408a2de6d762ae7c90",
-      "last_validated_sha": "7715827af83c267c4ea2b6408a2de6d762ae7c90",
-      "content_sha256": "c48f1a629431d92ffd83215ebc21fdb5ce6b2c8eb8c7d670d6fc0417c4c62d3f",
-      "line_count": 463,
-      "byte_count": 20548,
+      "git_blob_sha": "8445bd75ffc37c90863cb74e586a7bb32fdf8e83",
+      "last_validated_sha": "8445bd75ffc37c90863cb74e586a7bb32fdf8e83",
+      "content_sha256": "06f159e9e62b4d80ab12467c996d49d2025e6cac32d6f12b7762015feebe8df5",
+      "line_count": 525,
+      "byte_count": 24097,
       "headings": [
         {
           "level": 1,
@@ -1148,6 +1148,22 @@
         {
           "level": 2,
           "text": "Regle obligatoire — Lecture du snapshot production avant toute action"
+        },
+        {
+          "level": 2,
+          "text": "Regle obligatoire — Moyens d acces reels : ne jamais travailler a l aveugle"
+        },
+        {
+          "level": 3,
+          "text": "Les quatre canaux, et la commande qui prouve chacun"
+        },
+        {
+          "level": 3,
+          "text": "Canal de diagnostic a la demande — le plus sous-utilise"
+        },
+        {
+          "level": 3,
+          "text": "Ce que l autorisation d acces ne couvre pas"
         },
         {
           "level": 2,
@@ -2843,11 +2859,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "MCP_AUTONOMY.md",
-      "git_blob_sha": "b2442e01e660a200a027b6ca5839f12c71771dcc",
-      "last_validated_sha": "b2442e01e660a200a027b6ca5839f12c71771dcc",
-      "content_sha256": "8ac8d29a4a9c562d730c2b3b3fa278cf31c9670a1f9934dbb1ff92f3d8ab147c",
-      "line_count": 155,
-      "byte_count": 7228,
+      "git_blob_sha": "9148b0a5075aff73381ee065c324439eb34dd1ee",
+      "last_validated_sha": "9148b0a5075aff73381ee065c324439eb34dd1ee",
+      "content_sha256": "25027fb00316aa422dc9a12bff7e2f83dcbb07217882768db3c6c0ace30c9462",
+      "line_count": 156,
+      "byte_count": 7477,
       "headings": [
         {
           "level": 1,
@@ -10093,9 +10109,9 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "babeedf00b08c0476b6b408bf76acf874cf4c80c",
-      "last_validated_sha": "babeedf00b08c0476b6b408bf76acf874cf4c80c",
-      "content_sha256": "f5698b0e55a7016fc596ed0d9bf6fe06297bf09d4c6320dca0d204b1f61c8390",
+      "git_blob_sha": "69255c543890549586b46f053a98029ab0e2682c",
+      "last_validated_sha": "69255c543890549586b46f053a98029ab0e2682c",
+      "content_sha256": "becd10370823a0f8d0b594a3d5dc47908a9f5c277be63c32e2f5ac41e78ab029",
       "line_count": 1157,
       "byte_count": 75477,
       "headings": [
@@ -10264,9 +10280,9 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "8a65967b86bb87bd8b35771b272efbf1ccceeba7",
-      "last_validated_sha": "8a65967b86bb87bd8b35771b272efbf1ccceeba7",
-      "content_sha256": "c96b061d5b9109dc0707b34e9c7535d83a5729732a997eed246703263337bebd",
+      "git_blob_sha": "3cea1df36a35a705ee34381f04301bce3a605744",
+      "last_validated_sha": "3cea1df36a35a705ee34381f04301bce3a605744",
+      "content_sha256": "32633b4298b5b7fa1f0fd14310ef407eb38017a95c1ab3a328c826aee51f4a44",
       "line_count": 70,
       "byte_count": 5133,
       "headings": [
