@@ -1,0 +1,118 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W2_P1_MARKET_SOURCE_DOSSIERS_NON_AUTHORITATIVE",
+  "observed_at": "2026-10-06",
+  "observed_heads": {
+    "api": "4880373f13c94d2c8a3db98789fad9d603842658",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "policy": {
+    "registry_is_universe_authority_not_nav_authority": true,
+    "official_regulator_first": true,
+    "current_web_research_must_be_reverified_before_implementation": true,
+    "no_connector_or_task_created_by_this_file": true,
+    "fund_subfund_shareclass_grain_must_be_explicit_before_import": true
+  },
+  "KENYA": {
+    "regulator": "Capital Markets Authority Kenya",
+    "regulator_sources": [
+      {
+        "role": "CURRENT_CIS_UNIVERSE",
+        "url": "https://licensees.cma.or.ke/licenses/15/",
+        "observed_state": "Current list exposes umbrella/unit trust schemes and nested sub-funds; some products are explicitly KES/USD/EUR/GBP."
+      },
+      {
+        "role": "CURRENT_APPROVAL_CHRONOLOGY",
+        "url": "https://www.cma.or.ke/cma-approves-new-unit-trust-schemes-and-additional-sub-funds-to-expand-investor-choice/",
+        "observed_state": "2026 approvals confirm continued creation of umbrella schemes and multi-currency/multi-asset sub-funds."
+      }
+    ],
+    "canonical_identity_implication": {
+      "scheme": "Needs a stable scheme/umbrella identity when regulator groups products.",
+      "subfund": "Explicitly required: regulator list names sub-funds inside schemes.",
+      "shareclass": "Must not be inferred blindly from currency, but multi-currency variants make class/grain verification mandatory.",
+      "manager": "Manager relationship comes from regulator/official scheme context where available.",
+      "currency": "Treat currency as explicit attribute of sub-fund/class source, never name-only inference."
+    },
+    "acquisition_plan_candidate": [
+      "Parse official CMA scheme list into regulator-universe snapshots with acquisition date and source URL.",
+      "Preserve scheme heading and nested sub-fund text rather than flattening everything to one fund row.",
+      "For each manager/scheme, locate official NAV/unit-price/factsheet publication path.",
+      "Classify NAV source as regulator-hosted, manager-hosted, administrator-hosted or unavailable.",
+      "Measure publication cadence, history depth, currency, unit-price semantics, document lineage and terms of reuse.",
+      "Only after five representative managers pass source tests design a reusable Kenya adapter."
+    ],
+    "blockers": [
+      "No centralized official daily NAV endpoint certified yet.",
+      "No canonical AfricaFunds SubFund/ShareClass schema decision yet.",
+      "No source licence/redistribution review for manager-hosted price data yet."
+    ],
+    "readiness": "SOURCE_DISCOVERY_P1_REGISTRY_STRONG_NAV_PENDING",
+    "W1_dependencies": [
+      "W1-DELTA-003",
+      "W1-DELTA-004",
+      "W1-DELTA-007",
+      "W1-DELTA-008"
+    ]
+  },
+  "GHANA": {
+    "regulator": "Securities and Exchange Commission Ghana",
+    "regulator_sources": [
+      {
+        "role": "MUTUAL_FUND_UNIVERSE",
+        "url": "https://licensees.sec.gov.gh/licensees/MutualFunds.php",
+        "observed_state": "Official list exposes fund name, website, fund manager and custodian/trustee."
+      },
+      {
+        "role": "UNIT_TRUST_UNIVERSE",
+        "url": "https://licensees.sec.gov.gh/licensees/UnitTrust.php",
+        "observed_state": "Official list exposes unit trust identity, website, fund manager and custodian/trustee."
+      },
+      {
+        "role": "NAV_SEMANTICS",
+        "url": "https://sec.gov.gh/frequently-asked-questions/",
+        "observed_state": "SEC explains NAV per share and bid/offer reporting for open-ended collective investment schemes."
+      }
+    ],
+    "canonical_identity_implication": {
+      "scheme_types": [
+        "Mutual Fund",
+        "Unit Trust"
+      ],
+      "fund": "Regulator list provides scheme/product identity.",
+      "manager": "Explicit manager field available.",
+      "service_provider": "Custodian/trustee is explicit and should map to Organization/service-provider semantics, not remain a duplicated free-text copy long term.",
+      "price_semantics": "NAVPS, bid and offer are distinct concepts and must retain explicit price_type."
+    },
+    "acquisition_plan_candidate": [
+      "Snapshot regulator Mutual Fund and Unit Trust registries separately and preserve legal scheme type.",
+      "Resolve manager/custodian entities through canonical Organization aliases.",
+      "Sample at least five managers covering mutual funds and unit trusts to locate official NAVPS/bid/offer feeds.",
+      "Record whether price history is HTML, downloadable file, factsheet/report or API and whether historical depth is sufficient.",
+      "Use annual regulator reports only as validation/coverage evidence, not as a substitute for daily/periodic NAV time series.",
+      "Design Ghana adapter only after source semantics and publication cadence are certified."
+    ],
+    "blockers": [
+      "No centralized current fund-level daily NAV feed certified yet.",
+      "Fund-manager website heterogeneity likely requires source adapters.",
+      "NAVPS vs bid/offer selection must be explicit and quality-reviewed."
+    ],
+    "readiness": "SOURCE_DISCOVERY_P1_REGISTRY_STRONG_NAV_PENDING",
+    "W1_dependencies": [
+      "W1-DELTA-003",
+      "W1-DELTA-004",
+      "W1-DELTA-007"
+    ]
+  },
+  "shared_P1_acceptance_before_connector_task": [
+    "Regulator universe snapshot can be reproduced deterministically.",
+    "At least 90% of sampled scheme/sub-fund identities map without heuristic name guessing.",
+    "At least five representative managers/products have a stable official NAV/price publication path OR the absence of such path is explicitly documented.",
+    "Price type and currency are explicit.",
+    "Publication/effective/acquisition dates can be distinguished.",
+    "Raw/source evidence can fit the W2 ingestion contract.",
+    "No dependency requires inventing identifiers, NAV, benchmark or provenance."
+  ],
+  "next_action": "Perform read-only regulator-universe structure extraction/counting for Kenya/Ghana and source-path sampling. Do not create country connector tasks until NAV acquisition feasibility is proven."
+}
