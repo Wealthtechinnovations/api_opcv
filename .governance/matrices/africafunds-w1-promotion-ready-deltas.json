@@ -1,0 +1,267 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_PROMOTION_READY_DELTAS_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "2612f5efd3756786ee1e3d18ced8f3e224ab13f8",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "single_queue_authority": ".governance/loop/task-queue.json",
+  "rules": {
+    "these_are_not_tasks": true,
+    "no_ids_reserved": true,
+    "no_auto_promotion": true,
+    "deduplicate_again_after_queue_release": true,
+    "active_claims_take_precedence": true,
+    "code_only_and_data_write_phases_must_remain_separate": true
+  },
+  "execution_order": [
+    "W1-DELTA-001 code/dry-run before benchmark data correction",
+    "W1-DELTA-002 metadata transport before any Nigeria provenance backfill",
+    "W1-DELTA-003 read-only identity reconciliation before relational writes/FKs",
+    "W1-DELTA-008 strict FX helper before Allocation backtesting",
+    "W1-DELTA-004 lineage bridge design",
+    "W1-DELTA-005 ORM parity only after runtime sync gate",
+    "W1-DELTA-006 reference schema governance",
+    "W1-DELTA-007 view models before Atomic Design migration"
+  ],
+  "deltas": [
+    {
+      "id": "W1-DELTA-001",
+      "priority": "P0",
+      "title": "Benchmark temporal integrity — exact or latest prior, never future",
+      "state": "PROMOTION_READY_AFTER_QUEUE_RELEASE",
+      "existing_links": [
+        "AF-PROP-005",
+        "AF-PROP-006",
+        "AF-PROP-025",
+        "AF-OPS-007",
+        "AF-OPS-008"
+      ],
+      "evidence": [
+        "2,027 high-confidence contaminated valorisations rows measured: 1,919 Morocco + 108 UEMOA.",
+        "685 distinct funds, 10 VL dates.",
+        "scrape_indices_daily.js and propagate_indref_range.js both use Math.abs nearest +/-7d.",
+        "Historical BENCHMARKS_F3_MAPPING_SCHEMA already specifies last available <= target date."
+      ],
+      "code_phase": {
+        "surfaces": [
+          "scripts/scraper/scrape_indices_daily.js",
+          "scripts/scraper/propagate_indref_range.js",
+          "shared pure date-matcher helper/test candidate"
+        ],
+        "rule": "Exact first, otherwise latest source date <= target within declared tolerance; never future.",
+        "tests": [
+          "exact",
+          "prior",
+          "future-only->no match",
+          "equidistant->prior",
+          "weekend/holiday",
+          "outside tolerance"
+        ],
+        "dry_run": "Compare current matcher vs new matcher over measured scope; unaffected exact/prior rows must remain identical."
+      },
+      "data_phase": "Separate governed phase only after code GREEN: snapshot exact contaminated rows, bounded correction, rollback, dependent benchmark-derived recalculation, post-check.",
+      "blocker": "AF-TASK-028 queue claim + governed data-write gate."
+    },
+    {
+      "id": "W1-DELTA-002",
+      "priority": "P1",
+      "title": "Nigeria SEC — transport provenance and fallback price semantics",
+      "state": "PROMOTION_READY_AFTER_QUEUE_RELEASE",
+      "existing_links": [
+        "AF-OPS-007",
+        "AF-OPS-009",
+        "AF-PROP-003",
+        "AF-PROP-009"
+      ],
+      "evidence": [
+        "Current SEC CSV: 8,627/8,627 source_url present.",
+        "8,627/8,627 vl_price_source present.",
+        "All 8,627 current rows are offer_price_fallback.",
+        "Recent canonical Nigeria rows degraded to UNQUALIFIED/NO_SOURCE/NO_PRICE_TYPE."
+      ],
+      "code_phase": {
+        "surfaces": [
+          "scripts/import/import_vl_nigeria_sec.js",
+          "src/lib/vl_contract.js",
+          "tests/vl_contract.test.js"
+        ],
+        "numeric_values": "Must be byte/numeric-equivalent before/after for first rollout.",
+        "provenance": "Transport exact source_url.",
+        "price_type": "Transport explicit OFFER/BID/UNIT_PRICE mapping.",
+        "quality": "UNIT_PRICE may qualify normally; OFFER/BID fallback must be REVIEW, never silently OK.",
+        "forbidden": [
+          "invent report_date",
+          "invent sec_document_id",
+          "change fund matching",
+          "change currency choice",
+          "historical backfill in first rollout"
+        ]
+      },
+      "blocker": "Current AF-OPS-007/009 phases are read-only; task promotion required."
+    },
+    {
+      "id": "W1-DELTA-003",
+      "priority": "P1",
+      "title": "Fund/SGO identity reconciliation before FK or institutional hard gates",
+      "state": "PROMOTION_READY_READ_ONLY_FIRST",
+      "existing_links": [
+        "AF-PROP-001",
+        "AF-PROP-002"
+      ],
+      "evidence": [
+        "71 funds missing societe_id.",
+        "70 have manager text; only 28 exact-name matches currently available.",
+        "Maroc: 23 missing societe_id, zero exact-name matches.",
+        "Nigeria: 40 text-without-ID, 24 exact matches.",
+        "Tunisia: 7 text-without-ID, 4 exact matches.",
+        "Same-name UEMOA pair SICAV ABDOU DIOUF has two ISIN variants."
+      ],
+      "phase_1": "Read-only exact/alias/source-backed mapping report.",
+      "phase_2": "Only proven mappings may be updated under snapshot/rollback.",
+      "rule": "No generic ISIN requirement: Nigeria 333/333 and UEMOA 112/118 missing ISIN reflect market/source coverage, not permission to fabricate.",
+      "blocker": "No hard FK until missing/orphan relations are resolved and consumers tested."
+    },
+    {
+      "id": "W1-DELTA-004",
+      "priority": "P1",
+      "title": "Generic lineage bridge reusing country staging",
+      "state": "DESIGN_READY_NEEDS_SCHEMA_PROMOTION",
+      "existing_links": [
+        "AF-PROP-003",
+        "AF-PROP-007",
+        "AF-PROP-008",
+        "AF-PROP-009",
+        "AF-PROP-010"
+      ],
+      "evidence": [
+        "Nigeria canonical fields exist but current importer drops rich extractor metadata.",
+        "BRVM/BVMAC staging already retains PDF URL/hash/page/raw line/matching/quality.",
+        "Tunisia parser/audit retains source file/sheet/row.",
+        "Morocco active path has no canonical raw artifact/hash linkage."
+      ],
+      "design": "source_artifact + source_observation + canonical_lineage_link + transformation_run, or adapters/views onto existing staging where possible.",
+      "rule": "Do not copy country-specific raw evidence into a parallel store if a stable link can preserve it.",
+      "blocker": "Requires additive schema design/migration task after live schema map and queue release."
+    },
+    {
+      "id": "W1-DELTA-005",
+      "priority": "P2",
+      "title": "ORM/live-schema parity for valorisations",
+      "state": "BLOCKED_BY_RUNTIME_SCHEMA_SYNC_GATE",
+      "existing_links": [
+        "AF-PROP-003",
+        "AF-PROP-006"
+      ],
+      "evidence": [
+        "15 additive columns exist in live valorisations but are absent from src/models/vl.js.",
+        "sequelize.js can call sync({alter:true}) when DB_SYNC_ALTER=true.",
+        "Tracked .env.production has historical DB_SYNC_ALTER=true but is not authoritative runtime state."
+      ],
+      "target": "Mirror already-existing columns as nullable ORM fields only after active runtime DB_SYNC/DB_SYNC_ALTER flags are certified safe and writer tests exist.",
+      "forbidden": [
+        "sequelize sync alter as migration",
+        "type/nullability changes without migration",
+        "replaying Nigeria DDL"
+      ],
+      "blocker": "diag_w1_runtime_schema_gate result pending."
+    },
+    {
+      "id": "W1-DELTA-006",
+      "priority": "P2",
+      "title": "Reference-table schema governance without recreating data",
+      "state": "PROMOTION_READY_FOR_SCHEMA_REPRESENTATION_DESIGN",
+      "existing_links": [
+        "AF-PROP-001",
+        "AF-PROP-005"
+      ],
+      "evidence": [
+        "Live exact counts: ref_asset_classes=4, ref_geo_zones=29, ref_categories_fundafrica=140, ref_indices_fundafrica=137, ref_index_sources=10.",
+        "Current DDL lives in seed_referentiel_fundafrica.js rather than canonical Sequelize migration history."
+      ],
+      "target": "Represent the already-live schema via forward/idempotent migration governance, then make seed data-only where safe.",
+      "forbidden": [
+        "drop/recreate",
+        "reseed blindly",
+        "duplicate ref tables"
+      ],
+      "blocker": "Column-level equality check between live schema and seed DDL before migration artifact."
+    },
+    {
+      "id": "W1-DELTA-007",
+      "priority": "P1",
+      "title": "Additive stable view models before Atomic Design refactor",
+      "state": "DESIGN_READY",
+      "existing_links": [
+        "AF-PROP-012",
+        "AF-PROP-013",
+        "AF-PROP-014",
+        "AF-PROP-015",
+        "AF-PROP-021",
+        "AF-PROP-022"
+      ],
+      "evidence": [
+        "getfondbyidmeta is shared SSR SEO dependency across at least seven fund page templates.",
+        "getfondbyid is shared across investor/portfolio workflows.",
+        "manager/country/performance/risk routes have many direct consumers.",
+        "FundAfrica ref APIs are live backend authorities but largely not directly consumed by current frontend."
+      ],
+      "candidates": [
+        "FundIdentitySEOViewModel",
+        "FundSelectionViewModel",
+        "ManagerViewModel",
+        "CountryFundListViewModel",
+        "FundDocumentViewModel",
+        "FundAnalyticsViewModel"
+      ],
+      "rule": "Add adapters/shared clients first; migrate one organism/template at a time; preserve URLs, SSR metadata, calculations and legacy APIs until zero consumers."
+    },
+    {
+      "id": "W1-DELTA-008",
+      "priority": "P1",
+      "title": "Strict FX as-of helper without breaking legacy getRate",
+      "state": "PROMOTION_READY_CODE_ONLY_AFTER_QUEUE_RELEASE",
+      "existing_links": [
+        "AF-TASK-014",
+        "AF-TASK-019",
+        "AF-PROP-005",
+        "AF-PROP-006"
+      ],
+      "evidence": [
+        "Current tests explicitly require getRate(before history) -> first future rate.",
+        "Allocation/backtest governance explicitly requires no-lookahead.",
+        "Measured Morocco/Tunisia production has zero VL before first relevant FX rate, so no emergency historical rewrite is justified by that prehistory condition."
+      ],
+      "target": "Add getRateAsOf()/strict mode returning latest <= target and null when no prior; keep legacy getRate behavior until consumers are deliberately migrated.",
+      "tests": [
+        "exact",
+        "latest prior",
+        "before history -> null",
+        "empty -> null",
+        "fixed legal CFA parity handled explicitly outside guessed market fallback"
+      ],
+      "migration_order": [
+        "Allocation/backtests first",
+        "historical/backfill tools",
+        "country importers after impact tests",
+        "legacy consumers only when non-regression proven"
+      ],
+      "forbidden": [
+        "silently changing getRate existing semantics everywhere",
+        "hardcoded market-rate fallback in new strict path"
+      ]
+    }
+  ],
+  "protected_active_work": [
+    {
+      "task": "AF-TASK-017",
+      "rule": "No edits to allocation constraint surfaces."
+    },
+    {
+      "task": "AF-TASK-028",
+      "rule": "No edits to task-queue/projections/program governance surfaces."
+    }
+  ],
+  "next_action": "Wait only for runtime schema-gate diagnostic to resolve W1-DELTA-005, then persist W1 checkpoint. Promotion into the single queue occurs only after AF-TASK-028 releases queue surfaces and a fresh dedup."
+}
