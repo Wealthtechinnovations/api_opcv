@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "214a688d4eabef8cbdb825591224ca53cb1238f3"
+      "head": "23a5c1ea4d514afd392c972b9e6ea0562c6b582e"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -3173,7 +3173,7 @@
         "État global",
         "Héritage",
         "Principe",
-        "Matrice d'intakes candidats"
+        "Matrices de découverte et de promotion"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3189,11 +3189,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "PROJECT_CONTEXT.md",
-      "git_blob_sha": "988fc8d904458392df0cc1b771e3633d2a06a50f",
-      "last_validated_sha": "988fc8d904458392df0cc1b771e3633d2a06a50f",
-      "content_sha256": "69b64ad76973f801b69ba88d69dab200d00be516edb5ce5b37a3de38cb7d71bf",
-      "line_count": 59,
-      "byte_count": 3029,
+      "git_blob_sha": "7590d43fca759c75cc82792b73120d2e73be8c1a",
+      "last_validated_sha": "7590d43fca759c75cc82792b73120d2e73be8c1a",
+      "content_sha256": "8d80ef1188ac9d69339b40dda7b4f7539b5c9948cbe080bf6549c83f1ef27e12",
+      "line_count": 63,
+      "byte_count": 3814,
       "headings": [
         {
           "level": 1,
@@ -3221,7 +3221,7 @@
         },
         {
           "level": 2,
-          "text": "Matrice d'intakes candidats"
+          "text": "Matrices de découverte et de promotion"
         }
       ]
     },
