@@ -509,21 +509,53 @@ async function scrapeMASIviaFT(targetDate, verbose) {
     }
 
     // 3. Verifier la position de la cloture AVANT de lire une valeur.
-    //    Lignes du plus recent au plus ancien : ouverture[i] doit egaler
-    //    cloture[i+1]. Verifie sur les paires disponibles, trois suffisent.
-    const OUVERTURE = 1, CLOTURE = 4;
-    let paires = 0, coherentes = 0;
-    for (let i = 0; i + 1 < lignes.length && paires < 3; i++) {
-      const o = nombre(lignes[i][OUVERTURE]);
-      const c = nombre(lignes[i + 1][CLOTURE]);
-      if (!isFinite(o) || !isFinite(c)) continue;
-      paires++;
-      if (Math.abs(o - c) < 0.01) coherentes++;
+    //
+    //    PREMIERE VERSION FAUSSE, ET LA MESURE L A DITE. Elle exigeait
+    //    « ouverture du jour J = cloture du jour J-1 » sur TROIS paires sur
+    //    trois. Sur une fenetre de dix jours l invariant tenait (3/3), et je
+    //    l ai cru general. Mesure du 2026-10-05 sur quarante seances :
+    //    **29 paires sur 39**. Un quart des seances ouvre a un autre niveau que
+    //    la cloture precedente — c est un gap d ouverture, le comportement
+    //    normal d un marche apres un week-end, un jour ferie ou une nouvelle.
+    //    Mon invariant etait une heuristique. Avec 74 % de paires coherentes,
+    //    exiger l unanimite sur trois paires revenait a refuser la valeur six
+    //    fois sur dix, en silence, en se donnant l air de proteger la donnee.
+    //
+    //    DEUX CONTROLES, DONT UN VRAI INVARIANT. Le premier ne depend pas des
+    //    gaps : dans une ligne OHLC, le bas borne l ouverture et la cloture, le
+    //    haut les majore. Il valide la position des quatre colonnes. Le second
+    //    oriente ouverture et cloture — laquelle des deux suit la precedente —
+    //    et se juge donc EN MAJORITE, jamais a l unanimite.
+    const OUVERTURE = 1, HAUT = 2, BAS = 3, CLOTURE = 4;
+
+    let lignesOHLC = 0, lignesCoherentes = 0;
+    for (const l of lignes) {
+      const o = nombre(l[OUVERTURE]), h = nombre(l[HAUT]), b = nombre(l[BAS]), c = nombre(l[CLOTURE]);
+      if (![o, h, b, c].every(isFinite)) continue;
+      lignesOHLC++;
+      // Tolerance d un centieme : les arrondis de publication ne sont pas des
+      // violations de structure.
+      if (b - 0.01 <= o && o <= h + 0.01 && b - 0.01 <= c && c <= h + 0.01 && b <= h) lignesCoherentes++;
     }
-    if (paires === 0 || coherentes !== paires) {
-      console.log(`    [MASI] FT : structure de colonnes non confirmee (${coherentes}/${paires} paires coherentes) — aucune valeur retenue`);
+    if (lignesOHLC === 0 || lignesCoherentes !== lignesOHLC) {
+      console.log(`    [MASI] FT : colonnes OHLC non confirmees (${lignesCoherentes}/${lignesOHLC} lignes ou bas <= ouverture/cloture <= haut) — aucune valeur retenue`);
       return null;
     }
+
+    const PART_MINIMALE = 0.6;   // 74 % mesure ; en deca de 60 %, l orientation est douteuse
+    let paires = 0, suivies = 0;
+    for (let i = 0; i + 1 < lignes.length; i++) {
+      const o = nombre(lignes[i][OUVERTURE]);
+      const cPrec = nombre(lignes[i + 1][CLOTURE]);
+      if (!isFinite(o) || !isFinite(cPrec)) continue;
+      paires++;
+      if (Math.abs(o - cPrec) < 0.01) suivies++;
+    }
+    if (paires >= 5 && suivies / paires < PART_MINIMALE) {
+      console.log(`    [MASI] FT : orientation des colonnes douteuse (${suivies}/${paires} ouvertures egales a la cloture precedente, attendu >= ${Math.round(PART_MINIMALE * 100)} %) — aucune valeur retenue`);
+      return null;
+    }
+    if (verbose) console.log(`    [MASI] FT : colonnes confirmees — OHLC ${lignesCoherentes}/${lignesOHLC}, enchainement ${suivies}/${paires}`);
 
     // 4. La ligne de la date visee, et elle seule. Pas de date approchante :
     //    `propagateIndRef` gere deja le rapprochement a +/- 7 jours, et c est
