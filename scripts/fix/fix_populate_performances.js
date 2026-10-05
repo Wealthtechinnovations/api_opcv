@@ -15,6 +15,25 @@
  *   --pays NIGERIA     : un seul pays
  *   --fond 1141        : un seul fond
  *   --force            : recalculer meme si une perf recente existe deja
+ *   --dry-run          : n ecrit RIEN et compare au contenu de la table
+ *   --limit N          : s arrete apres N fonds
+ *
+ * POURQUOI --dry-run A ETE AJOUTE (2026-10-05). Ce script est le pendant direct
+ * de `fix_populate_performances_eur_usd.js`, que le cron appelle chaque soir en
+ * etape 8/9 — d ou des performances EUR/USD a jour au 02/10. Les performances
+ * LOCALES, elles, passent encore par `/api/saveperfdatemysql/:a/:b`, une route
+ * qui emet une requete HTTP interne par fonds ET par date vers sa propre API :
+ * elle sort en HTTP 000 sur le lot 601-1200 et laisse le Maroc a 122 jours de
+ * retard, pour 3,1 % de fonds a jour. Brancher ce script a la place de la route
+ * est la correction evidente — mais remplacer un calcul valide par un autre sans
+ * avoir verifie qu ils donnent les MEMES chiffres serait exactement la
+ * substitution silencieuse que ce depot interdit. `--dry-run` existe pour rendre
+ * cette verification possible : il affiche ce qui serait ecrit et le compare
+ * champ par champ a ce que la table contient deja.
+ *
+ * Le defaut reste l ECRITURE, a l inverse des autres scripts du depot. C est
+ * delibere : ce script ecrit depuis sa creation, et basculer son defaut
+ * changerait en silence le comportement de tout appelant que je ne vois pas.
  */
 
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
@@ -30,11 +49,13 @@ const DB_CONFIG = {
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  const opts = { pays: null, fondId: null, force: false };
+  const opts = { pays: null, fondId: null, force: false, dryRun: false, limit: null };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--pays' && args[i + 1]) opts.pays = args[++i];
     else if (args[i] === '--fond' && args[i + 1]) opts.fondId = parseInt(args[++i]);
     else if (args[i] === '--force') opts.force = true;
+    else if (args[i] === '--dry-run') opts.dryRun = true;
+    else if (args[i] === '--limit' && args[i + 1]) opts.limit = parseInt(args[++i]);
   }
   return opts;
 }
@@ -123,7 +144,9 @@ async function run() {
   const opts = parseArgs();
   const conn = await mysql.createConnection(DB_CONFIG);
   console.log('Connecte a la base fund_opcvm');
-  console.log(`Options: pays=${opts.pays || 'TOUS'}, force=${opts.force}`);
+  console.log(`Options: pays=${opts.pays || 'TOUS'}, force=${opts.force}`
+    + `, mode=${opts.dryRun ? 'DRY-RUN (aucune ecriture)' : 'ECRITURE'}`
+    + (opts.limit ? `, limit=${opts.limit}` : ''));
 
   let fondQuery = `
     SELECT f.id, f.nom_fond, f.pays, f.code_ISIN, f.dev_libelle,
@@ -146,6 +169,7 @@ async function run() {
   console.log(`${fonds.length} fonds a traiter\n`);
 
   let processed = 0, inserted = 0, updated = 0, skipped = 0, errors = 0;
+  let dryIdentiques = 0, dryDifferents = 0, dryAbsents = 0;
   const byPays = {};
 
   for (let i = 0; i < fonds.length; i++) {
@@ -215,9 +239,14 @@ async function run() {
         perf10ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 10));
       }
 
-      // Upsert
+      // Upsert. En dry-run on relit les colonnes de performance elles-memes et
+      // pas seulement l id : c est la comparaison qui donne son sens au mode.
       const [existingPerf] = await conn.execute(
-        'SELECT id FROM performences WHERE fond_id = ? AND date = ?',
+        opts.dryRun
+          ? `SELECT id, ytd, perfveille, perf1an, perf3ans, perf5ans, perf8ans,
+                    perf10ans, perf4s, perf3m, perf6m
+               FROM performences WHERE fond_id = ? AND date = ?`
+          : 'SELECT id FROM performences WHERE fond_id = ? AND date = ?',
         [f.id, latestDateStr]
       );
 
@@ -238,6 +267,44 @@ async function run() {
         perf1anm, perf3ansm, perf5ansm, perf8ansm, perf10ansm,
         perf4sm, perf3mm, perf6mm,
       };
+
+      if (opts.dryRun) {
+        // Une performance est un pourcentage : au-dela d un centieme de point,
+        // les deux calculs ne disent plus la meme chose et la substitution ne
+        // serait pas neutre.
+        const TOLERANCE = 0.01;
+        const champs = ['ytd', 'perfveille', 'perf1an', 'perf3ans', 'perf5ans',
+          'perf8ans', 'perf10ans', 'perf4s', 'perf3m', 'perf6m'];
+        if (!existingPerf.length) {
+          console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr} — ABSENT en base, serait INSERE`);
+          dryAbsents++;
+        } else {
+          const stocke = existingPerf[0];
+          const ecarts = [];
+          for (const c of champs) {
+            const calc = perfValues[c], base = stocke[c];
+            if (calc === null && (base === null || base === undefined)) continue;
+            if (calc === null || base === null || base === undefined) {
+              ecarts.push(`${c}: calcule=${calc} stocke=${base}`); continue;
+            }
+            if (Math.abs(Number(calc) - Number(base)) > TOLERANCE) {
+              ecarts.push(`${c}: calcule=${Number(calc).toFixed(4)} stocke=${Number(base).toFixed(4)}`);
+            }
+          }
+          if (ecarts.length) {
+            console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr} — ${ecarts.length} ecart(s)`);
+            for (const e of ecarts.slice(0, 6)) console.log(`        ${e}`);
+            dryDifferents++;
+          } else {
+            dryIdentiques++;
+          }
+        }
+        processed++;
+        if (!byPays[pays]) byPays[pays] = 0;
+        byPays[pays]++;
+        if (opts.limit && processed >= opts.limit) { console.log(`\n  limite de ${opts.limit} fonds atteinte`); break; }
+        continue;
+      }
 
       if (existingPerf.length > 0) {
         const sets = Object.keys(perfValues).filter(k => k !== 'fond_id' && k !== 'date')
@@ -264,6 +331,11 @@ async function run() {
       if (!byPays[pays]) byPays[pays] = 0;
       byPays[pays]++;
 
+      if (opts.limit && processed >= opts.limit) {
+        console.log(`  limite de ${opts.limit} fonds atteinte`);
+        break;
+      }
+
       if ((i + 1) % 50 === 0 || i === fonds.length - 1) {
         console.log(`  [${i + 1}/${fonds.length}] ${f.nom_fond} (${pays}) date=${latestDateStr}`);
       }
@@ -276,6 +348,16 @@ async function run() {
   console.log('\n==========================================');
   console.log('=== RAPPORT PEUPLAGE PERFORMANCES ===');
   console.log('==========================================');
+  if (opts.dryRun) {
+    console.log('--- DRY-RUN : comparaison avec la table performences ---');
+    console.log(`Identiques (<= 0,01 pt) : ${dryIdentiques}`);
+    console.log(`Divergents              : ${dryDifferents}`);
+    console.log(`Absents en base         : ${dryAbsents}`);
+    console.log(dryDifferents === 0
+      ? 'Les deux calculs donnent les memes chiffres sur ce perimetre.'
+      : 'ECARTS : ne pas substituer ce script a la route sans les expliquer.');
+    console.log('');
+  }
   console.log(`Fonds traites:    ${processed}`);
   console.log(`Inseres:          ${inserted}`);
   console.log(`Mis a jour:       ${updated}`);
