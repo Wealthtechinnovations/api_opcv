@@ -1,0 +1,333 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "W2_PROMOTION_READY_DELTAS_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "5a27f8597332497bde1ea916551a284cfa954ce1",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "single_queue_authority": ".governance/loop/task-queue.json",
+  "rules": {
+    "these_are_not_tasks": true,
+    "no_ids_reserved": true,
+    "no_auto_promotion": true,
+    "deduplicate_again_after_AF_TASK_028_release": true,
+    "do_not_duplicate_W1_deltas": true,
+    "do_not_duplicate_AF_OPS_007_008_009": true,
+    "security_external_rotation_may_block_closure_but_not_read_only_design": true
+  },
+  "execution_order": [
+    "W2-DELTA-001 country operations security boundary",
+    "W2-DELTA-002 credential/legacy FX writer retirement with provider rotation",
+    "W2-DELTA-003 CEMAC read-only preflight",
+    "W2-DELTA-004 lineage adoption linked to W1-DELTA-004",
+    "W2-DELTA-005 Country Panel import/contract modernization",
+    "W2-DELTA-007 pipeline observability",
+    "W2-DELTA-006 Kenya/Ghana feasibility discovery"
+  ],
+  "deltas": [
+    {
+      "id": "W2-DELTA-001",
+      "priority": "P0_SECURITY",
+      "title": "Country Operations — auth/RBAC/ownership and safe mutation boundary",
+      "state": "PROMOTION_READY_AFTER_QUEUE_RELEASE",
+      "existing_links": [
+        "AF-INTAKE-CAND-019",
+        "AF-INTAKE-CAND-020",
+        "AF-INTAKE-CAND-033",
+        "AF-PROP-015",
+        "AF-PROP-023"
+      ],
+      "evidence": [
+        "Country Panel routes are mounted and live.",
+        "Multiple fund/SGO/VL/user/fee mutations are unauthenticated in the current monolith.",
+        "updateSociete can also change a linked user password.",
+        "updateValues can partially mutate and contains a variable-scope defect in the previousValues path.",
+        "Frontend often uses direct fetch without Authorization, so blanket server protection would regress the UI."
+      ],
+      "definition_of_ready": [
+        "Current session/token transport for each Country Panel page is mapped.",
+        "Exact role/ownership semantics are verified from JWT/typeusers conventions.",
+        "RED tests exist for unauthorized/cross-country/cross-SGO access before route changes.",
+        "No overlap with AF-TASK-017/028 surfaces."
+      ],
+      "definition_of_done": [
+        "Sensitive reads/mutations return 401/403/200 as designed.",
+        "No public product/reference route is accidentally privatized.",
+        "Financial mutations use transaction/rollback/dry-run where required.",
+        "Country Panel user journeys remain functional after bounded rollout.",
+        "No auth bypass via client-supplied pays/societe_gestion."
+      ],
+      "candidate_mini_tasks": [
+        "Classify Country Panel calls as server/client-side and token availability.",
+        "Create shared authenticated Country Panel API helper from existing auth utilities.",
+        "Harden account/admin mutation routes.",
+        "Harden SGO profile/password flows and split password change.",
+        "Harden fund create/update routes with field allowlist and ownership.",
+        "Harden VL correction/upload/index mutation routes with transaction/dry-run.",
+        "Add 401/403/200 contract tests and bounded smoke checks."
+      ],
+      "forbidden": [
+        "Do not add authenticate to all routes in one commit.",
+        "Do not infer role names/ownership rules from labels alone.",
+        "Do not invoke production mutation routes as tests."
+      ]
+    },
+    {
+      "id": "W2-DELTA-002",
+      "priority": "P0_SECURITY",
+      "title": "Legacy FX HTTP writer and exposed provider credential retirement",
+      "state": "PROMOTION_READY_WITH_EXTERNAL_ROTATION_GAP",
+      "existing_links": [
+        "AF-INTAKE-CAND-020",
+        "AF-TASK-010",
+        "AF-PROP-024"
+      ],
+      "evidence": [
+        "Active monolith GET /api/fetch-currency-pairs contains an inline third-party credential.",
+        "The GET route performs devisedechanges.bulkCreate without authentication.",
+        "A scheduled FX importer already exists and is the candidate canonical operational path.",
+        "Plaintext browser-password exports are also tracked in current Git tree; secret values are intentionally excluded from governance artifacts."
+      ],
+      "definition_of_ready": [
+        "Provider/account owner identified without copying credential values.",
+        "External rotation/revocation plan exists.",
+        "Canonical FX importer behavior/consumers are proven sufficient before route retirement."
+      ],
+      "definition_of_done": [
+        "Exposed provider credential rotated/revoked externally.",
+        "No inline provider credential remains in active or legacy code.",
+        "Public GET-with-side-effect FX route is retired or converted into a properly governed operator action.",
+        "Tracked plaintext credential-export files are removed from current tree through an approved security task.",
+        "Secret-scanning/prevention gate is added; history-remediation decision is explicit."
+      ],
+      "candidate_mini_tasks": [
+        "Provider rotation/revocation.",
+        "Consumer audit for fetch-currency-pairs.",
+        "Replace inline secret with secret authority if provider still needed.",
+        "Remove/deprecate HTTP writer after canonical FX path proof.",
+        "Add repository secret-scan and upload-ignore controls.",
+        "Separate current-tree cleanup from any Git-history rewrite decision."
+      ],
+      "forbidden": [
+        "Do not print or copy secret values.",
+        "Do not treat Git deletion as credential revocation.",
+        "Do not rewrite history implicitly."
+      ]
+    },
+    {
+      "id": "W2-DELTA-003",
+      "priority": "P1",
+      "title": "CEMAC/BVMAC read-only deployment preflight",
+      "state": "READ_ONLY_PROMOTION_READY",
+      "existing_links": [
+        "AF-INTAKE-CAND-013",
+        "AF-PROP-007",
+        "AF-PROP-010",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ],
+      "evidence": [
+        "34 CEMAC funds / 34 active are live, but latest VL is 2024-12-12.",
+        "bvmac_boc_daily.py exists and historically parsed a real BOC sample.",
+        "No BVMAC cron, no bvmac_* staging tables and no data/bvmac_boc evidence directory are deployed."
+      ],
+      "definition_of_ready": [
+        "Official BVMAC source is reachable from the target runtime.",
+        "Read-only parsing of a recent bulletin is reproducible without DDL.",
+        "Live 34-fund identity mapping can be measured without writes.",
+        "Date-specific XAF FX semantics are defined."
+      ],
+      "definition_of_done": [
+        "Exact/fuzzy/unmatched fund mapping report exists.",
+        "No ambiguous fund is auto-promoted.",
+        "Source artifact/hash/page/raw-line model is proven.",
+        "Dry-run would_insert/skip/reject scope is measured.",
+        "A separately governed deployment task can then decide staging DDL/cron activation."
+      ],
+      "candidate_mini_tasks": [
+        "Build dedicated no-DDL CEMAC source/mapping diagnostic.",
+        "Measure source reachability and publication cadence.",
+        "Parse latest/recent BOC in memory/read-only.",
+        "Join parsed identities to canonical funds with explicit confidence.",
+        "Measure FX/date gaps.",
+        "Prepare activation/rollback/observability contract."
+      ],
+      "forbidden": [
+        "Do not run normal bvmac_boc_daily.py mode during preflight.",
+        "Do not CREATE bvmac_* tables from a read-only diagnostic.",
+        "Do not activate a cron before mapping/quality proof."
+      ]
+    },
+    {
+      "id": "W2-DELTA-004",
+      "priority": "P1",
+      "title": "Country pipeline lineage adoption using existing staging",
+      "state": "DESIGN_READY_LINK_TO_W1_NOT_DUPLICATE",
+      "existing_links": [
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-009",
+        "AF-PROP-003",
+        "AF-PROP-007",
+        "W1-DELTA-004",
+        "W1-DELTA-002"
+      ],
+      "evidence": [
+        "UEMOA staging retains source URL/hash/page/raw line/match/import state at scale.",
+        "Tunisia retains audit/quarantine/new-fund evidence.",
+        "Nigeria extractor already emits rich source metadata; importer drops some of it.",
+        "Morocco has active official acquisition but no generic canonical lineage."
+      ],
+      "definition_of_ready": [
+        "W1 generic lineage contract remains the parent authority.",
+        "Country-specific evidence fields are inventoried and mapped to generic concepts.",
+        "No second raw store is introduced where stable links/adapters suffice."
+      ],
+      "definition_of_done": [
+        "Each active country pipeline can trace a new canonical observation to source artifact/observation evidence.",
+        "Existing staging remains intact and queryable.",
+        "No historical provenance is fabricated.",
+        "Adoption is writer-by-writer and backward compatible."
+      ],
+      "candidate_mini_tasks": [
+        "Define adapters for BRVM and CMF staging.",
+        "Transport Nigeria source/type/quality metadata as W1-DELTA-002.",
+        "Add Morocco artifact identity/hash from acquisition forward.",
+        "Define canonical_lineage_link/transformation_run schema only after additive migration promotion.",
+        "Expose lineage/quality metadata in operator view models."
+      ],
+      "forbidden": [
+        "Do not create a second country data platform.",
+        "Do not copy entire staging tables into a generic duplicate."
+      ]
+    },
+    {
+      "id": "W2-DELTA-005",
+      "priority": "P1",
+      "title": "Country Panel contract modernization and governed import dry-run",
+      "state": "DESIGN_READY",
+      "existing_links": [
+        "AF-INTAKE-CAND-019",
+        "AF-INTAKE-CAND-033",
+        "AF-PROP-015",
+        "AF-PROP-023",
+        "AF-PROP-024"
+      ],
+      "evidence": [
+        "Existing Country Panel has dashboard/fund/validated/anomaly/import/add workflows.",
+        "Current live fund-list/reference/anomaly GET contracts return 200.",
+        "Frontend calls POST /api/importfondsvl, but no current backend implementation was found.",
+        "Existing /api/uploadsfilevl/:id is a different per-fund direct-write contract and must not be used as a blind substitute."
+      ],
+      "definition_of_ready": [
+        "W2-DELTA-001 auth/client foundation is designed or in place.",
+        "Current CSV/import use cases are inventoried by country/operator.",
+        "Country ingestion contract dry-run output is defined."
+      ],
+      "definition_of_done": [
+        "Country Panel can preview source/import rows, matched/unmatched, would_insert/update/reject and quality/provenance before write.",
+        "Apply requires explicit auth/ownership and evidence.",
+        "Existing valid screens/URLs remain stable or have compatibility redirect/adapters.",
+        "No arbitrary upload bypasses canonical country pipeline rules."
+      ],
+      "candidate_mini_tasks": [
+        "Inventory intended importfondsvl behavior from history/UI expectations.",
+        "Define ImportDryRunViewModel and apply token/confirmation.",
+        "Build additive backend dry-run adapter reusing W2 ingestion contract.",
+        "Migrate one Country Panel screen/client at a time to shared authenticated API.",
+        "Deprecate direct legacy upload only after consumers move."
+      ],
+      "forbidden": [
+        "Do not alias importfondsvl to uploadsfilevl without semantic equivalence.",
+        "Do not perform write during preview."
+      ]
+    },
+    {
+      "id": "W2-DELTA-006",
+      "priority": "P2",
+      "title": "Kenya/Ghana regulator-universe and NAV-source feasibility",
+      "state": "DISCOVERY_READY_NO_CONNECTOR_YET",
+      "existing_links": [
+        "AF-INTAKE-CAND-015",
+        "AF-PROP-011",
+        "W1-DELTA-003",
+        "W1-DELTA-004",
+        "W1-DELTA-007"
+      ],
+      "evidence": [
+        "Kenya CMA current registry exposes umbrella schemes/sub-funds and multi-currency products.",
+        "Ghana SEC current registries expose Mutual Funds and Unit Trusts with manager/custodian.",
+        "No centralized official current daily NAV feed has yet been certified for either market."
+      ],
+      "definition_of_ready": [
+        "Current regulator lists can be snapshotted deterministically.",
+        "Fund/SubFund/ShareClass grain rules from W1 are explicit enough for source discovery.",
+        "Terms/licensing constraints are captured before bulk acquisition design."
+      ],
+      "definition_of_done": [
+        "Regulator-universe counts/identities are reproducible.",
+        "At least five representative managers/products per market have a certified NAV/price publication path or a documented absence.",
+        "Currency/price type/publication cadence/history depth are explicit.",
+        "Only then can a country connector child task be considered."
+      ],
+      "candidate_mini_tasks": [
+        "Kenya scheme/sub-fund structure extraction.",
+        "Ghana Mutual Fund and Unit Trust structure extraction.",
+        "Sample manager official NAV/factsheet paths.",
+        "Record source type/cadence/history/licence.",
+        "Decide connector feasibility separately for Kenya and Ghana."
+      ],
+      "forbidden": [
+        "Do not treat regulator registry as NAV source.",
+        "Do not create connector implementation task from taxonomy presence."
+      ]
+    },
+    {
+      "id": "W2-DELTA-007",
+      "priority": "P2",
+      "title": "Country pipeline observability — source vs acquisition vs import vs derivation",
+      "state": "DESIGN_READY",
+      "existing_links": [
+        "AF-INTAKE-CAND-008",
+        "AF-INTAKE-CAND-034",
+        "AF-PROP-007",
+        "AF-PROP-024",
+        "AF-OPS-009"
+      ],
+      "evidence": [
+        "Nigeria publication delay can make freshness exceed a simple budget without pipeline outage.",
+        "Current diagnostics separately observe crons, source artifacts, canonical freshness and derived freshness, but no unified operator contract exists.",
+        "Country Panel is the natural existing UI surface for operator visibility."
+      ],
+      "definition_of_ready": [
+        "W2 ingestion stage vocabulary is accepted as design input.",
+        "Existing incident/data-quality authorities remain the source of truth."
+      ],
+      "definition_of_done": [
+        "Operator can distinguish source not published, acquisition failed, parse failed, identity unresolved, import failed, canonical stale and derivation stale.",
+        "No duplicate incident registry is created.",
+        "Per-country freshness budgets and publication lag are visible with evidence timestamps."
+      ],
+      "candidate_mini_tasks": [
+        "Define CountryPipelineStatusViewModel.",
+        "Map existing cron/log/audit/source/canonical timestamps.",
+        "Expose stage status read-only.",
+        "Integrate with Country Panel incrementally.",
+        "Link failures to existing AF-OPS/evidence rather than inventing parallel incident states."
+      ],
+      "forbidden": []
+    }
+  ],
+  "protected_active_work": [
+    {
+      "task": "AF-TASK-017",
+      "rule": "No edits to allocation constraint surfaces."
+    },
+    {
+      "task": "AF-TASK-028",
+      "rule": "No edits to queue/projection/Programme Director surfaces."
+    }
+  ],
+  "next_action": "Continue promotion-independent read-only W2 work: CEMAC no-DDL source/mapping preflight and Kenya/Ghana regulator-universe/source sampling. When AF-TASK-028 releases the queue, reobserve/deduplicate before promoting any delta."
+}
