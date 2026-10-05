@@ -3,7 +3,7 @@
   "project_uid": "CS-AFRICAFUNDS-001",
   "status": "W1_PROMOTION_READY_DELTAS_NON_AUTHORITATIVE",
   "observed_heads": {
-    "api": "2612f5efd3756786ee1e3d18ced8f3e224ab13f8",
+    "api": "41f6e89413512f25ac18cc6e4279c783616a97d2",
     "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
   },
   "single_queue_authority": ".governance/loop/task-queue.json",
@@ -149,7 +149,7 @@
       "id": "W1-DELTA-005",
       "priority": "P2",
       "title": "ORM/live-schema parity for valorisations",
-      "state": "BLOCKED_BY_RUNTIME_SCHEMA_SYNC_GATE",
+      "state": "PROMOTION_READY_FOR_ORM_PARITY_DESIGN",
       "existing_links": [
         "AF-PROP-003",
         "AF-PROP-006"
@@ -157,7 +157,8 @@
       "evidence": [
         "15 additive columns exist in live valorisations but are absent from src/models/vl.js.",
         "sequelize.js can call sync({alter:true}) when DB_SYNC_ALTER=true.",
-        "Tracked .env.production has historical DB_SYNC_ALTER=true but is not authoritative runtime state."
+        "Tracked .env.production has historical DB_SYNC_ALTER=true but is not authoritative runtime state.",
+        "Production runtime gate measured 2026-10-05 21:52 UTC: DB_SYNC_ALTER=false, DB_SYNC=false, NODE_ENV=production."
       ],
       "target": "Mirror already-existing columns as nullable ORM fields only after active runtime DB_SYNC/DB_SYNC_ALTER flags are certified safe and writer tests exist.",
       "forbidden": [
@@ -165,7 +166,7 @@
         "type/nullability changes without migration",
         "replaying Nigeria DDL"
       ],
-      "blocker": "diag_w1_runtime_schema_gate result pending."
+      "blocker": "Runtime schema-sync gate is cleared. Remaining gate: live schema/model field parity tests and governed promotion before any model change."
     },
     {
       "id": "W1-DELTA-006",
@@ -263,5 +264,5 @@
       "rule": "No edits to task-queue/projections/program governance surfaces."
     }
   ],
-  "next_action": "Wait only for runtime schema-gate diagnostic to resolve W1-DELTA-005, then persist W1 checkpoint. Promotion into the single queue occurs only after AF-TASK-028 releases queue surfaces and a fresh dedup."
+  "next_action": "W1 read-only discovery is complete enough for checkpoint. Do not mutate task-queue.json while AF-TASK-028 claims it. Continue only promotion-independent read-only qualification or wait for queue release; when released, reobserve/deduplicate and promote W1 deltas in priority order."
 }
