@@ -1,0 +1,96 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "PROPOSAL_NOT_TASK_NO_CODE_CHANGE",
+  "observed_heads": {
+    "api": "ae341b2331841092f99c7f4751ea78f5f5a37fff",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "title": "Nigeria SEC — transport provenance/type without changing the selected numeric measure",
+  "evidence": {
+    "live_csv_observed_at": "2026-10-05T21:45:46.285Z",
+    "rows": 8627,
+    "source_url_coverage_pct": 100,
+    "vl_price_source_coverage_pct": 100,
+    "vl_price_source_distribution": {
+      "offer_price_fallback": 8627
+    },
+    "currency_code_coverage_pct": 100,
+    "source_title_pct": 100,
+    "source_page_url_pct": 100,
+    "source_year_page_pct": 100,
+    "sheet_name_pct": 100,
+    "source_row_number_pct": 100,
+    "report_date_header": false,
+    "sec_document_id_header": false,
+    "source_file_nonempty_pct": 0
+  },
+  "code_path_finding": {
+    "extractor": "sec_ng_nav_extractor_v6.py exports source_url, source metadata, vl_price_source, currency evidence and quality_flags.",
+    "importer": "scripts/import/import_vl_nigeria_sec.js currently discards source/type fields while grouping rows before vl_contract.validate().",
+    "contract": "src/lib/vl_contract.js already stores source_url/price_type/data_quality/batch but currently considers any recognized BID/OFFER/UNIT_PRICE/NAV_TOTAL explicit type sufficient for OK if other checks pass.",
+    "doctrine": "Extractor comments explicitly state Unit Price is the VL; Bid/Offer are fallback prices and must be named so downstream can reject/review knowingly."
+  },
+  "target_behavior": {
+    "numeric_value": "UNCHANGED in first rollout. Continue using the same selected vl_price so this lot cannot silently alter NAV history.",
+    "currency": "UNCHANGED in first rollout; existing CURRENCY_MISMATCH rejection remains.",
+    "source_url": "Transport exact extractor source_url to canonical contract.",
+    "price_type_mapping": {
+      "unit_price": "UNIT_PRICE",
+      "offer_price_fallback": "OFFER",
+      "bid_price_fallback": "BID"
+    },
+    "data_quality_policy": {
+      "UNIT_PRICE": "Existing validation may yield OK when currency/provenance also conform.",
+      "OFFER": "REVIEW — explicit fallback, never automatically upgraded to OK.",
+      "BID": "REVIEW — explicit fallback, never automatically upgraded to OK.",
+      "NAV_TOTAL": "REVIEW unless a separate business rule proves it is the intended canonical measurement for that dataset.",
+      "missing_or_unknown": "UNQUALIFIED",
+      "currency_mismatch": "CURRENCY_MISMATCH and rejected as today"
+    },
+    "report_date": "NULL unless an actual published/report date is exported; valuation_date must not be repurposed.",
+    "sec_document_id": "NULL unless a real official identifier is available.",
+    "quality_flags": "Preserve through lineage/audit when generic lineage link exists; at minimum use fallback flags to prevent OK classification."
+  },
+  "implementation_candidate": {
+    "preferred_links": [
+      "AF-OPS-007",
+      "AF-OPS-009",
+      "AF-PROP-003",
+      "AF-PROP-009"
+    ],
+    "touched_surfaces_candidate": [
+      "scripts/import/import_vl_nigeria_sec.js",
+      "src/lib/vl_contract.js",
+      "tests/vl_contract.test.js",
+      "new focused importer metadata fixture/test if needed"
+    ],
+    "exact_sequence": [
+      "Add pure normalization helper for extractor vl_price_source -> contract price_type.",
+      "Extend vl_contract validation tests so BID/OFFER fallback yields REVIEW in warn mode and remains accepted but never OK.",
+      "Transport source_url and normalized price_type through importer grouping without changing vl_price/currency/fund matching.",
+      "Dry-run current sec_ng_latest.csv before/after: numeric selected values, fund matches, currency and row counts must be identical.",
+      "Assert 8627 current rows become provenance-present but fallback-review, not OK.",
+      "Deploy code only through existing governed path after task promotion; observe next scheduled Nigeria cycle.",
+      "Historical metadata backfill, if useful, is a separate task from retained artifacts and exact identity."
+    ]
+  },
+  "acceptance_criteria": [
+    "Zero numeric VL difference for identical input CSV.",
+    "Zero change to fund matching and selected currency.",
+    "100% current CSV source_url remains traceable.",
+    "Offer/Bid fallbacks are explicit REVIEW, never silently OK.",
+    "No fabricated report_date/sec_document_id.",
+    "Current strict/warn deployment semantics remain compatible.",
+    "AF-OPS-007 C7/C3 remains open until numeric scale/currency issues are independently resolved."
+  ],
+  "non_goals": [
+    "Does not solve C7/C3 by itself.",
+    "Does not decide whether Offer should remain canonical value long term.",
+    "Does not mutate historical database rows.",
+    "Does not create a new Nigeria pipeline.",
+    "Does not change cron cadence."
+  ],
+  "blocker": "Current operational tasks are read-only preflight/RCA and AF-TASK-028 claims task-queue.json. Promote only when governance permits.",
+  "next_action": "Attach this proposal to the existing DATA_QUALITY/pipeline program after queue release; start RED tests and dry-run, not production writes."
+}
