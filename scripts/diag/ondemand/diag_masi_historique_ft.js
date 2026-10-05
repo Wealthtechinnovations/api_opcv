@@ -105,21 +105,76 @@ function get(url, entetes = []) {
     if (typeof j.html === 'string') fragment = j.html;
   } catch { /* pas du JSON : on analyse le corps tel quel */ }
 
-  const texte = fragment.replace(/<[^>]+>/g, '|').replace(/&nbsp;?/gi, ' ').replace(/\|+/g, '|');
-  // Les dates FT se presentent « Fri, Oct 02, 2026 ».
-  const lignes = texte.match(/[A-Z][a-z]{2}, [A-Z][a-z]{2} \d{2}, \d{4}\|[^|]*\|[\d,\.]+/g) || [];
-  console.log(`  couples date + valeur reperes : ${lignes.length}`);
-  if (lignes.length) {
-    console.log('\n  Les six premieres lignes, telles que publiees :');
-    for (const l of lignes.slice(0, 6)) console.log(`    ${l.replace(/\|/g, '  ')}`);
-    console.log('\n  VERDICT : une serie datee est accessible depuis S2 sur la periode');
-    console.log('  manquante. Le rattrapage du 06/08 au 02/10 pourrait donc etre fait');
-    console.log('  avec des clotures PUBLIEES, sans deduire aucune valeur.');
+  // IDENTIFIER LA COLONNE DE CLOTURE, ET NE PAS LA DEVINER. Le tour precedent
+  // a imprime « Fri, Oct 02, 2026 17,579.17 17,698.72 » et il aurait ete facile
+  // d y lire une cloture. C en est une autre : la cloture du 02/10 vaut
+  // 17 303,69, concordante entre African Markets et l entete de la page FT.
+  // 17 579,17 est donc l ouverture, ou le plus haut. Prendre la premiere
+  // colonne venue aurait fausse tout le benchmark marocain d environ +1,6 %,
+  // sans qu aucun controle ne puisse le voir.
+  //
+  // On extrait donc toutes les cellules de chaque ligne, et on identifie la
+  // colonne par un CAS CONNU : celle qui porte 17 303,69 au 2 octobre est la
+  // cloture. Une mesure qui se verifie elle-meme vaut mieux qu une convention
+  // supposee sur l ordre des colonnes.
+  const CLOTURE_CONNUE = 17303.69;
+  const DATE_CONNUE = 'Oct 02, 2026';
+
+  const nombre = s => Number(String(s).replace(/,/g, ''));
+  const lignes = [];
+  const reLigne = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  let mr;
+  while ((mr = reLigne.exec(fragment)) !== null) {
+    const cellules = (mr[1].match(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi) || [])
+      .map(c => c.replace(/<[^>]+>/g, ' ').replace(/&nbsp;?/gi, ' ').replace(/\s+/g, ' ').trim())
+      .filter(c => c.length);
+    if (cellules.length >= 2) lignes.push(cellules);
+  }
+
+  console.log(`  lignes de tableau trouvees : ${lignes.length}`);
+  if (!lignes.length) {
+    console.log('  Aucune ligne reconnue. Echantillon du fragment recu :');
+    console.log(`    ${fragment.replace(/\s+/g, ' ').slice(0, 300)}`);
+    console.log('  Ne pas conclure que la serie est absente : c est l analyse du');
+    console.log('  fragment qu il faudra corriger.');
+    console.log('\n=== FIN — aucune ecriture effectuee ===');
+    return;
+  }
+
+  console.log('\n  Quatre lignes brutes, toutes colonnes :');
+  for (const l of lignes.slice(0, 4)) console.log(`    ${l.join('  |  ')}`);
+
+  const ligneTemoin = lignes.find(l => l[0] && l[0].includes(DATE_CONNUE));
+  let colCloture = -1;
+  if (ligneTemoin) {
+    console.log(`\n  Ligne temoin du ${DATE_CONNUE} : ${ligneTemoin.join('  |  ')}`);
+    for (let i = 1; i < ligneTemoin.length; i++) {
+      if (Math.abs(nombre(ligneTemoin[i]) - CLOTURE_CONNUE) < 0.01) { colCloture = i; break; }
+    }
+    console.log(`  colonne portant la cloture connue ${CLOTURE_CONNUE} : ${colCloture >= 0 ? `n°${colCloture}` : 'AUCUNE'}`);
   } else {
-    console.log('\n  Aucun couple date+valeur reconnu. Echantillon du corps recu :');
-    console.log(`    ${texte.slice(0, 300).replace(/\s+/g, ' ')}`);
-    console.log('  Ne pas conclure que la serie est absente : le format a peut-etre');
-    console.log('  change. C est l analyse du fragment qu il faudra corriger.');
+    console.log(`\n  Pas de ligne au ${DATE_CONNUE} dans la reponse : temoin indisponible.`);
+  }
+
+  console.log('\n## 3. Verdict');
+  if (colCloture >= 0) {
+    console.log(`  La serie est accessible ET la colonne de cloture est identifiee`);
+    console.log(`  (n°${colCloture}) par concordance avec une valeur connue de deux`);
+    console.log('  sources independantes. Le rattrapage du 06/08 au 02/10 peut donc');
+    console.log('  etre fait avec des clotures PUBLIEES, sans deduire aucune valeur.');
+    console.log('\n  Clotures disponibles sur la fenetre manquante :');
+    let n = 0;
+    for (const l of lignes) {
+      const v = nombre(l[colCloture]);
+      if (!Number.isFinite(v) || v < 1000) continue;
+      if (n < 8) console.log(`    ${l[0].padEnd(22)} cloture ${l[colCloture]}`);
+      n++;
+    }
+    console.log(`  total : ${n} cloture(s) datee(s)`);
+  } else {
+    console.log('  La serie repond, mais la colonne de cloture n est PAS identifiee.');
+    console.log('  Ne rien ecrire en base dans cet etat : prendre la mauvaise colonne');
+    console.log('  faussait le benchmark de ~1,6 % sans qu aucun controle le voie.');
   }
 
   console.log('\n=== FIN — aucune ecriture effectuee ===');
