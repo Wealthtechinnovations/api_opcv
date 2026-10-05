@@ -4,8 +4,8 @@
   "product": "AfricaFunds",
   "status": "W2_PROMOTION_READY_DELTAS_NON_AUTHORITATIVE",
   "observed_heads": {
-    "api": "5a27f8597332497bde1ea916551a284cfa954ce1",
-    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+    "api": "0a263f6702a8fb6643ea152dba951d3ce07a2500",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
   },
   "single_queue_authority": ".governance/loop/task-queue.json",
   "rules": {
@@ -120,7 +120,7 @@
       "id": "W2-DELTA-003",
       "priority": "P1",
       "title": "CEMAC/BVMAC read-only deployment preflight",
-      "state": "READ_ONLY_PROMOTION_READY",
+      "state": "SOURCE_AND_MAPPING_PREFLIGHT_PASS_DRYRUN_SCOPE_PENDING",
       "existing_links": [
         "AF-INTAKE-CAND-013",
         "AF-PROP-007",
@@ -131,13 +131,16 @@
       "evidence": [
         "34 CEMAC funds / 34 active are live, but latest VL is 2024-12-12.",
         "bvmac_boc_daily.py exists and historically parsed a real BOC sample.",
-        "No BVMAC cron, no bvmac_* staging tables and no data/bvmac_boc evidence directory are deployed."
+        "No BVMAC cron, no bvmac_* staging tables and no data/bvmac_boc evidence directory are deployed.",
+        "Production no-write probe on BVMAC BOC 2026-10-05: HTTP 200, PDF 2,238,241 bytes, 27 pages, OPCVM pages 9-13.",
+        "23 parsed rows, 0 parse failures; quality 19 OK / 4 SUSPECT_VARIATION.",
+        "19 matched rows: 18 exact + 1 fuzzy (95%); 4 unmatched; no alias/table/cron/VL write performed."
       ],
       "definition_of_ready": [
-        "Official BVMAC source is reachable from the target runtime.",
-        "Read-only parsing of a recent bulletin is reproducible without DDL.",
-        "Live 34-fund identity mapping can be measured without writes.",
-        "Date-specific XAF FX semantics are defined."
+        "Official BVMAC source reachable from target runtime — PASS.",
+        "Read-only latest BOC parsing reproducible without DDL — PASS.",
+        "Live 34-fund mapping measured — PASS_PARTIAL_19_MATCHED_4_UNMATCHED_FROM_CURRENT_BULLETIN.",
+        "Date-specific XAF FX semantics defined — PENDING."
       ],
       "definition_of_done": [
         "Exact/fuzzy/unmatched fund mapping report exists.",
@@ -147,18 +150,19 @@
         "A separately governed deployment task can then decide staging DDL/cron activation."
       ],
       "candidate_mini_tasks": [
-        "Build dedicated no-DDL CEMAC source/mapping diagnostic.",
-        "Measure source reachability and publication cadence.",
-        "Parse latest/recent BOC in memory/read-only.",
-        "Join parsed identities to canonical funds with explicit confidence.",
-        "Measure FX/date gaps.",
-        "Prepare activation/rollback/observability contract."
+        "Extend no-write preflight with duplicate fund/date detection and would_insert/skip/reject counts.",
+        "Resolve four unmatched source identities with source-backed aliases only.",
+        "Review four SUSPECT_VARIATION rows and avoid automatic promotion.",
+        "Measure date-specific XAF FX availability for each candidate observation.",
+        "Prepare staging/cron activation plan only after dry-run GREEN.",
+        "Define rollback/observability and lineage reuse before deployment."
       ],
       "forbidden": [
         "Do not run normal bvmac_boc_daily.py mode during preflight.",
         "Do not CREATE bvmac_* tables from a read-only diagnostic.",
         "Do not activate a cron before mapping/quality proof."
-      ]
+      ],
+      "blocker": "Dry-run promotion scope, unresolved identities/quality and date-specific FX still pending; no bvmac_* staging or cron may be activated yet."
     },
     {
       "id": "W2-DELTA-004",
@@ -329,5 +333,5 @@
       "rule": "No edits to queue/projection/Programme Director surfaces."
     }
   ],
-  "next_action": "Continue promotion-independent read-only W2 work: CEMAC no-DDL source/mapping preflight and Kenya/Ghana regulator-universe/source sampling. When AF-TASK-028 releases the queue, reobserve/deduplicate before promoting any delta."
+  "next_action": "Continue CEMAC no-write dry-run scope and Ghana/Kenya technical source probes. Reobserve/deduplicate before any queue promotion after AF-TASK-028 release."
 }
