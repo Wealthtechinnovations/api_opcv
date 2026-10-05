@@ -340,7 +340,42 @@ async function main() {
     // depuis 2023 qui ne sont plus alimentees par personne et dont l alerte
     // serait du bruit permanent. Severite AVERTISSEMENT, alignee sur C6 et C9 ;
     // try/catch comme C5 et C9 depuis le lot BF.
+    //
+    // PERIMETRE CORRIGE LE 2026-10-05, ET MESURE AVANT DE L ETRE. La premiere
+    // version jugeait tout indice alimente dans les 400 derniers jours, et
+    // mettait donc `MONIA` en alerte des sa premiere execution — fige depuis
+    // 144 jours. Or MONIA ne prive aucun fonds de benchmark : aucun fonds ne le
+    // declare, **zero** VL ne le porte, et `propagate_indref_range.js` le dit
+    // deja en clair — « MONIA exclu (pays: []) : c est un taux, non propage aux
+    // fonds ». Un controle de fraicheur applique a une statistique que rien ne
+    // consomme produit une alerte permanente sans enjeu, et une alerte
+    // permanente finit par etre ignoree — y compris le jour ou elle porte sur
+    // un vrai benchmark.
+    //
+    // Le critere n est donc PAS une liste d exceptions, et surtout pas une
+    // troisieme copie du mapping pays → indice (il en existe deja deux dans le
+    // code). Il est pris dans les donnees : un indice est juge s il est
+    // effectivement porte par des VL. Mesure du 2026-10-05 sur
+    // `valorisations` — MASI 550 866 VL, Tunindex 311 089, NSE All Share 54 069,
+    // BRVM Composite 45 102, et MONIA **absent**.
+    //
+    // Ce n est pas une desactivation : les indices non consommes restent
+    // affiches, avec leur age, et le detail dit pourquoi ils ne sont pas juges.
+    // Un indice mourant garde par ailleurs son historique de VL, donc il reste
+    // juge — le critere ne cree pas d angle mort sur une serie qui s arrete.
+    // Limite assumee et documentee : un indice tout neuf, pas encore propage,
+    // ne serait pas juge tant qu aucune VL ne le porte.
     try {
+      const SEUIL_CONSOMMATION = 100;   // en deca, residu historique, pas un benchmark vivant
+      const [consommes] = await conn.execute(`
+        SELECT COALESCE(NULLIF(TRIM(v.indice_name), ''), NULLIF(TRIM(v.ID_indice), '')) AS indice,
+               COUNT(*) AS vl
+          FROM valorisations v
+         WHERE COALESCE(NULLIF(TRIM(v.indice_name), ''), NULLIF(TRIM(v.ID_indice), '')) IS NOT NULL
+         GROUP BY 1
+        HAVING vl >= ?`, [SEUIL_CONSOMMATION]);
+      const porteParDesVL = new Map(consommes.map(r => [String(r.indice), Number(r.vl)]));
+
       const [idx] = await conn.execute(`
         SELECT COALESCE(i.nom_indice, i.id_indice) AS indice,
                MAX(i.date) AS derniere,
@@ -351,16 +386,31 @@ async function main() {
          ORDER BY age DESC`);
       for (const r of idx) {
         const age = Number(r.age);
+        const vl = porteParDesVL.get(String(r.indice));
+        const le = String(r.derniere).slice(0, 10);
+        if (!vl) {
+          // Affiche, date, mais pas juge : rien ne le consomme.
+          record(`C10.${r.indice}`, 'AVERTISSEMENT', `Fraicheur de l indice ${r.indice}`,
+            true,
+            `derniere valeur le ${le}, soit ${age} j — non juge : aucune VL ne porte cet indice, `
+              + 'ce n est pas un benchmark de fonds mais une statistique.');
+          continue;
+        }
         // Les indices boursiers cotent les jours ouvres : une semaine de marge
         // couvre un week-end prolonge sans masquer un arret reel.
         record(`C10.${r.indice}`, 'AVERTISSEMENT', `Fraicheur de l indice ${r.indice}`,
           age <= 8,
-          `derniere valeur le ${String(r.derniere).slice(0, 10)}, soit ${age} j`
+          `derniere valeur le ${le}, soit ${age} j (porte par ${vl} VL)`
             + (age > 8 ? ' — l indice n est plus alimente ; les VL de ce pays partiront sans benchmark et C6 restera vert pendant des mois.' : ''));
       }
       if (!idx.length) {
         record('C10', 'AVERTISSEMENT', 'Fraicheur des indices de reference', false,
           'aucun indice alimente dans les 400 derniers jours — la table source est morte.');
+      }
+      if (!porteParDesVL.size) {
+        record('C10.perimetre', 'AVERTISSEMENT', 'Perimetre de C10', false,
+          'aucun indice n est porte par des VL : le critere de jugement est vide, '
+            + 'donc C10 ne juge plus rien. A corriger avant de se fier a ses verdicts.');
       }
     } catch (err) {
       record('C10', 'AVERTISSEMENT', 'Fraicheur des indices de reference', false,
