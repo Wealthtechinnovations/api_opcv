@@ -171,6 +171,35 @@ function get(url, entetes = []) {
       n++;
     }
     console.log(`  total : ${n} cloture(s) datee(s)`);
+
+    // LE TEST DECISIF — LA JONCTION. Si la cloture FT du 31 juillet egale les
+    // 17 843,70 que notre table a stockes ce jour-la, alors FT publie LA MEME
+    // serie que celle suivie jusqu a la panne : le rattrapage est une
+    // continuation, non un raccord entre deux sources d echelles possiblement
+    // differentes. Si elles divergent, il faut le savoir AVANT d ecrire.
+    const NOTRE_31_JUILLET = 17843.70;
+    const jonction = lignes.find(l => l[0] && l[0].includes('Jul 31, 2026'));
+    console.log('\n## 4. Jonction avec notre propre serie');
+    if (!jonction) {
+      console.log('  Le 31 juillet n est pas dans la fenetre renvoyee : jonction non');
+      console.log('  verifiable ici. Ne pas conclure a une divergence.');
+    } else {
+      const v = nombre(jonction[colCloture]);
+      const ecart = v - NOTRE_31_JUILLET;
+      console.log(`  cloture FT au 31/07/2026 : ${jonction[colCloture]}`);
+      console.log(`  valeur stockee par nous  : ${NOTRE_31_JUILLET}`);
+      console.log(`  ecart                    : ${ecart.toFixed(2)} (${(100 * ecart / NOTRE_31_JUILLET).toFixed(4)} %)`);
+      if (Math.abs(ecart) < 0.01) {
+        console.log('  IDENTIQUES. FT publie la meme serie que celle suivie jusqu a la');
+        console.log('  panne : le rattrapage est une continuation, pas un raccord.');
+      } else if (Math.abs(100 * ecart / NOTRE_31_JUILLET) < 0.5) {
+        console.log('  Tres proches sans etre identiques : meme indice, arrondi ou heure');
+        console.log('  de releve differente. Acceptable, mais a documenter.');
+      } else {
+        console.log('  DIVERGENTES. Ne rien ecrire : deux series differentes ne se');
+        console.log('  raccordent pas sans decision explicite.');
+      }
+    }
   } else {
     console.log('  La serie repond, mais la colonne de cloture n est PAS identifiee.');
     console.log('  Ne rien ecrire en base dans cet etat : prendre la mauvaise colonne');
