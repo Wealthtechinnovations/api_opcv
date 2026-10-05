@@ -388,7 +388,7 @@ async function scrapeBRVM(targetDate, verbose) {
  * getMasiHistory renvoie { result: { labels:[ts UTC minuit], prices:[cloture] } }.
  * On selectionne la fenetre via `periode` puis on filtre par date.
  */
-async function scrapeMASI(targetDate, verbose) {
+async function scrapeMASIviaMedias24(targetDate, verbose) {
   const periode = periodeForDate(targetDate);
   const url = `https://medias24.com/content/api?method=getMasiHistory&periode=${periode}&format=json`;
   try {
@@ -404,11 +404,146 @@ async function scrapeMASI(targetDate, verbose) {
         }
       }
     }
-    if (verbose) console.log(`    [MASI] pas de valeur pour ${targetDate} (jour non ouvre ?)`);
+    if (verbose) console.log(`    [MASI] medias24 : pas de valeur pour ${targetDate} (jour non ouvre ?)`);
   } catch (err) {
-    if (verbose) console.log(`    [MASI] ERROR ${err.message}`);
+    if (verbose) console.log(`    [MASI] medias24 : ERROR ${err.message}`);
   }
   return null;
+}
+
+/**
+ * MASI — repli par la fiche FT markets (MASI:CAS, « ALL SHARES INDEX »).
+ *
+ * POURQUOI CE REPLI EXISTE. Mesure du 2026-10-04 depuis ce serveur :
+ * `medias24.com/content/api` rend **HTTP 403 avec une interstitielle
+ * Cloudflare, a Node comme a curl**. La source d origine est fermee, et
+ * `indice_references` n avait plus aucune valeur MASI depuis le 2026-07-31 —
+ * 66 jours — ce qui a prive de benchmark toutes les VL marocaines posterieures
+ * au 06/08 (soit le 31/07 + les 7 jours de la fenetre de `propagateIndRef`).
+ * 8 002 VL sans `indRef`, et C6 n y voyait rien : son denominateur est tout
+ * l historique.
+ *
+ * POURQUOI FT ET PAS AUTRE CHOSE. Mesure depuis ce serveur, le meme jour :
+ * casablanca-bourse.com et ammc.ma ne repondent pas du tout (timeout, y compris
+ * en IPv4 force), bkam.ma rend 403 meme avec Referer, Yahoo 429, Stooq ne
+ * connait pas le symbole. FT et African Markets repondent et donnent le MEME
+ * niveau au centime — 17 303,69 au 02/10 — et surtout :
+ *
+ *   **cloture FT du 31/07/2026 = 17 843,70 = la valeur exacte stockee dans
+ *   `indice_references` ce jour-la.** Ecart 0,00. FT publie donc la serie que
+ *   nous suivions deja : ce repli est une continuation, pas un raccord entre
+ *   deux series d echelles differentes.
+ *
+ * COMMENT LA COLONNE DE CLOTURE EST DETERMINEE. Pas par convention. Le tableau
+ * FT donne Date | Ouverture | Haut | Bas | Cloture | Volume, et prendre la
+ * premiere colonne venue aurait fausse le benchmark d environ +1,6 % — un ecart
+ * credible, donc invisible pour tous les controles. La fonction verifie a
+ * l execution l invariant « ouverture du jour J = cloture du jour J-1 » sur les
+ * lignes renvoyees, les plus recentes d abord. Si l invariant ne tient pas, la
+ * structure a change : on rend `null` et on n ecrit rien.
+ *
+ * Le transport est `curlGetText` et non le client de Node, pour la raison deja
+ * documentee dans ce fichier a propos de bkam.ma.
+ */
+async function scrapeMASIviaFT(targetDate, verbose) {
+  const TEARSHEET = 'https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS';
+  const MOIS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  const nombre = s => Number(String(s).replace(/,/g, ''));
+  const fmtFT = iso => {
+    const [a, m, j] = iso.split('-');
+    return `${MOIS[Number(m) - 1]} ${j}, ${a}`;
+  };
+  const fmtRequete = d => `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+
+  try {
+    // 1. L identifiant interne de l instrument, lu dans la page. Aucune valeur
+    //    codee en dur : un identifiant fournisseur perime pointerait vers un
+    //    autre instrument sans que rien ne le signale.
+    const page = await curlGetText(TEARSHEET);
+    let xid = null;
+    for (const re of [/&quot;symbol&quot;\s*:\s*&quot;(\d{6,})&quot;/, /"symbol"\s*:\s*"(\d{6,})"/]) {
+      const m = page.match(re);
+      if (m) { xid = m[1]; break; }
+    }
+    if (!xid) {
+      if (verbose) console.log('    [MASI] FT : identifiant interne introuvable dans la fiche');
+      return null;
+    }
+
+    // 2. La serie autour de la date visee. Dix jours de marge couvrent un pont.
+    const cible = new Date(`${targetDate}T00:00:00Z`);
+    const depuis = new Date(cible.getTime() - 10 * 86400000);
+    const jusqu = new Date(cible.getTime() + 86400000);
+    const url = 'https://markets.ft.com/data/equities/ajax/get-historical-prices'
+      + `?startDate=${encodeURIComponent(fmtRequete(depuis))}`
+      + `&endDate=${encodeURIComponent(fmtRequete(jusqu))}&symbol=${xid}`;
+    const brut = await curlGetText(url, ['-H', `Referer: ${TEARSHEET}`, '-H', 'X-Requested-With: XMLHttpRequest']);
+
+    let fragment = brut;
+    try { const j = JSON.parse(brut); if (typeof j.html === 'string') fragment = j.html; } catch { /* corps brut */ }
+
+    const lignes = [];
+    const reLigne = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let mr;
+    while ((mr = reLigne.exec(fragment)) !== null) {
+      const cellules = (mr[1].match(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi) || [])
+        .map(c => c.replace(/<[^>]+>/g, ' ').replace(/&nbsp;?/gi, ' ').replace(/\s+/g, ' ').trim())
+        .filter(c => c.length);
+      if (cellules.length >= 5) lignes.push(cellules);
+    }
+    if (lignes.length < 2) {
+      if (verbose) console.log(`    [MASI] FT : ${lignes.length} ligne(s) exploitable(s), insuffisant pour verifier la structure`);
+      return null;
+    }
+
+    // 3. Verifier la position de la cloture AVANT de lire une valeur.
+    //    Lignes du plus recent au plus ancien : ouverture[i] doit egaler
+    //    cloture[i+1]. Verifie sur les paires disponibles, trois suffisent.
+    const OUVERTURE = 1, CLOTURE = 4;
+    let paires = 0, coherentes = 0;
+    for (let i = 0; i + 1 < lignes.length && paires < 3; i++) {
+      const o = nombre(lignes[i][OUVERTURE]);
+      const c = nombre(lignes[i + 1][CLOTURE]);
+      if (!isFinite(o) || !isFinite(c)) continue;
+      paires++;
+      if (Math.abs(o - c) < 0.01) coherentes++;
+    }
+    if (paires === 0 || coherentes !== paires) {
+      console.log(`    [MASI] FT : structure de colonnes non confirmee (${coherentes}/${paires} paires coherentes) — aucune valeur retenue`);
+      return null;
+    }
+
+    // 4. La ligne de la date visee, et elle seule. Pas de date approchante :
+    //    `propagateIndRef` gere deja le rapprochement a +/- 7 jours, et c est
+    //    lui qui doit le faire, pas ce scraper.
+    const marqueur = fmtFT(targetDate);
+    const ligne = lignes.find(l => l[0] && l[0].includes(marqueur));
+    if (!ligne) {
+      if (verbose) console.log(`    [MASI] FT : pas de seance au ${targetDate} (jour non ouvre ?)`);
+      return null;
+    }
+    const val = nombre(ligne[CLOTURE]);
+    if (!isFinite(val) || val <= 1000) {
+      if (verbose) console.log(`    [MASI] FT : cloture inexploitable « ${ligne[CLOTURE]} »`);
+      return null;
+    }
+    console.log(`    [MASI] SUCCESS via FT markets MASI:CAS (cloture ${marqueur}): ${val}`);
+    return { value: val, source: 'FT markets MASI:CAS (cloture)', url };
+  } catch (err) {
+    if (verbose) console.log(`    [MASI] FT : ERROR ${err.message}`);
+    return null;
+  }
+}
+
+/**
+ * MASI — source d origine puis repli. L ordre importe : si medias24 redevient
+ * accessible, son resultat reprend la main sans qu aucun code ne change.
+ */
+async function scrapeMASI(targetDate, verbose) {
+  const parOrigine = await scrapeMASIviaMedias24(targetDate, verbose);
+  if (parOrigine) return parOrigine;
+  return await scrapeMASIviaFT(targetDate, verbose);
 }
 
 /**
