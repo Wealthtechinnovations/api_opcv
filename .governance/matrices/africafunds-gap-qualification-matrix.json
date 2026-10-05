@@ -1,0 +1,355 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "QUALIFIED_DISCOVERY_NON_AUTHORITATIVE",
+  "source_gap_harvester": {
+    "workflow_run_id": 35802877077,
+    "artifact_id": 10725938994,
+    "source_head_sha": "e08a973e0d700dc22dce9609a00da96cd204492e",
+    "candidate_count": 125,
+    "candidate_with_possible_existing_task": 2,
+    "candidate_without_possible_existing_task": 123
+  },
+  "live_revalidation": {
+    "api_head": "9b4bd0a1e0bd8261023634acefeb431b694920b5",
+    "frontend_head": "1d21989ad6c6de8713bbcf8e767facfaa06901cc",
+    "canonical_branch": "claude/code-review-improvements-ikvuj",
+    "unique_candidate_files": 16,
+    "live_marker_count": 125,
+    "conclusion": "ALL_125_MARKERS_STILL_PRESENT_ON_LIVE_CANONICAL_FILES",
+    "production_mutation_performed": false,
+    "task_queue_mutation_performed": false
+  },
+  "single_queue_authority": ".governance/loop/task-queue.json",
+  "intake_authority_for_discovery": ".governance/matrices/africafunds-product-intake-matrix.json",
+  "rules": {
+    "this_is_not_a_task_queue": true,
+    "auto_task_creation_forbidden": true,
+    "one_marker_is_not_one_task": true,
+    "qualify_by_behavior_and_runtime_not_keyword_only": true,
+    "extend_existing_authority_before_create": true,
+    "respect_active_surface_claims": true,
+    "promote_only_after_live_verification_dedup_dependencies_dor_dod_evidence_and_claim": true
+  },
+  "summary": {
+    "raw_candidates": 125,
+    "qualification_classes": 7,
+    "raw_candidates_not_to_promote_individually": 125,
+    "immediately_actionable_new_tasks_created": 0,
+    "clusters_requiring_future_qualification": 3,
+    "important_finding": "The 125 raw markers collapse mostly into false positives, inactive scaffold placeholders, third-party/theme code, and non-actionable comments. They must not be materialized as 125 tasks."
+  },
+  "classes": [
+    {
+      "class_id": "Q1_SELF_PATTERN_FALSE_POSITIVE",
+      "count": 3,
+      "disposition": "DO_NOT_PROMOTE",
+      "intake_refs": [
+        "AF-INTAKE-CAND-037"
+      ],
+      "future_cluster": "GAP_HARVESTER_PRECISION",
+      "rationale": "The scanner matches its own TODO/FIXME vocabulary and the markdown classifier planning vocabulary. These are parser literals, not product backlog.",
+      "source_paths": [
+        "scripts/governance/audit_markdown.py",
+        "scripts/governance/program_gap_harvester.py"
+      ],
+      "candidate_ids": [
+        "GAP-CAND-e9eb883f0ecb6620",
+        "GAP-CAND-2f53123de463c724",
+        "GAP-CAND-7d8d025d5779f642"
+      ]
+    },
+    {
+      "class_id": "Q2_LEGACY_INACTIVE_MICROSERVICE_PLACEHOLDER",
+      "count": 56,
+      "disposition": "COLLAPSE_TO_ONE_LEGACY_ARCHITECTURE_CLUSTER_NOT_TASKS",
+      "intake_refs": [
+        "AF-INTAKE-CAND-036",
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-019"
+      ],
+      "future_cluster": "LEGACY_MICROSERVICE_SCAFFOLD_RECONCILIATION",
+      "rationale": "services/funds and services/portfolio return literal TODO responses. Current app.js starts and mounts the monolith routes, while the historical architecture diagnostic classifies services/* microservices as prepared but not used in production. Individual placeholder endpoints are therefore not 56 product gaps.",
+      "source_paths": [
+        "services/funds/routes.js",
+        "services/portfolio/routes.js"
+      ],
+      "candidate_ids": [
+        "GAP-CAND-7fd8979062ed0292",
+        "GAP-CAND-062209320ff82e8c",
+        "GAP-CAND-2d626da0b10fc791",
+        "GAP-CAND-db5b5258a11effca",
+        "GAP-CAND-ac9f074000a55ce1",
+        "GAP-CAND-bfe580b6db5c597c",
+        "GAP-CAND-c66c451d18e12bc1",
+        "GAP-CAND-74808fd2528ddf07",
+        "GAP-CAND-ea25a4ac8e0d83ca",
+        "GAP-CAND-3758e8dc41f35547",
+        "GAP-CAND-123a26ec09068689",
+        "GAP-CAND-470fb5c4bc119c51",
+        "GAP-CAND-dc1d2eafd5bbe26f",
+        "GAP-CAND-bffc0efe6e17c3c3",
+        "GAP-CAND-faa1cbaf8e9c68d8",
+        "GAP-CAND-c64e9ffe0fb506f7",
+        "GAP-CAND-70f9d72667fdd2bc",
+        "GAP-CAND-8b20eb6e8bc06274",
+        "GAP-CAND-be2e6b8f16fd9a19",
+        "GAP-CAND-e268b2a46e1c4e8e",
+        "GAP-CAND-ab1d75937d53d405",
+        "GAP-CAND-2f54b97b214d416f",
+        "GAP-CAND-b3a4c8ddecb4d197",
+        "GAP-CAND-87736c627d0f6d7b",
+        "GAP-CAND-886c58eb4dafcb23",
+        "GAP-CAND-c9b58e59a65dd584",
+        "GAP-CAND-f6abe4a60c49f54e",
+        "GAP-CAND-8cc4316bfaf2a337",
+        "GAP-CAND-804c5df54ccea66c",
+        "GAP-CAND-bbd171aa8819bb55",
+        "GAP-CAND-fba17dce43041067",
+        "GAP-CAND-eadf8a2d6e6841f3",
+        "GAP-CAND-44c749dad694a856",
+        "GAP-CAND-ca80ffac3263e4f9",
+        "GAP-CAND-c2e65b05538f6ac8",
+        "GAP-CAND-0b32c2bb99490282",
+        "GAP-CAND-db6d323384838499",
+        "GAP-CAND-20cd790ad2e79120",
+        "GAP-CAND-3a0fdf2462ca14cb",
+        "GAP-CAND-be2da2e6bdff8e39",
+        "GAP-CAND-293bdcd822701a6d",
+        "GAP-CAND-2817d1e6a865415c",
+        "GAP-CAND-4e8868e5d10549eb",
+        "GAP-CAND-0a39f4689cfe3842",
+        "GAP-CAND-7144fa7e62982c7a",
+        "GAP-CAND-820c6f6d85c573f5",
+        "GAP-CAND-4bf65f52d79c1668",
+        "GAP-CAND-07aa29515374d1ed",
+        "GAP-CAND-0fa539f3530aa3e6",
+        "GAP-CAND-18ac60046a0fbd33",
+        "GAP-CAND-a4b19cc0addc27df",
+        "GAP-CAND-5900bf079c4566a9",
+        "GAP-CAND-d2d5452639bb3394",
+        "GAP-CAND-e177e2bc7d59521f",
+        "GAP-CAND-a6c2aa205c1fa9bb",
+        "GAP-CAND-fd02e6831094b41d"
+      ],
+      "promotion_gate": [
+        "Reobserve production process topology before any cleanup.",
+        "Map each scaffold route to monolith equivalent or prove it is intentionally absent.",
+        "Do not activate microservices merely to eliminate TODO markers.",
+        "Retire only after equivalence/inactivity proof and rollback plan."
+      ]
+    },
+    {
+      "class_id": "Q3_THIRD_PARTY_BOOTSTRAP_UPSTREAM_MARKER",
+      "count": 42,
+      "disposition": "DO_NOT_PROMOTE",
+      "intake_refs": [
+        "AF-INTAKE-CAND-036"
+      ],
+      "future_cluster": "VENDOR_DEPENDENCY_LIFECYCLE_ONLY",
+      "rationale": "All markers are upstream Bootstrap distribution TODO/FIXME comments replicated across bundle/esm/plain distribution files. They are not AfricaFunds requirements.",
+      "source_paths": [
+        "public/assets/vendor_components/bootstrap/dist-beta_1/js/bootstrap.bundle.js",
+        "public/assets/vendor_components/bootstrap/dist-beta_1/js/bootstrap.esm.js",
+        "public/assets/vendor_components/bootstrap/dist-beta_1/js/bootstrap.js"
+      ],
+      "candidate_ids": [
+        "GAP-CAND-e30acf583e3ccc57",
+        "GAP-CAND-97fa9518ff6d6d34",
+        "GAP-CAND-7a316d32d258eebf",
+        "GAP-CAND-ffd414ecdfdab2a1",
+        "GAP-CAND-4917a1352a6f8840",
+        "GAP-CAND-1ba6cf82818ffc3b",
+        "GAP-CAND-b8242b9b6da50953",
+        "GAP-CAND-a8f81c98b23668bd",
+        "GAP-CAND-b73e74f193da1087",
+        "GAP-CAND-ec97732aa74ffb2e",
+        "GAP-CAND-56cd8de7e9bb4a39",
+        "GAP-CAND-011ac691489aface",
+        "GAP-CAND-4e70894de5c7ab27",
+        "GAP-CAND-e2dfcb82b759ff3c",
+        "GAP-CAND-3f4672f0195afbdf",
+        "GAP-CAND-eca4ce1a06ebd499",
+        "GAP-CAND-a6ac501a6bb9afc9",
+        "GAP-CAND-befd01142769c56f",
+        "GAP-CAND-122d92516e2d1b60",
+        "GAP-CAND-39eed839a1f6c9ef",
+        "GAP-CAND-15e9df58d5efd019",
+        "GAP-CAND-bf22790abe7514f7",
+        "GAP-CAND-8e0b48d18589dfb5",
+        "GAP-CAND-85caacf971fe1717",
+        "GAP-CAND-5154848adf80d37f",
+        "GAP-CAND-13e5903b1ea6e5e2",
+        "GAP-CAND-9723c0c9ead1c2bc",
+        "GAP-CAND-86513e8995bb0dff",
+        "GAP-CAND-b2f65107c63fd4e1",
+        "GAP-CAND-7536817895021981",
+        "GAP-CAND-6fed0d7b22225d5e",
+        "GAP-CAND-6aee37270af85013",
+        "GAP-CAND-67716719473b6b87",
+        "GAP-CAND-d066c127ecd5f5fd",
+        "GAP-CAND-01a04004bb96755a",
+        "GAP-CAND-bb9396730d82c84d",
+        "GAP-CAND-2061fa8bdbae3b27",
+        "GAP-CAND-aeb6323a72b0ecbd",
+        "GAP-CAND-3fe1d108299e0639",
+        "GAP-CAND-d234681224287e5d",
+        "GAP-CAND-1aeed717d753307d",
+        "GAP-CAND-407b774a6b092af8"
+      ]
+    },
+    {
+      "class_id": "Q4_LEGACY_THEME_VENDOR_MARKER",
+      "count": 16,
+      "disposition": "DO_NOT_PROMOTE_INDIVIDUALLY",
+      "intake_refs": [
+        "AF-INTAKE-CAND-017",
+        "AF-INTAKE-CAND-036"
+      ],
+      "future_cluster": "LEGACY_THEME_MIGRATION_ONLY_IF_DESIGN_SYSTEM_REPLACES_IT",
+      "rationale": "TodoList/Waves/vendor compatibility comments are embedded in old template assets and duplicated between public and src/app/style, including minified copies. They are not feature requirements.",
+      "source_paths": [
+        "public/js/template.js",
+        "public/js/template.min.js",
+        "public/js/vendors.min.js",
+        "src/app/style/js/template.js",
+        "src/app/style/js/template.min.js",
+        "src/app/style/js/vendors.min.js"
+      ],
+      "candidate_ids": [
+        "GAP-CAND-f7fbd896776388f7",
+        "GAP-CAND-96c87536a0eb5096",
+        "GAP-CAND-4c872830e07e34fa",
+        "GAP-CAND-e4b12be44eeebb12",
+        "GAP-CAND-44a6600e1f3afabd",
+        "GAP-CAND-2d46b8e86ef62cad",
+        "GAP-CAND-9c7fedb47a24a42e",
+        "GAP-CAND-0690c327ce777124",
+        "GAP-CAND-3335cafbef610aa3",
+        "GAP-CAND-9621d5551eb0204d",
+        "GAP-CAND-0d356031ab3bf55e",
+        "GAP-CAND-052e9e59faa28da1",
+        "GAP-CAND-eefd4da40ce36b6e",
+        "GAP-CAND-6685367a281407ba",
+        "GAP-CAND-085ba6fc8c557ed5",
+        "GAP-CAND-0e3e669869f1adf2"
+      ]
+    },
+    {
+      "class_id": "Q5_STALE_COMMENT_ALREADY_IMPLEMENTED",
+      "count": 1,
+      "disposition": "DO_NOT_PROMOTE",
+      "intake_refs": [
+        "AF-INTAKE-CAND-007"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-020"
+      ],
+      "candidate_ids": [
+        "GAP-CAND-ff0203b5cb0c0b3d"
+      ],
+      "source": "src/routes/routes_vl.js:241",
+      "rationale": "The comment says upCaptureRatio, but current code imports both calculateUpCaptureRatio/calculateDownCaptureRatio and uses them across 1Y/3Y/5Y/8Y/10Y/12Y/origin analytics. This marker does not evidence a missing capability."
+    },
+    {
+      "class_id": "Q6_AMBIGUOUS_COMMENT_NO_ACTIONABLE_REQUIREMENT",
+      "count": 6,
+      "disposition": "ATTACH_AS_VERIFICATION_NOTES_ONLY",
+      "intake_refs": [
+        "AF-INTAKE-CAND-007",
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-018",
+        "AF-INTAKE-CAND-019",
+        "AF-INTAKE-CAND-032"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-020",
+        "AF-TASK-021"
+      ],
+      "candidate_ids": [
+        "GAP-CAND-1e96477c4b7e5002",
+        "GAP-CAND-e81c052781e15b43",
+        "GAP-CAND-31ceaa9dd187f82b",
+        "GAP-CAND-d1ebd5cc26409619",
+        "GAP-CAND-7f126d8224c60d6f",
+        "GAP-CAND-11f6fa21d3fb887a"
+      ],
+      "source_observations": [
+        "apigestionfonds.js maps response.value and merely appends //todo without a requested change.",
+        "apigestionperformance.js maps vl_ajuste and merely appends //todo without a requested change.",
+        "routes_vl.js portfolio valuation already applies signed quantities to value_ajuste_EUR/USD; four //todo markers contain no acceptance criterion."
+      ],
+      "promotion_gate": "A real defect, missing behavior, failing test, or explicit product requirement must be proven before these comments can become work."
+    },
+    {
+      "class_id": "Q7_QUALIFY_DISABLED_INDEX_PERSISTENCE",
+      "count": 1,
+      "disposition": "REAL_CANDIDATE_NEEDS_AUTHORITY_AND_BEHAVIOR_CHECK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-006",
+        "AF-INTAKE-CAND-033"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_ids": [
+        "GAP-CAND-ceb59e1a529a2f2b"
+      ],
+      "source": "src/routes/routes_vl.js:6502-6640 / POST /api/uploadsfileindice/:id",
+      "observed_behavior": "The upload path writes indRef/indRef_EUR/indRef_USD into VL entries, while indice table find/update/bulkCreate logic is commented out.",
+      "why_not_task_yet": [
+        "The canonical index ingestion authority must be identified first.",
+        "Writing both VL benchmark fields and indice table may be intentional duplication or historical dead logic.",
+        "Current index cron/import paths must be checked for ownership before restoring any write."
+      ],
+      "promotion_gate": [
+        "Map all current writers/readers of indice and indice_references.",
+        "Verify expected behavior of manual uploads against current benchmark model.",
+        "Prove whether missing indice persistence causes an observable functional/data gap.",
+        "Only then attach to an existing task or create one in the single queue."
+      ]
+    }
+  ],
+  "collapsed_future_clusters": [
+    {
+      "cluster_id": "CLUSTER-HARVESTER-PRECISION",
+      "raw_candidates": 61,
+      "sources": [
+        "Q1_SELF_PATTERN_FALSE_POSITIVE",
+        "Q3_THIRD_PARTY_BOOTSTRAP_UPSTREAM_MARKER",
+        "Q4_LEGACY_THEME_VENDOR_MARKER"
+      ],
+      "target_intakes": [
+        "AF-INTAKE-CAND-037",
+        "AF-INTAKE-CAND-036",
+        "AF-INTAKE-CAND-017"
+      ],
+      "action": "After AF-TASK-028 releases scripts/governance/program_*.py, improve discovery precision by excluding scanner source literals and known third-party/generated/vendor surfaces without weakening discovery of first-party TODO/FIXME/HACK markers."
+    },
+    {
+      "cluster_id": "CLUSTER-LEGACY-MICROSERVICE-SCAFFOLD",
+      "raw_candidates": 56,
+      "sources": [
+        "Q2_LEGACY_INACTIVE_MICROSERVICE_PLACEHOLDER"
+      ],
+      "target_intakes": [
+        "AF-INTAKE-CAND-036",
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-019"
+      ],
+      "action": "Treat as one architecture/legacy reconciliation subject, not 56 endpoint tasks. Preserve until current monolith equivalence and runtime inactivity are proven."
+    },
+    {
+      "cluster_id": "CLUSTER-MANUAL-INDEX-UPLOAD-AUTHORITY",
+      "raw_candidates": 1,
+      "sources": [
+        "Q7_QUALIFY_DISABLED_INDEX_PERSISTENCE"
+      ],
+      "target_intakes": [
+        "AF-INTAKE-CAND-006",
+        "AF-INTAKE-CAND-033"
+      ],
+      "action": "Read-only authority mapping first; no index data write and no uncommenting before proof."
+    }
+  ],
+  "next_action": "Continue exhaustive discovery beyond marker harvesting: cross the 37 product intakes with live repository surfaces, historical backlog, current requirements, runtime/data authorities and missing capability evidence. Do not mutate task-queue.json while AF-TASK-028 claims it."
+}
