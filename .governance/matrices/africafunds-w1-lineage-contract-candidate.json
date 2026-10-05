@@ -1,0 +1,210 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "LINEAGE_CONTRACT_CANDIDATE_NOT_IMPLEMENTATION",
+  "observed_heads": {
+    "api": "335db72aee5d67db975bb85993985d153acda075",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "purpose": "Unify source-to-canonical traceability by linking existing country-specific evidence rather than replacing it.",
+  "principles": [
+    "RAW_SOURCE_EVIDENCE_IS_IMMUTABLE_OR_APPEND_ONLY",
+    "OBSERVED_VALUE_IS_DISTINCT_FROM_DERIVED_VALUE",
+    "SOURCE_DATE_IS_DISTINCT_FROM_VALUATION_DATE_AND_ACQUISITION_DATE",
+    "NO_PROVENANCE_IS_BETTER_THAN_FABRICATED_PROVENANCE",
+    "COUNTRY_SPECIFIC_DETAILS_ARE_PRESERVED",
+    "CANONICAL_ROW_LINKS_TO_EVIDENCE_INSTEAD_OF_COPYING_ALL_RAW_FIELDS",
+    "EXISTING_STAGING_TABLES_ARE_REUSED_WHERE_DEPLOYED",
+    "LINEAGE_ADOPTION_IS_WRITER_BY_WRITER_IN_WARN_MODE_BEFORE_STRICT"
+  ],
+  "current_country_evidence": [
+    {
+      "country": "NIGERIA",
+      "canonical_row_contract": "currency_code, price_type, data_quality, correction_batch, source_url, sec_document_id, report_date",
+      "staging_candidate": "sec_ng_observations/sec_ng_fund_aliases design exists in code but is absent in current live DB; sec_ng_corrections_audit is live",
+      "strengths": [
+        "explicit measure type/currency",
+        "official document/source fields",
+        "reversible correction batch"
+      ],
+      "gap": "Current weekly loader can still write UNQUALIFIED rows when incoming CSV lacks price_type/provenance."
+    },
+    {
+      "country": "UEMOA",
+      "staging": "brvm_boc_sources + brvm_boc_navs_raw + brvm_fund_aliases + brvm_import_logs + brvm_missing_navs",
+      "strengths": [
+        "pdf_url",
+        "pdf_sha256",
+        "pdf_page",
+        "raw_line",
+        "line_hash",
+        "quality_status",
+        "match_status",
+        "matched_fund_id",
+        "promotion status"
+      ],
+      "gap": "Promoted valorisations row has no generic link back to source_id/raw row; FX at promotion uses latest global rate."
+    },
+    {
+      "country": "CEMAC",
+      "staging": "bvmac_boc_sources + bvmac_boc_navs_raw + bvmac_fund_aliases + bvmac_import_logs + bvmac_missing_navs",
+      "strengths": [
+        "same source/hash/page/raw-line/matching pattern as BRVM"
+      ],
+      "gap": "Pipeline is not certified active/current; promoted row has no generic source link and FX uses latest global rate."
+    },
+    {
+      "country": "TUNISIE",
+      "staging": "cmf_import_audit + cmf_extreme_variations + cmf_new_funds_queue; parser carries source_file, sheet, row_num",
+      "strengths": [
+        "source file/worksheet/row available at parse time",
+        "extreme variation quarantine",
+        "new-fund queue"
+      ],
+      "gap": "Canonical valorisations row does not persist/link source file/sheet/row; audit tables are created at runtime by scraper."
+    },
+    {
+      "country": "MAROC",
+      "staging": "none certified in current active ASFIM path",
+      "strengths": [
+        "official ASFIM endpoint and ISIN/Maroclear matching are explicit in code"
+      ],
+      "gap": "XLSX is processed from memory without canonical raw-artifact/hash/linkage; canonical valorisations row has no provenance fields; historical FX fallback may look ahead."
+    }
+  ],
+  "candidate_generic_entities": [
+    {
+      "entity": "source_artifact",
+      "role": "One acquired official file/API response identity",
+      "minimum_fields": [
+        "id",
+        "source_system",
+        "source_url_or_endpoint",
+        "artifact_type",
+        "acquired_at",
+        "effective_or_report_date",
+        "content_hash_if_bytes_retained",
+        "country",
+        "status"
+      ],
+      "compatibility": "May point to existing brvm/bvmac source rows or future generic records; does not require copying raw PDFs/XLSX."
+    },
+    {
+      "entity": "source_observation",
+      "role": "One extracted observation before canonical promotion",
+      "minimum_fields": [
+        "id",
+        "source_artifact_id",
+        "observation_type",
+        "valuation_date",
+        "raw_locator",
+        "raw_label",
+        "raw_value",
+        "currency",
+        "quality_status",
+        "match_status",
+        "canonical_fund_id_if_resolved"
+      ],
+      "compatibility": "Country staging can remain authoritative for detailed raw fields; generic identity can be an adapter/view where possible."
+    },
+    {
+      "entity": "canonical_lineage_link",
+      "role": "Trace a canonical row/derived result back to its evidence",
+      "minimum_fields": [
+        "entity_type",
+        "entity_id",
+        "source_observation_or_artifact_id",
+        "transformation_id_or_batch",
+        "relationship",
+        "created_at"
+      ],
+      "compatibility": "Prefer additive link table/ID over widening every canonical row with country-specific columns."
+    },
+    {
+      "entity": "transformation_run",
+      "role": "Trace recalculation/normalization/repair steps",
+      "minimum_fields": [
+        "id",
+        "operation",
+        "version_or_git_sha",
+        "started_at",
+        "completed_at",
+        "input_cutoff",
+        "output_scope",
+        "status",
+        "evidence_ref"
+      ],
+      "compatibility": "Can represent recalc_vl_ajuste, FX recalculation, performance calculations, corrections and backfills."
+    }
+  ],
+  "candidate_raw_locator_examples": {
+    "XLSX": [
+      "sheet",
+      "row",
+      "column/header"
+    ],
+    "PDF": [
+      "page",
+      "raw_line_hash"
+    ],
+    "API": [
+      "endpoint",
+      "request_date_or_params",
+      "response_hash_or_record_key"
+    ],
+    "CSV": [
+      "file_hash",
+      "row_number",
+      "column/header"
+    ]
+  },
+  "adoption_order": [
+    "CERTIFY_CURRENT_ACTIVE_STAGING_AND_ARTIFACT_RETENTION",
+    "DEFINE_GENERIC_IDS_WITHOUT_SCHEMA_WRITE",
+    "MAP_COUNTRY_STAGING_TO_GENERIC_CONTRACT",
+    "ADD_CANONICAL_LINKAGE_ADDITIVELY",
+    "ADOPT_MAROC_SOURCE_ARTIFACT_RETENTION",
+    "ADOPT_TUNISIA_CANONICAL_LINKAGE",
+    "ADOPT_BRVM_CANONICAL_LINKAGE",
+    "ADOPT_NIGERIA_WEEKLY_PROVENANCE_COMPLETENESS",
+    "ONLY_THEN_CONSIDER_STRICT_PROVENANCE_GATES"
+  ],
+  "schema_governance_issue": {
+    "finding": "Several active scrapers execute CREATE TABLE IF NOT EXISTS for audit/staging tables at runtime.",
+    "affected": [
+      "cmf_tunisie_daily.py",
+      "brvm_boc_daily.py",
+      "bvmac_boc_daily.py"
+    ],
+    "decision": "PRESERVE_RUNTIME_BEHAVIOR_NOW; later represent deployed structures in forward migrations and make runtime ensure_tables verification-only, after live schema certification.",
+    "prohibited": [
+      "Do not drop/recreate staging tables",
+      "Do not remove runtime DDL until migration equivalence is proven",
+      "Do not activate BVMAC merely to normalize schema"
+    ]
+  },
+  "proposed_quality_dimensions": [
+    "SOURCE_PRESENT",
+    "SOURCE_ARTIFACT_VERIFIED",
+    "MEASURE_TYPE_EXPLICIT",
+    "CURRENCY_EXPLICIT",
+    "IDENTITY_MATCH_CONFIDENCE",
+    "TEMPORAL_NO_LOOKAHEAD",
+    "VALUE_RANGE_OR_CHANGE_CHECK",
+    "DERIVATION_FRESHNESS"
+  ],
+  "queue_strategy": {
+    "preferred_parent": "AF-PROP-003",
+    "related": [
+      "AF-PROP-005",
+      "AF-PROP-007",
+      "AF-PROP-008",
+      "AF-PROP-009",
+      "AF-PROP-010",
+      "AF-PROP-024"
+    ],
+    "new_task_now": false,
+    "reason": "AF-TASK-028 still claims task-queue.json and this contract requires recent provenance/temporal measurements before promotion."
+  },
+  "next_action": "Measure recent provenance and temporal exposure live; then convert this candidate into exact additive schema/API deltas with compatibility and rollback requirements."
+}
