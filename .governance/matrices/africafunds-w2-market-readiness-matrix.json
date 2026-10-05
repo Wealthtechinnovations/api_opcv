@@ -1,0 +1,310 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W2_MARKET_READINESS_NON_AUTHORITATIVE",
+  "observed_at": "2026-10-06",
+  "observed_heads": {
+    "api": "126e1ba261c783b250e2d97bfba38231c9aa35d4",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
+  },
+  "readiness_model": {
+    "L0": "REFERENCE_ONLY",
+    "L1": "REGULATOR_OR_SOURCE_SURFACE_IDENTIFIED",
+    "L2": "REGULATOR_UNIVERSE_REPRODUCIBLE",
+    "L3": "REPRESENTATIVE_PRICE_SOURCE_FEASIBILITY_PROVEN",
+    "L4": "TECHNICAL_FETCH_MAPPING_DRYRUN_PROVEN",
+    "L5": "CONNECTOR_PROMOTION_READY",
+    "L6": "ACTIVE_PRODUCTION_PIPELINE"
+  },
+  "universal_promotion_gates": [
+    "Official/regulatory universe can be reproduced.",
+    "Fund/SubFund/ShareClass grain is source-backed.",
+    "At least representative price/NAV source paths are technically reachable.",
+    "Price type and currency are explicit.",
+    "Publication/effective/acquisition/import dates are distinct.",
+    "Raw evidence/provenance fits W2 ingestion contract.",
+    "Identity matching can be dry-run without guessed aliases.",
+    "Terms/licensing/redistribution considerations are recorded.",
+    "No production write or connector task is authorized by source discovery alone."
+  ],
+  "markets": [
+    {
+      "market": "MAROC",
+      "readiness_level": "L6",
+      "readiness_label": "ACTIVE_PRODUCTION_PIPELINE",
+      "state": "ACTIVE_PRODUCTION_WITH_KNOWN_LINEAGE_TEMPORAL_AND_DERIVED_GAPS",
+      "proof": [
+        "ASFIM daily ingestion active.",
+        "644 active funds; recent VL production fresh.",
+        "Benchmark look-ahead and local performance freshness gaps already separately governed."
+      ],
+      "blockers": [
+        "Generic lineage absent on canonical rows.",
+        "W1 benchmark temporal contamination.",
+        "Derived performance path gaps."
+      ],
+      "next_probe": "Improve existing pipeline only through W1/W2 deltas; no connector recreation.",
+      "links": [
+        "AF-OPS-008",
+        "W1-DELTA-001",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ]
+    },
+    {
+      "market": "NIGERIA",
+      "readiness_level": "L6",
+      "readiness_label": "ACTIVE_PRODUCTION_PIPELINE",
+      "state": "ACTIVE_WEEKLY_WITH_PUBLICATION_LAG_AND_MEASUREMENT_QUALITY_GAPS",
+      "proof": [
+        "SEC Nigeria weekly extractor/importer active.",
+        "Current source CSV carries rich source/type metadata.",
+        "Canonical provenance transport and price-quality semantics are incomplete."
+      ],
+      "blockers": [
+        "C3/C7 scale/currency anomalies.",
+        "Offer/Bid fallback qualification.",
+        "Recent source metadata dropped by importer."
+      ],
+      "next_probe": "Improve current pipeline; transport metadata without numeric change before any new connector work.",
+      "links": [
+        "AF-OPS-007",
+        "AF-OPS-009",
+        "W1-DELTA-002",
+        "W1-DELTA-003",
+        "W1-DELTA-004"
+      ]
+    },
+    {
+      "market": "TUNISIE",
+      "readiness_level": "L6",
+      "readiness_label": "ACTIVE_PRODUCTION_PIPELINE",
+      "state": "ACTIVE_DAILY_WITH_AUDIT_AND_WEAK_CANONICAL_LINEAGE",
+      "proof": [
+        "CMF daily pipeline active.",
+        "Audit/quarantine/new-fund evidence live.",
+        "131 active funds."
+      ],
+      "blockers": [
+        "Canonical source linkage absent.",
+        "Derived local performance freshness weak."
+      ],
+      "next_probe": "Bridge existing audit/staging to generic lineage; do not rebuild scraper.",
+      "links": [
+        "AF-OPS-008",
+        "AF-OPS-009",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ]
+    },
+    {
+      "market": "UEMOA",
+      "readiness_level": "L6",
+      "readiness_label": "ACTIVE_PRODUCTION_PIPELINE",
+      "state": "ACTIVE_DAILY_WITH_STRONG_STAGING",
+      "proof": [
+        "BRVM BOC pipeline active.",
+        "Source/hash/page/raw-line/matching staging deployed at scale.",
+        "118 funds, 111 active."
+      ],
+      "blockers": [
+        "Benchmark temporal look-ahead on 108 high-confidence rows.",
+        "Canonical row lacks generic source link.",
+        "One major scale break remains."
+      ],
+      "next_probe": "Reuse as reference staging pattern; correct only bounded gaps through existing tasks.",
+      "links": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "W1-DELTA-001",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ]
+    },
+    {
+      "market": "CEMAC",
+      "readiness_level": "L3",
+      "readiness_label": "REPRESENTATIVE_PRICE_SOURCE_FEASIBILITY_PROVEN",
+      "state": "CODE_AND_OFFICIAL_BVMAC_SOURCE_CANDIDATE_PREFLIGHT_RUNNING",
+      "proof": [
+        "34 canonical funds exist.",
+        "BVMAC parser/promotion code exists.",
+        "No active cron/staging tables are deployed.",
+        "JS wrapper now wires existing Python read-only preflight into production diagnostics."
+      ],
+      "blockers": [
+        "Technical production fetch/mapping proof pending.",
+        "No active cron.",
+        "No bvmac_* staging live.",
+        "Latest canonical VL 2024-12-12.",
+        "Date-specific XAF FX semantics required."
+      ],
+      "next_probe": "Await wrapped production diagnostic; if source+mapping succeeds, advance to L4 and prepare deployment dry-run only.",
+      "links": [
+        "W2-DELTA-003",
+        "AF-PROP-010",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ]
+    },
+    {
+      "market": "GHANA",
+      "readiness_level": "L3",
+      "readiness_label": "REPRESENTATIVE_PRICE_SOURCE_FEASIBILITY_PROVEN",
+      "state": "BOUNDED_FIVE_MANAGER_PILOT_FEASIBILITY_PROVEN",
+      "proof": [
+        "SEC current registries: 53 Mutual Funds, 33 Unit Trusts, 83 Fund Managers.",
+        "Five representative manager source paths mapped to regulator identities.",
+        "CAL exposes daily dated PRICE; EDC exposes dated public fund values; Brassica exposes distinct Bid/Offer; SDC and Databank provide current/periodic price evidence."
+      ],
+      "blockers": [
+        "Market-wide source coverage not proven.",
+        "Historical depth/cadence varies by manager.",
+        "NAVPS/Bid/Offer/share-price semantics require source-specific classification.",
+        "Terms/licensing review pending."
+      ],
+      "next_probe": "Run technical S2 GET/mapping probes starting CAL and EDC; no canonical import.",
+      "links": [
+        "W2-DELTA-006",
+        "AF-PROP-011",
+        "W1-DELTA-003",
+        "W1-DELTA-004"
+      ]
+    },
+    {
+      "market": "KENYA",
+      "readiness_level": "L3",
+      "readiness_label": "REPRESENTATIVE_PRICE_SOURCE_FEASIBILITY_PROVEN",
+      "state": "ONE_DIRECT_DAILY_PRICE_PILOT_PLUS_FOUR_REPRESENTATIVE_SOURCE_CLASSES",
+      "proof": [
+        "CMA scheme/sub-fund registry is current and multi-currency.",
+        "NCBA public page exposes dated daily buy/sell price derived from NAV.",
+        "Etica, Britam, CIC and KCB official product/factsheet sources classified."
+      ],
+      "blockers": [
+        "Only one direct daily price feed proven in sampled five.",
+        "Historical depth and stable URL pattern need measurement.",
+        "Umbrella/sub-fund/share-class grain must remain explicit.",
+        "Terms/licensing review pending."
+      ],
+      "next_probe": "Run technical S2 GET/mapping probe for NCBA; classify Etica/Britam/CIC/KCB daily vs periodic vs unavailable.",
+      "links": [
+        "W2-DELTA-006",
+        "AF-PROP-011",
+        "W1-DELTA-003",
+        "W1-DELTA-004",
+        "W1-DELTA-007"
+      ]
+    },
+    {
+      "market": "EGYPTE",
+      "readiness_level": "L1",
+      "readiness_label": "REGULATOR_OR_SOURCE_SURFACE_IDENTIFIED",
+      "state": "REGULATOR_MARKET_SCALE_CONFIRMED_FUND_LEVEL_SOURCE_PENDING",
+      "proof": [
+        "FRA current 2026 investment-fund sector reports identified.",
+        "Official Q2 2026 report confirms market scale and classifications."
+      ],
+      "blockers": [
+        "Fund-level current registry/feed not yet certified.",
+        "Daily/periodic NAV source not certified.",
+        "Arabic/English identity normalization required."
+      ],
+      "next_probe": "Locate official fund registry/downloads and determine regulator-hosted vs bank/manager-hosted NAV.",
+      "links": [
+        "AF-PROP-011"
+      ]
+    },
+    {
+      "market": "AFRIQUE_DU_SUD",
+      "readiness_level": "L1",
+      "readiness_label": "REGULATOR_OR_SOURCE_SURFACE_IDENTIFIED",
+      "state": "REGULATORY_SURFACES_IDENTIFIED_DATA_AND_LICENSING_COMPLEX",
+      "proof": [
+        "FSCA regulated-entity/entity-search/CIS e-service surfaces identified."
+      ],
+      "blockers": [
+        "Machine-readable portfolio register extraction pending.",
+        "Daily NAV/share-class source strategy pending.",
+        "Redistribution/licensing constraints material.",
+        "Large market requires explicit share-class grain."
+      ],
+      "next_probe": "Extract CIS manager/portfolio universe and assess manager data licensing before any bulk acquisition design.",
+      "links": [
+        "AF-PROP-011"
+      ]
+    },
+    {
+      "market": "MAURICE",
+      "readiness_level": "L1",
+      "readiness_label": "REGULATOR_OR_SOURCE_SURFACE_IDENTIFIED",
+      "state": "REGULATORY_LIFECYCLE_SURFACES_IDENTIFIED_SCOPE_PENDING",
+      "proof": [
+        "FSC codified licensing/public notice/surrender surfaces identified."
+      ],
+      "blockers": [
+        "AfricaFunds scope not yet fixed between domestic/local and global/foreign schemes.",
+        "Active fund registry and NAV source not certified."
+      ],
+      "next_probe": "Define target universe before source engineering, then locate active authorisation/NAV paths.",
+      "links": [
+        "AF-PROP-011"
+      ]
+    },
+    {
+      "market": "BOTSWANA",
+      "readiness_level": "L1",
+      "readiness_label": "REGULATOR_OR_SOURCE_SURFACE_IDENTIFIED",
+      "state": "REGULATOR_CONFIRMED_SCHEME_DISCOVERY_PENDING",
+      "proof": [
+        "NBFIRA CIU regulatory and regulated-entity surfaces identified."
+      ],
+      "blockers": [
+        "Public scheme list extraction pending.",
+        "NAV feed not proven.",
+        "Umbrella/sub-fund grain mapping required."
+      ],
+      "next_probe": "Enumerate licensed CIU entities and sample major managers for official price/factsheet feeds.",
+      "links": [
+        "AF-PROP-011"
+      ]
+    },
+    {
+      "market": "NAMIBIE",
+      "readiness_level": "L1",
+      "readiness_label": "REGULATOR_OR_SOURCE_SURFACE_IDENTIFIED",
+      "state": "MANAGER_REGISTRY_IDENTIFIED_SCHEME_NAV_PENDING",
+      "proof": [
+        "NAMFISA manager register/current CIS regulatory surface identified."
+      ],
+      "blockers": [
+        "Scheme/sub-fund register not yet extracted.",
+        "Daily/unit-price source not certified.",
+        "Cross-border feeder relationships need classification."
+      ],
+      "next_probe": "Enumerate CIS managers→schemes→public NAV feeds and tag feeder/cross-border structures.",
+      "links": [
+        "AF-PROP-011"
+      ]
+    },
+    {
+      "market": "ETHIOPIE",
+      "readiness_level": "L1",
+      "readiness_label": "REGULATOR_OR_SOURCE_SURFACE_IDENTIFIED",
+      "state": "NASCENT_CIS_REGULATORY_MARKET_DISCOVERY_ONLY",
+      "proof": [
+        "ECMA CIS directive published in September 2026."
+      ],
+      "blockers": [
+        "Live licensed operators/schemes not yet established.",
+        "NAV publication ecosystem not proven."
+      ],
+      "next_probe": "Monitor/verify current ECMA licensees and live scheme disclosures; no ingestion until live funds exist.",
+      "links": [
+        "AF-PROP-011"
+      ]
+    }
+  ],
+  "tier_b_rule": "All other reference-taxonomy markets remain L0 until current official regulatory/source discovery is performed; taxonomy presence never authorizes a connector.",
+  "next_action": "Complete CEMAC production preflight and Ghana/Kenya technical source probes. Then update readiness levels only from measured evidence. Deepen Egypt/South Africa/Mauritius next; keep Botswana/Namibia/Ethiopia discovery-only until stronger source evidence exists."
+}
