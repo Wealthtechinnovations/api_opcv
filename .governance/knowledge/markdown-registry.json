@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "e8aa4575bb31e2efde5d1a289bef2b6794a8fd77"
+      "head": "99aa739aed749ab2dad9479987e28a94bdd409d0"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "831d4c091f381d9a4883a0a7a5f6b43a171ca951"
+      "head": "96806096caee27bcbea5fb125530f9facd931000"
     }
   },
   "summary": {
@@ -10109,11 +10109,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "58da3b54fc360a7071e035b87f805d13cc50b1c9",
-      "last_validated_sha": "58da3b54fc360a7071e035b87f805d13cc50b1c9",
-      "content_sha256": "2066af0d380ca85f4f969c56c9908d05617aa57f7431366c00a641488344c513",
-      "line_count": 1322,
-      "byte_count": 83906,
+      "git_blob_sha": "fc92988cd83565854a4af3631065e589c372052c",
+      "last_validated_sha": "fc92988cd83565854a4af3631065e589c372052c",
+      "content_sha256": "2b52361299038c8d57bcb2e20cca43df3221747ad4923f718323a55437e397ad",
+      "line_count": 1191,
+      "byte_count": 73876,
       "headings": [
         {
           "level": 1,
@@ -10221,6 +10221,22 @@
         },
         {
           "level": 2,
+          "text": "1. Page tearsheet et extraction de l identifiant interne"
+        },
+        {
+          "level": 2,
+          "text": "2. Point d acces historique"
+        },
+        {
+          "level": 2,
+          "text": "3. Verdict"
+        },
+        {
+          "level": 2,
+          "text": "4. Jonction avec notre propre serie"
+        },
+        {
+          "level": 2,
           "text": "Devise emise par l extracteur, par annee (fonds concernes seulement)"
         },
         {
@@ -10258,22 +10274,6 @@
         {
           "level": 2,
           "text": "Par fonds — ce qui resterait apres correction"
-        },
-        {
-          "level": 2,
-          "text": "Ce que cette mesure autorise"
-        },
-        {
-          "level": 2,
-          "text": "Repartition par pays et lot d insertion"
-        },
-        {
-          "level": 2,
-          "text": "Detail (60 premieres)"
-        },
-        {
-          "level": 2,
-          "text": "Provenance"
         }
       ]
     },
@@ -10300,11 +10300,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "8cfe490d0c22796223dc6807f07390fc18652c92",
-      "last_validated_sha": "8cfe490d0c22796223dc6807f07390fc18652c92",
-      "content_sha256": "be539faad27a17cde3e88a63623d63f305e334657d519075d8070d063bd1f8bc",
-      "line_count": 80,
-      "byte_count": 5908,
+      "git_blob_sha": "53e58e10c88452804854ae49914a0049b398c3aa",
+      "last_validated_sha": "53e58e10c88452804854ae49914a0049b398c3aa",
+      "content_sha256": "346122eaa9346074936c4ec4e10c5ea931fe0ce611dd7e3564d19c477f12580a",
+      "line_count": 78,
+      "byte_count": 5845,
       "headings": [
         {
           "level": 1,
@@ -13416,11 +13416,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "a5d1b33a1f31f00ae9c720bf0b78cf5070d45e34",
-      "last_validated_sha": "a5d1b33a1f31f00ae9c720bf0b78cf5070d45e34",
-      "content_sha256": "0e0fa4b37fad82ed8024c6e3252fe4ad1325aacf1689c5f2b8f76d404582d848",
-      "line_count": 7553,
-      "byte_count": 514286,
+      "git_blob_sha": "52ea270001fceae6fb05c5573779e0c560da4d28",
+      "last_validated_sha": "52ea270001fceae6fb05c5573779e0c560da4d28",
+      "content_sha256": "69e6b77c924a470d46de37c3008171e58ac26ef5a74b1263ef1a45aacb63c56a",
+      "line_count": 7732,
+      "byte_count": 523480,
       "headings": [
         {
           "level": 1,
