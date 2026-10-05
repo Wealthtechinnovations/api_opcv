@@ -4,12 +4,12 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-10-05 04:01 UTC**
+Derniere execution : **2026-10-05 04:16 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_benchmark_fraicheur.js ##########
 === FRAICHEUR DU BENCHMARK ET VITALITE DE LA SOURCE NIGERIANE ===
-Mesure le 2026-10-05 03:58:14 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:04:38 UTC — LECTURE SEULE
 
 ## A. Derniere VL vs derniere VL portant un benchmark
 
@@ -119,7 +119,7 @@ Mesure le 2026-10-05 03:58:14 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-10-05 03:58:26 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:04:54 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -187,7 +187,7 @@ Mesure le 2026-10-05 03:58:26 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-10-05 03:59:23 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:06:01 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
@@ -210,7 +210,7 @@ Mesure le 2026-10-05 03:59:23 UTC — LECTURE SEULE
 
 ## C. Le classement suit-il les performances actuelles ?
 
-  OBLIGATIONS MAROC                strict  110/300  (36.7 %) · rho  0.696 · top10 3/10 · ex aequo 1
+  OBLIGATIONS MAROC                strict  108/300  (36.0 %) · rho  0.696 · top10 3/10 · ex aequo 1
                                    DIVERGE — le classement ne reflete pas les performances en base
   DIVERSIFIE MAROC                 strict   18/141  (12.8 %) · rho  0.210 · top10 6/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
@@ -218,8 +218,8 @@ Mesure le 2026-10-05 03:59:23 UTC — LECTURE SEULE
                                    DIVERGE — le classement ne reflete pas les performances en base
   OBLIGATIONS NIGERIA              strict   15/87   (17.2 %) · rho  0.831 · top10 4/10 · ex aequo 2
                                    DIVERGE — le classement ne reflete pas les performances en base
-  DIVERSIFIE TUNISIE               strict    3/70   (4.3 %) · rho  0.428 · top10 3/10 · ex aequo 0
-                                   DIVERGE — le classement ne reflete pas les performances en base
+  MONETAIRE MAROC                  strict   40/70   (57.1 %) · rho  0.978 · top10 8/10 · ex aequo 0
+                                   PROCHE — permutations locales, a instruire
 
 
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
@@ -230,12 +230,12 @@ Mesure le 2026-10-05 03:59:23 UTC — LECTURE SEULE
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
   cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20260928.log      6.7 j  ECHEC — 1 erreur(s)
   cron_daily_update      lun-ven 20:00        africafunds_daily_20261002.log        2.3 j  ECHEC — 2 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      5.9 h  ECHEC — 2 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      6.0 h  ECHEC — 2 erreur(s)
   cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      2.4 j  OK
   cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         2.4 j  OK
   cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                2.4 j  OK  (reserve : Echecs scraping: 24)
-  cron_health_check      tous les j 22:00     africafunds_health_20261004.log       6.0 h  ECHEC — 4 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   1.0 h  aucun marqueur de fin
+  cron_health_check      tous les j 22:00     africafunds_health_20261004.log       6.1 h  ECHEC — 4 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.1 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -309,13 +309,13 @@ Mesure le 2026-10-05 03:59:23 UTC — LECTURE SEULE
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
   | ============================================
-  | SNAPSHOT PRODUCTION — 2026-10-05 03:00:01
+  | SNAPSHOT PRODUCTION — 2026-10-05 04:00:01
   | ============================================
   | --- Generation du snapshot base de donnees ---
-  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44860 octets)
+  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44822 octets)
   |   -> Git non modifie: aucun add/commit/push
   | ============================================
-  | SNAPSHOT TERMINE — 2026-10-05 03:00:18
+  | SNAPSHOT TERMINE — 2026-10-05 04:00:16
   | ============================================
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
@@ -329,14 +329,14 @@ Mesure le 2026-10-05 03:59:23 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-10-05T03:59:30.306Z — LECTURE SEULE
+ Genere le 2026-10-05T04:06:09.336Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 10.24 Mo
-   modifie   : 2026-09-28T10:00:32.486Z (il y a 162.0 h)
+   modifie   : 2026-09-28T10:00:32.486Z (il y a 162.1 h)
    lignes    : 8169
    colonnes  : 59
 
@@ -439,7 +439,7 @@ Mesure le 2026-10-05 03:59:23 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-10-05 03:59:30 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:06:10 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 332
   etiquette CONFORME au contenu : 122
@@ -599,7 +599,7 @@ Fonds Nigeria examines : 332
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-10-05 03:59:36 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:06:15 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -791,17 +791,17 @@ VL Nigeria en base : 77466
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : d3cafaec5 — fix(diag): C10 juge les indices que les VL portent, pas les statistiques inertes
+  HEAD : dc97d4459 — perf(scraper): mettre en cache l identifiant FT, et mesurer le rattrapage en dry-run
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  169  depuis 553.7 h
-    fundafrique-frontend     online     redemarrages   48  depuis 1195.9 h
-    worker-recalculation     online     redemarrages    3  depuis 553.8 h
-    worker-data-import       online     redemarrages    3  depuis 553.8 h
+    api-monolith             online     redemarrages  169  depuis 553.8 h
+    fundafrique-frontend     online     redemarrages   48  depuis 1196.0 h
+    worker-recalculation     online     redemarrages    3  depuis 553.9 h
+    worker-data-import       online     redemarrages    3  depuis 553.9 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -818,7 +818,7 @@ VL Nigeria en base : 77466
 ########## scripts/diag/ondemand/diag_mariadb_incident_timeline.js ##########
 
 === MARIADB — TIMELINE INCIDENTS RECENTS (LECTURE SEULE) ===
-Mesure le 2026-10-05T03:59:42.058Z
+Mesure le 2026-10-05T04:06:22.465Z
 
 
 --- etat systemd courant ---
@@ -827,14 +827,14 @@ Result=success
 NRestarts=0
 ExecMainStartTimestamp=Tue 2026-09-22 06:25:02 UTC
 ExecMainPID=3041009
-MemoryCurrent=5096255488
+MemoryCurrent=5097054208
 ActiveState=active
 SubState=running
 StateChangeTimestamp=Tue 2026-09-22 06:25:02 UTC
 ActiveEnterTimestamp=Tue 2026-09-22 06:25:02 UTC
 
 --- processus mariadbd courant ---
-MARIADB_PROCESS pid=3041009 uptime_s=1114480 rss_kb=4905952 rssanon_kb=4893188 private_dirty_kb=4895056 swap_kb=1804960
+MARIADB_PROCESS pid=3041009 uptime_s=1114881 rss_kb=4906516 rssanon_kb=4893752 private_dirty_kb=4895772 swap_kb=1804960
 
 --- listener TCP 3306 courant ---
 LISTEN 0      80                                       127.0.0.1:3306       0.0.0.0:*    users:(("mariadbd",pid=3041009,fd=19))
@@ -874,11 +874,11 @@ SEP21_MARIADB_START_OR_READY_PRESENT=YES
 
 ########## scripts/diag/ondemand/diag_masi_historique_ft.js ##########
 === SERIE HISTORIQUE MASI — ACCES DEPUIS S2 ===
-Mesure le 2026-10-05 03:59:42 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:06:22 UTC — LECTURE SEULE
 
 ## 1. Page tearsheet et extraction de l identifiant interne
   https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS
-  statut 200 | 79814 o
+  statut 200 | 79452 o
   identifiant interne : 601207
 
 ## 2. Point d acces historique
@@ -923,7 +923,7 @@ Mesure le 2026-10-05 03:59:42 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-10-05 03:59:43 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:06:23 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -992,7 +992,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-10-05 03:59:47 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:06:29 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
@@ -1095,7 +1095,7 @@ Ruptures d echelle Nigeria encore en base : 139
 ########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-10-05 03:59:52 UTC — LECTURE SEULE
+Mesure le 2026-10-05 04:06:35 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -1183,286 +1183,9 @@ Mesure le 2026-10-05 03:59:52 UTC — LECTURE SEULE
   ce sont des sujets distincts, a ne pas melanger a celui-ci.
 
 
-########## scripts/diag/ondemand/diag_recalc_prepared_stmt_pressure.js ##########
+########## scripts/diag/ondemand/diag_rattrapage_masi_dryrun.js ##########
+=== RATTRAPAGE MASI — CE QU IL FERAIT, SANS LE FAIRE ===
+Mesure le 2026-10-05 04:06:41 UTC — DRY-RUN, AUCUNE ECRITURE
 
-=== PREPARED STATEMENT PRESSURE — READ ONLY ===
-Mesure: 2026-10-05T03:59:58.585Z
-STEP3_RECALC_EUR_USD funds=1249 vl_rows=998584 dynamic_update_statements=2610 batch_size=500
-STEP4_RECALC_VL_AJUSTE funds=1250 vl_rows=999188 dynamic_update_statements=5721 batch_size=200
-COMBINED_DYNAMIC_UPDATE_STATEMENTS=8331
-MYSQL_MAX_PREPARED_STMT_COUNT=16382
-MYSQL_PERFORMANCE_SCHEMA=OFF
-MYSQL_PREPARED_STMT_COUNT_NOW=0
-MYSQL_COM_STMT_PREPARE_SINCE_RESTART=9701
-MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=474111
-MYSQL_COM_STMT_CLOSE_SINCE_RESTART=4
-MYSQL_MEMORY_USED_NOW=485798504
-MYSQL_UPTIME=1114505
-PREPARE_MINUS_THEORETICAL_DYNAMIC=1370
-NOTE=Step3 count is an upper geometry bound before currency/rate skips; current daily log reported 1249 funds and 994766 VL actually processed. Step4 geometry is exact for active-fund row batches. Com_stmt_prepare is server-global and cumulative, so numerical proximity is evidence for correlation, not causal identity.
-MUTATION=NONE
-
-########## scripts/diag/ondemand/diag_recalc_sql_protocol_contract.js ##########
-
-=== RECALC SQL PROTOCOL CONTRACT — READ ONLY ===
-STEP3_RECALC_EUR_USD protocol=QUERY_TEXT parameterized_select_execute_preserved=YES
-STEP4_RECALC_VL_AJUSTE protocol=QUERY_TEXT parameterized_select_execute_preserved=YES
-MUTATION=NONE
-CONTRACT=GREEN
-
-########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
-
-=== RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-10-05 04:00:07 UTC — LECTURE SEULE
-Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
-
-TOTAL : 146 ligne(s) sur 64 fonds
-
-## Repartition par pays et lot d insertion
-
-     86 ligne(s)   NIGERIA | insere le Sun Aug 02
-      9 ligne(s)   NIGERIA | insere le Sun May 17
-      9 ligne(s)   NIGERIA | insere le Thu Jun 04
-      8 ligne(s)   NIGERIA | insere le Mon Aug 31
-      6 ligne(s)   NIGERIA | insere le Mon Jun 22
-      5 ligne(s)   Nigeria | insere le Mon Aug 31
-      4 ligne(s)   NIGERIA | insere le Mon Jun 08
-      3 ligne(s)   NIGERIA | insere le Mon Jul 06
-      3 ligne(s)   NIGERIA | insere le Mon Jul 13
-      2 ligne(s)   NIGERIA | insere le Mon Jun 29
-      2 ligne(s)   NIGERIA | insere le Mon Jul 27
-      2 ligne(s)   TUNISIE | insere le Fri May 22
-      2 ligne(s)   UEMOA | insere le Fri Jun 12
-      1 ligne(s)   MAROC | insere le Thu Apr 30
-      1 ligne(s)   Nigeria | insere le Thu Jun 04
-      1 ligne(s)   Nigeria | insere le Mon Jul 27
-      1 ligne(s)   TUNISIE | insere le Thu Apr 30
-      1 ligne(s)   UEMOA | insere le Thu Apr 30
-
-## Detail (60 premieres)
-
-  fonds dev  date               valeur     precedente   fact. insere     devise src  nom
-  ----- ---- ---------- -------------- -------------- ------- ---------- ------ ---  ---
-    790 MAD  Fri Jun 08         0.4600        11.2700    24.5 Thu Apr 30 -      non  UPLINE BONDS
-   1141 NGN  Fri Mar 25        92.1946     39043.5368   423.5 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
-   1141 NGN  Fri Apr 01     39441.4650        92.1946   427.8 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
-   1141 NGN  Fri Dec 15       109.8529    104587.4659   952.1 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
-   1141 NGN  Fri Dec 22    114459.8322       109.8529  1041.9 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
-   1141 NGN  Fri Dec 12       114.4702    165682.9307  1447.4 Sun Aug 02 NGN    oui  AFRINVEST DOLLAR FUND
-   1141 NGN  Fri Jan 02    165297.5204       114.6808  1441.4 Sun May 17 -      non  AFRINVEST DOLLAR FUND
-   1142 NGN  Fri Jul 18      1990.0300       172.0100    11.6 Sun Aug 02 NGN    oui  AFRINVEST EQUITY FUND
-   1142 NGN  Fri Jul 25       170.3400      1990.0300    11.7 Sun Aug 02 NGN    oui  AFRINVEST EQUITY FUND
-   1146 NGN  Fri Dec 12         1.0000       100.0000     100 Sun Aug 02 NGN    oui  AIICO MONEY MARKET FUND
-   1146 NGN  Fri Dec 19       100.0000         1.0000     100 Sun Aug 02 NGN    oui  AIICO MONEY MARKET FUND
-   1153 NGN  Fri Apr 19       523.4007        23.3802    22.4 Sun Aug 02 NGN    oui  ARM ETHICAL FUND
-   1153 NGN  Fri Apr 26        23.3905       523.4007    22.4 Sun Aug 02 NGN    oui  ARM ETHICAL FUND
-   1156 NGN  Fri Jul 25       339.7568         1.0000   339.8 Sun Aug 02 NGN    oui  ARM MONEY MARKET FUND
-   1156 NGN  Fri Aug 01         1.0000       339.7568   339.8 Sun Aug 02 NGN    oui  ARM MONEY MARKET FUND
-   1156 NGN  Fri Dec 12       100.0000         1.0000     100 Sun Aug 02 NGN    oui  ARM MONEY MARKET FUND
-   1156 NGN  Fri Dec 19         1.0000       100.0000     100 Sun Aug 02 NGN    oui  ARM MONEY MARKET FUND
-   1158 NGN  Fri Nov 05       107.1500     49755.0000   464.3 Sun Aug 02 NGN    oui  AVA GAM FIXED INCOME DOLLAR FU
-   1158 NGN  Fri Nov 12     49931.7000       107.1500     466 Sun May 17 -      non  AVA GAM FIXED INCOME DOLLAR FU
-   1168 NGN  Fri Nov 26       415.7564         1.0100   411.6 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
-   1168 NGN  Fri Mar 25         1.0259       425.9998   415.2 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
-   1168 NGN  Fri Apr 01       427.1666         1.0259   416.4 Sun Aug 02 NGN    oui  NIGERIA DOLLAR INCOME FUND
-   1169 NGN  Fri Aug 29 1046071210.6800       552.2000 1894370.2 Sun Aug 02 NGN    oui  NIGERIA ENERGY SECTOR FUND
-   1169 NGN  Fri Sep 05       552.2000 1046071210.6800 1894370.2 Sun Aug 02 NGN    oui  NIGERIA ENERGY SECTOR FUND
-   1171 NGN  Fri Oct 21       988.8300         1.2200   810.5 Sun Aug 02 NGN    oui  SFS FIXED INCOME FUND
-   1171 NGN  Fri Oct 28         1.2200       988.8300   810.5 Sun Aug 02 NGN    oui  SFS FIXED INCOME FUND
-   1179 NGN  Fri Dec 03        10.0000       100.0000      10 Sun May 17 NGN    oui  CORDROS MONEY MARKET FUND
-   1179 NGN  Fri Dec 10       100.0000        10.0000      10 Sun May 17 NGN    oui  CORDROS MONEY MARKET FUND
-   1196 NGN  Fri Dec 05      1668.4600    169387.5400   101.5 Sun Aug 02 NGN    oui  EMERGING AFRICA EUROBOND FUND
-   1196 NGN  Fri May 15    156778.4400      1664.5438    94.2 Thu Jun 04 NGN    oui  EMERGING AFRICA EUROBOND FUND
-   1206 NGN  Thu Dec 31         0.0100         0.9000      90 Sun Aug 02 NGN    oui  LEGACY EQUITY FUND
-   1206 NGN  Fri Jan 22         0.8300         0.0100      83 Sun Aug 02 NGN    oui  LEGACY EQUITY FUND
-   1207 NGN  Fri Feb 22         1.0000       100.0000     100 Sun Aug 02 NGN    oui  LEGACY MONEY MARKET FUND
-   1209 NGN  Fri Apr 07       100.0000         2.2600    44.2 Sun Aug 02 NGN    oui  CHAPEL HILL DENHAM MONEY MARKE
-   1212 NGN  Fri Jan 16       267.4600        26.5700    10.1 Sun May 17 NGN    oui  FRONTIER FUND
-   1223 NGN  Fri Dec 08         1.0000       100.0000     100 Sun May 17 -      non  GUARANTY TRUST MONEY MARKET FU
-   1223 NGN  Fri Jul 05       100.0000         1.0000     100 Sun May 17 -      non  GUARANTY TRUST MONEY MARKET FU
-   1239 NGN  Fri May 15         1.2600      1732.7394  1375.2 Thu Jun 04 NGN    oui  NOVA DOLLAR FIXED INCOME FUND
-   1239 NGN  Fri May 22      1747.0755         1.2600  1386.6 Thu Jun 04 NGN    oui  NOVA DOLLAR FIXED INCOME FUND
-   1239 NGN  Fri May 29         1.2700      1747.0755  1375.6 Mon Jun 08 NGN    oui  NOVA DOLLAR FIXED INCOME FUND
-   1239 NGN  Fri Jun 19      1863.8120         1.2700  1467.6 Mon Jun 29 NGN    oui  NOVA DOLLAR FIXED INCOME FUND
-   1239 NGN  Fri Jun 26         1.3600      1863.8120  1370.4 Mon Jul 06 NGN    oui  NOVA DOLLAR FIXED INCOME FUND
-   1249 NGN  Fri Aug 19       100.0000      1620.0800    16.2 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Aug 26      1622.4100       100.0000    16.2 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Sep 02       100.0000      1622.4100    16.2 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Sep 09      1627.7000       100.0000    16.3 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Apr 05       100.0000      1786.8800    17.9 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Apr 19      1805.4800       100.0000    18.1 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Mar 14       100.0000      1894.6800    18.9 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Mar 21      1902.8600       100.0000      19 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Apr 11       117.7600      1910.2400    16.2 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Thu Apr 17      1916.6600       117.7600    16.3 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Nov 28       100.0000      1973.5600    19.7 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1249 NGN  Fri Dec 05      1980.3700       100.0000    19.8 Sun Aug 02 NGN    oui  NIGERIA INTERNATIONAL DEBT FUN
-   1252 NGN  Fri Feb 27      4522.0000        45.2200     100 Sun Aug 02 NGN    oui  UNION HOMES REITS
-   1252 NGN  Fri Mar 06        45.2200      4522.0000     100 Sun Aug 02 NGN    oui  UNION HOMES REITS
-   1255 NGN  Fri Aug 29         1.2926       129.5200   100.2 Sun Aug 02 NGN    oui  STANBIC IBTC BOND FUND
-   1255 NGN  Fri Sep 05       129.7700         1.2926   100.4 Sun Aug 02 NGN    oui  STANBIC IBTC BOND FUND
-   1259 NGN  Fri Dec 16      7819.0000        78.1900     100 Sun Aug 02 NGN    oui  STANBIC IBTC ETF 30 FUND
-   1259 NGN  Fri Dec 30        78.1900      7819.0000     100 Sun Aug 02 NGN    oui  STANBIC IBTC ETF 30 FUND
-  ... et 86 autre(s)
-
-## Provenance
-
-  12 ligne(s) SANS provenance — meme signature que les 82 deja retirees
-  134 ligne(s) AVEC provenance — a corriger a la source, jamais par suppression aveugle
-
-
-########## scripts/diag/ondemand/diag_source_masi.js ##########
-=== SOURCE MASI — POURQUOI LE SCRAPING ECHOUE ===
-Mesure le 2026-10-05 04:00:48 UTC — LECTURE SEULE
-URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
-
-## A. Client HTTPS de Node — celui que `scrapeMASI` utilise aujourd hui
-  statut : 403
-  charge : interstitielle Cloudflare — « <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm »
-
-## B. curl — le contournement deja employe dans ce fichier pour bkam.ma
-  statut : 403
-  charge : interstitielle Cloudflare — « <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm »
-
-## C. Verdict
-  Ni Node ni curl n obtiennent la charge attendue depuis ce serveur.
-  Changer de client ne suffira pas : il faut une autre source MASI
-  ou une negociation d acces. Ne pas fabriquer de valeur d indice.
-
-=== FIN — aucune ecriture effectuee ===
-
-########## scripts/diag/ondemand/diag_source_monia.js ##########
-=== MONIA — ENJEU REEL ET ACCES A LA SOURCE ===
-Mesure le 2026-10-05 04:00:48 UTC — LECTURE SEULE
-
-## A. Qui se refere a MONIA ?
-
-  Aucun fonds ne declare MONIA comme reference.
-  La panne est reelle mais ne prive aucun fonds de benchmark :
-  elle ne justifie pas le meme effort qu une rupture actions.
-
-## B. Combien de VL portent un indRef issu de MONIA ?
-
-  0 VL, du null au null
-
-## C. La source repond-elle depuis ce serveur ?
-
-  page EN (voie principale)
-    https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average
-    HTTP 403 | 919 o | ip 3.160.39.38
-    page de blocage : OUI
-
-  page FR (voie secondaire)
-    https://www.bkam.ma/Marche-monetaire/Taux-du-marche-interbancaire-MONIA
-    HTTP 403 | 919 o | ip 3.160.39.38
-    page de blocage : OUI
-
-  racine bkam.ma
-    https://www.bkam.ma/
-    HTTP 403 | 919 o | ip 3.160.39.56
-    page de blocage : OUI
-
-## D. Conclusion a tirer, et celle a ne pas tirer
-
-  Si la racine et les deux pages rendent un blocage, le probleme est
-  l adresse de ce serveur, pas le code : aucun en-tete ne le resoudra,
-  et il faudra une autre source ou un accord d acces. Ne jamais
-  reconstituer un taux a partir d une variation affichee.
-
-=== FIN — aucune ecriture effectuee ===
-
-########## scripts/diag/ondemand/diag_sources_masi_alternatives.js ##########
-=== SOURCES MASI ALTERNATIVES — CE QUI REPOND DEPUIS S2 ===
-Mesure le 2026-10-05 04:00:52 UTC — LECTURE SEULE
-
-## African Markets — page indices
-  https://www.african-markets.com/en/stock-markets/bvc/indices
-  reponse : HTTP 404 | text/html | 2870 o | ip 172.67.205.222
-      → interstitielle Cloudflare : inutilisable par script
-
-## African Markets — donnees de marche
-  https://www.african-markets.com/en/stock-markets/bvc/market-data
-  reponse : HTTP 404 | text/html | 2870 o | ip 172.67.205.222
-      → interstitielle Cloudflare : inutilisable par script
-
-## FT — historique MASI:CAS
-  https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS
-  reponse : HTTP 200 | text/html | 79452 o | ip 209.234.238.17
-      → candidats « MASI + nombre > 1000 » : 17,303.69 (→ 17303.69)
-      → serie datee : aucune date reperable — source inutilisable telle quelle
-      → ce que la page dit autour du mot MASI :
-          « ALL SHARES INDEX, MASI:CAS Historical Prices - FT.com Subscribe Sign In Menu Search Financial Times myFT if you don't need to support both core and enhanced --> Search »
-          « Indices ALL SHARES INDEX + Add to watchlist + Add an alert MASI:CAS ALL SHARES INDEX Actions Add to watchlist Add an alert Price (MAD) 17,303.69 Today's Change -275.49 / -1.57% Shares traded -- 1 Year change - »
-
-## WSJ — historique MASI
-  https://www.wsj.com/market-data/quotes/index/MA/MASI/historical-prices
-  reponse : HTTP 401 | text/html | 767 o | ip 54.239.195.33
-      → candidats « MASI + nombre > 1000 » : aucun
-      → serie datee : aucune date reperable — source inutilisable telle quelle
-
-## Stooq — symbole marocain alternatif
-  https://stooq.com/q/d/l/?s=%5Emasi&i=d
-  reponse : HTTP 200 | text/html | 796 o | ip 78.47.47.99
-      → candidats « MASI + nombre > 1000 » : aucun
-      → serie datee : aucune date reperable — source inutilisable telle quelle
-
-## Yahoo — nouvelle tentative MASI.CS
-  https://query2.finance.yahoo.com/v8/finance/chart/MASI.CS?range=3mo&interval=1d
-  reponse : HTTP 429 | text/html | 23 o | ip 87.248.119.251
-      → candidats « MASI + nombre > 1000 » : aucun
-      → serie datee : aucune date reperable — source inutilisable telle quelle
-
-Rappel : la source retenue devra etre autoritative et fournir une
-SERIE datee, pas un cours instantane — `propagateIndRef` apparie une
-date de VL a une date d indice a +/- 7 jours.
-
-=== FIN — aucune ecriture effectuee ===
-
-########## scripts/diag/ondemand/diag_test_masi_ft_dryrun.js ##########
-
-########## 2026-10-02 — seance ouvree — cloture connue : 17 303,69
-Mode: DRY-RUN
-  [MASI] MASI...
-    [MASI] medias24 : ERROR HTTP 403 for https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
-    [MASI] SUCCESS via FT markets MASI:CAS (cloture Oct 02, 2026): 17303.69
-    [MONIA] ERROR curl failed: Command failed: curl -s -f -L --compressed --max-time 30 -H User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 AfricafundsBot/1.0 -H Accept-Language: fr-FR,fr;q=0.9,en;q=0.8 -H Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 -H Sec-Fetch-Dest: document -H Sec-Fetch-Mode: navigate -H Sec-Fetch-Site: same-origin -H Referer: https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average https://www.bkam.ma/en/export/blockcsv/566622/30551c1667f5f2004fb0019220d41795/06f7b466ca91da0596a810776852ee51?block=06f7b466ca91da0596a810776852ee51
-  Resume scraping: 4 indices recuperes, 1 echecs
---- PHASE 2: Insertion dans indice_references ---
-  [MASI] DRY-RUN: insererait 17303.69 pour 2026-10-02
-  [NSE] DRY-RUN: insererait 250808.27 pour 2026-10-02
-  Resume insertion: 2 inseres, 2 ignores (deja existants)
-  MODE DRY-RUN: aucune modification effectuee sur valorisations
-RESUME 2026-10-02
-  MASI: 17303.69 (via FT markets MASI:CAS (cloture))
-  >>> MODE DRY-RUN: aucune modification effectuee <<<
--- code de sortie : 0
-
-########## 2026-09-30 — seance ouvree — cloture attendue : 17 733,06
-Mode: DRY-RUN
-  [MASI] MASI...
-    [MASI] medias24 : ERROR HTTP 403 for https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
-    [MASI] SUCCESS via FT markets MASI:CAS (cloture Sep 30, 2026): 17733.06
-    [MONIA] ERROR curl failed: Command failed: curl -s -f -L --compressed --max-time 30 -H User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 AfricafundsBot/1.0 -H Accept-Language: fr-FR,fr;q=0.9,en;q=0.8 -H Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 -H Sec-Fetch-Dest: document -H Sec-Fetch-Mode: navigate -H Sec-Fetch-Site: same-origin -H Referer: https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average https://www.bkam.ma/en/export/blockcsv/566622/30551c1667f5f2004fb0019220d41795/06f7b466ca91da0596a810776852ee51?block=06f7b466ca91da0596a810776852ee51
-  Resume scraping: 4 indices recuperes, 1 echecs
---- PHASE 2: Insertion dans indice_references ---
-  [MASI] DRY-RUN: insererait 17733.06 pour 2026-09-30
-  Resume insertion: 1 inseres, 3 ignores (deja existants)
-  MODE DRY-RUN: aucune modification effectuee sur valorisations
-RESUME 2026-09-30
-  MASI: 17733.06 (via FT markets MASI:CAS (cloture))
-  >>> MODE DRY-RUN: aucune modification effectuee <<<
--- code de sortie : 0
-
-########## 2026-10-04 — dimanche — doit etre refuse, pas rempli par la veille
-Mode: DRY-RUN
-  [MASI] MASI...
-    [MASI] medias24 : ERROR HTTP 403 for https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
-    [MASI] FT : pas de seance au 2026-10-04 (jour non ouvre ?)
-    [MASI] ECHEC: aucune source n'a retourne de valeur
-    [MONIA] ERROR curl failed: Command failed: curl -s -f -L --compressed --max-time 30 -H User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 AfricafundsBot/1.0 -H Accept-Language: fr-FR,fr;q=0.9,en;q=0.8 -H Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8 -H Sec-Fetch-Dest: document -H Sec-Fetch-Mode: navigate -H Sec-Fetch-Site: same-origin -H Referer: https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average https://www.bkam.ma/en/export/blockcsv/566622/30551c1667f5f2004fb0019220d41795/06f7b466ca91da0596a810776852ee51?block=06f7b466ca91da0596a810776852ee51
-  Resume scraping: 0 indices recuperes, 5 echecs
--- code de sortie : 1
-
-=== FIN — dry-run uniquement, aucune ecriture effectuee ===
-
+client_loop: send disconnect: Broken pipe
 ```
