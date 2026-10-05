@@ -4,7 +4,7 @@
   "status": "W2_P1_MARKET_SOURCE_DOSSIERS_NON_AUTHORITATIVE",
   "observed_at": "2026-10-06",
   "observed_heads": {
-    "api": "4880373f13c94d2c8a3db98789fad9d603842658",
+    "api": "8e3d76de5d59df448f02424c83e98b97b9a45c9e",
     "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
   },
   "policy": {
@@ -48,13 +48,35 @@
       "No canonical AfricaFunds SubFund/ShareClass schema decision yet.",
       "No source licence/redistribution review for manager-hosted price data yet."
     ],
-    "readiness": "SOURCE_DISCOVERY_P1_REGISTRY_STRONG_NAV_PENDING",
+    "readiness": "SOURCE_DISCOVERY_P1_REGISTRY_VERY_STRONG_NAV_FEED_STILL_PENDING",
     "W1_dependencies": [
       "W1-DELTA-003",
       "W1-DELTA-004",
       "W1-DELTA-007",
       "W1-DELTA-008"
-    ]
+    ],
+    "nav_source_sampling": {
+      "observed_at": "2026-10-06",
+      "proven_examples": [
+        {
+          "manager": "Etica Capital",
+          "source": "https://eticacap.com/money-market-fund-kes/",
+          "finding": "Public product pages expose currency, benchmark, trustee/custodian, manager and current fund terms; downloadable factsheets are available."
+        },
+        {
+          "manager": "Britam",
+          "source": "https://ke.britam.com/save-and-invest/personal/invest/unit-trust-funds",
+          "finding": "Public product catalogue confirms daily liquidity/compounding and KES/USD fund variants, but no centralized public historical unit-price feed was certified."
+        },
+        {
+          "manager": "NCBA",
+          "source": "https://investment-bank.ncbagroup.com/wealth-management/collective-investment-schemes/",
+          "finding": "Official product/factsheet surfaces exist; centralized machine-readable historical NAV feed remains unproven."
+        }
+      ],
+      "conclusion": "Manager-hosted fund/factsheet data is clearly available, but a stable daily unit-price/NAV acquisition surface has not yet been certified across representative managers.",
+      "remaining": "Continue manager-by-manager source feasibility; do not equate yield/factsheet publication with NAV time series."
+    }
   },
   "GHANA": {
     "regulator": "Securities and Exchange Commission Ghana",
@@ -98,21 +120,43 @@
       "Fund-manager website heterogeneity likely requires source adapters.",
       "NAVPS vs bid/offer selection must be explicit and quality-reviewed."
     ],
-    "readiness": "SOURCE_DISCOVERY_P1_REGISTRY_STRONG_NAV_PENDING",
+    "readiness": "SOURCE_DISCOVERY_P1_REGISTRY_STRONG_ONE_PUBLIC_PRICE_FEED_PROVEN",
     "W1_dependencies": [
       "W1-DELTA-003",
       "W1-DELTA-004",
       "W1-DELTA-007"
-    ]
+    ],
+    "regulator_snapshot": {
+      "observed_at": "2026-10-06",
+      "official_operator_counts": {
+        "Mutual_Funds": 53,
+        "Unit_Trusts": 33,
+        "Fund_Managers": 83
+      },
+      "source": "https://licensees.sec.gov.gh/"
+    },
+    "nav_source_sampling": {
+      "observed_at": "2026-10-06",
+      "proven_examples": [
+        {
+          "manager": "EDC / Ecobank",
+          "source": "https://www.ecobank.com/gh/corporate-investment-banking/wsa-management/collective-investment-schemes",
+          "finding": "Public current fund values are displayed with explicit GHS/GHC currency and as-of dates for multiple Ghana funds."
+        }
+      ],
+      "conclusion": "At least one large licensed manager exposes a stable public price surface. This proves Ghana NAV-source feasibility for a pilot, not full-market coverage.",
+      "remaining": "Sample at least four additional licensed managers before designing a market-wide adapter."
+    }
   },
   "shared_P1_acceptance_before_connector_task": [
     "Regulator universe snapshot can be reproduced deterministically.",
-    "At least 90% of sampled scheme/sub-fund identities map without heuristic name guessing.",
+    "Fund/SubFund/ShareClass grain is explicit and source-backed.",
     "At least five representative managers/products have a stable official NAV/price publication path OR the absence of such path is explicitly documented.",
     "Price type and currency are explicit.",
     "Publication/effective/acquisition dates can be distinguished.",
     "Raw/source evidence can fit the W2 ingestion contract.",
-    "No dependency requires inventing identifiers, NAV, benchmark or provenance."
+    "No dependency requires inventing identifiers, NAV, benchmark or provenance.",
+    "A pilot manager feed does not authorize claiming full-market coverage."
   ],
-  "next_action": "Perform read-only regulator-universe structure extraction/counting for Kenya/Ghana and source-path sampling. Do not create country connector tasks until NAV acquisition feasibility is proven."
+  "next_action": "Ghana: sample four additional licensed managers for dated public fund prices and source stability. Kenya: continue NAV-source feasibility across at least five representative managers while preserving regulator scheme/sub-fund hierarchy. No connector task until acceptance criteria are met."
 }
