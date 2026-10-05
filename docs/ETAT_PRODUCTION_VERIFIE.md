@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-10-05 21:36 UTC**
+Derniere verification : **2026-10-05 21:40 UTC**
 
 ```
 
@@ -57,10 +57,10 @@ Derniere verification : **2026-10-05 21:36 UTC**
              derniere valeur le Fri Oct 02, soit 3 j (porte par 45112 VL)
 [OK   ] C10.NSE All Share Fraicheur de l indice NSE All Share
              derniere valeur le Fri Oct 02, soit 3 j (porte par 54093 VL)
-[OK   ] C10.Tunindex Fraicheur de l indice Tunindex
-             derniere valeur le Mon Oct 05, soit 0 j (porte par 311215 VL)
 [OK   ] C10.MASI     Fraicheur de l indice MASI
              derniere valeur le Mon Oct 05, soit 0 j (porte par 554080 VL)
+[OK   ] C10.Tunindex Fraicheur de l indice Tunindex
+             derniere valeur le Mon Oct 05, soit 0 j (porte par 311215 VL)
 
 18/25 controles OK — 4 echec(s) critique(s), 3 alerte(s).
 
