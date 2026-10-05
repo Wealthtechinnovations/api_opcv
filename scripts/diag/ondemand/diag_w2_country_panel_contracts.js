@@ -60,8 +60,8 @@ function table(rows){
   }
   console.log(table(rows));
   console.log('');
-  console.log('STATIC_FINDING=routes_vl_admin.js is not mounted by current app.js');
+  console.log('STATIC_FINDING=app.js mounts routes_vl.js and routes_vl.js transitively mounts routes_vl_admin.js');
   console.log('STATIC_FINDING=/api/importfondsvl has no current API implementation found by repository search');
-  console.log('RULE=Do not mount legacy routes wholesale. Missing contracts require route-by-route auth/ownership and semantic reconciliation.');
+  console.log('RULE=Preserve current working route URLs; certify route-by-route auth/ownership and reconcile missing/renamed contracts additively.');
   console.log('VERDICT=W2_COUNTRY_PANEL_CONTRACTS_OBSERVED_READ_ONLY');
 })().catch(e=>{console.error('W2_COUNTRY_PANEL_FATAL:',e&&e.message?e.message:String(e));process.exit(2);});
