@@ -4,7 +4,7 @@
   "status": "W2_P1_MARKET_SOURCE_DOSSIERS_NON_AUTHORITATIVE",
   "observed_at": "2026-10-06",
   "observed_heads": {
-    "api": "8e3d76de5d59df448f02424c83e98b97b9a45c9e",
+    "api": "a1c12eeccfd02e4412750b42b0fb5f5aacb805e1",
     "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
   },
   "policy": {
@@ -120,7 +120,7 @@
       "Fund-manager website heterogeneity likely requires source adapters.",
       "NAVPS vs bid/offer selection must be explicit and quality-reviewed."
     ],
-    "readiness": "SOURCE_DISCOVERY_P1_REGISTRY_STRONG_ONE_PUBLIC_PRICE_FEED_PROVEN",
+    "readiness": "PILOT_SOURCE_FEASIBILITY_PROVEN_MARKET_WIDE_COVERAGE_PENDING",
     "W1_dependencies": [
       "W1-DELTA-003",
       "W1-DELTA-004",
@@ -137,16 +137,48 @@
     },
     "nav_source_sampling": {
       "observed_at": "2026-10-06",
+      "sampled_manager_count": 5,
       "proven_examples": [
         {
           "manager": "EDC / Ecobank",
           "source": "https://www.ecobank.com/gh/corporate-investment-banking/wsa-management/collective-investment-schemes",
-          "finding": "Public current fund values are displayed with explicit GHS/GHC currency and as-of dates for multiple Ghana funds."
+          "data_shape": "dated public fund values in GHS/GHC across multiple Ghana funds",
+          "price_semantics": "Displayed fund value/price; exact NAV/bid/offer semantics must remain source-specific."
+        },
+        {
+          "manager": "CAL Asset Management",
+          "source": "https://calassetmanagement.net/about-us/reports-2/performance-update",
+          "data_shape": "daily dated PRICE (GHS) history plus YTD/annualized returns for multiple unit trusts",
+          "price_semantics": "Explicit PRICE column; suitable pilot time-series candidate pending source/terms validation."
+        },
+        {
+          "manager": "Brassica Capital",
+          "source": "https://www.brassicagroup.com/resources/understand-how-to-maximize",
+          "data_shape": "dated current/previous Offer Price and Bid Price plus performance",
+          "price_semantics": "BID and OFFER are explicitly distinct; never collapse to canonical VL without product rule."
+        },
+        {
+          "manager": "SDC Capital",
+          "source": "https://sdccapital.com.gh/",
+          "data_shape": "current CM Fund price, inception/opening price and performance as-of date",
+          "price_semantics": "Public fund price; historical depth still to measure."
+        },
+        {
+          "manager": "Databank",
+          "source": "https://www.databankgroup.com/",
+          "data_shape": "periodic fund factsheets expose dated share price and fund details",
+          "price_semantics": "Share price/NAV-per-share concept; cadence appears periodic rather than proven daily web feed."
         }
       ],
-      "conclusion": "At least one large licensed manager exposes a stable public price surface. This proves Ghana NAV-source feasibility for a pilot, not full-market coverage.",
-      "remaining": "Sample at least four additional licensed managers before designing a market-wide adapter."
-    }
+      "conclusion": "Five representative licensed-manager source paths are now proven. Ghana is feasible for a bounded source-adapter pilot, but market-wide coverage still requires per-manager source/cadence mapping and explicit price-type semantics.",
+      "remaining": [
+        "Measure historical depth and update cadence for each source.",
+        "Resolve URL stability/terms of use and artifact retention.",
+        "Map each sampled product to the SEC registry and canonical manager/custodian identities.",
+        "Classify BID/OFFER/share-price/NAV semantics per source before canonical promotion."
+      ]
+    },
+    "next_probe": "Build a no-write Ghana pilot source matrix linking SEC registry identities to the five sampled manager feeds; do not import until Fund/ShareClass grain and price_type rules are explicit."
   },
   "shared_P1_acceptance_before_connector_task": [
     "Regulator universe snapshot can be reproduced deterministically.",
@@ -158,5 +190,5 @@
     "No dependency requires inventing identifiers, NAV, benchmark or provenance.",
     "A pilot manager feed does not authorize claiming full-market coverage."
   ],
-  "next_action": "Ghana: sample four additional licensed managers for dated public fund prices and source stability. Kenya: continue NAV-source feasibility across at least five representative managers while preserving regulator scheme/sub-fund hierarchy. No connector task until acceptance criteria are met."
+  "next_action": "Ghana: prepare a no-write pilot mapping across five proven manager sources and SEC registry identities. Kenya: continue NAV-source feasibility across representative managers while preserving regulator scheme/sub-fund hierarchy. No production connector or queue task until governance gates are met."
 }
