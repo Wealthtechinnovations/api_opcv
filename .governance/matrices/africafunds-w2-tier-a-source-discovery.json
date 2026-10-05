@@ -1,0 +1,296 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W2_TIER_A_SOURCE_DISCOVERY_NON_AUTHORITATIVE",
+  "observed_at": "2026-10-06",
+  "observed_heads": {
+    "api": "9974efe3ab6fd91043284f32ecf81cfc0c528325",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "source_policy": {
+    "regulator_first": true,
+    "current_public_web_verification_used": true,
+    "registry_source_is_not_nav_source": true,
+    "nav_source_must_be_separately_certified": true,
+    "no_connector_claim_without_technical_fetch_and_mapping_proof": true,
+    "no_task_promotion_from_web_research_alone": true
+  },
+  "markets": [
+    {
+      "market": "GHANA",
+      "regulator": "Securities and Exchange Commission Ghana",
+      "regulator_domain": "sec.gov.gh",
+      "current_official_surfaces": [
+        {
+          "type": "LICENSED_MUTUAL_FUNDS",
+          "url": "https://licensees.sec.gov.gh/licensees/MutualFunds.php",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "LICENSED_FUND_MANAGERS",
+          "url": "https://licensees.sec.gov.gh/licensees/FundManager.php",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "CIS_REGULATORY_INFORMATION",
+          "url": "https://sec.gov.gh/frequently-asked-questions/",
+          "status": "CONFIRMED_PUBLIC"
+        }
+      ],
+      "what_is_proven": [
+        "Official regulator publishes current licensed mutual-fund and fund-manager registries.",
+        "Ghana CIS include Mutual Funds and Unit Trusts.",
+        "Open-ended mutual fund NAVPS/bid-offer monitoring is part of the market disclosure framework."
+      ],
+      "missing_before_connector": [
+        "Authoritative fund-level historical/daily NAV feed or stable manager-source acquisition path.",
+        "Canonical scheme/sub-fund identifiers and currency/frequency inventory.",
+        "Historical corporate-action/manager-change reconciliation."
+      ],
+      "feasibility": "REGISTRY_HIGH_NAV_FEED_PENDING",
+      "next_probe": "Inventory SEC Unit Trust registry if separate, then sample 5 licensed schemes across managers to locate stable NAV/factsheet feeds."
+    },
+    {
+      "market": "KENYA",
+      "regulator": "Capital Markets Authority Kenya",
+      "regulator_domain": "cma.or.ke",
+      "current_official_surfaces": [
+        {
+          "type": "CIS_LICENSEE_LIST",
+          "url": "https://licensees.cma.or.ke/licenses/15/",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "CIS_REGULATIONS",
+          "url": "https://www.cma.or.ke/regulatory-framework/",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "CURRENT_APPROVALS",
+          "url": "https://www.cma.or.ke/cma-grants-regulatory-approvals-for-fund-management-and-collective-investment-schemes/",
+          "status": "CONFIRMED_2026"
+        }
+      ],
+      "what_is_proven": [
+        "Official CMA list exposes schemes and many sub-funds, including multi-currency KES/USD/EUR/GBP products.",
+        "Umbrella/sub-fund structure is active and expanding in 2026.",
+        "Collective Investment Schemes Regulations 2023 remain current regulatory basis."
+      ],
+      "missing_before_connector": [
+        "Centralized official daily NAV feed not yet proven.",
+        "Share-class/sub-fund identifiers and manager source URLs need systematic extraction.",
+        "Multi-currency class grain must be modeled explicitly before import."
+      ],
+      "feasibility": "REGISTRY_VERY_HIGH_NAV_FEED_MANAGER_DISTRIBUTED",
+      "next_probe": "Parse official scheme/sub-fund list into candidate Fund/SubFund/ShareClass identities, then test manager sites for machine-readable NAV/factsheets."
+    },
+    {
+      "market": "EGYPTE",
+      "regulator": "Financial Regulatory Authority Egypt",
+      "regulator_domain": "fra.gov.eg",
+      "current_official_surfaces": [
+        {
+          "type": "FUND_PERFORMANCE_REPORT_Q1_2026",
+          "url": "https://fra.gov.eg/en/fra_news/%D8%A7%D9%84%D8%B1%D9%82%D8%A7%D8%A8%D8%A9-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9-%D8%AA%D8%B5%D8%AF%D8%B1-%D8%A3%D9%88%D9%84-%D8%AA%D9%82%D8%B1%D9%8A%D8%B1-%D9%84%D8%A3%D8%AF%D8%A7%D8%A1/",
+          "status": "CONFIRMED_2026"
+        },
+        {
+          "type": "FUND_PERFORMANCE_REPORT_Q2_2026",
+          "url": "https://fra.gov.eg/en/fra_news/%D8%A7%D9%84%D8%B1%D9%82%D8%A7%D8%A8%D8%A9-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9-%D8%AA%D8%B5%D8%AF%D8%B1-%D8%AA%D9%82%D8%B1%D9%8A%D8%B1-%D8%A3%D8%AF%D8%A7%D8%A1-%D8%B5%D9%86%D8%A7%D8%AF/",
+          "status": "CONFIRMED_2026"
+        }
+      ],
+      "what_is_proven": [
+        "FRA publishes current investment-fund sector performance reports.",
+        "Q2 2026 official report states 224 funds by end-June 2026 and updated fund classifications."
+      ],
+      "missing_before_connector": [
+        "Fund-level official registry/feed endpoint.",
+        "Daily or periodic NAV source at fund/share-class level.",
+        "Arabic/English identity normalization and manager/issuer relationships."
+      ],
+      "feasibility": "REGULATOR_AND_MARKET_SCALE_CONFIRMED_FUND_LEVEL_SOURCE_PENDING",
+      "next_probe": "Locate FRA official fund registry/downloads and determine whether fund-level NAV is regulator-hosted or distributed across banks/managers."
+    },
+    {
+      "market": "AFRIQUE_DU_SUD",
+      "regulator": "Financial Sector Conduct Authority",
+      "regulator_domain": "fsca.co.za",
+      "current_official_surfaces": [
+        {
+          "type": "REGULATED_ENTITIES",
+          "url": "https://www.fsca.co.za/Regulated-Entities/",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "ENTITY_SEARCH",
+          "url": "https://www.fsca.co.za/Entity-Persons-Search/?iframe_target=FSP+SEARCH",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "CIS_ESERVICES",
+          "url": "https://www.fsca.co.za/EServices/",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        }
+      ],
+      "what_is_proven": [
+        "FSCA currently regulates and registers CIS managers, local schemes/portfolios and approved foreign schemes.",
+        "Official regulatory/entity-search surface exists."
+      ],
+      "missing_before_connector": [
+        "Machine-readable public portfolio register extraction.",
+        "Fund/share-class daily NAV source and licensing/redistribution constraints.",
+        "Very large market requires explicit share-class grain before ingestion."
+      ],
+      "feasibility": "REGULATORY_REGISTRY_HIGH_DATA_SOURCE_LICENSING_COMPLEX",
+      "next_probe": "Extract official CIS manager/portfolio registries, then compare with public manager feeds and assess redistribution/licensing before any bulk ingestion."
+    },
+    {
+      "market": "MAURICE",
+      "regulator": "Financial Services Commission Mauritius",
+      "regulator_domain": "fscmauritius.org",
+      "current_official_surfaces": [
+        {
+          "type": "CIS_LICENSING_CODIFIED_LIST",
+          "url": "https://www.fscmauritius.org/licensing-supervision/codified-list",
+          "status": "CONFIRMED_CURRENT_2026"
+        },
+        {
+          "type": "CIS_PUBLIC_NOTICES",
+          "url": "https://www.fscmauritius.org/media-corner/public-notice",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "SURRENDERED_LICENSES",
+          "url": "https://www.fscmauritius.org/licensing-supervision/surrendered-licences",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        }
+      ],
+      "what_is_proven": [
+        "FSC licensing explicitly supports single funds, multi-fund CIS and foreign schemes/sub-funds.",
+        "Current public notices expose revocations/surrenders relevant to lifecycle tracking."
+      ],
+      "missing_before_connector": [
+        "Active CIS/fund registry extraction with stable identifiers.",
+        "Retail/local versus Global Business/foreign scheme scope definition.",
+        "Fund-level NAV data source and permitted redistribution."
+      ],
+      "feasibility": "REGULATORY_LIFECYCLE_HIGH_UNIVERSE_SCOPE_AND_NAV_PENDING",
+      "next_probe": "Define AfricaFunds Mauritius scope first (domestic retail/local CIS vs global funds), then locate active-authorisation registry and NAV publication paths."
+    },
+    {
+      "market": "BOTSWANA",
+      "regulator": "Non-Bank Financial Institutions Regulatory Authority",
+      "regulator_domain": "nbfira.org.bw",
+      "current_official_surfaces": [
+        {
+          "type": "CIU_LEGAL_FRAMEWORK",
+          "url": "https://www.nbfira.org.bw/resources/master-library-search/",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "REGULATED_ENTITIES",
+          "url": "https://www.nbfira.org.bw/regulated-entities/",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "CIU_GUIDANCE",
+          "url": "https://www.nbfira.org.bw/news/guidance-note-licensing-and-recognition-collective-investment-undertakings-under-revised-collective/",
+          "status": "CONFIRMED_PUBLIC"
+        }
+      ],
+      "what_is_proven": [
+        "NBFIRA publishes current regulated-entity and CIU legal/guidance surfaces.",
+        "CIU Act supports open-ended structures, umbrella/master/feeder concepts."
+      ],
+      "missing_before_connector": [
+        "Public fund/scheme list extraction and stable scheme IDs.",
+        "Central NAV feed not proven; manager websites may be required.",
+        "Umbrella/sub-fund/share-class grain needs explicit mapping."
+      ],
+      "feasibility": "REGULATOR_CONFIRMED_SCHEME_AND_NAV_DISCOVERY_REQUIRED",
+      "next_probe": "Extract NBFIRA licensed CIU entities, then sample major unit-trust managers for daily price feeds and factsheets."
+    },
+    {
+      "market": "NAMIBIE",
+      "regulator": "Namibia Financial Institutions Supervisory Authority",
+      "regulator_domain": "namfisa.com.na",
+      "current_official_surfaces": [
+        {
+          "type": "REGISTERED_INSTITUTIONS",
+          "url": "https://www.namfisa.com.na/registered-institutions-intermediaries/",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        },
+        {
+          "type": "REGULATORY_FRAMEWORK",
+          "url": "https://www.namfisa.com.na/regulatory-frameworks/",
+          "status": "CONFIRMED_CURRENT_2026"
+        }
+      ],
+      "what_is_proven": [
+        "NAMFISA public register exposes multiple active Managers of Collective Investment Schemes.",
+        "FIMA implementation/regulatory material for CIS is current in 2026."
+      ],
+      "missing_before_connector": [
+        "Scheme/sub-fund register rather than manager-only list.",
+        "Daily/unit-price source and fund identifiers.",
+        "Relationship to South African-domiciled or feeder structures."
+      ],
+      "feasibility": "MANAGER_REGISTRY_HIGH_SCHEME_NAV_PENDING",
+      "next_probe": "Enumerate CIS managers from NAMFISA, locate their scheme portfolios and public NAV feeds, and tag cross-border/feeder relationships."
+    },
+    {
+      "market": "ETHIOPIE",
+      "regulator": "Ethiopian Capital Market Authority",
+      "regulator_domain": "ecma.gov.et",
+      "current_official_surfaces": [
+        {
+          "type": "CIS_DIRECTIVE",
+          "url": "https://ecma.gov.et/laws-regulation/",
+          "status": "CONFIRMED_PUBLISHED_2026_09_23"
+        },
+        {
+          "type": "CIS_OPERATOR_FRAMEWORK",
+          "url": "https://ecma.gov.et/cmsp/",
+          "status": "CONFIRMED_CURRENT_PUBLIC"
+        }
+      ],
+      "what_is_proven": [
+        "ECMA published the Directive on Operation of Collective Investment Schemes on 23 September 2026.",
+        "CIS operator licensing framework is now formally defined."
+      ],
+      "missing_before_connector": [
+        "Current licensed CIS operators/schemes and whether any live funds have begun publishing NAV.",
+        "Operational market data cadence and identifiers.",
+        "Very recent regulatory launch means production-data readiness cannot be assumed."
+      ],
+      "feasibility": "NASCENT_REGULATORY_MARKET_DISCOVERY_ONLY",
+      "next_probe": "Check ECMA licensee announcements/register after directive effective publication; do not build ingestion until live schemes and disclosures exist."
+    }
+  ],
+  "prioritization": {
+    "P1": [
+      "KENYA",
+      "GHANA"
+    ],
+    "P2": [
+      "NAMIBIE",
+      "BOTSWANA",
+      "AFRIQUE_DU_SUD"
+    ],
+    "P3": [
+      "EGYPTE",
+      "MAURICE"
+    ],
+    "WATCH": [
+      "ETHIOPIE"
+    ],
+    "rationale": [
+      "P1 favors strong official scheme registries and manageable discovery path.",
+      "South Africa is data-rich but structurally/licensing complex; do not make it first connector.",
+      "Mauritius requires a product-scope decision because the regulator covers a large global-business universe.",
+      "Ethiopia is regulatory-watch until live CIS products/data are evidenced."
+    ]
+  },
+  "next_action": "Persist live W2 pipeline diagnostics for current five markets, then create one read-only source dossier per P1 market before any child task is promoted."
+}
