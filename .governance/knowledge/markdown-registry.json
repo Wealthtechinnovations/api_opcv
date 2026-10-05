@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "78227c6ff6dad699b434ea308705e270beb05ff0"
+      "head": "214a688d4eabef8cbdb825591224ca53cb1238f3"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "2aa4728b7ea288871085424305a1d2dca5f35253"
+      "head": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
     }
   },
   "summary": {
@@ -3172,7 +3172,8 @@
         "Rôle",
         "État global",
         "Héritage",
-        "Principe"
+        "Principe",
+        "Matrice d'intakes candidats"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3182,17 +3183,17 @@
       "contradictions": [],
       "duplication_risk": "NONE",
       "stale_state": [],
-      "security_impact": "NONE",
+      "security_impact": "HIGH",
       "production_impact": "YES",
       "title": "PROJECT_CONTEXT — AfricaFunds API",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "PROJECT_CONTEXT.md",
-      "git_blob_sha": "4f4f69996dd9052c3ffc434d105033d907cf5440",
-      "last_validated_sha": "4f4f69996dd9052c3ffc434d105033d907cf5440",
-      "content_sha256": "500572a08e9136c5722f122d2f96d8512f6c0ffc6e18f17cfd2bb7b7c5ecbb60",
-      "line_count": 39,
-      "byte_count": 1764,
+      "git_blob_sha": "988fc8d904458392df0cc1b771e3633d2a06a50f",
+      "last_validated_sha": "988fc8d904458392df0cc1b771e3633d2a06a50f",
+      "content_sha256": "69b64ad76973f801b69ba88d69dab200d00be516edb5ce5b37a3de38cb7d71bf",
+      "line_count": 59,
+      "byte_count": 3029,
       "headings": [
         {
           "level": 1,
@@ -3217,6 +3218,10 @@
         {
           "level": 2,
           "text": "Principe"
+        },
+        {
+          "level": 2,
+          "text": "Matrice d'intakes candidats"
         }
       ]
     },
@@ -10109,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "7c162deb4df27afbb487cb01496cd9356e1a9cf3",
-      "last_validated_sha": "7c162deb4df27afbb487cb01496cd9356e1a9cf3",
-      "content_sha256": "3102f9ca71905328627b7afeada95055bfe7b1693f9606ab32131c8311eb9d6c",
-      "line_count": 1540,
-      "byte_count": 94356,
+      "git_blob_sha": "b28a3e208ae2eefc174dd16eabb692327c9f5162",
+      "last_validated_sha": "b28a3e208ae2eefc174dd16eabb692327c9f5162",
+      "content_sha256": "9eb740cfa6d2635f180e4beb39b5ccaacfdf0bdc6ca2e604a903ba544aec4e5b",
+      "line_count": 1543,
+      "byte_count": 94566,
       "headings": [
         {
           "level": 1,
@@ -10300,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "157f53960b1914a7a346747ce6a5b7f5bf452c63",
-      "last_validated_sha": "157f53960b1914a7a346747ce6a5b7f5bf452c63",
-      "content_sha256": "518fd74da36b6a9d7d71a15be6197307c6e1d24b45aeeb90f037281679539ee8",
+      "git_blob_sha": "22a6a4278650f7c343844c1604f0771c7d58712b",
+      "last_validated_sha": "22a6a4278650f7c343844c1604f0771c7d58712b",
+      "content_sha256": "755018bc1b95383b4eef8b5e913c87e376c1d773487caaee5976087e3bffee49",
       "line_count": 80,
-      "byte_count": 5981,
+      "byte_count": 5865,
       "headings": [
         {
           "level": 1,
@@ -13416,11 +13421,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "8f481f3b9044a1361a1061c71418b669ed34cbc3",
-      "last_validated_sha": "8f481f3b9044a1361a1061c71418b669ed34cbc3",
-      "content_sha256": "c78a8fc98dd988252fee976adbf4ac66d61f73c550ee0d66a9fd67be4609f054",
-      "line_count": 7953,
-      "byte_count": 534619,
+      "git_blob_sha": "86e22f688287252f0376ee5fbaca4136f3d75973",
+      "last_validated_sha": "86e22f688287252f0376ee5fbaca4136f3d75973",
+      "content_sha256": "a693e629e307d32db3e6b61223d57edf8f3414e4f46d13b0bfb457784b61e45a",
+      "line_count": 8049,
+      "byte_count": 539524,
       "headings": [
         {
           "level": 1,
