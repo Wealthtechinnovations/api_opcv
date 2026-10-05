@@ -137,6 +137,29 @@ const j = x => {
     //    `cron_indices_daily.sh` tourne a 18h30 du lundi au vendredi.
     // ------------------------------------------------------------------
     console.log('\n## C. Table source `indice_references` — l import des indices vit-il ?\n');
+    // Combien de VL se rattachent effectivement a chaque indice ? C est la
+    // question qui dit si un indice est un BENCHMARK ou une simple statistique.
+    // Le depot documente deja le cas : « MONIA exclu (pays: []) : c est un taux,
+    // non propage aux fonds » (propagate_indref_range.js). Un controle de
+    // fraicheur applique a un indice que rien ne consomme crie sans enjeu ; un
+    // critere pris dans les DONNEES vaut mieux qu une troisieme copie du
+    // mapping pays → indice, qui existe deja en deux exemplaires dans le code.
+    const [rattachement] = await conn.query(`
+      SELECT COALESCE(NULLIF(TRIM(v.indice_name), ''), NULLIF(TRIM(v.ID_indice), ''), '(aucun)') AS indice,
+             COUNT(*) AS vl,
+             MAX(v.date) AS derniere_vl
+        FROM valorisations v
+       GROUP BY 1
+       ORDER BY vl DESC
+       LIMIT 15`);
+    console.log('  Rattachement reel des VL a un indice :');
+    console.log('    libelle porte par la VL              VL        derniere VL');
+    console.log('    -----------------------------------  --------  -----------');
+    for (const r of rattachement) {
+      console.log(`    ${String(r.indice).slice(0, 35).padEnd(35)}  ${String(r.vl).padEnd(8)}  ${j(r.derniere_vl)}`);
+    }
+    console.log('');
+
     const [c] = await conn.query(`
       SELECT x.indice, x.derniere, x.total, x.sur_30j,
              (SELECT i2.valeur FROM indice_references i2
