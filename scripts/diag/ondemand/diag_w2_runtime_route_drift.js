@@ -53,9 +53,13 @@ function table(rows){
 
   const appPath=path.resolve(process.cwd(),'app.js');
   const appText=fs.existsSync(appPath)?fs.readFileSync(appPath,'utf8'):'';
+  const routesVlPath=path.resolve(process.cwd(),'src/routes/routes_vl.js');
+  const routesVlText=fs.existsSync(routesVlPath)?fs.readFileSync(routesVlPath,'utf8'):'';
   const adminPath=path.resolve(process.cwd(),'src/routes/routes_vl_admin.js');
   const adminExists=fs.existsSync(adminPath);
-  const mountedNow=/routes_vl_admin/.test(appText);
+  const appMountsRoutesVl=/require\(['\"]\.\/src\/routes\/routes_vl['\"]\)\(app\)/.test(appText);
+  const routesVlMountsAdmin=/require\(['\"]\.\/routes_vl_admin['\"]\)\(app\)/.test(routesVlText);
+  const mountedNow=appMountsRoutesVl && routesVlMountsAdmin;
 
   let commitsSinceStart='UNKNOWN';
   let firstAfter='';
@@ -80,7 +84,9 @@ function table(rows){
 
   console.log('');
   console.log('## B. Current checkout route wiring');
-  console.log('CURRENT_APP_MOUNTS_ROUTES_VL_ADMIN='+(mountedNow?'YES':'NO'));
+  console.log('APP_MOUNTS_ROUTES_VL='+(appMountsRoutesVl?'YES':'NO'));
+  console.log('ROUTES_VL_MOUNTS_ROUTES_VL_ADMIN='+(routesVlMountsAdmin?'YES':'NO'));
+  console.log('CURRENT_TRANSITIVE_ADMIN_MOUNT='+(mountedNow?'YES':'NO'));
   console.log('ROUTES_VL_ADMIN_FILE_PRESENT='+(adminExists?'YES':'NO'));
 
   console.log('');
@@ -101,6 +107,6 @@ function table(rows){
   const legacy200=rows.filter(x=>x.status===200).length;
   const drift=(!mountedNow && adminExists && startedMs && legacy200>=2);
   console.log('RUNTIME_ROUTE_DRIFT_CANDIDATE='+(drift?'YES':'NO'));
-  console.log('RULE=Do not restart api-monolith solely to test this. First reconstruct route wiring at process start and preserve required Country Panel contracts with explicit auth/RBAC.');
+  console.log('RULE=Current transitive mount is the authority. Process age alone is not route drift; preserve working Country Panel contracts and harden auth/RBAC before any refactor.');
   console.log('VERDICT=W2_RUNTIME_ROUTE_DRIFT_OBSERVED_READ_ONLY');
 })().catch(e=>{console.error('W2_RUNTIME_ROUTE_DRIFT_FATAL:',e&&e.message?e.message:String(e));process.exit(2);});
