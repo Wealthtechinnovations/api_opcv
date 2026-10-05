@@ -4,7 +4,7 @@
   "status": "W2_MARKET_READINESS_NON_AUTHORITATIVE",
   "observed_at": "2026-10-06",
   "observed_heads": {
-    "api": "126e1ba261c783b250e2d97bfba38231c9aa35d4",
+    "api": "0a263f6702a8fb6643ea152dba951d3ce07a2500",
     "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
   },
   "readiness_model": {
@@ -125,21 +125,22 @@
       "market": "CEMAC",
       "readiness_level": "L3",
       "readiness_label": "REPRESENTATIVE_PRICE_SOURCE_FEASIBILITY_PROVEN",
-      "state": "CODE_AND_OFFICIAL_BVMAC_SOURCE_CANDIDATE_PREFLIGHT_RUNNING",
+      "state": "SOURCE_AND_MAPPING_TECHNICALLY_PROVEN_DRYRUN_SCOPE_PENDING",
       "proof": [
-        "34 canonical funds exist.",
-        "BVMAC parser/promotion code exists.",
-        "No active cron/staging tables are deployed.",
-        "JS wrapper now wires existing Python read-only preflight into production diagnostics."
+        "34 canonical CEMAC funds exist; current canonical VL remains stale at 2024-12-12.",
+        "BVMAC latest bulletin discovery returned 802 refs; 2026-10-05 PDF fetched HTTP 200 and validated as PDF.",
+        "23 OPCVM rows parsed, zero parse failures; 19 OK / 4 SUSPECT_VARIATION.",
+        "19 rows matched canonical funds (18 exact + 1 fuzzy), 4 unmatched.",
+        "No active cron, no bvmac_* staging tables and no canonical write occurred."
       ],
       "blockers": [
-        "Technical production fetch/mapping proof pending.",
-        "No active cron.",
-        "No bvmac_* staging live.",
-        "Latest canonical VL 2024-12-12.",
-        "Date-specific XAF FX semantics required."
+        "Would-insert/skip/reject and duplicate fund/date scope not yet measured.",
+        "Four unmatched identities need source-backed resolution.",
+        "Four suspect-variation rows require review.",
+        "Date-specific XAF FX semantics must be proven.",
+        "Staging/cron deployment remains separately governed."
       ],
-      "next_probe": "Await wrapped production diagnostic; if source+mapping succeeds, advance to L4 and prepare deployment dry-run only.",
+      "next_probe": "Extend current read-only BVMAC preflight to exact dry-run scope and FX-date coverage. Advance to L4 only when would_insert/skip/reject is reproducible and ambiguous rows stay blocked.",
       "links": [
         "W2-DELTA-003",
         "AF-PROP-010",
@@ -306,5 +307,5 @@
     }
   ],
   "tier_b_rule": "All other reference-taxonomy markets remain L0 until current official regulatory/source discovery is performed; taxonomy presence never authorizes a connector.",
-  "next_action": "Complete CEMAC production preflight and Ghana/Kenya technical source probes. Then update readiness levels only from measured evidence. Deepen Egypt/South Africa/Mauritius next; keep Botswana/Namibia/Ethiopia discovery-only until stronger source evidence exists."
+  "next_action": "Complete CEMAC dry-run scope and Ghana/Kenya S2 source reachability. Then refresh levels. Egypt/South Africa/Mauritius remain official-source discovery, not connector-ready."
 }
