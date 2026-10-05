@@ -18,6 +18,12 @@
  * quels, avec les memes en-tetes que le code de production, pour que l echec
  * mesure ici soit exactement celui que subit le cron.
  *
+ * CORRECTION. La premiere version interrogeait `f.actif`, colonne qui n existe
+ * pas : le modele declare `active`. Le script est tombe en « Erreur fatale :
+ * Unknown column » et n a rien mesure. Une colonne se verifie dans le modele,
+ * elle ne se devine pas — meme quand d autres scripts du depot affichent
+ * « actif=1 », qui est leur libelle d affichage et non le nom du champ.
+ *
  * LECTURE SEULE : des SELECT et des GET, aucune ecriture.
  *
  * USAGE  node scripts/diag/ondemand/diag_source_monia.js
@@ -63,7 +69,7 @@ function get(url, entetes = []) {
     const [refs] = await conn.query(`
       SELECT f.pays,
              COUNT(*) AS fonds,
-             SUM(CASE WHEN f.actif = 1 THEN 1 ELSE 0 END) AS actifs
+             SUM(CASE WHEN f.active = 1 THEN 1 ELSE 0 END) AS actifs
         FROM fond_investissements f
        WHERE UPPER(COALESCE(f.indice_benchmark, '')) LIKE '%MONIA%'
           OR UPPER(COALESCE(f.indice, '')) LIKE '%MONIA%'
