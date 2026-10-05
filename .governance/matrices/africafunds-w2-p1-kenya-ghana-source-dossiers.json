@@ -4,8 +4,8 @@
   "status": "W2_P1_MARKET_SOURCE_DOSSIERS_NON_AUTHORITATIVE",
   "observed_at": "2026-10-06",
   "observed_heads": {
-    "api": "a1c12eeccfd02e4412750b42b0fb5f5aacb805e1",
-    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+    "api": "e75c2abfe544859a226c0e7350ee115c64a5797b",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
   },
   "policy": {
     "registry_is_universe_authority_not_nav_authority": true,
@@ -48,7 +48,7 @@
       "No canonical AfricaFunds SubFund/ShareClass schema decision yet.",
       "No source licence/redistribution review for manager-hosted price data yet."
     ],
-    "readiness": "SOURCE_DISCOVERY_P1_REGISTRY_VERY_STRONG_NAV_FEED_STILL_PENDING",
+    "readiness": "PILOT_SOURCE_FEASIBILITY_PARTIAL_ONE_DAILY_PRICE_FEED_PROVEN_MARKET_WIDE_NAV_PENDING",
     "W1_dependencies": [
       "W1-DELTA-003",
       "W1-DELTA-004",
@@ -57,26 +57,56 @@
     ],
     "nav_source_sampling": {
       "observed_at": "2026-10-06",
+      "sampled_manager_count": 5,
+      "regulator_anchor": {
+        "source": "https://licensees.cma.or.ke/licenses/15/",
+        "finding": "Current CMA licensee list exposes schemes and nested funds/sub-funds and links to manager/operator websites. It is the universe authority, not a NAV feed."
+      },
       "proven_examples": [
+        {
+          "manager": "NCBA",
+          "source": "https://ncbagroup.com/investment-banking/equity-fund/",
+          "data_shape": "Public dated daily fund buy/sell price. The page states the daily price is calculated from NAV of issued units.",
+          "price_semantics": "Direct unit-price/NAV-derived public price; suitable bounded pilot candidate with explicit as-of date."
+        },
         {
           "manager": "Etica Capital",
           "source": "https://eticacap.com/money-market-fund-kes/",
-          "finding": "Public product pages expose currency, benchmark, trustee/custodian, manager and current fund terms; downloadable factsheets are available."
+          "companion_source": "https://eticacap.com/fact-sheet/",
+          "data_shape": "Product page exposes currency, benchmark, trustee, custodian, manager and daily compounding; factsheet archive includes recent monthly factsheets.",
+          "price_semantics": "Current product/factsheet evidence is strong, but a public daily historical unit-price feed was not certified."
         },
         {
           "manager": "Britam",
           "source": "https://ke.britam.com/save-and-invest/personal/invest/unit-trust-funds",
-          "finding": "Public product catalogue confirms daily liquidity/compounding and KES/USD fund variants, but no centralized public historical unit-price feed was certified."
+          "data_shape": "Official catalogue lists KES/USD unit trusts and confirms daily liquidity.",
+          "price_semantics": "No direct public historical daily unit-price series was certified from the sampled official surface."
         },
         {
-          "manager": "NCBA",
-          "source": "https://investment-bank.ncbagroup.com/wealth-management/collective-investment-schemes/",
-          "finding": "Official product/factsheet surfaces exist; centralized machine-readable historical NAV feed remains unproven."
+          "manager": "CIC Asset Management",
+          "source": "https://ke.cicinsurancegroup.com/asset-management-2/",
+          "data_shape": "Official asset-management catalogue lists licensed unit-trust products and current regulatory/financial documents.",
+          "price_semantics": "No direct public historical daily unit-price series was certified from the sampled official surface."
+        },
+        {
+          "manager": "KCB Asset Management / Investment Bank",
+          "source": "https://investment.kcbgroup.com/wealth-management",
+          "companion_source": "https://investment.kcbgroup.com/money-market-fund",
+          "data_shape": "Official product pages and recent 2026 factsheets/financial statements are public; money-market product confirms daily accrual.",
+          "price_semantics": "Periodic factsheet/product source proven; no centralized public daily unit-price history certified in this sample."
         }
       ],
-      "conclusion": "Manager-hosted fund/factsheet data is clearly available, but a stable daily unit-price/NAV acquisition surface has not yet been certified across representative managers.",
-      "remaining": "Continue manager-by-manager source feasibility; do not equate yield/factsheet publication with NAV time series."
-    }
+      "conclusion": "Kenya now has one clearly proven direct dated daily price surface (NCBA) plus four additional representative official manager/product or factsheet paths. This is enough to prove bounded pilot feasibility and source heterogeneity, but not a market-wide NAV connector.",
+      "remaining": [
+        "Measure historical depth and URL stability for NCBA daily price pages.",
+        "Determine whether Etica/KCB factsheets expose extractable unit/share prices versus only yields/returns.",
+        "Continue direct-price discovery for Britam/CIC or explicitly certify their public NAV path as unavailable.",
+        "Map sampled products to exact CMA scheme/sub-fund identities and currencies.",
+        "Review source terms/licensing before automated bulk acquisition.",
+        "Do not flatten CMA umbrella/sub-fund structure into one fund row before W1 Fund/SubFund/ShareClass grain is resolved."
+      ]
+    },
+    "next_probe": "Build a no-write Kenya pilot mapping anchored on CMA identities: start with NCBA as direct daily-price candidate, then classify Etica/Britam/CIC/KCB as daily-price, periodic-factsheet or no-public-price source. No canonical import."
   },
   "GHANA": {
     "regulator": "Securities and Exchange Commission Ghana",
@@ -190,5 +220,5 @@
     "No dependency requires inventing identifiers, NAV, benchmark or provenance.",
     "A pilot manager feed does not authorize claiming full-market coverage."
   ],
-  "next_action": "Ghana: prepare a no-write pilot mapping across five proven manager sources and SEC registry identities. Kenya: continue NAV-source feasibility across representative managers while preserving regulator scheme/sub-fund hierarchy. No production connector or queue task until governance gates are met."
+  "next_action": "Ghana: build no-write SEC-registry-to-five-manager mapping and cadence/price-type matrix. Kenya: build no-write CMA-registry-to-five-manager mapping with NCBA daily-price pilot and four source-availability classifications. CEMAC: wait for JS-wrapped read-only production preflight. No connector/task promotion until queue and governance gates permit."
 }
