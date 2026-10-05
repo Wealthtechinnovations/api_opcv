@@ -4,8 +4,8 @@
   "product": "AfricaFunds",
   "status": "W2_LIVE_PIPELINES_CERTIFIED_READ_ONLY",
   "observed_heads": {
-    "api": "d8ff6483d3eb63792105ea9050e7887e137771d5",
-    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+    "api": "0a263f6702a8fb6643ea152dba951d3ce07a2500",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
   },
   "evidence": {
     "source": "docs/DIAG_ONDEMAND.md / scripts/diag/ondemand/diag_w2_country_pipelines.js",
@@ -60,8 +60,8 @@
       "latest_vl": "2024-12-12",
       "vl_30d": 0,
       "cron": "NO_ACTIVE_BVMAC_CRON",
-      "staging_or_evidence": "All bvmac_* staging tables absent; data/bvmac_boc absent.",
-      "classification": "CODE_CANDIDATE_NOT_DEPLOYED"
+      "staging_or_evidence": "No bvmac_* staging live, but 2026-10-05 BVMAC BOC read-only preflight succeeded: 802 index refs, PDF HTTP 200, 23 parsed rows, 0 parse failures, 19 matched (18 exact + 1 fuzzy), 4 unmatched, 19 OK + 4 SUSPECT_VARIATION.",
+      "classification": "SOURCE_AND_IDENTITY_PREFLIGHT_PASS_PIPELINE_NOT_DEPLOYED"
     }
   },
   "certified_decisions": [
@@ -94,6 +94,11 @@
       "id": "W2-CERT-006",
       "decision": "DO_NOT_INFER_PIPELINE_FROM_REFERENCE_TAXONOMY",
       "rationale": "AfricaFunds lists 29 country/region reference values, but current runtime certifies only four active ingestion paths plus the undeployed CEMAC candidate."
+    },
+    {
+      "id": "W2-CERT-007",
+      "decision": "CEMAC_OFFICIAL_SOURCE_AND_CANONICAL_IDENTITY_MAPPING_ARE_TECHNICALLY_FEASIBLE",
+      "rationale": "Production no-write probe fetched the 2026-10-05 BVMAC bulletin, parsed 23 OPCVM rows with zero parse failures, and matched 19 to canonical CEMAC funds. This proves source/matcher feasibility but does not authorize deployment or import."
     }
   ],
   "stale_or_superseded_assumptions": [
@@ -114,5 +119,5 @@
     "W1-DELTA-004",
     "W1-DELTA-008"
   ],
-  "next_action": "Certify Country Panel/runtime contract drift and manager-alias candidates; then publish bounded W2 deltas without mutating the single task queue."
+  "next_action": "CEMAC: extend the no-write preflight to would_insert/skip/reject, duplicate fund/date and date-specific XAF FX scope; resolve 4 unmatched/suspect rows before any deployment. Ghana/Kenya: await S2 technical source probes. No queue mutation."
 }
