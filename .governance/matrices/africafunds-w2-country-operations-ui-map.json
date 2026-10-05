@@ -3,7 +3,7 @@
   "project_uid": "CS-AFRICAFUNDS-001",
   "status": "W2_COUNTRY_OPERATIONS_UI_MAP_NON_AUTHORITATIVE",
   "observed_heads": {
-    "api": "933c1e2f3197efd5a6c046f4085d687ea4888150",
+    "api": "617bacd1c7c6f1868525843d9f72cb5ac96c9e8b",
     "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
   },
   "frontend_surface": {
@@ -79,15 +79,15 @@
   "api_runtime_findings": [
     {
       "id": "W2-UI-001",
-      "finding": "src/routes/routes_vl_admin.js defines getfondbyuser/getfondbyuservalide and many admin routes, but current app.js does not mount routes_vl_admin.js.",
-      "state": "STATIC_RUNTIME_DISCONNECT_CANDIDATE",
-      "proof": "Repository search finds no runtime require/mount of routes_vl_admin.js."
+      "finding": "Current app.js mounts routes_vl.js, and routes_vl.js transitively mounts routes_vl_admin.js. Country Panel fund-list routes are therefore part of the current monolith route graph.",
+      "state": "CURRENT_RUNTIME_CONTRACT_PRESENT",
+      "proof": "src/routes/routes_vl.js contains require('./routes_vl_admin')(app) around line 5729; live GET probes return HTTP 200."
     },
     {
       "id": "W2-UI-002",
-      "finding": "services/funds/routes.js contains authenticated stubs for the same routes but the microservice scaffold is not the current production runtime.",
-      "state": "DO_NOT_TREAT_STUB_AS_ACTIVE_FIX",
-      "proof": "Current package start/app runtime authority remains monolith app.js; services/funds placeholders were already classified legacy/inactive."
+      "finding": "services/funds/routes.js also contains TODO placeholders for overlapping routes, but that microservice scaffold is not the current production authority.",
+      "state": "LEGACY_DUPLICATE_DO_NOT_ACTIVATE",
+      "proof": "Current PM2 production authority remains app.js monolith; overlapping microservice TODOs must not replace working monolith routes."
     },
     {
       "id": "W2-UI-003",
@@ -128,7 +128,7 @@
       "Generic file import toward country adapter contracts rather than one untyped upload endpoint."
     ],
     "do_not": [
-      "Do not mount all legacy admin routes just to make the UI respond.",
+      "Do not migrate Country Panel to inactive services/funds TODO routes; harden the currently mounted monolith routes in place or behind additive compatible adapters.",
       "Do not create a second Country Panel.",
       "Do not let a country operator bypass canonical pipeline quality gates.",
       "Do not allow arbitrary country/pays query parameters to grant cross-country access without RBAC ownership checks."
@@ -155,5 +155,5 @@
     "AF-PROP-023",
     "AF-PROP-024"
   ],
-  "next_action": "Confirm live GET contract status using a read-only HTTP diagnostic. Then classify each Country Panel workflow KEEP/REPAIR/REPLACE_ADAPTER/DEPRECATE before any route mount or frontend refactor."
+  "next_action": "Certify route-by-route auth/RBAC and import contract semantics for the currently mounted Country Panel. Preserve working URLs; repair security/ownership and missing import contracts additively before frontend convergence."
 }
