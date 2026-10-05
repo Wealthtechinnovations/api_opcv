@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "99aa739aed749ab2dad9479987e28a94bdd409d0"
+      "head": "78227c6ff6dad699b434ea308705e270beb05ff0"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "96806096caee27bcbea5fb125530f9facd931000"
+      "head": "2aa4728b7ea288871085424305a1d2dca5f35253"
     }
   },
   "summary": {
@@ -10093,7 +10093,7 @@
         "E. L etiquette de devise correspond-elle a l echelle ?",
         "F. Ce que cela implique pour l etape 0",
         "Etiquette en desaccord avec le contenu de `value`",
-        "Indetermines — a NE PAS basculer automatiquement (200 avec VL)"
+        "Indetermines — a NE PAS basculer automatiquement (201 avec VL)"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10109,11 +10109,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "fc92988cd83565854a4af3631065e589c372052c",
-      "last_validated_sha": "fc92988cd83565854a4af3631065e589c372052c",
-      "content_sha256": "2b52361299038c8d57bcb2e20cca43df3221747ad4923f718323a55437e397ad",
-      "line_count": 1191,
-      "byte_count": 73876,
+      "git_blob_sha": "7c162deb4df27afbb487cb01496cd9356e1a9cf3",
+      "last_validated_sha": "7c162deb4df27afbb487cb01496cd9356e1a9cf3",
+      "content_sha256": "3102f9ca71905328627b7afeada95055bfe7b1693f9606ab32131c8311eb9d6c",
+      "line_count": 1540,
+      "byte_count": 94356,
       "headings": [
         {
           "level": 1,
@@ -10193,11 +10193,11 @@
         },
         {
           "level": 2,
-          "text": "Indetermines — a NE PAS basculer automatiquement (200 avec VL)"
+          "text": "Indetermines — a NE PAS basculer automatiquement (201 avec VL)"
         },
         {
           "level": 2,
-          "text": "Les 28 fonds declares USD — les deux taux, cote a cote"
+          "text": "Les 29 fonds declares USD — les deux taux, cote a cote"
         },
         {
           "level": 2,
@@ -10300,11 +10300,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "53e58e10c88452804854ae49914a0049b398c3aa",
-      "last_validated_sha": "53e58e10c88452804854ae49914a0049b398c3aa",
-      "content_sha256": "346122eaa9346074936c4ec4e10c5ea931fe0ce611dd7e3564d19c477f12580a",
-      "line_count": 78,
-      "byte_count": 5845,
+      "git_blob_sha": "157f53960b1914a7a346747ce6a5b7f5bf452c63",
+      "last_validated_sha": "157f53960b1914a7a346747ce6a5b7f5bf452c63",
+      "content_sha256": "518fd74da36b6a9d7d71a15be6197307c6e1d24b45aeeb90f037281679539ee8",
+      "line_count": 80,
+      "byte_count": 5981,
       "headings": [
         {
           "level": 1,
@@ -13416,11 +13416,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "52ea270001fceae6fb05c5573779e0c560da4d28",
-      "last_validated_sha": "52ea270001fceae6fb05c5573779e0c560da4d28",
-      "content_sha256": "69e6b77c924a470d46de37c3008171e58ac26ef5a74b1263ef1a45aacb63c56a",
-      "line_count": 7732,
-      "byte_count": 523480,
+      "git_blob_sha": "8f481f3b9044a1361a1061c71418b669ed34cbc3",
+      "last_validated_sha": "8f481f3b9044a1361a1061c71418b669ed34cbc3",
+      "content_sha256": "c78a8fc98dd988252fee976adbf4ac66d61f73c550ee0d66a9fd67be4609f054",
+      "line_count": 7953,
+      "byte_count": 534619,
       "headings": [
         {
           "level": 1,
