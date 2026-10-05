@@ -1,0 +1,133 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_IDENTITY_CERTIFIED_READ_ONLY",
+  "observed_heads": {
+    "api": "32298a14cf148a751d11198e9889ac962b4eb2c6",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "evidence": {
+    "source": "docs/DIAG_ONDEMAND.md / diag_w1_identity_gaps.js",
+    "observed_at": "2026-10-05T21:40:44.866Z"
+  },
+  "facts": {
+    "by_country": {
+      "MAROC": {
+        "funds": 644,
+        "active": 644,
+        "missing_isin": 0,
+        "missing_societe_id": 23,
+        "missing_manager_text": 0,
+        "text_without_id": 23
+      },
+      "NIGERIA": {
+        "funds": 333,
+        "active": 332,
+        "missing_isin": 333,
+        "missing_societe_id": 41,
+        "missing_manager_text": 1,
+        "text_without_id": 40
+      },
+      "TUNISIE": {
+        "funds": 131,
+        "active": 131,
+        "missing_isin": 7,
+        "missing_societe_id": 7,
+        "missing_manager_text": 0,
+        "text_without_id": 7
+      },
+      "UEMOA": {
+        "funds": 118,
+        "active": 111,
+        "missing_isin": 112,
+        "missing_societe_id": 0,
+        "missing_manager_text": 0,
+        "text_without_id": 0
+      },
+      "CEMAC": {
+        "funds": 34,
+        "active": 34,
+        "missing_isin": 0,
+        "missing_societe_id": 0,
+        "missing_manager_text": 0,
+        "text_without_id": 0
+      }
+    },
+    "text_without_id_exact_manager_match": {
+      "NIGERIA": {
+        "funds": 40,
+        "distinct_labels": 22,
+        "exact_name_match_available": 24
+      },
+      "MAROC": {
+        "funds": 23,
+        "distinct_labels": 4,
+        "exact_name_match_available": 0
+      },
+      "TUNISIE": {
+        "funds": 7,
+        "distinct_labels": 7,
+        "exact_name_match_available": 4
+      }
+    },
+    "duplicate_same_name_country": [
+      {
+        "country": "UEMOA",
+        "normalized_name": "SICAV ABDOU DIOUF",
+        "fund_ids": [
+          1539,
+          2582
+        ],
+        "rows": 2,
+        "isin_variants": 2
+      }
+    ],
+    "documents": {
+      "rows": 5,
+      "missing_societe_id": 2,
+      "missing_fond_id": 0
+    },
+    "personnel_sgs": {
+      "rows": 5,
+      "missing_societe_id": 2
+    }
+  },
+  "decisions": [
+    {
+      "decision": "MISSING_ISIN_IS_NOT_A_GENERIC_ERROR",
+      "rationale": "The pattern is market-specific: Nigeria 333/333 and UEMOA 112/118 lack ISIN while Morocco/CEMAC are complete. Treat ISIN as source availability/identifier coverage, not a mandatory fabricated field."
+    },
+    {
+      "decision": "SOCIETE_ID_RECONCILIATION_IS_ACTIONABLE_BUT_NOT_BLIND",
+      "rationale": "71 funds lack societe_id. Only 28 of the 70 funds with manager text have an exact current societes.nom match (24 Nigeria + 4 Tunisia); Morocco has 23 with zero exact matches. Auto-fill by string equality alone would leave significant unresolved cases."
+    },
+    {
+      "decision": "DO_NOT_MERGE_DUPLICATE_FUND_NAMES_BY_NAME",
+      "rationale": "SICAV ABDOU DIOUF appears twice in UEMOA with two ISIN variants. Same normalized name can represent distinct instruments/classes; identity requires source evidence."
+    },
+    {
+      "decision": "NO_HARD_FK_YET",
+      "rationale": "Existing missing relations must be reconciled before any database FK is introduced."
+    }
+  ],
+  "promotion_ready_work": {
+    "parent": "AF-PROP-001 + AF-PROP-002",
+    "status": "READ_ONLY_RECONCILIATION_READY",
+    "mini_lots": [
+      "Build a manager-alias candidate report for the 70 text_without_id funds with exact/fuzzy/country-aware evidence, no DB write.",
+      "Classify the 23 Morocco manager labels against official manager entities; do not invent matches.",
+      "Classify Nigeria/Tunisia exact matches separately from fuzzy/ambiguous matches.",
+      "Investigate the UEMOA duplicate-name pair using ISIN/source history; preserve both unless proven duplicate.",
+      "Document market-specific identifier policy: ISIN when official/published, otherwise canonical internal ID + source aliases."
+    ],
+    "write_gate": "Any societe_id update or FK addition requires a separately promoted task with snapshot, exact mappings, rollback, post-check and consumer regression tests."
+  },
+  "no_actions_taken": [
+    "No fund merged",
+    "No ISIN invented",
+    "No societe_id changed",
+    "No FK added",
+    "No task queue change"
+  ],
+  "next_action": "Create read-only manager alias/match candidates from current fund and societes data, then attach only proven mappings to a future governed correction."
+}
