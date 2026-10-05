@@ -84,7 +84,7 @@ async function main(){
     const [countryRows]=await conn.query(
       `SELECT UPPER(TRIM(f.pays)) pays,
               COUNT(DISTINCT f.id) funds,
-              SUM(CASE WHEN f.active=1 THEN 1 ELSE 0 END) active_funds,
+              COUNT(DISTINCT CASE WHEN f.active=1 THEN f.id END) active_funds,
               COUNT(v.id) vl_rows,
               DATE_FORMAT(MAX(v.date),'%Y-%m-%d') latest_vl,
               SUM(CASE WHEN v.date>=DATE_SUB(CURDATE(),INTERVAL 30 DAY) THEN 1 ELSE 0 END) vl_30d
