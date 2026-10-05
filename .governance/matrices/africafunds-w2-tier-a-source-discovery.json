@@ -4,8 +4,8 @@
   "status": "W2_TIER_A_SOURCE_DISCOVERY_NON_AUTHORITATIVE",
   "observed_at": "2026-10-06",
   "observed_heads": {
-    "api": "9974efe3ab6fd91043284f32ecf81cfc0c528325",
-    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+    "api": "fbfaaefa6d7055a491ca8bde6e4d96b219f2dbcc",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
   },
   "source_policy": {
     "regulator_first": true,
@@ -38,17 +38,17 @@
         }
       ],
       "what_is_proven": [
-        "Official regulator publishes current licensed mutual-fund and fund-manager registries.",
-        "Ghana CIS include Mutual Funds and Unit Trusts.",
-        "Open-ended mutual fund NAVPS/bid-offer monitoring is part of the market disclosure framework."
+        "Official SEC regulator publishes current Mutual Fund, Unit Trust and Fund Manager registries.",
+        "Current regulator counts observed: 53 Mutual Funds, 33 Unit Trusts, 83 Fund Managers.",
+        "Five representative manager source paths are mapped to regulator identities; CAL exposes daily dated PRICE, EDC dated fund values, Brassica explicit Bid/Offer, SDC current fund price and Databank periodic factsheet share prices."
       ],
       "missing_before_connector": [
-        "Authoritative fund-level historical/daily NAV feed or stable manager-source acquisition path.",
-        "Canonical scheme/sub-fund identifiers and currency/frequency inventory.",
-        "Historical corporate-action/manager-change reconciliation."
+        "Market-wide per-manager price-source coverage and historical depth.",
+        "Source terms/licensing/redistribution review.",
+        "Source-specific NAVPS/Bid/Offer/share-price semantics and canonical Fund/SubFund/ShareClass grain."
       ],
-      "feasibility": "REGISTRY_HIGH_NAV_FEED_PENDING",
-      "next_probe": "Inventory SEC Unit Trust registry if separate, then sample 5 licensed schemes across managers to locate stable NAV/factsheet feeds."
+      "feasibility": "PILOT_FIVE_MANAGER_SOURCE_FEASIBILITY_PROVEN_MARKET_WIDE_COVERAGE_PENDING",
+      "next_probe": "Run S2 no-write technical probes for CAL/EDC and build SEC-registry-to-pilot product mapping; no canonical import."
     },
     {
       "market": "KENYA",
@@ -72,17 +72,17 @@
         }
       ],
       "what_is_proven": [
-        "Official CMA list exposes schemes and many sub-funds, including multi-currency KES/USD/EUR/GBP products.",
-        "Umbrella/sub-fund structure is active and expanding in 2026.",
-        "Collective Investment Schemes Regulations 2023 remain current regulatory basis."
+        "Official CMA list exposes current schemes and nested sub-funds including multi-currency variants.",
+        "NCBA public fund page exposes a dated daily buy/sell price and states the daily price is calculated from NAV of issued units.",
+        "Etica, Britam, CIC and KCB official product/factsheet sources are current and mapped to CMA scheme identities."
       ],
       "missing_before_connector": [
-        "Centralized official daily NAV feed not yet proven.",
-        "Share-class/sub-fund identifiers and manager source URLs need systematic extraction.",
-        "Multi-currency class grain must be modeled explicitly before import."
+        "Market-wide direct NAV/unit-price coverage; only one sampled direct daily price feed is certified.",
+        "Historical depth/stable URL patterns and terms/licensing.",
+        "Fund/SubFund/ShareClass model must preserve umbrella and multi-currency structure."
       ],
-      "feasibility": "REGISTRY_VERY_HIGH_NAV_FEED_MANAGER_DISTRIBUTED",
-      "next_probe": "Parse official scheme/sub-fund list into candidate Fund/SubFund/ShareClass identities, then test manager sites for machine-readable NAV/factsheets."
+      "feasibility": "PILOT_ONE_DIRECT_DAILY_PRICE_PLUS_FOUR_REPRESENTATIVE_SOURCE_CLASSES",
+      "next_probe": "Run S2 no-write NCBA price-page probe; classify Etica/Britam/CIC/KCB as daily-price, periodic-factsheet or unavailable and map exact CMA sub-funds."
     },
     {
       "market": "EGYPTE",
@@ -98,19 +98,25 @@
           "type": "FUND_PERFORMANCE_REPORT_Q2_2026",
           "url": "https://fra.gov.eg/en/fra_news/%D8%A7%D9%84%D8%B1%D9%82%D8%A7%D8%A8%D8%A9-%D8%A7%D9%84%D9%85%D8%A7%D9%84%D9%8A%D8%A9-%D8%AA%D8%B5%D8%AF%D8%B1-%D8%AA%D9%82%D8%B1%D9%8A%D8%B1-%D8%A3%D8%AF%D8%A7%D8%A1-%D8%B5%D9%86%D8%A7%D8%AF/",
           "status": "CONFIRMED_2026"
+        },
+        {
+          "type": "CAPITAL_MARKET_REGISTERS",
+          "url": "https://fra.gov.eg/en/%D8%AA%D8%B3%D8%AC%D9%8A%D9%84-%D9%88-%D8%AA%D8%AD%D8%AF%D9%8A%D8%AB-%D8%B3%D8%AC%D9%84%D8%A7%D8%AA-%D9%84%D8%B4%D8%B1%D9%83%D8%A7%D8%AA-%D8%B3%D9%88%D9%82-%D8%A7%D9%84%D9%85%D8%A7%D9%84/",
+          "status": "CONFIRMED_CURRENT_PUBLIC_MIXED_ENTITY_REGISTER"
         }
       ],
       "what_is_proven": [
         "FRA publishes current investment-fund sector performance reports.",
-        "Q2 2026 official report states 224 funds by end-June 2026 and updated fund classifications."
+        "Q2 2026 official report states 224 funds by end-June 2026 and updated fund classifications.",
+        "FRA public capital-market registers contain current fund entities and licensing dates, including 2026 entries."
       ],
       "missing_before_connector": [
-        "Fund-level official registry/feed endpoint.",
-        "Daily or periodic NAV source at fund/share-class level.",
-        "Arabic/English identity normalization and manager/issuer relationships."
+        "A deterministic fund-only filter/export/count from the FRA mixed capital-market register is not yet certified.",
+        "Fund-level NAV/price publication path and cadence remain unproven.",
+        "Arabic/English identity normalization and manager/issuer relationships require explicit mapping."
       ],
-      "feasibility": "REGULATOR_AND_MARKET_SCALE_CONFIRMED_FUND_LEVEL_SOURCE_PENDING",
-      "next_probe": "Locate FRA official fund registry/downloads and determine whether fund-level NAV is regulator-hosted or distributed across banks/managers."
+      "feasibility": "OFFICIAL_REGISTER_PRESENT_FUND_ONLY_UNIVERSE_AND_NAV_PENDING",
+      "next_probe": "Determine FRA category/type parameters or downloadable registry that reproducibly isolates investment funds, then sample fund-level NAV sources."
     },
     {
       "market": "AFRIQUE_DU_SUD",
@@ -134,16 +140,17 @@
         }
       ],
       "what_is_proven": [
-        "FSCA currently regulates and registers CIS managers, local schemes/portfolios and approved foreign schemes.",
-        "Official regulatory/entity-search surface exists."
+        "FSCA officially registers managers of local CIS and approves foreign schemes/portfolios.",
+        "FSCA public regulated-entity/search surfaces and CIS/Hedge Fund registration/e-services are current.",
+        "Regulatory workflow explicitly models schemes, portfolios and foreign sub-funds."
       ],
       "missing_before_connector": [
-        "Machine-readable public portfolio register extraction.",
-        "Fund/share-class daily NAV source and licensing/redistribution constraints.",
-        "Very large market requires explicit share-class grain before ingestion."
+        "Public reproducible extraction of current CIS managers/schemes/portfolios has not yet been certified from the exposed search/list surfaces.",
+        "Daily NAV/share-class source strategy and redistribution/licensing remain unresolved.",
+        "Large market requires explicit portfolio/share-class grain before acquisition."
       ],
-      "feasibility": "REGULATORY_REGISTRY_HIGH_DATA_SOURCE_LICENSING_COMPLEX",
-      "next_probe": "Extract official CIS manager/portfolio registries, then compare with public manager feeds and assess redistribution/licensing before any bulk ingestion."
+      "feasibility": "OFFICIAL_CIS_AUTHORITY_STRONG_PUBLIC_UNIVERSE_EXTRACTION_AND_DATA_LICENSING_PENDING",
+      "next_probe": "Find/export current public FSCA CIS manager/scheme/portfolio lists, then compare with manager price feeds and licensing terms."
     },
     {
       "market": "MAURICE",
@@ -167,16 +174,16 @@
         }
       ],
       "what_is_proven": [
-        "FSC licensing explicitly supports single funds, multi-fund CIS and foreign schemes/sub-funds.",
-        "Current public notices expose revocations/surrenders relevant to lifecycle tracking."
+        "FSC codified list current to July 2026 explicitly distinguishes single-fund CIS and multi-fund CIS authorisations.",
+        "Current 2026 public notices expose CIS revocations/surrenders and manager licence events, useful for lifecycle tracking."
       ],
       "missing_before_connector": [
-        "Active CIS/fund registry extraction with stable identifiers.",
-        "Retail/local versus Global Business/foreign scheme scope definition.",
-        "Fund-level NAV data source and permitted redistribution."
+        "Public active CIS universe extraction with stable fund/sub-fund identifiers is not yet certified.",
+        "AfricaFunds scope between domestic/local and Global Business/foreign schemes must be defined.",
+        "Fund-level NAV data source and redistribution rights remain unproven."
       ],
-      "feasibility": "REGULATORY_LIFECYCLE_HIGH_UNIVERSE_SCOPE_AND_NAV_PENDING",
-      "next_probe": "Define AfricaFunds Mauritius scope first (domestic retail/local CIS vs global funds), then locate active-authorisation registry and NAV publication paths."
+      "feasibility": "CIS_LICENSING_AND_LIFECYCLE_STRONG_ACTIVE_UNIVERSE_AND_NAV_PENDING",
+      "next_probe": "Locate current active-authorisation/entity register, define local-vs-global AfricaFunds scope, then sample NAV publication paths."
     },
     {
       "market": "BOTSWANA",
@@ -292,5 +299,5 @@
       "Ethiopia is regulatory-watch until live CIS products/data are evidenced."
     ]
   },
-  "next_action": "Persist live W2 pipeline diagnostics for current five markets, then create one read-only source dossier per P1 market before any child task is promoted."
+  "next_action": "Await W2 CEMAC wrapped production preflight and Ghana/Kenya S2 source probes. Continue official-universe extraction for Egypt, South Africa and Mauritius; do not create connector tasks from regulator surfaces alone."
 }
