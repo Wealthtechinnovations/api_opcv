@@ -4,21 +4,21 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-10-05 18:37 UTC**
+Derniere execution : **2026-10-05 21:28 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_benchmark_fraicheur.js ##########
 === FRAICHEUR DU BENCHMARK ET VITALITE DE LA SOURCE NIGERIANE ===
-Mesure le 2026-10-05 18:34:18 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:24:05 UTC — LECTURE SEULE
 
 ## A. Derniere VL vs derniere VL portant un benchmark
 
   pays       derniere VL   dernier benchmark   retard du benchmark
   ---------- ------------  -----------------   -------------------
   CEMAC      2024-12-12    ?                   JAMAIS AUCUN
-  MAROC      2026-10-01    2026-10-01          0 j
+  MAROC      2026-10-02    2026-10-01          1 j
   NIGERIA    2026-09-25    2026-09-25          0 j
-  TUNISIE    2026-10-02    2026-10-02          0 j
+  TUNISIE    2026-10-05    2026-10-05          0 j
   UEMOA      2026-10-01    2026-10-01          0 j
 
 ## B. Le niveau du benchmark varie-t-il ? (90 derniers jours)
@@ -40,8 +40,8 @@ Mesure le 2026-10-05 18:34:18 UTC — LECTURE SEULE
     libelle porte par la VL              VL        derniere VL
     -----------------------------------  --------  -----------
     MASI                                 554080    2026-10-01
-    Tunindex                             311089    2026-10-02
-    (aucun)                              73285     2026-09-18
+    Tunindex                             311215    2026-10-05
+    (aucun)                              73941     2026-10-02
     NSE All Share                        54093     2026-09-25
     BRVM Composite                       45112     2026-10-01
     Sovereign_bond_index                 6243      2018-02-20
@@ -55,11 +55,11 @@ Mesure le 2026-10-05 18:34:18 UTC — LECTURE SEULE
   NSE All Share                   2026-10-02        250808.27       4 j     19           6975
   MONIA                           2026-05-14        2.20            145 j   0            1000
   masi_all_shares                 2024-10-28        14211.68        708 j   0            5689
-  Sovereign_bond_index            2024-10-25        170.66          711 j   0            243
   Indice_monetaire_maroc          2024-10-25        2.70            711 j   0            231
+  Sovereign_bond_index            2024-10-25        170.66          711 j   0            243
   S&P Tunisia Sovereign Bond Ind  2024-03-01        161.79          949 j   0            2556
-  S&P Morocco Sovereign Bond Ind  2023-11-17        157.06          1054 j   0            2609
   INDICE MONETAIRE MAROC          2023-11-17        2.90            1054 j   0            971
+  S&P Morocco Sovereign Bond Ind  2023-11-17        157.06          1054 j   0            2609
 
 ## D. Maroc — a quelle semaine l ecriture du benchmark a-t-elle cesse ?
 
@@ -82,7 +82,7 @@ Mesure le 2026-10-05 18:34:18 UTC — LECTURE SEULE
   2026-09-07    1919    0                0.0 %
   2026-09-14    1919    0                0.0 %
   2026-09-21    1919    1919             100.0 %
-  2026-09-28    1295    1295             100.0 %
+  2026-09-28    1951    1295             66.4 %
 
 ## E. Nigeria — la SEC publie-t-elle plus recent que notre base ?
 
@@ -119,7 +119,7 @@ Mesure le 2026-10-05 18:34:18 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-10-05 18:34:29 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:24:22 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -187,23 +187,23 @@ Mesure le 2026-10-05 18:34:29 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-10-05 18:35:23 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:25:37 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
   classementfonds             3620 lignes — aucune colonne de date
-  classementfonds_eurs        3638 lignes — aucune colonne de date
+  classementfonds_eurs        3639 lignes — aucune colonne de date
   classementfonds_usds        3638 lignes — aucune colonne de date
-  performences               81772 lignes — updated_at max = aucune (?)
-  performences_eurs          38769 lignes — date max = Fri Oct 02 2026 00: (3.8 j)
-  performences_usds          39002 lignes — date max = Fri Oct 02 2026 00: (3.8 j)
+  performences               82002 lignes — updated_at max = aucune (?)
+  performences_eurs          39546 lignes — date max = Mon Oct 05 2026 00: (0.9 j)
+  performences_usds          39779 lignes — date max = Mon Oct 05 2026 00: (0.9 j)
 
 ## B. Retard des performances par pays
 
   pays        fonds  a jour      %  retard moy.  retard max
   ---------- ------ ------- ------ ------------ -----------
-  MAROC         640      22  3.4 %      122.0 j       139 j
-  TUNISIE       131       6  4.6 %      118.7 j       137 j
+  MAROC         640      19  3.0 %      125.4 j       140 j
+  TUNISIE       131       5  3.8 %      121.6 j       140 j
   UEMOA         109      36 33.0 %       37.8 j       280 j
   NIGERIA       320     297 92.8 %        8.2 j       665 j
   CEMAC          34      34 100.0 %        0.0 j         0 j
@@ -212,14 +212,14 @@ Mesure le 2026-10-05 18:35:23 UTC — LECTURE SEULE
 
   OBLIGATIONS MAROC                strict  109/300  (36.3 %) · rho  0.696 · top10 3/10 · ex aequo 1
                                    DIVERGE — le classement ne reflete pas les performances en base
-  DIVERSIFIE MAROC                 strict   18/141  (12.8 %) · rho  0.210 · top10 6/10 · ex aequo 0
+  DIVERSIFIE MAROC                 strict   19/141  (13.5 %) · rho  0.219 · top10 6/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
   ACTIONS MAROC                    strict    7/122  (5.7 %) · rho  0.474 · top10 7/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
   OBLIGATIONS NIGERIA              strict   12/87   (13.8 %) · rho  0.831 · top10 4/10 · ex aequo 2
                                    DIVERGE — le classement ne reflete pas les performances en base
-  DIVERSIFIE TUNISIE               strict    3/70   (4.3 %) · rho  0.428 · top10 3/10 · ex aequo 0
-                                   DIVERGE — le classement ne reflete pas les performances en base
+  MONETAIRE MAROC                  strict   40/70   (57.1 %) · rho  0.978 · top10 8/10 · ex aequo 0
+                                   PROCHE — permutations locales, a instruire
 
 
 ########## scripts/diag/ondemand/diag_crons_journaux.js ##########
@@ -228,14 +228,14 @@ Mesure le 2026-10-05 18:35:23 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20261005.log      8.4 h  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20261002.log        2.9 j  ECHEC — 2 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     20.5 h  ECHEC — 2 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      3.0 j  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         3.0 j  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                0.1 h  OK  (reserve : Echecs scraping: 19)
-  cron_health_check      tous les j 22:00     africafunds_health_20261004.log      20.6 h  ECHEC — 4 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   0.6 h  aucun marqueur de fin
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20261005.log     11.3 h  ECHEC — 1 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20261005.log        0.1 h  aucun marqueur de fin
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     23.3 h  ECHEC — 2 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      2.4 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         1.9 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                2.9 h  OK  (reserve : Echecs scraping: 19)
+  cron_health_check      tous les j 22:00     africafunds_health_20261004.log      23.4 h  ECHEC — 4 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.4 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -256,21 +256,21 @@ Mesure le 2026-10-05 18:35:23 UTC — LECTURE SEULE
   | === NIGERIA WEEKLY UPDATE TERMINE AVEC 1 ERREUR(S) Mon Oct  5 10:09:36 AM UTC 2026 ===
   | ========================================
 
---- cron_daily_update (ECHEC — 2 erreur(s)) — /var/log/africafunds_daily_20261002.log
+--- cron_daily_update (aucun marqueur de fin) — /var/log/africafunds_daily_20261005.log
+  |   CEMAC: 34 fonds
+  |   Nigeria: 12 fonds
+  | ============================================================
   | === VERIFICATION FINALE ===
   | ============================================================
-  | performences_eurs: 38769 lignes, 1244 fonds
-  | performences_usds: 39002 lignes, 1244 fonds
+  | performences_eurs: 39546 lignes, 1245 fonds
+  | performences_usds: 39779 lignes, 1245 fonds
   | Termine.
   | [8/9] OK
   | [9a/9] Classement local...
-  | "finishrank"[9a/9] OK (HTTP 200)
+  | [9a/9] ERREUR (HTTP 000)
   | [9b/9] Classement EUR...
   | "finishrank"[9b/9] OK (HTTP 200)
   | [9c/9] Classement USD...
-  | "finishrank"[9c/9] OK (HTTP 200)
-  | === MISE A JOUR TERMINEE AVEC 2 ERREUR(S) Fri Oct  2 09:26:32 PM UTC 2026 ===
-  | ========================================
 
 --- cron_daily_eur_usd (ECHEC — 2 erreur(s)) — /var/log/cron_eur_usd.log
   | Termine.
@@ -309,18 +309,18 @@ Mesure le 2026-10-05 18:35:23 UTC — LECTURE SEULE
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
   | ============================================
-  | SNAPSHOT PRODUCTION — 2026-10-05 18:00:01
+  | SNAPSHOT PRODUCTION — 2026-10-05 21:00:02
   | ============================================
   | --- Generation du snapshot base de donnees ---
-  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44844 octets)
+  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44818 octets)
   |   -> Git non modifie: aucun add/commit/push
   | ============================================
-  | SNAPSHOT TERMINE — 2026-10-05 18:00:16
+  | SNAPSHOT TERMINE — 2026-10-05 21:00:20
   | ============================================
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
 
-=== RESUME : 3 OK · 4 en echec · 1 non verifiable(s) ===
+=== RESUME : 3 OK · 3 en echec · 2 non verifiable(s) ===
   « non verifiable » ne veut pas dire « sain » : journal absent, illisible,
   ou sans marqueur de fin. A instruire avant de conclure quoi que ce soit.
 
@@ -329,14 +329,14 @@ Mesure le 2026-10-05 18:35:23 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-10-05T18:35:30.203Z — LECTURE SEULE
+ Genere le 2026-10-05T21:25:48.835Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 10.82 Mo
-   modifie   : 2026-10-05T10:00:42.321Z (il y a 8.6 h)
+   modifie   : 2026-10-05T10:00:42.321Z (il y a 11.4 h)
    lignes    : 8627
    colonnes  : 59
 
@@ -439,7 +439,7 @@ Mesure le 2026-10-05 18:35:23 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-10-05 18:35:30 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:25:49 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 333
   etiquette CONFORME au contenu : 122
@@ -600,7 +600,7 @@ Fonds Nigeria examines : 333
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-10-05 18:35:35 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:25:56 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -792,17 +792,17 @@ VL Nigeria en base : 77514
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : 35906dd35 — chore(governance): certify all current Markdown [skip ci]
+  HEAD : e7bd54e70 — chore(diag): add read-only W1 foundation schema probe
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  169  depuis 568.3 h
-    fundafrique-frontend     online     redemarrages   48  depuis 1210.5 h
-    worker-recalculation     online     redemarrages    3  depuis 568.4 h
-    worker-data-import       online     redemarrages    3  depuis 568.4 h
+    api-monolith             online     redemarrages  169  depuis 571.1 h
+    fundafrique-frontend     online     redemarrages   48  depuis 1213.3 h
+    worker-recalculation     online     redemarrages    3  depuis 571.2 h
+    worker-data-import       online     redemarrages    3  depuis 571.2 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -819,7 +819,7 @@ VL Nigeria en base : 77514
 ########## scripts/diag/ondemand/diag_mariadb_incident_timeline.js ##########
 
 === MARIADB — TIMELINE INCIDENTS RECENTS (LECTURE SEULE) ===
-Mesure le 2026-10-05T18:35:41.436Z
+Mesure le 2026-10-05T21:26:05.674Z
 
 
 --- etat systemd courant ---
@@ -828,14 +828,14 @@ Result=success
 NRestarts=0
 ExecMainStartTimestamp=Tue 2026-09-22 06:25:02 UTC
 ExecMainPID=3041009
-MemoryCurrent=5229490176
+MemoryCurrent=5258104832
 ActiveState=active
 SubState=running
 StateChangeTimestamp=Tue 2026-09-22 06:25:02 UTC
 ActiveEnterTimestamp=Tue 2026-09-22 06:25:02 UTC
 
 --- processus mariadbd courant ---
-MARIADB_PROCESS pid=3041009 uptime_s=1167040 rss_kb=4991324 rssanon_kb=4978752 private_dirty_kb=4979848 swap_kb=1804668
+MARIADB_PROCESS pid=3041009 uptime_s=1177264 rss_kb=4994584 rssanon_kb=4982076 private_dirty_kb=4983300 swap_kb=1805080
 
 --- listener TCP 3306 courant ---
 LISTEN 0      80                                       127.0.0.1:3306       0.0.0.0:*    users:(("mariadbd",pid=3041009,fd=19))
@@ -870,7 +870,7 @@ SEP21_MARIADB_START_OR_READY_PRESENT=YES
 
 ########## scripts/diag/ondemand/diag_masi_historique_ft.js ##########
 === SERIE HISTORIQUE MASI — ACCES DEPUIS S2 ===
-Mesure le 2026-10-05 18:35:41 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:26:06 UTC — LECTURE SEULE
 
 ## 1. Page tearsheet et extraction de l identifiant interne
   https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS
@@ -918,7 +918,7 @@ Mesure le 2026-10-05 18:35:41 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_perf_locale_equivalence.js ##########
 === PERFORMANCES LOCALES — EQUIVALENCE CALCUL DIRECT / ROUTE API ===
-Mesure le 2026-10-05 18:35:43 UTC — DRY-RUN, AUCUNE ECRITURE
+Mesure le 2026-10-05 21:26:07 UTC — DRY-RUN, AUCUNE ECRITURE
 
 ########## NIGERIA
 Options: pays=NIGERIA, force=false, mode=DRY-RUN (aucune ecriture), limit=20
@@ -947,7 +947,7 @@ Les deux calculs donnent les memes chiffres sur ce perimetre.
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-10-05 18:35:44 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:26:09 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -1016,7 +1016,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-10-05 18:35:49 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:26:16 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
@@ -1119,7 +1119,7 @@ Ruptures d echelle Nigeria encore en base : 140
 ########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-10-05 18:35:53 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:26:24 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -1209,7 +1209,7 @@ Mesure le 2026-10-05 18:35:53 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_rattrapage_masi_dryrun.js ##########
 === RATTRAPAGE MASI — CE QU IL COUVRIRAIT, SANS RIEN ECRIRE ===
-Mesure le 2026-10-05 18:35:58 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:26:32 UTC — LECTURE SEULE
 
 ## A. Ce que la source publie, en UNE requete
 
@@ -1257,19 +1257,19 @@ Mesure le 2026-10-05 18:35:58 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_recalc_prepared_stmt_pressure.js ##########
 
 === PREPARED STATEMENT PRESSURE — READ ONLY ===
-Mesure: 2026-10-05T18:35:59.148Z
-STEP3_RECALC_EUR_USD funds=1250 vl_rows=998632 dynamic_update_statements=2611 batch_size=500
-STEP4_RECALC_VL_AJUSTE funds=1251 vl_rows=999236 dynamic_update_statements=5722 batch_size=200
-COMBINED_DYNAMIC_UPDATE_STATEMENTS=8333
+Mesure: 2026-10-05T21:26:33.300Z
+STEP3_RECALC_EUR_USD funds=1250 vl_rows=999414 dynamic_update_statements=2611 batch_size=500
+STEP4_RECALC_VL_AJUSTE funds=1251 vl_rows=1000018 dynamic_update_statements=5726 batch_size=200
+COMBINED_DYNAMIC_UPDATE_STATEMENTS=8337
 MYSQL_MAX_PREPARED_STMT_COUNT=16382
 MYSQL_PERFORMANCE_SCHEMA=OFF
-MYSQL_PREPARED_STMT_COUNT_NOW=0
-MYSQL_COM_STMT_PREPARE_SINCE_RESTART=9954
-MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=495586
+MYSQL_PREPARED_STMT_COUNT_NOW=31
+MYSQL_COM_STMT_PREPARE_SINCE_RESTART=10055
+MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=519558
 MYSQL_COM_STMT_CLOSE_SINCE_RESTART=4
-MYSQL_MEMORY_USED_NOW=484124720
-MYSQL_UPTIME=1167064
-PREPARE_MINUS_THEORETICAL_DYNAMIC=1621
+MYSQL_MEMORY_USED_NOW=487115328
+MYSQL_UPTIME=1177304
+PREPARE_MINUS_THEORETICAL_DYNAMIC=1718
 NOTE=Step3 count is an upper geometry bound before currency/rate skips; current daily log reported 1249 funds and 994766 VL actually processed. Step4 geometry is exact for active-fund row batches. Com_stmt_prepare is server-global and cumulative, so numerical proximity is evidence for correlation, not causal identity.
 MUTATION=NONE
 
@@ -1284,7 +1284,7 @@ CONTRACT=GREEN
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-10-05 18:36:07 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:26:46 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 147 ligne(s) sur 64 fonds
@@ -1385,7 +1385,7 @@ TOTAL : 147 ligne(s) sur 64 fonds
 
 ########## scripts/diag/ondemand/diag_source_masi.js ##########
 === SOURCE MASI — POURQUOI LE SCRAPING ECHOUE ===
-Mesure le 2026-10-05 18:36:39 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:27:30 UTC — LECTURE SEULE
 URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
 
 ## A. Client HTTPS de Node — celui que `scrapeMASI` utilise aujourd hui
@@ -1405,7 +1405,7 @@ URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=j
 
 ########## scripts/diag/ondemand/diag_source_monia.js ##########
 === MONIA — ENJEU REEL ET ACCES A LA SOURCE ===
-Mesure le 2026-10-05 18:36:39 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:27:30 UTC — LECTURE SEULE
 
 ## A. Qui se refere a MONIA ?
 
@@ -1426,12 +1426,12 @@ Mesure le 2026-10-05 18:36:39 UTC — LECTURE SEULE
 
   page FR (voie secondaire)
     https://www.bkam.ma/Marche-monetaire/Taux-du-marche-interbancaire-MONIA
-    HTTP 403 | 919 o | ip 3.160.39.56
+    HTTP 403 | 919 o | ip 3.160.39.72
     page de blocage : OUI
 
   racine bkam.ma
     https://www.bkam.ma/
-    HTTP 403 | 919 o | ip 3.160.39.38
+    HTTP 403 | 919 o | ip 3.160.39.56
     page de blocage : OUI
 
 ## D. Conclusion a tirer, et celle a ne pas tirer
@@ -1445,11 +1445,11 @@ Mesure le 2026-10-05 18:36:39 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_sources_masi_alternatives.js ##########
 === SOURCES MASI ALTERNATIVES — CE QUI REPOND DEPUIS S2 ===
-Mesure le 2026-10-05 18:36:43 UTC — LECTURE SEULE
+Mesure le 2026-10-05 21:27:35 UTC — LECTURE SEULE
 
 ## African Markets — page indices
   https://www.african-markets.com/en/stock-markets/bvc/indices
-  reponse : HTTP 404 | text/html | 2870 o | ip 104.21.42.129
+  reponse : HTTP 404 | text/html | 2870 o | ip 172.67.205.222
       → interstitielle Cloudflare : inutilisable par script
 
 ## African Markets — donnees de marche
@@ -1474,13 +1474,13 @@ Mesure le 2026-10-05 18:36:43 UTC — LECTURE SEULE
 
 ## Stooq — symbole marocain alternatif
   https://stooq.com/q/d/l/?s=%5Emasi&i=d
-  reponse : HTTP 200 | text/html | 796 o | ip 159.69.202.225
+  reponse : HTTP 200 | text/html | 796 o | ip 78.47.47.99
       → candidats « MASI + nombre > 1000 » : aucun
       → serie datee : aucune date reperable — source inutilisable telle quelle
 
 ## Yahoo — nouvelle tentative MASI.CS
   https://query2.finance.yahoo.com/v8/finance/chart/MASI.CS?range=3mo&interval=1d
-  reponse : HTTP 429 | text/html | 23 o | ip 87.248.119.251
+  reponse : HTTP 429 | text/html | 23 o | ip 87.248.119.252
       → candidats « MASI + nombre > 1000 » : aucun
       → serie datee : aucune date reperable — source inutilisable telle quelle
 
@@ -1539,5 +1539,100 @@ Mode: DRY-RUN
 -- code de sortie : 1
 
 === FIN — dry-run uniquement, aucune ecriture effectuee ===
+
+########## scripts/diag/ondemand/diag_w1_foundations.js ##########
+=== W1 FOUNDATIONS — LIVE SCHEMA / RELATIONSHIPS / PROVENANCE ===
+Mesure le 2026-10-05T21:28:04.437Z — LECTURE SEULE
+
+## A. Tables canoniques / referentielles presentes
+  table                      present  approx_rows
+  -------------------------  -------  -----------
+  fond_investissements       YES      1177       
+  societes                   YES      156        
+  documents                  YES      5          
+  personnel_sgs              YES      5          
+  valorisations              YES      1029432    
+  indice_references          YES      40577      
+  devisedechanges            YES      129890     
+  ref_asset_classes          YES      4          
+  ref_geo_zones              YES      29         
+  ref_categories_fundafrica  YES      140        
+  ref_indices_fundafrica     YES      137        
+  ref_index_sources          YES      10         
+  sec_ng_observations        NO       -          
+  sec_ng_fund_aliases        NO       -          
+  sec_ng_corrections_audit   YES      48980      
+
+## B. valorisations — parite schema additive / provenance
+  column            present
+  ----------------  -------
+  net_assets_ngn    YES    
+  net_assets_usd    YES    
+  unit_price_ngn    YES    
+  unit_price_usd    YES    
+  bid_price_ngn     YES    
+  bid_price_usd     YES    
+  offer_price_ngn   YES    
+  offer_price_usd   YES    
+  price_type        YES    
+  currency_code     YES    
+  sec_document_id   YES    
+  source_url        YES    
+  report_date       YES    
+  data_quality      YES    
+  correction_batch  YES    
+
+## C. Relations societe_id et contraintes FK reelles
+  table                 societe_id_column  real_fk_to_societes  fk_names
+  --------------------  -----------------  -------------------  --------
+  fond_investissements  YES                NO                   -       
+  documents             YES                NO                   -       
+  personnel_sgs         YES                NO                   -       
+
+## D. Couverture societe_id — agrégats uniquement
+  table                 total  missing_societe_id
+  --------------------  -----  ------------------
+  fond_investissements  1260   71                
+  documents             5      2                 
+  personnel_sgs         5      2                 
+
+## E. Identite fonds — agrégats de collision, sans données sensibles
+  total  active  missing_isin  missing_societe_id  duplicate_isin_keys  duplicate_name_country_keys
+  -----  ------  ------------  ------------------  -------------------  ---------------------------
+  1260   1252    452           71                  0                    1                          
+
+## F. Provenance valorisations — couverture globale et par pays
+Global:
+  total    with_currency  with_price_type  with_source  with_report_date  with_quality  with_batch
+  -------  -------------  ---------------  -----------  ----------------  ------------  ----------
+  1044685  68692          68442            68442        68442             76070         51949     
+Par pays:
+  pays     total   with_currency  with_price_type  with_source  with_quality
+  -------  ------  -------------  ---------------  -----------  ------------
+  MAROC    565299  0              0                0            0           
+  TUNISIE  311215  0              0                0            0           
+  NIGERIA  78098   68692          68442            68442        76070       
+  UEMOA    48154   0              0                0            0           
+  CEMAC    2134    0              0                0            0           
+
+## G. Referentiels FundAfrica — comptes exacts
+  table                      count
+  -------------------------  -----
+  ref_asset_classes          4    
+  ref_geo_zones              29   
+  ref_categories_fundafrica  140  
+  ref_indices_fundafrica     137  
+  ref_index_sources          10   
+
+## H. Indices / FX — bornes temporelles
+  authority          rows_count  series_count  min_date                                                        max_date                                                      
+  -----------------  ----------  ------------  --------------------------------------------------------------  --------------------------------------------------------------
+  indice_references  41132       9             Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Mon Oct 05 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
+  devisedechanges    132844      21            Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Mon Oct 05 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
+
+## I. Colonnes documents — capacité de provenance documentaire
+  id, nom, fichier, societe, date, annee, mois, type_fichier, fond_id, objet, fond, created_at, updated_at, societe_id
+
+VERDICT=W1_FOUNDATION_SCHEMA_OBSERVED_READ_ONLY
 
 ```
