@@ -445,6 +445,13 @@ async function scrapeMASIviaMedias24(targetDate, verbose) {
  * Le transport est `curlGetText` et non le client de Node, pour la raison deja
  * documentee dans ce fichier a propos de bkam.ma.
  */
+// L identifiant interne FT ne change pas d une date a l autre. Sans ce cache,
+// un rattrapage de soixante jours redemanderait soixante fois la meme fiche de
+// 80 Ko — soixante requetes inutiles, et une invitation au bridage. Portee
+// processus : chaque execution du scraper le redemande une fois, donc un
+// changement cote FT est pris en compte au passage suivant du cron.
+let ftXidMASI = null;
+
 async function scrapeMASIviaFT(targetDate, verbose) {
   const TEARSHEET = 'https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS';
   const MOIS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -460,15 +467,19 @@ async function scrapeMASIviaFT(targetDate, verbose) {
     // 1. L identifiant interne de l instrument, lu dans la page. Aucune valeur
     //    codee en dur : un identifiant fournisseur perime pointerait vers un
     //    autre instrument sans que rien ne le signale.
-    const page = await curlGetText(TEARSHEET);
-    let xid = null;
-    for (const re of [/&quot;symbol&quot;\s*:\s*&quot;(\d{6,})&quot;/, /"symbol"\s*:\s*"(\d{6,})"/]) {
-      const m = page.match(re);
-      if (m) { xid = m[1]; break; }
-    }
+    let xid = ftXidMASI;
     if (!xid) {
-      if (verbose) console.log('    [MASI] FT : identifiant interne introuvable dans la fiche');
-      return null;
+      const page = await curlGetText(TEARSHEET);
+      for (const re of [/&quot;symbol&quot;\s*:\s*&quot;(\d{6,})&quot;/, /"symbol"\s*:\s*"(\d{6,})"/]) {
+        const m = page.match(re);
+        if (m) { xid = m[1]; break; }
+      }
+      if (!xid) {
+        if (verbose) console.log('    [MASI] FT : identifiant interne introuvable dans la fiche');
+        return null;
+      }
+      ftXidMASI = xid;
+      if (verbose) console.log(`    [MASI] FT : identifiant interne ${xid} (mis en cache pour cette execution)`);
     }
 
     // 2. La serie autour de la date visee. Dix jours de marge couvrent un pont.
