@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-10-07 15:24 UTC**
+Derniere verification : **2026-10-07 15:29 UTC**
 
 ```
 
@@ -28,7 +28,7 @@ Derniere verification : **2026-10-07 15:24 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Mon Oct 05, soit 2 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-10-07T15:00, soit 0.3 h
+             runtime: genere le 2026-10-07T15:00, soit 0.4 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1531x [100.00 .. 153145] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1524x [1.09 .. 1668] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1516x [10.65 .. 16148] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1515x [1.00 .. 1515] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1515x [1.03 .. 1555] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1494x [114.47 .. 171007] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1478x [1.05 .. 1545] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1475x [1.15 .. 1697] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1464x [1.09 .. 1593] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1439x [1.17 .. 1684] | [2770] CFG AM FIXED INCOME DOLLAR FUN (NIGERIA/USD) 1428x [106.08 .. 151487] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182]
 [ECHEC] C8           Les performances suivent les VL
@@ -61,8 +61,24 @@ Derniere verification : **2026-10-07 15:24 UTC**
              derniere valeur le Tue Oct 06, soit 1 j (porte par 554736 VL)
 [OK   ] C10.BRVM Composite Fraicheur de l indice BRVM Composite
              derniere valeur le Tue Oct 06, soit 1 j (porte par 45112 VL)
+[ALERTE] C11.classementfonds Fraicheur de reconstruction de classementfonds
+             colonne `created_at` absente : l age du dernier recalcul est inconnaissable. Appliquer la migration 20261007000001-add-rebuild-timestamps-classementfonds.js (ADD COLUMN seul, aucune ligne metier touchee).
+[ALERTE] C11.classementfonds_eurs Fraicheur de reconstruction de classementfonds_eurs
+             colonne `created_at` absente : l age du dernier recalcul est inconnaissable. Appliquer la migration 20261007000001-add-rebuild-timestamps-classementfonds.js (ADD COLUMN seul, aucune ligne metier touchee).
+[ALERTE] C11.classementfonds_usds Fraicheur de reconstruction de classementfonds_usds
+             colonne `created_at` absente : l age du dernier recalcul est inconnaissable. Appliquer la migration 20261007000001-add-rebuild-timestamps-classementfonds.js (ADD COLUMN seul, aucune ligne metier touchee).
+[OK   ] C12.OBLIGATIONS MAROC Les rangs correspondent aux performances
+             300/300 fonds au rang que leur performance stockee leur donne (100.0 %)
+[OK   ] C12.DIVERSIFIE MAROC Les rangs correspondent aux performances
+             141/141 fonds au rang que leur performance stockee leur donne (100.0 %)
+[OK   ] C12.ACTIONS MAROC Les rangs correspondent aux performances
+             122/122 fonds au rang que leur performance stockee leur donne (100.0 %)
+[OK   ] C12.OBLIGATIONS NIGERIA Les rangs correspondent aux performances
+             87/87 fonds au rang que leur performance stockee leur donne (100.0 %)
+[OK   ] C12.DIVERSIFIE TUNISIE Les rangs correspondent aux performances
+             70/70 fonds au rang que leur performance stockee leur donne (100.0 %)
 
-18/25 controles OK — 4 echec(s) critique(s), 3 alerte(s).
+23/33 controles OK — 4 echec(s) critique(s), 6 alerte(s).
 
 Un echec critique signifie que la production contredit ce que la
 documentation affirme. Corriger la production OU corriger le document,
