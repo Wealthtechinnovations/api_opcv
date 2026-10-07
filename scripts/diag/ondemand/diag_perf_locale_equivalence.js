@@ -48,14 +48,20 @@ console.log(`Mesure le ${new Date().toISOString().replace('T', ' ').slice(0, 19)
 // fraiches, donc le seul ou la comparaison a un sens. Comparer sur le Maroc
 // opposerait le calcul du jour a des chiffres de juin : tout divergerait, et
 // cela ne dirait rien des formules.
+// Perimetre reduit de 20 a 10 fonds par pays le 2026-10-07 : depuis cette
+// date le script appelle aussi l endpoint de ratios, jusqu a trois fois par
+// fonds. Vingt fonds sur deux pays feraient jusqu a 120 appels HTTP dans la
+// SEULE session SSH du canal a la demande — et un script de dix minutes casse
+// le tunnel (`client_loop: send disconnect: Broken pipe`, lecon du lot BS).
+// Le plafond ci-dessous borne le pire cas a cinq minutes au total.
 for (const pays of ['NIGERIA', 'UEMOA']) {
   console.log(`########## ${pays}`);
   const r = spawnSync('node', ['scripts/fix/fix_populate_performances.js',
-    '--pays', pays, '--dry-run', '--limit', '20'],
-    { cwd: RACINE, encoding: 'utf8', timeout: 240000, maxBuffer: 8 * 1024 * 1024 });
+    '--pays', pays, '--dry-run', '--limit', '10'],
+    { cwd: RACINE, encoding: 'utf8', timeout: 150000, maxBuffer: 8 * 1024 * 1024 });
   const sortie = `${r.stdout || ''}${r.stderr || ''}`;
   const utiles = sortie.split(/\r?\n/).filter(l =>
-    /DRY-RUN|Identiques|Divergents|Absents|ecart|memes chiffres|ECARTS|Options|fonds a traiter|ERROR|limite/i.test(l));
+    /DRY-RUN|Identiques|Divergents|Absents|ecart|memes chiffres|ECARTS|Options|fonds a traiter|ERROR|limite|Colonnes comparees|DIVERGENCES PAR COLONNE|ratios|Ratios|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
   console.log(utiles.length ? utiles.join('\n') : '(aucune ligne retenue)');
   console.log(`-- code de sortie : ${r.status}${r.error ? ` | ${r.error.message}` : ''}\n`);
 }
