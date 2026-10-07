@@ -417,6 +417,150 @@ async function main() {
         `controle non evalue : ${err.message}. Les autres controles restent valides.`);
     }
 
+    // C11 — la reconstruction des classements est-elle recente ?
+    //
+    // POURQUOI. Le 2026-10-06 j ai conclu d un `HTTP 000` sur l etape 9a du
+    // cron que « le classement local n est pas recalcule ». La conclusion
+    // etait indue : le depot avertit par ecrit qu un `HTTP 000` signifie que le
+    // CLIENT a cesse d attendre, pas que le serveur a echoue. Et elle restera
+    // indue tant que la reconstruction ne sera pas OBSERVABLE : les trois
+    // tables sont en `timestamps: false` et n ont aucune colonne de date, donc
+    // apres un run on ne distingue pas un commit d un rollback.
+    //
+    // Ce controle devient donc utile SEULEMENT apres la migration
+    // `20261007000001-add-rebuild-timestamps-classementfonds.js`. Avant, il se
+    // degrade proprement en disant ce qui manque — motif deja retenu pour
+    // C5/C9/C10, et preferable a un controle absent : l absence de la colonne
+    // est elle-meme l information a afficher.
+    //
+    // Seuil 4 jours : le cron tourne du lundi au vendredi, il faut tolerer un
+    // week-end plus un jour ferie. En AVERTISSEMENT et non en CRITIQUE jusqu a
+    // ce qu un run propre ait prouve le seuil atteignable — ce depot a deja
+    // paye deux fois le prix d un seuil pose en theorie.
+    const TABLES_CLASSEMENT = ['classementfonds', 'classementfonds_eurs', 'classementfonds_usds'];
+    const SEUIL_AGE_CLASSEMENT_J = 4;
+    // Attendu ≈ 1 245 fonds x 3 niveaux ≈ 3 735 lignes ; on juge a 80 %.
+    const LIGNES_ATTENDUES_MIN = 0.8;
+    try {
+      const [colTs] = await conn.execute(`
+        SELECT table_name AS t
+          FROM information_schema.columns
+         WHERE table_schema = DATABASE() AND column_name = 'created_at'
+           AND table_name IN (${TABLES_CLASSEMENT.map(() => '?').join(', ')})`,
+        TABLES_CLASSEMENT);
+      const horodatees = new Set(colTs.map(r => String(r.t || r.TABLE_NAME || r.table_name)));
+
+      // Le cardinal attendu se deduit des fonds reellement classables, pas
+      // d un nombre ecrit en dur qui vieillirait sans que personne ne le voie.
+      const [attendu] = await conn.execute(`
+        SELECT COUNT(DISTINCT f.id) AS n
+          FROM fond_investissements f
+          JOIN performences p ON p.fond_id = f.id
+         WHERE f.active = 1`);
+      const cibleLignes = Number(attendu[0].n) * 3;
+
+      for (const table of TABLES_CLASSEMENT) {
+        if (!horodatees.has(table)) {
+          record(`C11.${table}`, 'AVERTISSEMENT', `Fraicheur de reconstruction de ${table}`,
+            false,
+            'colonne `created_at` absente : l age du dernier recalcul est inconnaissable. '
+              + 'Appliquer la migration 20261007000001-add-rebuild-timestamps-classementfonds.js '
+              + '(ADD COLUMN seul, aucune ligne metier touchee).');
+          continue;
+        }
+        const [etat] = await conn.query(
+          `SELECT COUNT(*) AS lignes, MIN(created_at) AS debut, MAX(created_at) AS fin,
+                  TIMESTAMPDIFF(HOUR, MAX(created_at), NOW()) AS age_h
+             FROM \`${table}\``);
+        const e = etat[0];
+        const ageH = e.age_h == null ? null : Number(e.age_h);
+        const lignes = Number(e.lignes);
+        const assezFrais = ageH != null && ageH <= SEUIL_AGE_CLASSEMENT_J * 24;
+        const assezPlein = lignes >= cibleLignes * LIGNES_ATTENDUES_MIN;
+        record(`C11.${table}`, 'AVERTISSEMENT', `Fraicheur de reconstruction de ${table}`,
+          assezFrais && assezPlein,
+          `${lignes} lignes (attendu ≈ ${cibleLignes}), dernier recalcul `
+            + `${ageH == null ? 'jamais horodate' : `il y a ${ageH} h`}`
+            + (e.debut && e.fin ? `, fenetre du run : ${String(e.debut).slice(0, 19)} → ${String(e.fin).slice(0, 19)}` : '')
+            + (!assezFrais ? ` — au-dela de ${SEUIL_AGE_CLASSEMENT_J} j : les rangs affiches ne suivent plus les performances.` : '')
+            + (!assezPlein ? ' — table incomplete : une purge a reussi la ou les insertions ont echoue.' : ''));
+      }
+    } catch (err) {
+      record('C11', 'AVERTISSEMENT', 'Fraicheur de reconstruction des classements', false,
+        `controle non evalue : ${err.message}. Les autres controles restent valides.`);
+    }
+
+    // C12 — les rangs stockes correspondent-ils aux performances stockees ?
+    //
+    // POURQUOI. Mesure du 2026-10-06 : sur ACTIONS MAROC, 7 fonds sur 122
+    // portaient le rang que leur performance stockee leur donne. Aucun controle
+    // ne voyait cela : C8 verifie que les performances suivent les VL, rien ne
+    // verifiait que les RANGS suivent les performances. Deux etages de
+    // peremption empiles, dont un invisible.
+    //
+    // Le tri est celui de la PRODUCTION, importe depuis `ranking.pure.js` — pas
+    // une reecriture. Un controle qui reimplemente ce qu il verifie ne verifie
+    // rien : il compare deux implementations dont l une n a jamais servi.
+    //
+    // En AVERTISSEMENT : le seuil de 90 % ci-dessous n a pas encore ete atteint
+    // par un run propre, donc il n est pas encore un invariant. Il le deviendra
+    // quand un run l aura prouve, et pas avant.
+    const SEUIL_CONCORDANCE_RANGS = 0.9;
+    try {
+      const { rankFundInList } = require('../../src/services/ranking.pure');
+      const [cats] = await conn.execute(`
+        SELECT categorie_nationale AS cat, COUNT(*) AS n
+          FROM classementfonds
+         WHERE type_classement = 1 AND categorie_nationale IS NOT NULL
+           AND categorie_nationale <> ''
+         GROUP BY categorie_nationale
+         ORDER BY n DESC
+         LIMIT 5`);
+      if (!cats.length) {
+        record('C12', 'AVERTISSEMENT', 'Les rangs correspondent aux performances', false,
+          'aucune categorie nationale classee : le classement local est vide.');
+      }
+      for (const c of cats) {
+        const [perfs] = await conn.execute(`
+          SELECT p1.fond_id, p1.ytd
+            FROM performences p1
+            INNER JOIN (
+              SELECT fond_id, MAX(date) AS max_date
+                FROM performences
+               WHERE categorie_nationale = ?
+               GROUP BY fond_id
+            ) p2 ON p1.fond_id = p2.fond_id AND p1.date = p2.max_date
+           WHERE p1.categorie_nationale = ?`, [c.cat, c.cat]);
+        const [stockes] = await conn.execute(`
+          SELECT fond_id, rank1erJanvier AS rang
+            FROM classementfonds
+           WHERE type_classement = 1 AND categorie_nationale = ?
+             AND rank1erJanvier IS NOT NULL`, [c.cat]);
+
+        let exacts = 0, comparables = 0;
+        for (const s of stockes) {
+          const [attenduRang] = rankFundInList(perfs, s.fond_id, 'ytd');
+          if (!attenduRang) continue;
+          comparables++;
+          if (attenduRang === Number(s.rang)) exacts++;
+        }
+        const taux = comparables ? exacts / comparables : 0;
+        record(`C12.${String(c.cat).slice(0, 24)}`, 'AVERTISSEMENT',
+          'Les rangs correspondent aux performances',
+          comparables > 0 && taux >= SEUIL_CONCORDANCE_RANGS,
+          `${exacts}/${comparables} fonds au rang que leur performance stockee leur donne`
+            + ` (${(100 * taux).toFixed(1)} %)`
+            + (taux < SEUIL_CONCORDANCE_RANGS
+              ? ' — les rangs affiches ne derivent pas des performances affichees : soit la table'
+                + ' de classement est perimee, soit les ex aequo ne sont pas departages'
+                + ' (le SQL du classement n a pas d ORDER BY). Voir diag_classement_vs_perf.js.'
+              : ''));
+      }
+    } catch (err) {
+      record('C12', 'AVERTISSEMENT', 'Les rangs correspondent aux performances', false,
+        `controle non evalue : ${err.message}. Les autres controles restent valides.`);
+    }
+
     // Rendu
     if (json) {
       console.log(JSON.stringify({ generated_at: new Date().toISOString(), results }, null, 2));

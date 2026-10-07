@@ -1,68 +1,23 @@
 const { sequelize, performences_eurs, performences_usds } = require('../db/sequelize');
 
-const LOWER_IS_BETTER = new Set([
-  'pertemax3an', 'betabaissier3an', 'volatility3an', 'dsr3an',
-]);
-
-const PERF_PERIODS = ['perf3m', 'perf6m', 'perf1an', 'perf3ans', 'perf5ans', 'ytd'];
-
-const PERF_PERIODS_FULL = [
-  ...PERF_PERIODS,
-  'perfveille', 'perfveillem',
-  'perf3mm', 'perf6mm', 'perf1anm', 'perf3ansm', 'perf5ansm', 'ytdm',
-  'volatility3an', 'ratiosharpe3an', 'pertemax3an', 'sortino3an',
-  'info3an', 'calamar3an', 'var953an', 'betabaissier3an', 'omega3an', 'dsr3an',
-];
-
-const PERF_PERIODS_FULL_DEV = [
-  ...PERF_PERIODS,
-  'perfveille',
-  'volatility3an', 'ratiosharpe3an', 'pertemax3an', 'sortino3an',
-  'info3an', 'calamar3an', 'var953an', 'betabaissier3an', 'omega3an', 'dsr3an',
-];
-
-function rankFundInList(fundsWithPerformance, fundId, period) {
-  const validPerformances = fundsWithPerformance.filter(
-    (f) => f[period] != null && f[period] != '-'
-  );
-  if (validPerformances.length === 0) return [null, 0];
-
-  if (LOWER_IS_BETTER.has(period)) {
-    validPerformances.sort((a, b) => a[period] - b[period]);
-  } else {
-    validPerformances.sort((a, b) => b[period] - a[period]);
-  }
-
-  const rank = validPerformances.findIndex((f) => f.fond_id === fundId) + 1;
-  return [rank, validPerformances.length];
-}
-
-function buildRankResult(fundsWithPerformance, fundId, category, periods) {
-  const data = { ranktotal: fundsWithPerformance.length, category };
-  const names = {
-    perf3m: '3Mois', perf6m: '6Mois', perf1an: '1An',
-    perf3ans: '3Ans', perf5ans: '5Ans', ytd: '1erJanvier',
-    perfveille: 'veille', perfveillem: 'veillem',
-    perf3mm: '3Moism', perf6mm: '6Moism', perf1anm: '1Anm',
-    perf3ansm: '3Ansm', perf5ansm: '5Ansm', ytdm: '1erJanvierm',
-    volatility3an: 'volatilite', ratiosharpe3an: 'sharpe', pertemax3an: 'pertemax',
-    sortino3an: 'sortino', info3an: 'info', calamar3an: 'calamar',
-    var953an: 'var95', betabaissier3an: 'betabaissier', omega3an: 'omega', dsr3an: 'dsr',
-  };
-
-  const totalNames = {
-    perf3mm: '3Moistotalm', perf6mm: '6Moistotalm', perf1anm: '1Antotalm',
-    perf3ansm: '3Anstotalm', perf5ansm: '5Anstotalm', ytdm: '1erJanviertotalm',
-  };
-
-  for (const period of periods) {
-    const [rank, total] = rankFundInList(fundsWithPerformance, fundId, period);
-    const name = names[period] || period;
-    data[`rank${name}`] = rank;
-    data[`rank${totalNames[period] || (name + 'total')}`] = total;
-  }
-  return data;
-}
+// Le calcul de rang lui-meme vit dans `ranking.pure.js`, sans aucun `require`
+// vers la base. Deplacement pur du 2026-10-07 : aucune signature ni aucune
+// ligne de logique n a change, et tout est re-exporte a l identique en bas de
+// ce fichier, donc aucun appelant n est touche.
+//
+// Raison : `check_doc_drift.js` travaille en `mysql2` brut et ne peut pas
+// charger ce fichier-ci, qui ouvre une connexion des son premier `require`.
+// Sans module pur, le controle « les rangs correspondent-ils aux
+// performances ? » devrait REECRIRE le tri — et un controle qui reimplemente
+// ce qu il verifie ne verifie rien.
+const {
+  LOWER_IS_BETTER,
+  PERF_PERIODS,
+  PERF_PERIODS_FULL,
+  PERF_PERIODS_FULL_DEV,
+  rankFundInList,
+  buildRankResult,
+} = require('./ranking.pure');
 
 // Les tables performences_eurs/usds contiennent plusieurs dates par fond.
 // On ne garde que la derniere date par fond pour eviter de gonfler les totaux
@@ -79,6 +34,15 @@ function keepLatestPerFund(rows) {
 }
 
 async function calculateRankNational(category, fundId, date) {
+  // Sans categorie, la requete ci-dessous compare `categorie_nationale = NULL`,
+  // qui n est JAMAIS vrai en SQL : le jeu de resultats est vide, `selectedFund`
+  // est introuvable et la fonction rend deja l erreur « Fond non trouve ». La
+  // garde ne change donc AUCUN resultat — elle evite seulement une analyse
+  // complete de `performences` par fonds sans categorie, a chaque run de
+  // classement. C est une economie, pas une correction, et il faut le dire
+  // ainsi plutot que de laisser croire a un defaut repare.
+  if (!category) return { error: 'Fond non trouvé.' };
+
   // Chaque fond est compare a sa derniere performance disponible (MAX(date) par fond),
   // comme pour le classement regional/global. L'ancien filtre `date = :date` fixe
   // excluait la quasi-totalite des pairs (dernieres VL a des dates differentes),
@@ -106,6 +70,10 @@ async function calculateRankNational(category, fundId, date) {
 }
 
 async function calculateRankRegional(category, fundId) {
+  // Meme raison, meme absence d effet numerique que dans `calculateRankNational` :
+  // `categorie_fundafrica_regionale = NULL` n est jamais vrai.
+  if (!category) return { error: 'Fond non trouvé.' };
+
   const fundsWithPerformance = await sequelize.query(`
     SELECT p1.fond_id, ${PERF_PERIODS.map(p => `p1.${p}`).join(', ')}
     FROM performences p1
