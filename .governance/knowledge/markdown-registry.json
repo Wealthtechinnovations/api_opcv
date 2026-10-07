@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "f1cb4893dfcf125009cf05924e33af434d6c0417"
+      "head": "fd96472f4e0d61a7ae47c731df23c2294fb94a94"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "840678a8e5b25db45224994e6e7fadaf93d346b6"
+      "head": "0035b1184c719d76e8e9f470144e19ec64ebf60c"
     }
   },
   "summary": {
@@ -10088,17 +10088,17 @@
         "A. Fonds dont la rupture n est pas un taux de change",
         "B. Les 25 lignes sans provenance, en detail",
         "C. Ruptures hors Nigeria — quelles chaines d import ?",
+        "1. Index existants sur `performences`",
+        "2. Taille de `performences`",
+        "3. Cinq plus grosses categories nationales (selectivite)",
+        "4. Plan et duree de la sous-requete reelle (ranking.service.js:87-100)",
+        "5. Fonds actifs sans categorie (perimetre de la garde L7)",
+        "6. Cron reellement deploye sur ce serveur",
         "A. Tables de classement",
         "B. Retard des performances par pays",
         "C. Le classement suit-il les performances actuelles ?",
-        "A. Etat du CSV",
-        "B. Devise emise, fonds en devise etrangere contre les autres",
-        "C. Echantillon des lignes de fonds en devise etrangere",
-        "D. Confrontation au referentiel (dev_libelle en base)",
-        "E. L etiquette de devise correspond-elle a l echelle ?",
-        "F. Ce que cela implique pour l etape 0",
-        "Etiquette en desaccord avec le contenu de `value`",
-        "Indetermines — a NE PAS basculer automatiquement (201 avec VL)"
+        "0. Volumetrie de `classementfonds`",
+        "A. Etat du CSV"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "ab5d1f91229086bbb953113b3f6460cc629104c4",
-      "last_validated_sha": "ab5d1f91229086bbb953113b3f6460cc629104c4",
-      "content_sha256": "8722b0ff8c5a6094643900f737df185b5929a29037d32b1dd3030b15b3a4ae06",
-      "line_count": 2183,
-      "byte_count": 150277,
+      "git_blob_sha": "e409d9de0d67a7c20c5a34548b0856191694d05b",
+      "last_validated_sha": "e409d9de0d67a7c20c5a34548b0856191694d05b",
+      "content_sha256": "8f96db892cbb8282172541c2dacf7c93d6373d9edf2cf6cf727ff8754536c78b",
+      "line_count": 2458,
+      "byte_count": 169786,
       "headings": [
         {
           "level": 1,
@@ -10158,6 +10158,30 @@
         },
         {
           "level": 2,
+          "text": "1. Index existants sur `performences`"
+        },
+        {
+          "level": 2,
+          "text": "2. Taille de `performences`"
+        },
+        {
+          "level": 2,
+          "text": "3. Cinq plus grosses categories nationales (selectivite)"
+        },
+        {
+          "level": 2,
+          "text": "4. Plan et duree de la sous-requete reelle (ranking.service.js:87-100)"
+        },
+        {
+          "level": 2,
+          "text": "5. Fonds actifs sans categorie (perimetre de la garde L7)"
+        },
+        {
+          "level": 2,
+          "text": "6. Cron reellement deploye sur ce serveur"
+        },
+        {
+          "level": 2,
           "text": "A. Tables de classement"
         },
         {
@@ -10167,6 +10191,10 @@
         {
           "level": 2,
           "text": "C. Le classement suit-il les performances actuelles ?"
+        },
+        {
+          "level": 2,
+          "text": "0. Volumetrie de `classementfonds`"
         },
         {
           "level": 2,
@@ -10242,43 +10270,15 @@
         },
         {
           "level": 2,
-          "text": "Devise emise par l extracteur, par annee (fonds concernes seulement)"
+          "text": "1. Volumetrie de `performences`"
         },
         {
           "level": 2,
-          "text": "Cout par fonds (les 30 plus exposes)"
+          "text": "2. Ligne MAX(date) de chaque fonds actif — ratios absents (NULL ou `-`)"
         },
         {
           "level": 2,
-          "text": "Total"
-        },
-        {
-          "level": 2,
-          "text": "A. Ce que la source permet"
-        },
-        {
-          "level": 2,
-          "text": "B. Et ce que la correction produirait"
-        },
-        {
-          "level": 2,
-          "text": "C. Detail (50 premieres)"
-        },
-        {
-          "level": 2,
-          "text": "D. Ruptures que le naira source NE resout pas"
-        },
-        {
-          "level": 2,
-          "text": "Ce que la source revele"
-        },
-        {
-          "level": 2,
-          "text": "Les plateaux, du plus long au plus court"
-        },
-        {
-          "level": 2,
-          "text": "Par fonds — ce qui resterait apres correction"
+          "text": "3. Perimetre reel du rattrapage (sans `--force`)"
         }
       ]
     },
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "b083eb61d8a21ebab0a5a94ed7a90b9f211fff04",
-      "last_validated_sha": "b083eb61d8a21ebab0a5a94ed7a90b9f211fff04",
-      "content_sha256": "f2ec65bce7f7434978c1675f1586daa34593422fe50bf918b7d5e9f42b885777",
-      "line_count": 80,
-      "byte_count": 5864,
+      "git_blob_sha": "b6e1ef88a439b1169a4c4fbc29455180fd822820",
+      "last_validated_sha": "b6e1ef88a439b1169a4c4fbc29455180fd822820",
+      "content_sha256": "bc8ece719c921faa400f2d2cdcb9de2bafbd19629c5bfc488795e781e0a72299",
+      "line_count": 96,
+      "byte_count": 7540,
       "headings": [
         {
           "level": 1,
@@ -13421,11 +13421,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "135eab983bd87b191e853011394e92470d937d55",
-      "last_validated_sha": "135eab983bd87b191e853011394e92470d937d55",
-      "content_sha256": "a508be5f237f66c266da80dbb54ed1e8cc01b80b3692d3ff1277e311ba60e2a9",
-      "line_count": 8155,
-      "byte_count": 545260,
+      "git_blob_sha": "e5341aaa8297238c73581514253ba414dcbec10e",
+      "last_validated_sha": "e5341aaa8297238c73581514253ba414dcbec10e",
+      "content_sha256": "d3cd2cd33345372d2edd5e81179dfc579089b2739ca38189feaadf990da29f03",
+      "line_count": 8291,
+      "byte_count": 553365,
       "headings": [
         {
           "level": 1,
