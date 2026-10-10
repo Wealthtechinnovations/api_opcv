@@ -4,22 +4,22 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-10-09 12:59 UTC**
+Derniere execution : **2026-10-10 12:18 UTC**
 
 ```
 ########## scripts/diag/ondemand/diag_benchmark_fraicheur.js ##########
 === FRAICHEUR DU BENCHMARK ET VITALITE DE LA SOURCE NIGERIANE ===
-Mesure le 2026-10-09 12:55:36 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:13:32 UTC — LECTURE SEULE
 
 ## A. Derniere VL vs derniere VL portant un benchmark
 
   pays       derniere VL   dernier benchmark   retard du benchmark
   ---------- ------------  -----------------   -------------------
   CEMAC      2024-12-12    ?                   JAMAIS AUCUN
-  MAROC      2026-10-07    2026-10-06          1 j
+  MAROC      2026-10-08    2026-10-07          1 j
   NIGERIA    2026-09-25    2026-09-25          0 j
-  TUNISIE    2026-10-08    2026-10-08          0 j
-  UEMOA      2026-10-07    2026-10-07          0 j
+  TUNISIE    2026-10-09    2026-10-09          0 j
+  UEMOA      2026-10-08    2026-10-08          0 j
 
 ## B. Le niveau du benchmark varie-t-il ? (90 derniers jours)
 
@@ -39,33 +39,32 @@ Mesure le 2026-10-09 12:55:36 UTC — LECTURE SEULE
   Rattachement reel des VL a un indice :
     libelle porte par la VL              VL        derniere VL
     -----------------------------------  --------  -----------
-    MASI                                 555382    2026-10-06
-    Tunindex                             311593    2026-10-08
-    (aucun)                              73626     2026-10-07
+    MASI                                 555705    2026-10-07
+    Tunindex                             311719    2026-10-09
+    (aucun)                              73619     2026-10-08
     NSE All Share                        54093     2026-09-25
-    BRVM Composite                       45144     2026-10-06
+    BRVM Composite                       45162     2026-10-07
     Sovereign_bond_index                 6243      2018-02-20
     BRVM Composite (BRVMCI)              1         2023-02-27
 
   indice                          derniere date     valeur          age     lignes/30j   total
   ------------------------------  --------------    ------------    -----   ----------   -----
-  MASI                            2026-10-08        16749.18        2 j     9            6939
-  Tunindex                        2026-10-08        18667.20        2 j     22           6976
-  BRVM Composite                  2026-10-08        548.41          2 j     22           6953
-  NSE All Share                   2026-10-07        250096.75       3 j     20           6978
-  MONIA                           2026-05-14        2.20            149 j   0            1000
-  masi_all_shares                 2024-10-28        14211.68        712 j   0            5689
-  Sovereign_bond_index            2024-10-25        170.66          715 j   0            243
-  Indice_monetaire_maroc          2024-10-25        2.70            715 j   0            231
-  S&P Tunisia Sovereign Bond Ind  2024-03-01        161.79          953 j   0            2556
-  S&P Morocco Sovereign Bond Ind  2023-11-17        157.06          1058 j   0            2609
-  INDICE MONETAIRE MAROC          2023-11-17        2.90            1058 j   0            971
+  Tunindex                        2026-10-09        18604.24        2 j     22           6977
+  MASI                            2026-10-09        16797.10        2 j     10           6940
+  NSE All Share                   2026-10-08        248042.50       3 j     20           6979
+  BRVM Composite                  2026-10-08        548.41          3 j     21           6953
+  MONIA                           2026-05-14        2.20            150 j   0            1000
+  masi_all_shares                 2024-10-28        14211.68        713 j   0            5689
+  Sovereign_bond_index            2024-10-25        170.66          716 j   0            243
+  Indice_monetaire_maroc          2024-10-25        2.70            716 j   0            231
+  S&P Tunisia Sovereign Bond Ind  2024-03-01        161.79          954 j   0            2556
+  S&P Morocco Sovereign Bond Ind  2023-11-17        157.06          1059 j   0            2609
+  INDICE MONETAIRE MAROC          2023-11-17        2.90            1059 j   0            971
 
 ## D. Maroc — a quelle semaine l ecriture du benchmark a-t-elle cesse ?
 
   semaine du    VL      avec benchmark   couverture
   ----------    -----   --------------   ----------
-  2026-06-05    623     623              100.0 %
   2026-06-08    1888    1888             100.0 %
   2026-06-15    1578    1578             100.0 %
   2026-06-22    1896    1896             100.0 %
@@ -83,7 +82,7 @@ Mesure le 2026-10-09 12:55:36 UTC — LECTURE SEULE
   2026-09-14    1919    0                0.0 %
   2026-09-21    1919    1919             100.0 %
   2026-09-28    1951    1951             100.0 %
-  2026-10-05    969     646              66.7 %
+  2026-10-05    1292    969              75.0 %
 
 ## E. Nigeria — la SEC publie-t-elle plus recent que notre base ?
 
@@ -120,7 +119,7 @@ Mesure le 2026-10-09 12:55:36 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-10-09 12:55:49 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:13:45 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -187,39 +186,39 @@ Mesure le 2026-10-09 12:55:49 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_classement_index_plan.js ##########
 === L0.b — PLAN D EXECUTION DU CLASSEMENT LOCAL, ET CONTENU REEL DU CRON ===
-Mesure le 2026-10-09 12:56:42 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:14:41 UTC — LECTURE SEULE
 
 ## 1. Index existants sur `performences`
-  PRIMARY                            (id) [UNIQUE] cardinalite ≈ 65648
-  idx_perf_fond_id                   (fond_id) cardinalite ≈ 1215
-  idx_perf_code_isin                 (code_ISIN) cardinalite ≈ 1238
+  PRIMARY                            (id) [UNIQUE] cardinalite ≈ 66136
+  idx_perf_fond_id                   (fond_id) cardinalite ≈ 1202
+  idx_perf_code_isin                 (code_ISIN) cardinalite ≈ 1247
   idx_perf_date                      (date) cardinalite ≈ 405
   → index couvrant (categorie_nationale, fond_id, date) : NON
   → L6 n a de sens que si cette reponse est NON.
 
 ## 2. Taille de `performences`
-  ≈ 65648 lignes | donnees 90.7 Mo | index 7.5 Mo | ratio index/donnees 0.08
+  ≈ 66136 lignes | donnees 90.7 Mo | index 7.5 Mo | ratio index/donnees 0.08
 
 ## 3. Cinq plus grosses categories nationales (selectivite)
-  OBLIGATIONS MAROC                           32750 lignes |  300 fonds | 49.9 % de la table
-  DIVERSIFIE MAROC                            14392 lignes |  141 fonds | 21.9 % de la table
-  ACTIONS MAROC                               14390 lignes |  122 fonds | 21.9 % de la table
-  MONETAIRE MAROC                              7058 lignes |   70 fonds | 10.8 % de la table
-  OBLIGATIONS NIGERIA                          3141 lignes |   87 fonds | 4.8 % de la table
+  OBLIGATIONS MAROC                           32873 lignes |  300 fonds | 49.7 % de la table
+  ACTIONS MAROC                               14466 lignes |  122 fonds | 21.9 % de la table
+  DIVERSIFIE MAROC                            14417 lignes |  141 fonds | 21.8 % de la table
+  MONETAIRE MAROC                              7083 lignes |   70 fonds | 10.7 % de la table
+  OBLIGATIONS NIGERIA                          3141 lignes |   87 fonds | 4.7 % de la table
 
 ## 4. Plan et duree de la sous-requete reelle (ranking.service.js:87-100)
-  OBLIGATIONS MAROC                  type=index  key=idx_perf_fond_id       rows=  65648 extra="Using where"
-                                     cout=? | 394 ms | 300 lignes rendues
-  DIVERSIFIE MAROC                   type=index  key=idx_perf_fond_id       rows=  65648 extra="Using where"
-                                     cout=? | 414 ms | 141 lignes rendues
-  ACTIONS MAROC                      type=index  key=idx_perf_fond_id       rows=  65648 extra="Using where"
-                                     cout=? | 459 ms | 122 lignes rendues
-  MONETAIRE MAROC                    type=index  key=idx_perf_fond_id       rows=  65648 extra="Using where"
-                                     cout=? | 419 ms | 70 lignes rendues
-  OBLIGATIONS NIGERIA                type=index  key=idx_perf_fond_id       rows=  65648 extra="Using where"
-                                     cout=? | 428 ms | 87 lignes rendues
-  moyenne : 423 ms par sous-requete
-  → projection : 1 245 fonds x 3 niveaux x 423 ms ≈ 26.3 min de SQL seul — a comparer au --max-time du cron ci-dessous.
+  OBLIGATIONS MAROC                  type=index  key=idx_perf_fond_id       rows=  66136 extra="Using where"
+                                     cout=? | 427 ms | 300 lignes rendues
+  ACTIONS MAROC                      type=index  key=idx_perf_fond_id       rows=  66136 extra="Using where"
+                                     cout=? | 410 ms | 122 lignes rendues
+  DIVERSIFIE MAROC                   type=index  key=idx_perf_fond_id       rows=  66136 extra="Using where"
+                                     cout=? | 430 ms | 141 lignes rendues
+  MONETAIRE MAROC                    type=index  key=idx_perf_fond_id       rows=  66136 extra="Using where"
+                                     cout=? | 494 ms | 70 lignes rendues
+  OBLIGATIONS NIGERIA                type=index  key=idx_perf_fond_id       rows=  66136 extra="Using where"
+                                     cout=? | 441 ms | 87 lignes rendues
+  moyenne : 440 ms par sous-requete
+  → projection : 1 245 fonds x 3 niveaux x 440 ms ≈ 27.4 min de SQL seul — a comparer au --max-time du cron ci-dessous.
 
 ## 5. Fonds actifs sans categorie (perimetre de la garde L7)
   sur 1252 fonds actifs : categorie_national nulle 8 | fundafrica_regionale nulle 50 | fundafrica_globale nulle 50
@@ -271,30 +270,30 @@ Mesure le 2026-10-09 12:56:42 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-10-09 12:56:46 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:14:45 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
-  classementfonds             3620 lignes — aucune colonne de date
+  classementfonds             3622 lignes — aucune colonne de date
   classementfonds_eurs        3639 lignes — aucune colonne de date
   classementfonds_usds        3639 lignes — aucune colonne de date
-  performences               83517 lignes — updated_at max = aucune (?)
-  performences_eurs          40933 lignes — date max =  hu Oct 08 2026 00: (1.5 j)
-  performences_usds          41166 lignes — date max =  hu Oct 08 2026 00: (1.5 j)
+  performences               84005 lignes — updated_at max = aucune (?)
+  performences_eurs          41388 lignes — date max = Fri Oct 09 2026 00: (1.5 j)
+  performences_usds          41621 lignes — date max = Fri Oct 09 2026 00: (1.5 j)
 
 ## B. Retard des performances par pays
 
   pays        fonds  a jour      %  retard moy.  retard max
   ---------- ------ ------- ------ ------------ -----------
-  MAROC         640      19  3.0 %      127.5 j       145 j
-  TUNISIE       131       5  3.8 %      123.1 j       143 j
-  UEMOA         109      36 33.0 %       40.9 j       286 j
+  MAROC         640      18  2.8 %      127.8 j       146 j
+  TUNISIE       131       6  4.6 %      123.0 j       144 j
+  UEMOA         109      36 33.0 %       41.0 j       286 j
   NIGERIA       320     298 93.1 %        8.0 j       665 j
   CEMAC          34      34 100.0 %        0.0 j         0 j
 
 ## C. Le classement suit-il les performances actuelles ?
 
-  OBLIGATIONS MAROC                strict  110/300  (36.7 %) · rho  0.696 · top10 3/10 · ex aequo 1
+  OBLIGATIONS MAROC                strict  108/300  (36.0 %) · rho  0.696 · top10 3/10 · ex aequo 1
                                    DIVERGE — le classement ne reflete pas les performances en base
   DIVERSIFIE MAROC                 strict   19/141  (13.5 %) · rho  0.219 · top10 6/10 · ex aequo 0
                                    DIVERGE — le classement ne reflete pas les performances en base
@@ -308,12 +307,12 @@ Mesure le 2026-10-09 12:56:46 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_classement_vs_perf.js ##########
 === L0.c — RANGS STOCKES CONTRE PERFORMANCES STOCKEES : QUATRE HYPOTHESES ===
-Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:14:53 UTC — LECTURE SEULE
 
 ## 0. Volumetrie de `classementfonds`
   type 1 (national) : 1230 lignes, 1230 fonds
-  type 2 (regional) : 1195 lignes, 1195 fonds
-  type 3 (global) : 1195 lignes, 1195 fonds
+  type 2 (regional) : 1196 lignes, 1196 fonds
+  type 3 (global) : 1196 lignes, 1196 fonds
   (aucune colonne de date : l age de ces lignes est inconnaissable — c est precisement ce que la migration L2 corrige)
 
 ########## OBLIGATIONS MAROC — 300 fonds classes
@@ -336,16 +335,16 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
 ########## DIVERSIFIE MAROC — 141 fonds classes
   H4 perimetre : 141 fonds cote performances, 141 cote classement | absents du classement : 0 | classes mais hors performances : 0
   H1 fraicheur : total stocke le plus frequent = 141 (sur 141 lignes) | total recalcule aujourd hui = 141 | CONCORDE → la table n est pas perimee sur ce point
-               dates des performances lues : 18 distinctes, de Fri Apr 12 a Wed Jun 24
+               dates des performances lues : 19 distinctes, de Fri Apr 12 a Wed Jun 24
   H2 champ :
     ytd             0/141  exacts (  0.0 %) | rho = 1.000
     ytdm            0/141  exacts (  0.0 %) | rho = 0.865
-    perfveille      0/141  exacts (  0.0 %) | rho = 0.165
-    perfveillem     0/141  exacts (  0.0 %) | rho = -0.053
-    perf3m          0/141  exacts (  0.0 %) | rho = 0.885
-    perf6m          0/141  exacts (  0.0 %) | rho = 0.959
+    perfveille      0/141  exacts (  0.0 %) | rho = 0.166
+    perfveillem     0/141  exacts (  0.0 %) | rho = -0.051
+    perf3m          0/141  exacts (  0.0 %) | rho = 0.882
+    perf6m          0/141  exacts (  0.0 %) | rho = 0.950
     perf1an         0/141  exacts (  0.0 %) | rho = 0.138
-    perf3ans        0/141  exacts (  0.0 %) | rho = 0.061
+    perf3ans        0/141  exacts (  0.0 %) | rho = 0.062
     → meilleur candidat : ytd (rho 1.000, 0.0 % exacts) — c est bien le champ attendu, H2 ecartee
   H3 ex aequo sur ytd : 0/141 fonds dans 0 paquet(s), plus gros paquet = 0 fonds
                ecart de rang max = 0 | 0/141 ecarts STRICTEMENT superieurs au plus gros paquet → H3 suffit a tout expliquer : le correctif est le departage deterministe (L7), pas la reconstruction
@@ -384,19 +383,19 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
   H3 ex aequo sur ytd : 3/87 fonds dans 1 paquet(s), plus gros paquet = 3 fonds
                ecart de rang max = 0 | 0/87 ecarts STRICTEMENT superieurs au plus gros paquet → H3 suffit a tout expliquer : le correctif est le departage deterministe (L7), pas la reconstruction
 
-########## DIVERSIFIE TUNISIE — 70 fonds classes
+########## MONETAIRE MAROC — 70 fonds classes
   H4 perimetre : 70 fonds cote performances, 70 cote classement | absents du classement : 0 | classes mais hors performances : 0
   H1 fraicheur : total stocke le plus frequent = 70 (sur 70 lignes) | total recalcule aujourd hui = 70 | CONCORDE → la table n est pas perimee sur ce point
-               dates des performances lues : 16 distinctes, de Fri Aug 07 a Wed Jun 25
+               dates des performances lues : 11 distinctes, de Fri Sep 04 a Wed Oct 07
   H2 champ :
     ytd             0/70   exacts (  0.0 %) | rho = 1.000
-    ytdm            0/70   exacts (  0.0 %) | rho = 0.929
-    perfveille      0/70   exacts (  0.0 %) | rho = 0.060
-    perfveillem     0/70   exacts (  0.0 %) | rho = -0.066
-    perf3m          0/70   exacts (  0.0 %) | rho = 0.799
-    perf6m          0/70   exacts (  0.0 %) | rho = 0.906
-    perf1an         0/70   exacts (  0.0 %) | rho = 0.921
-    perf3ans        0/70   exacts (  0.0 %) | rho = 0.761
+    ytdm            0/70   exacts (  0.0 %) | rho = -0.312
+    perfveille      0/70   exacts (  0.0 %) | rho = 0.012
+    perfveillem     0/70   exacts (  0.0 %) | rho = 0.369
+    perf3m          0/70   exacts (  0.0 %) | rho = 0.870
+    perf6m          0/70   exacts (  0.0 %) | rho = 0.969
+    perf1an         0/70   exacts (  0.0 %) | rho = 0.775
+    perf3ans        0/70   exacts (  0.0 %) | rho = 0.680
     → meilleur candidat : ytd (rho 1.000, 0.0 % exacts) — c est bien le champ attendu, H2 ecartee
   H3 ex aequo sur ytd : 0/70 fonds dans 0 paquet(s), plus gros paquet = 0 fonds
                ecart de rang max = 0 | 0/70 ecarts STRICTEMENT superieurs au plus gros paquet → H3 suffit a tout expliquer : le correctif est le departage deterministe (L7), pas la reconstruction
@@ -409,14 +408,14 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20261005.log      4.1 j  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20261008.log       15.5 h  ECHEC — 3 erreur(s)
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     14.8 h  ECHEC — 2 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     17.9 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        17.4 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               18.4 h  OK  (reserve : Echecs scraping: 18)
-  cron_health_check      tous les j 22:00     africafunds_health_20261008.log      14.9 h  ECHEC — 3 probleme(s)
-  sync_production        toutes les heures    sync_production.log                   0.9 h  aucun marqueur de fin
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20261005.log      5.1 j  ECHEC — 1 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20261009.log       14.8 h  ECHEC — 3 erreur(s)
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     14.1 h  ECHEC — 2 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     17.2 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        16.7 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               17.7 h  OK  (reserve : Echecs scraping: 18)
+  cron_health_check      tous les j 22:00     africafunds_health_20261009.log      14.2 h  ECHEC — 3 probleme(s)
+  sync_production        toutes les heures    sync_production.log                   0.2 h  aucun marqueur de fin
 
 
 === FIN DES JOURNAUX EN ECHEC OU SANS VERDICT ===
@@ -437,11 +436,11 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
   | === NIGERIA WEEKLY UPDATE TERMINE AVEC 1 ERREUR(S) Mon Oct  5 10:09:36 AM UTC 2026 ===
   | ========================================
 
---- cron_daily_update (ECHEC — 3 erreur(s)) — /var/log/africafunds_daily_20261008.log
+--- cron_daily_update (ECHEC — 3 erreur(s)) — /var/log/africafunds_daily_20261009.log
   | === VERIFICATION FINALE ===
   | ============================================================
-  | performences_eurs: 40933 lignes, 1245 fonds
-  | performences_usds: 41166 lignes, 1245 fonds
+  | performences_eurs: 41388 lignes, 1245 fonds
+  | performences_usds: 41621 lignes, 1245 fonds
   | Termine.
   | [8/9] OK
   | [9a/9] Classement local...
@@ -450,7 +449,7 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
   | "finishrank"[9b/9] OK (HTTP 200)
   | [9c/9] Classement USD...
   | "finishrank"[9c/9] OK (HTTP 200)
-  | === MISE A JOUR TERMINEE AVEC 3 ERREUR(S) Thu Oct  8 09:29:45 PM UTC 2026 ===
+  | === MISE A JOUR TERMINEE AVEC 3 ERREUR(S) Fri Oct  9 09:29:25 PM UTC 2026 ===
   | ========================================
 
 --- cron_daily_eur_usd (ECHEC — 2 erreur(s)) — /var/log/cron_eur_usd.log
@@ -463,26 +462,26 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
   | 000
   | [2b/3] ERREUR (HTTP 000)
   | --- [3/3] Verification ---
-  |   performences_eurs        40933 lignes / 1245 fonds
-  |   performences_usds        41166 lignes / 1245 fonds
+  |   performences_eurs        41388 lignes / 1245 fonds
+  |   performences_usds        41621 lignes / 1245 fonds
   |   classementfonds_eurs     3639 lignes / 1239 fonds
   |   classementfonds_usds     3639 lignes / 1239 fonds
-  | CRON EUR/USD TERMINE AVEC 2 ERREUR(S) — 2026-10-08 22:09:22
+  | CRON EUR/USD TERMINE AVEC 2 ERREUR(S) — 2026-10-09 22:09:31
 
---- cron_health_check (ECHEC — 3 probleme(s)) — /var/log/africafunds_health_20261008.log
+--- cron_health_check (ECHEC — 3 probleme(s)) — /var/log/africafunds_health_20261009.log
   |   nigeria      pas attendu aujourd'hui (pas lundi)
   | === RESUME ===
   | STATUT: 3 PROBLEME(S) DETECTE(S)
-  |   [!] CEMAC: derniere VL il y a 665 jours (budget 400j)
-  |   [!] Performances en retard sur les VL: 392/1234 a jour (31.8 %), retard moyen 84.9 j
-  |   [!] Seulement 7 fonds avec perf recente
+  |   [!] CEMAC: derniere VL il y a 666 jours (budget 400j)
+  |   [!] Performances en retard sur les VL: 392/1234 a jour (31.8 %), retard moyen 85.0 j
+  |   [!] Seulement 5 fonds avec perf recente
   |   [OK] TUNISIE: VL a jour
-  |   [OK] UEMOA: VL a jour
   |   [OK] MAROC: VL a jour
+  |   [OK] UEMOA: VL a jour
   |   [OK] NIGERIA: VL a jour
   |   [OK] Classement local peuple
   |   [OK] Forex a jour
-  | === HEALTH CHECK TERMINE Thu Oct  8 10:00:03 PM UTC 2026 ===
+  | === HEALTH CHECK TERMINE Fri Oct  9 10:00:05 PM UTC 2026 ===
   | ========================================
 
 --- sync_production (aucun marqueur de fin) — /var/log/sync_production.log
@@ -490,13 +489,13 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
   | ============================================
-  | SNAPSHOT PRODUCTION — 2026-10-09 12:00:01
+  | SNAPSHOT PRODUCTION — 2026-10-10 12:00:01
   | ============================================
   | --- Generation du snapshot base de donnees ---
-  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44781 octets)
+  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44779 octets)
   |   -> Git non modifie: aucun add/commit/push
   | ============================================
-  | SNAPSHOT TERMINE — 2026-10-09 12:00:16
+  | SNAPSHOT TERMINE — 2026-10-10 12:00:15
   | ============================================
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
@@ -510,14 +509,14 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-10-09T12:56:58.629Z — LECTURE SEULE
+ Genere le 2026-10-10T12:14:58.416Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 10.82 Mo
-   modifie   : 2026-10-05T10:00:42.321Z (il y a 98.9 h)
+   modifie   : 2026-10-05T10:00:42.321Z (il y a 122.2 h)
    lignes    : 8627
    colonnes  : 59
 
@@ -620,7 +619,7 @@ Mesure le 2026-10-09 12:56:54 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-10-09 12:56:59 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:14:59 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 333
   etiquette CONFORME au contenu : 122
@@ -781,7 +780,7 @@ Fonds Nigeria examines : 333
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-10-09 12:57:05 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:15:05 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -973,17 +972,17 @@ VL Nigeria en base : 77514
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : 3a0bcaf00 — chore(governance): certify all current Markdown [skip ci]
+  HEAD : 925bd5dbb — chore(governance): certify all current Markdown [skip ci]
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  169  depuis 658.6 h
-    fundafrique-frontend     online     redemarrages   48  depuis 1300.8 h
-    worker-recalculation     online     redemarrages    3  depuis 658.7 h
-    worker-data-import       online     redemarrages    3  depuis 658.7 h
+    api-monolith             online     redemarrages  169  depuis 681.9 h
+    fundafrique-frontend     online     redemarrages   48  depuis 1324.1 h
+    worker-recalculation     online     redemarrages    3  depuis 682.0 h
+    worker-data-import       online     redemarrages    3  depuis 682.0 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -1000,7 +999,7 @@ VL Nigeria en base : 77514
 ########## scripts/diag/ondemand/diag_mariadb_incident_timeline.js ##########
 
 === MARIADB — TIMELINE INCIDENTS RECENTS (LECTURE SEULE) ===
-Mesure le 2026-10-09T12:57:10.909Z
+Mesure le 2026-10-10T12:15:11.532Z
 
 
 --- etat systemd courant ---
@@ -1009,14 +1008,14 @@ Result=success
 NRestarts=0
 ExecMainStartTimestamp=Tue 2026-09-22 06:25:02 UTC
 ExecMainPID=3041009
-MemoryCurrent=5270200320
+MemoryCurrent=5270679552
 ActiveState=active
 SubState=running
 StateChangeTimestamp=Tue 2026-09-22 06:25:02 UTC
 ActiveEnterTimestamp=Tue 2026-09-22 06:25:02 UTC
 
 --- processus mariadbd courant ---
-MARIADB_PROCESS pid=3041009 uptime_s=1492329 rss_kb=5059872 rssanon_kb=5048440 private_dirty_kb=5049592 swap_kb=1807336
+MARIADB_PROCESS pid=3041009 uptime_s=1576210 rss_kb=5060944 rssanon_kb=5049572 private_dirty_kb=5050544 swap_kb=1807440
 
 --- listener TCP 3306 courant ---
 LISTEN 0      80                                       127.0.0.1:3306       0.0.0.0:*    users:(("mariadbd",pid=3041009,fd=19))
@@ -1050,11 +1049,11 @@ SEP21_MARIADB_START_OR_READY_PRESENT=YES
 
 ########## scripts/diag/ondemand/diag_masi_historique_ft.js ##########
 === SERIE HISTORIQUE MASI — ACCES DEPUIS S2 ===
-Mesure le 2026-10-09 12:57:11 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:15:12 UTC — LECTURE SEULE
 
 ## 1. Page tearsheet et extraction de l identifiant interne
   https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS
-  statut 200 | 80528 o
+  statut 200 | 80163 o
   identifiant interne : 601207
 
 ## 2. Point d acces historique
@@ -1098,35 +1097,35 @@ Mesure le 2026-10-09 12:57:11 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_perf_colonnes_manquantes.js ##########
 === L0.a — RATIOS MANQUANTS SUR LA LIGNE MAX(date), ET COUT D UN APPEL DE RATIOS ===
-Mesure le 2026-10-09 12:57:12 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:15:14 UTC — LECTURE SEULE
 
 ## 1. Volumetrie de `performences`
-  83517 lignes | 1236 fonds distincts | de NaN-NaN-NaN a 2026-10-07
+  84005 lignes | 1236 fonds distincts | de NaN-NaN-NaN a 2026-10-09
 
 ## 2. Ligne MAX(date) de chaque fonds actif — ratios absents (NULL ou `-`)
    LIGNE DE BASE : apres le rattrapage, ces nombres ne doivent pas augmenter.
-  MAROC           640 fonds | volatility3an vide :  566 | les 10 ratios vides :  566 (88.4 %) | retard perf.  127.5 j
-  NIGERIA         320 fonds | volatility3an vide :  307 | les 10 ratios vides :  307 (95.9 %) | retard perf.    8.0 j
-  TUNISIE         131 fonds | volatility3an vide :  107 | les 10 ratios vides :  107 (81.7 %) | retard perf.  123.1 j
-  UEMOA           109 fonds | volatility3an vide :  104 | les 10 ratios vides :  104 (95.4 %) | retard perf.   40.9 j
+  MAROC           640 fonds | volatility3an vide :  565 | les 10 ratios vides :  565 (88.3 %) | retard perf.  127.8 j
+  NIGERIA         320 fonds | volatility3an vide :  306 | les 10 ratios vides :  306 (95.6 %) | retard perf.    8.0 j
+  TUNISIE         131 fonds | volatility3an vide :  106 | les 10 ratios vides :  106 (80.9 %) | retard perf.  123.0 j
+  UEMOA           109 fonds | volatility3an vide :  104 | les 10 ratios vides :  104 (95.4 %) | retard perf.   41.0 j
   CEMAC            34 fonds | volatility3an vide :   33 | les 10 ratios vides :   33 (97.1 %) | retard perf.    0.0 j
-  TOTAL          1234 fonds | les 10 ratios vides : 1117 (90.5 %)
+  TOTAL          1234 fonds | les 10 ratios vides : 1114 (90.3 %)
 
 ## 3. Perimetre reel du rattrapage (sans `--force`)
-  MAROC           635 fonds a rattraper
-  TUNISIE         126 fonds a rattraper
+  MAROC           636 fonds a rattraper
+  TUNISIE         125 fonds a rattraper
   UEMOA            77 fonds a rattraper
   NIGERIA          33 fonds a rattraper
   TOTAL           871 fonds
 
 ## 4. Temps de reponse de `/api/ratiosnewithdate/3/:fond/:date`
    Ce chiffre seul dicte la duree de L3 : il sera multiplie par le perimetre ci-dessus.
-  fonds   569 (MAROC   ) date=2026-10-02 → HTTP 200 en    193 ms, 1236 octets
-  fonds  1141 (NIGERIA ) date=2026-07-10 → HTTP 200 en    350 ms, 1713 octets
-  fonds  1539 (UEMOA   ) date=2024-11-01 → HTTP 200 en    908 ms, 2116 octets
-  moyenne : 484 ms sur 3 appel(s) reussi(s)
-  → projection L3 : 871 fonds x 1 appel(s) ≈ 0.12 h
-  → projection L3 : 871 fonds x 3 appel(s) ≈ 0.35 h
+  fonds   569 (MAROC   ) date=2026-10-02 → HTTP 200 en    160 ms, 1236 octets
+  fonds  1141 (NIGERIA ) date=2026-07-10 → HTTP 200 en    354 ms, 1713 octets
+  fonds  1539 (UEMOA   ) date=2024-11-01 → HTTP 200 en   1063 ms, 2116 octets
+  moyenne : 526 ms sur 3 appel(s) reussi(s)
+  → projection L3 : 871 fonds x 1 appel(s) ≈ 0.13 h
+  → projection L3 : 871 fonds x 3 appel(s) ≈ 0.38 h
 
 ## 4bis. Type REEL des colonnes de ratios, et mode SQL
   alpha3an         double         nullable=YES
@@ -1138,21 +1137,21 @@ Mesure le 2026-10-09 12:57:12 UTC — LECTURE SEULE
   table performences : 97 colonnes au total — c est le denominateur du « 0 divergence sur N colonnes » attendu en L1.
   sql_mode : IGNORE_SPACE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
   → mode strict : NON (une ecriture de `-` dans un DOUBLE donnerait 0 — faux ratio valide)
-  volatility3an sur 83517 lignes : 7237 NULL | 10189 exactement 0 | 66091 > 0 | 0 < 0
+  volatility3an sur 84005 lignes : 7265 NULL | 10367 exactement 0 | 66373 > 0 | 0 < 0
   → des zeros exacts existent : a instruire, une volatilite nulle n a pas de sens financier
 
 ## 5. Prerequis de la migration L2 (horodatage des classements)
   DB_SYNC_ALTER  : ABSENTE | vaut 'true' : non
   DB_SYNC        : ABSENTE | vaut 'true' : non
-  classementfonds        ≈ 3407 lignes | donnees 2.0 Mo | index 0.4 Mo
-  classementfonds_eurs   ≈ 3613 lignes | donnees 2.0 Mo | index NaN Mo
-  classementfonds_usds   ≈ 3685 lignes | donnees 2.0 Mo | index NaN Mo
+  classementfonds        ≈ 3624 lignes | donnees 2.0 Mo | index 0.4 Mo
+  classementfonds_eurs   ≈ 3643 lignes | donnees 2.0 Mo | index NaN Mo
+  classementfonds_usds   ≈ 3783 lignes | donnees 2.0 Mo | index NaN Mo
 
 === FIN L0.a — aucune ecriture effectuee ===
 
 ########## scripts/diag/ondemand/diag_perf_locale_equivalence.js ##########
 === PERFORMANCES LOCALES — EQUIVALENCE CALCUL DIRECT / ROUTE API ===
-Mesure le 2026-10-09 12:57:17 UTC — DRY-RUN, AUCUNE ECRITURE
+Mesure le 2026-10-10 12:15:20 UTC — DRY-RUN, AUCUNE ECRITURE
 
 ########## NIGERIA
 Options: pays=NIGERIA, force=false, mode=DRY-RUN (aucune ecriture), limit=10
@@ -1220,7 +1219,7 @@ Fonds sans les 10 ratios du classement : 2 — leurs rangs de risque resteraient
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-10-09 12:57:40 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:15:46 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -1289,7 +1288,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-10-09 12:57:44 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:15:51 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
@@ -1392,7 +1391,7 @@ Ruptures d echelle Nigeria encore en base : 140
 ########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-10-09 12:57:49 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:15:57 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -1482,7 +1481,7 @@ Mesure le 2026-10-09 12:57:49 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_rattrapage_masi_dryrun.js ##########
 === RATTRAPAGE MASI — CE QU IL COUVRIRAIT, SANS RIEN ECRIRE ===
-Mesure le 2026-10-09 12:57:54 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:16:02 UTC — LECTURE SEULE
 
 ## A. Ce que la source publie, en UNE requete
 
@@ -1491,7 +1490,7 @@ Mesure le 2026-10-09 12:57:54 UTC — LECTURE SEULE
 
 ## B. Croisement avec indice_references
 
-  deja en base sur la periode : 10
+  deja en base sur la periode : 11
   seances a inserer           : 34
 
 ## C. Coherence de la serie
@@ -1531,19 +1530,19 @@ Mesure le 2026-10-09 12:57:54 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_recalc_prepared_stmt_pressure.js ##########
 
 === PREPARED STATEMENT PRESSURE — READ ONLY ===
-Mesure: 2026-10-09T12:57:55.605Z
-STEP3_RECALC_EUR_USD funds=1250 vl_rows=1000801 dynamic_update_statements=2613 batch_size=500
-STEP4_RECALC_VL_AJUSTE funds=1251 vl_rows=1001405 dynamic_update_statements=5732 batch_size=200
-COMBINED_DYNAMIC_UPDATE_STATEMENTS=8345
+Mesure: 2026-10-10T12:16:03.249Z
+STEP3_RECALC_EUR_USD funds=1250 vl_rows=1001256 dynamic_update_statements=2613 batch_size=500
+STEP4_RECALC_VL_AJUSTE funds=1251 vl_rows=1001860 dynamic_update_statements=5734 batch_size=200
+COMBINED_DYNAMIC_UPDATE_STATEMENTS=8347
 MYSQL_MAX_PREPARED_STMT_COUNT=16382
 MYSQL_PERFORMANCE_SCHEMA=OFF
-MYSQL_PREPARED_STMT_COUNT_NOW=26
-MYSQL_COM_STMT_PREPARE_SINCE_RESTART=10965
-MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=675608
+MYSQL_PREPARED_STMT_COUNT_NOW=25
+MYSQL_COM_STMT_PREPARE_SINCE_RESTART=11109
+MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=720413
 MYSQL_COM_STMT_CLOSE_SINCE_RESTART=4
-MYSQL_MEMORY_USED_NOW=487018952
-MYSQL_UPTIME=1492380
-PREPARE_MINUS_THEORETICAL_DYNAMIC=2620
+MYSQL_MEMORY_USED_NOW=486777112
+MYSQL_UPTIME=1576268
+PREPARE_MINUS_THEORETICAL_DYNAMIC=2762
 NOTE=Step3 count is an upper geometry bound before currency/rate skips; current daily log reported 1249 funds and 994766 VL actually processed. Step4 geometry is exact for active-fund row batches. Com_stmt_prepare is server-global and cumulative, so numerical proximity is evidence for correlation, not causal identity.
 MUTATION=NONE
 
@@ -1558,7 +1557,7 @@ CONTRACT=GREEN
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-10-09 12:58:03 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:16:11 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 147 ligne(s) sur 64 fonds
@@ -1659,7 +1658,7 @@ TOTAL : 147 ligne(s) sur 64 fonds
 
 ########## scripts/diag/ondemand/diag_source_masi.js ##########
 === SOURCE MASI — POURQUOI LE SCRAPING ECHOUE ===
-Mesure le 2026-10-09 12:58:34 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:16:45 UTC — LECTURE SEULE
 URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
 
 ## A. Client HTTPS de Node — celui que `scrapeMASI` utilise aujourd hui
@@ -1679,7 +1678,7 @@ URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=j
 
 ########## scripts/diag/ondemand/diag_source_monia.js ##########
 === MONIA — ENJEU REEL ET ACCES A LA SOURCE ===
-Mesure le 2026-10-09 12:58:34 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:16:45 UTC — LECTURE SEULE
 
 ## A. Qui se refere a MONIA ?
 
@@ -1695,17 +1694,17 @@ Mesure le 2026-10-09 12:58:34 UTC — LECTURE SEULE
 
   page EN (voie principale)
     https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average
-    HTTP 403 | 919 o | ip 3.160.39.78
+    HTTP 403 | 919 o | ip 3.160.39.38
     page de blocage : OUI
 
   page FR (voie secondaire)
     https://www.bkam.ma/Marche-monetaire/Taux-du-marche-interbancaire-MONIA
-    HTTP 403 | 919 o | ip 3.160.39.38
+    HTTP 403 | 919 o | ip 3.160.39.72
     page de blocage : OUI
 
   racine bkam.ma
     https://www.bkam.ma/
-    HTTP 403 | 919 o | ip 3.160.39.56
+    HTTP 403 | 919 o | ip 3.160.39.72
     page de blocage : OUI
 
 ## D. Conclusion a tirer, et celle a ne pas tirer
@@ -1719,7 +1718,7 @@ Mesure le 2026-10-09 12:58:34 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_sources_masi_alternatives.js ##########
 === SOURCES MASI ALTERNATIVES — CE QUI REPOND DEPUIS S2 ===
-Mesure le 2026-10-09 12:58:38 UTC — LECTURE SEULE
+Mesure le 2026-10-10 12:16:50 UTC — LECTURE SEULE
 
 ## African Markets — page indices
   https://www.african-markets.com/en/stock-markets/bvc/indices
@@ -1733,16 +1732,16 @@ Mesure le 2026-10-09 12:58:38 UTC — LECTURE SEULE
 
 ## FT — historique MASI:CAS
   https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS
-  reponse : HTTP 200 | text/html | 80528 o | ip 209.234.238.17
-      → candidats « MASI + nombre > 1000 » : 16,776.33 (→ 16776.33)
+  reponse : HTTP 200 | text/html | 80163 o | ip 209.234.238.16
+      → candidats « MASI + nombre > 1000 » : 16,797.10 (→ 16797.1)
       → serie datee : aucune date reperable — source inutilisable telle quelle
       → ce que la page dit autour du mot MASI :
           « ALL SHARES INDEX, MASI:CAS Historical Prices - FT.com Subscribe Sign In Menu Search Financial Times myFT if you don't need to support both core and enhanced --> Search »
-          « Indices ALL SHARES INDEX + Add to watchlist + Add an alert MASI:CAS ALL SHARES INDEX Actions Add to watchlist Add an alert Price (MAD) 16,776.33 Today's Change 27.16 / 0.16% Shares traded -- 1 Year change -9.8 »
+          « Indices ALL SHARES INDEX + Add to watchlist + Add an alert MASI:CAS ALL SHARES INDEX Actions Add to watchlist Add an alert Price (MAD) 16,797.10 Today's Change 47.93 / 0.29% Shares traded -- 1 Year change -9.6 »
 
 ## WSJ — historique MASI
   https://www.wsj.com/market-data/quotes/index/MA/MASI/historical-prices
-  reponse : HTTP 401 | text/html | 767 o | ip 18.66.2.24
+  reponse : HTTP 401 | text/html | 767 o | ip 18.66.2.90
       → candidats « MASI + nombre > 1000 » : aucun
       → serie datee : aucune date reperable — source inutilisable telle quelle
 
@@ -1816,7 +1815,7 @@ Mode: DRY-RUN
 
 ########## scripts/diag/ondemand/diag_w1_benchmark_lookahead_scope.js ##########
 === W1 BENCHMARK LOOK-AHEAD — HIGH CONFIDENCE SCOPE ===
-Mesure le 2026-10-09T12:59:08.551Z — LECTURE SEULE
+Mesure le 2026-10-10T12:17:22.619Z — LECTURE SEULE
 
 ## A. Scope par pays
   pays   rows  distinct_funds  distinct_vl_dates  min_vl_date  max_vl_date
@@ -1861,7 +1860,7 @@ VERDICT=W1_BENCHMARK_LOOKAHEAD_SCOPE_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_foundations.js ##########
 === W1 FOUNDATIONS — LIVE SCHEMA / RELATIONSHIPS / PROVENANCE ===
-Mesure le 2026-10-09T12:59:10.364Z — LECTURE SEULE
+Mesure le 2026-10-10T12:17:24.529Z — LECTURE SEULE
 
 ## A. Tables canoniques / referentielles presentes
   table                      present  approx_rows
@@ -1870,9 +1869,9 @@ Mesure le 2026-10-09T12:59:10.364Z — LECTURE SEULE
   societes                   YES      156        
   documents                  YES      5          
   personnel_sgs              YES      5          
-  valorisations              YES      1031444    
-  indice_references          YES      40590      
-  devisedechanges            YES      129953     
+  valorisations              YES      1031948    
+  indice_references          YES      40593      
+  devisedechanges            YES      129974     
   ref_asset_classes          YES      4          
   ref_geo_zones              YES      29         
   ref_categories_fundafrica  YES      140        
@@ -1924,14 +1923,14 @@ Mesure le 2026-10-09T12:59:10.364Z — LECTURE SEULE
 Global:
   total    with_currency  with_price_type  with_source  with_report_date  with_quality  with_batch
   -------  -------------  ---------------  -----------  ----------------  ------------  ----------
-  1046082  68692          68442            68442        68442             76070         51949     
+  1046542  68692          68442            68442        68442             76070         51949     
 Par pays:
   pays     total   with_currency  with_price_type  with_source  with_quality
   -------  ------  -------------  ---------------  -----------  ------------
-  MAROC    566268  0              0                0            0           
-  TUNISIE  311593  0              0                0            0           
+  MAROC    566591  0              0                0            0           
+  TUNISIE  311719  0              0                0            0           
   NIGERIA  78098   68692          68442            68442        76070       
-  UEMOA    48204   0              0                0            0           
+  UEMOA    48215   0              0                0            0           
   CEMAC    2134    0              0                0            0           
 
 ## G. Referentiels FundAfrica — comptes exacts
@@ -1946,8 +1945,8 @@ Par pays:
 ## H. Indices / FX — bornes temporelles
   authority          rows_count  series_count  min_date                                                        max_date                                                      
   -----------------  ----------  ------------  --------------------------------------------------------------  --------------------------------------------------------------
-  indice_references  41145       9             Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Thu Oct 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
-  devisedechanges    132907      21            Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Thu Oct 08 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
+  indice_references  41148       9             Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Fri Oct 09 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
+  devisedechanges    132928      21            Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Fri Oct 09 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
 
 ## I. Colonnes documents — capacité de provenance documentaire
   id, nom, fichier, societe, date, annee, mois, type_fichier, fond_id, objet, fond, created_at, updated_at, societe_id
@@ -1956,7 +1955,7 @@ VERDICT=W1_FOUNDATION_SCHEMA_OBSERVED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_identity_gaps.js ##########
 === W1 FUND / MANAGER IDENTITY GAPS ===
-Mesure le 2026-10-09T12:59:20.531Z — LECTURE SEULE
+Mesure le 2026-10-10T12:17:35.231Z — LECTURE SEULE
 
 ## A. Completude par pays
   pays     total  active  missing_isin  missing_societe_id  missing_manager_text  text_without_id
@@ -1989,7 +1988,7 @@ VERDICT=W1_IDENTITY_GAPS_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_manager_alias_candidates.js ##########
 === W1 MANAGER ALIAS CANDIDATES — READ ONLY ===
-Mesure le 2026-10-09T12:59:20.685Z
+Mesure le 2026-10-10T12:17:35.397Z
 
 ## A. Classification des labels
   classification         count
@@ -2043,7 +2042,7 @@ VERDICT=W1_MANAGER_ALIAS_CANDIDATES_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_nigeria_transport_readiness.js ##########
 === W1 NIGERIA METADATA TRANSPORT READINESS ===
-Mesure le 2026-10-09T12:59:20.798Z — LECTURE SEULE
+Mesure le 2026-10-10T12:17:35.531Z — LECTURE SEULE
 CSV_PRESENT=YES
 CSV_SIZE_BYTES=11348002
 CSV_MTIME=2026-10-05T10:00:42.321Z
@@ -2089,31 +2088,31 @@ VERDICT=W1_NIGERIA_METADATA_TRANSPORT_READINESS_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_recent_provenance.js ##########
 === W1 RECENT PROVENANCE — CANONICAL VALUATIONS ===
-Mesure le 2026-10-09T12:59:21.325Z — LECTURE SEULE
+Mesure le 2026-10-10T12:17:36.082Z — LECTURE SEULE
 
 ## Fenetre 30 jours
   pays     total  currency  price_type  source  report_date  quality  batch 
   -------  -----  --------  ----------  ------  -----------  -------  ------
   MAROC    8031   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
   TUNISIE  2518   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
-  UEMOA    328    0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
+  UEMOA    325    0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
   NIGERIA  71     100.0%    0.0%        0.0%    0.0%         100.0%   100.0%
 
 ## Fenetre 90 jours
   pays     total  currency  price_type  source  report_date  quality  batch 
   -------  -----  --------  ----------  ------  -----------  -------  ------
-  MAROC    22039  0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
-  TUNISIE  6797   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
-  UEMOA    1382   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
+  MAROC    22362  0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
+  TUNISIE  6923   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
+  UEMOA    1393   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
   Nigeria  245    100.0%    0.0%        0.0%    0.0%         100.0%   100.0%
 
 ## Fenetre 365 jours
   pays     total  currency  price_type  source  report_date  quality  batch
   -------  -----  --------  ----------  ------  -----------  -------  -----
-  MAROC    65441  0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
-  TUNISIE  27082  0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
+  MAROC    65579  0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
+  TUNISIE  27208  0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
   NIGERIA  9129   98.4%     95.7%       95.7%   95.7%        98.5%    80.1%
-  UEMOA    6243   0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
+  UEMOA    6235   0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
 
 ## Nigeria — statuts data_quality par annee de VL
   year  quality      rows_count
@@ -2208,7 +2207,7 @@ VERDICT=W1_RECENT_PROVENANCE_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_runtime_schema_gate.js ##########
 === W1 RUNTIME SCHEMA GATE ===
-Mesure le 2026-10-09T12:59:25.861Z — LECTURE SEULE
+Mesure le 2026-10-10T12:17:40.807Z — LECTURE SEULE
 DB_SYNC_ALTER_TRUE=NO
 DB_SYNC_TRUE=NO
 NODE_ENV=production
@@ -2217,19 +2216,19 @@ VERDICT=W1_RUNTIME_SCHEMA_GATE_OBSERVED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_temporal_integrity.js ##########
 === W1 TEMPORAL INTEGRITY — FX / BENCHMARK LOOK-AHEAD ===
-Mesure le 2026-10-09T12:59:25.997Z — LECTURE SEULE
+Mesure le 2026-10-10T12:17:40.936Z — LECTURE SEULE
 
 ## A. Bornes des series FX pertinentes
   paire    min_date    max_date    rows_count
   -------  ----------  ----------  ----------
-  EUR/MAD  2000-01-03  2026-10-08  7540      
-  EUR/TND  2003-12-01  2026-10-08  6072      
-  EUR/XAF  2000-01-03  2026-10-08  6985      
-  EUR/XOF  2000-01-03  2026-10-08  6985      
-  USD/MAD  2000-01-03  2026-10-08  7642      
-  USD/TND  2003-12-01  2026-10-08  6395      
-  USD/XAF  2000-01-03  2026-10-08  6914      
-  USD/XOF  2000-01-03  2026-10-08  6903      
+  EUR/MAD  2000-01-03  2026-10-09  7541      
+  EUR/TND  2003-12-01  2026-10-09  6073      
+  EUR/XAF  2000-01-03  2026-10-09  6986      
+  EUR/XOF  2000-01-03  2026-10-09  6986      
+  USD/MAD  2000-01-03  2026-10-09  7643      
+  USD/TND  2003-12-01  2026-10-09  6396      
+  USD/XAF  2000-01-03  2026-10-09  6915      
+  USD/XOF  2000-01-03  2026-10-09  6904      
 
 ## B. Exposition historique avant le premier taux disponible
   pays     pair     first_fx    vl_before_first_fx
@@ -2242,11 +2241,11 @@ Mesure le 2026-10-09T12:59:25.997Z — LECTURE SEULE
 ## C. Benchmark recent — comparaison stored vs latest<=VL vs nearest absolu
   pays     rows   exact  stored_matches_latest_prior  stored_matches_future  future_nearest_candidate  no_series
   -------  -----  -----  ---------------------------  ---------------------  ------------------------  ---------
-  MAROC    19376  16219  17457                        1919                   1919                      0        
+  MAROC    19382  16225  17463                        1919                   1919                      0        
   TUNISIE  6797   6671   6671                         126                    0                         0        
-  UEMOA    1637   1521   1521                         116                    108                       0        
-  NIGERIA  170    170    170                          0                      0                         0        
-  Nigeria  41     41     41                           0                      0                         0        
+  UEMOA    1655   1539   1539                         116                    108                       0        
+  NIGERIA  134    134    134                          0                      0                         0        
+  Nigeria  36     36     36                           0                      0                         0        
 
 Exemples stored correspondant a une valeur future (IDs/date uniquement, max 20):
   pays   fund_id  vl_date     index_id  future_date  gap_days
@@ -2288,12 +2287,12 @@ MODE=READ_ONLY_DELEGATE_NO_DDL_NO_FILE_WRITE_NO_CANONICAL_WRITE
 PYTHON_SCRIPT=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/diag/ondemand/diag_w2_cemac_source_mapping.py
 === W2 CEMAC/BVMAC — SOURCE + FUND MATCH PREFLIGHT ===
 MODE=READ_ONLY_NO_DDL_NO_FILE_WRITE_NO_CANONICAL_WRITE
-INDEX_REFS=805
-LATEST_BOC=2026-10-08
+INDEX_REFS=806
+LATEST_BOC=2026-10-09
 PDF_HTTP_STATUS=200
-PDF_URL=https://www.bvm-ac.org/wp-content/uploads/2026/10/BOC-20261008.pdf
-PDF_BYTES=1761258
-PDF_SHA256=06474f1f02cc14f9911d262f1e49e9934a44f40478a167277cf4a000a65f4d17
+PDF_URL=https://www.bvm-ac.org/wp-content/uploads/2026/10/BOC-20261009.pdf
+PDF_BYTES=1759304
+PDF_SHA256=8c0a44a1c23c3f6c95e57bca489377fd4c269ea0f8c4432acac03340aa700f74
 PDF_PAGES=27
 OPCVM_PAGES=9,10,11,12,13
 PARSED_ROWS=23
@@ -2308,8 +2307,8 @@ MATCH_COUNTS={"MATCHED_EXACT": 18, "MATCHED_FUZZY": 1, "UNMATCHED": 4}
 FUZZY_ENGINE_AVAILABLE=YES
 MATCHED_ROWS=19
 UNMATCHED_OR_AMBIGUOUS_ROWS=4
-UNMATCHED_OR_AMBIGUOUS_SAMPLE=[{"source_name": "FCP HARVEST DIVERSIFIE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-06", "current_nav": 108516.39, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null}, {"source_name": "FCP ESS PREMIUM PERSO", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 10415.0, "quality": "OK", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null}, {"source_name": "FCPHARVEST DIVERSIFIE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-06", "current_nav": 108516.39, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null}, {"source_name": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "management_company": null, "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-02", "current_nav": 129263.33, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null}]
-MATCHED_SAMPLE=[{"source_name": "FCP AB AVENIR", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-01", "current_nav": 1294.58, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2655, "confidence": 100.0}, {"source_name": "FCP ECOBANK MONETAIRE CEMAC", "management_company": "EDC ASSET MANAGEMENT CEMAC ECOBANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-07", "current_nav": 1190.22, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2663, "confidence": 100.0}, {"source_name": "FCP AB CASH", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT UBA BANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 13302.52, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2650, "confidence": 100.0}, {"source_name": "FCP AB INVEST", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT UBA BANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 12777.43, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2651, "confidence": 100.0}, {"source_name": "FCP PERFORMANCE", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT ORABANK GABON", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 11967.2, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2652, "confidence": 100.0}, {"source_name": "FCP CAP OBLIGATIONS", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 12819.49, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2649, "confidence": 100.0}, {"source_name": "FCP AB DIVERSIFIE", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 11398.57, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2654, "confidence": 100.0}, {"source_name": "FCP ASCA LIQUIDITES", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 15023.94, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2656, "confidence": 100.0}, {"source_name": "FCP ASCA PATRIMOINE", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 16234.14, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2657, "confidence": 100.0}, {"source_name": "FCP ASCA HORIZON", "management_company": "ASCA ASSET MANAGEMENT CREDIT DU CONGO", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 15830.42, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2658, "confidence": 100.0}, {"source_name": "FCP CRBC PROSPERITE 0", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 14391.42, "quality": "OK", "match_status": "MATCHED_FUZZY", "matched_fund_id": 2659, "confidence": 95.0}, {"source_name": "FCP ABD KOMO", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-10-01", "current_nav": 11068.06, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2653, "confidence": 100.0}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0}, {"source_name": "FCP ESS TRESO PRIVILEGE", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12636.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2669, "confidence": 100.0}, {"source_name": "FCP ESS PROMO PME", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12178.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2670, "confidence": 100.0}, {"source_name": "FCP ATLANTIQUE PERFORMANCE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-02", "current_nav": 15510.36, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2671, "confidence": 100.0}, {"source_name": "FCP HARVEST LIQUIDITÉS", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-25", "current_nav": 12750.57, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2677, "confidence": 100.0}, {"source_name": "FCP HARVEST ACTIONS CEMAC", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-25", "current_nav": 144946.92, "quality": "SUSPECT_VARIATION", "match_status": "MATCHED_EXACT", "matched_fund_id": 2675, "confidence": 100.0}]
+UNMATCHED_OR_AMBIGUOUS_SAMPLE=[{"source_name": "FCP HARVEST DIVERSIFIE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-08", "current_nav": 108525.01, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null}, {"source_name": "FCP ESS PREMIUM PERSO", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 10415.0, "quality": "OK", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null}, {"source_name": "FCPHARVEST DIVERSIFIE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-08", "current_nav": 108525.01, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null}, {"source_name": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "management_company": null, "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-02", "current_nav": 129263.33, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null}]
+MATCHED_SAMPLE=[{"source_name": "FCP AB AVENIR", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-09", "current_nav": 1295.64, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2655, "confidence": 100.0}, {"source_name": "FCP ECOBANK MONETAIRE CEMAC", "management_company": "EDC ASSET MANAGEMENT CEMAC ECOBANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-08", "current_nav": 1190.47, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2663, "confidence": 100.0}, {"source_name": "FCP AB CASH", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT UBA BANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 13314.15, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2650, "confidence": 100.0}, {"source_name": "FCP AB INVEST", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT UBA BANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 12785.69, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2651, "confidence": 100.0}, {"source_name": "FCP PERFORMANCE", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT ORABANK GABON", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 11976.37, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2652, "confidence": 100.0}, {"source_name": "FCP CAP OBLIGATIONS", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 12829.29, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2649, "confidence": 100.0}, {"source_name": "FCP AB DIVERSIFIE", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 11407.1, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2654, "confidence": 100.0}, {"source_name": "FCP ASCA LIQUIDITES", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 15023.94, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2656, "confidence": 100.0}, {"source_name": "FCP ASCA PATRIMOINE", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 16234.14, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2657, "confidence": 100.0}, {"source_name": "FCP ASCA HORIZON", "management_company": "ASCA ASSET MANAGEMENT CREDIT DU CONGO", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 15830.42, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2658, "confidence": 100.0}, {"source_name": "FCP CRBC PROSPERITE 0", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 14391.42, "quality": "OK", "match_status": "MATCHED_FUZZY", "matched_fund_id": 2659, "confidence": 95.0}, {"source_name": "FCP ABD KOMO", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-10-09", "current_nav": 9717.04, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2653, "confidence": 100.0}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0}, {"source_name": "FCP ESS TRESO PRIVILEGE", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12636.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2669, "confidence": 100.0}, {"source_name": "FCP ESS PROMO PME", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12178.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2670, "confidence": 100.0}, {"source_name": "FCP ATLANTIQUE PERFORMANCE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-02", "current_nav": 15510.36, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2671, "confidence": 100.0}, {"source_name": "FCP HARVEST LIQUIDITÉS", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-25", "current_nav": 12750.57, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2677, "confidence": 100.0}, {"source_name": "FCP HARVEST ACTIONS CEMAC", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-25", "current_nav": 144946.92, "quality": "SUSPECT_VARIATION", "match_status": "MATCHED_EXACT", "matched_fund_id": 2675, "confidence": 100.0}]
 
 DRYRUN_DISPOSITION_COUNTS={"BLOCK_SOURCE_DUPLICATE_SAME_VALUE": 2, "BLOCK_UNMATCHED": 4, "REJECT_QUALITY": 1, "WOULD_INSERT": 16}
 SOURCE_DUPLICATE_KEYS=1
@@ -2317,9 +2316,9 @@ SOURCE_DUPLICATE_SAME_VALUE_KEYS=1
 SOURCE_DUPLICATE_CONFLICT_KEYS=0
 SOURCE_DUPLICATE_DETAILS=[{"fund_id": 2668, "nav_date": "2026-09-15", "rows": 2, "same_value": true, "values": [12980.0, 12980.0], "sections": ["MENSUELLES", "TRIMESTRIELLES"], "source_names": ["FCP ESS CONFORT", "FCP ESS CONFORT"]}]
 FX_ASOF_METHOD_COUNTS={"USD/XAF_PRIOR": 16}
-FX_ASOF_BY_DATE=[{"nav_date": "2026-09-15", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-09-15", "gap_days": 0}, {"nav_date": "2026-09-25", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-09-25", "gap_days": 0}, {"nav_date": "2026-10-01", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-10-01", "gap_days": 0}, {"nav_date": "2026-10-02", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-10-02", "gap_days": 0}, {"nav_date": "2026-10-07", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-10-07", "gap_days": 0}]
-DRYRUN_ACTIONABLE_SAMPLE=[{"source_name": "FCP AB AVENIR", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-01", "current_nav": 1294.58, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2655, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-01"}, {"source_name": "FCP ECOBANK MONETAIRE CEMAC", "management_company": "EDC ASSET MANAGEMENT CEMAC ECOBANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-07", "current_nav": 1190.22, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2663, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-07"}, {"source_name": "FCP AB CASH", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT UBA BANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 13302.52, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2650, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-01"}, {"source_name": "FCP AB INVEST", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT UBA BANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 12777.43, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2651, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-01"}, {"source_name": "FCP PERFORMANCE", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT ORABANK GABON", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 11967.2, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2652, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-01"}, {"source_name": "FCP CAP OBLIGATIONS", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 12819.49, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2649, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-01"}, {"source_name": "FCP AB DIVERSIFIE", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-01", "current_nav": 11398.57, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2654, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-01"}, {"source_name": "FCP ASCA LIQUIDITES", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 15023.94, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2656, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP ASCA PATRIMOINE", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 16234.14, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2657, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP ASCA HORIZON", "management_company": "ASCA ASSET MANAGEMENT CREDIT DU CONGO", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 15830.42, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2658, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP CRBC PROSPERITE 0", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 14391.42, "quality": "OK", "match_status": "MATCHED_FUZZY", "matched_fund_id": 2659, "confidence": 95.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP ABD KOMO", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-10-01", "current_nav": 11068.06, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2653, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-01"}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0, "disposition": "BLOCK_SOURCE_DUPLICATE_SAME_VALUE", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0, "disposition": "BLOCK_SOURCE_DUPLICATE_SAME_VALUE", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS TRESO PRIVILEGE", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12636.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2669, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-09-15"}, {"source_name": "FCP ESS PROMO PME", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12178.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2670, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-09-15"}, {"source_name": "FCP ATLANTIQUE PERFORMANCE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-02", "current_nav": 15510.36, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2671, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP HARVEST LIQUIDITÉS", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-25", "current_nav": 12750.57, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2677, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-09-25"}]
-DRYRUN_BLOCKED_SAMPLE=[{"source_name": "FCP HARVEST DIVERSIFIE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-06", "current_nav": 108516.39, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null, "disposition": "BLOCK_UNMATCHED", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0, "disposition": "BLOCK_SOURCE_DUPLICATE_SAME_VALUE", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0, "disposition": "BLOCK_SOURCE_DUPLICATE_SAME_VALUE", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS PREMIUM PERSO", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 10415.0, "quality": "OK", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null, "disposition": "BLOCK_UNMATCHED", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCPHARVEST DIVERSIFIE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-06", "current_nav": 108516.39, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null, "disposition": "BLOCK_UNMATCHED", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "management_company": null, "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-02", "current_nav": 129263.33, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null, "disposition": "BLOCK_UNMATCHED", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP HARVEST ACTIONS CEMAC", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-25", "current_nav": 144946.92, "quality": "SUSPECT_VARIATION", "match_status": "MATCHED_EXACT", "matched_fund_id": 2675, "confidence": 100.0, "disposition": "REJECT_QUALITY", "existing_value": null, "fx_method": null, "fx_source_date": null}]
+FX_ASOF_BY_DATE=[{"nav_date": "2026-09-15", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-09-15", "gap_days": 0}, {"nav_date": "2026-09-25", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-09-25", "gap_days": 0}, {"nav_date": "2026-10-02", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-10-02", "gap_days": 0}, {"nav_date": "2026-10-08", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-10-08", "gap_days": 0}, {"nav_date": "2026-10-09", "available": true, "method": "USD/XAF_PRIOR", "source_date": "2026-10-09", "gap_days": 0}]
+DRYRUN_ACTIONABLE_SAMPLE=[{"source_name": "FCP AB AVENIR", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-09", "current_nav": 1295.64, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2655, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-09"}, {"source_name": "FCP ECOBANK MONETAIRE CEMAC", "management_company": "EDC ASSET MANAGEMENT CEMAC ECOBANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-08", "current_nav": 1190.47, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2663, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-08"}, {"source_name": "FCP AB CASH", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT UBA BANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 13314.15, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2650, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-09"}, {"source_name": "FCP AB INVEST", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT UBA BANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 12785.69, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2651, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-09"}, {"source_name": "FCP PERFORMANCE", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT ORABANK GABON", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 11976.37, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2652, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-09"}, {"source_name": "FCP CAP OBLIGATIONS", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 12829.29, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2649, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-09"}, {"source_name": "FCP AB DIVERSIFIE", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT BGFIBANK CAMEROUN", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-09", "current_nav": 11407.1, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2654, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-09"}, {"source_name": "FCP ASCA LIQUIDITES", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 15023.94, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2656, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP ASCA PATRIMOINE", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 16234.14, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2657, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP ASCA HORIZON", "management_company": "ASCA ASSET MANAGEMENT CREDIT DU CONGO", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 15830.42, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2658, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP CRBC PROSPERITE 0", "management_company": "ASCA ASSET MANAGEMENT ASCA", "section": "HEBDOMADAIRES", "periodicity": "Hebdomadaire", "nav_date": "2026-10-02", "current_nav": 14391.42, "quality": "OK", "match_status": "MATCHED_FUZZY", "matched_fund_id": 2659, "confidence": 95.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP ABD KOMO", "management_company": "AFRICA BRIGHT ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-10-09", "current_nav": 9717.04, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2653, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-09"}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0, "disposition": "BLOCK_SOURCE_DUPLICATE_SAME_VALUE", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0, "disposition": "BLOCK_SOURCE_DUPLICATE_SAME_VALUE", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS TRESO PRIVILEGE", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12636.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2669, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-09-15"}, {"source_name": "FCP ESS PROMO PME", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12178.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2670, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-09-15"}, {"source_name": "FCP ATLANTIQUE PERFORMANCE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-02", "current_nav": 15510.36, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2671, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-10-02"}, {"source_name": "FCP HARVEST LIQUIDITÉS", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-25", "current_nav": 12750.57, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2677, "confidence": 100.0, "disposition": "WOULD_INSERT", "existing_value": null, "fx_method": "USD/XAF_PRIOR", "fx_source_date": "2026-09-25"}]
+DRYRUN_BLOCKED_SAMPLE=[{"source_name": "FCP HARVEST DIVERSIFIE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "QUOTIDIENNES", "periodicity": "Journaliere", "nav_date": "2026-10-08", "current_nav": 108525.01, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null, "disposition": "BLOCK_UNMATCHED", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "MENSUELLES", "periodicity": "Mensuelle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0, "disposition": "BLOCK_SOURCE_DUPLICATE_SAME_VALUE", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS CONFORT", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 12980.0, "quality": "OK", "match_status": "MATCHED_EXACT", "matched_fund_id": 2668, "confidence": 100.0, "disposition": "BLOCK_SOURCE_DUPLICATE_SAME_VALUE", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP ESS PREMIUM PERSO", "management_company": "ESS ASSET MANAGEMENT ORABANK GABON", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-15", "current_nav": 10415.0, "quality": "OK", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null, "disposition": "BLOCK_UNMATCHED", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCPHARVEST DIVERSIFIE", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-08", "current_nav": 108525.01, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null, "disposition": "BLOCK_UNMATCHED", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "management_company": null, "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-10-02", "current_nav": 129263.33, "quality": "SUSPECT_VARIATION", "match_status": "UNMATCHED", "matched_fund_id": null, "confidence": null, "disposition": "BLOCK_UNMATCHED", "existing_value": null, "fx_method": null, "fx_source_date": null}, {"source_name": "FCP HARVEST ACTIONS CEMAC", "management_company": "HARVEST ASSET MANAGEMENT AFG BANK CAMEROUN", "section": "TRIMESTRIELLES", "periodicity": "Trimestrielle", "nav_date": "2026-09-25", "current_nav": 144946.92, "quality": "SUSPECT_VARIATION", "match_status": "MATCHED_EXACT", "matched_fund_id": 2675, "confidence": 100.0, "disposition": "REJECT_QUALITY", "existing_value": null, "fx_method": null, "fx_source_date": null}]
 
 RULE_FX=Exact/prior only: USD/XAF <= nav_date, else USD/EUR <= nav_date derived through fixed EUR/XAF parity. Never future.
 RULE=No alias, fund, staging table, cron or VL is written by this probe.
@@ -2328,7 +2327,7 @@ PYTHON_EXIT_CODE=0
 
 ########## scripts/diag/ondemand/diag_w2_country_panel_contracts.js ##########
 === W2 COUNTRY PANEL CONTRACTS — LIVE GET PROBE ===
-Mesure le 2026-10-09T12:59:40.763Z — GET ONLY
+Mesure le 2026-10-10T12:17:56.381Z — GET ONLY
   name                         path                                   status  content_type      json_top_keys  body_bytes_seen
   ---------------------------  -------------------------------------  ------  ----------------  -------------  ---------------
   getPays                      /api/getPays                           200     application/json  code,data      1189           
@@ -2346,27 +2345,27 @@ VERDICT=W2_COUNTRY_PANEL_CONTRACTS_OBSERVED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w2_country_pipelines.js ##########
 === W2 COUNTRY PIPELINES — LIVE READ-ONLY INVENTORY ===
-Mesure le 2026-10-09T12:59:43.228Z — LECTURE SEULE
+Mesure le 2026-10-10T12:17:59.074Z — LECTURE SEULE
 
 ## A. Canonical fund/VL state by market
   pays     funds  active_funds  vl_rows  latest_vl   vl_30d
   -------  -----  ------------  -------  ----------  ------
-  MAROC    644    644           566268   2026-10-07  8031  
+  MAROC    644    644           566591   2026-10-08  8031  
   NIGERIA  333    332           78098    2026-09-25  71    
-  TUNISIE  131    131           311593   2026-10-08  2518  
-  UEMOA    118    111           48204    2026-10-07  328   
+  TUNISIE  131    131           311719   2026-10-09  2518  
+  UEMOA    118    111           48215    2026-10-08  325   
   CEMAC    34     34            2134     2024-12-12  0     
 
 ## B. Staging/audit tables
   table                     present  approx_rows
   ------------------------  -------  -----------
-  cmf_import_audit          YES      51         
+  cmf_import_audit          YES      52         
   cmf_extreme_variations    YES      2          
   cmf_new_funds_queue       YES      0          
-  brvm_boc_sources          YES      1114       
-  brvm_boc_navs_raw         YES      113015     
+  brvm_boc_sources          YES      1115       
+  brvm_boc_navs_raw         YES      113110     
   brvm_fund_aliases         YES      103        
-  brvm_import_logs          YES      117        
+  brvm_import_logs          YES      118        
   brvm_missing_navs         YES      2          
   bvmac_boc_sources         NO       -          
   bvmac_boc_navs_raw        NO       -          
@@ -2389,17 +2388,17 @@ Mesure le 2026-10-09T12:59:43.228Z — LECTURE SEULE
 ## D. Evidence/artifact directories
   path              present  files
   ----------------  -------  -----
-  data/tunisie_cmf  YES      318  
-  data/brvm_boc     YES      1498 
+  data/tunisie_cmf  YES      322  
+  data/brvm_boc     YES      1502 
   data/bvmac_boc    NO       0    
   sec_ng_downloads  YES      562  
 
 ## E. Source-specific recent audit counts
   surface                    table                     present  rows  
   -------------------------  ------------------------  -------  ------
-  TUNISIA_AUDIT              cmf_import_audit          YES      51    
-  UEMOA_SOURCES              brvm_boc_sources          YES      1178  
-  UEMOA_RAW                  brvm_boc_navs_raw         YES      122373
+  TUNISIA_AUDIT              cmf_import_audit          YES      52    
+  UEMOA_SOURCES              brvm_boc_sources          YES      1179  
+  UEMOA_RAW                  brvm_boc_navs_raw         YES      122468
   CEMAC_SOURCES              bvmac_boc_sources         NO       -     
   CEMAC_RAW                  bvmac_boc_navs_raw        NO       -     
   NIGERIA_CORRECTIONS_AUDIT  sec_ng_corrections_audit  YES      51750 
@@ -2417,23 +2416,23 @@ VERDICT=W2_COUNTRY_PIPELINES_OBSERVED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w2_p1_source_pilots.js ##########
 === W2 P1 GHANA / KENYA SOURCE PILOTS — TECHNICAL REACHABILITY ===
-Mesure le 2026-10-09T12:59:44.271Z — HTTP GET ONLY / NO WRITE
+Mesure le 2026-10-10T12:18:00.287Z — HTTP GET ONLY / NO WRITE
 IMPLEMENTATION=NODE_CORE_HTTP_ONLY
-{"market":"GHANA","manager":"CAL Asset Management","role":"DAILY_PRICE_HISTORY_CANDIDATE","status":200,"content_type":"text/html","bytes_seen":828793,"elapsed_ms":1992,"marker_counts":{"PRICE":4,"GHS":2,"Performance":18},"final_url":"https://calassetmanagement.net/about-us/reports-2/performance-update"}
-{"market":"GHANA","manager":"EDC / Ecobank","role":"DATED_FUND_VALUES_CANDIDATE","status":"ERROR","content_type":"-","bytes_seen":0,"elapsed_ms":89,"marker_counts":{"fund":0,"GHS":0,"GHC":0},"error":"unable to get local issuer certificate"}
-{"market":"KENYA","manager":"NCBA","role":"DIRECT_DAILY_PRICE_CANDIDATE","status":200,"content_type":"text/html","bytes_seen":368072,"elapsed_ms":2818,"marker_counts":{"Buy Price":1,"Sell Price":1,"daily price":1,"KES":3},"final_url":"https://ncbagroup.com/investment-banking/equity-fund/"}
+{"market":"GHANA","manager":"CAL Asset Management","role":"DAILY_PRICE_HISTORY_CANDIDATE","status":200,"content_type":"text/html","bytes_seen":828793,"elapsed_ms":2110,"marker_counts":{"PRICE":4,"GHS":2,"Performance":18},"final_url":"https://calassetmanagement.net/about-us/reports-2/performance-update"}
+{"market":"GHANA","manager":"EDC / Ecobank","role":"DATED_FUND_VALUES_CANDIDATE","status":"ERROR","content_type":"-","bytes_seen":0,"elapsed_ms":80,"marker_counts":{"fund":0,"GHS":0,"GHC":0},"error":"unable to get local issuer certificate"}
+{"market":"KENYA","manager":"NCBA","role":"DIRECT_DAILY_PRICE_CANDIDATE","status":200,"content_type":"text/html","bytes_seen":374548,"elapsed_ms":3720,"marker_counts":{"Buy Price":1,"Sell Price":1,"daily price":1,"KES":3},"final_url":"https://ncbagroup.com/investment-banking/equity-fund/"}
 REACHABLE_SOURCES=2/3
 RULE=HTTP reachability and markers prove only technical source feasibility, not NAV semantics, licence, identity mapping or permission to import.
 VERDICT=W2_P1_SOURCE_PILOTS_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w2_runtime_route_drift.js ##########
 === W2 RUNTIME ROUTE DRIFT — READ ONLY ===
-Mesure le 2026-10-09T12:59:49.228Z
+Mesure le 2026-10-10T12:18:06.260Z
 
 ## A. Process vs checkout
   git_head      head_message                                               pm2_script  pm2_cwd  process_started  restart_count  commits_since_process_start
   ------------  ---------------------------------------------------------  ----------  -------  ---------------  -------------  ---------------------------
-  3a0bcaf007ce  chore(governance): certify all current Markdown [skip ci]  -           -        -                -              UNKNOWN                    
+  925bd5dbb087  chore(governance): certify all current Markdown [skip ci]  -           -        -                -              UNKNOWN                    
 
 FIRST_COMMIT_AFTER_PROCESS_START=-
 
@@ -2449,7 +2448,7 @@ ROUTES_VL_ADMIN_FILE_PRESENT=YES
   /api/getfondbyuser/0?pays=MAROC        200     32    
   /api/getfondbyuservalide/0?pays=MAROC  200     99326 
   /api/getfondbypays/MAROC               200     141152
-  /api/getallfondsvlanomalie?pays=MAROC  200     310626
+  /api/getallfondsvlanomalie?pays=MAROC  200     308759
 
 RUNTIME_ROUTE_DRIFT_CANDIDATE=NO
 RULE=Current transitive mount is the authority. Process age alone is not route drift; preserve working Country Panel contracts and harden auth/RBAC before any refactor.
