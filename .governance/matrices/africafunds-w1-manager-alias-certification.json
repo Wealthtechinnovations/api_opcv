@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_MANAGER_ALIAS_SUPPLEMENT_CERTIFIED_READ_ONLY",
+  "observed_heads": {
+    "api": "e5c3dcd8da3c816cba57c422975013fd86e0f052",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "evidence": {
+    "source": "docs/DIAG_ONDEMAND.md / scripts/diag/ondemand/diag_w1_manager_alias_candidates.js",
+    "observed_at": "2026-10-05T23:02:29.656Z",
+    "mutation_performed": false
+  },
+  "scope": {
+    "funds_without_societe_id_with_manager_text": 70,
+    "distinct_manager_labels": 33,
+    "label_classification": {
+      "EXACT_NORMALIZED": 15,
+      "HIGH_CONFIDENCE_FUZZY": 1,
+      "AMBIGUOUS": 3,
+      "NO_CANDIDATE": 14
+    }
+  },
+  "interpretation": [
+    "A meaningful subset can be reconciled with high confidence, but global string-based autofill is unsafe.",
+    "Two Tunisia labels have exact textual matches yet remain AMBIGUOUS because the organization reference contains multiple candidates; exact text alone is not sufficient proof.",
+    "Morocco's four unresolved manager labels cover 23 funds and have no safe automatic candidate.",
+    "Nigeria contains both exact normalized aliases and historical/ambiguous manager labels; country-aware source evidence is required.",
+    "The single high-confidence fuzzy Tunisia label is a candidate for review, not authorization to write."
+  ],
+  "decisions": [
+    {
+      "decision": "NO_GLOBAL_AUTO_FILL",
+      "rationale": "17 of 33 labels are ambiguous/no-candidate, and even exact text can map to multiple organization rows."
+    },
+    {
+      "decision": "EXACT_NORMALIZED_IS_REVIEW_PRIORITY_NOT_WRITE_AUTHORITY",
+      "rationale": "Use exact-normalized candidates to prioritize source-backed review; do not mutate societe_id solely from this diagnostic."
+    },
+    {
+      "decision": "MOROCCO_REQUIRES_REFERENCE_EXPANSION_OR_ALIAS_EVIDENCE",
+      "rationale": "23 funds use four manager labels with no safe current organization candidate."
+    },
+    {
+      "decision": "HARD_FK_REMAINS_BLOCKED",
+      "rationale": "Relationship gaps are not fully resolved; FK enforcement would create regressions."
+    }
+  ],
+  "promotion_candidate": {
+    "parent": "W1-DELTA-003 / AF-PROP-002",
+    "phase_1": "Read-only source-backed manager alias review by country.",
+    "phase_2": "Create explicit alias mappings or missing organizations only from authoritative evidence.",
+    "phase_3": "Bounded societe_id update with snapshot/rollback and consumer regression checks.",
+    "hard_fk": "Separate later phase only after zero unresolved required relations."
+  },
+  "no_actions_taken": [
+    "No societes row created or merged.",
+    "No fund societe_id changed.",
+    "No alias persisted.",
+    "No FK added.",
+    "No queue mutation."
+  ],
+  "next_action": "Use W2 country-source work to obtain official manager identity evidence for unresolved Morocco/Nigeria/Tunisia labels; keep reconciliation read-only until a governed write task exists."
+}

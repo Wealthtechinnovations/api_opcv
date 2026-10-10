@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AfricaFunds Incident Registry",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "project_uid",
+    "incidents"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "project_uid": {
+      "const": "CS-AFRICAFUNDS-001"
+    },
+    "incidents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "primary_type",
+          "severity",
+          "status",
+          "recurrence",
+          "impact",
+          "detection",
+          "mechanism",
+          "root_cause",
+          "corrective_actions",
+          "linked_tasks",
+          "postmortem_ref",
+          "closure"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^AF-INC-[0-9]{8}-[0-9]{3}$"
+          },
+          "severity": {
+            "enum": [
+              "SEV0",
+              "SEV1",
+              "SEV2",
+              "SEV3",
+              "SEV4"
+            ]
+          },
+          "status": {
+            "enum": [
+              "DETECTED",
+              "TRIAGED",
+              "CONTAINED",
+              "MITIGATED",
+              "RCA_PENDING",
+              "CORRECTIVE_ACTION_IN_PROGRESS",
+              "VERIFYING",
+              "RESOLVED",
+              "CLOSED",
+              "BLOCKED_EXTERNAL"
+            ]
+          },
+          "mechanism": {
+            "type": "object",
+            "required": [
+              "status",
+              "statement",
+              "evidence_refs"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "PROVEN",
+                  "PROBABLE",
+                  "UNKNOWN"
+                ]
+              },
+              "statement": {
+                "type": "string"
+              },
+              "evidence_refs": {
+                "type": "array"
+              }
+            }
+          },
+          "root_cause": {
+            "type": "object",
+            "required": [
+              "status",
+              "statement",
+              "evidence_refs"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "PROVEN",
+                  "PROBABLE",
+                  "UNKNOWN"
+                ]
+              },
+              "statement": {
+                "type": "string"
+              },
+              "evidence_refs": {
+                "type": "array"
+              },
+              "why_not_proven": {}
+            }
+          },
+          "linked_tasks": {
+            "type": "array"
+          },
+          "postmortem_ref": {
+            "type": "string"
+          },
+          "closure": {
+            "type": "object",
+            "required": [
+              "criteria_met",
+              "verification_refs",
+              "residual_risks"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

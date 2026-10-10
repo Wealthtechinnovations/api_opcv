@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "repository": "Wealthtechinnovations/api_opcv",
+  "repository_role": "API",
+  "canonical_branch": "claude/code-review-improvements-ikvuj",
+  "policy": "NEW_BRANCH_CREATION_FORBIDDEN",
+  "observed_at": "2026-09-11",
+  "allowed_existing_branches": [
+    {
+      "name": "claude/code-review-improvements-ikvuj",
+      "classification": "CANONICAL"
+    },
+    {
+      "name": "claude/review-previous-work-Ps4eJ",
+      "classification": "HISTORICAL_PREEXISTING"
+    },
+    {
+      "name": "server",
+      "classification": "HISTORICAL_PREEXISTING"
+    }
+  ],
+  "rule": "Any branch not present in this baseline is unexpected until an explicit owner decision updates governance. Historical branches are preserved; this baseline is not authorization to use them for normal work."
+}

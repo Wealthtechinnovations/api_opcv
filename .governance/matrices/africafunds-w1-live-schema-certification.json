@@ -1,0 +1,232 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_LIVE_SCHEMA_CERTIFIED_READ_ONLY",
+  "observed_heads": {
+    "api": "7e0161821eb4ca85211d2f4d0141f51811e19c1c",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "measurement": {
+    "source": "docs/DIAG_ONDEMAND.md / scripts/diag/ondemand/diag_w1_foundations.js",
+    "observed_at": "2026-10-05T21:28:04.437Z",
+    "production_mutation_performed": false
+  },
+  "facts": {
+    "fund_master": {
+      "rows": 1260,
+      "active": 1252,
+      "missing_isin": 452,
+      "missing_societe_id": 71,
+      "duplicate_isin_keys": 0,
+      "duplicate_name_country_keys": 1
+    },
+    "organizations": {
+      "societes_approx_rows": 156
+    },
+    "documents": {
+      "rows": 5,
+      "missing_societe_id": 2,
+      "columns": [
+        "id",
+        "nom",
+        "fichier",
+        "societe",
+        "date",
+        "annee",
+        "mois",
+        "type_fichier",
+        "fond_id",
+        "objet",
+        "fond",
+        "created_at",
+        "updated_at",
+        "societe_id"
+      ]
+    },
+    "personnel": {
+      "rows": 5,
+      "missing_societe_id": 2
+    },
+    "relationship_constraints": {
+      "fond_investissements_societe_id_real_fk": false,
+      "documents_societe_id_real_fk": false,
+      "personnel_sgs_societe_id_real_fk": false
+    },
+    "valuations": {
+      "rows": 1044685,
+      "additive_measure_columns_present": [
+        "net_assets_ngn",
+        "net_assets_usd",
+        "unit_price_ngn",
+        "unit_price_usd",
+        "bid_price_ngn",
+        "bid_price_usd",
+        "offer_price_ngn",
+        "offer_price_usd",
+        "price_type",
+        "currency_code",
+        "sec_document_id",
+        "source_url",
+        "report_date",
+        "data_quality",
+        "correction_batch"
+      ],
+      "provenance_coverage": {
+        "with_currency": 68692,
+        "with_price_type": 68442,
+        "with_source": 68442,
+        "with_report_date": 68442,
+        "with_quality": 76070,
+        "with_batch": 51949
+      },
+      "by_country": {
+        "MAROC": {
+          "total": 565299,
+          "with_currency": 0,
+          "with_price_type": 0,
+          "with_source": 0,
+          "with_quality": 0
+        },
+        "TUNISIE": {
+          "total": 311215,
+          "with_currency": 0,
+          "with_price_type": 0,
+          "with_source": 0,
+          "with_quality": 0
+        },
+        "NIGERIA": {
+          "total": 78098,
+          "with_currency": 68692,
+          "with_price_type": 68442,
+          "with_source": 68442,
+          "with_quality": 76070
+        },
+        "UEMOA": {
+          "total": 48154,
+          "with_currency": 0,
+          "with_price_type": 0,
+          "with_source": 0,
+          "with_quality": 0
+        },
+        "CEMAC": {
+          "total": 2134,
+          "with_currency": 0,
+          "with_price_type": 0,
+          "with_source": 0,
+          "with_quality": 0
+        }
+      }
+    },
+    "reference_tables": {
+      "ref_asset_classes": 4,
+      "ref_geo_zones": 29,
+      "ref_categories_fundafrica": 140,
+      "ref_indices_fundafrica": 137,
+      "ref_index_sources": 10
+    },
+    "nigeria_staging": {
+      "sec_ng_observations_present": false,
+      "sec_ng_fund_aliases_present": false,
+      "sec_ng_corrections_audit_present": true,
+      "sec_ng_corrections_audit_approx_rows": 48980
+    },
+    "market_series": {
+      "indice_references": {
+        "rows": 41132,
+        "series": 9,
+        "min_date": "2000-01-03",
+        "max_date": "2026-10-05"
+      },
+      "devisedechanges": {
+        "rows": 132844,
+        "series": 21,
+        "min_date": "2000-01-03",
+        "max_date": "2026-10-05"
+      }
+    }
+  },
+  "certified_decisions": [
+    {
+      "id": "CERT-W1-001",
+      "decision": "KEEP_FOND_INVESTISSEMENTS_AS_CANONICAL_FUND_AUTHORITY",
+      "rationale": "It is live, broad, and reused by runtime and Allocation. No duplicate ISIN keys were measured."
+    },
+    {
+      "id": "CERT-W1-002",
+      "decision": "DO_NOT_ADD_HARD_MANAGER_FK_YET",
+      "rationale": "No real FK exists today and 71 funds, 2/5 documents and 2/5 personnel rows lack societe_id; orphan/identity reconciliation must precede any FK."
+    },
+    {
+      "id": "CERT-W1-003",
+      "decision": "ORM_LIVE_SCHEMA_PARITY_IS_A_REAL_GAP",
+      "rationale": "All 15 additive valuation columns exist live but are absent from src/models/vl.js. Any parity change must remain a nullable mirror and follow writer audit/tests."
+    },
+    {
+      "id": "CERT-W1-004",
+      "decision": "GENERIC_PROVENANCE_IS_A_REAL_PLATFORM_GAP",
+      "rationale": "Canonical-row source/currency/type/quality provenance exists substantially only for Nigeria; Morocco/Tunisia/UEMOA/CEMAC are 0 in the measured generic fields."
+    },
+    {
+      "id": "CERT-W1-005",
+      "decision": "KEEP_ALL_FIVE_FUNDAFRICA_REFERENCE_TABLES",
+      "rationale": "They exist live at exactly the designed row counts. Future governance should represent their schema canonically, never recreate/drop them."
+    },
+    {
+      "id": "CERT-W1-006",
+      "decision": "DOCUMENT_ENGINE_EXISTS_BUT_IS_SPARSE_AND_METADATA_LIMITED",
+      "rationale": "Only 5 rows are present and columns do not expose source URL/hash/visa/official-document lineage. Extend existing store instead of creating a parallel institutional document store."
+    },
+    {
+      "id": "CERT-W1-007",
+      "decision": "HISTORICAL_NIGERIA_STAGING_IS_NOT_A_LIVE_AUTHORITY",
+      "rationale": "sec_ng_observations and sec_ng_fund_aliases are absent live; sec_ng_corrections_audit exists. Future work must not assume staging tables are deployed."
+    }
+  ],
+  "promotion_readiness": [
+    {
+      "proposal": "AF-PROP-001",
+      "state": "PARTIALLY_READY",
+      "remaining": "ShareClass/SubFund identity and live consumer map."
+    },
+    {
+      "proposal": "AF-PROP-002",
+      "state": "READY_FOR_READ_ONLY_IDENTITY_RECONCILIATION",
+      "remaining": "Resolve 71+2+2 missing societe_id before FK design."
+    },
+    {
+      "proposal": "AF-PROP-003",
+      "state": "READY_FOR_GENERIC_LINEAGE_DESIGN",
+      "remaining": "Map source-specific staging/artifacts and writer adoption order."
+    },
+    {
+      "proposal": "AF-PROP-004",
+      "state": "READY_FOR_DOCUMENT_INVENTORY",
+      "remaining": "Map file storage/access controls and official metadata sources."
+    },
+    {
+      "proposal": "AF-PROP-005",
+      "state": "READY_FOR_TEMPORAL_AUTHORITY_AUDIT",
+      "remaining": "Temporal-integrity diagnostic pending."
+    },
+    {
+      "proposal": "AF-PROP-006",
+      "state": "PARTIALLY_READY",
+      "remaining": "Metric implementation/consumer matrix and reference fixtures."
+    },
+    {
+      "proposal": "AF-PROP-012",
+      "state": "PARTIALLY_READY",
+      "remaining": "Frontend consumer/view-model inventory."
+    }
+  ],
+  "no_write_actions": [
+    "No DB migration executed.",
+    "No FK added.",
+    "No model changed.",
+    "No reference table recreated.",
+    "No provenance backfill fabricated.",
+    "No task queue mutation.",
+    "No production restart/deploy."
+  ],
+  "next_action": "Complete temporal-integrity measurement and source-lineage staging map; then define exact additive contracts for ORM parity and generic lineage without implementation until promotion gates and claims allow it."
+}

@@ -106,7 +106,7 @@ const calculateSkewness = (valeursLiquidatives, periodYears) => {
 
 function calculateUpCaptureRatio(valeursLiquidatives, benchmarkReturns, periodYears) {
   const portfolioReturns = calculateRendementsForPeriod(valeursLiquidatives, periodYears);
-  const filteredBenchmarkReturns = selectDataForPeriod(benchmarkReturns, periodYears);
+  const filteredBenchmarkReturns = calculateRendementsForPeriod(benchmarkReturns, periodYears);
 
   let sumPortfolioUpReturns = 0;
   let sumBenchmarkUpReturns = 0;
@@ -126,7 +126,7 @@ function calculateUpCaptureRatio(valeursLiquidatives, benchmarkReturns, periodYe
 }
 function calculateDownCaptureRatio(valeursLiquidatives, benchmarkReturns, periodYears) {
   const portfolioReturns = calculateRendementsForPeriod(valeursLiquidatives, periodYears);
-  const filteredBenchmarkReturns = selectDataForPeriod(benchmarkReturns, periodYears);
+  const filteredBenchmarkReturns = calculateRendementsForPeriod(benchmarkReturns, periodYears);
 
   let sumPortfolioDownReturns = 0;
   let sumBenchmarkDownReturns = 0;
@@ -161,7 +161,7 @@ const calculateOmegaRatio = (valeursLiquidatives, targetReturn = 0, periodYears)
 
 function calculateDownsideBeta(valeursLiquidatives, benchmarkReturns, periodYears) {
   const portfolioReturns = calculateRendementsForPeriod(valeursLiquidatives, periodYears);
-  const filteredBenchmarkReturns = selectDataForPeriod(benchmarkReturns, periodYears);
+  const filteredBenchmarkReturns = calculateRendementsForPeriod(benchmarkReturns, periodYears);
 
   const negativeBenchmarkPeriods = filteredBenchmarkReturns.map((ret, idx) => ret < 0 ? portfolioReturns[idx] : null).filter(x => x !== null);
   const negativeBenchmarkReturns = filteredBenchmarkReturns.filter(ret => ret < 0);
@@ -178,7 +178,7 @@ function calculateDownsideBeta(valeursLiquidatives, benchmarkReturns, periodYear
 
 function calculateBetanew(valeursLiquidatives, benchmarkReturns, periodYears) {
   const portfolioReturns = calculateRendementsForPeriod(valeursLiquidatives, periodYears);
-  const filteredBenchmarkReturns = selectDataForPeriod(benchmarkReturns, periodYears);
+  const filteredBenchmarkReturns = calculateRendementsForPeriod(benchmarkReturns, periodYears);
 
   const covariance = calculateCovariance(portfolioReturns, filteredBenchmarkReturns);
   const varianceBenchmark = calculateVariance(filteredBenchmarkReturns);
@@ -188,7 +188,7 @@ function calculateBetanew(valeursLiquidatives, benchmarkReturns, periodYears) {
 
 function calculateInformationRatio(valeursLiquidatives, benchmarkReturns, periodYears) {
   const portfolioReturns = calculateRendementsForPeriod(valeursLiquidatives, periodYears);
-  const filteredBenchmarkReturns = selectDataForPeriod(benchmarkReturns, periodYears);
+  const filteredBenchmarkReturns = calculateRendementsForPeriod(benchmarkReturns, periodYears);
 
   const differences = portfolioReturns.map((ret, idx) => ret - filteredBenchmarkReturns[idx]);
   const trackingError = math.std(differences);
@@ -199,7 +199,7 @@ function calculateInformationRatio(valeursLiquidatives, benchmarkReturns, period
 
 function calculateTrackingError(valeursLiquidatives, benchmarkReturns, periodYears) {
   const portfolioReturns = calculateRendementsForPeriod(valeursLiquidatives, periodYears);
-  const filteredBenchmarkReturns = selectDataForPeriod(benchmarkReturns, periodYears);
+  const filteredBenchmarkReturns = calculateRendementsForPeriod(benchmarkReturns, periodYears);
 
   const differences = portfolioReturns.map((ret, idx) => ret - filteredBenchmarkReturns[idx]);
 

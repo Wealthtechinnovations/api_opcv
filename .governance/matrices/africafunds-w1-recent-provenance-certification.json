@@ -1,0 +1,187 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_RECENT_PROVENANCE_CERTIFIED_READ_ONLY",
+  "observed_heads": {
+    "api": "32298a14cf148a751d11198e9889ac962b4eb2c6",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "evidence": {
+    "source": "docs/DIAG_ONDEMAND.md / diag_w1_recent_provenance.js",
+    "observed_at": "2026-10-05T21:40:45.046Z"
+  },
+  "facts": {
+    "last_30_days": {
+      "MAROC": {
+        "rows": 7708,
+        "currency_pct": 0,
+        "price_type_pct": 0,
+        "source_pct": 0,
+        "report_date_pct": 0,
+        "quality_pct": 0,
+        "batch_pct": 0
+      },
+      "TUNISIE": {
+        "rows": 2392,
+        "currency_pct": 0,
+        "price_type_pct": 0,
+        "source_pct": 0,
+        "report_date_pct": 0,
+        "quality_pct": 0,
+        "batch_pct": 0
+      },
+      "UEMOA": {
+        "rows": 335,
+        "currency_pct": 0,
+        "price_type_pct": 0,
+        "source_pct": 0,
+        "report_date_pct": 0,
+        "quality_pct": 0,
+        "batch_pct": 0
+      },
+      "NIGERIA": {
+        "rows": 71,
+        "currency_pct": 100,
+        "price_type_pct": 0,
+        "source_pct": 0,
+        "report_date_pct": 0,
+        "quality_pct": 100,
+        "batch_pct": 100
+      }
+    },
+    "nigeria_last_90_days": {
+      "rows": 469,
+      "currency_pct": 100,
+      "price_type_pct": 47.5,
+      "source_pct": 47.5,
+      "report_date_pct": 47.5,
+      "quality_pct": 100,
+      "batch_pct": 98.3
+    },
+    "nigeria_last_365_days": {
+      "rows": 9129,
+      "currency_pct": 98.4,
+      "price_type_pct": 95.7,
+      "source_pct": 95.7,
+      "report_date_pct": 95.7,
+      "quality_pct": 98.5,
+      "batch_pct": 80.1
+    },
+    "nigeria_last_180_days_classes": [
+      {
+        "quality": "OK",
+        "source": "WITH_SOURCE",
+        "price_type": "WITH_PRICE_TYPE",
+        "rows": 3109,
+        "min_date": "2026-04-10",
+        "max_date": "2026-07-10"
+      },
+      {
+        "quality": "UNQUALIFIED",
+        "source": "NO_SOURCE",
+        "price_type": "NO_PRICE_TYPE",
+        "rows": 250,
+        "min_date": "2026-06-11",
+        "max_date": "2026-09-25"
+      },
+      {
+        "quality": "NULL",
+        "source": "NO_SOURCE",
+        "price_type": "NO_PRICE_TYPE",
+        "rows": 14,
+        "min_date": "2026-04-10",
+        "max_date": "2026-04-24"
+      },
+      {
+        "quality": "REVIEW",
+        "source": "WITH_SOURCE",
+        "price_type": "WITH_PRICE_TYPE",
+        "rows": 9,
+        "min_date": "2026-04-10",
+        "max_date": "2026-06-19"
+      },
+      {
+        "quality": "SOURCE_ZERO",
+        "source": "WITH_SOURCE",
+        "price_type": "WITH_PRICE_TYPE",
+        "rows": 3,
+        "min_date": "2026-04-10",
+        "max_date": "2026-06-26"
+      },
+      {
+        "quality": "QUARANTINE",
+        "source": "NO_SOURCE",
+        "price_type": "NO_PRICE_TYPE",
+        "rows": 2,
+        "min_date": "2026-04-17",
+        "max_date": "2026-04-24"
+      }
+    ]
+  },
+  "root_cause_candidate": {
+    "confidence": "HIGH_CODE_PATH",
+    "finding": "sec_ng_nav_extractor_v6.py already emits source_url, source_file, sheet/row evidence, currency and vl_price_source; import_vl_nigeria_sec.js drops source/type when grouping records, then explicitly writes null price_type/source_url/report_date.",
+    "price_type_mapping_candidate": {
+      "unit_price": "UNIT_PRICE",
+      "offer_price_fallback": "OFFER",
+      "bid_price_fallback": "BID"
+    },
+    "source_mapping": "Carry source_url from the chosen extractor record into the grouped VL item.",
+    "report_date_rule": "Carry only an actual published/report date if the extractor exports one. Do not substitute valuation_date.",
+    "sec_document_id_rule": "Remain NULL unless an actual official document identifier is available."
+  },
+  "decisions": [
+    {
+      "decision": "NIGERIA_METADATA_TRANSPORT_IS_A_REAL_ADDITIVE_FIX_CANDIDATE",
+      "rationale": "It can improve qualification without changing the numeric VL, NAV, fund match or currency choice."
+    },
+    {
+      "decision": "DO_NOT_BACKFILL_OTHER_COUNTRIES_WITH_FAKE_GENERIC_PROVENANCE",
+      "rationale": "Morocco/Tunisia/UEMOA/CEMAC need adapters to their existing evidence or future acquisition metadata; zero coverage cannot be repaired by guessed URLs."
+    },
+    {
+      "decision": "QUALITY_PASS_MUST_NOT_EQUAL_HISTORY_SUFFICIENCY",
+      "rationale": "Recent Nigeria rows can have data_quality=UNQUALIFIED even while downstream series length/alignment would pass Allocation preparation."
+    }
+  ],
+  "promotion_candidate": {
+    "title": "Nigeria SEC — transport extractor provenance and explicit price type into canonical valuation contract",
+    "preferred_existing_links": [
+      "AF-OPS-007",
+      "AF-OPS-009",
+      "AF-PROP-003",
+      "AF-PROP-009"
+    ],
+    "status": "PROPOSAL_NOT_TASK",
+    "scope_files": [
+      "sec_ng_nav_extractor_v6.py (read-only source contract unless export naming needs a compatibility alias)",
+      "scripts/import/import_vl_nigeria_sec.js",
+      "src/lib/vl_contract.js tests/fixtures only if mapping needs explicit normalization helper"
+    ],
+    "do_not_change": [
+      "numeric VL selection",
+      "fund matching",
+      "currency selection",
+      "historical values",
+      "strict/warn mode",
+      "cron schedule"
+    ],
+    "tests": [
+      "CSV row with unit_price + source_url maps to UNIT_PRICE and keeps same numeric VL.",
+      "offer_price_fallback maps to OFFER, bid_price_fallback maps to BID.",
+      "missing source remains UNQUALIFIED; no fabricated document ID/report date.",
+      "CURRENCY_MISMATCH remains rejected as today.",
+      "Dry-run count/value equivalence before/after transport."
+    ],
+    "rollback": "Code-only rollback before future imports; no historical data mutation in first rollout.",
+    "later_backfill": "Historical metadata backfill, if desired, must be a separate evidence-driven task from retained source artifacts and exact row identity."
+  },
+  "no_actions_taken": [
+    "No Nigeria importer code changed",
+    "No VL changed",
+    "No provenance backfilled",
+    "No quality status rewritten",
+    "No task queue change"
+  ],
+  "next_action": "Measure current sec_ng_latest.csv transport readiness and then freeze exact patch contract for future promotion."
+}

@@ -1,0 +1,219 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W2_P1_PILOT_SOURCE_MAP_NON_AUTHORITATIVE",
+  "observed_at": "2026-10-06",
+  "observed_heads": {
+    "api": "a328e9d76ea07e6b6afb228ebea4c8fd10cf8114",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
+  },
+  "policy": {
+    "regulator_identity_is_authoritative_for_universe": true,
+    "manager_pages_are_source_candidates_not_identity_authorities": true,
+    "no_import_or_connector_created": true,
+    "price_type_must_remain_explicit": true,
+    "market_wide_coverage_not_inferred_from_pilot": true,
+    "source_terms_licensing_review_required_before_bulk_acquisition": true
+  },
+  "GHANA": {
+    "regulator": {
+      "mutual_funds": "https://licensees.sec.gov.gh/licensees/MutualFunds.php",
+      "unit_trusts": "https://licensees.sec.gov.gh/licensees/UnitTrust.php",
+      "fund_managers": "https://licensees.sec.gov.gh/licensees/FundManager.php",
+      "current_counts": {
+        "mutual_funds": 53,
+        "unit_trusts": 33,
+        "fund_managers": 83
+      }
+    },
+    "pilots": [
+      {
+        "manager": "EDC Investments Limited",
+        "regulator_identities": [
+          "EDC Ghana Africa Cash Trust",
+          "EDC Ghana Fixed Income Unit Trust",
+          "EDC Ghana Growth Trust",
+          "EDC Ghana Money Market Unit Trust",
+          "EDC Ghana Balanced Fund Plc",
+          "EDC Retirement Fund Plc"
+        ],
+        "manager_source": "https://www.ecobank.com/gh/corporate-investment-banking/wsa-management/collective-investment-schemes",
+        "source_class": "PUBLIC_DATED_FUND_VALUES",
+        "cadence": "DATED_PUBLIC_VALUES_OBSERVED",
+        "price_semantics": "FUND_VALUE_PRICE_NEEDS_NAV_BID_OFFER_CONFIRMATION",
+        "readiness": "PILOT_CANDIDATE"
+      },
+      {
+        "manager": "CAL Asset Management Company LTD",
+        "regulator_identities": [
+          "Cal Advantage Balanced Unit Trust",
+          "Cal Benefit Fixed Income Unit Trust"
+        ],
+        "manager_source": "https://calassetmanagement.net/about-us/reports-2/performance-update",
+        "source_class": "DAILY_DATED_PRICE_HISTORY",
+        "cadence": "DAILY_ON_PUBLIC_PERFORMANCE_SURFACE",
+        "price_semantics": "EXPLICIT_PRICE_GHS_NEEDS_NAVPS_DOCTRINE_CONFIRMATION",
+        "readiness": "STRONG_PILOT_CANDIDATE"
+      },
+      {
+        "manager": "Brassica Capital Limited Company",
+        "regulator_identities": [
+          "Brassica Alpha Fund Plc"
+        ],
+        "manager_source": "https://www.brassicagroup.com/resources/understand-how-to-maximize",
+        "source_class": "DATED_BID_OFFER_PRICE",
+        "cadence": "CURRENT_PREVIOUS_DATED_VALUES",
+        "price_semantics": "BID_AND_OFFER_DISTINCT_REVIEW_REQUIRED",
+        "readiness": "PILOT_CANDIDATE_REVIEW_ONLY"
+      },
+      {
+        "manager": "SDC Capital Limited",
+        "regulator_identities": [
+          "CM Fund PLC"
+        ],
+        "manager_source": "https://sdccapital.com.gh/",
+        "source_class": "CURRENT_FUND_PRICE",
+        "cadence": "CURRENT_VALUE_WITH_AS_OF_DATE",
+        "price_semantics": "PUBLIC_FUND_PRICE_HISTORICAL_DEPTH_PENDING",
+        "readiness": "PILOT_CANDIDATE_DEPTH_PENDING"
+      },
+      {
+        "manager": "Databank Asset Management Services LTD",
+        "regulator_identities": [
+          "Databank Ark Fund Plc",
+          "DataBank Balanced Fund Plc",
+          "DataBank Educational Investment Fund Plc",
+          "Databank EPACK Investment Fund Plc",
+          "DataBank MFund Plc"
+        ],
+        "manager_source": "https://www.databankgroup.com/",
+        "source_class": "PERIODIC_FACTSHEET_SHARE_PRICE",
+        "cadence": "PERIODIC_FACTSHEET",
+        "price_semantics": "SHARE_PRICE_NAV_PER_SHARE_CONCEPT_TO_CERTIFY",
+        "readiness": "PILOT_CANDIDATE_PERIODIC"
+      }
+    ],
+    "decision": "BOUNDED_PILOT_FEASIBILITY_PROVEN",
+    "next_gates": [
+      "Measure historical depth and update cadence per pilot source.",
+      "Record URL stability and source terms.",
+      "Resolve exact source product to SEC regulator identity mapping.",
+      "Preserve Mutual Fund vs Unit Trust legal type.",
+      "Do not promote BID/OFFER as canonical NAV without explicit doctrine."
+    ]
+  },
+  "KENYA": {
+    "regulator": {
+      "schemes": "https://licensees.cma.or.ke/licenses/15/",
+      "fund_managers": "https://licensees.cma.or.ke/licenses/8/",
+      "current_structure": "Umbrella/unit-trust schemes with nested sub-funds; multi-currency products are explicit."
+    },
+    "pilots": [
+      {
+        "manager": "NCBA",
+        "regulator_identity": "NCBA Unit Trust Funds",
+        "regulator_examples": [
+          "NCBA Equity Fund",
+          "NCBA Money Market Fund (KES)",
+          "NCBA Money Market Fund (USD)",
+          "NCBA Fixed Income Fund",
+          "NCBA Dollar Fixed Income Fund"
+        ],
+        "manager_source": "https://ncbagroup.com/investment-banking/equity-fund/",
+        "source_class": "DIRECT_DATED_DAILY_PRICE",
+        "cadence": "DAILY_PRICE_PAGE",
+        "price_semantics": "Page states daily price derives from NAV of issued units; buy/sell prices are explicit.",
+        "readiness": "STRONG_PILOT_CANDIDATE"
+      },
+      {
+        "manager": "Etica Capital",
+        "regulator_identity": "Etica Unit Trust Funds",
+        "regulator_examples": [
+          "Etica Money Market Fund",
+          "Etica Money Market Fund (USD)",
+          "Etica Fixed Income Fund",
+          "Etica Shariah Fund",
+          "Etica Wealth Fund"
+        ],
+        "manager_source": "https://eticacap.com/money-market-fund-kes/",
+        "companion_source": "https://eticacap.com/fact-sheet/",
+        "source_class": "PRODUCT_PLUS_MONTHLY_FACTSHEETS",
+        "cadence": "CURRENT_PRODUCT_PLUS_MONTHLY_FACTSHEET_ARCHIVE",
+        "price_semantics": "Daily compounding/yield and fund facts proven; direct daily historical unit price not certified.",
+        "readiness": "PILOT_METADATA_AND_PERIODIC_SOURCE"
+      },
+      {
+        "manager": "Britam Asset Managers (Kenya) Limited",
+        "regulator_identity": "British-American Unit Trust Scheme",
+        "regulator_examples": [
+          "Britam Money Market Fund",
+          "Britam Equity Fund",
+          "Britam USD Fixed Income Fund",
+          "Britam Bond Plus Fund"
+        ],
+        "manager_source": "https://ke.britam.com/save-and-invest/personal/invest/unit-trust-funds",
+        "source_class": "PRODUCT_CATALOGUE",
+        "cadence": "CURRENT_PRODUCT_INFORMATION",
+        "price_semantics": "Daily liquidity proven; direct public historical price feed not certified.",
+        "readiness": "NAV_SOURCE_PENDING"
+      },
+      {
+        "manager": "CIC Asset Managers Limited",
+        "regulator_identity": "CIC Unit Trust Scheme",
+        "regulator_examples": [
+          "CIC Money Market Fund",
+          "CIC Balanced Fund",
+          "CIC Fixed Income Fund",
+          "CIC Equity Fund",
+          "CIC Dollar Fund"
+        ],
+        "manager_source": "https://ke.cicinsurancegroup.com/asset-management-2/",
+        "source_class": "PRODUCT_CATALOGUE_AND_DOCUMENTS",
+        "cadence": "CURRENT_PRODUCT_INFO_PLUS_PERIODIC_DOCUMENTS",
+        "price_semantics": "No direct public daily historical unit-price series certified from sampled surface.",
+        "readiness": "NAV_SOURCE_PENDING"
+      },
+      {
+        "manager": "KCB Asset Management",
+        "regulator_identity": "KCB Unit Trust Scheme (formerly Natbank Unit Trust Scheme)",
+        "regulator_examples": [
+          "KCB Money Market Fund (KES)",
+          "KCB Money Market Fund (USD)",
+          "KCB Fixed Income Fund",
+          "KCB Equity Fund"
+        ],
+        "manager_source": "https://investment.kcbgroup.com/wealth-management",
+        "companion_source": "https://investment.kcbgroup.com/money-market-fund",
+        "source_class": "PRODUCT_PLUS_RECENT_FACTSHEETS",
+        "cadence": "CURRENT_PRODUCT_PLUS_PERIODIC_FACTSHEETS",
+        "price_semantics": "Daily accrual/product facts proven; direct public daily unit-price history not certified.",
+        "readiness": "PILOT_METADATA_AND_PERIODIC_SOURCE"
+      }
+    ],
+    "decision": "ONE_STRONG_DIRECT_DAILY_PRICE_PILOT_PLUS_FOUR_REPRESENTATIVE_SOURCE_CLASSIFICATIONS",
+    "next_gates": [
+      "Measure NCBA historical depth and stable URL pattern across multiple funds.",
+      "Determine whether Etica/KCB factsheets contain extractable share/unit price rather than only yield/performance.",
+      "Continue direct-price discovery for Britam/CIC or certify public daily price path unavailable.",
+      "Preserve scheme/sub-fund hierarchy from CMA; do not flatten multi-currency sub-funds.",
+      "Review terms/licensing before bulk acquisition."
+    ]
+  },
+  "shared_acceptance_for_connector_child_task": [
+    "Deterministic regulator-universe snapshot.",
+    "Explicit Fund/SubFund/ShareClass grain.",
+    "At least five representative manager/source paths classified.",
+    "At least one technically reproducible price/NAV acquisition path for pilot scope.",
+    "Price type and currency explicit.",
+    "Publication/effective/acquisition dates distinguishable.",
+    "Raw evidence fits W2 ingestion contract.",
+    "Terms/licensing reviewed.",
+    "No guessed identifier, NAV, benchmark or provenance."
+  ],
+  "queue_strategy": {
+    "create_task_now": false,
+    "parent": "W2-DELTA-006 / AF-PROP-011",
+    "blocker": "AF-TASK-028 owns task-queue/projection surfaces and pilot feasibility is not market-wide connector readiness."
+  },
+  "next_action": "Run technical no-write acquisition/mapping probes for Ghana CAL/EDC and Kenya NCBA first; separately complete source-availability classifications for the other sampled managers. Do not import canonical data."
+}

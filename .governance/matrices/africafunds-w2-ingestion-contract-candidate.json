@@ -1,0 +1,366 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "W2_INGESTION_CONTRACT_CANDIDATE_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "39fb209b808f9661a7ed6cf83b72c403f569389f",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "authority_and_scope": {
+    "single_task_queue": ".governance/loop/task-queue.json",
+    "canonical_fund_authority": "fond_investissements",
+    "canonical_valuation_authority": "valorisations",
+    "canonical_qualification_contract": "src/lib/vl_contract.js",
+    "country_adapters_remain_source_specific": true,
+    "no_second_data_platform": true
+  },
+  "lifecycle": [
+    {
+      "step": "SOURCE_DISCOVERY",
+      "required_outputs": [
+        "official authority/provider",
+        "stable landing/API/document path",
+        "publication cadence",
+        "licence/redistribution note",
+        "known access constraints"
+      ],
+      "gate": "No connector task until the source can be named and its intended data grain is explicit."
+    },
+    {
+      "step": "ACQUISITION",
+      "required_outputs": [
+        "acquisition timestamp",
+        "HTTP/status/result",
+        "source URL",
+        "artifact identity/hash where bytes are retained"
+      ],
+      "gate": "A network success is not a parsed observation; source failures never erase prior good data."
+    },
+    {
+      "step": "RAW_EVIDENCE",
+      "required_outputs": [
+        "artifact/response reference",
+        "source date",
+        "raw locator such as sheet/row/page/record key",
+        "immutable or append-only evidence when feasible"
+      ],
+      "gate": "Never fabricate evidence for historical rows."
+    },
+    {
+      "step": "PARSE_OBSERVATION",
+      "required_outputs": [
+        "raw fund label",
+        "raw manager label when present",
+        "valuation/effective date",
+        "raw measure",
+        "measure type",
+        "currency",
+        "source-specific metadata"
+      ],
+      "gate": "Observed values remain distinct from derived/conversion values."
+    },
+    {
+      "step": "IDENTITY_MATCH",
+      "required_outputs": [
+        "canonical fund_id candidate",
+        "match method",
+        "confidence",
+        "alias/source evidence",
+        "ambiguous/unmatched state"
+      ],
+      "gate": "Ambiguous/unmatched observations remain in review/staging and are not promoted by name guess."
+    },
+    {
+      "step": "MEASURE_QUALIFICATION",
+      "required_outputs": [
+        "currency_code",
+        "price_type",
+        "source/provenance reference",
+        "quality flags",
+        "report/publication date if actually observed"
+      ],
+      "gate": "Fund currency does not authorize silent conversion; BID/OFFER fallback is explicit REVIEW unless product doctrine later decides otherwise."
+    },
+    {
+      "step": "TEMPORAL_INTEGRITY",
+      "required_outputs": [
+        "source/effective date",
+        "as_of target",
+        "gap_days where carried prior"
+      ],
+      "gate": "Exact date first; otherwise latest valid source date <= target within declared tolerance. Never future for normal NAV/benchmark/FX/backtest paths."
+    },
+    {
+      "step": "QUALITY_GATE",
+      "required_outputs": [
+        "quality status",
+        "reasons",
+        "quarantine/review decision"
+      ],
+      "gate": "Missing control is NOT_RUN/UNKNOWN, never PASS. Extreme variation alone does not silently overwrite prior data."
+    },
+    {
+      "step": "DRY_RUN",
+      "required_outputs": [
+        "source rows",
+        "matched/unmatched",
+        "would_insert",
+        "would_skip",
+        "would_reject",
+        "numeric/value equivalence where replacing a legacy path"
+      ],
+      "gate": "No production write until dry-run scope and identity are reviewable."
+    },
+    {
+      "step": "CANONICAL_PROMOTION",
+      "required_outputs": [
+        "batch/run ID",
+        "insert/update policy",
+        "snapshot/rollback for corrections",
+        "lineage link"
+      ],
+      "gate": "New official observations may be INSERT IGNORE/additive; corrections/backfills require their own governed write phase."
+    },
+    {
+      "step": "PRESENTATION_CACHE_SYNC",
+      "required_outputs": [
+        "denormalized fields affected such as datejour",
+        "idempotent sync result"
+      ],
+      "gate": "Caches are downstream of canonical observations and never become source of truth."
+    },
+    {
+      "step": "DERIVED_RECALC",
+      "required_outputs": [
+        "FX/adjusted NAV/performance/ranking dependencies",
+        "input cutoff",
+        "version/git SHA"
+      ],
+      "gate": "Do not recalc rankings before upstream VL/performance integrity is validated."
+    },
+    {
+      "step": "POST_CHECK_OBSERVABILITY",
+      "required_outputs": [
+        "freshness",
+        "row counts",
+        "quality states",
+        "unmatched/quarantine",
+        "cron result",
+        "source-vs-pipeline distinction"
+      ],
+      "gate": "Publication lag, acquisition failure, parser failure, identity failure and derived-calculation failure must be distinguishable."
+    }
+  ],
+  "reuse_map": {
+    "NIGERIA": {
+      "reuse": [
+        "sec_ng_nav_extractor_v6.py source evidence",
+        "src/lib/vl_contract.js",
+        "sec_ng_corrections_audit"
+      ],
+      "extend": [
+        "transport source/type/quality_flags to canonical contract",
+        "generic lineage adapter"
+      ],
+      "do_not": [
+        "create new SEC extractor",
+        "fabricate ISIN",
+        "auto-OK OFFER fallback"
+      ]
+    },
+    "TUNISIE": {
+      "reuse": [
+        "cmf_import_audit",
+        "cmf_extreme_variations",
+        "cmf_new_funds_queue",
+        "source_file/sheet/row parser metadata"
+      ],
+      "extend": [
+        "generic source artifact/observation linkage",
+        "canonical lineage"
+      ],
+      "do_not": [
+        "replace quarantine/new-fund queue with direct canonical inserts"
+      ]
+    },
+    "UEMOA": {
+      "reuse": [
+        "brvm_boc_sources",
+        "brvm_boc_navs_raw",
+        "brvm_fund_aliases",
+        "brvm_import_logs",
+        "brvm_missing_navs"
+      ],
+      "extend": [
+        "canonical lineage link",
+        "date-specific FX",
+        "temporal benchmark fix"
+      ],
+      "do_not": [
+        "duplicate raw PDF staging",
+        "overwrite canonical VL conflicts"
+      ]
+    },
+    "CEMAC": {
+      "reuse": [
+        "bvmac_boc_daily.py guarded BRVM-like design"
+      ],
+      "extend": [
+        "read-only live fund mapping certification before deployment",
+        "same generic lineage contract when activated"
+      ],
+      "do_not": [
+        "create bvmac tables during a read-only preflight",
+        "activate cron before match/quality evidence"
+      ]
+    },
+    "MAROC": {
+      "reuse": [
+        "ASFIM official XLSX endpoint",
+        "ISIN/Maroclear identity",
+        "current daily pipeline"
+      ],
+      "extend": [
+        "artifact hash/source linkage",
+        "explicit acquisition/import evidence",
+        "strict as-of FX for historical/backfill uses"
+      ],
+      "do_not": [
+        "invent raw artifact provenance for old rows",
+        "replace canonical ASFIM path with generic upload"
+      ]
+    }
+  },
+  "common_entities_candidate": [
+    {
+      "entity": "source_artifact",
+      "purpose": "One official file/API response acquisition identity.",
+      "required": [
+        "source_system",
+        "source_url_or_endpoint",
+        "acquired_at",
+        "country",
+        "artifact_type",
+        "status"
+      ],
+      "optional": [
+        "content_hash",
+        "publication_date",
+        "report_date",
+        "http_status",
+        "metadata_json"
+      ]
+    },
+    {
+      "entity": "source_observation",
+      "purpose": "One source measure before canonical promotion.",
+      "required": [
+        "source_artifact_ref",
+        "raw_locator",
+        "observation_type",
+        "effective_date",
+        "raw_value",
+        "quality_status",
+        "match_status"
+      ],
+      "optional": [
+        "raw_fund_name",
+        "raw_manager_name",
+        "currency_code",
+        "price_type",
+        "matched_fund_id",
+        "match_confidence"
+      ]
+    },
+    {
+      "entity": "canonical_lineage_link",
+      "purpose": "Trace canonical/derived entity to source observation/artifact.",
+      "required": [
+        "entity_type",
+        "entity_id",
+        "relationship",
+        "source_ref",
+        "created_at"
+      ],
+      "optional": [
+        "transformation_run_id"
+      ]
+    },
+    {
+      "entity": "transformation_run",
+      "purpose": "Trace import/recalc/correction/backfill.",
+      "required": [
+        "operation",
+        "version_or_sha",
+        "started_at",
+        "status",
+        "scope"
+      ],
+      "optional": [
+        "completed_at",
+        "input_cutoff",
+        "evidence_ref",
+        "rollback_ref"
+      ]
+    }
+  ],
+  "date_semantics": {
+    "publication_date": "When provider publishes/releases an artifact.",
+    "acquisition_date": "When AfricaFunds fetched it.",
+    "effective_or_valuation_date": "Date represented by the observation.",
+    "import_date": "When canonical storage occurred.",
+    "report_date": "Only if explicitly provided by the source; never alias valuation_date by convenience.",
+    "as_of_rule": "Source observation used at T must have effective date <= T unless a future-looking calculation explicitly says otherwise."
+  },
+  "quality_dimensions": [
+    "SOURCE_PRESENT",
+    "SOURCE_ARTIFACT_VERIFIED",
+    "IDENTITY_MATCH_CONFIDENCE",
+    "MEASURE_TYPE_EXPLICIT",
+    "CURRENCY_EXPLICIT",
+    "TEMPORAL_NO_LOOKAHEAD",
+    "VALUE_RANGE_OR_CHANGE_CHECK",
+    "PUBLICATION_FRESHNESS",
+    "PIPELINE_FRESHNESS",
+    "DERIVATION_FRESHNESS"
+  ],
+  "operational_backoffice": {
+    "existing_surface": "src/app/country-panel",
+    "target_use": "Review unmatched funds, source evidence, anomalies, import dry-runs and country pipeline status.",
+    "precondition": "Current backend contracts/RBAC must be recertified route by route. Never mount routes_vl_admin.js wholesale.",
+    "future_view_models": [
+      "CountryPipelineStatusViewModel",
+      "CountryFundReviewViewModel",
+      "UnmatchedFundCandidateViewModel",
+      "SourceArtifactReviewViewModel",
+      "CountryQualityIssueViewModel",
+      "ImportDryRunViewModel"
+    ]
+  },
+  "promotion_strategy": {
+    "existing_parent": "AF-PROP-007",
+    "related": [
+      "AF-PROP-003",
+      "AF-PROP-008",
+      "AF-PROP-009",
+      "AF-PROP-010",
+      "AF-PROP-015",
+      "AF-PROP-023",
+      "AF-PROP-024",
+      "W1-DELTA-002",
+      "W1-DELTA-003",
+      "W1-DELTA-004",
+      "W1-DELTA-008"
+    ],
+    "create_new_task_now": false,
+    "blocker": "AF-TASK-028 owns task-queue/projection surfaces.",
+    "after_queue_release": [
+      "Fresh HEAD/claim reobservation.",
+      "Deduplicate against completed country/data-quality work.",
+      "Promote framework changes only where multiple country pipelines truly share a reusable contract.",
+      "Keep country-source adapters as child scopes, not duplicated platforms."
+    ]
+  },
+  "next_action": "Certify live W2 diagnostics, then produce a bounded W2 promotion-ready delta set: current-market reliability, CEMAC preflight, Country Panel contract repair, generic lineage adoption order, and P1 market discovery dossiers."
+}

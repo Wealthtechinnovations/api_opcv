@@ -1,0 +1,11 @@
+{
+  "schema_version":"1.0.0",
+  "product":"AfricaFunds",
+  "repository":"Wealthtechinnovations/api_opcv",
+  "canonical_branch":"claude/code-review-improvements-ikvuj",
+  "reference_model":"chainsolutions-wealthtech/Regulatory@483da3e11c30dd0b4f2a4cee114909d512a1b426",
+  "mode":"ADDITIVE_INTEGRATION",
+  "destructive_actions":false,
+  "global_checkpoint_repository":"Wealthtechinnovations/front_end_opcvm",
+  "runtime_authority":"S2 measurements governed by GOV-006"
+}

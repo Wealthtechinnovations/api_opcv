@@ -1,0 +1,775 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "COVERAGE_DISCOVERY_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "a6e4674fa15ee5022b3dd361364e6c3c7287d122",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc",
+    "branch": "claude/code-review-improvements-ikvuj"
+  },
+  "source_authorities": [
+    ".governance/loop/task-queue.json",
+    ".governance/matrices/africafunds-product-intake-matrix.json",
+    ".governance/matrices/africafunds-gap-qualification-matrix.json",
+    "DIRECTIVE_TRAVAIL.md",
+    "LOOP_ENGINEERING.md",
+    "ARCHITECTURE_DIAGNOSTIC.md (historical architecture reference, not current-state authority)",
+    "front_end_opcvm/CLAUDE.md",
+    "front_end_opcvm/SUIVI.md",
+    "docs/ETAT_PRODUCTION_VERIFIE.md"
+  ],
+  "current_production_summary": {
+    "controls_ok": 18,
+    "total_controls": 25,
+    "critical_failures": 4,
+    "alerts": 3,
+    "measured_at": "2026-10-05T18:37:00Z"
+  },
+  "rules": {
+    "not_a_task_queue": true,
+    "no_automatic_promotion": true,
+    "historical_plan_is_not_runtime_proof": true,
+    "partial_does_not_mean_broken": true,
+    "missing_evidence_is_unknown_not_done": true,
+    "current_task_claims_have_precedence": true
+  },
+  "entries": [
+    {
+      "intake_id": "AF-INTAKE-CAND-001",
+      "coverage": "PARTIAL_NOT_CANONICALLY_CERTIFIED",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "fond_investissements is the live fund table and historical FundAfrica referential work exists.",
+        "Historical design requires Fund/SubFund/ShareClass, but current canonical ShareClass/SubFund completeness is not certified."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-003"
+      ],
+      "qualification_next": "Audit live schema/models/consumers and classify existing share-class/subfund representations before any additive model change."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-002",
+      "coverage": "PARTIAL_LIVE",
+      "confidence": "HIGH",
+      "evidence": [
+        "Live/historical SUIVI documents table societes, manager links and prior duplicate cleanup.",
+        "Canonical historical manager-period/alias model is not yet certified."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-003"
+      ],
+      "qualification_next": "Inventory manager aliases/history and identify whether existing relations can be extended without a second Manager Master."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-003",
+      "coverage": "PARTIAL_TO_CERTIFY",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Data-quality/provenance conventions are normative and source-specific pipelines persist evidence.",
+        "Fine-grained lineage to document/page/sheet/row/cell/API path is not certified platform-wide."
+      ],
+      "queue_links": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ],
+      "depends_on_intakes": [],
+      "qualification_next": "Map current provenance fields and artifacts by data domain; define missing lineage additions only after inventory."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-004",
+      "coverage": "PARTIAL_LIVE",
+      "confidence": "HIGH",
+      "evidence": [
+        "valorisations is live at >1M historical observations in prior checkpoints; NAV/VL is core production data.",
+        "Dividends/AUM/events exist historically in uneven forms and completeness is not certified."
+      ],
+      "queue_links": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-003"
+      ],
+      "qualification_next": "Inventory live models/tables for AUM, distributions and events; separate observed fields and derived values."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-005",
+      "coverage": "PARTIAL_LIVE_NOT_UNIFIED",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Current monolith has document routes and user panels consume documents.",
+        "Historical Morocco methodology requires verified official href/type/date/visa; unified document engine completeness is not certified."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-002",
+        "AF-INTAKE-CAND-003"
+      ],
+      "qualification_next": "Map document storage/routes/types and duplicates, then define one canonical document relationship model."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-006",
+      "coverage": "ACTIVE_PARTIAL",
+      "confidence": "HIGH",
+      "evidence": [
+        "FX, indices and benchmark fields are live and heavily consumed.",
+        "Production 2026-10-05: MASI/Tunindex/BRVM/NSE freshness OK, CEMAC benchmark 0%, C9 Morocco 45.6%.",
+        "Gap qualification found disabled indice-table persistence in manual uploads requiring authority mapping."
+      ],
+      "queue_links": [
+        "AF-OPS-007",
+        "AF-OPS-009",
+        "AF-TASK-014",
+        "AF-TASK-020"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-003"
+      ],
+      "qualification_next": "Map canonical writers/readers of indices, benchmark declarations and FX conventions; resolve disabled manual-upload persistence only if a functional gap is proven."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-007",
+      "coverage": "ACTIVE_BUT_FRAGMENTED",
+      "confidence": "HIGH",
+      "evidence": [
+        "Monolith contains large risk/performance implementations and current allocation tasks reuse portfolio-analytics.",
+        "Up/Down Capture are implemented despite a stale TODO marker.",
+        "C2/C3/C8 show derived analytics can be stale or wrong when inputs/pipelines fail."
+      ],
+      "queue_links": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-TASK-018",
+        "AF-TASK-020"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-004",
+        "AF-INTAKE-CAND-006"
+      ],
+      "qualification_next": "Inventory duplicate quantitative functions/conventions and define canonical reusable service boundaries with regression fixtures."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-008",
+      "coverage": "ACTIVE_EXISTING_QUEUE",
+      "confidence": "HIGH",
+      "evidence": [
+        "Production authority reports 18/25 OK with C2/C3/C7/C8 critical and CEMAC/C9 Morocco alerts.",
+        "AF-OPS-007/008/009 are already the canonical data-quality execution chain."
+      ],
+      "queue_links": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-004"
+      ],
+      "qualification_next": "Do not create a new quality program; attach new verified controls to the existing tasks and requirements."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-009",
+      "coverage": "PARTIAL_COUNTRY_SPECIFIC",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Multiple country-specific collectors/imports/crons exist.",
+        "Patterns are not yet certified as one reusable ingestion framework."
+      ],
+      "queue_links": [
+        "AF-OPS-009"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-008"
+      ],
+      "qualification_next": "Compare source discovery/acquisition/raw snapshot/parser/mapping/import/rollback patterns across Morocco/Nigeria/Tunisia/UEMOA/CEMAC."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-010",
+      "coverage": "LIVE_PARTIAL_HISTORICAL_RECONCILIATION_PENDING",
+      "confidence": "HIGH",
+      "evidence": [
+        "Production Tunisia VL freshness is OK at 2026-10-02.",
+        "Historical CMF research/assets are extensive but canonical completeness was explicitly not certified."
+      ],
+      "queue_links": [
+        "AF-OPS-009"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-002",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-009"
+      ],
+      "qualification_next": "Reconcile historical Tunisia identities/dividends/manager events with current Fund Master without blind reimport."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-011",
+      "coverage": "LIVE_PARTIAL_WITH_DATA_QUALITY_GAPS",
+      "confidence": "HIGH",
+      "evidence": [
+        "Production Nigeria freshness is OK at 2026-09-25.",
+        "Production still has severe C3/C7 scale/currency anomalies.",
+        "Historical SEC archive/reconstruction assets are extensive."
+      ],
+      "queue_links": [
+        "AF-OPS-007",
+        "AF-OPS-009"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-009"
+      ],
+      "qualification_next": "Complete governed identity/currency/scale reconciliation before claiming canonical archive completeness."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-012",
+      "coverage": "LIVE_PARTIAL",
+      "confidence": "HIGH",
+      "evidence": [
+        "Production Morocco VL freshness is OK; MASI is fresh and overall C6 benchmark coverage is 98.1%.",
+        "C9 recent Morocco benchmark coverage remains 45.6% because historical gap/backfill is incomplete."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-005",
+        "AF-INTAKE-CAND-006",
+        "AF-INTAKE-CAND-009"
+      ],
+      "qualification_next": "Keep current MASI fallback; qualify historical backfill and document completeness as separate governed actions."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-013",
+      "coverage": "OPEN_MAJOR_DATA_GAP",
+      "confidence": "HIGH",
+      "evidence": [
+        "Production CEMAC last VL is 2024-12-12 and benchmark coverage is 0% (2134/2134 without benchmark).",
+        "Historical BVMAC/BOC scraper assets exist but live completeness is not achieved."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-006",
+        "AF-INTAKE-CAND-009"
+      ],
+      "qualification_next": "Revalidate source/scraper/mapping read-only; only then propose governed import/backfill and benchmark linkage."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-014",
+      "coverage": "LIVE_PARTIAL",
+      "confidence": "HIGH",
+      "evidence": [
+        "Production UEMOA freshness and benchmark coverage are currently OK.",
+        "C7 still includes FCP BRIDGE EQUILIBRE scale break and C8 performance freshness is only 30.6%."
+      ],
+      "queue_links": [
+        "AF-OPS-007",
+        "AF-OPS-008"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-006",
+        "AF-INTAKE-CAND-008",
+        "AF-INTAKE-CAND-009"
+      ],
+      "qualification_next": "Resolve UEMOA integrity/performance gaps through existing quality queue before expansion work."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-015",
+      "coverage": "ROADMAP_NOT_RUNTIME_CERTIFIED",
+      "confidence": "HIGH",
+      "evidence": [
+        "Historical roadmap names Ghana, Kenya, Egypt, South Africa, Botswana, Namibia, Ethiopia and Mauritius.",
+        "No evidence in current authorities certifies production connectors for these markets."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-009"
+      ],
+      "qualification_next": "Create country child intakes only after source discovery and live repository check; roadmap mention is not implementation."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-016",
+      "coverage": "PARTIAL_LEGACY_AND_CANONICAL_COEXIST",
+      "confidence": "HIGH",
+      "evidence": [
+        "Current app.js mounts monolith routes; Allocation V2 has a stable canonical API contract.",
+        "services/funds and services/portfolio are inactive scaffold placeholders and must not become parallel authorities."
+      ],
+      "queue_links": [
+        "AF-TASK-013",
+        "AF-TASK-023"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-007"
+      ],
+      "qualification_next": "Inventory route contracts/view models and deprecation candidates; preserve backward compatibility."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-017",
+      "coverage": "NORMATIVE_PARTIAL_IMPLEMENTATION_TO_AUDIT",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "DIRECTIVE_TRAVAIL.md makes Atomic Design mandatory and defines semantic/non-regression expectations.",
+        "Frontend has many existing pages/components but full atoms→molecules→organisms→templates coverage is not certified."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-016"
+      ],
+      "qualification_next": "Inventory existing component taxonomy, tokens and duplicated shells before any refactor."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-018",
+      "coverage": "EXISTING_PAGES_PARTIAL_TARGET",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Fund, manager and country pages exist and historical SEO work has been deployed.",
+        "Target Fund/ShareClass organism coverage and stable view models are not fully certified."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-002",
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-017"
+      ],
+      "qualification_next": "Map each current entity page to required organisms/data contracts and identify additive gaps."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-019",
+      "coverage": "EXISTING_PARTIAL",
+      "confidence": "HIGH",
+      "evidence": [
+        "Frontend authority lists Admin, Investor, Management, Institutional, Data Requester, Country Panel and Distributor spaces.",
+        "Historical SUIVI records significant panel duplication and uneven coverage."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-017",
+        "AF-INTAKE-CAND-020"
+      ],
+      "qualification_next": "Build role-by-role screen/API/permission coverage matrix and shared-shell refactor candidates."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-020",
+      "coverage": "PARTIAL_SECURITY_FOUNDATION",
+      "confidence": "HIGH",
+      "evidence": [
+        "Current app.js uses helmet, CORS, sanitization and rate limiting; many routes use auth middleware.",
+        "Historical backlog documents endpoint-auth gaps and the monolith still contains sensitive legacy routes requiring audit."
+      ],
+      "queue_links": [
+        "AF-TASK-010",
+        "AF-OPS-005",
+        "AF-TASK-013"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-019"
+      ],
+      "qualification_next": "Audit mutating routes and role/ownership checks with tests; do not replace current auth authority."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-021",
+      "coverage": "PLANNED_WITH_ACTIVE_FOUNDATIONS",
+      "confidence": "HIGH",
+      "evidence": [
+        "AF-TASK-017 explicitly prepares quality/DDQ/institutional mandate constraints.",
+        "AF-TASK-022 reserves Mandate Engine/model portfolio/reporting integration.",
+        "Institutional frontend shell exists."
+      ],
+      "queue_links": [
+        "AF-TASK-017",
+        "AF-TASK-022"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-007",
+        "AF-INTAKE-CAND-008",
+        "AF-INTAKE-CAND-019"
+      ],
+      "qualification_next": "Define mandate/eligibility objects only after Fund Master/quality/constraint contracts are certified."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-022",
+      "coverage": "DESIGNED_NOT_CANONICALLY_INTEGRATED",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Historical project design specifies DDQ, ODD, Findings and Short List.",
+        "Canonical production integration/migrations are not certified."
+      ],
+      "queue_links": [
+        "AF-TASK-022"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-005",
+        "AF-INTAKE-CAND-019",
+        "AF-INTAKE-CAND-021"
+      ],
+      "qualification_next": "Audit any existing candidate UI/code and map it to canonical users/documents/funds before promotion."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-023",
+      "coverage": "DESIGNED_NOT_CANONICALLY_INTEGRATED",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Historical institutional design specifies RFP, clarifications and technical/financial evaluation.",
+        "Current canonical integration is not certified."
+      ],
+      "queue_links": [
+        "AF-TASK-022"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-005",
+        "AF-INTAKE-CAND-019",
+        "AF-INTAKE-CAND-021",
+        "AF-INTAKE-CAND-022"
+      ],
+      "qualification_next": "Locate existing RFP/portal candidate surfaces and classify EXTEND/INTEGRATE/CREATE without parallel data models."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-024",
+      "coverage": "DESIGNED_NOT_CANONICALLY_INTEGRATED",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Historical institutional workflow includes Investment Committee and approval/rejection.",
+        "No current evidence certifies this workflow end-to-end in production."
+      ],
+      "queue_links": [
+        "AF-TASK-022"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-021",
+        "AF-INTAKE-CAND-022",
+        "AF-INTAKE-CAND-023"
+      ],
+      "qualification_next": "Define reconstructible decision snapshot/audit requirements before implementation."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-025",
+      "coverage": "DESIGNED_NOT_CANONICALLY_INTEGRATED",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Historical target includes monitoring, periodic review and re-underwriting.",
+        "No canonical end-to-end monitoring workflow is currently certified."
+      ],
+      "queue_links": [
+        "AF-TASK-022"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-007",
+        "AF-INTAKE-CAND-008",
+        "AF-INTAKE-CAND-024"
+      ],
+      "qualification_next": "Define monitored signals/triggers and reuse canonical analytics/documents rather than new copies."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-026",
+      "coverage": "PARTIAL_EXISTING",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Repository dependencies and historical features include Excel/PDF/document generation and exports.",
+        "AF-TASK-022 explicitly plans institutional exports with provenance/version history."
+      ],
+      "queue_links": [
+        "AF-TASK-022"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-007",
+        "AF-INTAKE-CAND-021"
+      ],
+      "qualification_next": "Inventory existing export/report paths and converge on shared data snapshots/provenance."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-027",
+      "coverage": "PARTIAL_DEPLOYED_NEEDS_CURRENT_AUDIT",
+      "confidence": "HIGH",
+      "evidence": [
+        "Historical SUIVI records deployed SEO work including generateMetadata, robots and sitemap fixes.",
+        "DIRECTIVE_TRAVAIL.md defines current SEO architecture requirements."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-018"
+      ],
+      "qualification_next": "Run current route/template SEO audit: URLs, crawlable links, metadata, canonical, sitemap, robots, SSR and orphan pages."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-028",
+      "coverage": "NORMATIVE_PARTIAL_TO_CERTIFY",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "DIRECTIVE_TRAVAIL.md explicitly requires coherent Schema.org graph with Organization/WebSite/WebPage/BreadcrumbList/etc.",
+        "Current exhaustive JSON-LD coverage is not certified here."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-018",
+        "AF-INTAKE-CAND-027"
+      ],
+      "qualification_next": "Inventory emitted JSON-LD by page type, @id relationships and SSR/CSR duplication."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-029",
+      "coverage": "NORMATIVE_PARTIAL_TO_CERTIFY",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "DIRECTIVE_TRAVAIL.md requires semantic HTML, accessibility, responsive behavior and performance checks.",
+        "No exhaustive accessibility/Core Web Vitals certification is recorded in current authorities."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-017",
+        "AF-INTAKE-CAND-018"
+      ],
+      "qualification_next": "Build accessibility/responsive/CWV baseline for high-value templates before refactor."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-030",
+      "coverage": "PARTIAL_MISSING_SYSTEMATIC_GATE",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "SEO work and manual audits exist historically.",
+        "Systematic automated meta/canonical/JSON-LD/link/SSR regression coverage is not certified."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-027",
+        "AF-INTAKE-CAND-028",
+        "AF-INTAKE-CAND-029",
+        "AF-INTAKE-CAND-035"
+      ],
+      "qualification_next": "Define deterministic SEO/structured-data regression checks after current coverage audit."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-031",
+      "coverage": "EXISTING_PARTIAL",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Historical product includes search, comparison, heatmap/screener-like discovery and country/category views.",
+        "Quality C2/C3/C7/C8 means discovery UIs must gate stale/invalid analytics."
+      ],
+      "queue_links": [
+        "AF-TASK-020",
+        "AF-TASK-021"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-007",
+        "AF-INTAKE-CAND-008",
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-017"
+      ],
+      "qualification_next": "Map live discovery pages/APIs and ensure quality-aware view models before UX expansion."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-032",
+      "coverage": "ACTIVE_EXISTING_PROGRAM",
+      "confidence": "HIGH",
+      "evidence": [
+        "AF-ALLOC-001 is canonical in AF-TASK-012..023.",
+        "012/013/014/016 are advanced/DONE; AF-TASK-017 is IN_PROGRESS; later tasks dependency-gated."
+      ],
+      "queue_links": [
+        "AF-TASK-012",
+        "AF-TASK-013",
+        "AF-TASK-014",
+        "AF-TASK-015",
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-018",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021",
+        "AF-TASK-022",
+        "AF-TASK-023"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-007",
+        "AF-INTAKE-CAND-008"
+      ],
+      "qualification_next": "Never create a second Allocation program; attach new findings to AF-ALLOC-001."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-033",
+      "coverage": "EXISTING_PARTIAL",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "Admin/country/manager panels and data correction/import routes exist.",
+        "Governance already requires dry-run/snapshot/rollback for sensitive corrections."
+      ],
+      "queue_links": [],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-008",
+        "AF-INTAKE-CAND-019",
+        "AF-INTAKE-CAND-020"
+      ],
+      "qualification_next": "Inventory operator workflows and convert unsafe direct-write operations to governed preview/apply patterns only when justified."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-034",
+      "coverage": "ACTIVE_PARTIAL",
+      "confidence": "HIGH",
+      "evidence": [
+        "Health routes, production snapshot, cron diagnostics, incidents and GitHub Actions observers exist.",
+        "AF-OPS-003/005/009 remain active because observability still has attribution/reliability gaps."
+      ],
+      "queue_links": [
+        "AF-OPS-003",
+        "AF-OPS-005",
+        "AF-OPS-009"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-008"
+      ],
+      "qualification_next": "Unify source/acquisition/import/derived/runtime telemetry without creating a second incident system."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-035",
+      "coverage": "PARTIAL_BACKEND_HEAVY",
+      "confidence": "HIGH",
+      "evidence": [
+        "Gap Harvester inventory at source run saw 26 API test files and 0 frontend test files.",
+        "Allocation/governance have focused CI contracts, but full multi-layer regression strategy is not certified."
+      ],
+      "queue_links": [
+        "AF-TASK-018"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-017"
+      ],
+      "qualification_next": "Inventory actual test suites by layer and add frontend/e2e/data/SEO fixtures based on risk, not raw coverage percentage."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-036",
+      "coverage": "ACTIVE_TECHNICAL_DEBT_SURFACE",
+      "confidence": "HIGH",
+      "evidence": [
+        "56 raw TODO markers are inactive microservice scaffold placeholders, not 56 features.",
+        "Historical architecture documents giant routes_vl.js, duplicated panels and inactive microservice architecture.",
+        "AF-TASK-023 covers Allocation-specific legacy retirement only."
+      ],
+      "queue_links": [
+        "AF-TASK-023"
+      ],
+      "depends_on_intakes": [
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-017",
+        "AF-INTAKE-CAND-035"
+      ],
+      "qualification_next": "Create a general legacy-debt program only after deduping historical backlog and proving runtime inactivity/equivalence for each removal cluster."
+    },
+    {
+      "intake_id": "AF-INTAKE-CAND-037",
+      "coverage": "ACTIVE_EXISTING_PROGRAM_EXTENSION",
+      "confidence": "HIGH",
+      "evidence": [
+        "Programme Director AF-TASK-024..028, single queue, surface claims, fail-closed projections and gap harvester are live.",
+        "Gap qualification matrix now reduces 125 marker candidates to a few clusters without auto-task creation."
+      ],
+      "queue_links": [
+        "AF-TASK-024",
+        "AF-TASK-025",
+        "AF-TASK-026",
+        "AF-TASK-027",
+        "AF-TASK-028"
+      ],
+      "depends_on_intakes": [],
+      "qualification_next": "After AF-TASK-028 releases queue/projection surfaces, promote only verified/deduped intakes into the single queue with DoR/DoD/evidence/claims."
+    }
+  ],
+  "execution_waves": [
+    {
+      "wave": "W0_PROTECT_AND_STABILIZE",
+      "intakes": [
+        "AF-INTAKE-CAND-008",
+        "AF-INTAKE-CAND-032",
+        "AF-INTAKE-CAND-034",
+        "AF-INTAKE-CAND-037"
+      ],
+      "rule": "Continue existing queue work; do not duplicate."
+    },
+    {
+      "wave": "W1_CANONICAL_FOUNDATIONS",
+      "intakes": [
+        "AF-INTAKE-CAND-001",
+        "AF-INTAKE-CAND-002",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-004",
+        "AF-INTAKE-CAND-005",
+        "AF-INTAKE-CAND-006",
+        "AF-INTAKE-CAND-007",
+        "AF-INTAKE-CAND-016",
+        "AF-INTAKE-CAND-020",
+        "AF-INTAKE-CAND-035",
+        "AF-INTAKE-CAND-036"
+      ],
+      "rule": "Inventory and certify before schema/refactor work."
+    },
+    {
+      "wave": "W2_COUNTRY_RECONCILIATION_AND_ROLLOUT",
+      "intakes": [
+        "AF-INTAKE-CAND-009",
+        "AF-INTAKE-CAND-010",
+        "AF-INTAKE-CAND-011",
+        "AF-INTAKE-CAND-012",
+        "AF-INTAKE-CAND-013",
+        "AF-INTAKE-CAND-014",
+        "AF-INTAKE-CAND-015"
+      ],
+      "rule": "Fix/qualify current markets before scaling the reusable framework."
+    },
+    {
+      "wave": "W3_FRONTEND_AND_DISCOVERY",
+      "intakes": [
+        "AF-INTAKE-CAND-017",
+        "AF-INTAKE-CAND-018",
+        "AF-INTAKE-CAND-019",
+        "AF-INTAKE-CAND-031",
+        "AF-INTAKE-CAND-033"
+      ],
+      "rule": "Consume stable view models and quality-aware analytics."
+    },
+    {
+      "wave": "W4_INSTITUTIONAL_AND_REPORTING",
+      "intakes": [
+        "AF-INTAKE-CAND-021",
+        "AF-INTAKE-CAND-022",
+        "AF-INTAKE-CAND-023",
+        "AF-INTAKE-CAND-024",
+        "AF-INTAKE-CAND-025",
+        "AF-INTAKE-CAND-026"
+      ],
+      "rule": "Reuse canonical funds/users/docs/analytics; no parallel platform."
+    },
+    {
+      "wave": "W5_DISCOVERABILITY_AND_EXPERIENCE_CERTIFICATION",
+      "intakes": [
+        "AF-INTAKE-CAND-027",
+        "AF-INTAKE-CAND-028",
+        "AF-INTAKE-CAND-029",
+        "AF-INTAKE-CAND-030"
+      ],
+      "rule": "Audit current implementation first, then automate regression gates."
+    }
+  ],
+  "next_action": "Deepen W1 read-only capability inventory and convert only verified gaps into promotion-ready task proposals after AF-TASK-028 releases task-queue.json."
+}

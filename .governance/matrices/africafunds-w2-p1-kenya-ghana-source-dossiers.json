@@ -1,0 +1,224 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W2_P1_MARKET_SOURCE_DOSSIERS_NON_AUTHORITATIVE",
+  "observed_at": "2026-10-06",
+  "observed_heads": {
+    "api": "e75c2abfe544859a226c0e7350ee115c64a5797b",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
+  },
+  "policy": {
+    "registry_is_universe_authority_not_nav_authority": true,
+    "official_regulator_first": true,
+    "current_web_research_must_be_reverified_before_implementation": true,
+    "no_connector_or_task_created_by_this_file": true,
+    "fund_subfund_shareclass_grain_must_be_explicit_before_import": true
+  },
+  "KENYA": {
+    "regulator": "Capital Markets Authority Kenya",
+    "regulator_sources": [
+      {
+        "role": "CURRENT_CIS_UNIVERSE",
+        "url": "https://licensees.cma.or.ke/licenses/15/",
+        "observed_state": "Current list exposes umbrella/unit trust schemes and nested sub-funds; some products are explicitly KES/USD/EUR/GBP."
+      },
+      {
+        "role": "CURRENT_APPROVAL_CHRONOLOGY",
+        "url": "https://www.cma.or.ke/cma-approves-new-unit-trust-schemes-and-additional-sub-funds-to-expand-investor-choice/",
+        "observed_state": "2026 approvals confirm continued creation of umbrella schemes and multi-currency/multi-asset sub-funds."
+      }
+    ],
+    "canonical_identity_implication": {
+      "scheme": "Needs a stable scheme/umbrella identity when regulator groups products.",
+      "subfund": "Explicitly required: regulator list names sub-funds inside schemes.",
+      "shareclass": "Must not be inferred blindly from currency, but multi-currency variants make class/grain verification mandatory.",
+      "manager": "Manager relationship comes from regulator/official scheme context where available.",
+      "currency": "Treat currency as explicit attribute of sub-fund/class source, never name-only inference."
+    },
+    "acquisition_plan_candidate": [
+      "Parse official CMA scheme list into regulator-universe snapshots with acquisition date and source URL.",
+      "Preserve scheme heading and nested sub-fund text rather than flattening everything to one fund row.",
+      "For each manager/scheme, locate official NAV/unit-price/factsheet publication path.",
+      "Classify NAV source as regulator-hosted, manager-hosted, administrator-hosted or unavailable.",
+      "Measure publication cadence, history depth, currency, unit-price semantics, document lineage and terms of reuse.",
+      "Only after five representative managers pass source tests design a reusable Kenya adapter."
+    ],
+    "blockers": [
+      "No centralized official daily NAV endpoint certified yet.",
+      "No canonical AfricaFunds SubFund/ShareClass schema decision yet.",
+      "No source licence/redistribution review for manager-hosted price data yet."
+    ],
+    "readiness": "PILOT_SOURCE_FEASIBILITY_PARTIAL_ONE_DAILY_PRICE_FEED_PROVEN_MARKET_WIDE_NAV_PENDING",
+    "W1_dependencies": [
+      "W1-DELTA-003",
+      "W1-DELTA-004",
+      "W1-DELTA-007",
+      "W1-DELTA-008"
+    ],
+    "nav_source_sampling": {
+      "observed_at": "2026-10-06",
+      "sampled_manager_count": 5,
+      "regulator_anchor": {
+        "source": "https://licensees.cma.or.ke/licenses/15/",
+        "finding": "Current CMA licensee list exposes schemes and nested funds/sub-funds and links to manager/operator websites. It is the universe authority, not a NAV feed."
+      },
+      "proven_examples": [
+        {
+          "manager": "NCBA",
+          "source": "https://ncbagroup.com/investment-banking/equity-fund/",
+          "data_shape": "Public dated daily fund buy/sell price. The page states the daily price is calculated from NAV of issued units.",
+          "price_semantics": "Direct unit-price/NAV-derived public price; suitable bounded pilot candidate with explicit as-of date."
+        },
+        {
+          "manager": "Etica Capital",
+          "source": "https://eticacap.com/money-market-fund-kes/",
+          "companion_source": "https://eticacap.com/fact-sheet/",
+          "data_shape": "Product page exposes currency, benchmark, trustee, custodian, manager and daily compounding; factsheet archive includes recent monthly factsheets.",
+          "price_semantics": "Current product/factsheet evidence is strong, but a public daily historical unit-price feed was not certified."
+        },
+        {
+          "manager": "Britam",
+          "source": "https://ke.britam.com/save-and-invest/personal/invest/unit-trust-funds",
+          "data_shape": "Official catalogue lists KES/USD unit trusts and confirms daily liquidity.",
+          "price_semantics": "No direct public historical daily unit-price series was certified from the sampled official surface."
+        },
+        {
+          "manager": "CIC Asset Management",
+          "source": "https://ke.cicinsurancegroup.com/asset-management-2/",
+          "data_shape": "Official asset-management catalogue lists licensed unit-trust products and current regulatory/financial documents.",
+          "price_semantics": "No direct public historical daily unit-price series was certified from the sampled official surface."
+        },
+        {
+          "manager": "KCB Asset Management / Investment Bank",
+          "source": "https://investment.kcbgroup.com/wealth-management",
+          "companion_source": "https://investment.kcbgroup.com/money-market-fund",
+          "data_shape": "Official product pages and recent 2026 factsheets/financial statements are public; money-market product confirms daily accrual.",
+          "price_semantics": "Periodic factsheet/product source proven; no centralized public daily unit-price history certified in this sample."
+        }
+      ],
+      "conclusion": "Kenya now has one clearly proven direct dated daily price surface (NCBA) plus four additional representative official manager/product or factsheet paths. This is enough to prove bounded pilot feasibility and source heterogeneity, but not a market-wide NAV connector.",
+      "remaining": [
+        "Measure historical depth and URL stability for NCBA daily price pages.",
+        "Determine whether Etica/KCB factsheets expose extractable unit/share prices versus only yields/returns.",
+        "Continue direct-price discovery for Britam/CIC or explicitly certify their public NAV path as unavailable.",
+        "Map sampled products to exact CMA scheme/sub-fund identities and currencies.",
+        "Review source terms/licensing before automated bulk acquisition.",
+        "Do not flatten CMA umbrella/sub-fund structure into one fund row before W1 Fund/SubFund/ShareClass grain is resolved."
+      ]
+    },
+    "next_probe": "Build a no-write Kenya pilot mapping anchored on CMA identities: start with NCBA as direct daily-price candidate, then classify Etica/Britam/CIC/KCB as daily-price, periodic-factsheet or no-public-price source. No canonical import."
+  },
+  "GHANA": {
+    "regulator": "Securities and Exchange Commission Ghana",
+    "regulator_sources": [
+      {
+        "role": "MUTUAL_FUND_UNIVERSE",
+        "url": "https://licensees.sec.gov.gh/licensees/MutualFunds.php",
+        "observed_state": "Official list exposes fund name, website, fund manager and custodian/trustee."
+      },
+      {
+        "role": "UNIT_TRUST_UNIVERSE",
+        "url": "https://licensees.sec.gov.gh/licensees/UnitTrust.php",
+        "observed_state": "Official list exposes unit trust identity, website, fund manager and custodian/trustee."
+      },
+      {
+        "role": "NAV_SEMANTICS",
+        "url": "https://sec.gov.gh/frequently-asked-questions/",
+        "observed_state": "SEC explains NAV per share and bid/offer reporting for open-ended collective investment schemes."
+      }
+    ],
+    "canonical_identity_implication": {
+      "scheme_types": [
+        "Mutual Fund",
+        "Unit Trust"
+      ],
+      "fund": "Regulator list provides scheme/product identity.",
+      "manager": "Explicit manager field available.",
+      "service_provider": "Custodian/trustee is explicit and should map to Organization/service-provider semantics, not remain a duplicated free-text copy long term.",
+      "price_semantics": "NAVPS, bid and offer are distinct concepts and must retain explicit price_type."
+    },
+    "acquisition_plan_candidate": [
+      "Snapshot regulator Mutual Fund and Unit Trust registries separately and preserve legal scheme type.",
+      "Resolve manager/custodian entities through canonical Organization aliases.",
+      "Sample at least five managers covering mutual funds and unit trusts to locate official NAVPS/bid/offer feeds.",
+      "Record whether price history is HTML, downloadable file, factsheet/report or API and whether historical depth is sufficient.",
+      "Use annual regulator reports only as validation/coverage evidence, not as a substitute for daily/periodic NAV time series.",
+      "Design Ghana adapter only after source semantics and publication cadence are certified."
+    ],
+    "blockers": [
+      "No centralized current fund-level daily NAV feed certified yet.",
+      "Fund-manager website heterogeneity likely requires source adapters.",
+      "NAVPS vs bid/offer selection must be explicit and quality-reviewed."
+    ],
+    "readiness": "PILOT_SOURCE_FEASIBILITY_PROVEN_MARKET_WIDE_COVERAGE_PENDING",
+    "W1_dependencies": [
+      "W1-DELTA-003",
+      "W1-DELTA-004",
+      "W1-DELTA-007"
+    ],
+    "regulator_snapshot": {
+      "observed_at": "2026-10-06",
+      "official_operator_counts": {
+        "Mutual_Funds": 53,
+        "Unit_Trusts": 33,
+        "Fund_Managers": 83
+      },
+      "source": "https://licensees.sec.gov.gh/"
+    },
+    "nav_source_sampling": {
+      "observed_at": "2026-10-06",
+      "sampled_manager_count": 5,
+      "proven_examples": [
+        {
+          "manager": "EDC / Ecobank",
+          "source": "https://www.ecobank.com/gh/corporate-investment-banking/wsa-management/collective-investment-schemes",
+          "data_shape": "dated public fund values in GHS/GHC across multiple Ghana funds",
+          "price_semantics": "Displayed fund value/price; exact NAV/bid/offer semantics must remain source-specific."
+        },
+        {
+          "manager": "CAL Asset Management",
+          "source": "https://calassetmanagement.net/about-us/reports-2/performance-update",
+          "data_shape": "daily dated PRICE (GHS) history plus YTD/annualized returns for multiple unit trusts",
+          "price_semantics": "Explicit PRICE column; suitable pilot time-series candidate pending source/terms validation."
+        },
+        {
+          "manager": "Brassica Capital",
+          "source": "https://www.brassicagroup.com/resources/understand-how-to-maximize",
+          "data_shape": "dated current/previous Offer Price and Bid Price plus performance",
+          "price_semantics": "BID and OFFER are explicitly distinct; never collapse to canonical VL without product rule."
+        },
+        {
+          "manager": "SDC Capital",
+          "source": "https://sdccapital.com.gh/",
+          "data_shape": "current CM Fund price, inception/opening price and performance as-of date",
+          "price_semantics": "Public fund price; historical depth still to measure."
+        },
+        {
+          "manager": "Databank",
+          "source": "https://www.databankgroup.com/",
+          "data_shape": "periodic fund factsheets expose dated share price and fund details",
+          "price_semantics": "Share price/NAV-per-share concept; cadence appears periodic rather than proven daily web feed."
+        }
+      ],
+      "conclusion": "Five representative licensed-manager source paths are now proven. Ghana is feasible for a bounded source-adapter pilot, but market-wide coverage still requires per-manager source/cadence mapping and explicit price-type semantics.",
+      "remaining": [
+        "Measure historical depth and update cadence for each source.",
+        "Resolve URL stability/terms of use and artifact retention.",
+        "Map each sampled product to the SEC registry and canonical manager/custodian identities.",
+        "Classify BID/OFFER/share-price/NAV semantics per source before canonical promotion."
+      ]
+    },
+    "next_probe": "Build a no-write Ghana pilot source matrix linking SEC registry identities to the five sampled manager feeds; do not import until Fund/ShareClass grain and price_type rules are explicit."
+  },
+  "shared_P1_acceptance_before_connector_task": [
+    "Regulator universe snapshot can be reproduced deterministically.",
+    "Fund/SubFund/ShareClass grain is explicit and source-backed.",
+    "At least five representative managers/products have a stable official NAV/price publication path OR the absence of such path is explicitly documented.",
+    "Price type and currency are explicit.",
+    "Publication/effective/acquisition dates can be distinguished.",
+    "Raw/source evidence can fit the W2 ingestion contract.",
+    "No dependency requires inventing identifiers, NAV, benchmark or provenance.",
+    "A pilot manager feed does not authorize claiming full-market coverage."
+  ],
+  "next_action": "Ghana: build no-write SEC-registry-to-five-manager mapping and cadence/price-type matrix. Kenya: build no-write CMA-registry-to-five-manager mapping with NCBA daily-price pilot and four source-availability classifications. CEMAC: wait for JS-wrapped read-only production preflight. No connector/task promotion until queue and governance gates permit."
+}

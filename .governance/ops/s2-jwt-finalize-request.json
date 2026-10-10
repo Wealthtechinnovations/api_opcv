@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "action": "DISABLE_PREVIOUS_JWT_KEY",
+  "confirmation": "REVOKE AFRICAFUNDS PREVIOUS JWT KEY",
+  "one_shot": true,
+  "request_id": "AF-SEC-JWT-FINALIZE-20260912T0220Z",
+  "accept_old_session_revocation": true,
+  "rollback_required": true,
+  "authorization_basis": "explicit owner instruction in current ChatGPT session to continue end-to-end and unblock security blockers",
+  "incident_reason": "The old JWT signing key was historically exposed in a public repository. Keeping it active as a compatibility key would preserve forgery capability.",
+  "evidence": {
+    "jwt_rotation_run": 34667308136,
+    "jwt_rotation_result": "PASS",
+    "new_key_active": true,
+    "old_token_temporarily_validated": true,
+    "local_api_http": 200
+  },
+  "safety": {
+    "backup_runtime_env_before_change": true,
+    "api_monolith_only_restart": true,
+    "current_token_must_remain_valid": true,
+    "old_key_token_must_be_rejected": true,
+    "secret_values_never_logged": true,
+    "token_values_never_logged": true,
+    "automatic_rollback_on_failure": true
+  }
+}

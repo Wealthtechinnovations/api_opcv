@@ -1,0 +1,119 @@
+name: AfricaFunds Finalize JWT Rotation
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.governance/ops/s2-jwt-finalize-request.json'
+      - '.github/workflows/governance-s2-jwt-finalize.yml'
+      - 'scripts/governance/s2_finalize_jwt_rotation.py'
+      - 'scripts/governance/prepare_s2_ssh.sh'
+      - 'scripts/governance/s2_git_guard.sh'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-jwt-finalize
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout canonical governance
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          fetch-depth: 2
+
+      - name: Resolve one-shot authorization
+        id: auth
+        env:
+          GITHUB_SHA_VALUE: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "authorized=false" >> "$GITHUB_OUTPUT"
+          if ! git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA_VALUE" \
+              | grep -Fxq '.governance/ops/s2-jwt-finalize-request.json'; then
+            echo "No JWT finalize request in this commit; safe no-op."
+            exit 0
+          fi
+          python3 - <<'PY'
+          import json
+          p=json.load(open('.governance/ops/s2-jwt-finalize-request.json',encoding='utf-8'))
+          assert p['schema_version']=='1.0.0'
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['action']=='DISABLE_PREVIOUS_JWT_KEY'
+          assert p['confirmation']=='REVOKE AFRICAFUNDS PREVIOUS JWT KEY'
+          assert p['one_shot'] is True
+          assert p['accept_old_session_revocation'] is True
+          assert p['rollback_required'] is True
+          print('VERSIONED_JWT_FINALIZE_REQUEST=PASS')
+          PY
+          echo "authorized=true" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare strict pinned SSH
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Reconcile API checkout before JWT finalization
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- reconcile api' \
+            < scripts/governance/s2_git_guard.sh | tee jwt-finalize-reconcile.txt
+
+      - name: Disable compromised previous JWT key
+        if: steps.auth.outputs.authorized == 'true'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'python3 -' \
+            < scripts/governance/s2_finalize_jwt_rotation.py \
+            | tee JWT_FINALIZE_RESULT.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('JWT_FINALIZE_RESULT.json',encoding='utf-8'))
+          assert p['project_uid']=='CS-AFRICAFUNDS-001'
+          assert p['result']=='PASS'
+          assert p['previous_key_active'] is False
+          assert p['current_token_valid'] is True
+          assert p['old_key_token_rejected'] is True
+          assert p['old_sessions_revoked'] is True
+          assert str(p['local_api_http']).startswith('2')
+          assert p['secret_values_exposed'] is False
+          assert p['token_values_exposed'] is False
+          assert p['rollback_used'] is False
+          print('JWT_COMPROMISED_KEY_REVOCATION=PASS')
+          PY
+
+      - name: Upload non-secret evidence
+        if: always() && steps.auth.outputs.authorized == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-jwt-finalization
+          path: |
+            JWT_FINALIZE_RESULT.json
+            jwt-finalize-reconcile.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

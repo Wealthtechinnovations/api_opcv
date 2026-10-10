@@ -1,0 +1,64 @@
+name: AfricaFunds State Coherence
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.governance/loop/**'
+      - 'CURRENT_ITERATION.md'
+      - 'LOOP_STATE.md'
+      - 'HANDOFF.md'
+      - 'NEXT_ACTION.md'
+      - '00_START_HERE.md'
+      - 'GOVERNANCE.md'
+      - 'AGENTS.md'
+      - 'LOOP_ENGINEERING.md'
+      - 'scripts/governance/validate_state_coherence.py'
+      - '.github/workflows/governance-state-coherence.yml'
+  schedule:
+    - cron: '11 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-state-coherence
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+          path: api
+          fetch-depth: 1
+
+      - uses: actions/checkout@v4
+        with:
+          repository: Wealthtechinnovations/front_end_opcvm
+          ref: claude/code-review-improvements-ikvuj
+          path: frontend
+          fetch-depth: 1
+          token: ${{ github.token }}
+
+      - name: Validate state projections and global checkpoint
+        run: |
+          mkdir -p out
+          python3 api/scripts/governance/validate_state_coherence.py \
+            --api-root api \
+            --frontend-root frontend \
+            --output out/state-coherence.json
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-state-coherence
+          path: out/state-coherence.json
+          if-no-files-found: warn
+          retention-days: 30
