@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "0048adc36d929173d35b910593357f8f6b5b74cc"
+      "head": "dbc22f541dc4d8d9865418bfa8d29a87e9125518"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "0662664f870fd7ad477d0bd8082e611a14850019",
-      "last_validated_sha": "0662664f870fd7ad477d0bd8082e611a14850019",
-      "content_sha256": "30466bb8f05e38e84a3e23a5b7a5247346bed77c14a4fe1ddb79e77fc543512f",
-      "line_count": 2457,
-      "byte_count": 169748,
+      "git_blob_sha": "489a63560d1685f7f1c1c66e25b1dd95db67e281",
+      "last_validated_sha": "489a63560d1685f7f1c1c66e25b1dd95db67e281",
+      "content_sha256": "6350972576bc79822103eb39f3c1663a1f353ee7a6fe48bc23804e5cb19af85a",
+      "line_count": 2460,
+      "byte_count": 168701,
       "headings": [
         {
           "level": 1,
@@ -10226,11 +10226,11 @@
         },
         {
           "level": 2,
-          "text": "Indetermines — a NE PAS basculer automatiquement (201 avec VL)"
+          "text": "Indetermines — a NE PAS basculer automatiquement (204 avec VL)"
         },
         {
           "level": 2,
-          "text": "Les 29 fonds declares USD — les deux taux, cote a cote"
+          "text": "Les 32 fonds declares USD — les deux taux, cote a cote"
         },
         {
           "level": 2,
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "3eaf03d124c368d56625eed7c524fcabdaf67814",
-      "last_validated_sha": "3eaf03d124c368d56625eed7c524fcabdaf67814",
-      "content_sha256": "fad9339ebdb8613f0e7dea92080b39a748f41fb6bfa2ed025778cb9ae363a109",
+      "git_blob_sha": "21e2fb1dab497217964c3467a68a8bd0600d17cf",
+      "last_validated_sha": "21e2fb1dab497217964c3467a68a8bd0600d17cf",
+      "content_sha256": "25157534a519b02c4a784559c29adc7c8e602951a453eb8efd9c31c156df00e8",
       "line_count": 96,
-      "byte_count": 7540,
+      "byte_count": 7539,
       "headings": [
         {
           "level": 1,
