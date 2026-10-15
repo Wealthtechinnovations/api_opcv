@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-10-15 19:04 UTC**
+Derniere verification : **2026-10-15 19:10 UTC**
 
 ```
 
@@ -28,7 +28,7 @@ Derniere verification : **2026-10-15 19:04 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Tue Oct 13, soit 2 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-10-15T18:00, soit 1.0 h
+             runtime: genere le 2026-10-15T19:00, soit 0.1 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1531x [100.00 .. 153145] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1524x [1.02 .. 1555] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1519x [1.09 .. 1662] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1506x [10.65 .. 16036] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1501x [1.00 .. 1501] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1482x [114.47 .. 169687] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1472x [1.08 .. 1593] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1465x [1.05 .. 1532] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1462x [1.15 .. 1682] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1439x [1.17 .. 1684] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182] | [2770] CFG AM FIXED INCOME DOLLAR FUN (NIGERIA/USD) 1415x [106.08 .. 150150]
 [ECHEC] C8           Les performances suivent les VL
@@ -75,7 +75,7 @@ Derniere verification : **2026-10-15 19:04 UTC**
              122/122 fonds au rang que leur performance stockee leur donne (100.0 %)
 [OK   ] C12.OBLIGATIONS NIGERIA Les rangs correspondent aux performances
              87/87 fonds au rang que leur performance stockee leur donne (100.0 %)
-[OK   ] C12.DIVERSIFIE TUNISIE Les rangs correspondent aux performances
+[OK   ] C12.MONETAIRE MAROC Les rangs correspondent aux performances
              70/70 fonds au rang que leur performance stockee leur donne (100.0 %)
 
 23/33 controles OK — 4 echec(s) critique(s), 6 alerte(s).
