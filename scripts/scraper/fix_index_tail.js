@@ -27,6 +27,10 @@
  *   node scripts/scraper/fix_index_tail.js --indice NSE --since 2025-01-15 --execute
  *   # tous les indices concernes :
  *   node scripts/scraper/fix_index_tail.js --since 2025-01-15 --execute
+ *
+ *   # MASI via la source de repli FT markets (medias24 etant ferme par
+ *   # Cloudflare). medias24 reste le DEFAUT : il faut demander --source ft.
+ *   node scripts/scraper/fix_index_tail.js --indice MASI --since 2026-08-06 --source ft
  */
 
 'use strict';
@@ -50,7 +54,7 @@ const USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l
 // --------------------------------------------------------------------------
 function parseArgs() {
   const a = process.argv.slice(2);
-  const o = { since: null, until: todayISO(), seuil: 3, indice: null, execute: false, propagate: false };
+  const o = { since: null, until: todayISO(), seuil: 3, indice: null, execute: false, propagate: false, source: 'medias24' };
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--since' && a[i + 1]) o.since = a[++i];
     else if (a[i] === '--until' && a[i + 1]) o.until = a[++i];
@@ -58,6 +62,7 @@ function parseArgs() {
     else if (a[i] === '--indice' && a[i + 1]) o.indice = a[++i].toUpperCase();
     else if (a[i] === '--execute') o.execute = true;
     else if (a[i] === '--propagate') o.propagate = true;
+    else if (a[i] === '--source' && a[i + 1]) o.source = a[++i].toLowerCase();
   }
   return o;
 }
@@ -112,6 +117,43 @@ async function authMASI() {
   return map;
 }
 
+/**
+ * MASI via FT markets — source de REPLI, ajoutee A COTE de l existante.
+ *
+ * POURQUOI. medias24 est ferme par Cloudflare : 403 a Node ET a curl depuis S2,
+ * verifie. `authMASI` ci-dessus echoue donc, `fixOne` rend « ECHEC source
+ * autoritative » et ignore l indice — et les seances marocaines manquantes ne
+ * sont jamais comblees. Mesure du 2026-10-07 : `C9.MAROC` a 48,2 %, soit
+ * 4 161 VL sans benchmark sur 8 031 entrees en 30 jours.
+ *
+ * medias24 RESTE LE DEFAUT. Rien ne change pour un appel existant : il faut
+ * `--source ft` pour emprunter ce chemin. C est la regle d evolution additive
+ * du depot — on ajoute une voie, on n en retire aucune.
+ *
+ * La logique de validation des colonnes vit dans `scripts/scraper/masi_ft.js`
+ * et n est pas recopiee ici : le tableau FT donne
+ * Date | Ouverture | Haut | Bas | Cloture | Volume, et prendre la premiere
+ * colonne venue fausserait le benchmark d environ +1,6 % — un ecart credible,
+ * donc invisible pour tous les controles. `serieMASIviaFT` rend une serie VIDE
+ * si les colonnes ne sont pas confirmees, jamais une serie a demi fiable, et
+ * `fixOne` traite une source vide comme une absence de donnees.
+ *
+ * ANCRE DE NON-REGRESSION. La cloture FT du 31/07/2026 vaut 17 843,70, soit
+ * exactement la valeur deja presente dans `indice_references` ce jour-la
+ * (ecart 0,00). Avant tout `--execute` sur une plage englobant cette date,
+ * verifier en dry-run que cette seance n est PAS signalee comme a corriger :
+ * si elle l etait, les deux series ne seraient pas la meme et il faudrait
+ * s arreter.
+ */
+async function authMASIviaFT(opts) {
+  const { serieMASIviaFT } = require('./masi_ft');
+  // Une marge de dix jours avant `--since` : `fixOne` ne corrige que les dates
+  // de la fenetre, mais la validation des colonnes a besoin de plusieurs
+  // seances consecutives pour juger l enchainement.
+  const depuis = new Date(new Date(`${opts.since}T00:00:00Z`).getTime() - 10 * 86400000);
+  return serieMASIviaFT(depuis.toISOString().slice(0, 10), opts.until, true);
+}
+
 const INDICES = {
   NSE: { nom: 'NSE All Share', type_indice_id: 1, min: 1000, auth: authNSE, dbId: 'NSE' },
   TUNINDEX: { nom: 'Tunindex', type_indice_id: 1, min: 1000, auth: authTunindex, dbId: 'Tunindex' },
@@ -128,9 +170,16 @@ async function fixOne(conn, key, opts) {
   console.log('============================================================');
 
   let authMap;
-  try { authMap = await cfg.auth(); }
+  // `--source ft` ne concerne que MASI : les autres indices ont des sources
+  // qui repondent. Un `--source ft` sur NSE ou TUNINDEX est donc ignore, et
+  // dit, plutot que silencieusement interprete.
+  const useFT = opts.source === 'ft' && key === 'MASI';
+  if (opts.source === 'ft' && key !== 'MASI') {
+    console.log(`  --source ft ne s applique qu a MASI : ${key} garde sa source habituelle.`);
+  }
+  try { authMap = useFT ? await authMASIviaFT(opts) : await cfg.auth(); }
   catch (e) { console.log(`  ECHEC source autoritative: ${e.message} — indice ignore.`); return { updated: 0, inserted: 0 }; }
-  console.log(`  Source autoritative: ${authMap.size} points.`);
+  console.log(`  Source autoritative${useFT ? ' (FT markets MASI:CAS)' : ''}: ${authMap.size} points.`);
 
   // Liste des dates autoritatives dans la fenetre [since, until]
   const inWindow = [...authMap.entries()]
