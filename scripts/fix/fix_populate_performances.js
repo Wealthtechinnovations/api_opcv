@@ -239,6 +239,69 @@ function findValueAtYearsAgo(dates, values, lastDate, years) {
   return findValueAtDate(dates, values, target);
 }
 
+/**
+ * La valeur a N annees, MAIS SEULEMENT si l historique couvre reellement N
+ * annees. Sinon `null`.
+ *
+ * POURQUOI CETTE GARDE EXISTE, ET CE QU ELLE CORRIGE. `findValueAtDate`
+ * ci-dessus se termine par :
+ *
+ *     if (bestIdx === -1 && dates.length > 0) { bestIdx = 0; }
+ *
+ * c est-a-dire : faute de VL a la date visee, elle retombe sur la PLUS ANCIENNE
+ * valeur disponible. Consequence mesuree sur la production le 2026-10-15 :
+ *
+ *   [1543] SOAGA EPARGNE ACTIVE — 1 528 VL, du 2016-10-28 au 2024-11-01,
+ *   soit 8,01 ans d historique. AUCUNE VL a dix ans ou avant.
+ *   Et pourtant : perf10ans calcule = 20,4574.
+ *
+ * Ce chiffre est une performance mesuree sur huit ans et presentee comme une
+ * performance dix ans. La route fait la meme chose : sur la ligne MAX(date) de
+ * ce fonds, elle stocke perf8ans = 19,7076 ET perf10ans = 19,7076 — deux
+ * horizons differents, un seul chiffre, donc le meme repli sur la plus ancienne
+ * valeur.
+ *
+ * **565 fonds** sont dans ce cas : historique de moins de dix ans et un
+ * `perf10ans` tout de meme renseigne. Ce n est pas un cas isole, c est une
+ * classe de defaut.
+ *
+ * `CLAUDE.md` l interdit en ces termes : « Ne jamais inventer : benchmark,
+ * donnee financiere, taux de change, **performance**, categorie, historique. »
+ * Une performance dix ans sur huit ans d historique est une performance
+ * inventee. Rendre `null` n est pas une perte d information : c est le retrait
+ * d une information fausse.
+ *
+ * CE QUE CELA PRODUIRA DANS LE DRY-RUN, ET QU IL NE FAUDRA PAS MAL LIRE. La
+ * table contient aujourd hui les chiffres fabriques par la route. Ecrire `null`
+ * la ou elle a un nombre fait apparaitre ces colonnes en **PERDU** au sens du
+ * critere a quatre classes. C est voulu : le script ne perd pas une valeur, il
+ * refuse d en inventer une. Le critere doit donc etre lu en distinguant un
+ * PERDU sur une colonne d horizon non couvert — attendu, souhaite — d un PERDU
+ * sur une colonne dont l horizon est couvert, qui serait lui un vrai defaut.
+ *
+ * `findValueAtDate` n est PAS modifiee : elle sert aussi aux horizons courts
+ * (veille, quatre semaines, trois et six mois, premier janvier), ou le repli
+ * joue un autre role. Changement cible, pas global.
+ */
+function valeurSiHorizonCouvert(dates, values, lastDate, years) {
+  if (!dates.length) return null;
+  const target = new Date(lastDate);
+  target.setFullYear(target.getFullYear() - years);
+  // La plus ancienne VL est-elle anterieure ou egale a la date visee ? Si non,
+  // l horizon n est pas couvert et il n y a rien a mesurer.
+  if (dates[0].getTime() > target.getTime()) return null;
+  return findValueAtDate(dates, values, target);
+}
+
+/** Meme garde, pour les horizons calcules depuis la fin du mois precedent. */
+function valeurSiHorizonCouvertPourDate(dates, values, refDate, years) {
+  if (!dates.length) return null;
+  const target = new Date(refDate);
+  target.setFullYear(target.getFullYear() - years);
+  if (dates[0].getTime() > target.getTime()) return null;
+  return findValueAtDate(dates, values, target);
+}
+
 function findValueAtMonthsAgo(dates, values, lastDate, months) {
   const target = new Date(lastDate);
   target.setMonth(target.getMonth() - months);
@@ -385,11 +448,11 @@ async function run() {
       const ytd = perf(lastValue, findValueAtJanuary1(dates, values, lastDate));
       const perf3m = perf(lastValue, findValueAtMonthsAgo(dates, values, lastDate, 3));
       const perf6m = perf(lastValue, findValueAtMonthsAgo(dates, values, lastDate, 6));
-      const perf1an = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 1));
-      const perf3ans = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 3));
-      const perf5ans = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 5));
-      const perf8ans = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 8));
-      const perf10ans = perf(lastValue, findValueAtYearsAgo(dates, values, lastDate, 10));
+      const perf1an = perf(lastValue, valeurSiHorizonCouvert(dates, values, lastDate, 1));
+      const perf3ans = perf(lastValue, valeurSiHorizonCouvert(dates, values, lastDate, 3));
+      const perf5ans = perf(lastValue, valeurSiHorizonCouvert(dates, values, lastDate, 5));
+      const perf8ans = perf(lastValue, valeurSiHorizonCouvert(dates, values, lastDate, 8));
+      const perf10ans = perf(lastValue, valeurSiHorizonCouvert(dates, values, lastDate, 10));
 
       // Performances glissantes fin de mois precedent
       const prevMonthEnd = new Date(lastDate.getFullYear(), lastDate.getMonth(), 0);
@@ -408,11 +471,11 @@ async function run() {
         ytdm = perf(prevMonthValue, findValueAtJanuary1ForDate(dates, values, prevMonthEnd));
         perf3mm = perf(prevMonthValue, findValueAtMonthsAgoForDate(dates, values, prevMonthEnd, 3));
         perf6mm = perf(prevMonthValue, findValueAtMonthsAgoForDate(dates, values, prevMonthEnd, 6));
-        perf1anm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 1));
-        perf3ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 3));
-        perf5ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 5));
-        perf8ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 8));
-        perf10ansm = perf(prevMonthValue, findValueAtYearsAgoForDate(dates, values, prevMonthEnd, 10));
+        perf1anm = perf(prevMonthValue, valeurSiHorizonCouvertPourDate(dates, values, prevMonthEnd, 1));
+        perf3ansm = perf(prevMonthValue, valeurSiHorizonCouvertPourDate(dates, values, prevMonthEnd, 3));
+        perf5ansm = perf(prevMonthValue, valeurSiHorizonCouvertPourDate(dates, values, prevMonthEnd, 5));
+        perf8ansm = perf(prevMonthValue, valeurSiHorizonCouvertPourDate(dates, values, prevMonthEnd, 8));
+        perf10ansm = perf(prevMonthValue, valeurSiHorizonCouvertPourDate(dates, values, prevMonthEnd, 10));
       }
 
       // Ratios. `years` reproduit `anneevalorisation` : DATEDIFF(MAX, MIN)/365
