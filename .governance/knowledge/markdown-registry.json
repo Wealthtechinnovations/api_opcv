@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "45ecb862984a4cd98aeb3757a3ee15a7b354e241"
+      "head": "b73fbba6971b7a34c0176f92c1856286cfc64af0"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "0035b1184c719d76e8e9f470144e19ec64ebf60c"
+      "head": "ec227896755eae6334e0602471abc38e15aa4750"
     }
   },
   "summary": {
@@ -10097,8 +10097,8 @@
         "A. Tables de classement",
         "B. Retard des performances par pays",
         "C. Le classement suit-il les performances actuelles ?",
-        "0. Volumetrie de `classementfonds`",
-        "A. Etat du CSV"
+        "0. Type REEL des colonnes en cause (la base fait foi, pas le modele)",
+        "0bis. Les cinq plus grands ytd selon chacun des deux tris SQL"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "b9d7d74dde3ec881d55f12dff686ab1231a172eb",
-      "last_validated_sha": "b9d7d74dde3ec881d55f12dff686ab1231a172eb",
-      "content_sha256": "58d45e7ee5bcb2f0f27fc482b32e3e3ce13148200f328414189c9e6ab24f62d6",
-      "line_count": 2461,
-      "byte_count": 168858,
+      "git_blob_sha": "261f9fcf0947ef57384b3c01a42d8f4166b45331",
+      "last_validated_sha": "261f9fcf0947ef57384b3c01a42d8f4166b45331",
+      "content_sha256": "65741c1c6ac26ffa182847714ec21ffc6670578d7d93237f1c3f4f11c434ad39",
+      "line_count": 2823,
+      "byte_count": 188061,
       "headings": [
         {
           "level": 1,
@@ -10191,6 +10191,14 @@
         {
           "level": 2,
           "text": "C. Le classement suit-il les performances actuelles ?"
+        },
+        {
+          "level": 2,
+          "text": "0. Type REEL des colonnes en cause (la base fait foi, pas le modele)"
+        },
+        {
+          "level": 2,
+          "text": "0bis. Les cinq plus grands ytd selon chacun des deux tris SQL"
         },
         {
           "level": 2,
@@ -10270,15 +10278,7 @@
         },
         {
           "level": 2,
-          "text": "1. Volumetrie de `performences`"
-        },
-        {
-          "level": 2,
-          "text": "2. Ligne MAX(date) de chaque fonds actif — ratios absents (NULL ou `-`)"
-        },
-        {
-          "level": 2,
-          "text": "3. Perimetre reel du rattrapage (sans `--force`)"
+          "text": "1. Type REEL des colonnes longues (la base fait foi)"
         }
       ]
     },
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "d13d2f4d4d789d952a4d21393d2e55ee958f0daa",
-      "last_validated_sha": "d13d2f4d4d789d952a4d21393d2e55ee958f0daa",
-      "content_sha256": "29f678f908364c33057055e84e8ec2aca93e068983bfedaf8415d87c35f9ebf4",
+      "git_blob_sha": "0254194d12dd74c6a2ea69957a33c74c19142dc6",
+      "last_validated_sha": "0254194d12dd74c6a2ea69957a33c74c19142dc6",
+      "content_sha256": "fc28db5e5a12fd529b8f6152026928d800eed9de81b6d000c6bf9913921f9619",
       "line_count": 96,
-      "byte_count": 7539,
+      "byte_count": 7536,
       "headings": [
         {
           "level": 1,
@@ -13421,11 +13421,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "e5341aaa8297238c73581514253ba414dcbec10e",
-      "last_validated_sha": "e5341aaa8297238c73581514253ba414dcbec10e",
-      "content_sha256": "d3cd2cd33345372d2edd5e81179dfc579089b2739ca38189feaadf990da29f03",
-      "line_count": 8291,
-      "byte_count": 553365,
+      "git_blob_sha": "f4c5dc37a3f4dc0701993e8c6ef27218836a5541",
+      "last_validated_sha": "f4c5dc37a3f4dc0701993e8c6ef27218836a5541",
+      "content_sha256": "c1a0e0f24c19db463b9cb4873156b3f83c8db520446d0bcef0573be97342cbd8",
+      "line_count": 8522,
+      "byte_count": 565998,
       "headings": [
         {
           "level": 1,
