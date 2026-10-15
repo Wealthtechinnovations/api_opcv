@@ -82,6 +82,26 @@
  *     `anneevalorisation` (apigestionsavequotidien.js:301) et `fetchRatioData`.
  *     Un fonds de deux ans n a donc que les ratios 1 an, comme aujourd hui.
  *
+ * LE CRITERE DE BASCULE A ETE REDEFINI (2026-10-15), PARCE QUE L ANCIEN ETAIT
+ * INATTEIGNABLE. Le plan exigeait « 0 divergence sur 84 colonnes ». Le dry-run
+ * etendu a tourne : il a sorti « 10 divergents » — et aucun de ces dix ecarts
+ * n etait un desaccord de valeur. Tous etaient de la forme
+ * `calcule=4,06 / stocke=null` : des colonnes de ratios que ce script remplit
+ * desormais et que la table n a pas. Le critere condamnait donc l amelioration
+ * en meme temps que le defaut, et il ne pouvait jamais etre satisfait.
+ *
+ * Le dry-run classe maintenant chaque colonne dans l une de quatre classes :
+ *
+ *   IDENTIQUE  les deux cotes ont une valeur, ecart sous tolerance
+ *   DIVERGENT  les deux cotes ont une valeur, ecart au-dessus  → EXIGE : 0
+ *   COMBLE     le script a une valeur, la table est vide       → attendu
+ *   PERDU      la table a une valeur, le script n en a pas     → EXIGE : 0
+ *
+ * `DIVERGENT = 0` est la garantie d equivalence : la ou les deux calculs ont un
+ * chiffre, c est le meme. `PERDU = 0` est la garantie de non-destruction, et
+ * c est elle qui manquait a l ancien critere. Les deux sont atteignables, et
+ * verifiables sans interpretation.
+ *
  * CE QUE LE PLAN DEMANDAIT ET QUI N A PAS ETE FAIT : ecrire
  * `lastdatepreviousmonth`. Verification faite, `src/models/performence.js` ne
  * DECLARE PAS cette colonne ; Sequelize ignore silencieusement un attribut non
@@ -300,6 +320,26 @@ async function run() {
   // diverge » sans dire ou, et c est precisement ce qui a permis de croire a
   // une equivalence qui ne portait que sur dix champs.
   const divergencesParColonne = {};
+  // QUATRE CLASSES, ET NON UN COMPTEUR BINAIRE. Le dry-run livre le 2026-10-07
+  // comparait bien les ~90 colonnes, mais il rangeait tout ecart dans
+  // « divergent » — et sa sortie disait « 10 divergents » alors qu AUCUN ecart
+  // n etait un desaccord de valeur : tous etaient de la forme
+  // `calcule=4,06 / stocke=null`, c est-a-dire des colonnes de ratios que le
+  // script remplit desormais et que la table n a pas. Le critere « 0 divergence
+  // sur 84 colonnes » exige par le plan ne pouvait donc JAMAIS etre atteint :
+  // il condamnait l amelioration en meme temps que le defaut.
+  //
+  //   IDENTIQUE : les deux cotes ont une valeur, ecart sous tolerance
+  //   DIVERGENT : les deux cotes ont une valeur, ecart au-dessus → DOIT ETRE 0
+  //   COMBLE    : le script a une valeur, la table est vide → attendu, souhaite
+  //   PERDU     : la table a une valeur, le script n en a pas → DOIT ETRE 0
+  //
+  // `PERDU = 0` est la garantie de non-destruction, et c est elle qui manquait.
+  // `DIVERGENT = 0` est la garantie d equivalence. Les deux sont atteignables
+  // et verifiables.
+  const comblesParColonne = {};
+  const perdusParColonne = {};
+  let dryCombles = 0, dryPerdus = 0;
   let colonnesComparees = 0;
   let ratiosEchoues = 0;
   // Fonds dont au moins un des dix ratios lus par le classement local ne
@@ -441,6 +481,7 @@ async function run() {
         } else {
           const stocke = existingPerf[0];
           const ecarts = [];
+          let nbCombles = 0;
           // `date` et `fond_id` sont la cle de la comparaison, pas son objet.
           for (const c of Object.keys(perfValues)) {
             if (c === 'fond_id' || c === 'date') continue;
@@ -456,7 +497,20 @@ async function run() {
               continue;
             }
             if (vide(calc) && vide(base)) continue;
-            if (vide(calc) || vide(base)) { ecarts.push(`${c}: calcule=${calc} stocke=${base}`); continue; }
+            // COMBLE : le script apporte une valeur ou la table n avait rien.
+            // C est l effet VOULU de l ajout des ratios, pas une divergence.
+            if (vide(base)) {
+              comblesParColonne[c] = (comblesParColonne[c] || 0) + 1;
+              nbCombles++;
+              continue;
+            }
+            // PERDU : la table avait une valeur, le script n en produit pas.
+            // C est la seule forme destructrice, et elle doit rester a zero.
+            if (vide(calc)) {
+              perdusParColonne[c] = (perdusParColonne[c] || 0) + 1;
+              ecarts.push(`${c}: PERDU — calcule=${calc} stocke=${base}`);
+              continue;
+            }
             const a = Number(calc), b = Number(base);
             const ecart = Math.abs(a - b);
             const depasse = estRatio(c)
@@ -469,12 +523,23 @@ async function run() {
           }
           colonnesComparees = Math.max(colonnesComparees, Object.keys(perfValues).length - 2);
 
+          // Le fonds est classe par sa PIRE classe : un seul desaccord de
+          // valeur ou une seule perte suffit a le sortir du vert.
+          if (nbCombles) dryCombles += nbCombles;
           if (ecarts.length) {
-            console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr} — ${ecarts.length} ecart(s)`
+            const perdus = ecarts.filter(e => e.includes('PERDU')).length;
+            console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr}`
+              + ` — ${ecarts.length} ecart(s) dont ${perdus} PERDU`
+              + (nbCombles ? `, ${nbCombles} colonne(s) comblee(s)` : '')
               + (periodesEchouees.length ? ` | ratios non obtenus : ${periodesEchouees.join(', ')}` : ''));
             for (const e of ecarts.slice(0, 8)) console.log(`        ${e}`);
             if (ecarts.length > 8) console.log(`        … et ${ecarts.length - 8} autre(s)`);
+            if (perdus) dryPerdus += perdus;
             dryDifferents++;
+          } else if (nbCombles) {
+            console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr}`
+              + ` — 0 divergence, ${nbCombles} colonne(s) COMBLEE(S) (la table etait vide)`);
+            dryIdentiques++;
           } else {
             dryIdentiques++;
           }
@@ -537,24 +602,38 @@ async function run() {
     console.log(`Colonnes comparees par fonds : ${colonnesComparees}`
       + ' (performances ET ratios — le dry-run du 2026-10-06 n en comparait que dix,'
       + ' d ou une equivalence affirmee a tort)');
-    console.log(`Identiques              : ${dryIdentiques}`);
-    console.log(`Divergents              : ${dryDifferents}`);
-    console.log(`Absents en base         : ${dryAbsents}`);
-    const colonnesDivergentes = Object.entries(divergencesParColonne)
-      .sort((a, b) => b[1] - a[1]);
-    if (colonnesDivergentes.length) {
-      console.log('\n--- DIVERGENCES PAR COLONNE ---');
-      for (const [c, n] of colonnesDivergentes) {
-        console.log(`  ${c.padEnd(22)} ${n} fonds`);
-      }
-    } else {
-      console.log('\n--- DIVERGENCES PAR COLONNE : aucune ---');
-    }
-    console.log(dryDifferents === 0
-      ? `\n0 divergence sur ${colonnesComparees} colonnes : les deux calculs donnent`
-        + ' les memes chiffres sur ce perimetre.'
-      : '\nECARTS : ne pas substituer ce script a la route sans les expliquer,'
-        + ' colonne par colonne.');
+    console.log(`Fonds sans aucun desaccord : ${dryIdentiques}`);
+    console.log(`Fonds avec desaccord       : ${dryDifferents}`);
+    console.log(`Fonds absents en base      : ${dryAbsents}`);
+    console.log('');
+    const parCol = (titre, obj) => {
+      const l = Object.entries(obj).sort((a, b) => b[1] - a[1]);
+      if (!l.length) { console.log(`--- ${titre} : aucune ---`); return; }
+      console.log(`--- ${titre} ---`);
+      for (const [c, n] of l) console.log(`  ${c.padEnd(22)} ${n} fonds`);
+    };
+    // DIVERGENT : les deux cotes ont une valeur et elles ne concordent pas.
+    // C est le seul ecart qui remet en cause l equivalence des deux calculs.
+    parCol('DIVERGENT — desaccord de valeur (doit etre vide)', divergencesParColonne);
+    console.log('');
+    // PERDU : la table avait une valeur, le script n en produit pas. C est la
+    // seule forme destructrice de la substitution.
+    parCol('PERDU — la table avait une valeur, le script non (doit etre vide)', perdusParColonne);
+    console.log('');
+    // COMBLE : attendu et souhaite. C est l effet de l ajout des ratios.
+    parCol('COMBLE — le script remplit une colonne vide (attendu)', comblesParColonne);
+
+    const nbDivergent = Object.values(divergencesParColonne).reduce((a, b) => a + b, 0);
+    console.log(`\n=== CRITERE DE BASCULE, sur ${colonnesComparees} colonnes comparees ===`);
+    console.log(`  DIVERGENT : ${nbDivergent} (exige : 0)`);
+    console.log(`  PERDU     : ${dryPerdus} (exige : 0)`);
+    console.log(`  COMBLE    : ${dryCombles} (attendu non nul : les ratios que la table n a pas)`);
+    console.log(nbDivergent === 0 && dryPerdus === 0
+      ? '  → CRITERE ATTEINT. Les deux calculs donnent les memes chiffres la ou'
+        + ' les deux en ont un, et le script ne fait perdre aucune valeur existante.'
+        + ' La substitution est non destructrice sur ce perimetre.'
+      : '  → CRITERE NON ATTEINT. Ne pas brancher le calcul direct : expliquer'
+        + ' chaque DIVERGENT et chaque PERDU, colonne par colonne, d abord.');
     console.log('');
   }
   if (opts.ratios) {

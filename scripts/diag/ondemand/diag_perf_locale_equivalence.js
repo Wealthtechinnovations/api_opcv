@@ -61,7 +61,7 @@ for (const pays of ['NIGERIA', 'UEMOA']) {
     { cwd: RACINE, encoding: 'utf8', timeout: 150000, maxBuffer: 8 * 1024 * 1024 });
   const sortie = `${r.stdout || ''}${r.stderr || ''}`;
   const utiles = sortie.split(/\r?\n/).filter(l =>
-    /DRY-RUN|Identiques|Divergents|Absents|ecart|memes chiffres|ECARTS|Options|fonds a traiter|ERROR|limite|Colonnes comparees|DIVERGENCES PAR COLONNE|ratios|Ratios|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
+    /DRY-RUN|Fonds sans aucun|Fonds avec desaccord|Fonds absents|ecart|CRITERE|DIVERGENT|PERDU|COMBLE|Options|fonds a traiter|ERROR|limite|Colonnes comparees|ratios|Ratios|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
   console.log(utiles.length ? utiles.join('\n') : '(aucune ligne retenue)');
   console.log(`-- code de sortie : ${r.status}${r.error ? ` | ${r.error.message}` : ''}\n`);
 }
