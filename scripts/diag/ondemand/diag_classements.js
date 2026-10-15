@@ -152,7 +152,18 @@ function colonneDate(cols) {
            AND c.categorie_nationale = ?
            AND p.ytd IS NOT NULL
          GROUP BY c.fond_id, p.ytd
-         ORDER BY p.ytd DESC
+         -- TRI NUMERIQUE FORCE, ET LA PREMIERE VERSION ETAIT FAUSSE.
+         -- Ce script ecrivait ORDER BY p.ytd DESC. Mesure du 2026-10-07 :
+         -- plusieurs colonnes de performences que le modele declare DOUBLE
+         -- sont en realite des varchar(255) en base (volatility3an,
+         -- ratiosharpe3an, perfannu3an). Un ORDER BY SQL sur du texte trie
+         -- par ordre alphabetique : 9.5 passe devant 10.2. L ordre attendu
+         -- etait donc faux, et ce script a annonce pendant des semaines
+         -- "ACTIONS MAROC 7/122, rho 0,474 - DIVERGE" alors que C12, qui
+         -- utilise le tri de la production (rankFundInList) et une
+         -- comparaison numerique, mesure 122/122 soit 100 %.
+         -- Le controle est CORRIGE, jamais desactive : regle du depot.
+         ORDER BY CAST(p.ytd AS DECIMAL(30,10)) DESC
       `, [a.cat]);
 
       const [stocke] = await conn.query(`
@@ -185,7 +196,11 @@ function colonneDate(cols) {
         if (reel !== undefined) paires.push({ attendu: idx + 1, reel, fond: r.fond_id });
       });
       const compares = paires.length;
-      const concordent = paires.filter(x => x.attendu === x.reel).length;
+      // COMPARAISON NUMERIQUE EXPLICITE. `CAST(... AS UNSIGNED)` cote SQL rend
+      // deja un nombre, mais la lecon du 2026-10-07 est qu un `===` contre une
+      // valeur dont on croit connaitre le type produit un compteur a zero et
+      // une conclusion fausse.
+      const concordent = paires.filter(x => Number(x.attendu) === Number(x.reel)).length;
 
       const exaequo = attendu.length - new Set(attendu.map(r => Number(r.ytd))).size;
 

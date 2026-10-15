@@ -165,9 +165,21 @@ function rho(paires) {
         const { rangs } = rangsAttendus(perfs, champ);
         const paires = [];
         let exacts = 0;
-        for (const [id, rs] of rangStocke) {
+        for (const [id, brut] of rangStocke) {
           const ra = rangs.get(id);
           if (ra == null) continue;
+          // COMPARAISON NUMERIQUE, ET LA PREMIERE VERSION ETAIT FAUSSE. Elle
+          // comparait par `===`. La colonne de rang peut etre du TEXTE en base
+          // — le modele la declare INTEGER, mais la mesure du 2026-10-07 a
+          // montre que `ytd`, `volatility3an` et d autres sont des varchar
+          // malgre un modele qui les declare DOUBLE : la base fait foi. Or
+          // `"5" === 5` est faux alors que `"5" - 5` vaut zero, d ou une sortie
+          // annoncant « 0,0 % exacts » a cote d un « ecart de rang max = 0 »,
+          // deux chiffres impossibles ensemble. Un compteur casse dans un
+          // diagnostic fabrique des conclusions fausses, et celui-la allait
+          // faire recommander une reconstruction de classement inutile.
+          const rs = Number(brut);
+          if (!Number.isFinite(rs)) continue;
           paires.push([rs, ra]);
           if (rs === ra) exacts++;
         }
