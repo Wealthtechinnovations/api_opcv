@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-10-15 11:15 UTC**
+Derniere verification : **2026-10-15 18:47 UTC**
 
 ```
 
@@ -28,7 +28,7 @@ Derniere verification : **2026-10-15 11:15 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Tue Oct 13, soit 2 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-10-15T11:00, soit 0.2 h
+             runtime: genere le 2026-10-15T18:00, soit 0.7 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1531x [100.00 .. 153145] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1524x [1.02 .. 1555] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1519x [1.09 .. 1662] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1506x [10.65 .. 16036] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1501x [1.00 .. 1501] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1482x [114.47 .. 169687] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1472x [1.08 .. 1593] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1465x [1.05 .. 1532] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1462x [1.15 .. 1682] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1439x [1.17 .. 1684] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182] | [2770] CFG AM FIXED INCOME DOLLAR FUN (NIGERIA/USD) 1415x [106.08 .. 150150]
 [ECHEC] C8           Les performances suivent les VL
@@ -36,7 +36,7 @@ Derniere verification : **2026-10-15 11:15 UTC**
 [ALERTE] C6.CEMAC     Couverture indRef CEMAC
              0.0 % (2134 VL sans benchmark sur 2134)
 [OK   ] C6.MAROC     Couverture indRef MAROC
-             98.1 % (10889 VL sans benchmark sur 567867)
+             98.1 % (10563 VL sans benchmark sur 567867)
 [OK   ] C6.NIGERIA   Couverture indRef NIGERIA
              100.0 % (0 VL sans benchmark sur 78125)
 [OK   ] C6.TUNISIE   Couverture indRef TUNISIE
@@ -44,7 +44,7 @@ Derniere verification : **2026-10-15 11:15 UTC**
 [OK   ] C6.UEMOA     Couverture indRef UEMOA
              100.0 % (0 VL sans benchmark sur 48274)
 [ALERTE] C9.MAROC     Couverture indRef des VL recentes MAROC (30 j)
-             76.1 % (1922 VL sans benchmark sur 8034 entrees en 30 j) — les VL neuves arrivent sans benchmark ; C6 ne peut pas le voir, son denominateur est tout l historique.
+             80.1 % (1596 VL sans benchmark sur 8034 entrees en 30 j) — les VL neuves arrivent sans benchmark ; C6 ne peut pas le voir, son denominateur est tout l historique.
 [OK   ] C9.NIGERIA   Couverture indRef des VL recentes NIGERIA (30 j)
              100.0 % (0 VL sans benchmark sur 75 entrees en 30 j)
 [OK   ] C9.TUNISIE   Couverture indRef des VL recentes TUNISIE (30 j)
@@ -53,14 +53,14 @@ Derniere verification : **2026-10-15 11:15 UTC**
              100.0 % (0 VL sans benchmark sur 329 entrees en 30 j)
 [OK   ] C10.MONIA    Fraicheur de l indice MONIA
              derniere valeur le Thu May 14, soit 154 j — non juge : aucune VL ne porte cet indice, ce n est pas un benchmark de fonds mais une statistique.
-[OK   ] C10.NSE All Share Fraicheur de l indice NSE All Share
-             derniere valeur le Tue Oct 13, soit 2 j (porte par 54120 VL)
 [OK   ] C10.Tunindex Fraicheur de l indice Tunindex
              derniere valeur le Wed Oct 14, soit 1 j (porte par 312093 VL)
+[OK   ] C10.NSE All Share Fraicheur de l indice NSE All Share
+             derniere valeur le Wed Oct 14, soit 1 j (porte par 54120 VL)
 [OK   ] C10.MASI     Fraicheur de l indice MASI
-             derniere valeur le Wed Oct 14, soit 1 j (porte par 556978 VL)
+             derniere valeur le Thu Oct 15, soit 0 j (porte par 557304 VL)
 [OK   ] C10.BRVM Composite Fraicheur de l indice BRVM Composite
-             derniere valeur le Wed Oct 14, soit 1 j (porte par 45213 VL)
+             derniere valeur le Thu Oct 15, soit 0 j (porte par 45232 VL)
 [ALERTE] C11.classementfonds Fraicheur de reconstruction de classementfonds
              colonne `created_at` absente : l age du dernier recalcul est inconnaissable. Appliquer la migration 20261007000001-add-rebuild-timestamps-classementfonds.js (ADD COLUMN seul, aucune ligne metier touchee).
 [ALERTE] C11.classementfonds_eurs Fraicheur de reconstruction de classementfonds_eurs
