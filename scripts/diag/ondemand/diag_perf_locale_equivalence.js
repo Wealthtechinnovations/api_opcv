@@ -61,8 +61,42 @@ for (const pays of ['NIGERIA', 'UEMOA']) {
     { cwd: RACINE, encoding: 'utf8', timeout: 150000, maxBuffer: 8 * 1024 * 1024 });
   const sortie = `${r.stdout || ''}${r.stderr || ''}`;
   const utiles = sortie.split(/\r?\n/).filter(l =>
-    /DRY-RUN|Fonds sans aucun|Fonds avec desaccord|Fonds absents|ecart|CRITERE|DIVERGENT|PERDU|COMBLE|Options|fonds a traiter|ERROR|limite|Colonnes comparees|ratios|Ratios|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
+    // LES LIGNES DE DETAIL sont retenues, c est-a-dire la seule chose qui
+    // permette de trancher. Le filtre precedent les laissait tomber : la sortie
+    // du 2026-10-15 annoncait « DIVERGENT : 1 ... perf10ans 1 fonds » sans
+    // jamais donner les deux nombres, donc sans permettre de dire si l ecart
+    // etait un arrondi ou un desaccord reel. Un filtre qui retient le verdict
+    // et jette la preuve ne sert a rien.
+    /DRY-RUN|Fonds sans aucun|Fonds avec desaccord|Fonds absents|ecart|CRITERE|DIVERGENT|PERDU|COMBLE|Options|fonds a traiter|ERROR|limite|Colonnes comparees|ratios|Ratios|calcule=|stocke=|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
   console.log(utiles.length ? utiles.join('\n') : '(aucune ligne retenue)');
+  console.log(`-- code de sortie : ${r.status}${r.error ? ` | ${r.error.message}` : ''}\n`);
+}
+
+// TROISIEME PASSE — ciblee sur le fonds qui diverge.
+//
+// POURQUOI. La passe UEMOA du 2026-10-15 a sorti « DIVERGENT : 1 ... perf10ans
+// 1 fonds » sur [1543] SOAGA EPARGNE ACTIVE, derniere VL au 2024-11-01. Un seul
+// fonds, une seule colonne — mais le critere de bascule exige zero, donc il faut
+// les deux nombres, pas le constat.
+//
+// On relance le MEME code sur ce seul fonds plutot que de reecrire le calcul
+// ailleurs : une reimplementation ne prouverait rien sur celle qui tourne.
+// `perf10ans` n est PAS lu par le classement (zero occurrence dans
+// `ranking.pure.js`), mais il EST servi par `apigestionperformance.js`, donc il
+// s affiche sur la fiche fonds. L ecart ne deplace aucun rang et change un
+// chiffre affiche : a expliquer avant toute bascule, pas a laisser passer.
+const FONDS_DIVERGENTS = ['1543'];
+for (const fond of FONDS_DIVERGENTS) {
+  console.log(`########## FONDS ${fond} — passe ciblee, detail complet`);
+  const r = spawnSync('node', ['scripts/fix/fix_populate_performances.js',
+    '--fond', fond, '--dry-run'],
+    { cwd: RACINE, encoding: 'utf8', timeout: 90000, maxBuffer: 8 * 1024 * 1024 });
+  const sortie = `${r.stdout || ''}${r.stderr || ''}`;
+  // Ici on ne filtre presque rien : le perimetre est d un fonds, le volume est
+  // borne, et c est le detail qu on vient chercher.
+  const utiles = sortie.split(/\r?\n/).filter(l =>
+    l.trim() && !/^\s*\[\d+\/\d+\]/.test(l));
+  console.log(utiles.slice(0, 60).join('\n'));
   console.log(`-- code de sortie : ${r.status}${r.error ? ` | ${r.error.message}` : ''}\n`);
 }
 
