@@ -133,6 +133,19 @@ const PERIODES_RATIO = [
   { annee: 5, suffixe: '5an', seuil: 5 },
 ];
 
+// Les colonnes dont la valeur n a de sens que si l historique couvre l horizon.
+// Elles servent au dry-run a distinguer deux choses que l ancien critere
+// confondait : le script qui PERD une valeur, et le script qui REFUSE d en
+// inventer une. La garde `valeurSiHorizonCouvert` rend `null` sur un horizon
+// non couvert ; sans cette table, ce `null` serait compte comme une perte.
+const HORIZON_PAR_COLONNE = {
+  perf1an: 1, perf1anm: 1,
+  perf3ans: 3, perf3ansm: 3,
+  perf5ans: 5, perf5ansm: 5,
+  perf8ans: 8, perf8ansm: 8,
+  perf10ans: 10, perf10ansm: 10,
+};
+
 // Les colonnes de ratios que lit le classement local (ranking.service.js:9-15).
 // Listees ici pour que le dry-run les signale nommement : ce sont celles dont
 // l absence vide les rangs de risque.
@@ -403,6 +416,12 @@ async function run() {
   const comblesParColonne = {};
   const perdusParColonne = {};
   let dryCombles = 0, dryPerdus = 0;
+  // REFUSE : le script rend `null` parce que l horizon n est pas couvert par
+  // l historique, alors que la table porte un chiffre que la route a fabrique.
+  // Ce n est PAS une perte : c est le retrait d une performance inventee.
+  // 565 fonds sont dans ce cas pour `perf10ans` (mesure du 2026-10-15).
+  const refusesParColonne = {};
+  let dryRefuses = 0;
   let colonnesComparees = 0;
   let ratiosEchoues = 0;
   // Fonds dont au moins un des dix ratios lus par le classement local ne
@@ -544,7 +563,7 @@ async function run() {
         } else {
           const stocke = existingPerf[0];
           const ecarts = [];
-          let nbCombles = 0;
+          let nbCombles = 0, nbRefuses = 0;
           // `date` et `fond_id` sont la cle de la comparaison, pas son objet.
           for (const c of Object.keys(perfValues)) {
             if (c === 'fond_id' || c === 'date') continue;
@@ -567,9 +586,18 @@ async function run() {
               nbCombles++;
               continue;
             }
-            // PERDU : la table avait une valeur, le script n en produit pas.
-            // C est la seule forme destructrice, et elle doit rester a zero.
             if (vide(calc)) {
+              // REFUSE ou PERDU ? La question est : l historique de ce fonds
+              // couvre-t-il l horizon de cette colonne ? S il ne le couvre pas,
+              // le `null` est le refus delibere d inventer un chiffre, et la
+              // valeur stockee est celle que la route a fabriquee en retombant
+              // sur la plus ancienne VL. S il le couvre, c est une vraie perte.
+              const horizon = HORIZON_PAR_COLONNE[c];
+              if (horizon != null && years < horizon) {
+                refusesParColonne[c] = (refusesParColonne[c] || 0) + 1;
+                nbRefuses++;
+                continue;
+              }
               perdusParColonne[c] = (perdusParColonne[c] || 0) + 1;
               ecarts.push(`${c}: PERDU — calcule=${calc} stocke=${base}`);
               continue;
@@ -589,6 +617,7 @@ async function run() {
           // Le fonds est classe par sa PIRE classe : un seul desaccord de
           // valeur ou une seule perte suffit a le sortir du vert.
           if (nbCombles) dryCombles += nbCombles;
+          if (nbRefuses) dryRefuses += nbRefuses;
           if (ecarts.length) {
             const perdus = ecarts.filter(e => e.includes('PERDU')).length;
             console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr}`
@@ -599,9 +628,11 @@ async function run() {
             if (ecarts.length > 8) console.log(`        … et ${ecarts.length - 8} autre(s)`);
             if (perdus) dryPerdus += perdus;
             dryDifferents++;
-          } else if (nbCombles) {
+          } else if (nbCombles || nbRefuses) {
             console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr}`
-              + ` — 0 divergence, ${nbCombles} colonne(s) COMBLEE(S) (la table etait vide)`);
+              + ` — 0 divergence`
+              + (nbCombles ? `, ${nbCombles} COMBLEE(S)` : '')
+              + (nbRefuses ? `, ${nbRefuses} REFUSEE(S) (horizon non couvert, historique ${years.toFixed(1)} ans)` : ''));
             dryIdentiques++;
           } else {
             dryIdentiques++;
@@ -685,12 +716,20 @@ async function run() {
     console.log('');
     // COMBLE : attendu et souhaite. C est l effet de l ajout des ratios.
     parCol('COMBLE — le script remplit une colonne vide (attendu)', comblesParColonne);
+    console.log('');
+    // REFUSE : compte a part, et surtout PAS avec les pertes. La table porte un
+    // chiffre que la route a fabrique en retombant sur la plus ancienne VL ; le
+    // script rend `null` parce que l horizon n est pas couvert. Confondre les
+    // deux reviendrait a traiter le retrait d un faux chiffre comme une
+    // regression, et donc a bloquer la correction au nom de la prudence.
+    parCol('REFUSE — horizon non couvert par l historique (attendu, corrige un faux chiffre)', refusesParColonne);
 
     const nbDivergent = Object.values(divergencesParColonne).reduce((a, b) => a + b, 0);
     console.log(`\n=== CRITERE DE BASCULE, sur ${colonnesComparees} colonnes comparees ===`);
     console.log(`  DIVERGENT : ${nbDivergent} (exige : 0)`);
     console.log(`  PERDU     : ${dryPerdus} (exige : 0)`);
     console.log(`  COMBLE    : ${dryCombles} (attendu non nul : les ratios que la table n a pas)`);
+    console.log(`  REFUSE    : ${dryRefuses} (attendu non nul : les horizons que l historique ne couvre pas)`);
     console.log(nbDivergent === 0 && dryPerdus === 0
       ? '  → CRITERE ATTEINT. Les deux calculs donnent les memes chiffres la ou'
         + ' les deux en ont un, et le script ne fait perdre aucune valeur existante.'

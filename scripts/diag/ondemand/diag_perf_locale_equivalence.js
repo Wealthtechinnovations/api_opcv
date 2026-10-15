@@ -67,7 +67,7 @@ for (const pays of ['NIGERIA', 'UEMOA']) {
     // jamais donner les deux nombres, donc sans permettre de dire si l ecart
     // etait un arrondi ou un desaccord reel. Un filtre qui retient le verdict
     // et jette la preuve ne sert a rien.
-    /DRY-RUN|Fonds sans aucun|Fonds avec desaccord|Fonds absents|ecart|CRITERE|DIVERGENT|PERDU|COMBLE|Options|fonds a traiter|ERROR|limite|Colonnes comparees|ratios|Ratios|calcule=|stocke=|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
+    /DRY-RUN|Fonds sans aucun|Fonds avec desaccord|Fonds absents|ecart|CRITERE|DIVERGENT|PERDU|COMBLE|REFUSE|Options|fonds a traiter|ERROR|limite|Colonnes comparees|ratios|Ratios|calcule=|stocke=|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
   console.log(utiles.length ? utiles.join('\n') : '(aucune ligne retenue)');
   console.log(`-- code de sortie : ${r.status}${r.error ? ` | ${r.error.message}` : ''}\n`);
 }
