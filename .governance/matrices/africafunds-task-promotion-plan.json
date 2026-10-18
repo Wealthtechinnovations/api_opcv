@@ -1,0 +1,943 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "PROMOTION_PLAN_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "a2275b191a3c5792878ab9cb721dff198d653bd7",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc",
+    "branch": "claude/code-review-improvements-ikvuj"
+  },
+  "authority_rules": {
+    "task_queue_remains": ".governance/loop/task-queue.json",
+    "proposals_are_not_tasks": true,
+    "no_task_ids_reserved": true,
+    "no_auto_promotion": true,
+    "promotion_blocked_while_queue_surface_is_claimed": true,
+    "current_active_work_must_not_be_restarted": true
+  },
+  "promotion_gate": [
+    "Reobserve both repository HEADs and current queue.",
+    "AF-TASK-028 must be DONE or its task-queue/projection claim released.",
+    "Deduplicate proposal against all current tasks, requirements and newly completed work.",
+    "Verify live code/data/runtime evidence for the proposed scope.",
+    "Define exact touched surfaces and verify no active-claim overlap.",
+    "Persist dependencies, DoR, DoD, evidence requirements and next transition.",
+    "Only then add/extend a task in the single queue."
+  ],
+  "proposals": [
+    {
+      "proposal_id": "AF-PROP-001",
+      "title": "Canonical Fund / SubFund / ShareClass certification",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-001"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [],
+      "definition_of_ready": [
+        "Live schema/models/consumers inventoried",
+        "No second Fund Master introduced",
+        "Country identity edge cases sampled"
+      ],
+      "definition_of_done": [
+        "Canonical identity model documented",
+        "Existing structures classified EXTEND/MIGRATE/KEEP",
+        "Additive gaps specified with regression plan"
+      ],
+      "candidate_mini_tasks": [
+        "Inventory fond_investissements and related identity fields",
+        "Locate all share-class/subfund representations",
+        "Map frontend/API consumers",
+        "Define additive migration only if proven necessary"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-002",
+      "title": "Organization / SGO / manager identity and history",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-002"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [
+        "AF-PROP-001"
+      ],
+      "definition_of_ready": [
+        "Current societes/manager links and aliases inventoried",
+        "Duplicate/merge history reviewed"
+      ],
+      "definition_of_done": [
+        "One canonical manager authority and alias/history policy",
+        "No duplicate Manager Master"
+      ],
+      "candidate_mini_tasks": [
+        "Map societes and fund links",
+        "Reconcile aliases/name variants",
+        "Model manager periods only if missing",
+        "Add regression fixtures for fund-manager pages"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-003",
+      "title": "Platform-wide provenance and lineage contract",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-003"
+      ],
+      "existing_queue_refs": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-001"
+      ],
+      "definition_of_ready": [
+        "Current provenance fields/artifacts inventoried by domain",
+        "Existing raw evidence preservation rules known"
+      ],
+      "definition_of_done": [
+        "Observed vs calculated vs corrected states explicit",
+        "Minimum lineage fields defined per source type",
+        "No destructive rewrite of historical evidence"
+      ],
+      "candidate_mini_tasks": [
+        "Map source metadata by country pipeline",
+        "Define document/page/sheet/row/cell/API locators where available",
+        "Define transformation/version linkage",
+        "Expose quality/lineage view model"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-004",
+      "title": "Canonical document engine reconciliation",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-005"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [
+        "AF-PROP-001",
+        "AF-PROP-002",
+        "AF-PROP-003"
+      ],
+      "definition_of_ready": [
+        "Document tables/routes/storage inventoried",
+        "Historical official-document methodology reviewed"
+      ],
+      "definition_of_done": [
+        "Canonical document types/relations established",
+        "Official URLs verified, never guessed",
+        "Duplicate storage/metadata paths reconciled"
+      ],
+      "candidate_mini_tasks": [
+        "Map current document APIs and panels",
+        "Define FS/NI/FP/reporting taxonomy plus extensions",
+        "Add source/date/visa/hash checks",
+        "Design fund/SGO/document relations"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-005",
+      "title": "Benchmark / index / FX authority reconciliation",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-006"
+      ],
+      "existing_queue_refs": [
+        "AF-OPS-007",
+        "AF-OPS-009",
+        "AF-TASK-014",
+        "AF-TASK-020"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-003"
+      ],
+      "definition_of_ready": [
+        "All index/FX writers/readers inventoried",
+        "Declared fund benchmark separated from analytical indices",
+        "CEMAC/Morocco known gaps preserved"
+      ],
+      "definition_of_done": [
+        "Single configuration/authority map for indices/FX",
+        "Manual upload behavior decided by evidence",
+        "No look-ahead FX in historical analytics"
+      ],
+      "candidate_mini_tasks": [
+        "Map INDEX_CONFIG/config duplicates",
+        "Map indice/indice_references/indRef ownership",
+        "Qualify disabled uploadsfileindice persistence",
+        "Document LOCAL/EUR/USD benchmark conversion rules"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-006",
+      "title": "Canonical analytics service boundary and conventions",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-007"
+      ],
+      "existing_queue_refs": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-TASK-018",
+        "AF-TASK-020"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-003",
+        "AF-PROP-005"
+      ],
+      "definition_of_ready": [
+        "Quantitative functions and conventions inventoried",
+        "Data-quality dependencies explicit",
+        "Reference fixtures available"
+      ],
+      "definition_of_done": [
+        "One reusable analytics authority identified",
+        "Conventions/versioning documented",
+        "Cross-module regression corpus GREEN"
+      ],
+      "candidate_mini_tasks": [
+        "Deduplicate performance/risk helpers",
+        "Version horizons/annualization/risk-free/benchmark conventions",
+        "Create reference fixtures",
+        "Expose stable analytics view models"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-007",
+      "title": "Reusable country ingestion framework",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-009"
+      ],
+      "existing_queue_refs": [
+        "AF-OPS-009"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-003"
+      ],
+      "definition_of_ready": [
+        "At least Morocco/Nigeria/Tunisia/UEMOA pipeline patterns compared",
+        "Source publication vs acquisition vs import dates distinguished"
+      ],
+      "definition_of_done": [
+        "Reusable acquisition→raw→parse→map→validate→import→rollback contract",
+        "Country adapters remain source-specific without duplicating framework"
+      ],
+      "candidate_mini_tasks": [
+        "Inventory collectors/crons",
+        "Define raw artifact and checksum contract",
+        "Define import preflight/rollback/evidence",
+        "Define freshness telemetry"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-008",
+      "title": "Tunisia canonical reconciliation",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-010"
+      ],
+      "existing_queue_refs": [
+        "AF-OPS-009"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-001",
+        "AF-PROP-002",
+        "AF-PROP-003",
+        "AF-PROP-007"
+      ],
+      "definition_of_ready": [
+        "Current CMF pipeline and historical archives reconciled read-only",
+        "Identity ambiguities listed"
+      ],
+      "definition_of_done": [
+        "Current live Tunisia remains stable",
+        "Historical assets classified imported/missing/ambiguous",
+        "No blind reimport"
+      ],
+      "candidate_mini_tasks": [
+        "Reconcile funds/aliases",
+        "Reconcile dividends and manager periods",
+        "Reconcile legal events",
+        "Certify source coverage"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-009",
+      "title": "Nigeria canonical identity/currency/archive reconciliation",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-011"
+      ],
+      "existing_queue_refs": [
+        "AF-OPS-007",
+        "AF-OPS-009"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-001",
+        "AF-PROP-003",
+        "AF-PROP-007"
+      ],
+      "definition_of_ready": [
+        "C7/C3 cases classified first",
+        "SEC archive formats and current importer mapped",
+        "No field confusion NAV/Unit/Bid/Offer/Net Assets"
+      ],
+      "definition_of_done": [
+        "Scale/currency identity rules certified",
+        "Archive-to-live mapping coverage measured",
+        "Unresolved ambiguous share classes explicit"
+      ],
+      "candidate_mini_tasks": [
+        "Map SEC historical identities",
+        "Separate share classes/renames/closures",
+        "Certify currency labels vs content",
+        "Link correction eligibility to AF-OPS-007"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-010",
+      "title": "CEMAC live pipeline and benchmark recovery",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-013"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [
+        "AF-PROP-001",
+        "AF-PROP-003",
+        "AF-PROP-005",
+        "AF-PROP-007"
+      ],
+      "definition_of_ready": [
+        "BVMAC/BOC source and scraper revalidated read-only",
+        "34 live fund mapping measured",
+        "Rollback/snapshot path ready"
+      ],
+      "definition_of_done": [
+        "Freshness gap reduced through governed import if authorized",
+        "Benchmark coverage strategy proven",
+        "All writes provenance-traceable"
+      ],
+      "candidate_mini_tasks": [
+        "Dry-run latest BOC mapping",
+        "Classify matched/unmatched funds",
+        "Validate values/scale",
+        "Prepare governed import and rollback",
+        "Add benchmark linkage only from valid source"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-011",
+      "title": "Pan-African market expansion discovery",
+      "priority": "P3",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-015"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [
+        "AF-PROP-001",
+        "AF-PROP-003",
+        "AF-PROP-007"
+      ],
+      "definition_of_ready": [
+        "Current markets stabilized enough to reuse framework",
+        "No target market assumed implemented from roadmap alone"
+      ],
+      "definition_of_done": [
+        "Each target country has a source discovery dossier and promotion decision",
+        "No connector built without official-source viability"
+      ],
+      "candidate_mini_tasks": [
+        "Ghana source discovery",
+        "Kenya source discovery",
+        "Egypt source discovery",
+        "South Africa source discovery",
+        "Botswana/Namibia/Ethiopia/Mauritius discovery"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-012",
+      "title": "API contracts and stable view-model layer",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-016"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-013",
+        "AF-TASK-023"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-001",
+        "AF-PROP-006"
+      ],
+      "definition_of_ready": [
+        "Route inventory and consumer map available",
+        "Legacy inactive microservice scaffolds classified"
+      ],
+      "definition_of_done": [
+        "Stable backward-compatible view models for core entity/analytics pages",
+        "Deprecations have measured consumers and rollback path"
+      ],
+      "candidate_mini_tasks": [
+        "Inventory monolith routes",
+        "Map duplicate/legacy contracts",
+        "Define fund/manager/country/analytics view models",
+        "Add contract tests"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-013",
+      "title": "Frontend Design System / Atomic Design migration plan",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-017"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [
+        "AF-PROP-012"
+      ],
+      "definition_of_ready": [
+        "Current components/pages/tokens inventoried",
+        "Legacy theme/vendor usage mapped",
+        "No refactor starts from theoretical target only"
+      ],
+      "definition_of_done": [
+        "Atoms/molecules/organisms/templates taxonomy mapped to live components",
+        "Migration order preserves routes and behavior"
+      ],
+      "candidate_mini_tasks": [
+        "Inventory primitives and shared layouts",
+        "Map duplicated components",
+        "Define state patterns loading/error/empty/stale",
+        "Define tokens/accessibility primitives",
+        "Plan incremental migrations"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-014",
+      "title": "Entity pages Fund / ShareClass / SGO / Country V2",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-018"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [
+        "AF-PROP-001",
+        "AF-PROP-002",
+        "AF-PROP-012",
+        "AF-PROP-013"
+      ],
+      "definition_of_ready": [
+        "Stable entity/view-model contracts ready",
+        "Current routes/SEO baseline recorded"
+      ],
+      "definition_of_done": [
+        "Required organisms covered without route regression",
+        "Fund and ShareClass semantics separated",
+        "Data-quality states visible"
+      ],
+      "candidate_mini_tasks": [
+        "Map current templates",
+        "Gap-map target organisms",
+        "Migrate one template at a time",
+        "Regression test URLs/metadata/financial outputs"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-015",
+      "title": "User spaces coverage, shared shells and RBAC",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-019",
+        "AF-INTAKE-CAND-020"
+      ],
+      "existing_queue_refs": [
+        "AF-OPS-005",
+        "AF-TASK-013"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-012",
+        "AF-PROP-013"
+      ],
+      "definition_of_ready": [
+        "Seven existing role spaces inventoried",
+        "Permission model and route guards mapped"
+      ],
+      "definition_of_done": [
+        "Role-by-role capability matrix complete",
+        "Shared UI extracted without collapsing business roles",
+        "Mutating routes have verified auth/ownership"
+      ],
+      "candidate_mini_tasks": [
+        "Audit Admin/Investor/Management/Institutional/Data Requester/Country/Distributor",
+        "Map API dependencies",
+        "Map permissions",
+        "Factor shared shells/navigation",
+        "Add RBAC regression tests"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-016",
+      "title": "Institutional mandate and eligibility workflow",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-021"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-017",
+        "AF-TASK-022"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-001",
+        "AF-PROP-006",
+        "AF-PROP-015"
+      ],
+      "definition_of_ready": [
+        "Allocation constraint engine and Fund Master fields certified",
+        "Quality gates machine-readable"
+      ],
+      "definition_of_done": [
+        "Mandate versioning and hard gates reproducible",
+        "Universe snapshot and inclusion/exclusion reasons persisted"
+      ],
+      "candidate_mini_tasks": [
+        "Define mandate object",
+        "Define eligibility rules",
+        "Connect quality/DDQ filters",
+        "Persist universe snapshot",
+        "Design long-list workflow"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-017",
+      "title": "Institutional DDQ / ODD / Findings / Short List",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-022"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-022"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-004",
+        "AF-PROP-015",
+        "AF-PROP-016"
+      ],
+      "definition_of_ready": [
+        "Existing candidate implementation audited",
+        "Document/user authorities reusable"
+      ],
+      "definition_of_done": [
+        "Versioned questionnaires/responses/findings with audit trail",
+        "No duplicate document or fund data stores"
+      ],
+      "candidate_mini_tasks": [
+        "Audit candidate DDQ code/UI",
+        "Define question/version model",
+        "Define evidence attachment references",
+        "Define findings/severity",
+        "Define short-list transition"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-018",
+      "title": "Institutional RFP and evaluation workflow",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-023"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-022"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-004",
+        "AF-PROP-015",
+        "AF-PROP-016",
+        "AF-PROP-017"
+      ],
+      "definition_of_ready": [
+        "Existing portal/RFP candidate surfaces audited",
+        "Roles and communication model defined"
+      ],
+      "definition_of_done": [
+        "RFP invitations/responses/clarifications/evaluations versioned",
+        "Human evaluation separated from calculated metrics"
+      ],
+      "candidate_mini_tasks": [
+        "Map SGO portal candidate",
+        "Define RFP package/versioning",
+        "Clarification workflow",
+        "Technical criteria",
+        "Financial criteria",
+        "Audit trail"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-019",
+      "title": "Investment Committee, decision memory and monitoring",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-024",
+        "AF-INTAKE-CAND-025"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-022"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-016",
+        "AF-PROP-017",
+        "AF-PROP-018"
+      ],
+      "definition_of_ready": [
+        "Decision inputs snapshot contract exists",
+        "Monitoring signals come from canonical analytics/quality/documents"
+      ],
+      "definition_of_done": [
+        "Approval/rejection reconstructible from exact snapshot",
+        "Periodic review/re-underwriting versioned",
+        "No automatic score-to-decision shortcut"
+      ],
+      "candidate_mini_tasks": [
+        "Committee dossier snapshot",
+        "Participants/roles/minutes",
+        "Decision justification",
+        "Monitoring triggers",
+        "Periodic review workflow",
+        "Re-underwriting history"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-020",
+      "title": "Reporting/export convergence",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-026"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-022"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-003",
+        "AF-PROP-006",
+        "AF-PROP-016"
+      ],
+      "definition_of_ready": [
+        "Existing PDF/Excel/export paths inventoried"
+      ],
+      "definition_of_done": [
+        "Shared reporting snapshots include cutoff, currency, conventions, provenance and warnings",
+        "Institutional/allocation/fund reports reuse core engine"
+      ],
+      "candidate_mini_tasks": [
+        "Inventory exports",
+        "Define report data contract",
+        "Version templates",
+        "Add provenance/warnings",
+        "Regression-check numeric outputs"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-021",
+      "title": "SEO / Schema.org / semantic architecture certification",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-027",
+        "AF-INTAKE-CAND-028",
+        "AF-INTAKE-CAND-029",
+        "AF-INTAKE-CAND-030"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [
+        "AF-PROP-012",
+        "AF-PROP-013",
+        "AF-PROP-014"
+      ],
+      "definition_of_ready": [
+        "Current routes/templates and emitted metadata audited",
+        "Historical SEO work treated as baseline, not assumed complete"
+      ],
+      "definition_of_done": [
+        "Canonical/title/description/robots/sitemap/links/SSR verified by page type",
+        "JSON-LD @id graph coherent",
+        "Accessibility/CWV baseline and automated regression checks established"
+      ],
+      "candidate_mini_tasks": [
+        "Audit metadata/canonical",
+        "Audit sitemap/robots",
+        "Audit crawlable internal links/headings",
+        "Inventory JSON-LD graph",
+        "Audit semantic HTML/a11y",
+        "Measure CWV",
+        "Add deterministic SEO tests"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-022",
+      "title": "Discovery surfaces: search / compare / screener / heatmap",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-031"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-020",
+        "AF-TASK-021"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-006",
+        "AF-PROP-012",
+        "AF-PROP-013"
+      ],
+      "definition_of_ready": [
+        "Live discovery surfaces/API contracts inventoried",
+        "Data-quality display policy defined"
+      ],
+      "definition_of_done": [
+        "Discovery UIs use canonical analytics/view models",
+        "Stale/invalid data cannot masquerade as valid ranking"
+      ],
+      "candidate_mini_tasks": [
+        "Map routes/pages",
+        "Map filters/sorts",
+        "Quality-state UX",
+        "Shared comparison components",
+        "Regression fixtures"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-023",
+      "title": "Governed back-office data operations",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-033"
+      ],
+      "existing_queue_refs": [],
+      "depends_on_proposals": [
+        "AF-PROP-003",
+        "AF-PROP-008",
+        "AF-PROP-015"
+      ],
+      "definition_of_ready": [
+        "Sensitive admin/data writes inventoried",
+        "Existing rollback/snapshot conventions known"
+      ],
+      "definition_of_done": [
+        "Corrections use preview/dry-run where possible",
+        "Writes have snapshot/transaction/rollback/post-check appropriate to risk"
+      ],
+      "candidate_mini_tasks": [
+        "Audit admin corrections/imports",
+        "Classify read/write risk",
+        "Add previews",
+        "Add evidence hooks",
+        "Harden RBAC"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-024",
+      "title": "Unified observability for source→pipeline→derived→runtime",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-034"
+      ],
+      "existing_queue_refs": [
+        "AF-OPS-003",
+        "AF-OPS-005",
+        "AF-OPS-009"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-007"
+      ],
+      "definition_of_ready": [
+        "Current health/cron/incident telemetry inventoried"
+      ],
+      "definition_of_done": [
+        "Source publication, acquisition, import, derivation, DB/runtime and HTTP failures distinguishable",
+        "Existing incident registry remains authority"
+      ],
+      "candidate_mini_tasks": [
+        "Define pipeline stage events",
+        "Freshness timestamps",
+        "Cron/job correlation IDs",
+        "Runtime/DB correlation",
+        "Alert routing"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-025",
+      "title": "Cross-layer regression strategy",
+      "priority": "P1",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-035"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-018"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-012",
+        "AF-PROP-013"
+      ],
+      "definition_of_ready": [
+        "Current test suites inventoried",
+        "Critical financial/data/SEO/user journeys ranked by risk"
+      ],
+      "definition_of_done": [
+        "Backend/data/frontend/e2e/SEO fixtures cover critical invariants",
+        "No gate is weakened to obtain green"
+      ],
+      "candidate_mini_tasks": [
+        "Catalogue tests",
+        "Create missing frontend test baseline",
+        "Add API contract tests",
+        "Add data invariants",
+        "Add high-value e2e",
+        "Integrate SEO/a11y checks"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-026",
+      "title": "General legacy debt retirement program",
+      "priority": "P2",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-036"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-023"
+      ],
+      "depends_on_proposals": [
+        "AF-PROP-012",
+        "AF-PROP-013",
+        "AF-PROP-025"
+      ],
+      "definition_of_ready": [
+        "Legacy components classified ACTIVE/INACTIVE/PROTOTYPE",
+        "Consumers/runtime status proven"
+      ],
+      "definition_of_done": [
+        "Retirements are evidence-based with rollback",
+        "No deletion solely because code looks old"
+      ],
+      "candidate_mini_tasks": [
+        "Microservice scaffold reconciliation",
+        "Giant route decomposition plan",
+        "Panel duplication plan",
+        "Vendor/theme replacement plan",
+        "limit/config duplication cleanup"
+      ]
+    },
+    {
+      "proposal_id": "AF-PROP-027",
+      "title": "Future-agent continuity and intake promotion protocol",
+      "priority": "P0",
+      "status": "PROPOSAL_NOT_TASK",
+      "intake_refs": [
+        "AF-INTAKE-CAND-037"
+      ],
+      "existing_queue_refs": [
+        "AF-TASK-024",
+        "AF-TASK-025",
+        "AF-TASK-026",
+        "AF-TASK-027",
+        "AF-TASK-028"
+      ],
+      "depends_on_proposals": [],
+      "definition_of_ready": [
+        "AF-TASK-028 completed or queue claim released",
+        "Current intake/gap/coverage matrices readable"
+      ],
+      "definition_of_done": [
+        "Promotion process consumes matrices without a second queue",
+        "Each promoted task has deps/DoR/DoD/evidence/surface claim",
+        "Any agent can resume from Git only"
+      ],
+      "candidate_mini_tasks": [
+        "Qualify remaining historical backlog",
+        "Deduplicate proposals vs live queue",
+        "Promote approved/verified gaps",
+        "Refresh projection blocks",
+        "Validate multi-agent resume"
+      ]
+    }
+  ],
+  "explicit_existing_programs_not_to_recreate": [
+    {
+      "scope": "Data quality",
+      "refs": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ]
+    },
+    {
+      "scope": "Allocation",
+      "refs": [
+        "AF-TASK-012",
+        "AF-TASK-013",
+        "AF-TASK-014",
+        "AF-TASK-015",
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-018",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021",
+        "AF-TASK-022",
+        "AF-TASK-023"
+      ]
+    },
+    {
+      "scope": "Programme Director",
+      "refs": [
+        "AF-TASK-024",
+        "AF-TASK-025",
+        "AF-TASK-026",
+        "AF-TASK-027",
+        "AF-TASK-028"
+      ]
+    },
+    {
+      "scope": "MariaDB / DB auth",
+      "refs": [
+        "AF-OPS-003",
+        "AF-OPS-005"
+      ]
+    },
+    {
+      "scope": "External secrets/resilience blockers",
+      "refs": [
+        "AF-TASK-010",
+        "AF-OPS-001"
+      ]
+    }
+  ],
+  "next_action": "Continue read-only historical-backlog reconciliation against these proposals; when AF-TASK-028 releases the queue, promote only the highest-confidence non-duplicate proposals in dependency order."
+}

@@ -1,0 +1,462 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "W1_READ_ONLY_FOUNDATION_AUDIT_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "514d4a48bf0ebfe485c67fa313afa84150a02e81",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc",
+    "branch": "claude/code-review-improvements-ikvuj"
+  },
+  "scope": "Canonical data, organizations, valuations/provenance, documents, reference data, benchmarks/FX, analytics and API authority. No production/DB/task-queue mutation.",
+  "global_rules": [
+    "REUSE_CORRECT_STRENGTHEN_EXTEND_MIGRATE_COMPATIBLY",
+    "NO_SECOND_FUND_MASTER",
+    "NO_SECOND_MANAGER_MASTER",
+    "NO_SECOND_DOCUMENT_STORE",
+    "NO_PARALLEL_ANALYTICS_AUTHORITY",
+    "NO_SCHEMA_WRITE_WITHOUT_LIVE_DB_PREFLIGHT",
+    "NO_RUNTIME_ACTIVATION_OF_LEGACY_MICROSERVICES",
+    "UNKNOWN_IS_NOT_DONE"
+  ],
+  "findings": [
+    {
+      "id": "W1-FND-001",
+      "domain": "FUND_MASTER",
+      "current_state": "fond_investissements is the live fund authority. It contains identity, ISIN, country/region, periodicity, currency, manager link, categories, fees, investment policy, benchmark mapping and FundAfrica reference fields.",
+      "decision": "KEEP_AND_EXTEND",
+      "confidence": "HIGH",
+      "evidence": [
+        "src/models/fond.js defines fond_investissements.",
+        "src/services/allocation/data/provider.js explicitly declares fund_master_table='fond_investissements' and active_only=true.",
+        "app.js and current routes consume the same table."
+      ],
+      "verified_gaps": [
+        "No canonical SubFund/ShareClass entity was found in current code search.",
+        "Fund/share-class identity ambiguities are known historically, especially Nigeria.",
+        "Several categorical/reference values still live as strings on the fund row."
+      ],
+      "required_preflight": [
+        "Measure live schema and duplicate/identity cases before any new table.",
+        "Map every fund identity consumer in API/frontend/importers.",
+        "Reconcile ISIN/name/class-share ambiguities per country."
+      ],
+      "compatible_future_actions": [
+        "Preserve fond_investissements as compatibility authority.",
+        "Add child/alias/history structures only if live evidence proves they are necessary.",
+        "Introduce stable IDs/relationships additively and migrate consumers incrementally."
+      ],
+      "do_not": [
+        "Do not rename/drop fond_investissements.",
+        "Do not infer ShareClass/SubFund solely from names.",
+        "Do not create a second Fund Master."
+      ]
+    },
+    {
+      "id": "W1-FND-002",
+      "domain": "MANAGER_MASTER",
+      "current_state": "societes is the live manager/SGO authority; fond_investissements.societe_id exists alongside legacy societe_gestion text. documents and personnel_sgs also contain societe_id.",
+      "decision": "KEEP_AND_NORMALIZE_RELATIONSHIPS",
+      "confidence": "HIGH",
+      "evidence": [
+        "src/models/societe.js defines societes.",
+        "20260514000001-add-societe-id-fk.js added societe_id columns and populated them by name match.",
+        "src/db/sequelize.js defines Fond<->Societe association."
+      ],
+      "verified_gaps": [
+        "The migration name says FK but only columns/indexes are added; no database FK constraint is created.",
+        "documents.societe_id and personnel_sgs.societe_id have no Sequelize association in src/db/sequelize.js.",
+        "Legacy string joins by societe_gestion/societe remain active in routes."
+      ],
+      "required_preflight": [
+        "Measure null/orphan/duplicate societe_id counts live.",
+        "Inventory routes still joining by manager name.",
+        "Check whether actual DB FK constraints exist independently of migration naming."
+      ],
+      "compatible_future_actions": [
+        "Prefer societe_id for canonical joins while retaining legacy text during migration.",
+        "Add ORM associations for documents/personnel only after consumer/test audit.",
+        "Introduce aliases/manager-history additively if required."
+      ],
+      "do_not": [
+        "Do not delete societe_gestion/societe string fields before all consumers migrate.",
+        "Do not add hard FK constraints before orphan audit and rollback plan."
+      ]
+    },
+    {
+      "id": "W1-FND-003",
+      "domain": "VALUATION_CORE",
+      "current_state": "valorisations is the live time-series authority for NAV-like values, adjusted values, currencies, dividends, benchmarks and AUM-related fields.",
+      "decision": "KEEP_AND_RECONCILE_SCHEMA_MODEL",
+      "confidence": "HIGH",
+      "evidence": [
+        "src/models/vl.js defines core valorisations fields.",
+        "Production diagnostics and allocation both consume valorisations.",
+        "2026_08_nigeria_additive_measures.sql adds explicit measurement/provenance columns."
+      ],
+      "verified_gaps": [
+        "src/models/vl.js does not expose additive live-schema fields net_assets_*, unit_price_*, bid_price_*, offer_price_*, price_type, currency_code, sec_document_id, source_url, report_date, data_quality, correction_batch.",
+        "ORM/schema parity is therefore incomplete at source level.",
+        "Legacy core columns are allowNull:false in Sequelize while production history contains heterogeneous legacy semantics."
+      ],
+      "required_preflight": [
+        "Read live information_schema for all valorisations columns/types/nullability.",
+        "Inventory all ORM and raw-SQL writers before changing the model.",
+        "Verify whether sequelize sync is disabled in production and keep it disabled for audit."
+      ],
+      "compatible_future_actions": [
+        "Add missing model fields only as nullable mirrors after live schema confirmation.",
+        "Keep value compatibility but expose explicit measurement type/currency/provenance to new code.",
+        "Create writer contract tests before broadening strict enforcement."
+      ],
+      "do_not": [
+        "Do not change legacy column types/nullability from code without migration.",
+        "Do not reinterpret value as Unit Price when price_type proves BID/OFFER.",
+        "Do not enable sync alter as a shortcut."
+      ]
+    },
+    {
+      "id": "W1-FND-004",
+      "domain": "VALUATION_PROVENANCE",
+      "current_state": "vl_contract.js provides a valuable write contract for currency, price type, quality, batch and official source provenance, currently strongest for Nigeria.",
+      "decision": "KEEP_GENERALIZE_GRADUALLY",
+      "confidence": "HIGH",
+      "evidence": [
+        "src/lib/vl_contract.js explicitly protects currency/type/provenance and supports warn/strict.",
+        "Nigeria migrations/importers persist source_url, sec_document_id, report_date, data_quality and correction_batch.",
+        "docs/12-optional/DATA_LINEAGE.md defines source→ingestion→transformation→storage→calculation→API→display/export."
+      ],
+      "verified_gaps": [
+        "Provenance vocabulary is partly Nigeria-specific (sec_document_id).",
+        "Fine-grained document/page/sheet/row/cell/API-path lineage is not platform-wide.",
+        "Most non-Nigeria writers historically did not populate the qualification contract."
+      ],
+      "required_preflight": [
+        "Inventory every current valorisations writer and which provenance fields it supplies.",
+        "Classify source types by country/file/API/manual correction.",
+        "Measure UNQUALIFIED/null provenance by pipeline without mutating data."
+      ],
+      "compatible_future_actions": [
+        "Define a generic source observation/artifact identifier while retaining SEC-specific fields for compatibility.",
+        "Adopt the contract writer-by-writer in warn mode before strict mode.",
+        "Propagate quality/provenance into view models where useful."
+      ],
+      "do_not": [
+        "Do not retroactively fabricate provenance.",
+        "Do not make strict mode global before every active writer is compatible.",
+        "Do not overwrite official raw artifacts."
+      ]
+    },
+    {
+      "id": "W1-FND-005",
+      "domain": "DOCUMENT_ENGINE",
+      "current_state": "documents is an active store linked to funds and carrying societe_id plus legacy manager/fund strings and file metadata.",
+      "decision": "KEEP_AND_EXTEND_METADATA",
+      "confidence": "HIGH",
+      "evidence": [
+        "src/models/document.js defines documents.",
+        "src/db/sequelize.js defines Fond<->Document.",
+        "Routes expose document upload/listing surfaces."
+      ],
+      "verified_gaps": [
+        "No canonical document type taxonomy, official source URL, hash/checksum, visa/issuer verification fields are visible in the model.",
+        "No Societe<->Document ORM association despite societe_id.",
+        "Fine-grained lineage from data observation to source document is not generalized."
+      ],
+      "required_preflight": [
+        "Inventory document rows/types/storage paths and duplicate semantics live.",
+        "Map all upload/download consumers and access controls.",
+        "Identify existing official-document metadata outside this model before adding fields."
+      ],
+      "compatible_future_actions": [
+        "Extend the existing documents authority additively with verified metadata as needed.",
+        "Use stable document IDs/hashes and explicit fund/manager relationships.",
+        "Reference canonical documents from DDQ/RFP rather than copying files."
+      ],
+      "do_not": [
+        "Do not create a second document repository for Institutional.",
+        "Do not guess official URLs/types from filenames.",
+        "Do not break existing file paths."
+      ]
+    },
+    {
+      "id": "W1-FND-006",
+      "domain": "FUNDAFRICA_REFERENCE_TABLES",
+      "current_state": "Five additive reference tables exist by design: ref_asset_classes, ref_geo_zones, ref_categories_fundafrica, ref_indices_fundafrica, ref_index_sources; apigestionreferentiel exposes read APIs.",
+      "decision": "KEEP_DATA_MIGRATE_SCHEMA_GOVERNANCE",
+      "confidence": "HIGH",
+      "evidence": [
+        "scripts/seed/seed_referentiel_fundafrica.js creates and seeds the five tables.",
+        "src/routes/apigestionreferentiel.js reads them and handles ER_NO_SUCH_TABLE.",
+        "fond_investissements stores mapped FundAfrica category/index fields."
+      ],
+      "verified_gaps": [
+        "No src/db/migrations entry was found for these five CREATE TABLE statements.",
+        "Table creation and seed data are coupled in one operational script.",
+        "Sequelize models for these reference tables are not present; routes use raw SQL."
+      ],
+      "required_preflight": [
+        "Verify live table existence/count/schema before creating any migration.",
+        "Compare live schema byte-for-byte/column-for-column with seed DDL.",
+        "Determine whether raw-SQL read access is intentionally preferred."
+      ],
+      "compatible_future_actions": [
+        "Create idempotent canonical migrations representing the already-existing schema only after live verification.",
+        "Refactor seed to seed-only after migration authority exists.",
+        "Keep current routes backward-compatible."
+      ],
+      "do_not": [
+        "Do not recreate/drop populated ref tables.",
+        "Do not run seed --execute as a schema migration substitute during production maintenance.",
+        "Do not create duplicate reference tables."
+      ]
+    },
+    {
+      "id": "W1-FND-007",
+      "domain": "BENCHMARK_INDEX_FX",
+      "current_state": "indice_references and devisedechanges are live series authorities; fund rows also hold declared benchmark/reference mapping and FundAfrica analytical mappings.",
+      "decision": "KEEP_AND_CLARIFY_LAYERS",
+      "confidence": "HIGH",
+      "evidence": [
+        "src/models/indice.js defines indice_references.",
+        "src/models/devisedechanges.js defines FX table.",
+        "Production shows live MASI/Tunindex/BRVM/NSE series and country benchmark coverage.",
+        "FundAfrica ref_indices_fundafrica is a separate analytical/reference mapping layer."
+      ],
+      "verified_gaps": [
+        "Declared benchmark, FundAfrica analytical benchmark and raw index series are represented across multiple fields/tables and need explicit authority semantics.",
+        "Manual uploadsfileindice has commented indice_references persistence while writing indRef on VL.",
+        "CEMAC has 0% benchmark coverage and Morocco recent historical coverage remains partial."
+      ],
+      "required_preflight": [
+        "Map every writer/reader of indice_references, indRef*, indice_benchmark, indice and indice_fundafrica*.",
+        "Classify each field as declared benchmark, analytical benchmark, series ID or denormalized cached value.",
+        "Verify FX nearest-date/no-lookahead semantics by consumer."
+      ],
+      "compatible_future_actions": [
+        "Document a three-layer benchmark contract without changing data first.",
+        "Use one canonical index series authority and explicit mappings.",
+        "Keep denormalized indRef fields only as compatibility/cache with reproducible propagation."
+      ],
+      "do_not": [
+        "Do not restore commented writes blindly.",
+        "Do not use one equity index as benchmark for every fund category.",
+        "Do not use future FX rates for historical dates."
+      ]
+    },
+    {
+      "id": "W1-FND-008",
+      "domain": "ANALYTICS",
+      "current_state": "Production analytics are fragmented between large monolith functions/models and an optional ClickHouse analytics route set. Allocation has a newer deterministic Node engine/data preparation layer.",
+      "decision": "KEEP_VALIDATED_CALCULATIONS_CONVERGE_CONTRACTS",
+      "confidence": "HIGH",
+      "evidence": [
+        "apigestionfonds/apigestionratios/apigestionperformance contain extensive legacy calculations.",
+        "src/routes/analytics.js requires ClickHouse and contains its own risk calculations.",
+        "Allocation preparation/engine has explicit versions, covariance conventions and provenance."
+      ],
+      "verified_gaps": [
+        "ClickHouse risk route assumes risk-free ~0 and duplicates analytics conventions; runtime availability has historically been absent/optional.",
+        "Performance/risk logic is duplicated across modules.",
+        "Production C2/C3/C8 proves derived tables can be stale/wrong despite plausible UI values."
+      ],
+      "required_preflight": [
+        "Inventory each metric implementation and current runtime consumer.",
+        "Build reference outputs on certified funds/dates.",
+        "Classify ClickHouse routes ACTIVE/OPTIONAL/LEGACY at current runtime."
+      ],
+      "compatible_future_actions": [
+        "Converge metric contracts incrementally around shared versioned functions.",
+        "Keep output compatibility while replacing duplicate internal implementations.",
+        "Use quality/data-cutoff metadata in every new analytics response."
+      ],
+      "do_not": [
+        "Do not activate ClickHouse merely because routes exist.",
+        "Do not change financial conventions without before/after fixtures.",
+        "Do not delete legacy calculations before all consumers migrate."
+      ]
+    },
+    {
+      "id": "W1-FND-009",
+      "domain": "ALLOCATION_DATA_QUALITY_BRIDGE",
+      "current_state": "Allocation has an internal quality object and refuses prepared.quality != PASS, but preparation currently sets quality.status='PASS' after history/alignment checks rather than reading production data-quality flags.",
+      "decision": "EXTEND_EXISTING_ALLOCATION_PROGRAM_NOT_NEW_PROGRAM",
+      "confidence": "HIGH",
+      "evidence": [
+        "src/services/allocation/data/preparation.js sets quality.status='PASS'.",
+        "src/services/allocation/engine/adapter.js rejects non-PASS quality.",
+        "provider VALUATION_ATTRIBUTES does not load data_quality/currency_code/source_url.",
+        "Governance correctly keeps live certification gated by AF-OPS-007/008/009."
+      ],
+      "verified_gaps": [
+        "Internal 'quality' currently means preparation sufficiency, not full production data integrity.",
+        "Naming can imply stronger certification than actually present.",
+        "C3/C7/C8 remain live production failures."
+      ],
+      "required_preflight": [
+        "Do not touch AF-TASK-017 claimed constraint surfaces.",
+        "Resolve AF-OPS-007/008/009 or define machine-readable fund/date eligibility first.",
+        "Decide whether the bridge belongs to AF-TASK-018, AF-TASK-020 or an extension of AF-TASK-014/015 after queue claim release."
+      ],
+      "compatible_future_actions": [
+        "Add separate quality dimensions such as preparation_quality and source_data_quality rather than silently redefining existing fields.",
+        "Load certified quality metadata only when semantics are stable.",
+        "Fail closed for live optimization when selected inputs intersect known invalid data."
+      ],
+      "do_not": [
+        "Do not create AF-ALLOC-002.",
+        "Do not mark live data PASS solely because history length is sufficient.",
+        "Do not write inside AF-TASK-017 surfaces."
+      ]
+    },
+    {
+      "id": "W1-FND-010",
+      "domain": "API_RUNTIME_AUTHORITY",
+      "current_state": "app.js monolith is the current application entry point and mounts canonical routes; services/funds and services/portfolio contain literal TODO placeholder endpoints in an inactive microservice scaffold.",
+      "decision": "KEEP_MONOLITH_DEPRECATE_SCAFFOLD_ONLY_AFTER_PROOF",
+      "confidence": "HIGH",
+      "evidence": [
+        "package.json start = node app.js.",
+        "app.js mounts current route files.",
+        "Gap qualification identified 56 placeholder endpoints in services/funds and services/portfolio.",
+        "Historical architecture diagnostic says services/* prepared but not used in production."
+      ],
+      "verified_gaps": [
+        "package.json main points to services/gateway/index.js while start points to app.js, which is potentially confusing metadata.",
+        "Inactive scaffold duplicates route names/contracts and can mislead future agents.",
+        "Some old routes remain very large and mix concerns."
+      ],
+      "required_preflight": [
+        "Reobserve production process topology before any cleanup.",
+        "Map scaffold routes to monolith equivalents.",
+        "Check scripts/tools relying on package.json main."
+      ],
+      "compatible_future_actions": [
+        "Make runtime authority explicit in developer docs/metadata after consumer audit.",
+        "Retire inactive scaffold in bounded clusters only with equivalence proof.",
+        "Extract monolith logic into services behind existing routes rather than big-bang microservices."
+      ],
+      "do_not": [
+        "Do not switch production to gateway/microservices as cleanup.",
+        "Do not delete scaffold until all references are classified.",
+        "Do not break current public routes."
+      ]
+    },
+    {
+      "id": "W1-FND-011",
+      "domain": "SCHEMA_MIGRATION_DISCIPLINE",
+      "current_state": "Schema evolution uses a mix of Sequelize migrations and executable scripts containing DDL.",
+      "decision": "STANDARDIZE_FORWARD_ONLY_COMPATIBLY",
+      "confidence": "HIGH",
+      "evidence": [
+        "src/db/migrations contains additive migrations for indexes/audit timestamps/societe_id.",
+        "Nigeria additive measure schema lives under scripts/migration as SQL.",
+        "FundAfrica ref tables are created from a seed script."
+      ],
+      "verified_gaps": [
+        "Canonical schema history is split across locations/mechanisms.",
+        "Source models do not fully mirror live additive schema.",
+        "Future agents can incorrectly infer absence/presence from only Sequelize migrations."
+      ],
+      "required_preflight": [
+        "Create complete live schema inventory and map every table/column to its creating artifact.",
+        "Do not normalize history by rewriting old migrations.",
+        "Classify runtime-only/schema-only artifacts."
+      ],
+      "compatible_future_actions": [
+        "Adopt one forward migration convention for new schema changes.",
+        "Add no-op/idempotent representation migrations for existing live structures only if governance chooses and live equivalence is proven.",
+        "Keep old scripts as historical evidence."
+      ],
+      "do_not": [
+        "Do not replay historical DDL blindly.",
+        "Do not delete old migration evidence.",
+        "Do not use sequelize.sync alter in production."
+      ]
+    },
+    {
+      "id": "W1-FND-012",
+      "domain": "VIEW_MODEL_BOUNDARY",
+      "current_state": "Core pages consume route-specific shapes built directly from Sequelize/raw queries; Allocation V2 is one of the few newer stable shared contracts.",
+      "decision": "EXTEND_WITH_STABLE_VIEW_MODELS",
+      "confidence": "MEDIUM",
+      "evidence": [
+        "apigestionfonds builds fund/meta/graph responses directly from models.",
+        "apigestionsociete performs large raw SQL aggregates keyed partly by manager name.",
+        "Allocation V2 has a shared frontend client and canonical contract."
+      ],
+      "verified_gaps": [
+        "Entity pages are tightly coupled to historical route shapes.",
+        "Quality/provenance state is not a first-class cross-page view-model contract.",
+        "Atomic Design target cannot be safely realized if organisms fetch heterogeneous raw shapes."
+      ],
+      "required_preflight": [
+        "Inventory frontend consumers for fund/manager/country routes.",
+        "Identify compatibility fields that cannot be removed.",
+        "Define versioned/additive view models before refactoring UI."
+      ],
+      "compatible_future_actions": [
+        "Introduce adapters/view models behind existing endpoints or additive V2 endpoints.",
+        "Expose freshness/quality/provenance metadata consistently.",
+        "Make frontend organisms depend on stable contracts, not DB table vocabulary."
+      ],
+      "do_not": [
+        "Do not rewrite all routes at once.",
+        "Do not expose raw schema additions directly to UI without semantic contract.",
+        "Do not break old pages while V2 migrates."
+      ]
+    }
+  ],
+  "migration_order": [
+    "LIVE_SCHEMA_INVENTORY",
+    "WRITER_AND_CONSUMER_MAP",
+    "IDENTITY_AND_RELATIONSHIP_CERTIFICATION",
+    "ORM_SCHEMA_PARITY",
+    "GENERIC_LINEAGE_CONTRACT",
+    "REFERENCE_SCHEMA_GOVERNANCE",
+    "BENCHMARK_FX_AUTHORITY_CONTRACT",
+    "ANALYTICS_CONVENTION_CONVERGENCE",
+    "VIEW_MODEL_LAYER",
+    "ONLY_THEN_FRONTEND_ATOMIC_AND_INSTITUTIONAL_EXPANSION"
+  ],
+  "proposal_links": {
+    "W1-FND-001": "AF-PROP-001",
+    "W1-FND-002": "AF-PROP-002",
+    "W1-FND-004": "AF-PROP-003",
+    "W1-FND-005": "AF-PROP-004",
+    "W1-FND-007": "AF-PROP-005",
+    "W1-FND-008": "AF-PROP-006",
+    "W1-FND-010": "AF-PROP-026",
+    "W1-FND-012": "AF-PROP-012"
+  },
+  "new_proposal_candidates_not_tasks": [
+    {
+      "title": "ORM/live-schema parity for valorisations and additive provenance fields",
+      "rationale": "The live/additive schema used by contracts/importers is not represented in src/models/vl.js.",
+      "recommended_parent": [
+        "AF-PROP-003",
+        "AF-PROP-006"
+      ],
+      "promotion_condition": "Live information_schema and writer compatibility proof."
+    },
+    {
+      "title": "Reference-table schema governance migration",
+      "rationale": "Five canonical ref_* tables are created by a seed script rather than canonical migration history.",
+      "recommended_parent": [
+        "AF-PROP-001",
+        "AF-PROP-005"
+      ],
+      "promotion_condition": "Live schema equality with seed DDL and no destructive migration."
+    },
+    {
+      "title": "Allocation source-data quality bridge",
+      "rationale": "Allocation preparation quality PASS currently covers sufficiency/alignment, not C2/C3/C7/C8/source qualification.",
+      "recommended_parent": [
+        "AF-TASK-018",
+        "AF-TASK-020"
+      ],
+      "promotion_condition": "AF-OPS-007/008/009 semantics available machine-readably and AF-TASK-028 queue claim released."
+    }
+  ],
+  "next_action": "Perform a read-only live-schema/writer-consumer certification for W1-FND-001..012 before any model, migration, reference-table or analytics code change. Persist exact promotion-ready deltas only after that certification."
+}

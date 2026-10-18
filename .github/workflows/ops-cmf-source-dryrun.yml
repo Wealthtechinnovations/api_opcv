@@ -1,0 +1,47 @@
+name: OPS — CMF source structure dry-run
+
+on:
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/ops-cmf-source-dryrun.yml'
+      - 'scripts/diag/ondemand/diag_cmf_source.py'
+      - 'scripts/scraper/cmf_tunisie_daily.py'
+      - 'tests/test_cmf_tunisie_discovery.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-public-cmf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install public-source diagnostic dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4 openpyxl
+
+      - name: Test CMF filename and discovery contract
+        run: python -m unittest tests/test_cmf_tunisie_discovery.py -v
+
+      - name: Inspect current CMF public source contract
+        run: python scripts/diag/ondemand/diag_cmf_source.py
+
+      - name: Dry-run September discovery and parsing
+        env:
+          CMF_TUNISIE_DATA_DIR: ${{ runner.temp }}/cmf_tunisie
+        run: |
+          set -o pipefail
+          python scripts/scraper/cmf_tunisie_daily.py \
+            --dry-run \
+            --lookback-days 60 \
+            --start-date 2026-09-01 \
+            --end-date 2026-09-16 | tee /tmp/cmf_tunisie_dryrun.log
+          grep -Eq '"parsed_nav": [1-9][0-9]*' /tmp/cmf_tunisie_dryrun.log

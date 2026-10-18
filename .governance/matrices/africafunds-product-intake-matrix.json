@@ -1,0 +1,811 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "DISCOVERY_NON_AUTHORITATIVE",
+  "purpose": "Consolider les capacités historiques, gaps et grands chantiers AfricaFunds en intakes candidats avant déduplication et promotion vers la queue unique.",
+  "single_queue_authority": ".governance/loop/task-queue.json",
+  "canonical_branch": "claude/code-review-improvements-ikvuj",
+  "source_basis": [
+    "DIRECTIVE_TRAVAIL.md",
+    "LOOP_ENGINEERING.md",
+    "PROJECT_CONTEXT.md",
+    "Wealthtechinnovations/front_end_opcvm/CLAUDE.md",
+    "Wealthtechinnovations/front_end_opcvm/SUIVI.md",
+    "docs/ETAT_PRODUCTION_VERIFIE.md",
+    "scripts/governance/program_gap_harvester.py",
+    "historical AfricaFunds project analyses and due-diligence design assets"
+  ],
+  "non_authority_rules": {
+    "task_creation_performed": false,
+    "auto_task_creation_forbidden": true,
+    "must_deduplicate_against_single_queue": true,
+    "must_reobserve_live_code_data_and_heads_before_promotion": true,
+    "must_extend_existing_authority_before_creating_new": true,
+    "must_not_touch_active_claimed_surfaces": true,
+    "must_not_create_second_queue_or_second_claim_registry": true,
+    "unknown_is_not_done": true
+  },
+  "protected_active_claims_at_creation": [
+    {
+      "task_id": "AF-TASK-017",
+      "surfaces": [
+        "src/services/allocation/constraints/**",
+        "tests/allocation-constraints.test.js",
+        ".github/workflows/governance-allocation-constraints.yml"
+      ]
+    },
+    {
+      "task_id": "AF-TASK-028",
+      "surfaces": [
+        "scripts/governance/program_*.py",
+        ".github/workflows/governance-program-director.yml",
+        ".github/workflows/governance-programme-projection-writeback.yml",
+        ".governance/loop/task-queue.json",
+        ".governance/loop/handoff.json",
+        ".governance/knowledge/evidence.json",
+        "NEXT_ACTION.md",
+        "CURRENT_ITERATION.md",
+        "LOOP_STATE.md",
+        "HANDOFF.md",
+        "STATUS.md",
+        "SUIVI.md"
+      ]
+    }
+  ],
+  "promotion_pipeline": [
+    "DISCOVERED_CANDIDATE_NOT_TASK",
+    "LIVE_VERIFIED",
+    "DEDUPED",
+    "MAPPED_TO_EXISTING_TASK_OR_APPROVED_NEW_TASK",
+    "DEPENDENCIES_DOR_DOD_EVIDENCE_DEFINED",
+    "SURFACE_CLAIMED",
+    "IMPLEMENTED_COMPATIBLY",
+    "VERIFIED_AND_REGRESSION_CHECKED",
+    "EVIDENCED_AND_STATE_PERSISTED"
+  ],
+  "programme_order": [
+    "PROTECT_ACTIVE_WORK_AND_PRODUCTION",
+    "FINISH_PROGRAMME_DIRECTOR_WRITEBACK_GATE",
+    "QUALIFY_GAP_HARVESTER_AND_THIS_INTAKE_MATRIX",
+    "CANONICAL_DATA_AND_LINEAGE_FOUNDATIONS",
+    "COUNTRY_PIPELINE_RECONCILIATION_AND_EXPANSION",
+    "ANALYTICS_AND_QUALITY",
+    "API_VIEW_MODELS_AND_CONTRACTS",
+    "ATOMIC_DESIGN_AND_ENTITY_PAGES",
+    "USER_SPACES_AND_BACKOFFICE",
+    "ALLOCATION_AND_INSTITUTIONAL_WORKFLOWS",
+    "SEO_SCHEMA_ORG_ACCESSIBILITY_PERFORMANCE",
+    "ROLLOUT_OBSERVABILITY_AND_LEGACY_RETIREMENT"
+  ],
+  "covered_existing_programs_do_not_duplicate": [
+    {
+      "scope": "Allocation / Robot Advisor / Portfolio Lab",
+      "tasks": "AF-TASK-012..AF-TASK-023"
+    },
+    {
+      "scope": "Programme Director / projections / writeback",
+      "tasks": "AF-TASK-024..AF-TASK-028"
+    },
+    {
+      "scope": "Data quality C3/C7/C2/C8/freshness",
+      "tasks": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ]
+    },
+    {
+      "scope": "MariaDB OOM RCA",
+      "tasks": [
+        "AF-OPS-003"
+      ]
+    },
+    {
+      "scope": "DB auth attribution",
+      "tasks": [
+        "AF-OPS-005"
+      ]
+    },
+    {
+      "scope": "Secrets/governance external gaps",
+      "tasks": [
+        "AF-TASK-010",
+        "AF-OPS-001"
+      ]
+    }
+  ],
+  "candidate_intakes": [
+    {
+      "id": "AF-INTAKE-CAND-001",
+      "program": "CANONICAL_DATA",
+      "title": "Référentiel Fund / SubFund / ShareClass",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Auditer le modèle réel fonds/classes de parts et les identifiants utilisés.",
+        "Cartographier les mappings historiques sans recréer un second Fund Master.",
+        "Définir seulement les migrations additives réellement nécessaires.",
+        "Certifier les consommateurs API/frontend avant toute migration."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-002",
+      "program": "CANONICAL_DATA",
+      "title": "Organization / SGO / Manager Master et historique des gestionnaires",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Unifier sociétés de gestion, alias et périodes de gestionnaire autour de l'autorité existante.",
+        "Préserver l'historique des changements de gestionnaire.",
+        "Éliminer les duplications de référentiels uniquement après migration prouvée."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-003",
+      "program": "DATA_LINEAGE",
+      "title": "Provenance, observations, artefacts bruts et lineage fin",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Tracer source, URL, document/hash, page/feuille/ligne/cellule ou API path quand disponible.",
+        "Séparer strictement donnée observée, calculée et corrigée.",
+        "Préserver les artefacts bruts utiles et l'historique des transformations."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-004",
+      "program": "CANONICAL_DATA",
+      "title": "NAV / AUM / dividendes / distributions / événements",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Auditer les objets existants VL, actif net, dividendes, souscriptions/rachats et événements.",
+        "Empêcher toute confusion VL/AUM/dividende/bid/offer et autres champs sources.",
+        "Définir l'historisation compatible et les règles NULL/UNKNOWN."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-005",
+      "program": "DOCUMENTS",
+      "title": "Moteur documentaire canonique et classification des pièces officielles",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Réutiliser les documents existants et leurs relations fonds/SGO.",
+        "Classifier prospectus/notice, fiche signalétique, fiche produit, reporting et autres documents.",
+        "Vérifier fonds, SGO, ISIN, type, date et visa avant de qualifier une URL comme officielle.",
+        "Ne jamais deviner un nom ou une URL de document."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-006",
+      "program": "MARKET_DATA",
+      "title": "Market data / Benchmarks / FX / conventions communes",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-014",
+        "AF-TASK-020"
+      ],
+      "candidate_mini_tasks": [
+        "Centraliser les configurations d'indices et éviter les INDEX_CONFIG divergents.",
+        "Conserver benchmark déclaré et indices analytiques AfricaFunds comme objets distincts.",
+        "Garantir les vues LOCAL/EUR/USD avec conventions FX datées cohérentes.",
+        "Interdire look-ahead FX et fallbacks futurs sur dates historiques."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-007",
+      "program": "ANALYTICS",
+      "title": "Moteur quantitatif commun performance / risque / ratios",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-011",
+        "AF-REQ-012",
+        "AF-REQ-013",
+        "AF-REQ-014"
+      ],
+      "possible_existing_task_refs": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-TASK-020"
+      ],
+      "candidate_mini_tasks": [
+        "Inventorier les calculs existants avant toute duplication.",
+        "Versionner conventions, horizons, annualisation, risk-free et benchmark.",
+        "Réutiliser un moteur canonique pour pages fonds, screener, allocation et institutionnel.",
+        "Établir jeux de référence et tolérances de non-régression."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-008",
+      "program": "DATA_QUALITY",
+      "title": "Quality engine, fraîcheur, anomalies, lineage et qualité affichable",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "LINK_EXISTING_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-011",
+        "AF-REQ-012",
+        "AF-REQ-013",
+        "AF-REQ-014",
+        "AF-REQ-015"
+      ],
+      "possible_existing_task_refs": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ],
+      "candidate_mini_tasks": [
+        "Étendre les contrôles C2/C3/C4/C7/C8 sans créer une seconde autorité.",
+        "Définir budgets de fraîcheur par source/pays et distinguer retard publication vs panne pipeline.",
+        "Propager les états de qualité vers API/view models/UI avec explication."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-009",
+      "program": "COUNTRY_PIPELINES",
+      "title": "Framework réutilisable d'ingestion pays et sources officielles",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008",
+        "AF-REQ-015"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Standardiser source discovery, acquisition, raw snapshot, parsing, mapping, validation, import, rollback et preuve.",
+        "Conserver les particularités pays sans dupliquer le pipeline complet.",
+        "Séparer date publication, date effective, date acquisition et date import."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-010",
+      "program": "COUNTRY_TUNISIA",
+      "title": "Tunisie / CMF — réconciliation canonique fonds, VL, dividendes, gestionnaires et événements",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_HISTORICAL_ASSETS",
+      "requirement_refs": [
+        "AF-REQ-008",
+        "AF-REQ-015"
+      ],
+      "possible_existing_task_refs": [
+        "AF-OPS-009"
+      ],
+      "candidate_mini_tasks": [
+        "Réconcilier archives/research historiques avec le Fund Master live avant import complémentaire.",
+        "Préserver alias, événements juridiques, gestionnaires, dividendes et sources officielles.",
+        "Certifier la complétude au lieu de supposer les anciennes extractions canoniques."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-011",
+      "program": "COUNTRY_NIGERIA",
+      "title": "Nigeria / SEC — réconciliation canonique des archives Weekly NAV",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_HISTORICAL_ASSETS",
+      "requirement_refs": [
+        "AF-REQ-008",
+        "AF-REQ-011",
+        "AF-REQ-012",
+        "AF-REQ-015"
+      ],
+      "possible_existing_task_refs": [
+        "AF-OPS-007",
+        "AF-OPS-009"
+      ],
+      "candidate_mini_tasks": [
+        "Réconcilier l'archive historique SEC avec fonds/classes/alias canoniques.",
+        "Distinguer Unit Price, Bid, Offer, Yield et Net Assets sans alimenter la VL avec des champs interdits.",
+        "Intégrer le retard naturel de publication à la mesure de fraîcheur.",
+        "Ne pas rejouer les corrections data déjà gouvernées sans nouvelle preuve."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-012",
+      "program": "COUNTRY_MOROCCO",
+      "title": "Maroc — complétude VL, documents, benchmarks et rattrapages gouvernés",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008",
+        "AF-REQ-015"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Conserver le fallback MASI déjà réparé et ne pas le reconstruire.",
+        "Qualifier le rattrapage historique benchmark restant avant écriture.",
+        "Industrialiser la collecte documentaire AMMC/SGO selon href réels et vérification d'identité."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-013",
+      "program": "COUNTRY_CEMAC",
+      "title": "CEMAC — pipeline VL et benchmark depuis sources officielles/BVMAC",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008",
+        "AF-REQ-015"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Revalider le scraper BVMAC/BOC historique et le mapping avec les fonds CEMAC live.",
+        "Établir provenance, fraîcheur et contrôles avant toute écriture production.",
+        "Construire la couverture benchmark sans inventer de proxy au niveau fonds."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-014",
+      "program": "COUNTRY_UEMOA",
+      "title": "UEMOA / BRVM — couverture fonds, VL, performances, indices et documents",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008",
+        "AF-REQ-011",
+        "AF-REQ-013",
+        "AF-REQ-015"
+      ],
+      "possible_existing_task_refs": [
+        "AF-OPS-007",
+        "AF-OPS-008"
+      ],
+      "candidate_mini_tasks": [
+        "Conserver les imports et benchmarks fonctionnels.",
+        "Qualifier les anomalies hors Nigeria, dont les ruptures d'échelle UEMOA.",
+        "Compléter documents/organisations/qualité sans perturber les pipelines BRVM existants."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-015",
+      "program": "COUNTRY_ROLLOUT",
+      "title": "Expansion panafricaine — Ghana, Kenya, Égypte, Afrique du Sud, Botswana, Namibie, Éthiopie, Maurice",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "PROGRAM_INTAKE_WITH_CHILD_MARKETS",
+      "requirement_refs": [
+        "AF-REQ-008",
+        "AF-REQ-015"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Pour chaque marché: autorités officielles, univers fonds, identifiants, SGO, NAV/AUM/distributions, documents, FX, benchmarks, qualité et cadence.",
+        "Créer un intake enfant par pays seulement après source discovery et audit de l'existant.",
+        "Ne jamais confondre roadmap historique et connecteur production disponible."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-016",
+      "program": "API_CONTRACTS",
+      "title": "API canonique, view models et séparation données métier / présentation",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-001",
+        "AF-REQ-006"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-013"
+      ],
+      "candidate_mini_tasks": [
+        "Inventorier routes publiques/privées et duplications historiques.",
+        "Créer/étendre des view models stables consommés par les organismes frontend.",
+        "Préserver compatibilité des routes validées et planifier les dépréciations avec preuves."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-017",
+      "program": "FRONTEND_DESIGN_SYSTEM",
+      "title": "Design System + Atomic Design AfricaFunds",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-001"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Cartographier atoms, molecules, organisms, templates et pages déjà présents.",
+        "Définir tokens, composants primitifs, états loading/error/empty/stale et contrats de view models.",
+        "Réutiliser l'existant et supprimer les duplications seulement après migration prouvée."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-018",
+      "program": "FRONTEND_ENTITY_PAGES",
+      "title": "Pages Fund / ShareClass / SGO / Country V2",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-001",
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Stabiliser Fund != UI template et distinguer FundDetailPage/ShareClassPage.",
+        "Assembler les organismes Overview, Key Figures, NAV, Performance, Risk, Benchmark, Portfolio, Fees, Documents, Events, Organizations, Data Quality, etc.",
+        "Préserver routes, URLs et comportements existants pendant la migration."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-019",
+      "program": "USER_SPACES",
+      "title": "Espaces utilisateurs unifiés et navigation par rôle",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-001"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Auditer Admin, Investor, Management/SGO, Institutional, Data Requester, Country Panel et Distributor.",
+        "Harmoniser shell, navigation, permissions, composants communs et parcours sans fusionner les rôles métier.",
+        "Établir la couverture fonctionnelle et les gaps écran/API par espace."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-020",
+      "program": "AUTH_SECURITY",
+      "title": "Auth, RBAC, ownership, sécurité frontend/API et durcissement des routes",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-022"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-013",
+        "AF-OPS-005"
+      ],
+      "candidate_mini_tasks": [
+        "Auditer les routes POST/PUT/DELETE, ownership et permissions par rôle.",
+        "Conserver les mécanismes auth existants et corriger additivement les trous.",
+        "Ajouter tests d'accès horizontal/vertical et protections XSS/input sans exposer de secrets."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-021",
+      "program": "INSTITUTIONAL_MANDATES",
+      "title": "Institutional — Mandates, Eligibility, Hard Gates, Screening et Long List",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_NEW_PROGRAM_REUSING_CORE",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-017",
+        "AF-TASK-022"
+      ],
+      "candidate_mini_tasks": [
+        "Transformer un mandat en règles machine-readable sur données canoniques.",
+        "Réutiliser Fund Master, SGO, analytics et quality/DDQ.",
+        "Historiser le snapshot d'univers et les raisons d'inclusion/exclusion."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-022",
+      "program": "INSTITUTIONAL_DD",
+      "title": "Institutional — DDQ, ODD, Findings et Short List",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_NEW_PROGRAM_REUSING_CORE",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-022"
+      ],
+      "candidate_mini_tasks": [
+        "Définir questionnaires/versioning, réponses, pièces, findings, sévérités et preuves.",
+        "Ne pas recopier les documents fondamentaux ; référencer le moteur documentaire canonique.",
+        "Maintenir un audit trail reconstructible."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-023",
+      "program": "INSTITUTIONAL_RFP",
+      "title": "Institutional — RFP, Clarifications, Technical/Financial Evaluation",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_NEW_PROGRAM_REUSING_CORE",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-022"
+      ],
+      "candidate_mini_tasks": [
+        "Raccorder les workflows RFP aux utilisateurs/SGO existants.",
+        "Versionner invitations, réponses, clarifications, critères, scores et pièces.",
+        "Séparer score calculé, appréciation humaine et décision finale."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-024",
+      "program": "INSTITUTIONAL_COMMITTEE",
+      "title": "Institutional — Investment Committee, décision, approbation/rejet",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_NEW_PROGRAM_REUSING_CORE",
+      "requirement_refs": [
+        "AF-REQ-010"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-022"
+      ],
+      "candidate_mini_tasks": [
+        "Tracer dossier présenté, participants/rôles, décision et justification.",
+        "Reconstruire toute décision depuis le snapshot exact des données et analyses utilisées.",
+        "Préserver les étapes humaines et ne jamais transformer un score en décision automatique."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-025",
+      "program": "INSTITUTIONAL_MONITORING",
+      "title": "Institutional — Monitoring, revues périodiques et re-underwriting",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_NEW_PROGRAM_REUSING_CORE",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-022"
+      ],
+      "candidate_mini_tasks": [
+        "Définir triggers de revue, changements fonds/SGO, dérives performance/risque/qualité et échéances documentaires.",
+        "Historiser chaque revue et la comparaison avec le dossier d'origine.",
+        "Réutiliser analytics, documents et quality engine."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-026",
+      "program": "REPORTING",
+      "title": "Reporting et exports traçables fonds / portefeuille / institutionnel",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-022"
+      ],
+      "candidate_mini_tasks": [
+        "Inventorier exports Excel/PDF existants.",
+        "Versionner données, date de coupure, devise, conventions, provenance et warnings.",
+        "Réutiliser un moteur de reporting partagé plutôt que des exports divergents par module."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-027",
+      "program": "SEO_ARCHITECTURE",
+      "title": "SEO technique et architecture de découvrabilité",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-001"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Auditer URLs, navigation, profondeur, liens crawlables, titles, descriptions, headings, canoniques, pagination et pages orphelines.",
+        "Auditer robots.txt, sitemap, hreflang si nécessaire, Open Graph/Twitter Cards et conflits SSR/CSR.",
+        "Définir des contrats SEO par type de page avant refonte massive."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-028",
+      "program": "SCHEMA_ORG",
+      "title": "Schema.org / JSON-LD — graphe d'entités reliées par @id",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-001"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Construire une architecture cohérente Organization, WebSite, WebPage, BreadcrumbList, Article, Dataset, Person et entités financières pertinentes.",
+        "Relier publisher, isPartOf, mainEntity, about, author, provider par identifiants stables.",
+        "Éviter la duplication de blocs contradictoires SSR/CSR."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-029",
+      "program": "WEB_SEMANTICS_ACCESSIBILITY",
+      "title": "HTML sémantique, accessibilité, responsive et Core Web Vitals",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-006"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Auditer header/nav/main/section/article/aside/footer/headings/tables/figures/time/address.",
+        "Préserver responsive desktop/mobile et navigation clavier.",
+        "Mesurer performance frontend/Core Web Vitals avant/après les refontes."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-030",
+      "program": "SEO_VALIDATION",
+      "title": "Validation SEO/Schema.org et non-régression automatisée",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-006"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Ajouter checks déterministes meta/canonical/robots/JSON-LD/liens crawlables/SSR quand le socle est qualifié.",
+        "Comparer avant/après pour les pages majeures.",
+        "Ne pas affaiblir les validations pour obtenir un PASS."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-031",
+      "program": "DISCOVERY_SEARCH",
+      "title": "Comparaison, screener, heatmap, recherche et découverte de fonds",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-020",
+        "AF-TASK-021"
+      ],
+      "candidate_mini_tasks": [
+        "Cartographier les écrans et APIs de comparaison/screener/heatmap existants.",
+        "Réutiliser analytics/quality/view models canoniques.",
+        "Empêcher l'affichage de chiffres plausibles mais stale/non qualifiés."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-032",
+      "program": "ALLOCATION",
+      "title": "Allocation / Robot Advisor / Portfolio Lab",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "LINK_EXISTING_PROGRAM_NO_NEW_TASKS",
+      "requirement_refs": [
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-012",
+        "AF-TASK-013",
+        "AF-TASK-014",
+        "AF-TASK-015",
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-018",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021",
+        "AF-TASK-022",
+        "AF-TASK-023"
+      ],
+      "candidate_mini_tasks": [
+        "Ne créer aucun programme parallèle : AF-ALLOC-001 est l'autorité.",
+        "Rattacher les nouveaux gaps Allocation aux tâches 012→023 après déduplication.",
+        "Respecter les claims actifs, en particulier AF-TASK-017."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-033",
+      "program": "BACKOFFICE",
+      "title": "Back-office data, corrections gouvernées et opérations de contenu",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-006",
+        "AF-REQ-008"
+      ],
+      "possible_existing_task_refs": [],
+      "candidate_mini_tasks": [
+        "Cartographier les opérations admin/data existantes et leurs droits.",
+        "Favoriser dry-run, preview, snapshot, transaction, rollback et post-check pour les corrections sensibles.",
+        "Séparer correction métier, recalcul dérivé et publication."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-034",
+      "program": "OBSERVABILITY",
+      "title": "Observabilité applicative, crons, workers, sources et alerting",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-006",
+        "AF-REQ-025"
+      ],
+      "possible_existing_task_refs": [
+        "AF-OPS-003",
+        "AF-OPS-005",
+        "AF-OPS-009"
+      ],
+      "candidate_mini_tasks": [
+        "Unifier la visibilité freshness source, acquisition, import, calcul dérivé, cron, worker, DB et HTTP.",
+        "Distinguer source tardive, panne pipeline et panne infrastructure.",
+        "Rattacher incidents aux tâches existantes et conserver RCA/proofs."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-035",
+      "program": "TESTING",
+      "title": "Stratégie de tests multi-couches et corpus de non-régression",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-006"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-018"
+      ],
+      "candidate_mini_tasks": [
+        "Cartographier tests unitaires, contrats API, data invariants, frontend, e2e, SEO et runtime.",
+        "Définir fixtures représentatives par pays et cas financiers sensibles.",
+        "Conserver les baselines et interdire la suppression d'un contrôle pour faire passer un lot."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-036",
+      "program": "LEGACY_DEBT",
+      "title": "Dette technique, duplications, limites, routes mortes et retrait gouverné du legacy",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "QUALIFY_AND_EXTEND",
+      "requirement_refs": [
+        "AF-REQ-001"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-023"
+      ],
+      "candidate_mini_tasks": [
+        "Inventorier limit:500, routes dupliquées, configs divergentes, composants clonés et prototypes inactifs.",
+        "Classer chaque legacy ACTIVE/INACTIVE/PROTOTYPE avant retrait.",
+        "Exiger équivalence, fenêtre de rollback et preuve d'inactivité avant suppression."
+      ]
+    },
+    {
+      "id": "AF-INTAKE-CAND-037",
+      "program": "CONTINUITY",
+      "title": "Continuité multi-agent, backlog exhaustif et promotion des intakes",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK",
+      "promotion_intent": "PROGRAMME_DIRECTOR_EXTENSION_CANDIDATE",
+      "requirement_refs": [
+        "AF-REQ-002",
+        "AF-REQ-003",
+        "AF-REQ-017",
+        "AF-REQ-023"
+      ],
+      "possible_existing_task_refs": [
+        "AF-TASK-024",
+        "AF-TASK-025",
+        "AF-TASK-026",
+        "AF-TASK-027",
+        "AF-TASK-028"
+      ],
+      "candidate_mini_tasks": [
+        "Faire de cette matrice une surface de découverte, jamais une seconde queue.",
+        "Qualifier/dédupliquer les 125 gaps du harvester et tout nouvel intake avant promotion.",
+        "Après libération du claim AF-TASK-028, promouvoir uniquement les gaps vérifiés vers task-queue.json avec dépendances/DoR/DoD/claims.",
+        "Tout agent arrivant doit pouvoir reconstruire le plan sans mémoire conversationnelle."
+      ]
+    }
+  ],
+  "next_rule": "Do not promote any candidate while it duplicates an existing task or overlaps an active claim. After AF-TASK-028 releases task-queue.json, qualify candidates against live repositories, current requirements, the gap harvester output, and production evidence; then promote only verified gaps into the single queue."
+}

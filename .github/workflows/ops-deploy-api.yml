@@ -1,0 +1,147 @@
+# OPERATION — fallback API S2 indépendant du bridge MCP.
+# Le bridge reste nominal. Ce workflow applique le même gate GOV-006 que les
+# autres opérations et ne redémarre jamais l'API sans dispatch + phrase exacte.
+name: OPS — deployer API AfricaFunds sans bridge
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "observe ou deploy"
+        required: true
+        default: observe
+        type: choice
+        options:
+          - observe
+          - deploy
+      confirmation:
+        description: "DEPLOY AFRICAFUNDS API"
+        required: false
+        default: ""
+  push:
+    branches:
+      - claude/code-review-improvements-ikvuj
+    paths:
+      - '.github/workflows/ops-deploy-api.yml'
+      - 'scripts/governance/prepare_s2_ssh.sh'
+      - '.governance/ssh/s2_known_hosts.tofu'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ops-deploy-api
+  cancel-in-progress: false
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout governance primitives
+        uses: actions/checkout@v4
+        with:
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Resolve safe action
+        id: mode
+        env:
+          EVENT: ${{ github.event_name }}
+          REQUESTED: ${{ inputs.action }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          ACTION="observe"
+          if [ "$EVENT" = "workflow_dispatch" ]; then ACTION="${REQUESTED:-observe}"; fi
+          case "$ACTION" in observe|deploy) ;; *) echo "::error::invalid action"; exit 2;; esac
+          if [ "$ACTION" = "deploy" ] && [ "$CONFIRMATION" != "DEPLOY AFRICAFUNDS API" ]; then
+            echo "::error::deploy confirmation phrase missing"
+            exit 3
+          fi
+          echo "action=$ACTION" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare strict pinned SSH
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Observe both repositories before any mutation
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- observe both' \
+            < scripts/governance/s2_git_guard.sh | tee api-preflight.txt
+
+      - name: Reconcile API through shared GOV-006 guard
+        if: steps.mode.outputs.action == 'deploy'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s -- reconcile api' \
+            < scripts/governance/s2_git_guard.sh | tee api-reconcile.txt
+
+      - name: Restart API only for explicit deploy
+        if: steps.mode.outputs.action == 'deploy'
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+        run: |
+          set -euo pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$SSH_USER@$HOST" 'bash -s' <<'REMOTE' | tee api-deploy.txt
+              set -euo pipefail
+              API=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+              BRANCH=claude/code-review-improvements-ikvuj
+              PROBE=http://localhost:3005/api/performancesdev/fond/1141/USD
+              cd "$API"
+              test "$(git branch --show-current)" = "$BRANCH"
+              REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
+              test "$(git rev-parse HEAD)" = "$REMOTE_HEAD"
+              pm2 restart api-monolith
+              CODE=000
+              for i in 1 2 3 4 5 6 7 8 9 10; do
+                sleep 3
+                CODE="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$PROBE" || true)"
+                echo "api_attempt_$i=$CODE"
+                case "$CODE" in 2*) break;; esac
+              done
+              case "$CODE" in 2*) ;; *) echo "API local HTTP check failed" >&2; exit 40;; esac
+              PUBLIC="$(curl -sS -L --max-redirs 3 -o /dev/null -w '%{http_code}' --max-time 20 https://africafunds.chainsolutions.fr/api/getactualite || true)"
+              echo "public_api_http=$PUBLIC"
+              case "$PUBLIC" in 2*) ;; *) exit 41;; esac
+              pm2 describe api-monolith | grep -E 'status|restarts|exec interpreter|script path' || true
+            REMOTE
+
+      - name: Publish report
+        if: always()
+        run: |
+          {
+            echo "## API fallback — ${{ steps.mode.outputs.action }}"
+            for f in api-preflight.txt api-reconcile.txt api-deploy.txt; do
+              if [ -f "$f" ]; then
+                echo
+                echo "### $f"
+                echo '~~~text'
+                tail -200 "$f"
+                echo '~~~'
+              fi
+            done
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

@@ -1,0 +1,594 @@
+/**
+ * BOUCLE DE CONTROLE — verifie en continu que la realite de la production
+ * correspond toujours a ce que la documentation affirme.
+ *
+ * POURQUOI CE SCRIPT
+ * ------------------
+ * Le 2026-08-12, l'audit des 33 fichiers .md a montre que le vrai probleme du
+ * projet n'est pas l'oubli, mais la DERIVE SILENCIEUSE : un document affirme
+ * quelque chose de faux, rien ne proteste, et chaque reprise refait le meme
+ * travail sur une base fausse.
+ *
+ * Exemples reels ayant motive chaque controle ci-dessous :
+ *   - CODE_REVIEW #34 a affirme pendant 2 mois « UEMOA stale 233 jours, pas de
+ *     scraper BRVM ». Les deux moities etaient fausses : les VL etaient a jour et
+ *     le scraper tournait. La date perimee venait du cache `datejour` (C1).
+ *   - Une perf orpheline (fonds 1224, YTD 15 655 %) a survecu a un rollback de VL
+ *     et restait servie par l'API (C2, C3).
+ *   - `PRODUCTION_STATE.json`, declare source de verite par CLAUDE.md, etait lu
+ *     perime depuis un clone alors que le cron tournait (C5).
+ *
+ * Un .md ne peut pas echouer bruyamment. Ce script, si.
+ *
+ * PORTEE : LECTURE SEULE. Aucune ecriture, jamais.
+ *
+ * SORTIE : rapport lisible + code de sortie 1 si au moins un controle CRITIQUE
+ * echoue (pour declencher une alerte cron). Les controles AVERTISSEMENT
+ * n'echouent pas le script mais apparaissent dans le rapport.
+ *
+ * USAGE
+ *   node check_doc_drift.js            # rapport complet
+ *   node check_doc_drift.js --json     # sortie machine (pour un dashboard)
+ */
+
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+const mysql = require('mysql2/promise');
+const fs = require('fs');
+const path = require('path');
+
+const DB_CONFIG = {
+  host: process.env.DB_HOST || '127.0.0.1',
+  user: process.env.DB_USER || 'fund_opcvm',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'fund_opcvm',
+  charset: 'utf8mb4',
+};
+
+/**
+ * Budget de fraicheur par pays, en jours calendaires, et gravite associee.
+ *
+ * CALIBRE SUR LES CADENCES REELLEMENT OBSERVEES le 2026-08-13, pas sur un ideal.
+ * Le premier passage du script avec des budgets theoriques (5 j partout, 10 j
+ * Nigeria) a produit 2 faux positifs sur 3 echecs : une alerte quotidienne
+ * injustifiee finit ignoree, ce qui recree exactement la cecite que ce script
+ * doit supprimer. Un seuil doit donc tolerer le week-end et le rythme reel de
+ * publication de la source.
+ *
+ *   MAROC   ASFIM quotidien lun-ven  -> observe 2 j  -> 6 j (week-end + jour ferie)
+ *   UEMOA   BRVM BOC quotidien       -> observe 1 j  -> 6 j
+ *   TUNISIE CMF quotidien lun-ven    -> observe 6 j  -> 9 j (publication irreguliere)
+ *   NIGERIA SEC, publication espacee -> observe 20 j -> 45 j, et AVERTISSEMENT :
+ *           un retard vient de la source, pas de la plateforme.
+ *   CEMAC   import par fichier, aucun cron -> AVERTISSEMENT permanent tant que
+ *           bvmac_boc_daily.py n'est pas en production.
+ *
+ * Revoir ces valeurs si la cadence d'une source change — pas l'inverse.
+ */
+// Budgets de fraicheur : source unique dans src/lib/freshness_budgets.js.
+// Ils vivaient ici ET dans scripts/monitoring/check_cron_health.js sous une
+// autre forme, et les deux repondaient differemment a la meme question.
+const { budgetPour } = require('../../src/lib/freshness_budgets');
+
+// Au-dela, une performance est physiquement invraisemblable pour un OPCVM et
+// signale presque toujours un melange d'echelles ou un historique troue.
+const YTD_ABSURD_THRESHOLD = 500;
+
+const results = [];
+function record(id, level, label, ok, detail) {
+  results.push({ id, level, label, ok, detail });
+}
+
+async function main() {
+  const json = process.argv.includes('--json');
+  const conn = await mysql.createConnection(DB_CONFIG);
+
+  try {
+    // C1 — `datejour` desynchronise du dernier VL reel.
+    // Le bug P1-01 : 315 fonds affichaient une date perimee sur des VL a jour.
+    const [drift] = await conn.execute(`
+      SELECT f.pays, COUNT(*) AS n
+        FROM fond_investissements f
+        JOIN (SELECT fund_id, MAX(date) AS d FROM valorisations GROUP BY fund_id) v
+          ON v.fund_id = f.id
+       WHERE f.datejour IS NULL OR DATE(f.datejour) <> DATE(v.d)
+       GROUP BY f.pays`);
+    const driftTotal = drift.reduce((s, r) => s + Number(r.n), 0);
+    record('C1', 'CRITIQUE', 'Cache datejour synchronise avec la derniere VL',
+      driftTotal === 0,
+      driftTotal === 0 ? 'aucun ecart'
+        : `${driftTotal} fonds desynchronises (${drift.map(r => `${r.pays}:${r.n}`).join(', ')}) — les pages pays affichent des dates fausses. Correctif : scripts/fix/fix_datejour_sync.js`);
+
+    // C2 — performance orpheline EN TETE de serie (date sans VL correspondante,
+    // et plus recente ligne du fonds).
+    //
+    // Le premier passage reel (2026-08-13) a compte 50 150 orphelines sur ~67 600
+    // lignes, soit 74 % de la table : l'invariant initial etait trop large. Toutes
+    // les perfs ne sont pas produites a une date de VL — `fix_populate_performances`
+    // ecrit bien a la derniere VL du fonds, mais les routes batch
+    // `saveperfdatemysql` historisent a d'autres dates. Ces lignes sont donc
+    // normales, et les supprimer aurait ete une perte massive de donnees.
+    //
+    // Le sous-ensemble reellement nuisible est celui qui a cause le bug Vantage :
+    // une orpheline qui est la LIGNE LA PLUS RECENTE du fonds, donc celle que
+    // l'API sert. C'est ce que ce controle mesure desormais.
+    const orphanHead = [];
+    for (const t of ['performences', 'performences_eurs', 'performences_usds']) {
+      const [[row]] = await conn.execute(`
+        SELECT COUNT(*) AS n FROM ${t} p
+         WHERE p.date = (SELECT MAX(date) FROM ${t} WHERE fond_id = p.fond_id)
+           AND NOT EXISTS (SELECT 1 FROM valorisations v
+                            WHERE v.fund_id = p.fond_id AND DATE(v.date) = DATE(p.date))
+           AND EXISTS (SELECT 1 FROM valorisations v2 WHERE v2.fund_id = p.fond_id)`);
+      if (Number(row.n) > 0) orphanHead.push(`${t}:${row.n}`);
+    }
+    record('C2', 'CRITIQUE', 'Aucune performance orpheline en tete de serie',
+      orphanHead.length === 0,
+      orphanHead.length === 0 ? 'aucune'
+        : `${orphanHead.join(', ')} fonds dont la perf la plus recente porte une date sans VL — c'est elle que l'API sert. Instruire fonds par fonds AVANT toute suppression.`);
+
+    // C3 — performances physiquement invraisemblables.
+    // Aurait attrape Vantage 1224 (15 655 %) et attrape encore Zenith 2825 (239 %).
+    const [absurd] = await conn.execute(`
+      SELECT p.fond_id, f.nom_fond, f.pays, p.date, p.ytd
+        FROM performences p JOIN fond_investissements f ON f.id = p.fond_id
+       WHERE ABS(p.ytd) > ${YTD_ABSURD_THRESHOLD}
+         AND p.date = (SELECT MAX(date) FROM performences WHERE fond_id = p.fond_id)
+       ORDER BY ABS(p.ytd) DESC LIMIT 10`);
+    record('C3', 'CRITIQUE', `Aucune performance recente au-dela de ${YTD_ABSURD_THRESHOLD} %`,
+      absurd.length === 0,
+      absurd.length === 0 ? 'aucune'
+        : absurd.map(r => `[${r.fond_id}] ${String(r.nom_fond).slice(0, 32)} (${r.pays}) YTD ${Number(r.ytd).toFixed(0)} % au ${String(r.date).slice(0, 10)}`).join(' | '));
+
+    // C4 — fraicheur des VL par pays, contre un budget explicite.
+    const [fresh] = await conn.execute(`
+      SELECT f.pays, MAX(v.date) AS derniere, DATEDIFF(CURDATE(), MAX(v.date)) AS age
+        FROM fond_investissements f JOIN valorisations v ON v.fund_id = f.id
+       GROUP BY f.pays`);
+    for (const r of fresh) {
+      // `budgetPour` normalise la casse. L acces direct par cle laissait passer
+      // les 18 fonds enregistres « Nigeria » au lieu de « NIGERIA » : ils
+      // tombaient sur le budget par defaut de 30 jours en simple AVERTISSEMENT.
+      const { days, level } = budgetPour(r.pays);
+      record(`C4.${r.pays}`, level,
+        `Fraicheur VL ${r.pays} (budget ${days} j)`,
+        Number(r.age) <= days,
+        `derniere VL ${String(r.derniere).slice(0, 10)}, soit ${r.age} j`);
+    }
+
+    // C5 — le snapshot runtime doit etre frais. Depuis GOV-006, S2 n'ecrit plus
+    // de commits Git horaires : le snapshot live est hors du working tree.
+    // Fallback historique conserve pour les clones/environnements non migres.
+    const runtimeSnap = process.env.FUNDAFRICA_PRODUCTION_STATE
+      || '/var/lib/fundafrica/runtime/PRODUCTION_STATE.json';
+    const legacySnap = path.resolve(__dirname, '../../PRODUCTION_STATE.json');
+    const snap = fs.existsSync(runtimeSnap) ? runtimeSnap : legacySnap;
+    const snapSource = snap === runtimeSnap ? 'runtime' : 'fallback historique';
+    let snapOk = false, snapDetail = `fichier absent (${runtimeSnap} et ${legacySnap})`;
+    if (fs.existsSync(snap)) {
+      // UN AVERTISSEMENT NE DOIT PAS POUVOIR TUER LES CONTROLES CRITIQUES.
+      // Ce `JSON.parse` etait nu. Le 2026-09-14, apres les 3 h 56 pendant
+      // lesquelles `mariadbd` est reste mort, `sync_production.sh` — qui tourne
+      // a l heure — a laisse un snapshot tronque. La lecture a lance
+      // « Unexpected end of JSON input », l exception est remontee jusqu au
+      // `main().catch()`, et TOUTE la mesure a ete perdue : C2, C3, C4, C7 et
+      // C8 compris, alors qu ils n ont rien a voir avec ce fichier.
+      //
+      // C5 est declare AVERTISSEMENT : un snapshot illisible doit le faire
+      // echouer LUI, et rien d autre. Le cas « fichier corrompu » est d ailleurs
+      // plus informatif qu une absence — il dit que le producteur a tourne et
+      // mal fini, ce qui est exactement ce qui s est passe.
+      try {
+        const brut = fs.readFileSync(snap, 'utf8');
+        const gen = JSON.parse(brut).generated_at;
+        const ageH = (Date.now() - new Date(gen).getTime()) / 3600000;
+        snapOk = Number.isFinite(ageH) && ageH <= 6;
+        snapDetail = `${snapSource}: genere le ${String(gen).slice(0, 16)}, soit ${ageH.toFixed(1)} h`;
+        if (!snapOk) snapDetail += ' — snapshot perime : ne pas s\'y fier en l\'etat';
+      } catch (err) {
+        snapOk = false;
+        const taille = (() => { try { return fs.statSync(snap).size; } catch { return '?'; } })();
+        snapDetail = `${snapSource}: fichier ILLISIBLE (${taille} octets) — ${err.message}. `
+          + 'Le producteur a tourne et mal fini ; regenerer par sync_production.sh. '
+          + 'Les autres controles restent valides.';
+      }
+    }
+    record('C5', 'AVERTISSEMENT', 'Snapshot production runtime frais (< 6 h)', snapOk, snapDetail);
+
+    // C7 — series de VL contaminees par deux echelles de devise.
+    //
+    // Classe de defaut identifiee le 2026-08-13, recurrente et non ponctuelle :
+    //   fonds 1141 AFRINVEST DOLLAR FUND — 13 ruptures d'echelle depuis 2022-03,
+    //     300 points en NGN (10^4-10^5) et 13 points isolés en USD (10^1-10^2).
+    //     Base YTD tombee sur un point contamine (114,68) contre 165 207 en NGN
+    //     -> YTD servi de 143 958 %.
+    //   fonds 1196 EMERGING AFRICA EUROBOND — trois echelles (115 / 1 655 / 159 000).
+    //   fonds 1224 Vantage (lot T) — meme signature, ~90x.
+    //
+    // Un OPCVM ne varie pas d'un facteur 20 en douze mois. Un tel rapport signale
+    // un melange d'unites (prix unitaire vs encours total, ou devise locale vs
+    // devise du fonds), jamais une performance reelle.
+    //
+    // Volontairement sans fonction de fenetrage (LAG) : MAX/MIN sur 400 jours
+    // glissants suffit et reste portable sur MySQL comme sur MariaDB.
+    const [scale] = await conn.execute(`
+      SELECT v.fund_id, f.nom_fond, f.pays, f.dev_libelle,
+             MIN(v.value) AS vmin, MAX(v.value) AS vmax,
+             MAX(v.value) / MIN(v.value) AS ratio
+        FROM valorisations v
+        JOIN fond_investissements f ON f.id = v.fund_id
+       WHERE v.value > 0
+         AND v.date >= DATE_SUB(CURDATE(), INTERVAL 400 DAY)
+       GROUP BY v.fund_id, f.nom_fond, f.pays, f.dev_libelle
+      HAVING ratio > 20
+       ORDER BY ratio DESC
+       LIMIT 15`);
+    record('C7', 'CRITIQUE', 'Aucune serie de VL melangeant deux echelles (12 mois)',
+      scale.length === 0,
+      scale.length === 0 ? 'aucune'
+        : scale.map(r => `[${r.fund_id}] ${String(r.nom_fond).slice(0, 30)} (${r.pays}/${r.dev_libelle}) ${Number(r.ratio).toFixed(0)}x [${Number(r.vmin).toFixed(2)} .. ${Number(r.vmax).toFixed(0)}]`).join(' | '));
+
+    // C8 — les performances suivent-elles les VL ?
+    //
+    // Decouvert le 2026-08-17 : le Maroc avait 9 fonds sur 644 dont la
+    // performance etait a jour, avec un retard moyen de 78,5 jours ; la Tunisie
+    // 6 sur 131, 80,1 jours. Les VL etaient fraiches, mais les performances
+    // affichees dataient de fin mai. Trois mois sans que rien ne le signale.
+    //
+    // Une VL fraiche avec une performance perimee est pire qu une donnee
+    // absente : la page affiche un chiffre plausible et faux. Le controle C4
+    // ne voyait rien, puisqu il ne regarde que la fraicheur des VL.
+    //
+    // Seuil : moins de 50 % des fonds a jour, ou un retard moyen superieur a
+    // 15 jours, sur un pays dont les VL ont moins de 15 jours. Un pays dont les
+    // VL sont elles-memes figees (CEMAC) est exclu : sa performance figee est
+    // coherente, ce n est pas le meme defaut.
+    const [lag] = await conn.execute(`
+      SELECT f.pays,
+             COUNT(*)                                                          AS fonds,
+             SUM(CASE WHEN p.dp = v.dv THEN 1 ELSE 0 END)                      AS a_jour,
+             ROUND(100 * SUM(CASE WHEN p.dp = v.dv THEN 1 ELSE 0 END) / COUNT(*), 1) AS pct,
+             ROUND(AVG(DATEDIFF(v.dv, p.dp)), 1)                               AS retard_j,
+             DATEDIFF(CURDATE(), MAX(v.dv))                                    AS vl_age
+        FROM fond_investissements f
+        JOIN (SELECT fund_id, MAX(date) AS dv FROM valorisations GROUP BY fund_id) v
+          ON v.fund_id = f.id
+        LEFT JOIN (SELECT fond_id, MAX(date) AS dp FROM performences GROUP BY fond_id) p
+          ON p.fond_id = f.id
+       WHERE f.active = 1
+       GROUP BY f.pays
+      HAVING vl_age <= 15 AND (pct < 50 OR retard_j > 15)
+       ORDER BY pct`);
+    record('C8', 'CRITIQUE', 'Les performances suivent les VL',
+      lag.length === 0,
+      lag.length === 0 ? 'tous les pays a jour'
+        : lag.map(r => `${r.pays} : ${r.a_jour}/${r.fonds} a jour (${r.pct} %), retard moyen ${r.retard_j} j`).join(' | ')
+          + ' — VL fraiches mais performances perimees : le site affiche des chiffres plausibles et faux');
+
+    // C6 — couverture benchmark : un fonds sans indRef n'est comparable a rien.
+    const [cov] = await conn.execute(`
+      SELECT f.pays, COUNT(*) AS total, SUM(CASE WHEN v.indRef IS NULL THEN 1 ELSE 0 END) AS sans
+        FROM valorisations v JOIN fond_investissements f ON f.id = v.fund_id
+       GROUP BY f.pays`);
+    for (const r of cov) {
+      const pct = Number(r.total) ? (100 * (Number(r.total) - Number(r.sans)) / Number(r.total)) : 0;
+      record(`C6.${r.pays}`, 'AVERTISSEMENT', `Couverture indRef ${r.pays}`,
+        pct >= 95, `${pct.toFixed(1)} % (${r.sans} VL sans benchmark sur ${r.total})`);
+    }
+
+    // C9 — couverture benchmark des VL RECENTES.
+    //
+    // Pourquoi ce controle existe, alors que C6 mesure deja la couverture indRef :
+    // parce que C6 la mesure sur TOUT l historique, et qu un denominateur de
+    // plusieurs centaines de milliers de VL rend l arrivee de donnees neuves
+    // invisible. Mesure du 2026-09-25 : entre le 22 aout et le 25 septembre,
+    // 8 609 VL marocaines sont entrees et 8 609 etaient sans benchmark — 100,0 %
+    // sur chacun des treize intervalles releves, sans une exception, et sans
+    // aucun rattrapage a posteriori. Pendant ces 34 jours C6.MAROC est reste
+    // [OK], de 98,3 % a 97,9 %, et il lui aurait fallu ~54 jours de plus pour
+    // franchir le seuil de 95 %. Un pipeline de benchmark integralement casse
+    // serait donc reste invisible ~88 jours au controle cense le voir.
+    //
+    // La lecon est celle deja payee deux fois (seuils C4, perimetre C2) : un
+    // invariant mesure sur le mauvais perimetre n est pas un invariant. C9 ne
+    // remplace pas C6 et ne modifie rien : il regarde la meme colonne sur une
+    // fenetre de 30 jours, la ou le defaut est observable.
+    //
+    // Severite AVERTISSEMENT, alignee sur C6 : ce controle decrit une qualite de
+    // donnee, pas une indisponibilite. Enveloppe dans un try/catch pour la meme
+    // raison que C5 : un controle de second rang ne doit jamais pouvoir
+    // empecher les controles CRITIQUE de rendre leur verdict.
+    try {
+      const [recent] = await conn.execute(`
+        SELECT f.pays, COUNT(*) AS total,
+               SUM(CASE WHEN v.indRef IS NULL THEN 1 ELSE 0 END) AS sans
+          FROM valorisations v JOIN fond_investissements f ON f.id = v.fund_id
+         WHERE v.date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+         GROUP BY f.pays`);
+      for (const r of recent) {
+        const total = Number(r.total); const sans = Number(r.sans);
+        if (total < 30) continue;   // trop peu de VL neuves pour conclure
+        const pct = 100 * (total - sans) / total;
+        record(`C9.${r.pays}`, 'AVERTISSEMENT', `Couverture indRef des VL recentes ${r.pays} (30 j)`,
+          pct >= 95,
+          `${pct.toFixed(1)} % (${sans} VL sans benchmark sur ${total} entrees en 30 j)`
+            + (pct < 95 ? ' — les VL neuves arrivent sans benchmark ; C6 ne peut pas le voir, son denominateur est tout l historique.' : ''));
+      }
+    } catch (err) {
+      record('C9', 'AVERTISSEMENT', 'Couverture indRef des VL recentes', false,
+        `controle non evalue : ${err.message}. Les autres controles restent valides.`);
+    }
+
+    // C10 — FRAICHEUR de l indice de reference, pas seulement sa presence.
+    //
+    // Mesure du 2026-10-04 qui justifie ce controle. C6 et C9 ne demandent
+    // qu une chose a `indRef` : ne pas etre NULL. Aucun des deux ne regarde la
+    // DATE de l indice. Consequence mesuree ce jour-la : `MASI` n avait plus
+    // aucune valeur dans `indice_references` depuis le 2026-07-31 — 66 jours —
+    // et les VL marocaines etaient sans benchmark depuis le 2026-08-06, la
+    // semaine du 03/08 marquant la bascule (64,5 % puis 0,0 %). Pendant ces
+    // deux mois, `cron_indices_daily` a rendu le verdict **OK** avec la reserve
+    // « Echecs scraping: 24 », et C6.MAROC est reste [OK] a 97,6 %.
+    //
+    // Un fonds compare a un indice immobile affiche une surperformance qui
+    // n existe pas. C est pire qu une case vide : la case vide se voit, le
+    // chiffre faux se lit comme une donnee.
+    //
+    // Le controle porte sur la table SOURCE, parce que c est la que la panne
+    // commence et que c est le seul endroit ou elle est visible avant d avoir
+    // contamine les VL. Seuls les indices vivants — alimentes dans les 400
+    // derniers jours — sont juges : la table conserve des series arretees
+    // depuis 2023 qui ne sont plus alimentees par personne et dont l alerte
+    // serait du bruit permanent. Severite AVERTISSEMENT, alignee sur C6 et C9 ;
+    // try/catch comme C5 et C9 depuis le lot BF.
+    //
+    // PERIMETRE CORRIGE LE 2026-10-05, ET MESURE AVANT DE L ETRE. La premiere
+    // version jugeait tout indice alimente dans les 400 derniers jours, et
+    // mettait donc `MONIA` en alerte des sa premiere execution — fige depuis
+    // 144 jours. Or MONIA ne prive aucun fonds de benchmark : aucun fonds ne le
+    // declare, **zero** VL ne le porte, et `propagate_indref_range.js` le dit
+    // deja en clair — « MONIA exclu (pays: []) : c est un taux, non propage aux
+    // fonds ». Un controle de fraicheur applique a une statistique que rien ne
+    // consomme produit une alerte permanente sans enjeu, et une alerte
+    // permanente finit par etre ignoree — y compris le jour ou elle porte sur
+    // un vrai benchmark.
+    //
+    // Le critere n est donc PAS une liste d exceptions, et surtout pas une
+    // troisieme copie du mapping pays → indice (il en existe deja deux dans le
+    // code). Il est pris dans les donnees : un indice est juge s il est
+    // effectivement porte par des VL. Mesure du 2026-10-05 sur
+    // `valorisations` — MASI 550 866 VL, Tunindex 311 089, NSE All Share 54 069,
+    // BRVM Composite 45 102, et MONIA **absent**.
+    //
+    // Ce n est pas une desactivation : les indices non consommes restent
+    // affiches, avec leur age, et le detail dit pourquoi ils ne sont pas juges.
+    // Un indice mourant garde par ailleurs son historique de VL, donc il reste
+    // juge — le critere ne cree pas d angle mort sur une serie qui s arrete.
+    // Limite assumee et documentee : un indice tout neuf, pas encore propage,
+    // ne serait pas juge tant qu aucune VL ne le porte.
+    try {
+      const SEUIL_CONSOMMATION = 100;   // en deca, residu historique, pas un benchmark vivant
+      const [consommes] = await conn.execute(`
+        SELECT COALESCE(NULLIF(TRIM(v.indice_name), ''), NULLIF(TRIM(v.ID_indice), '')) AS indice,
+               COUNT(*) AS vl
+          FROM valorisations v
+         WHERE COALESCE(NULLIF(TRIM(v.indice_name), ''), NULLIF(TRIM(v.ID_indice), '')) IS NOT NULL
+         GROUP BY 1
+        HAVING vl >= ?`, [SEUIL_CONSOMMATION]);
+      const porteParDesVL = new Map(consommes.map(r => [String(r.indice), Number(r.vl)]));
+
+      const [idx] = await conn.execute(`
+        SELECT COALESCE(i.nom_indice, i.id_indice) AS indice,
+               MAX(i.date) AS derniere,
+               DATEDIFF(CURDATE(), MAX(i.date)) AS age
+          FROM indice_references i
+         GROUP BY COALESCE(i.nom_indice, i.id_indice)
+        HAVING age <= 400
+         ORDER BY age DESC`);
+      for (const r of idx) {
+        const age = Number(r.age);
+        const vl = porteParDesVL.get(String(r.indice));
+        const le = String(r.derniere).slice(0, 10);
+        if (!vl) {
+          // Affiche, date, mais pas juge : rien ne le consomme.
+          record(`C10.${r.indice}`, 'AVERTISSEMENT', `Fraicheur de l indice ${r.indice}`,
+            true,
+            `derniere valeur le ${le}, soit ${age} j — non juge : aucune VL ne porte cet indice, `
+              + 'ce n est pas un benchmark de fonds mais une statistique.');
+          continue;
+        }
+        // Les indices boursiers cotent les jours ouvres : une semaine de marge
+        // couvre un week-end prolonge sans masquer un arret reel.
+        record(`C10.${r.indice}`, 'AVERTISSEMENT', `Fraicheur de l indice ${r.indice}`,
+          age <= 8,
+          `derniere valeur le ${le}, soit ${age} j (porte par ${vl} VL)`
+            + (age > 8 ? ' — l indice n est plus alimente ; les VL de ce pays partiront sans benchmark et C6 restera vert pendant des mois.' : ''));
+      }
+      if (!idx.length) {
+        record('C10', 'AVERTISSEMENT', 'Fraicheur des indices de reference', false,
+          'aucun indice alimente dans les 400 derniers jours — la table source est morte.');
+      }
+      if (!porteParDesVL.size) {
+        record('C10.perimetre', 'AVERTISSEMENT', 'Perimetre de C10', false,
+          'aucun indice n est porte par des VL : le critere de jugement est vide, '
+            + 'donc C10 ne juge plus rien. A corriger avant de se fier a ses verdicts.');
+      }
+    } catch (err) {
+      record('C10', 'AVERTISSEMENT', 'Fraicheur des indices de reference', false,
+        `controle non evalue : ${err.message}. Les autres controles restent valides.`);
+    }
+
+    // C11 — la reconstruction des classements est-elle recente ?
+    //
+    // POURQUOI. Le 2026-10-06 j ai conclu d un `HTTP 000` sur l etape 9a du
+    // cron que « le classement local n est pas recalcule ». La conclusion
+    // etait indue : le depot avertit par ecrit qu un `HTTP 000` signifie que le
+    // CLIENT a cesse d attendre, pas que le serveur a echoue. Et elle restera
+    // indue tant que la reconstruction ne sera pas OBSERVABLE : les trois
+    // tables sont en `timestamps: false` et n ont aucune colonne de date, donc
+    // apres un run on ne distingue pas un commit d un rollback.
+    //
+    // Ce controle devient donc utile SEULEMENT apres la migration
+    // `20261007000001-add-rebuild-timestamps-classementfonds.js`. Avant, il se
+    // degrade proprement en disant ce qui manque — motif deja retenu pour
+    // C5/C9/C10, et preferable a un controle absent : l absence de la colonne
+    // est elle-meme l information a afficher.
+    //
+    // Seuil 4 jours : le cron tourne du lundi au vendredi, il faut tolerer un
+    // week-end plus un jour ferie. En AVERTISSEMENT et non en CRITIQUE jusqu a
+    // ce qu un run propre ait prouve le seuil atteignable — ce depot a deja
+    // paye deux fois le prix d un seuil pose en theorie.
+    const TABLES_CLASSEMENT = ['classementfonds', 'classementfonds_eurs', 'classementfonds_usds'];
+    const SEUIL_AGE_CLASSEMENT_J = 4;
+    // Attendu ≈ 1 245 fonds x 3 niveaux ≈ 3 735 lignes ; on juge a 80 %.
+    const LIGNES_ATTENDUES_MIN = 0.8;
+    try {
+      const [colTs] = await conn.execute(`
+        SELECT table_name AS t
+          FROM information_schema.columns
+         WHERE table_schema = DATABASE() AND column_name = 'created_at'
+           AND table_name IN (${TABLES_CLASSEMENT.map(() => '?').join(', ')})`,
+        TABLES_CLASSEMENT);
+      const horodatees = new Set(colTs.map(r => String(r.t || r.TABLE_NAME || r.table_name)));
+
+      // Le cardinal attendu se deduit des fonds reellement classables, pas
+      // d un nombre ecrit en dur qui vieillirait sans que personne ne le voie.
+      const [attendu] = await conn.execute(`
+        SELECT COUNT(DISTINCT f.id) AS n
+          FROM fond_investissements f
+          JOIN performences p ON p.fond_id = f.id
+         WHERE f.active = 1`);
+      const cibleLignes = Number(attendu[0].n) * 3;
+
+      for (const table of TABLES_CLASSEMENT) {
+        if (!horodatees.has(table)) {
+          record(`C11.${table}`, 'AVERTISSEMENT', `Fraicheur de reconstruction de ${table}`,
+            false,
+            'colonne `created_at` absente : l age du dernier recalcul est inconnaissable. '
+              + 'Appliquer la migration 20261007000001-add-rebuild-timestamps-classementfonds.js '
+              + '(ADD COLUMN seul, aucune ligne metier touchee).');
+          continue;
+        }
+        const [etat] = await conn.query(
+          `SELECT COUNT(*) AS lignes, MIN(created_at) AS debut, MAX(created_at) AS fin,
+                  TIMESTAMPDIFF(HOUR, MAX(created_at), NOW()) AS age_h
+             FROM \`${table}\``);
+        const e = etat[0];
+        const ageH = e.age_h == null ? null : Number(e.age_h);
+        const lignes = Number(e.lignes);
+        const assezFrais = ageH != null && ageH <= SEUIL_AGE_CLASSEMENT_J * 24;
+        const assezPlein = lignes >= cibleLignes * LIGNES_ATTENDUES_MIN;
+        record(`C11.${table}`, 'AVERTISSEMENT', `Fraicheur de reconstruction de ${table}`,
+          assezFrais && assezPlein,
+          `${lignes} lignes (attendu ≈ ${cibleLignes}), dernier recalcul `
+            + `${ageH == null ? 'jamais horodate' : `il y a ${ageH} h`}`
+            + (e.debut && e.fin ? `, fenetre du run : ${String(e.debut).slice(0, 19)} → ${String(e.fin).slice(0, 19)}` : '')
+            + (!assezFrais ? ` — au-dela de ${SEUIL_AGE_CLASSEMENT_J} j : les rangs affiches ne suivent plus les performances.` : '')
+            + (!assezPlein ? ' — table incomplete : une purge a reussi la ou les insertions ont echoue.' : ''));
+      }
+    } catch (err) {
+      record('C11', 'AVERTISSEMENT', 'Fraicheur de reconstruction des classements', false,
+        `controle non evalue : ${err.message}. Les autres controles restent valides.`);
+    }
+
+    // C12 — les rangs stockes correspondent-ils aux performances stockees ?
+    //
+    // POURQUOI. Mesure du 2026-10-06 : sur ACTIONS MAROC, 7 fonds sur 122
+    // portaient le rang que leur performance stockee leur donne. Aucun controle
+    // ne voyait cela : C8 verifie que les performances suivent les VL, rien ne
+    // verifiait que les RANGS suivent les performances. Deux etages de
+    // peremption empiles, dont un invisible.
+    //
+    // Le tri est celui de la PRODUCTION, importe depuis `ranking.pure.js` — pas
+    // une reecriture. Un controle qui reimplemente ce qu il verifie ne verifie
+    // rien : il compare deux implementations dont l une n a jamais servi.
+    //
+    // En AVERTISSEMENT : le seuil de 90 % ci-dessous n a pas encore ete atteint
+    // par un run propre, donc il n est pas encore un invariant. Il le deviendra
+    // quand un run l aura prouve, et pas avant.
+    const SEUIL_CONCORDANCE_RANGS = 0.9;
+    try {
+      const { rankFundInList } = require('../../src/services/ranking.pure');
+      const [cats] = await conn.execute(`
+        SELECT categorie_nationale AS cat, COUNT(*) AS n
+          FROM classementfonds
+         WHERE type_classement = 1 AND categorie_nationale IS NOT NULL
+           AND categorie_nationale <> ''
+         GROUP BY categorie_nationale
+         ORDER BY n DESC
+         LIMIT 5`);
+      if (!cats.length) {
+        record('C12', 'AVERTISSEMENT', 'Les rangs correspondent aux performances', false,
+          'aucune categorie nationale classee : le classement local est vide.');
+      }
+      for (const c of cats) {
+        const [perfs] = await conn.execute(`
+          SELECT p1.fond_id, p1.ytd
+            FROM performences p1
+            INNER JOIN (
+              SELECT fond_id, MAX(date) AS max_date
+                FROM performences
+               WHERE categorie_nationale = ?
+               GROUP BY fond_id
+            ) p2 ON p1.fond_id = p2.fond_id AND p1.date = p2.max_date
+           WHERE p1.categorie_nationale = ?`, [c.cat, c.cat]);
+        const [stockes] = await conn.execute(`
+          SELECT fond_id, rank1erJanvier AS rang
+            FROM classementfonds
+           WHERE type_classement = 1 AND categorie_nationale = ?
+             AND rank1erJanvier IS NOT NULL`, [c.cat]);
+
+        let exacts = 0, comparables = 0;
+        for (const s of stockes) {
+          const [attenduRang] = rankFundInList(perfs, s.fond_id, 'ytd');
+          if (!attenduRang) continue;
+          comparables++;
+          if (attenduRang === Number(s.rang)) exacts++;
+        }
+        const taux = comparables ? exacts / comparables : 0;
+        record(`C12.${String(c.cat).slice(0, 24)}`, 'AVERTISSEMENT',
+          'Les rangs correspondent aux performances',
+          comparables > 0 && taux >= SEUIL_CONCORDANCE_RANGS,
+          `${exacts}/${comparables} fonds au rang que leur performance stockee leur donne`
+            + ` (${(100 * taux).toFixed(1)} %)`
+            + (taux < SEUIL_CONCORDANCE_RANGS
+              ? ' — les rangs affiches ne derivent pas des performances affichees : soit la table'
+                + ' de classement est perimee, soit les ex aequo ne sont pas departages'
+                + ' (le SQL du classement n a pas d ORDER BY). Voir diag_classement_vs_perf.js.'
+              : ''));
+      }
+    } catch (err) {
+      record('C12', 'AVERTISSEMENT', 'Les rangs correspondent aux performances', false,
+        `controle non evalue : ${err.message}. Les autres controles restent valides.`);
+    }
+
+    // Rendu
+    if (json) {
+      console.log(JSON.stringify({ generated_at: new Date().toISOString(), results }, null, 2));
+    } else {
+      console.log('\n=== BOUCLE DE CONTROLE — DERIVE DOCUMENTATION / PRODUCTION ===\n');
+      for (const r of results) {
+        const mark = r.ok ? 'OK   ' : (r.level === 'CRITIQUE' ? 'ECHEC' : 'ALERTE');
+        console.log(`[${mark}] ${r.id.padEnd(12)} ${r.label}`);
+        if (!r.ok || process.argv.includes('--verbose')) console.log(`             ${r.detail}`);
+      }
+      const failed = results.filter(r => !r.ok && r.level === 'CRITIQUE');
+      const warned = results.filter(r => !r.ok && r.level === 'AVERTISSEMENT');
+      console.log(`\n${results.filter(r => r.ok).length}/${results.length} controles OK` +
+                  ` — ${failed.length} echec(s) critique(s), ${warned.length} alerte(s).`);
+      if (failed.length) {
+        console.log('\nUn echec critique signifie que la production contredit ce que la');
+        console.log('documentation affirme. Corriger la production OU corriger le document,');
+        console.log('puis consigner dans SUIVI.md > POINT DE REPRISE COURANT.');
+      }
+    }
+
+    if (results.some(r => !r.ok && r.level === 'CRITIQUE')) process.exitCode = 1;
+  } finally {
+    await conn.end();
+  }
+}
+
+main().catch(err => {
+  console.error('Erreur fatale :', err.message);
+  process.exit(2);
+});

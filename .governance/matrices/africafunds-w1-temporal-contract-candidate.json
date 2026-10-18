@@ -1,0 +1,110 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "TEMPORAL_CONTRACT_CANDIDATE_NOT_NORMATIVE",
+  "observed_heads": {
+    "api": "c67835ba3de084d349c8323237b57373d23b8f20",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "extends_existing_authorities": [
+    "docs/03-data/CANONICAL_DATA_DICTIONARY_V1.md",
+    "docs/12-optional/DATA_LINEAGE.md",
+    "docs/05-quality/QUALITY_GATES.md"
+  ],
+  "preserves": [
+    "null != 0",
+    "observed != calculated",
+    "unknown != invented",
+    "source -> ingestion -> transformation -> storage -> calculation -> API -> display/export",
+    "a missing control is NOT_RUN/NOT_AVAILABLE, never PASS"
+  ],
+  "candidate_rules": [
+    {
+      "id": "TEMP-001",
+      "name": "AS_OF_CUTOFF",
+      "rule": "For any observation used at target date T, source_date must be <= T unless the calculation explicitly models future information, which normal NAV/performance/benchmark/backtest paths do not.",
+      "failure": "TEMPORAL_LOOKAHEAD"
+    },
+    {
+      "id": "TEMP-002",
+      "name": "EXACT_THEN_PRIOR",
+      "rule": "For irregular market series, use exact date first; otherwise the latest valid observation strictly before or on target date within a declared tolerance. Never choose absolute-nearest across both sides of T.",
+      "applies_to": [
+        "benchmarks",
+        "FX",
+        "rates",
+        "market series"
+      ]
+    },
+    {
+      "id": "TEMP-003",
+      "name": "NO_FUTURE_FALLBACK",
+      "rule": "If no prior observation exists, return NULL/NOT_AVAILABLE or fail closed according to the consumer contract. Do not fall forward to the first future observation.",
+      "applies_to": [
+        "historical conversion",
+        "backtests",
+        "performance horizons",
+        "benchmark mapping"
+      ]
+    },
+    {
+      "id": "TEMP-004",
+      "name": "NO_HARDCODED_MARKET_FALLBACK",
+      "rule": "A market FX/index value must not be silently replaced with a hardcoded approximate rate. Fixed legal parities such as EUR/XOF or EUR/XAF are explicit reference conventions, not fallback guesses.",
+      "exception": "Legally fixed parity must be versioned/documented as such."
+    },
+    {
+      "id": "TEMP-005",
+      "name": "SOURCE_DATE_VISIBLE",
+      "rule": "New derived data contracts should expose source/effective date or sufficient lineage to reconstruct it, plus gap_days when a prior observation is carried forward.",
+      "goal": "Make stale-but-present data distinguishable from exact-date data."
+    },
+    {
+      "id": "TEMP-006",
+      "name": "BACKTEST_AS_OF",
+      "rule": "Allocation/backtesting must slice every input by as_of date and must never reuse a helper that falls forward to future FX, benchmark or fund observations.",
+      "related": [
+        "AF-TASK-019",
+        "AF-TASK-014"
+      ]
+    },
+    {
+      "id": "TEMP-007",
+      "name": "CORRECTION_BEFORE_DERIVATION",
+      "rule": "When temporal contamination is corrected in source/benchmark fields, dependent ratios/relative analytics must be regenerated only after source correction and validated against unaffected outputs."
+    }
+  ],
+  "current_proven_findings": [
+    "Benchmark look-ahead is measured in production for Morocco and UEMOA within the last 120 days.",
+    "FX first-future fallback exists in code but no Morocco/Tunisia valuation predates their first available pair in the measured DB, so no prehistory exposure is proven there.",
+    "Current C6/C9 coverage controls do not test temporal validity."
+  ],
+  "implementation_strategy": [
+    "CERTIFY_SCOPE",
+    "ADD_UNIT_LEVEL_DATE_MATCH_HELPER_TESTS",
+    "CHANGE_MATCHER_BEHIND_EXISTING_CONTRACT",
+    "DRY_RUN_OLD_VS_NEW",
+    "SNAPSHOT_CONTAMINATED_ROWS",
+    "GOVERNED_APPLY",
+    "RECALCULATE_DEPENDENCIES",
+    "ADD_TEMPORAL_QUALITY_GATE",
+    "VERIFY_NON_REGRESSION"
+  ],
+  "do_not": [
+    "Do not rewrite current indRef values before exact scope and rollback are measured.",
+    "Do not silently reinterpret historical FX.",
+    "Do not modify Allocation constraint engine surfaces claimed by AF-TASK-017.",
+    "Do not make this candidate normative until it is reconciled through existing governance."
+  ],
+  "queue_strategy": {
+    "preferred_existing_or_parent": [
+      "AF-PROP-005",
+      "AF-PROP-006",
+      "AF-PROP-025",
+      "AF-TASK-019"
+    ],
+    "new_task_now": false,
+    "blocker": "AF-TASK-028 currently claims task-queue.json and projection surfaces."
+  },
+  "next_action": "Use benchmark look-ahead scope and recent-provenance diagnostics to create a promotion-ready remediation proposal with exact files/tests/data scope."
+}

@@ -1,0 +1,361 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "W2_COUNTRY_PIPELINE_DISCOVERY_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "8c0eb7de379448bab6da1b8f83d7d65699175a89",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc",
+    "canonical_branch": "claude/code-review-improvements-ikvuj"
+  },
+  "single_queue_authority": ".governance/loop/task-queue.json",
+  "protected_active_claims": [
+    "AF-TASK-017",
+    "AF-TASK-028"
+  ],
+  "rules": {
+    "this_is_not_a_task_queue": true,
+    "reference_country_does_not_mean_connector_exists": true,
+    "old_docs_do_not_override_live_cron_and_prod_measurements": true,
+    "official_source_preferred": true,
+    "raw_source_and_canonical_import_must_be_distinguished": true,
+    "no_pipeline_activation_without_dry_run_mapping_and_quality_proof": true,
+    "no_country_expansion_before_source_identity_and_lineage_plan": true
+  },
+  "reference_universe": {
+    "source": "referentiel_fundafrica.json",
+    "country_or_region_count": 29,
+    "values": [
+      "ALGERIE",
+      "ANGOLA",
+      "BOTSWANA",
+      "CAP-VERT",
+      "CEMAC",
+      "EGYPTE",
+      "ESWATINI",
+      "ETHIOPIE",
+      "GHANA",
+      "KENYA",
+      "LESOTHO",
+      "LIBYE",
+      "MALAWI",
+      "MAROC",
+      "MAURICE",
+      "MOZAMBIQUE",
+      "NAMIBIE",
+      "NIGERIA",
+      "OUGANDA",
+      "RWANDA",
+      "SEYCHELLES",
+      "SIERRA LEONE",
+      "SOMALIE",
+      "SOUDAN",
+      "TANZANIE",
+      "TUNISIE",
+      "UEMOA",
+      "ZAMBIE",
+      "ZIMBABWE"
+    ],
+    "interpretation": "Taxonomy/classification coverage only. Outside current production markets, no ingestion connector is certified by this list."
+  },
+  "markets": [
+    {
+      "market": "MAROC",
+      "state": "ACTIVE_PRODUCTION_WITH_KNOWN_DATA_AND_LINEAGE_GAPS",
+      "fund_count_reference": 644,
+      "canonical_source": {
+        "type": "INDUSTRY_ASSOCIATION_OFFICIAL_MARKET_DATA",
+        "provider": "ASFIM",
+        "url_pattern": "https://fundshare.asfim.ma/api/performances/export/?date=YYYY-MM-DD",
+        "implementation": "scripts/import/scrape_asfim_import.js"
+      },
+      "scheduler": "scripts/cron/cron_daily_update.sh step 1, weekdays 20:00",
+      "live_evidence": {
+        "latest_vl": "2026-10-02",
+        "freshness_days": 3,
+        "benchmark_history_coverage_pct": 98,
+        "recent_benchmark_coverage_pct": 41.7,
+        "recent_provenance_generic_pct": 0,
+        "performance_current_funds": "9/644",
+        "benchmark_lookahead_high_confidence_rows": 1919
+      },
+      "strengths": [
+        "Stable XLSX structure with ISIN/Maroclear, manager, classification, benchmark, AUM and VL.",
+        "Production freshness currently within budget.",
+        "MASI source continuity repaired and current."
+      ],
+      "gaps": [
+        "No generic source artifact/hash linkage on canonical valuation rows.",
+        "Recent benchmark propagation incomplete and temporal look-ahead proven on 1,919 rows.",
+        "Local performance freshness severely behind current VL.",
+        "Current import can use future FX fallback/hardcoded market fallback in edge cases; measured prehistory exposure is zero but contract is unsafe for backfill."
+      ],
+      "decision": "KEEP_PIPELINE; ADD_LINEAGE; FIX_TEMPORAL_BENCHMARK_MATCHING; FIX_DERIVED_PIPELINE_VIA_EXISTING_QUEUE",
+      "intake_refs": [
+        "AF-INTAKE-CAND-012",
+        "AF-INTAKE-CAND-006",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-008"
+      ],
+      "task_or_proposal_refs": [
+        "AF-OPS-008",
+        "AF-PROP-003",
+        "AF-PROP-005",
+        "W1-DELTA-001",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ]
+    },
+    {
+      "market": "NIGERIA",
+      "state": "ACTIVE_WEEKLY_PRODUCTION_WITH_SOURCE_LAG_AND_MEASUREMENT_QUALITY_GAPS",
+      "fund_count_reference": 333,
+      "canonical_source": {
+        "type": "REGULATOR",
+        "provider": "SEC Nigeria",
+        "landing_page": "https://sec.gov.ng/for-operators/keep-track-of-capital-market-data/",
+        "implementation": "sec_ng_nav_extractor_v6.py + scripts/import/import_vl_nigeria_sec.js"
+      },
+      "scheduler": "scripts/cron/cron_nigeria_weekly.sh, Monday 10:00",
+      "live_evidence": {
+        "latest_vl": "2026-09-25",
+        "freshness_days": 10,
+        "benchmark_recent_coverage_pct": 100,
+        "current_sec_csv_rows": 8627,
+        "current_csv_source_url_pct": 100,
+        "current_csv_price_source": "offer_price_fallback",
+        "recent_30d_price_type_pct": 0,
+        "recent_30d_source_pct": 0,
+        "scale_breaks": "multiple C7 cases",
+        "extreme_performance": "multiple C3 cases"
+      },
+      "strengths": [
+        "Extractor preserves source URL, source page metadata, price-source choice, currency evidence and quality flags.",
+        "Canonical schema already has explicit measurement/provenance columns.",
+        "Weekly source delay is observable and not equivalent to pipeline outage."
+      ],
+      "gaps": [
+        "Importer drops current extractor source/type metadata before canonical write.",
+        "All current CSV selected prices are Offer fallbacks, which must be REVIEW, not silently OK.",
+        "C3/C7 scale/currency anomalies remain open.",
+        "No generic share-class identity model; 333/333 Nigeria funds lack ISIN, so internal/source aliases are required."
+      ],
+      "decision": "KEEP_EXTRACTOR_AND_IMPORTER; TRANSPORT_EXISTING_METADATA; PRESERVE_REVIEW_FOR_OFFER_BID; RESOLVE_SCALE_IDENTITY_WITH_EXISTING_AF_OPS",
+      "intake_refs": [
+        "AF-INTAKE-CAND-011",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-008"
+      ],
+      "task_or_proposal_refs": [
+        "AF-OPS-007",
+        "AF-OPS-009",
+        "AF-PROP-009",
+        "W1-DELTA-002",
+        "W1-DELTA-003",
+        "W1-DELTA-004"
+      ]
+    },
+    {
+      "market": "TUNISIE",
+      "state": "ACTIVE_DAILY_PRODUCTION_WITH_STRONG_AUDIT_BUT_WEAK_CANONICAL_LINEAGE",
+      "fund_count_reference": 131,
+      "canonical_source": {
+        "type": "REGULATOR",
+        "provider": "CMF Tunisie",
+        "urls": [
+          "https://www.cmf.tn/valeurs-liquidatives-des-titres-opcvm",
+          "https://www.cmf.tn/?q=valeurs-liquidatives-des-titres-opcvm"
+        ],
+        "implementation": "scripts/scraper/cmf_tunisie_daily.py"
+      },
+      "scheduler": "scripts/cron/cron_tunisie_daily.sh, weekdays 19:00",
+      "live_evidence": {
+        "latest_vl": "2026-10-05",
+        "freshness_days": 0,
+        "benchmark_recent_coverage_pct": 100,
+        "recent_provenance_generic_pct": 0,
+        "performance_current_funds": "5/131"
+      },
+      "strengths": [
+        "Daily automatic official-source scraper is live.",
+        "Parser keeps source_file/sheet/row evidence.",
+        "Extreme variations are quarantined and unknown funds are queued."
+      ],
+      "gaps": [
+        "Canonical valorisations row does not link generic source_file/sheet/row lineage.",
+        "Local performance freshness remains poor despite fresh VL.",
+        "Current FX helper can fall forward before history; no current prehistory exposure measured."
+      ],
+      "decision": "KEEP_PIPELINE; BRIDGE_EXISTING_AUDIT_TO_GENERIC_LINEAGE; FIX_DERIVED_PERFORMANCE_THROUGH_EXISTING_QUEUE",
+      "intake_refs": [
+        "AF-INTAKE-CAND-010",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-008"
+      ],
+      "task_or_proposal_refs": [
+        "AF-OPS-008",
+        "AF-OPS-009",
+        "AF-PROP-008",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ]
+    },
+    {
+      "market": "UEMOA",
+      "state": "ACTIVE_DAILY_PRODUCTION_WITH_STRONG_STAGING_AND_TEMPORAL_BENCHMARK_GAP",
+      "fund_count_reference": 118,
+      "canonical_source": {
+        "type": "EXCHANGE_OFFICIAL_BULLETIN",
+        "provider": "BRVM",
+        "index_url": "https://bfin.brvm.org/boc/boc_jour.aspx",
+        "pdf_pattern": "https://bfin.brvm.org/boc/BOC_JOUR/BOC_YYYYMMDD.pdf",
+        "implementation": "scripts/scraper/brvm_boc_daily.py"
+      },
+      "scheduler": "scripts/cron/cron_brvm_daily.sh, weekdays 19:30",
+      "live_evidence": {
+        "latest_vl": "2026-10-01",
+        "freshness_days": 4,
+        "benchmark_recent_coverage_pct": 100,
+        "recent_provenance_generic_pct": 0,
+        "performance_current_funds": "34/111",
+        "benchmark_lookahead_high_confidence_rows": 108,
+        "known_scale_break": "FCP BRIDGE EQUILIBRE"
+      },
+      "strengths": [
+        "Staging stores PDF source, hash, page, raw line, matching confidence and import state.",
+        "Promotion is guarded: no overwrite, unknown funds remain unmatched.",
+        "Production freshness and benchmark coverage are currently within budget."
+      ],
+      "gaps": [
+        "Canonical valuation rows do not link back to staging source_id/raw record.",
+        "108 high-confidence future benchmark matches measured.",
+        "One major scale break remains.",
+        "Historical promotion uses latest global FX rather than NAV-date-specific FX."
+      ],
+      "decision": "KEEP_STAGING_AND_PROMOTION; ADD_CANONICAL_LINEAGE_LINK; FIX_BENCHMARK_MATCHER; RESOLVE_SCALE_BREAK_THROUGH_AF_OPS_007",
+      "intake_refs": [
+        "AF-INTAKE-CAND-014",
+        "AF-INTAKE-CAND-003",
+        "AF-INTAKE-CAND-008"
+      ],
+      "task_or_proposal_refs": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-PROP-003",
+        "AF-PROP-005",
+        "W1-DELTA-001",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ]
+    },
+    {
+      "market": "CEMAC",
+      "state": "CODE_READY_CANDIDATE_NOT_RUNTIME_CERTIFIED",
+      "fund_count_reference": 34,
+      "canonical_source": {
+        "type": "EXCHANGE_OFFICIAL_BULLETIN",
+        "provider": "BVMAC",
+        "index_url": "https://www.bvm-ac.org/bulletin-officiel-de-la-cote-boc/",
+        "pdf_pattern": "https://www.bvm-ac.org/wp-content/uploads/YYYY/MM/BOC-YYYYMMDD.pdf",
+        "implementation": "scripts/scraper/bvmac_boc_daily.py"
+      },
+      "scheduler": "NO_ACTIVE_CRON_CERTIFIED",
+      "live_evidence": {
+        "latest_vl": "2024-12-12",
+        "freshness_days": 662,
+        "benchmark_coverage_pct": 0,
+        "generic_provenance_pct": 0,
+        "runtime_staging_tables": "NOT_CERTIFIED"
+      },
+      "strengths": [
+        "Parser is adapted from the proven BRVM BOC structure.",
+        "Historical real-PDF validation documented 30/30 rows parsed on a 2026 BOC sample.",
+        "Staging/promotion design mirrors guarded UEMOA pipeline with separate bvmac_* namespace."
+      ],
+      "gaps": [
+        "No active production cron is certified.",
+        "Live mapping to the 34 CEMAC funds has not been certified.",
+        "Live staging-table deployment is not certified.",
+        "VL freshness is 662 days and benchmark coverage is zero.",
+        "FX promotion path uses latest global rate rather than NAV-date-specific rate."
+      ],
+      "decision": "DO_NOT_ACTIVATE_BLINDLY; RUN_READ_ONLY_DRY_RUN_AND_MAPPING_PREFLIGHT; THEN GOVERNED_DEPLOYMENT_CANDIDATE",
+      "intake_refs": [
+        "AF-INTAKE-CAND-013",
+        "AF-INTAKE-CAND-009",
+        "AF-INTAKE-CAND-003"
+      ],
+      "task_or_proposal_refs": [
+        "AF-PROP-010",
+        "AF-PROP-007",
+        "W1-DELTA-004",
+        "W1-DELTA-008"
+      ]
+    }
+  ],
+  "expansion_tiers": [
+    {
+      "tier": "TIER_A_REGULATORY_AND_SCHEME_REGISTRY_CONFIRMED",
+      "markets": [
+        "GHANA",
+        "KENYA",
+        "EGYPTE",
+        "AFRIQUE DU SUD",
+        "MAURICE",
+        "BOTSWANA",
+        "NAMIBIE",
+        "ETHIOPIE"
+      ],
+      "meaning": "Current official regulator/source surface was identified or historically targeted; no AfricaFunds ingestion connector is certified.",
+      "rule": "Create country child intake only after fund-level source/NAV/identifier/frequency/licence feasibility is measured."
+    },
+    {
+      "tier": "TIER_B_REFERENCE_AND_BENCHMARK_TAXONOMY_ONLY",
+      "markets": [
+        "ALGERIE",
+        "ANGOLA",
+        "CAP-VERT",
+        "ESWATINI",
+        "LESOTHO",
+        "LIBYE",
+        "MALAWI",
+        "MOZAMBIQUE",
+        "OUGANDA",
+        "RWANDA",
+        "SEYCHELLES",
+        "SIERRA LEONE",
+        "SOMALIE",
+        "SOUDAN",
+        "TANZANIE",
+        "ZAMBIE",
+        "ZIMBABWE"
+      ],
+      "meaning": "Present in AfricaFunds classification/reference universe but no production fund pipeline found in current scripts search.",
+      "rule": "Source discovery first; do not create connector tasks from taxonomy presence alone."
+    }
+  ],
+  "cross_country_architecture": {
+    "reusable_stages": [
+      "SOURCE_DISCOVERY",
+      "ACQUISITION",
+      "RAW_ARTIFACT_OR_AUDIT_EVIDENCE",
+      "PARSE",
+      "IDENTITY_MATCH",
+      "MEASURE_TYPE_AND_CURRENCY_QUALIFICATION",
+      "QUALITY_GATE",
+      "DRY_RUN",
+      "CANONICAL_PROMOTION",
+      "DATEJOUR_OR_VIEW_CACHE_SYNC_IF_NEEDED",
+      "DERIVED_RECALC",
+      "POST_CHECK_AND_FRESHNESS"
+    ],
+    "rules": [
+      "Country adapters own source quirks; common framework owns evidence, quality states, dates and promotion contract.",
+      "Publication date, effective/valuation date, acquisition date and import date must remain distinct.",
+      "A source delay is not a pipeline outage.",
+      "A present benchmark is not necessarily temporally valid.",
+      "Country-specific staging evidence should be linked, not copied into a second generic raw store when avoidable."
+    ]
+  },
+  "next_action": "Run live read-only W2 pipeline inventory for staging tables, recent import/audit state, current cron presence and country row counts. Then create source-discovery dossiers for Tier A markets and promotion-ready deltas without touching task-queue.json."
+}

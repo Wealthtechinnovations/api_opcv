@@ -159,6 +159,18 @@ const rateLimit = (maxRequests = 100, windowMs = 15 * 60 * 1000) => {
 
   return (req, res, next) => {
     const key = req.ip || req.connection.remoteAddress;
+
+    // Exempter les appels INTERNES (crons + scripts batch qui appellent l'API en
+    // boucle sur localhost:3005). Un appel interne arrive directement sur la
+    // loopback SANS en-tete X-Forwarded-For ; les clients externes passent par
+    // Nginx qui ajoute toujours X-Forwarded-For (trust proxy=1). Aucun impact sur
+    // le rate-limit des clients externes (ils gardent leur IP reelle).
+    const socketIp = (req.socket && req.socket.remoteAddress) || (req.connection && req.connection.remoteAddress) || '';
+    const isLoopbackSocket = socketIp === '127.0.0.1' || socketIp === '::1' || socketIp === '::ffff:127.0.0.1';
+    if (isLoopbackSocket && !req.headers['x-forwarded-for']) {
+      return next();
+    }
+
     const now = Date.now();
 
     if (!requests.has(key)) {

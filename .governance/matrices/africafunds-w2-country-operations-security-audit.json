@@ -1,0 +1,232 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "W2_COUNTRY_OPERATIONS_SECURITY_AUDIT_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "197ffed11e16bd539b5d5c1f123c84a40b037ae4",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc",
+    "canonical_branch": "claude/code-review-improvements-ikvuj"
+  },
+  "scope": "Country Panel, country/fund/VL/SGO operational routes and immediately adjacent FX write path. Static/read-only audit only; no mutation route invoked.",
+  "existing_auth_authority": "src/middleware/auth.js exports authenticate/authorize/optionalAuth. Reuse it; do not build a second auth system.",
+  "classification_rules": {
+    "PUBLIC_REFERENCE": "Read-only reference/discovery data intended for public product pages may remain unauthenticated after privacy review.",
+    "AUTHENTICATED_READ": "Back-office operational data should require a valid user session even if it does not mutate.",
+    "AUTHORIZED_MUTATION": "Any fund/SGO/VL/user/fee write requires authentication plus role/ownership authorization.",
+    "GOVERNED_MUTATION": "Financial/data corrections or bulk imports also require dry-run/preview, snapshot/transaction/rollback/post-check appropriate to risk.",
+    "REMOVE_OR_DEPRECATE": "Legacy HTTP writers superseded by scheduled governed pipelines should not remain public write endpoints."
+  },
+  "current_findings": [
+    {
+      "id": "W2-SEC-001",
+      "severity": "CRITICAL",
+      "route": "GET /api/fetch-currency-pairs",
+      "file": "src/routes/routes_vl.js",
+      "current_auth": "NONE",
+      "current_effect": "Fetches third-party FX data and bulk-inserts into devisedechanges despite HTTP GET semantics.",
+      "secret_issue": "Contains an inline third-party credential; value intentionally omitted.",
+      "target": "REMOVE_OR_DEPRECATE",
+      "remediation": [
+        "Treat provider credential as exposed and rotate/revoke externally.",
+        "Prove scheduled scripts/import/scrape_forex_import.js is canonical runtime path.",
+        "Disable/deprecate public GET-with-write route after consumer audit.",
+        "If an operator-triggered refresh remains needed, expose an authenticated/authorized POST or workflow with dry-run/evidence, using secret authority."
+      ]
+    },
+    {
+      "id": "W2-SEC-002",
+      "severity": "CRITICAL",
+      "route": "POST /api/updateSociete",
+      "file": "src/routes/apigestionsociete.js",
+      "current_auth": "NONE",
+      "current_effect": "Updates SGO metadata and can change password of a linked user when password is supplied.",
+      "target": "AUTHORIZED_MUTATION",
+      "remediation": [
+        "Require authenticate.",
+        "Require admin or proven owning management-company role; exact role/ownership semantics must be verified from live auth/JWT conventions.",
+        "Split ordinary SGO profile update from password change or require a dedicated password-reset/re-auth contract.",
+        "Add tests proving cross-SGO modification is denied."
+      ]
+    },
+    {
+      "id": "W2-SEC-003",
+      "severity": "CRITICAL",
+      "route": "POST /api/updateValues/:id",
+      "file": "src/routes/routes_vl.js",
+      "current_auth": "NONE",
+      "current_effect": "Directly updates canonical VL and derived EUR/USD values, then emits recalculation.",
+      "code_integrity_issue": "The previousValues loop references exchangeRatesEUR/exchangeRatesUSD that are scoped inside the prior loop, so non-empty previousValues can fail after partial updates.",
+      "target": "GOVERNED_MUTATION",
+      "remediation": [
+        "Do not merely add auth; first fix transactional integrity and variable-scope defect with RED tests.",
+        "Require authenticate + admin/authorized country/manager ownership.",
+        "Validate requested fund belongs to caller's authorized scope.",
+        "Preview exact row/date/value changes before apply.",
+        "Use transaction and rollback/snapshot; avoid partial write on failure.",
+        "Recalculate derived values only after canonical write commits.",
+        "Record correction reason/evidence/batch."
+      ]
+    },
+    {
+      "id": "W2-SEC-004",
+      "severity": "CRITICAL",
+      "route": "POST /api/uploadsfilevl/:id",
+      "file": "src/routes/routes_vl.js",
+      "current_auth": "NONE",
+      "current_effect": "Bulk inserts/updates canonical VL from uploaded CSV and recomputes adjusted values.",
+      "target": "GOVERNED_MUTATION",
+      "remediation": [
+        "Require authenticate + ownership/role authorization.",
+        "Replace direct apply-first behavior with parse/validate/dry-run preview then explicit apply.",
+        "Validate fund identity, currency, date, price semantics and source provenance.",
+        "Use bounded transaction/snapshot/rollback.",
+        "Preserve current URL only as compatibility wrapper if frontend consumers require it."
+      ]
+    },
+    {
+      "id": "W2-SEC-005",
+      "severity": "HIGH",
+      "route": "POST /api/postfond",
+      "file": "src/routes/routes_vl.js",
+      "current_auth": "NONE",
+      "current_effect": "Creates a canonical fund row with identity/classification/manager/payment-related fields.",
+      "target": "AUTHORIZED_MUTATION",
+      "remediation": [
+        "Require authenticate + admin/authorized country/manager role.",
+        "Validate country/manager ownership and canonical identity rules.",
+        "Do not allow client-provided category/region text to become canonical without reference mapping.",
+        "Never require/fabricate ISIN where market source does not publish one."
+      ]
+    },
+    {
+      "id": "W2-SEC-006",
+      "severity": "HIGH",
+      "route": "POST /api/updatefondmodif/:id",
+      "file": "src/routes/routes_vl.js",
+      "current_auth": "NONE",
+      "current_effect": "Updates canonical fund metadata.",
+      "target": "AUTHORIZED_MUTATION",
+      "remediation": [
+        "Require authenticate + role/ownership.",
+        "Restrict editable field set; do not mass-assign identity/security-sensitive fields.",
+        "Log old/new values for material fund-reference changes."
+      ]
+    },
+    {
+      "id": "W2-SEC-007",
+      "severity": "HIGH",
+      "route": "POST /api/ajoutVL/:id and POST /api/ajoutIndice/:id and POST /api/uploadsfileindice/:id",
+      "file": "src/routes/routes_vl.js",
+      "current_auth": "NONE",
+      "current_effect": "Writes valuation/index data or propagates index-related changes.",
+      "target": "GOVERNED_MUTATION",
+      "remediation": [
+        "Require auth/role/ownership.",
+        "Use strict temporal rule exact-or-prior, never future.",
+        "Preview and transaction for financial/index data changes.",
+        "Unify with W1 benchmark/FX temporal contracts rather than creating parallel semantics."
+      ]
+    },
+    {
+      "id": "W2-SEC-008",
+      "severity": "HIGH",
+      "route": "POST /api/reject-user/:id, POST /api/activate-user/:id, POST /api/createfrais, POST /api/updatefraisbyadminid/:id",
+      "file": "src/routes/routes_vl_admin.js",
+      "current_auth": "NONE",
+      "current_effect": "Administrative user/fee mutations.",
+      "target": "AUTHORIZED_MUTATION",
+      "remediation": [
+        "Require authenticate + authorize('admin') or exact existing admin authority.",
+        "Add negative tests for unauthenticated/non-admin users.",
+        "Keep endpoint response shape compatible where frontend depends on it."
+      ]
+    },
+    {
+      "id": "W2-SEC-009",
+      "severity": "MEDIUM_TO_HIGH",
+      "route": "GET /api/getusersbyadmin, /api/pending-accounts, /api/getfondbyadmin, /api/getfondbyuser, /api/getfondbyuservalide",
+      "file": "src/routes/routes_vl_admin.js",
+      "current_auth": "NONE",
+      "current_effect": "Returns operational/back-office data; some fund-list routes accept arbitrary pays query parameter.",
+      "target": "AUTHENTICATED_READ_OR_PUBLIC_AFTER_EXPLICIT_PRODUCT_DECISION",
+      "remediation": [
+        "Admin/user-account lists must require admin auth.",
+        "Country/manager operational fund lists should enforce ownership if used by Country Panel.",
+        "If a country fund list is intended public, expose a separate public read model rather than overloading an operational endpoint with arbitrary pays."
+      ]
+    },
+    {
+      "id": "W2-SEC-010",
+      "severity": "LOW_TO_MEDIUM",
+      "route": "GET /api/getPays, /api/getRegulateur, /api/getDevise, public fund/country discovery routes",
+      "files": [
+        "src/routes/routes_vl.js",
+        "src/routes/apigestionpays.js"
+      ],
+      "current_auth": "NONE",
+      "current_effect": "Reference/discovery reads.",
+      "target": "PUBLIC_REFERENCE",
+      "remediation": [
+        "May remain public if no sensitive fields are returned.",
+        "Prefer stable read-only reference/view models and rate limiting.",
+        "Do not couple public reference reads to operator mutations."
+      ]
+    },
+    {
+      "id": "W2-SEC-011",
+      "severity": "HIGH_PRODUCT_CONTRACT_GAP",
+      "route": "POST /api/importfondsvl",
+      "file": "frontend src/app/country-panel/import-nav/page.tsx",
+      "current_auth": "Frontend calls this path but no current API implementation was found.",
+      "current_effect": "Country Panel import workflow is not backed by a certified current API contract.",
+      "target": "REPLACE_WITH_GOVERNED_IMPORT_ADAPTER",
+      "remediation": [
+        "Do not map blindly to /api/uploadsfilevl/:id because semantics differ.",
+        "Define import dry-run contract: source/artifact, country, mapping, would_insert/update/reject, quality/provenance.",
+        "Require explicit apply phase with auth/ownership and evidence.",
+        "Preserve Country Panel UX route while swapping underlying client/API incrementally."
+      ]
+    }
+  ],
+  "frontend_migration_constraints": [
+    "Many Country Panel pages use direct fetch without Authorization. Adding authenticate server-side before updating the frontend/session transport would cause immediate regressions.",
+    "Use existing src/lib/api.ts or an additive shared authenticated server/client helper; do not rewrite all screens at once.",
+    "Characterize whether calls execute server-side or client-side before choosing token transport.",
+    "For each protected route, add a compatibility test matrix: unauthenticated=401, wrong-role/cross-country=403, authorized=200/expected response.",
+    "Keep public product routes distinct from operational back-office routes."
+  ],
+  "safe_execution_sequence": [
+    "MAP_CURRENT_FRONTEND_CALL_CONTEXT_AND_AUTH_TOKEN_AVAILABILITY",
+    "WRITE_RED_ROUTE_AUTH_AND_OWNERSHIP_TESTS",
+    "ADD_SHARED_AUTHENTICATED_COUNTRY_PANEL_CLIENT",
+    "HARDEN_ONE_ROUTE_FAMILY_AT_A_TIME",
+    "VERIFY_401_403_200_MATRIX",
+    "FOR_FINANCIAL_WRITES_ADD_DRY_RUN_TRANSACTION_ROLLBACK",
+    "DEPLOY_BOUNDED",
+    "SMOKE_EXISTING_COUNTRY_PANEL_WORKFLOWS",
+    "THEN_RETIRE_DUPLICATE_OR_UNSAFE_LEGACY_PATHS"
+  ],
+  "explicit_non_actions": [
+    "No POST/PUT/DELETE/GET-with-side-effect route was invoked during this audit.",
+    "No authentication middleware was added yet.",
+    "No frontend request was changed.",
+    "No credential value was recorded.",
+    "No queue/task/claim was changed."
+  ],
+  "governance_links": {
+    "intakes": [
+      "AF-INTAKE-CAND-019",
+      "AF-INTAKE-CAND-020",
+      "AF-INTAKE-CAND-033",
+      "AF-INTAKE-CAND-034"
+    ],
+    "proposals": [
+      "AF-PROP-015",
+      "AF-PROP-023",
+      "AF-PROP-024"
+    ],
+    "security_discovery": ".governance/matrices/africafunds-security-credential-exposure-discovery.json"
+  },
+  "next_action": "Promote a bounded Country Operations Security task only after AF-TASK-028 releases queue ownership. First implementation phase must be tests/client-auth plumbing; do not start by blanket-protecting every legacy route."
+}

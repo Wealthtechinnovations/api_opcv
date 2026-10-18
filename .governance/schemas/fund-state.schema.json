@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "africafunds/fund-state.schema.json",
+  "type": "object",
+  "required": ["api_sha", "frontend_sha", "suivi_checkpoint", "production_attestation"],
+  "properties": {
+    "api_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "frontend_sha": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+    "suivi_checkpoint": {"type": ["string", "null"]},
+    "production_attestation": {"type": ["string", "null"]}
+  },
+  "additionalProperties": false
+}
