@@ -87,6 +87,35 @@ const CANDIDATS_CATEGORIE = [
 // depot a deja paye deux fois (perimetre de C10, seuils de C4).
 let perimetresVides = 0;
 
+// Statistiques de permutation pour UNE cle de regroupement donnee.
+// Existe parce que la mesure du 2026-10-21 19:57 UTC est ambigue : groupees par
+// `categorie_regionale`, les tables devise montrent 13 categories sur 19 hors
+// permutation et 233 rangs doubles — mais avec `max = distincts` et ZERO trou,
+// ce qui est la signature d une AGREGATION de plusieurs groupes de classement,
+// pas d une numerotation cassee. Si les rangs ont ete calcules par categorie
+// nationale et qu on les regroupe par region, les doublons sont attendus par
+// construction. La bonne cle est celle sous laquelle la numerotation EST une
+// permutation : on les essaie toutes et on laisse les chiffres trancher.
+async function statsPourCle(conn, t, r, exprCle, clauseType) {
+  const [rows] = await conn.query(
+    `SELECT ${exprCle} AS cat, COUNT(*) AS n,
+            COUNT(DISTINCT \`${r}\`) AS distincts,
+            MAX(CAST(\`${r}\` AS UNSIGNED)) AS maxrang
+       FROM \`${t}\`
+      WHERE ${clauseType} ${exprCle} IS NOT NULL AND ${exprCle} <> ''
+        AND \`${r}\` IS NOT NULL
+      GROUP BY ${exprCle}
+     HAVING n >= 5
+      ORDER BY n DESC`);
+  let invalides = 0, doublons = 0, trous = 0;
+  for (const c of rows) {
+    const n = Number(c.n), d = Number(c.distincts), mx = Number(c.maxrang);
+    if (n === d && mx === n) continue;
+    invalides++; doublons += (n - d); trous += (mx - d);
+  }
+  return { groupes: rows.length, invalides, doublons, trous, rows };
+}
+
 async function colonnesDe(conn, table) {
   const [rows] = await conn.query(
     `SELECT COLUMN_NAME AS c, DATA_TYPE AS t
@@ -165,6 +194,32 @@ async function colonnesDe(conn, table) {
         // Le filtre sur `type_classement` n est applique que si la colonne
         // existe : l imposer a une table qui ne l a pas vidait le perimetre.
         const clauseType = aTypeClassement ? 'type_classement = 1 AND' : '';
+
+        // Quelle cle de regroupement rend la numerotation propre ?
+        const remplis = presentsCat.filter(x => remplissage[x] > 0);
+        const cles = remplis.map(x => ({ nom: x, expr: `\`${x}\`` }));
+        if (remplis.length > 1) {
+          cles.push({
+            nom: remplis.join(' + '),
+            expr: `CONCAT_WS('\u241F', ${remplis.map(x => `\`${x}\``).join(', ')})`,
+          });
+        }
+        if (cles.length > 1) {
+          console.log('  Cles de regroupement essayees — la bonne est celle qui rend'
+            + ' une permutation propre :');
+          for (const k of cles) {
+            try {
+              const st = await statsPourCle(conn, t, r, k.expr, clauseType);
+              console.log(`    ${k.nom.padEnd(38)} ${String(st.groupes).padStart(4)} groupes`
+                + ` | ${String(st.invalides).padStart(4)} hors permutation`
+                + ` | ${String(st.doublons).padStart(4)} doublon(s)`
+                + ` | ${String(st.trous).padStart(4)} trou(s)`
+                + (st.groupes && st.invalides === 0 ? '   ← PROPRE' : ''));
+            } catch (e) {
+              console.log(`    ${k.nom.padEnd(38)} (echec : ${e.message})`);
+            }
+          }
+        }
         const [c] = await conn.query(
           `SELECT \`${colCat}\` AS cat, COUNT(*) AS n,
                   COUNT(DISTINCT \`${r}\`) AS distincts,
