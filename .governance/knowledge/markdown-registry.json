@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "4eb318261743070ba2d1c4f68c893d239e7e6688"
+      "head": "bbdd968d21c3125c7a1cdbf18857b3c950856fb7"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "ec227896755eae6334e0602471abc38e15aa4750"
+      "head": "30c1643be5864aaf4784ae92a7c1ea8785507d6b"
     }
   },
   "summary": {
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "d1e8a27d0aa2a35397a9c1b2e7a4a967a29aa000",
-      "last_validated_sha": "d1e8a27d0aa2a35397a9c1b2e7a4a967a29aa000",
-      "content_sha256": "063912ca9af5cedfb84a09f7bc3a148bbeb07509eae4bdba9b841cebf289d639",
-      "line_count": 2976,
-      "byte_count": 196808,
+      "git_blob_sha": "d41d5bd193e76caf1bace06bd667e092f8a0b205",
+      "last_validated_sha": "d41d5bd193e76caf1bace06bd667e092f8a0b205",
+      "content_sha256": "01407b3f2348d6dfd3b7440db00d02b513fb54bafdf6e462d558479ef7b56aa7",
+      "line_count": 3016,
+      "byte_count": 198419,
       "headings": [
         {
           "level": 1,
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "06b82b236f6cd90a0cb17834250ab814013786e0",
-      "last_validated_sha": "06b82b236f6cd90a0cb17834250ab814013786e0",
-      "content_sha256": "3aaf9456ae23b054397d70542d048acab323e73954580dc5d3f228cc54a5bf00",
+      "git_blob_sha": "f6f6441e449a4512df6629e6c2b884a455126679",
+      "last_validated_sha": "f6f6441e449a4512df6629e6c2b884a455126679",
+      "content_sha256": "2880a27a8c9e6aa44f780e26816f95d14033deecce865a2fbf3317c636d7f4f2",
       "line_count": 96,
-      "byte_count": 7645,
+      "byte_count": 7647,
       "headings": [
         {
           "level": 1,
@@ -13388,24 +13388,24 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-21 19:30 UTC — Lot CD : critere de bascule ATTEINT et mesure",
+        "Le juge compte juste, et le critère est atteint",
+        "Le deuxième défaut de classificateur, trouvé en instruisant le premier",
+        "Ce que le critère couvre, et ce qu'il ne couvre pas",
+        "Prochaine action recommandée — décision du propriétaire",
+        "Risques connus",
+        "À ne pas faire à la reprise",
+        "POINT DE REPRISE COURANT — 2026-10-21 — Lot CC : le juge du rattrapage savait pas compter",
+        "Correction d'une affirmation que j'ai faite",
+        "Lot traité",
+        "Invariant désormais imprimé à chaque exécution",
+        "Prochaine action recommandée",
+        "Risques connus",
+        "À ne pas faire à la reprise",
         "POINT DE REPRISE COURANT — 2026-09-22 — Programme Directeur actif / AF-OPS-003 POST_FIX_VALIDATION",
         "Continuité préservée",
         "AF-OPS-003 — correctif déployé, RCA en validation post-fix",
-        "Programme Directeur AfricaFunds — actif en lecture seule",
-        "Chronologie dérivée / event ledger",
-        "Gap Harvester — découverte uniquement, aucune création automatique",
-        "Ordre de marche conservé",
-        "Claims de surfaces multi-agent — OBSERVE_ONLY actif",
-        "Contrat anti-régression machine-checkable — ACTIF",
-        "Write-back gate des projections — preflight",
-        "POINT DE REPRISE COURANT — 2026-09-22 — AF-OPS-003 RCA resserrée",
-        "Gouvernance et travaux concurrents préservés",
-        "7e OOM MariaDB désormais prouvé",
-        "Trajectoire longue et saut du daily update",
-        "Candidat prepared statements — non encore causalement prouvé",
-        "Etat data live mesuré",
-        "Prochaine action gouvernée",
-        "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée"
+        "Programme Directeur AfricaFunds — actif en lecture seule"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13416,16 +13416,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "f4c5dc37a3f4dc0701993e8c6ef27218836a5541",
-      "last_validated_sha": "f4c5dc37a3f4dc0701993e8c6ef27218836a5541",
-      "content_sha256": "c1a0e0f24c19db463b9cb4873156b3f83c8db520446d0bcef0573be97342cbd8",
-      "line_count": 8522,
-      "byte_count": 565998,
+      "git_blob_sha": "15c7a1a7b39bf2a3eb9ebcddba655751c8796286",
+      "last_validated_sha": "15c7a1a7b39bf2a3eb9ebcddba655751c8796286",
+      "content_sha256": "a1d6fba198edfba94e40790a0887b4b97d4ddb59edb3e648d9434a36336363e9",
+      "line_count": 8674,
+      "byte_count": 575014,
       "headings": [
         {
           "level": 1,
@@ -13434,6 +13434,62 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-21 19:30 UTC — Lot CD : critere de bascule ATTEINT et mesure"
+        },
+        {
+          "level": 3,
+          "text": "Le juge compte juste, et le critère est atteint"
+        },
+        {
+          "level": 3,
+          "text": "Le deuxième défaut de classificateur, trouvé en instruisant le premier"
+        },
+        {
+          "level": 3,
+          "text": "Ce que le critère couvre, et ce qu'il ne couvre pas"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine action recommandée — décision du propriétaire"
+        },
+        {
+          "level": 3,
+          "text": "Risques connus"
+        },
+        {
+          "level": 3,
+          "text": "À ne pas faire à la reprise"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-21 — Lot CC : le juge du rattrapage savait pas compter"
+        },
+        {
+          "level": 3,
+          "text": "Correction d'une affirmation que j'ai faite"
+        },
+        {
+          "level": 3,
+          "text": "Lot traité"
+        },
+        {
+          "level": 3,
+          "text": "Invariant désormais imprimé à chaque exécution"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine action recommandée"
+        },
+        {
+          "level": 3,
+          "text": "Risques connus"
+        },
+        {
+          "level": 3,
+          "text": "À ne pas faire à la reprise"
         },
         {
           "level": 2,
@@ -13530,62 +13586,6 @@
         {
           "level": 2,
           "text": "POINT DE REPRISE COURANT — AF-GOV-FINAL-CERT / AF-TASK-011"
-        },
-        {
-          "level": 3,
-          "text": "Produit et Git"
-        },
-        {
-          "level": 3,
-          "text": "Loop Engineering / gouvernance"
-        },
-        {
-          "level": 3,
-          "text": "Canal serveur sans MCP"
-        },
-        {
-          "level": 3,
-          "text": "Remédiation secrets exécutée"
-        },
-        {
-          "level": 3,
-          "text": "Gaps externes qui empêchent FULLY_GOVERNED"
-        },
-        {
-          "level": 3,
-          "text": "Prochaine action unique"
-        },
-        {
-          "level": 1,
-          "text": "BACKLOG CONSOLIDE UNIQUE — etabli le 2026-08-12"
-        },
-        {
-          "level": 2,
-          "text": "1. ETAT REEL DE LA PLATEFORME (verifie PROD le 2026-08-12)"
-        },
-        {
-          "level": 2,
-          "text": "2. BACKLOG CONSOLIDE — CE QUI RESTE VRAIMENT A FAIRE"
-        },
-        {
-          "level": 3,
-          "text": "P1 — Bloquant (donnee fausse affichee, ou perte de visibilite)"
-        },
-        {
-          "level": 3,
-          "text": "P2 — Important (integrite, securite, exploitation)"
-        },
-        {
-          "level": 3,
-          "text": "P3 — Dette technique et surveillance"
-        },
-        {
-          "level": 2,
-          "text": "3. DEJA FAIT — NE PLUS REFAIRE (preuve PROD du 2026-08-12)"
-        },
-        {
-          "level": 2,
-          "text": "4. DECISIONS UTILISATEUR — **DEJA TRANCHEES LE 2026-07-14, JAMAIS EXECUTEES**"
         }
       ]
     },
