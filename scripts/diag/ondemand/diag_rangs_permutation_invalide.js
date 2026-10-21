@@ -204,6 +204,33 @@ async function colonnesDe(conn, table) {
             expr: `CONCAT_WS('\u241F', ${remplis.map(x => `\`${x}\``).join(', ')})`,
           });
         }
+        // DERNIERE POSSIBILITE avant de conclure au defaut : la vraie cle n est
+        // peut-etre pas STOCKEE dans la table de classement, mais lue par
+        // jointure depuis le fonds. `classementfonds` porte
+        // `categorie_nationale` et s avere propre avec elle (1/22, contre 8/11
+        // et 9/15 pour les autres cles) ; les tables devise ne la portent pas.
+        // Mesure du 2026-10-21 20:0x UTC : affiner la cle avec la composee ne
+        // nettoie PAS (233 → 201 doublons, toujours 13 groupes sur 19), donc
+        // l hypothese « cle trop grossiere » est ecartee. Il reste a verifier
+        // que le defaut ne vient pas d une cle externe a la table.
+        try {
+          const colsF = await colonnesDe(conn, 'fond_investissements');
+          const catsF = colsF.map(x => x.c).filter(c => /categorie/i.test(c));
+          for (const cf of catsF) {
+            cles.push({
+              nom: `JOIN fond_investissements.${cf}`,
+              expr: `(SELECT f.\`${cf}\` FROM fond_investissements f
+                       WHERE f.id = \`${t}\`.fond_id)`,
+            });
+          }
+          if (catsF.length) {
+            console.log(`  (cles externes essayees aussi, depuis`
+              + ` fond_investissements : ${catsF.join(', ')})`);
+          }
+        } catch (e) {
+          console.log(`  (cles externes indisponibles : ${e.message})`);
+        }
+
         if (cles.length > 1) {
           console.log('  Cles de regroupement essayees — la bonne est celle qui rend'
             + ' une permutation propre :');
