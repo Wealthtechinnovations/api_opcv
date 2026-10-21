@@ -194,6 +194,28 @@ async function colonnesDe(conn, table) {
               GROUP BY \`${colCatE}\` ORDER BY n DESC LIMIT 6`);
           console.log(`    categories les plus peuplees : `
             + cats.map(c => `${JSON.stringify(c.c)}=${c.n}`).join(', '));
+          // MESURE DU 2026-10-21 19:44 UTC : `categorie_nationale` est nulle
+          // sur 3 643 lignes sur 3 643, dans les deux tables devise. La colonne
+          // existe, elle n est jamais renseignee. La question devient donc :
+          // quelle colonne porte reellement le regroupement ici ? On compte le
+          // remplissage de CHAQUE colonne candidate, et on liste la structure,
+          // plutot que de deviner laquelle essayer ensuite.
+          const cols2 = await colonnesDe(conn, t);
+          const presents = CANDIDATS_CATEGORIE.filter(x => cols2.some(y => y.c === x));
+          if (presents.length) {
+            const sel = presents
+              .map(x => `SUM(\`${x}\` IS NOT NULL AND \`${x}\` <> '') AS \`${x}\``)
+              .join(', ');
+            const [rem] = await conn.query(`SELECT ${sel} FROM \`${t}\``);
+            console.log('    remplissage des colonnes de categorie candidates :');
+            for (const k of presents) {
+              const v = Number(rem[0][k]);
+              console.log(`      ${k.padEnd(24)} ${v} / ${x.total}`
+                + (v === 0 ? '   ← jamais renseignee' : ''));
+            }
+          }
+          console.log(`    structure de la table : `
+            + cols2.map(y => `${y.c}:${y.t}`).join(', '));
         } catch (e) {
           console.log(`    (decompte impossible : ${e.message})`);
         }
