@@ -70,6 +70,32 @@ const TABLES = [
   { t: 'classementfonds_usds', r: 'rank1erJanvier', p: 'performences_usds' },
 ];
 
+// Colonnes de categorie possibles, par ordre de preference. La requete
+// d origine prenait `categorie_nationale` pour acquis sur les trois tables ;
+// sur les tables devise elle rendait zero categorie, et le script concluait
+// « toutes les numerotations sont propres ». Zero categorie JUGEE ne veut pas
+// dire zero defaut : cela veut dire que le critere est VIDE. On decouvre donc
+// la colonne reellement presente, et on le dit.
+const CANDIDATS_CATEGORIE = [
+  'categorie_nationale', 'categorie_national', 'categorie',
+  'categorie_regionale', 'categorie_afrique', 'categorie_globale',
+  'categorie_interne', 'categorie_fundafrica',
+];
+
+// Sortie non nulle si un perimetre se revele vide : un controle vide doit
+// echouer bruyamment, pas rendre du vert. C est exactement le piege que ce
+// depot a deja paye deux fois (perimetre de C10, seuils de C4).
+let perimetresVides = 0;
+
+async function colonnesDe(conn, table) {
+  const [rows] = await conn.query(
+    `SELECT COLUMN_NAME AS c, DATA_TYPE AS t
+       FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+      ORDER BY ORDINAL_POSITION`, [table]);
+  return rows.map(r => ({ c: String(r.c), t: String(r.t) }));
+}
+
 (async () => {
   console.log('=== LES CLASSEMENTS STOCKES SONT-ILS DES PERMUTATIONS DE 1..N ? ===');
   console.log(`Mesure le ${new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC — LECTURE SEULE\n`);
@@ -80,20 +106,68 @@ const TABLES = [
     for (const { t, r } of TABLES) {
       console.log(`## ${t}`);
       let categories = [];
+      let colCat = null, totalLignes = 0;
       try {
+        const cols = await colonnesDe(conn, t);
+        if (!cols.length) {
+          console.log(`  ECHEC : table absente ou illisible. CRITERE VIDE.\n`);
+          perimetresVides++;
+          continue;
+        }
+        const noms = new Set(cols.map(x => x.c));
+        colCat = CANDIDATS_CATEGORIE.find(x => noms.has(x)) || null;
+        const aTypeClassement = noms.has('type_classement');
+        const [[{ n: tot }]] = [await conn.query(
+          `SELECT COUNT(*) AS n FROM \`${t}\``)];
+        totalLignes = Number(tot);
+
+        if (!noms.has(r)) {
+          console.log(`  ECHEC : colonne de rang \`${r}\` absente.`
+            + ` Colonnes presentes : ${cols.map(x => x.c).join(', ')}`);
+          console.log(`  CRITERE VIDE — rien n a ete juge sur ${totalLignes} lignes.\n`);
+          perimetresVides++;
+          continue;
+        }
+        if (!colCat) {
+          console.log(`  ECHEC : aucune colonne de categorie connue.`
+            + ` Colonnes presentes : ${cols.map(x => x.c).join(', ')}`);
+          console.log(`  CRITERE VIDE — rien n a ete juge sur ${totalLignes} lignes.\n`);
+          perimetresVides++;
+          continue;
+        }
+        console.log(`  ${totalLignes} lignes | categorie lue dans \`${colCat}\``
+          + ` | type_classement ${aTypeClassement ? 'present' : 'ABSENT (filtre omis)'}`);
+
+        // Le filtre sur `type_classement` n est applique que si la colonne
+        // existe : l imposer a une table qui ne l a pas vidait le perimetre.
+        const clauseType = aTypeClassement ? 'type_classement = 1 AND' : '';
         const [c] = await conn.query(
-          `SELECT categorie_nationale AS cat, COUNT(*) AS n,
+          `SELECT \`${colCat}\` AS cat, COUNT(*) AS n,
                   COUNT(DISTINCT \`${r}\`) AS distincts,
                   MAX(CAST(\`${r}\` AS UNSIGNED)) AS maxrang
              FROM \`${t}\`
-            WHERE type_classement = 1 AND categorie_nationale IS NOT NULL
-              AND categorie_nationale <> '' AND \`${r}\` IS NOT NULL
-            GROUP BY categorie_nationale
+            WHERE ${clauseType} \`${colCat}\` IS NOT NULL
+              AND \`${colCat}\` <> '' AND \`${r}\` IS NOT NULL
+            GROUP BY \`${colCat}\`
            HAVING n >= 5
             ORDER BY n DESC`);
         categories = c;
       } catch (e) {
-        console.log(`  table non interrogeable : ${e.message}\n`);
+        console.log(`  ECHEC : table non interrogeable : ${e.message}`);
+        console.log(`  CRITERE VIDE — rien n a ete juge.\n`);
+        perimetresVides++;
+        continue;
+      }
+
+      if (!categories.length) {
+        // LE POINT DE CE LOT. Zero categorie d au moins 5 fonds sur une table
+        // qui porte des milliers de lignes n est pas un resultat vert, c est un
+        // controle qui ne mesure rien. On le dit, et on sort non nul.
+        console.log(`  ECHEC : 0 categorie d au moins 5 fonds retenue, alors que la`
+          + ` table porte ${totalLignes} lignes.`);
+        console.log(`  CRITERE VIDE — ce n est PAS « toutes propres ». Le perimetre`
+          + ` est vide : filtre ou colonne de categorie a revoir.\n`);
+        perimetresVides++;
         continue;
       }
       let invalides = 0, rangsEnTrop = 0;
@@ -115,7 +189,7 @@ const TABLES = [
         + ` | ${rangsEnTrop} rang(s) double(s) au total`);
       for (const e of exemples) console.log(`    ${e}`);
       console.log(`  → ${invalides === 0
-        ? 'toutes les numerotations sont propres sur cette table.'
+        ? `toutes les numerotations sont propres sur les ${categories.length} categories JUGEES.`
         : invalides > categories.length * 0.1
           ? 'ce n est pas un accident isole : le defaut est STRUCTUREL.'
           : 'defaut circonscrit a quelques categories.'}\n`);
@@ -162,5 +236,12 @@ const TABLES = [
   } finally {
     await conn.end();
   }
+  if (perimetresVides) {
+    console.log(`\n=== ECHEC DU CONTROLE : ${perimetresVides} perimetre(s) VIDE(S) ===`);
+    console.log('Un controle qui ne juge rien ne doit pas rendre du vert. Tant qu un');
+    console.log('perimetre est vide, cette table n est PAS attestee : elle est');
+    console.log('simplement non mesuree, et la difference est tout le sujet.');
+  }
   console.log('\n=== FIN — aucune ecriture effectuee ===');
+  if (perimetresVides) process.exitCode = 2;
 })().catch(e => { console.error('ECHEC :', e.message); process.exit(1); });
