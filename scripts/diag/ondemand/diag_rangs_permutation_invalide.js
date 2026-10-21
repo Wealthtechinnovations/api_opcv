@@ -115,7 +115,23 @@ async function colonnesDe(conn, table) {
           continue;
         }
         const noms = new Set(cols.map(x => x.c));
-        colCat = CANDIDATS_CATEGORIE.find(x => noms.has(x)) || null;
+        // MESURE DU 2026-10-21 19:50 UTC : sur les tables devise, les colonnes
+        // reellement renseignees sont `categorie` (3 590/3 643) et
+        // `categorie_regionale` (3 621/3 643) ; `categorie_nationale` est a
+        // 0/3 643. Choisir par PRESENCE tombait donc sur la seule colonne vide
+        // des trois, et vidait le perimetre. On choisit par REMPLISSAGE, et on
+        // dit lequel.
+        const presentsCat = CANDIDATS_CATEGORIE.filter(x => noms.has(x));
+        let remplissage = {};
+        if (presentsCat.length) {
+          const sel = presentsCat
+            .map(x => `SUM(\`${x}\` IS NOT NULL AND \`${x}\` <> '') AS \`${x}\``)
+            .join(', ');
+          const [rem] = await conn.query(`SELECT ${sel} FROM \`${t}\``);
+          for (const x of presentsCat) remplissage[x] = Number(rem[0][x]);
+          const trie = presentsCat.slice().sort((a, b) => remplissage[b] - remplissage[a]);
+          colCat = remplissage[trie[0]] > 0 ? trie[0] : null;
+        }
         const aTypeClassement = noms.has('type_classement');
         // `conn.query` rend [rows, fields] : un niveau d enveloppe de trop
         // donnait `NaN lignes` dans la sortie du 2026-10-21 19:37 UTC.
@@ -130,14 +146,21 @@ async function colonnesDe(conn, table) {
           continue;
         }
         if (!colCat) {
-          console.log(`  ECHEC : aucune colonne de categorie connue.`
+          console.log(`  ECHEC : aucune colonne de categorie RENSEIGNEE.`
+            + ` Remplissage mesure : ${JSON.stringify(remplissage)}.`
             + ` Colonnes presentes : ${cols.map(x => x.c).join(', ')}`);
           console.log(`  CRITERE VIDE — rien n a ete juge sur ${totalLignes} lignes.\n`);
           perimetresVides++;
           continue;
         }
         console.log(`  ${totalLignes} lignes | categorie lue dans \`${colCat}\``
+          + ` (rempli ${remplissage[colCat]}/${totalLignes})`
           + ` | type_classement ${aTypeClassement ? 'present' : 'ABSENT (filtre omis)'}`);
+        const vides = Object.entries(remplissage).filter(([, v]) => v === 0).map(([k]) => k);
+        if (vides.length) {
+          console.log(`  colonne(s) de categorie presente(s) mais JAMAIS renseignee(s) : `
+            + vides.join(', ') + ' — a signaler, pas a contourner en silence');
+        }
 
         // Le filtre sur `type_classement` n est applique que si la colonne
         // existe : l imposer a une table qui ne l a pas vidait le perimetre.
