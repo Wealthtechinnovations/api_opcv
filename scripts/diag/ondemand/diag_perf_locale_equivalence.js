@@ -32,6 +32,21 @@
  * session SSH unique et un script de dix minutes casse le tunnel — lecon du
  * lot BS.
  *
+ * RELECTURE DU 2026-10-21 — le juge a ete repare, le verdict est a refaire.
+ * La sortie du 2026-10-15 annoncait « CRITERE ATTEINT » sur NIGERIA en affichant
+ * dans le meme bloc « Fonds avec desaccord : 8 » et « DIVERGENT 0 | PERDU 0 ».
+ * Les deux enonces ne pouvaient pas etre vrais ensemble : dans
+ * `fix_populate_performances.js`, la comparaison de chaines passait avant la
+ * classification, si bien que tout ecart sur une colonne stockee en varchar
+ * partait dans la liste sans etre compte dans aucune classe. L ordre est
+ * corrige et le script imprime desormais l invariant
+ *   DIVERGENT + PERDU + COMBLE + REFUSE = desaccords constates
+ * Ce qu on vient chercher ici, dans cet ordre : d abord que l invariant soit
+ * VERIFIE, ensuite seulement ce que valent DIVERGENT et PERDU. Les dix-neuf
+ * ecarts jusqu ici non classes vont se repartir entre REFUSE (horizon non
+ * couvert — attendu) et PERDU (vrai defaut) ; la proportion n est pas devinable
+ * et ne sera pas devinee.
+ *
  * LECTURE SEULE : `--dry-run`, aucune ecriture.
  *
  * USAGE  node scripts/diag/ondemand/diag_perf_locale_equivalence.js
@@ -67,7 +82,7 @@ for (const pays of ['NIGERIA', 'UEMOA']) {
     // jamais donner les deux nombres, donc sans permettre de dire si l ecart
     // etait un arrondi ou un desaccord reel. Un filtre qui retient le verdict
     // et jette la preuve ne sert a rien.
-    /DRY-RUN|Fonds sans aucun|Fonds avec desaccord|Fonds absents|ecart|CRITERE|DIVERGENT|PERDU|COMBLE|REFUSE|Options|fonds a traiter|ERROR|limite|Colonnes comparees|ratios|Ratios|calcule=|stocke=|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
+    /DRY-RUN|Fonds sans aucun|Fonds avec desaccord|Fonds absents|ecart|CRITERE|INVARIANT|Desaccords constates|DIVERGENT|PERDU|COMBLE|REFUSE|Options|fonds a traiter|ERROR|limite|Colonnes comparees|ratios|Ratios|calcule=|stocke=|^ {2}[a-z_0-9]+ +[0-9]+ fonds$/i.test(l));
   console.log(utiles.length ? utiles.join('\n') : '(aucune ligne retenue)');
   console.log(`-- code de sortie : ${r.status}${r.error ? ` | ${r.error.message}` : ''}\n`);
 }

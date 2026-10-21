@@ -422,6 +422,13 @@ async function run() {
   // 565 fonds sont dans ce cas pour `perf10ans` (mesure du 2026-10-15).
   const refusesParColonne = {};
   let dryRefuses = 0;
+  // Total des desaccords CONSTATES, toutes classes confondues. Il existe pour
+  // une seule raison : permettre d imprimer l invariant
+  //   DIVERGENT + PERDU + COMBLE + REFUSE = desaccords constates
+  // Tant que cette egalite n est pas vraie, le verdict ne vaut rien — c est
+  // exactement ce qui s est produit le 2026-10-15, ou huit fonds etaient
+  // annonces « avec desaccord » et les quatre classes affichaient zero.
+  let dryConstats = 0;
   let colonnesComparees = 0;
   let ratiosEchoues = 0;
   // Fonds dont au moins un des dix ratios lus par le classement local ne
@@ -563,7 +570,7 @@ async function run() {
         } else {
           const stocke = existingPerf[0];
           const ecarts = [];
-          let nbCombles = 0, nbRefuses = 0;
+          let nbCombles = 0, nbRefuses = 0, nbPerdus = 0;
           // `date` et `fond_id` sont la cle de la comparaison, pas son objet.
           for (const c of Object.keys(perfValues)) {
             if (c === 'fond_id' || c === 'date') continue;
@@ -572,18 +579,22 @@ async function run() {
             const base = stocke[c];
             const vide = v => v === null || v === undefined || v === '-' || v === '';
 
-            // Colonnes de categorie, devise, ISIN : comparaison de chaines.
-            if (typeof calc === 'string' || typeof base === 'string') {
-              if (vide(calc) && vide(base)) continue;
-              if (String(calc) !== String(base)) ecarts.push(`${c}: calcule=${calc} stocke=${base}`);
-              continue;
-            }
+            // L ORDRE DE CES BRANCHES EST LE COEUR DU JUGE, et il a ete faux.
+            // Jusqu au 2026-10-15, la comparaison de chaines passait AVANT la
+            // classification. Or la base stocke en `varchar(255)` la plupart des
+            // colonnes de performance (`perf3ans`, `perf5ans`, tous les `*m`,
+            // `volatility3an`, `ratiosharpe3an`, `perfannu3an`…). Des que la
+            // valeur stockee etait une chaine non vide, l ecart partait dans la
+            // liste SANS etre compte dans aucune classe : le rapport affichait
+            // « 8 fonds avec desaccord » et « DIVERGENT 0 | PERDU 0 », puis
+            // concluait « CRITERE ATTEINT ». Classer d abord, comparer ensuite.
             if (vide(calc) && vide(base)) continue;
             // COMBLE : le script apporte une valeur ou la table n avait rien.
             // C est l effet VOULU de l ajout des ratios, pas une divergence.
             if (vide(base)) {
               comblesParColonne[c] = (comblesParColonne[c] || 0) + 1;
               nbCombles++;
+              dryConstats++;
               continue;
             }
             if (vide(calc)) {
@@ -596,10 +607,44 @@ async function run() {
               if (horizon != null && years < horizon) {
                 refusesParColonne[c] = (refusesParColonne[c] || 0) + 1;
                 nbRefuses++;
+                dryConstats++;
                 continue;
               }
               perdusParColonne[c] = (perdusParColonne[c] || 0) + 1;
+              nbPerdus++;
+              dryConstats++;
               ecarts.push(`${c}: PERDU — calcule=${calc} stocke=${base}`);
+              continue;
+            }
+            // Les deux cotes portent une valeur. Si l un des deux est une
+            // chaine (categories, devise, `code_ISIN`, mais aussi toute colonne
+            // numerique que la base stocke en varchar), on compare des chaines
+            // APRES avoir ecarte les cas vides — et un desaccord compte en
+            // DIVERGENT comme n importe quel autre.
+            if (typeof calc === 'string' || typeof base === 'string') {
+              const sc = String(calc).trim(), sb = String(base).trim();
+              // Deux ecritures du meme nombre ('12.50' et '12.5') ne sont pas un
+              // desaccord : on tranche numeriquement quand les deux le sont.
+              const nc = Number(sc), nb = Number(sb);
+              const tousDeuxNumeriques = sc !== '' && sb !== ''
+                && Number.isFinite(nc) && Number.isFinite(nb);
+              if (tousDeuxNumeriques) {
+                const ecartNum = Math.abs(nc - nb);
+                const depasseNum = estRatio(c)
+                  ? ecartNum > Math.max(Math.abs(nb) * TOLERANCE_RATIO_REL, 1e-6)
+                  : ecartNum > TOLERANCE_PERF;
+                if (depasseNum) {
+                  ecarts.push(`${c}: calcule=${nc.toFixed(6)} stocke=${nb.toFixed(6)}`);
+                  divergencesParColonne[c] = (divergencesParColonne[c] || 0) + 1;
+                  dryConstats++;
+                }
+                continue;
+              }
+              if (sc !== sb) {
+                ecarts.push(`${c}: calcule=${calc} stocke=${base}`);
+                divergencesParColonne[c] = (divergencesParColonne[c] || 0) + 1;
+                dryConstats++;
+              }
               continue;
             }
             const a = Number(calc), b = Number(base);
@@ -610,6 +655,7 @@ async function run() {
             if (depasse) {
               ecarts.push(`${c}: calcule=${a.toFixed(6)} stocke=${b.toFixed(6)}`);
               divergencesParColonne[c] = (divergencesParColonne[c] || 0) + 1;
+              dryConstats++;
             }
           }
           colonnesComparees = Math.max(colonnesComparees, Object.keys(perfValues).length - 2);
@@ -618,15 +664,15 @@ async function run() {
           // valeur ou une seule perte suffit a le sortir du vert.
           if (nbCombles) dryCombles += nbCombles;
           if (nbRefuses) dryRefuses += nbRefuses;
+          if (nbPerdus) dryPerdus += nbPerdus;
           if (ecarts.length) {
-            const perdus = ecarts.filter(e => e.includes('PERDU')).length;
+            const perdus = nbPerdus;
             console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr}`
               + ` — ${ecarts.length} ecart(s) dont ${perdus} PERDU`
               + (nbCombles ? `, ${nbCombles} colonne(s) comblee(s)` : '')
               + (periodesEchouees.length ? ` | ratios non obtenus : ${periodesEchouees.join(', ')}` : ''));
             for (const e of ecarts.slice(0, 8)) console.log(`        ${e}`);
             if (ecarts.length > 8) console.log(`        … et ${ecarts.length - 8} autre(s)`);
-            if (perdus) dryPerdus += perdus;
             dryDifferents++;
           } else if (nbCombles || nbRefuses) {
             console.log(`  [${f.id}] ${f.nom_fond} (${pays}) date=${latestDateStr}`
@@ -725,12 +771,33 @@ async function run() {
     parCol('REFUSE — horizon non couvert par l historique (attendu, corrige un faux chiffre)', refusesParColonne);
 
     const nbDivergent = Object.values(divergencesParColonne).reduce((a, b) => a + b, 0);
+
+    // INVARIANT DE SOMME — a lire AVANT le critere.
+    // Un desaccord constate qui n atterrit dans aucune classe rend les quatre
+    // compteurs faux, donc le verdict faux. L egalite ci-dessous est la seule
+    // garantie que le juge sait compter ; elle est imprimee a chaque execution
+    // parce qu un invariant qu on ne verifie pas n est qu une affirmation.
+    const sommeClasses = nbDivergent + dryPerdus + dryCombles + dryRefuses;
+    const invariantOk = sommeClasses === dryConstats;
+    console.log(`\n=== INVARIANT DU JUGE ===`);
+    console.log(`  DIVERGENT + PERDU + COMBLE + REFUSE = ${nbDivergent} + ${dryPerdus}`
+      + ` + ${dryCombles} + ${dryRefuses} = ${sommeClasses}`);
+    console.log(`  Desaccords constates                = ${dryConstats}`);
+    console.log(invariantOk
+      ? '  → INVARIANT VERIFIE. Les compteurs couvrent tous les desaccords constates.'
+      : `  → INVARIANT VIOLE (ecart de ${Math.abs(dryConstats - sommeClasses)}).`
+        + ' Des desaccords echappent aux classes : AUCUN verdict ci-dessous n est'
+        + ' recevable, et la bascule reste interdite.');
+
     console.log(`\n=== CRITERE DE BASCULE, sur ${colonnesComparees} colonnes comparees ===`);
     console.log(`  DIVERGENT : ${nbDivergent} (exige : 0)`);
     console.log(`  PERDU     : ${dryPerdus} (exige : 0)`);
     console.log(`  COMBLE    : ${dryCombles} (attendu non nul : les ratios que la table n a pas)`);
     console.log(`  REFUSE    : ${dryRefuses} (attendu non nul : les horizons que l historique ne couvre pas)`);
-    console.log(nbDivergent === 0 && dryPerdus === 0
+    console.log(!invariantOk
+      ? '  → VERDICT SUSPENDU : l invariant de somme est viole, les compteurs'
+        + ' ci-dessus sous-comptent. Reparer le juge avant de juger.'
+      : nbDivergent === 0 && dryPerdus === 0
       ? '  → CRITERE ATTEINT. Les deux calculs donnent les memes chiffres la ou'
         + ' les deux en ont un, et le script ne fait perdre aucune valeur existante.'
         + ' La substitution est non destructrice sur ce perimetre.'
