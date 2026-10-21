@@ -117,9 +117,10 @@ async function colonnesDe(conn, table) {
         const noms = new Set(cols.map(x => x.c));
         colCat = CANDIDATS_CATEGORIE.find(x => noms.has(x)) || null;
         const aTypeClassement = noms.has('type_classement');
-        const [[{ n: tot }]] = [await conn.query(
-          `SELECT COUNT(*) AS n FROM \`${t}\``)];
-        totalLignes = Number(tot);
+        // `conn.query` rend [rows, fields] : un niveau d enveloppe de trop
+        // donnait `NaN lignes` dans la sortie du 2026-10-21 19:37 UTC.
+        const [cnt] = await conn.query(`SELECT COUNT(*) AS n FROM \`${t}\``);
+        totalLignes = Number(cnt[0].n);
 
         if (!noms.has(r)) {
           console.log(`  ECHEC : colonne de rang \`${r}\` absente.`
@@ -160,6 +161,42 @@ async function colonnesDe(conn, table) {
       }
 
       if (!categories.length) {
+        // MESURE DU 2026-10-21 19:37 UTC : sur les tables devise, les colonnes
+        // `categorie_nationale` ET `type_classement` sont bien PRESENTES. Ma
+        // cause supposee — une colonne manquante — est donc FAUSSE. Le
+        // perimetre se vide ailleurs, et seul un decompte clause par clause
+        // peut dire ou. Pas de nouvelle hypothese : des chiffres.
+        try {
+          const colCatE = colCat, rE = r;
+          const [d] = await conn.query(
+            `SELECT COUNT(*) AS total,
+                    SUM(type_classement = 1) AS type1,
+                    SUM(\`${colCatE}\` IS NOT NULL AND \`${colCatE}\` <> '') AS avecCat,
+                    SUM(\`${rE}\` IS NOT NULL) AS avecRang,
+                    COUNT(DISTINCT type_classement) AS typesDistincts,
+                    COUNT(DISTINCT \`${colCatE}\`) AS catsDistinctes
+               FROM \`${t}\``);
+          const x = d[0];
+          console.log(`  Decompte clause par clause, pour savoir OU le perimetre se vide :`);
+          console.log(`    lignes totales                         ${x.total}`);
+          console.log(`    dont type_classement = 1               ${x.type1}`);
+          console.log(`    dont categorie non vide                ${x.avecCat}`);
+          console.log(`    dont \`${rE}\` non nul   ${x.avecRang}`);
+          console.log(`    valeurs distinctes de type_classement  ${x.typesDistincts}`);
+          console.log(`    categories distinctes                  ${x.catsDistinctes}`);
+          const [vals] = await conn.query(
+            `SELECT type_classement AS v, COUNT(*) AS n FROM \`${t}\`
+              GROUP BY type_classement ORDER BY n DESC LIMIT 6`);
+          console.log(`    repartition de type_classement : `
+            + vals.map(v => `${JSON.stringify(v.v)}=${v.n}`).join(', '));
+          const [cats] = await conn.query(
+            `SELECT \`${colCatE}\` AS c, COUNT(*) AS n FROM \`${t}\`
+              GROUP BY \`${colCatE}\` ORDER BY n DESC LIMIT 6`);
+          console.log(`    categories les plus peuplees : `
+            + cats.map(c => `${JSON.stringify(c.c)}=${c.n}`).join(', '));
+        } catch (e) {
+          console.log(`    (decompte impossible : ${e.message})`);
+        }
         // LE POINT DE CE LOT. Zero categorie d au moins 5 fonds sur une table
         // qui porte des milliers de lignes n est pas un resultat vert, c est un
         // controle qui ne mesure rien. On le dit, et on sort non nul.
