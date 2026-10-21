@@ -48,6 +48,35 @@
  *   3. pour la categorie temoin, si les deux fonds du rang double ont des `ytd`
  *      qui se comparent proprement.
  *
+ * CONCLUSION MESUREE LE 2026-10-21 20:1x UTC, apres reparation de ce controle.
+ *
+ * Ce script rendait « 0 categorie d au moins 5 fonds → toutes les numerotations
+ * sont propres » sur les deux tables devise, qui portent 3 643 lignes chacune.
+ * Critere VIDE affiche en vert. Cause : il choisissait la colonne de categorie
+ * par PRESENCE, et `categorie_nationale` — premiere de la liste — est nulle sur
+ * 3 643 lignes sur 3 643 dans ces tables.
+ *
+ * Une fois le perimetre rempli, il a affiche l inverse : 13 groupes sur 19 hors
+ * permutation, 233 rangs doubles, « defaut STRUCTUREL ». C etait faux aussi. La
+ * vraie cle de regroupement n est stockee dans aucune des deux tables : c est la
+ * categorie nationale du FONDS. Mesure finale :
+ *
+ *   classementfonds_eurs  JOIN fond_investissements.categorie_national
+ *     → 22 groupes, 0 hors permutation, 0 doublon, 0 trou   PROPRE
+ *   classementfonds_usds  idem                              PROPRE
+ *   classementfonds       categorie_nationale (stockee, 3622/3622)
+ *     → 22 groupes, 1 hors permutation, 7 doublons, 7 trous
+ *
+ * Donc : les classements EUR et USD sont des permutations propres de 1..N. Le
+ * seul defaut de numerotation reel est en devise LOCALE, sur une categorie sur
+ * vingt-deux — DIVERSIFIE MAROC, rang 80 vacant et rang 81 double.
+ *
+ * Les deux erreurs etaient les miennes, dans ce script, et dans les deux sens :
+ * un controle qui dort et un controle qui crie au loup se valent. Il essaie
+ * maintenant chaque cle disponible — colonnes stockees, leur composee, et les
+ * categories du fonds par jointure — NOMME celle qu il retient, et ne parle de
+ * defaut que sous la cle la plus propre existante.
+ *
  * LECTURE SEULE : uniquement des SELECT.
  *
  * USAGE  node scripts/diag/ondemand/diag_rangs_permutation_invalide.js
@@ -231,33 +260,52 @@ async function colonnesDe(conn, table) {
           console.log(`  (cles externes indisponibles : ${e.message})`);
         }
 
-        if (cles.length > 1) {
-          console.log('  Cles de regroupement essayees — la bonne est celle qui rend'
-            + ' une permutation propre :');
-          for (const k of cles) {
-            try {
-              const st = await statsPourCle(conn, t, r, k.expr, clauseType);
-              console.log(`    ${k.nom.padEnd(38)} ${String(st.groupes).padStart(4)} groupes`
-                + ` | ${String(st.invalides).padStart(4)} hors permutation`
-                + ` | ${String(st.doublons).padStart(4)} doublon(s)`
-                + ` | ${String(st.trous).padStart(4)} trou(s)`
-                + (st.groupes && st.invalides === 0 ? '   ← PROPRE' : ''));
-            } catch (e) {
-              console.log(`    ${k.nom.padEnd(38)} (echec : ${e.message})`);
+        // MESURE DU 2026-10-21 20:1x UTC — LE VERDICT SE REND SUR LA BONNE CLE.
+        // Resultat decisif : sur classementfonds_eurs ET _usds,
+        //   JOIN fond_investissements.categorie_national
+        //     → 22 groupes, 0 hors permutation, 0 doublon, 0 trou.
+        // Les classements devise SONT des permutations propres de 1..N. La vraie
+        // cle est la categorie nationale du FONDS, que ces tables ne
+        // denormalisent pas. Mes « 233 doublons structurels » etaient l artefact
+        // d un regroupement par `categorie_regionale` — une alerte fausse, et un
+        // controle qui crie au loup ne vaut pas mieux qu un controle qui dort.
+        // On retient donc la cle la plus propre, on la NOMME, et c est elle qui
+        // porte le verdict.
+        console.log('  Cles de regroupement essayees — la bonne est celle qui rend'
+          + ' une permutation propre :');
+        let meilleure = null;
+        for (const k of cles) {
+          try {
+            const st = await statsPourCle(conn, t, r, k.expr, clauseType);
+            const propre = st.groupes > 0 && st.invalides === 0;
+            console.log(`    ${k.nom.padEnd(38)} ${String(st.groupes).padStart(4)} groupes`
+              + ` | ${String(st.invalides).padStart(4)} hors permutation`
+              + ` | ${String(st.doublons).padStart(4)} doublon(s)`
+              + ` | ${String(st.trous).padStart(4)} trou(s)`
+              + (propre ? '   ← PROPRE' : ''));
+            if (!st.groupes) continue;
+            if (!meilleure
+                || st.invalides < meilleure.st.invalides
+                || (st.invalides === meilleure.st.invalides
+                    && st.doublons < meilleure.st.doublons)) {
+              meilleure = { k, st };
             }
+          } catch (e) {
+            console.log(`    ${k.nom.padEnd(38)} (echec : ${e.message})`);
           }
         }
-        const [c] = await conn.query(
-          `SELECT \`${colCat}\` AS cat, COUNT(*) AS n,
-                  COUNT(DISTINCT \`${r}\`) AS distincts,
-                  MAX(CAST(\`${r}\` AS UNSIGNED)) AS maxrang
-             FROM \`${t}\`
-            WHERE ${clauseType} \`${colCat}\` IS NOT NULL
-              AND \`${colCat}\` <> '' AND \`${r}\` IS NOT NULL
-            GROUP BY \`${colCat}\`
-           HAVING n >= 5
-            ORDER BY n DESC`);
-        categories = c;
+        if (!meilleure) {
+          console.log('  ECHEC : aucune cle de regroupement ne rend de groupe'
+            + ` d au moins 5 fonds sur ${totalLignes} lignes. CRITERE VIDE.\n`);
+          perimetresVides++;
+          continue;
+        }
+        console.log(`  Cle retenue pour le verdict : ${meilleure.k.nom}`
+          + (meilleure.st.invalides === 0
+            ? ' — numerotation propre sous cette cle.'
+            : ` — ${meilleure.st.invalides} groupe(s) hors permutation subsistent`
+              + ' sous la cle la PLUS propre disponible : c est un vrai defaut.'));
+        categories = meilleure.st.rows;
       } catch (e) {
         console.log(`  ECHEC : table non interrogeable : ${e.message}`);
         console.log(`  CRITERE VIDE — rien n a ete juge.\n`);
