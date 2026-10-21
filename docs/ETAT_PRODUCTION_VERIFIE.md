@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-10-21 20:13 UTC**
+Derniere verification : **2026-10-21 20:21 UTC**
 
 ```
 
@@ -28,7 +28,7 @@ Derniere verification : **2026-10-21 20:13 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Tue Oct 20, soit 1 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-10-21T20:00, soit 0.1 h
+             runtime: genere le 2026-10-21T20:00, soit 0.3 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1545x [1.01 .. 1555] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1531x [100.00 .. 153145] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1524x [1.09 .. 1662] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1499x [10.65 .. 15963] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1488x [1.00 .. 1488] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1480x [114.47 .. 169450] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1472x [1.08 .. 1593] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1462x [1.15 .. 1681] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1457x [1.05 .. 1523] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1452x [1.16 .. 1684] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182] | [2765] CARDINALSTONE DOLLAR FUND (NIGERIA/USD) 1425x [1.26 .. 1799]
 [ECHEC] C8           Les performances suivent les VL
