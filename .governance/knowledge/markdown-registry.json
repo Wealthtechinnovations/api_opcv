@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "bbdd968d21c3125c7a1cdbf18857b3c950856fb7"
+      "head": "e15958f197fe9b8f64779e452e089edd39810a2a"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "30c1643be5864aaf4784ae92a7c1ea8785507d6b"
+      "head": "bbbde52a48090662d3079ccc750c6f21356dbe1b"
     }
   },
   "summary": {
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "d41d5bd193e76caf1bace06bd667e092f8a0b205",
-      "last_validated_sha": "d41d5bd193e76caf1bace06bd667e092f8a0b205",
-      "content_sha256": "01407b3f2348d6dfd3b7440db00d02b513fb54bafdf6e462d558479ef7b56aa7",
-      "line_count": 3016,
-      "byte_count": 198419,
+      "git_blob_sha": "edbc2ded53d6a71bb8eb8df9493b89044f525d0c",
+      "last_validated_sha": "edbc2ded53d6a71bb8eb8df9493b89044f525d0c",
+      "content_sha256": "c893f553beb43543a9d0ebd8a64b63bed4d06b472244e2b55ab54b85ed297e74",
+      "line_count": 3064,
+      "byte_count": 204706,
       "headings": [
         {
           "level": 1,
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "f6f6441e449a4512df6629e6c2b884a455126679",
-      "last_validated_sha": "f6f6441e449a4512df6629e6c2b884a455126679",
-      "content_sha256": "2880a27a8c9e6aa44f780e26816f95d14033deecce865a2fbf3317c636d7f4f2",
+      "git_blob_sha": "67a77641eff23de6afed0fa06373fc2deeab66ce",
+      "last_validated_sha": "67a77641eff23de6afed0fa06373fc2deeab66ce",
+      "content_sha256": "14504ceb1664395d57b259cfb31c2f572d789b788467dd085f699702b9e4d1ca",
       "line_count": 96,
-      "byte_count": 7647,
+      "byte_count": 7648,
       "headings": [
         {
           "level": 1,
@@ -13388,6 +13388,13 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-21 20:15 UTC — Lot CE : l'angle mort EUR/USD instruit, et il etait sain",
+        "Deux erreurs à moi, dans le même script, en sens inverse",
+        "Conclusion mesurée",
+        "Étapes de la mesure, pour ne pas refaire le chemin",
+        "Le contrôle ne peut plus se tromper en silence",
+        "Prochaine action recommandée",
+        "À ne pas faire à la reprise",
         "POINT DE REPRISE COURANT — 2026-10-21 19:30 UTC — Lot CD : critere de bascule ATTEINT et mesure",
         "Le juge compte juste, et le critère est atteint",
         "Le deuxième défaut de classificateur, trouvé en instruisant le premier",
@@ -13398,14 +13405,7 @@
         "POINT DE REPRISE COURANT — 2026-10-21 — Lot CC : le juge du rattrapage savait pas compter",
         "Correction d'une affirmation que j'ai faite",
         "Lot traité",
-        "Invariant désormais imprimé à chaque exécution",
-        "Prochaine action recommandée",
-        "Risques connus",
-        "À ne pas faire à la reprise",
-        "POINT DE REPRISE COURANT — 2026-09-22 — Programme Directeur actif / AF-OPS-003 POST_FIX_VALIDATION",
-        "Continuité préservée",
-        "AF-OPS-003 — correctif déployé, RCA en validation post-fix",
-        "Programme Directeur AfricaFunds — actif en lecture seule"
+        "Invariant désormais imprimé à chaque exécution"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13421,11 +13421,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "15c7a1a7b39bf2a3eb9ebcddba655751c8796286",
-      "last_validated_sha": "15c7a1a7b39bf2a3eb9ebcddba655751c8796286",
-      "content_sha256": "a1d6fba198edfba94e40790a0887b4b97d4ddb59edb3e648d9434a36336363e9",
-      "line_count": 8674,
-      "byte_count": 575014,
+      "git_blob_sha": "ad79717cd5145b6a31aa41ce8f8bcca0fa852f5d",
+      "last_validated_sha": "ad79717cd5145b6a31aa41ce8f8bcca0fa852f5d",
+      "content_sha256": "d1d6250a8bd7f6a99d071ce38e37ebde1da9f1790d21a442723bbb52f2c58664",
+      "line_count": 8745,
+      "byte_count": 579479,
       "headings": [
         {
           "level": 1,
@@ -13434,6 +13434,34 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-21 20:15 UTC — Lot CE : l'angle mort EUR/USD instruit, et il etait sain"
+        },
+        {
+          "level": 3,
+          "text": "Deux erreurs à moi, dans le même script, en sens inverse"
+        },
+        {
+          "level": 3,
+          "text": "Conclusion mesurée"
+        },
+        {
+          "level": 3,
+          "text": "Étapes de la mesure, pour ne pas refaire le chemin"
+        },
+        {
+          "level": 3,
+          "text": "Le contrôle ne peut plus se tromper en silence"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine action recommandée"
+        },
+        {
+          "level": 3,
+          "text": "À ne pas faire à la reprise"
         },
         {
           "level": 2,
@@ -13558,34 +13586,6 @@
         {
           "level": 3,
           "text": "Prochaine action gouvernée"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-09-13 17:59 UTC — AF-TASK-011 clôturée"
-        },
-        {
-          "level": 3,
-          "text": "Verdict de la boucle de gouvernance"
-        },
-        {
-          "level": 3,
-          "text": "Preuve GitHub ↔ S2 mesurée"
-        },
-        {
-          "level": 3,
-          "text": "Refus MariaDB post-rotation — classification"
-        },
-        {
-          "level": 3,
-          "text": "Gaps externes conservés"
-        },
-        {
-          "level": 3,
-          "text": "Prochaine action"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — AF-GOV-FINAL-CERT / AF-TASK-011"
         }
       ]
     },
