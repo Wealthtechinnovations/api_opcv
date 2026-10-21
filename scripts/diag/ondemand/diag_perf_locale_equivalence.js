@@ -41,11 +41,26 @@
  * partait dans la liste sans etre compte dans aucune classe. L ordre est
  * corrige et le script imprime desormais l invariant
  *   DIVERGENT + PERDU + COMBLE + REFUSE = desaccords constates
- * Ce qu on vient chercher ici, dans cet ordre : d abord que l invariant soit
- * VERIFIE, ensuite seulement ce que valent DIVERGENT et PERDU. Les dix-neuf
- * ecarts jusqu ici non classes vont se repartir entre REFUSE (horizon non
- * couvert — attendu) et PERDU (vrai defaut) ; la proportion n est pas devinable
- * et ne sera pas devinee.
+ * MESURE DU 2026-10-21 19:22 UTC, juge repare : l invariant est VERIFIE sur les
+ * trois passes (NIGERIA 0+1+363+32 = 396 = 396 ; UEMOA 0+0+179+43 = 222 = 222 ;
+ * fonds 1543 0+0+0+1 = 1 = 1). DIVERGENT = 0 partout : les deux calculs donnent
+ * bien les memes chiffres la ou les deux en ont un, sur 90 colonnes et non dix.
+ * UEMOA passe le critere. NIGERIA ne le passe pas, pour UN seul ecart :
+ *   [1145] AIICO BALANCED FUND — perf8ansm : calcule=null stocke=322.1552848087039
+ *
+ * POURQUOI CETTE PASSE CIBLEE SUR 1145. Les colonnes `*m` ne mesurent pas depuis
+ * la derniere VL mais depuis la fin du mois precedent, qui est ANTERIEURE : elles
+ * exigent donc un peu plus d historique. Le classificateur comparait l horizon a
+ * l historique vu depuis la derniere VL, soit a une autre question que celle a
+ * laquelle la garde avait repondu — un refus legitime pouvait donc etre etiquete
+ * PERDU. Les deux ancrages sont desormais alignes, et la ligne PERDU porte
+ * l horizon, l historique, l ancrage utilise et la VL la plus ancienne.
+ *
+ * Ce que cette passe tranche, et que je ne devine pas : si ce PERDU disparait,
+ * c etait l artefact de frontiere decrit ci-dessus et le critere est atteint sur
+ * NIGERIA aussi. S il subsiste avec un historique superieur a huit ans, c est une
+ * perte reelle, et elle devra etre expliquee colonne par colonne avant toute
+ * bascule. Les nombres imprimes suffiront a trancher sans relancer.
  *
  * LECTURE SEULE : `--dry-run`, aucune ecriture.
  *
@@ -100,7 +115,7 @@ for (const pays of ['NIGERIA', 'UEMOA']) {
 // `ranking.pure.js`), mais il EST servi par `apigestionperformance.js`, donc il
 // s affiche sur la fiche fonds. L ecart ne deplace aucun rang et change un
 // chiffre affiche : a expliquer avant toute bascule, pas a laisser passer.
-const FONDS_DIVERGENTS = ['1543'];
+const FONDS_DIVERGENTS = ['1543', '1145'];
 for (const fond of FONDS_DIVERGENTS) {
   console.log(`########## FONDS ${fond} — passe ciblee, detail complet`);
   const r = spawnSync('node', ['scripts/fix/fix_populate_performances.js',

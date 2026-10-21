@@ -507,6 +507,12 @@ async function run() {
       // Ratios. `years` reproduit `anneevalorisation` : DATEDIFF(MAX, MIN)/365
       // sur les VL deja chargees — aucune requete de plus.
       const years = (lastDate.getTime() - dates[0].getTime()) / (365 * 86400000);
+      // Les colonnes `*m` ne mesurent pas depuis la derniere VL mais depuis la
+      // fin du mois precedent, qui est ANTERIEURE. Elles exigent donc un peu
+      // plus d historique que `years` ne le suggere. Le classificateur du
+      // dry-run doit poser la question a laquelle la garde a repondu, sinon il
+      // etiquette PERDU un refus parfaitement legitime.
+      const yearsFinDeMois = (prevMonthEnd.getTime() - dates[0].getTime()) / (365 * 86400000);
       const colonnesRatio = {};
       const periodesEchouees = [];
       if (opts.ratios) {
@@ -604,9 +610,26 @@ async function run() {
               // valeur stockee est celle que la route a fabriquee en retombant
               // sur la plus ancienne VL. S il le couvre, c est une vraie perte.
               const horizon = HORIZON_PAR_COLONNE[c];
-              if (horizon != null && years < horizon) {
+              // Meme ancrage que la garde : fin de mois precedent pour les `*m`,
+              // derniere VL pour les autres.
+              const ancrageM = /ansm$|anm$/.test(c);
+              const histo = ancrageM ? yearsFinDeMois : years;
+              if (horizon != null && histo < horizon) {
                 refusesParColonne[c] = (refusesParColonne[c] || 0) + 1;
                 nbRefuses++;
+                dryConstats++;
+                continue;
+              }
+              if (horizon != null) {
+                // Horizon couvert et pourtant rien de calcule : c est une perte
+                // reelle, et le rapport doit porter les nombres qui permettent
+                // de la trancher sans relancer quoi que ce soit.
+                ecarts.push(`${c}: PERDU — calcule=null stocke=${base}`
+                  + ` | horizon=${horizon} ans, historique=${histo.toFixed(2)} ans`
+                  + ` (ancrage ${ancrageM ? 'fin de mois precedent' : 'derniere VL'}`
+                  + `, VL la plus ancienne ${dates[0].toISOString().slice(0, 10)})`);
+                perdusParColonne[c] = (perdusParColonne[c] || 0) + 1;
+                nbPerdus++;
                 dryConstats++;
                 continue;
               }
