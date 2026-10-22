@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "e15958f197fe9b8f64779e452e089edd39810a2a"
+      "head": "52c48ae4e1ab8f3d78ccd23c6cac60382c5b9d6a"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "bbbde52a48090662d3079ccc750c6f21356dbe1b"
+      "head": "987212d687952ec2ce99b17d54771fa96edb7cbe"
     }
   },
   "summary": {
@@ -10588,16 +10588,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "NONE",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Recalcul des derives — journal des operations",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_RECALC_DERIVES.md",
-      "git_blob_sha": "aa4d9a57998a7fab138a567b19528617022a6774",
-      "last_validated_sha": "aa4d9a57998a7fab138a567b19528617022a6774",
-      "content_sha256": "dcdbca0e3e9456d03c939ce093682b4046fa81a130c68fe03e78fde8353f0a3f",
-      "line_count": 61,
-      "byte_count": 2508,
+      "git_blob_sha": "9b72ee43c5ca4e87035560342f30edbeb3b2f574",
+      "last_validated_sha": "9b72ee43c5ca4e87035560342f30edbeb3b2f574",
+      "content_sha256": "fe9e46d24fd3e857035a24aac53ec88f2a2bd1bdb045af0ccf147eaf3a12409e",
+      "line_count": 249,
+      "byte_count": 9609,
       "headings": [
         {
           "level": 1,
@@ -13388,6 +13388,13 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-22 00:00 UTC — Lot CF : RATTRAPAGE DES PERFORMANCES EXECUTE",
+        "Résultat mesuré",
+        "Canal utilisé, et un écart avec le plan",
+        "Migration des index : AUCUN CANAL — non exécutée",
+        "DÉCOUVERTE — `C3` est `C7`, et le correctif existe sans avoir jamais tourné",
+        "Prochaine action recommandée",
+        "Risques connus",
         "POINT DE REPRISE COURANT — 2026-10-21 20:15 UTC — Lot CE : l'angle mort EUR/USD instruit, et il etait sain",
         "Deux erreurs à moi, dans le même script, en sens inverse",
         "Conclusion mesurée",
@@ -13398,14 +13405,7 @@
         "POINT DE REPRISE COURANT — 2026-10-21 19:30 UTC — Lot CD : critere de bascule ATTEINT et mesure",
         "Le juge compte juste, et le critère est atteint",
         "Le deuxième défaut de classificateur, trouvé en instruisant le premier",
-        "Ce que le critère couvre, et ce qu'il ne couvre pas",
-        "Prochaine action recommandée — décision du propriétaire",
-        "Risques connus",
-        "À ne pas faire à la reprise",
-        "POINT DE REPRISE COURANT — 2026-10-21 — Lot CC : le juge du rattrapage savait pas compter",
-        "Correction d'une affirmation que j'ai faite",
-        "Lot traité",
-        "Invariant désormais imprimé à chaque exécution"
+        "Ce que le critère couvre, et ce qu'il ne couvre pas"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13416,16 +13416,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "ad79717cd5145b6a31aa41ce8f8bcca0fa852f5d",
-      "last_validated_sha": "ad79717cd5145b6a31aa41ce8f8bcca0fa852f5d",
-      "content_sha256": "d1d6250a8bd7f6a99d071ce38e37ebde1da9f1790d21a442723bbb52f2c58664",
-      "line_count": 8745,
-      "byte_count": 579479,
+      "git_blob_sha": "fecf71d543a6c5750d63a2557c77609cc6eeb716",
+      "last_validated_sha": "fecf71d543a6c5750d63a2557c77609cc6eeb716",
+      "content_sha256": "f301f418fec7fc93efa38224cedb34c8ed3a6ff0168dfb5c3a08aca632ca361b",
+      "line_count": 8830,
+      "byte_count": 584310,
       "headings": [
         {
           "level": 1,
@@ -13434,6 +13434,34 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-22 00:00 UTC — Lot CF : RATTRAPAGE DES PERFORMANCES EXECUTE"
+        },
+        {
+          "level": 3,
+          "text": "Résultat mesuré"
+        },
+        {
+          "level": 3,
+          "text": "Canal utilisé, et un écart avec le plan"
+        },
+        {
+          "level": 3,
+          "text": "Migration des index : AUCUN CANAL — non exécutée"
+        },
+        {
+          "level": 3,
+          "text": "DÉCOUVERTE — `C3` est `C7`, et le correctif existe sans avoir jamais tourné"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine action recommandée"
+        },
+        {
+          "level": 3,
+          "text": "Risques connus"
         },
         {
           "level": 2,
@@ -13558,34 +13586,6 @@
         {
           "level": 3,
           "text": "Write-back gate des projections — preflight"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-09-22 — AF-OPS-003 RCA resserrée"
-        },
-        {
-          "level": 3,
-          "text": "Gouvernance et travaux concurrents préservés"
-        },
-        {
-          "level": 3,
-          "text": "7e OOM MariaDB désormais prouvé"
-        },
-        {
-          "level": 3,
-          "text": "Trajectoire longue et saut du daily update"
-        },
-        {
-          "level": 3,
-          "text": "Candidat prepared statements — non encore causalement prouvé"
-        },
-        {
-          "level": 3,
-          "text": "Etat data live mesuré"
-        },
-        {
-          "level": 3,
-          "text": "Prochaine action gouvernée"
         }
       ]
     },
