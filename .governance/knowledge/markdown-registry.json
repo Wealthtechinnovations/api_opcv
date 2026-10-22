@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "52c48ae4e1ab8f3d78ccd23c6cac60382c5b9d6a"
+      "head": "817b1d2b7e9828950ed9374b668c820d02fe2b6e"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "987212d687952ec2ce99b17d54771fa96edb7cbe"
+      "head": "cda3b5ecde8739302a568d1e1e7c6a8026957b6e"
     }
   },
   "summary": {
@@ -10454,11 +10454,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/OPS_FIX_SEGMENTS_NAIRA.md",
-      "git_blob_sha": "2346f4dd50e0c4a30483e7e89fbf9c95fdfb26dc",
-      "last_validated_sha": "2346f4dd50e0c4a30483e7e89fbf9c95fdfb26dc",
-      "content_sha256": "2215323c91aa8345ed00f33de7b2d040551f18965ab79ce314c9056922334881",
+      "git_blob_sha": "aa0f160aa10e3d2c40c2177190ccdc5192841254",
+      "last_validated_sha": "aa0f160aa10e3d2c40c2177190ccdc5192841254",
+      "content_sha256": "340a3a87924e884584368bc42277354a492dd87b0a8c8f084fc11d14caf9a77f",
       "line_count": 180,
-      "byte_count": 11805,
+      "byte_count": 11867,
       "headings": [
         {
           "level": 1,
@@ -13388,6 +13388,12 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-22 03:35 UTC — Lot CG : dry-run naira, et un ecart entre promesse et perimetre",
+        "Perimetre mesure aujourd'hui",
+        "Correction d'une affirmation que j'ai faite",
+        "LE POINT BLOQUANT — le fonds 1141 n'est PAS dans les 157 lignes",
+        "EXECUTE NON LANCE, et pour cette raison precise",
+        "Si l'execute est valide un jour : l'enchainement obligatoire",
         "POINT DE REPRISE COURANT — 2026-10-22 00:00 UTC — Lot CF : RATTRAPAGE DES PERFORMANCES EXECUTE",
         "Résultat mesuré",
         "Canal utilisé, et un écart avec le plan",
@@ -13399,13 +13405,7 @@
         "Deux erreurs à moi, dans le même script, en sens inverse",
         "Conclusion mesurée",
         "Étapes de la mesure, pour ne pas refaire le chemin",
-        "Le contrôle ne peut plus se tromper en silence",
-        "Prochaine action recommandée",
-        "À ne pas faire à la reprise",
-        "POINT DE REPRISE COURANT — 2026-10-21 19:30 UTC — Lot CD : critere de bascule ATTEINT et mesure",
-        "Le juge compte juste, et le critère est atteint",
-        "Le deuxième défaut de classificateur, trouvé en instruisant le premier",
-        "Ce que le critère couvre, et ce qu'il ne couvre pas"
+        "Le contrôle ne peut plus se tromper en silence"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13416,16 +13416,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "fecf71d543a6c5750d63a2557c77609cc6eeb716",
-      "last_validated_sha": "fecf71d543a6c5750d63a2557c77609cc6eeb716",
-      "content_sha256": "f301f418fec7fc93efa38224cedb34c8ed3a6ff0168dfb5c3a08aca632ca361b",
-      "line_count": 8830,
-      "byte_count": 584310,
+      "git_blob_sha": "47a6ac6af11d55fb7a70ce32c43b71d18260ce43",
+      "last_validated_sha": "47a6ac6af11d55fb7a70ce32c43b71d18260ce43",
+      "content_sha256": "c636609c810d8e9975b4210aea569d23c2efa8e9dbb7f8f263fa7b43c1fa6f94",
+      "line_count": 8901,
+      "byte_count": 587696,
       "headings": [
         {
           "level": 1,
@@ -13434,6 +13434,30 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-22 03:35 UTC — Lot CG : dry-run naira, et un ecart entre promesse et perimetre"
+        },
+        {
+          "level": 3,
+          "text": "Perimetre mesure aujourd'hui"
+        },
+        {
+          "level": 3,
+          "text": "Correction d'une affirmation que j'ai faite"
+        },
+        {
+          "level": 3,
+          "text": "LE POINT BLOQUANT — le fonds 1141 n'est PAS dans les 157 lignes"
+        },
+        {
+          "level": 3,
+          "text": "EXECUTE NON LANCE, et pour cette raison precise"
+        },
+        {
+          "level": 3,
+          "text": "Si l'execute est valide un jour : l'enchainement obligatoire"
         },
         {
           "level": 2,
@@ -13562,30 +13586,6 @@
         {
           "level": 3,
           "text": "Programme Directeur AfricaFunds — actif en lecture seule"
-        },
-        {
-          "level": 3,
-          "text": "Chronologie dérivée / event ledger"
-        },
-        {
-          "level": 3,
-          "text": "Gap Harvester — découverte uniquement, aucune création automatique"
-        },
-        {
-          "level": 3,
-          "text": "Ordre de marche conservé"
-        },
-        {
-          "level": 3,
-          "text": "Claims de surfaces multi-agent — OBSERVE_ONLY actif"
-        },
-        {
-          "level": 3,
-          "text": "Contrat anti-régression machine-checkable — ACTIF"
-        },
-        {
-          "level": 3,
-          "text": "Write-back gate des projections — preflight"
         }
       ]
     },
