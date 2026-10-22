@@ -2,21 +2,21 @@
 
 > Genere par `ops-fix-segments-naira.yml`. Ne pas modifier a la main.
 
-Derniere execution : **2026-09-16 21:48 UTC**
+Derniere execution : **2026-10-22 03:32 UTC**
 Mode : **dry-run**
-Declencheur : `push` — par `Wealthtechinnovations`
+Declencheur : `workflow_dispatch` — par `Wealthtechinnovations`
 
 ```
-Commit avant mise a jour : 8895783f9 chore(ops): refresh AF-OPS-007 dry-run preflight
+Commit avant mise a jour : c661ef25c chore(ops): recalcul derives TUNISIE — execute 2026-10-21 23:01 UTC [skip ci]
 From https://github.com/Wealthtechinnovations/api_opcv
  * branch                claude/code-review-improvements-ikvuj -> FETCH_HEAD
-   8895783f9..750c793ec  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
-Updating 8895783f9..750c793ec
+   c661ef25c..e67dcd485  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
+Updating c661ef25c..e67dcd485
 Fast-forward
- .github/workflows/ops-fix-segments-naira.yml |  4 ++++
- docs/OPS_FIX_SEGMENTS_NAIRA.md               | 29 ++++++++++++++++++++--------
- 2 files changed, 25 insertions(+), 8 deletions(-)
-Commit retenu        : 750c793ec feat(ops): add source-aware C7 diagnostic to dry-run
+ .governance/knowledge/markdown-registry.json | 100 ++++++-------
+ docs/OPS_RECALC_DERIVES.md                   | 212 +++++++++++++++------------
+ 2 files changed, 166 insertions(+), 146 deletions(-)
+Commit retenu        : e67dcd485 chore(governance): certify all current Markdown [skip ci]
 
 ==============================================
  1. PERIMETRE (dry-run de controle)
@@ -88,7 +88,7 @@ DRY-RUN — aucune ecriture. Relancer avec --execute pour appliquer.
  1bis. DIAGNOSTIC PLATEAUX NIGERIA (lecture seule)
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-09-16 21:48:51 UTC — LECTURE SEULE
+Mesure le 2026-10-22 03:32:26 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -136,27 +136,27 @@ Mesure le 2026-09-16 21:48:51 UTC — LECTURE SEULE
 
   fonds dev     VL  dollars  conformes  ecarts   hors  nom
   ----- ---- ----- -------- ---------- ------- ------  ---
-   2777 USD     72       13         30      25      4  VETIVA USD FIXED INCOME FU
-   2878 USD     19       13          1       2      3  FCMBAM USD Bond Fund
-   2769 USD     25       12          5       5      3  ALPHA10 DOLLAR FUND
-   2773 USD    113       12         45      16     40  GUARANTY TRUST DOLLAR FUND
-   2772 USD     55       11         22      18      4  GREENWICH FIXED INCOME DOL
+   2777 USD     78       13         30      25     10  VETIVA USD FIXED INCOME FU
+   2878 USD     25       13          1       2      9  FCMBAM USD Bond Fund
+   2769 USD     31       12          5       5      9  ALPHA10 DOLLAR FUND
+   2773 USD    119       12         45      16     46  GUARANTY TRUST DOLLAR FUND
+   2772 USD     61       11         22      18     10  GREENWICH FIXED INCOME DOL
    2768 NGN     71        9         40      20      2  FSL EUROBOND FUND
-   2778 USD    129        9         54      62      4  ZEDCREST DOLLAR FUND
-   2766 USD    120        8         55      53      4  COMERCIO PARTNERS DOLLAR F
+   2778 USD    135        9         54      62     10  ZEDCREST DOLLAR FUND
+   2766 USD    126        8         55      53     10  COMERCIO PARTNERS DOLLAR F
    2856 NGN    131        8         34      87      2  LEAD DOLLAR FIXED INCOME F
    1239 NGN    292        7         78     148     59  NOVA DOLLAR FIXED INCOME F
-   2809 USD     21        6          7       5      3  MYRTLE DOLLAR SHIELD FUND
-   2765 USD    125        4         71      46      4  CARDINALSTONE DOLLAR FUND
-   2770 USD     55        4         31      16      4  CFG AM FIXED INCOME DOLLAR
-   2771 USD     82        4         41      33      4  CORONATION DOLLAR FUND
-   2774 USD    133        4         71      54      4  MERISTEM DOLLAR FUND
-   2775 USD     73        4         51      14      4  PARTHIAN DOLLAR FIXED INCO
-   2776 USD     86        4         55      23      4  STL DOLLAR FUND
-   2876 USD     18        4          9       3      2  First Asset Dollar Fund (R
-   2877 USD     19        4          9       3      3  First Asset Specialized Do
-   2879 USD     19        4          9       3      3  First Asset Blended Dollar
-   2880 USD     18        4          9       2      3  ValuAlliance Specialized D
+   2809 USD     27        6          7       5      9  MYRTLE DOLLAR SHIELD FUND
+   2765 USD    131        4         71      46     10  CARDINALSTONE DOLLAR FUND
+   2770 USD     61        4         31      16     10  CFG AM FIXED INCOME DOLLAR
+   2771 USD     88        4         41      33     10  CORONATION DOLLAR FUND
+   2774 USD    139        4         71      54     10  MERISTEM DOLLAR FUND
+   2775 USD     79        4         51      14     10  PARTHIAN DOLLAR FIXED INCO
+   2776 USD     92        4         55      23     10  STL DOLLAR FUND
+   2876 USD     23        4          9       3      7  First Asset Dollar Fund (R
+   2877 USD     25        4          9       3      9  First Asset Specialized Do
+   2879 USD     25        4          9       3      9  First Asset Blended Dollar
+   2880 USD     24        4          9       2      9  ValuAlliance Specialized D
    1163 NGN    267        1        211      21     34  CARDINALSTONE FIXED INCOME
    1171 NGN    608        1        224       8    375  SFS FIXED INCOME FUND
    1183 NGN    453        1        188      44    220  CORONATION FIXED INCOME FU
