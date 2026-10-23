@@ -1,0 +1,249 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_ACTIVE_WRITER_CONSUMER_MAP_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "e7bd54e703f3d4550ef45a801b1b2ff76dcf2478",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "rules": {
+    "runtime_activity_requires_cron_or_app_evidence": true,
+    "historical_search_hits_are_not_active_writers": true,
+    "source_ingestion_and_derived_recalculation_are_separate_classes": true,
+    "no_writer_change_without_live_schema_and_output_equivalence": true
+  },
+  "active_source_writers": [
+    {
+      "id": "WRITER-MAROC-ASFIM",
+      "country": "MAROC",
+      "entrypoint": "scripts/cron/cron_daily_update.sh step 1",
+      "implementation": "scripts/import/scrape_asfim_import.js",
+      "target": [
+        "fond_investissements",
+        "valorisations"
+      ],
+      "write_mode": "INSERT_IGNORE + fill-empty fund metadata + datejour refresh",
+      "canonical_provenance_contract": "NO",
+      "source_evidence": "ASFIM XLSX API URL is explicit in code, but canonical valorisations rows do not persist source_url/document/hash/batch.",
+      "temporal_fx_semantics": "latest <= target when available; if target precedes FX history, first future FX is used; if no rate resolves, hardcoded EUR/MAD=10.85 and USD/MAD=9.95 fallbacks are used.",
+      "decision": "KEEP_ACTIVE_PIPELINE; ADD_PROVENANCE_AND_TEMPORAL_GATES_ONLY_AFTER_MEASURED_IMPACT"
+    },
+    {
+      "id": "WRITER-NIGERIA-SEC",
+      "country": "NIGERIA",
+      "entrypoint": "scripts/cron/cron_nigeria_weekly.sh steps 1-2",
+      "implementation": "sec_ng_nav_extractor_v6.py + scripts/import/import_vl_nigeria_sec.js",
+      "target": [
+        "fond_investissements",
+        "valorisations"
+      ],
+      "write_mode": "validated batch insert with currency/type/provenance contract",
+      "canonical_provenance_contract": "YES_PARTIAL_COUNTRY_SPECIFIC",
+      "source_evidence": "currency_code, price_type, data_quality, correction_batch, source_url, sec_document_id, report_date written to valorisations.",
+      "temporal_fx_semantics": "Uses shared forex service whose getRate falls back to first future rate when target predates history.",
+      "decision": "KEEP_AND_USE_AS_PROVENANCE_REFERENCE; REMOVE_LOOKAHEAD_ONLY_VIA_TESTED_SHARED_CONTRACT"
+    },
+    {
+      "id": "WRITER-TUNISIA-CMF",
+      "country": "TUNISIE",
+      "entrypoint": "scripts/cron/cron_tunisie_daily.sh",
+      "implementation": "scripts/scraper/cmf_tunisie_daily.py",
+      "target": [
+        "valorisations",
+        "CMF audit/staging tables"
+      ],
+      "write_mode": "quality-controlled insert; extreme changes quarantined; unknown funds queued",
+      "canonical_provenance_contract": "NO_ON_CANONICAL_VALORISATIONS_ROW",
+      "source_evidence": "Parser retains source_file/sheet/row_num and import audit exists, but promoted valorisations insert uses legacy fields only.",
+      "temporal_fx_semantics": "latest <= target; if target predates FX history, first future rate is used.",
+      "decision": "KEEP_PIPELINE; BRIDGE_EXISTING_SOURCE_METADATA_TO_GENERIC_LINEAGE_COMPATIBLY"
+    },
+    {
+      "id": "WRITER-UEMOA-BRVM",
+      "country": "UEMOA",
+      "entrypoint": "scripts/cron/cron_brvm_daily.sh",
+      "implementation": "scripts/scraper/brvm_boc_daily.py",
+      "target": [
+        "brvm_boc_* staging/audit tables",
+        "valorisations"
+      ],
+      "write_mode": "staging with source PDF trace, then promote only matched/quality OK rows; never overwrite conflicts",
+      "canonical_provenance_contract": "STRONG_STAGING_BUT_NOT_CANONICAL_ROW",
+      "source_evidence": "PDF/source trace retained in BRVM staging; promoted valorisations row carries legacy fields only.",
+      "temporal_fx_semantics": "promotion uses latest USD/XOF (or derived latest USD/EUR) globally, not a rate resolved for nav_date.",
+      "decision": "KEEP_STRONG_STAGING_PATTERN; FIX_DATE_SPECIFIC_FX_BEFORE_ANY_HISTORICAL_BACKFILL"
+    },
+    {
+      "id": "WRITER-CEMAC-BVMAC",
+      "country": "CEMAC",
+      "entrypoint": "not certified as active production cron in current cron set",
+      "implementation": "scripts/scraper/bvmac_boc_daily.py",
+      "target": [
+        "bvmac_boc_* staging/audit tables",
+        "valorisations"
+      ],
+      "write_mode": "same guarded staging/promotion pattern as BRVM",
+      "canonical_provenance_contract": "STRONG_STAGING_BUT_NOT_CANONICAL_ROW",
+      "source_evidence": "BOC staging/provenance exists, but production freshness is still Dec 2024.",
+      "temporal_fx_semantics": "promotion uses latest USD/XAF (or latest USD/EUR-derived) globally, not nav_date-specific.",
+      "decision": "KEEP_AS_CANDIDATE_PIPELINE; DO_NOT_ACTIVATE_UNTIL_SOURCE/MAPPING/FX_PREFLIGHT"
+    },
+    {
+      "id": "WRITER-INDEX-DAILY",
+      "country": "MULTI",
+      "entrypoint": "scripts/cron/cron_indices_daily.sh",
+      "implementation": "scripts/scraper/scrape_indices_daily.js",
+      "target": [
+        "indice_references",
+        "valorisations.indRef/indice_name/ID_indice"
+      ],
+      "write_mode": "idempotent index ingestion + propagation to linked VL",
+      "canonical_provenance_contract": "INDEX_SOURCE_CONFIG_ONLY",
+      "source_evidence": "Index source/config exists; propagated VL row does not store selected index source date.",
+      "temporal_fx_semantics": "N/A",
+      "benchmark_temporal_semantics": "Exact date first, otherwise absolute nearest date within 7 days; can select a future index observation.",
+      "decision": "KEEP_INGESTION; MEASURE_FUTURE_DATE_PROPAGATION_BEFORE_CHANGING_MATCH_RULE"
+    }
+  ],
+  "active_derived_writers": [
+    {
+      "id": "DERIVED-FX",
+      "entrypoint": "cron_daily_update step 2 + other crons",
+      "implementation": "scripts/import/scrape_forex_import.js",
+      "target": [
+        "devisedechanges"
+      ],
+      "decision": "KEEP; DATE_SEMANTICS_ARE_UPSTREAM_INPUT"
+    },
+    {
+      "id": "DERIVED-VALUE-FX",
+      "entrypoint": "cron_daily_update step 3",
+      "implementation": "scripts/recalc/recalc_eur_usd_daily_rate.js",
+      "target": [
+        "valorisations value_EUR/value_USD and related derived fields"
+      ],
+      "decision": "KEEP; execute->query protocol fix already deployed, do not replay"
+    },
+    {
+      "id": "DERIVED-TOTAL-RETURN",
+      "entrypoint": "cron_daily_update step 4",
+      "implementation": "scripts/recalc/recalc_vl_ajuste.js",
+      "target": [
+        "valorisations vl_ajuste*"
+      ],
+      "decision": "KEEP; execute->query protocol fix already deployed, do not replay"
+    },
+    {
+      "id": "DERIVED-PERFORMANCE-LOCAL",
+      "entrypoint": "cron_daily_update steps 5-7",
+      "implementation": "HTTP /api/saveperfdatemysql/:a/:b",
+      "target": [
+        "performences"
+      ],
+      "decision": "KNOWN_C8_BOTTLENECK; governed direct-script candidate already equivalence-tested, do not duplicate task"
+    },
+    {
+      "id": "DERIVED-PERFORMANCE-FX",
+      "entrypoint": "cron_daily_update step 8 and cron_daily_eur_usd",
+      "implementation": "scripts/fix/fix_populate_performances_eur_usd.js",
+      "target": [
+        "performences_eurs",
+        "performences_usds"
+      ],
+      "decision": "KEEP; currently more reliable than local path"
+    },
+    {
+      "id": "DERIVED-RANKINGS",
+      "entrypoint": "cron_daily_update step 9 + cron_daily_eur_usd",
+      "implementation": "/api/classementmysql,/api/classementeur,/api/classementusd",
+      "target": [
+        "classementfonds*"
+      ],
+      "decision": "DEPEND_ON_VALID_PERFORMANCES; never recalc rankings before C2/C3/C7/C8 chain is valid"
+    }
+  ],
+  "primary_consumers": [
+    {
+      "domain": "FUND_AND_MANAGER_PAGES",
+      "sources": [
+        "fond_investissements",
+        "societes",
+        "valorisations",
+        "documents",
+        "performences*",
+        "classementfonds*"
+      ],
+      "risk": "route-specific shapes and legacy string joins"
+    },
+    {
+      "domain": "COUNTRY_AND_DISCOVERY_PAGES",
+      "sources": [
+        "fond_investissements",
+        "valorisations",
+        "performences*",
+        "classementfonds*"
+      ],
+      "risk": "stale derived data can look plausible"
+    },
+    {
+      "domain": "ALLOCATION_V2",
+      "sources": [
+        "fond_investissements",
+        "valorisations",
+        "devisedechanges"
+      ],
+      "risk": "provider currently does not load source data_quality/provenance columns; preparation PASS is not production quality certification"
+    },
+    {
+      "domain": "BENCHMARK_COMPARISON",
+      "sources": [
+        "indice_references",
+        "valorisations.indRef*",
+        "fund benchmark mapping"
+      ],
+      "risk": "denormalized propagation may use future nearest index observation"
+    },
+    {
+      "domain": "INSTITUTIONAL_FUTURE",
+      "sources": [
+        "must reuse canonical fund/manager/documents/analytics"
+      ],
+      "risk": "no parallel master/document/analytics stores allowed"
+    }
+  ],
+  "high_confidence_deltas": [
+    {
+      "id": "DELTA-WRITER-001",
+      "severity": "HIGH",
+      "subject": "Temporal no-lookahead contract is not consistently enforced",
+      "evidence": [
+        "forex.service.js getRate returns first available rate if no prior rate exists",
+        "Morocco and Tunisia use equivalent behavior",
+        "index propagation uses absolute nearest date within 7 days",
+        "BRVM/BVMAC use latest FX globally at promotion time"
+      ],
+      "next": "Measure production exposure read-only before any correction."
+    },
+    {
+      "id": "DELTA-WRITER-002",
+      "severity": "HIGH",
+      "subject": "Generic provenance contract is uneven across active country pipelines",
+      "evidence": [
+        "Nigeria writes qualification fields to canonical row",
+        "Tunisia/BRVM retain source evidence in pipeline/audit but not canonical row",
+        "Morocco canonical rows retain no generic source metadata"
+      ],
+      "next": "Design generic lineage bridge preserving existing staging and source-specific metadata."
+    },
+    {
+      "id": "DELTA-WRITER-003",
+      "severity": "MEDIUM",
+      "subject": "Source and derived writers are numerous and must be governed separately",
+      "evidence": [
+        "daily source ingestion, FX, adjusted NAV, local/EUR/USD performance and ranking are distinct stages"
+      ],
+      "next": "Any future task must state whether it changes observation ingestion, transformation, or derived publication."
+    }
+  ],
+  "next_action": "Run read-only temporal-integrity diagnostics and W1 live-schema diagnostics through the existing doc-drift ondemand channel; then produce promotion-ready deltas without mutating task-queue.json."
+}

@@ -1,0 +1,151 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_VIEW_MODEL_CONSUMER_MAP_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "c592bad7e3320296ffbb2874c3b4be91c48fbc8d",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "findings": [
+    {
+      "id": "VM-001",
+      "surface": "FUND_METADATA_SEO",
+      "current_api": "GET /api/getfondbyidmeta/:id",
+      "known_frontend_consumers": [
+        "funds/[fondId]/page.server.ts",
+        "funds/history/[fondId]/page.server.ts",
+        "funds/portfolio/[fondId]/page.server.ts",
+        "funds/documents/[fondId]/page.server.ts",
+        "funds/summary-eur/[fondId]/page.server.ts",
+        "funds/summary-usd/[fondId]/page.server.ts",
+        "funds/download-nav/[fondId]/page.server.ts"
+      ],
+      "decision": "KEEP_CONTRACT_STABLE",
+      "future_adapter": "FundIdentitySEOViewModel",
+      "reason": "This route is a shared SSR metadata dependency; breaking it would regress SEO across multiple fund templates."
+    },
+    {
+      "id": "VM-002",
+      "surface": "FUND_DETAIL_AND_PORTFOLIO_WORKFLOWS",
+      "current_api": "GET /api/getfondbyid/:id",
+      "known_frontend_consumers": [
+        "panel/investor/favorites",
+        "panel/portfolio/favorites",
+        "panel/investor/selected-funds",
+        "panel/portfolio/selected-funds",
+        "panel/investor/reconstruction",
+        "panel/portfolio/reconstruction",
+        "investor/portfolio transaction flows"
+      ],
+      "decision": "KEEP_AND_WRAP",
+      "future_adapter": "FundSelectionViewModel",
+      "reason": "Investor and portfolio areas duplicate consumption patterns; shared client/view model can reduce duplication without route removal."
+    },
+    {
+      "id": "VM-003",
+      "surface": "FUND_MANAGER",
+      "current_api": "GET /api/getSocietebyidfisrt/:id and /api/getSocietebyid/:id",
+      "known_frontend_consumers": [
+        "fund-managers/[fondId]/FundView.tsx",
+        "fund-managers/funds/[fondId]/FundView.tsx",
+        "fund-managers/statistique/[fondId]/FundView.tsx",
+        "panel/management/dashboard",
+        "panel/management/documents",
+        "country-panel/dashboard"
+      ],
+      "decision": "KEEP_AND_MIGRATE_IDENTITY_INCREMENTALLY",
+      "future_adapter": "ManagerViewModel",
+      "risk": "Backend still uses name-based joins in places even though societe_id exists. Do not force ID-only frontend until missing societe_id rows are reconciled."
+    },
+    {
+      "id": "VM-004",
+      "surface": "COUNTRY_FUNDS",
+      "current_api": "/api/getfondbypays and /api/listeproduitpayssociete",
+      "known_frontend_consumers": [
+        "countries/funds/[fondId]/FundView.tsx"
+      ],
+      "decision": "KEEP_AND_ADD_QUALITY_METADATA",
+      "future_adapter": "CountryFundListViewModel",
+      "reason": "Country pages should expose freshness/quality without changing existing filtering/navigation semantics."
+    },
+    {
+      "id": "VM-005",
+      "surface": "FUND_DOCUMENTS",
+      "current_api": "/api/documentsfond",
+      "known_frontend_consumers": [
+        "funds/documents/[fondId]/FundSubView.tsx"
+      ],
+      "decision": "KEEP_AND_EXTEND",
+      "future_adapter": "FundDocumentViewModel",
+      "risk": "Live documents table has only 5 rows and lacks official source/hash/visa metadata; do not design Institutional documents as a second store."
+    },
+    {
+      "id": "VM-006",
+      "surface": "PERFORMANCE_RISK_RANKING",
+      "current_api": "/api/performances*, /api/ratiosnew*, /api/classementquartile*",
+      "known_frontend_consumers": [
+        "funds/[fondId]/FundView.tsx",
+        "funds/performance/[fondId]",
+        "funds/history/[fondId]",
+        "funds/summary-eur/[fondId]",
+        "funds/summary-usd/[fondId]",
+        "portfolio/investor reconstruction settings"
+      ],
+      "decision": "KEEP_OUTPUT_COMPATIBILITY_AND_CONVERGE_INTERNAL_ANALYTICS",
+      "future_adapter": "FundAnalyticsViewModel",
+      "risk": "C2/C3/C7/C8 prove that plausible response shapes are not enough; freshness/quality/data-cutoff must become first-class metadata."
+    },
+    {
+      "id": "VM-007",
+      "surface": "FUNDAFRICA_REFERENCE_API",
+      "current_api": "/api/ref/categories, /api/ref/indices, /api/ref/pays, /api/ref/asset-classes, /api/ref/sources, /api/ref/mapping",
+      "known_frontend_consumers": [],
+      "decision": "KEEP_BACKEND_REFERENCE_AUTHORITY_DO_NOT_FORCE_UI_USAGE",
+      "future_adapter": "ReferenceDataClient when product screens need it",
+      "reason": "Current frontend code search found no direct application consumer for categories/indices/asset-classes/sources/mapping; backend data is live and should not be removed."
+    },
+    {
+      "id": "VM-008",
+      "surface": "ALLOCATION_V2",
+      "current_api": "/api/allocation/** with shared src/lib/allocation.ts frontend client",
+      "known_frontend_consumers": [
+        "Allocation program AF-TASK-012..023"
+      ],
+      "decision": "USE_AS_CONTRACT_PATTERN",
+      "future_adapter": "Existing Allocation V2 contract",
+      "reason": "This is the strongest existing example of an additive stable API/client boundary. Do not duplicate it."
+    }
+  ],
+  "target_view_model_rules": [
+    "View models express financial/business semantics, not table column names.",
+    "Every analytics-bearing view model can expose as_of/data_cutoff and quality/freshness metadata.",
+    "LOCAL/EUR/USD views preserve explicit currency and conversion provenance.",
+    "Fund and ShareClass remain distinct concepts even if legacy pages currently use a single fund route.",
+    "New organisms consume shared clients/view models, not direct DB-shaped payloads.",
+    "Existing public URLs and API contracts remain until every consumer is migrated and regression-tested."
+  ],
+  "atomic_design_dependency": {
+    "blocks_frontend_big_bang": true,
+    "safe_sequence": [
+      "BASELINE_CURRENT_ROUTES_AND_PAGES",
+      "DEFINE_ADDITIVE_VIEW_MODELS",
+      "ADD_SHARED_FRONTEND_CLIENTS",
+      "MIGRATE_ONE_ORGANISM_OR_TEMPLATE_AT_A_TIME",
+      "COMPARE_DATA_SEO_NAVIGATION_BEFORE_AFTER",
+      "DEPRECATE_ONLY_AFTER_ZERO_CONSUMERS"
+    ]
+  },
+  "seo_dependency": {
+    "note": "Fund metadata route is reused by server metadata generation across at least seven fund page templates.",
+    "rule": "Any view-model/API migration must preserve SSR metadata, canonical URL behavior and Schema.org/SEO consumers."
+  },
+  "proposal_links": [
+    "AF-PROP-012",
+    "AF-PROP-013",
+    "AF-PROP-014",
+    "AF-PROP-015",
+    "AF-PROP-021",
+    "AF-PROP-022"
+  ],
+  "next_action": "After W1 data/temporal certification, define additive FundIdentity/FundAnalytics/Manager/Country/Document view-model schemas and migration tests; do not change frontend pages yet."
+}

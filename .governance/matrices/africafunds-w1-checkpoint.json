@@ -1,0 +1,104 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "W1_DISCOVERY_CHECKPOINT_COMPLETE_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api_before_checkpoint": "41f6e89413512f25ac18cc6e4279c783616a97d2",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc",
+    "canonical_branch": "claude/code-review-improvements-ikvuj"
+  },
+  "execution_mode": {
+    "default": "CHATGPT_DIRECT_GITHUB",
+    "codex_default": false,
+    "codex_allowed_only_if_user_explicitly_requests_or_required_capability_missing": true
+  },
+  "governance": {
+    "task_queue": ".governance/loop/task-queue.json",
+    "queue_task_count": 37,
+    "active_claims": [
+      "AF-TASK-017",
+      "AF-TASK-028"
+    ],
+    "protected_surfaces_respected": true,
+    "task_queue_mutated": false,
+    "runtime_mutated": false,
+    "db_mutated": false,
+    "production_write_performed": false
+  },
+  "completed_w1_evidence": [
+    ".governance/matrices/africafunds-w1-foundation-audit.json",
+    ".governance/matrices/africafunds-w1-live-schema-certification.json",
+    ".governance/matrices/africafunds-w1-writer-consumer-map.json",
+    ".governance/matrices/africafunds-w1-lineage-contract-candidate.json",
+    ".governance/matrices/africafunds-w1-view-model-consumer-map.json",
+    ".governance/matrices/africafunds-w1-fund-master-semantic-map.json",
+    ".governance/matrices/africafunds-w1-temporal-certification.json",
+    ".governance/matrices/africafunds-w1-temporal-contract-candidate.json",
+    ".governance/matrices/africafunds-w1-identity-certification.json",
+    ".governance/matrices/africafunds-w1-recent-provenance-certification.json",
+    ".governance/matrices/africafunds-w1-benchmark-remediation-proposal.json",
+    ".governance/matrices/africafunds-w1-nigeria-metadata-transport-proposal.json",
+    ".governance/matrices/africafunds-w1-promotion-ready-deltas.json"
+  ],
+  "runtime_schema_gate": {
+    "observed_at": "2026-10-05T21:52:18.553Z",
+    "DB_SYNC_ALTER": false,
+    "DB_SYNC": false,
+    "DB_SYNC_ALTER_TRUE": "NO",
+    "DB_SYNC_TRUE": "NO",
+    "NODE_ENV": "production",
+    "conclusion": "ORM parity work is no longer blocked by an active runtime sync flag, but any model change still requires governed promotion and tests."
+  },
+  "promotion_ready_deltas": [
+    "W1-DELTA-001 Benchmark temporal integrity",
+    "W1-DELTA-002 Nigeria provenance/type transport",
+    "W1-DELTA-003 Fund/SGO identity reconciliation",
+    "W1-DELTA-004 Generic lineage bridge",
+    "W1-DELTA-005 ORM/live-schema parity",
+    "W1-DELTA-006 Reference-table schema governance",
+    "W1-DELTA-007 Stable view models before Atomic Design",
+    "W1-DELTA-008 Strict FX as-of helper"
+  ],
+  "priority_findings": {
+    "benchmark_lookahead": {
+      "high_confidence_rows": 2027,
+      "funds": 685,
+      "dates": 10,
+      "maroc_rows": 1919,
+      "uemoa_rows": 108
+    },
+    "identity": {
+      "funds_missing_societe_id": 71,
+      "funds_missing_isin": 452,
+      "hard_fk_now": "FORBIDDEN_PENDING_RECONCILIATION"
+    },
+    "nigeria_recent_provenance": {
+      "current_csv_rows": 8627,
+      "source_url_coverage_pct": 100,
+      "vl_price_source_coverage_pct": 100,
+      "current_price_source": "offer_price_fallback",
+      "required_quality": "REVIEW_NOT_OK"
+    },
+    "valuation_schema": {
+      "live_additive_columns_missing_from_orm_model": 15
+    }
+  },
+  "next_governed_transition": {
+    "blocker": "AF-TASK-028 currently claims task-queue.json and projection surfaces.",
+    "rule": "Do not promote new tasks until AF-TASK-028 releases queue ownership or governance explicitly reallocates it.",
+    "when_released": [
+      "Reobserve both HEADs.",
+      "Reload queue/claims and recent commits.",
+      "Deduplicate W1 deltas against work completed in the meantime.",
+      "Promote only verified non-duplicate deltas with dependency, DoR, DoD, evidence and surface claims.",
+      "Start W1-DELTA-001 with code/tests/dry-run only; keep data correction as separate governed phase."
+    ]
+  },
+  "safe_parallel_work_until_queue_release": [
+    "Read-only identity/alias/source reconciliation.",
+    "Read-only consumer and provenance mapping.",
+    "Non-authoritative W2 country-pipeline discovery.",
+    "No code patch on promotion-gated deltas unless explicitly admitted by the live queue."
+  ]
+}

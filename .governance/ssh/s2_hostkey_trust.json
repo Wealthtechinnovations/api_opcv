@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "server": "S2",
+  "trust_model": "TOFU_PINNED_PENDING_OOB",
+  "source": "one-time ssh-keyscan from GitHub-hosted runner; no SSH login",
+  "strict_host_key_checking_required": true,
+  "automatic_key_rotation": false,
+  "oob_verification": "PENDING",
+  "note": "The host key is public material. A future mismatch is a hard failure until independently investigated."
+}

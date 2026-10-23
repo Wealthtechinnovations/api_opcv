@@ -433,7 +433,6 @@ router.get('/api/performancesportefeuillewithindice/fond/:id/:categorie/:date', 
         const perfFindeMois20Ans = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDate20Ans)])
         const perfFindeMoisOrigine = calculatePerformance(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(targetDateOrigine[targetDateOrigine.length - 1])])
 
-        console.log(findLastDateOfPreviousMonth(dates))
         //Performances annualizées fin de mois
         const perfFindeMoisAnnualized1An = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 1, findLastDateOfPreviousMonth(dates)))], 1);
         const perfFindeMoisAnnualized3Ans = calculateAnnualizedPerformanceper100(values[dates.indexOf(findLastDateOfPreviousMonth(dates))], values[dates.indexOf(findNearestDateAnnualized(dates, 3, findLastDateOfPreviousMonth(dates)))], 3);
@@ -480,7 +479,6 @@ router.get('/api/performancesportefeuillewithindice/fond/:id/:categorie/:date', 
         });
 
 
-        console.log(multipliedValues);
         res.json({
           code: 200,
           data: {
@@ -754,7 +752,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1059,7 +1056,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1121,7 +1117,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -1355,8 +1350,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -1398,7 +1391,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1686,7 +1678,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1766,7 +1757,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -1841,7 +1831,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -1921,7 +1910,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -1996,7 +1984,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -2076,7 +2063,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -2152,7 +2138,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -2231,7 +2216,6 @@ router.get('/api/ratiosportefeuille/:year/:id', async (req, res) => {
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -2408,7 +2392,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSSjour);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -2713,7 +2696,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           let Vlsindice = [];
 
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -2775,7 +2757,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
                   const VAR95 = calculateVAR95([...rendementsTableau["3_ans"]], 0.95);
                   const VAR99 = calculateVAR99([...rendementsTableau["3_ans"]], 0.99);
                 
-                console.log(valuesindifref.slice((dates.indexOf(lastPreviousDate)),dates.indexOf(yDate)  + 1))
                   const maxDrawdown = calculateMaxDrawdown(Vls.reverse())
                   const maxDrawdownInd = calculateMaxDrawdown(Vlsindice.reverse())
                   const dsr = calculerDSRAnnualise([...rendementsTableau["3_ans"]], 0)
@@ -3009,8 +2990,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           let donneesGroupéesSS = grouperParSemaine(donneesarray);
           let donneesGroupéesindice = grouperParSemaine(donneesarrayindref);
 
-          console.log(donneesarray);
-          console.log(donneesGroupéesSS)
 
           let donneesGroupéesSSjour = grouperParJour(donneesarray);
           let donneesGroupéesindicejour = grouperParJour(donneesarrayindref);
@@ -3052,7 +3031,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             //let donneestauxPeriodesemaine = tableauDonneestsr.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
 
-            console.log(donneesPeriodesemaine);
 
             let donneesPeriodejour = donneesGroupéesSSjour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicejour = donneesGroupéesindicejour.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3340,7 +3318,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3420,7 +3397,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           const r2 = calculerR2([...rendementsTableau["8_ans"]], [...rendementsTableauindice["8_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -3495,7 +3471,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3575,7 +3550,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           const r2 = calculerR2([...rendementsTableau["10_ans"]], [...rendementsTableauindice["10_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -3650,7 +3624,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3730,7 +3703,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           const r2 = calculerR2([...rendementsTableau["12_ans"]], [...rendementsTableauindice["12_ans"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,
@@ -3806,7 +3778,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           let Vls = [];
           let Vlsindice = [];
           for (let [periode, dateDebut] of Object.entries(periods)) {
-            console.log(donneesGroupéesSS);
 
             let donneesPeriodesemaine = donneesGroupéesSS.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
             let donneesPeriodeindicesemaine = donneesGroupéesindice.filter(d => moment(d.date, 'YYYY-MM-DD').isSameOrAfter(dateDebut) && moment(d.date, 'YYYY-MM-DD').isSameOrBefore(endDate));
@@ -3885,7 +3856,6 @@ router.get('/api/ratiosportefeuilledev/:year/:id/:devise', async (req, res) => {
           const r2 = calculerR2([...rendementsTableau["origine"]], [...rendementsTableauindice["origine"]])
 
 
-          console.log(beta);
 
           res.json({
             code: 200,

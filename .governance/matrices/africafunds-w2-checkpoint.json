@@ -1,0 +1,149 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "W2_DISCOVERY_IN_PROGRESS_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "945f7d3922e4c671bf6901d05dbde18dcc8d973c",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6",
+    "canonical_branch": "claude/code-review-improvements-ikvuj"
+  },
+  "execution_mode": {
+    "default": "CHATGPT_DIRECT_GITHUB",
+    "codex_used": false
+  },
+  "governance": {
+    "single_queue": ".governance/loop/task-queue.json",
+    "task_queue_mutated": false,
+    "active_claims": [
+      "AF-TASK-017",
+      "AF-TASK-028"
+    ],
+    "protected_claims_respected": true,
+    "production_business_write": false,
+    "database_write": false,
+    "new_branch": false
+  },
+  "completed_surfaces": [
+    ".governance/matrices/africafunds-w2-country-pipeline-matrix.json",
+    ".governance/matrices/africafunds-w2-ingestion-contract-candidate.json",
+    ".governance/matrices/africafunds-w2-live-pipeline-certification.json",
+    ".governance/matrices/africafunds-w2-country-operations-ui-map.json",
+    ".governance/matrices/africafunds-w2-country-operations-security-audit.json",
+    ".governance/matrices/africafunds-w2-promotion-ready-deltas.json",
+    ".governance/matrices/africafunds-w2-tier-a-source-discovery.json",
+    ".governance/matrices/africafunds-w2-p1-kenya-ghana-source-dossiers.json",
+    ".governance/matrices/africafunds-w2-p1-pilot-source-map.json",
+    ".governance/matrices/africafunds-w2-market-readiness-matrix.json"
+  ],
+  "market_state": {
+    "MAROC": "L6_ACTIVE_PRODUCTION",
+    "NIGERIA": "L6_ACTIVE_PRODUCTION",
+    "TUNISIE": "L6_ACTIVE_PRODUCTION",
+    "UEMOA": "L6_ACTIVE_PRODUCTION",
+    "CEMAC": "L3_SOURCE_AND_IDENTITY_PREFLIGHT_PASS_DRYRUN_SCOPE_PENDING",
+    "GHANA": "L3_BOUNDED_FIVE_MANAGER_PILOT_FEASIBILITY",
+    "KENYA": "L3_ONE_DIRECT_DAILY_PRICE_PILOT_PLUS_FOUR_SOURCE_CLASSES",
+    "EGYPTE": "L1_OFFICIAL_MIXED_REGISTER_FUND_ONLY_UNIVERSE_PENDING",
+    "AFRIQUE_DU_SUD": "L1_OFFICIAL_CIS_AUTHORITY_PUBLIC_UNIVERSE_EXTRACTION_PENDING",
+    "MAURICE": "L1_CIS_LICENSING_LIFECYCLE_ACTIVE_UNIVERSE_PENDING",
+    "BOTSWANA": "L1_REGULATOR_SOURCE_DISCOVERY",
+    "NAMIBIE": "L1_MANAGER_REGISTRY_DISCOVERY",
+    "ETHIOPIE": "L1_NASCENT_CIS_MARKET_DISCOVERY",
+    "OTHER_REFERENCE_MARKETS": "L0_REFERENCE_ONLY"
+  },
+  "cemac_proven": {
+    "source": "BVMAC official BOC 2026-10-05",
+    "index_refs": 802,
+    "pdf_http": 200,
+    "pdf_pages": 27,
+    "opcvm_pages": [
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "parsed_rows": 23,
+    "parse_failures": 0,
+    "quality": {
+      "OK": 19,
+      "SUSPECT_VARIATION": 4
+    },
+    "canonical_funds": 34,
+    "matched": {
+      "exact": 18,
+      "fuzzy": 1,
+      "unmatched": 4
+    },
+    "mutation": "NONE"
+  },
+  "ghana_kenya": {
+    "GHANA": {
+      "regulator_counts": {
+        "mutual_funds": 53,
+        "unit_trusts": 33,
+        "fund_managers": 83
+      },
+      "sampled_managers": 5,
+      "strong_sources": [
+        "CAL daily dated PRICE",
+        "EDC dated values"
+      ],
+      "caution": [
+        "Brassica explicit BID/OFFER",
+        "SDC history depth pending",
+        "Databank periodic factsheets"
+      ]
+    },
+    "KENYA": {
+      "sampled_managers": 5,
+      "direct_daily_price_candidate": "NCBA",
+      "periodic_or_metadata_candidates": [
+        "Etica",
+        "Britam",
+        "CIC",
+        "KCB"
+      ],
+      "caution": "CMA umbrella/sub-fund/multi-currency grain must not be flattened."
+    }
+  },
+  "pending_measurements": [
+    {
+      "id": "W2-PENDING-001",
+      "diagnostic": "scripts/diag/ondemand/diag_w2_cemac_source_mapping.py via JS wrapper",
+      "expected": "would_insert/skip/conflict/source-duplicate/quality-block + strict as-of XAF FX coverage",
+      "rule": "No staging/cron/canonical write."
+    },
+    {
+      "id": "W2-PENDING-002",
+      "diagnostic": "scripts/diag/ondemand/diag_w2_p1_source_pilots.js",
+      "expected": "S2 HTTP reachability and marker evidence for Ghana CAL, Ghana EDC, Kenya NCBA",
+      "rule": "Reachability does not prove NAV semantics/licence/import permission."
+    }
+  ],
+  "w2_deltas": [
+    "W2-DELTA-001 Country Operations auth/RBAC/ownership",
+    "W2-DELTA-002 Legacy FX HTTP writer and credential retirement",
+    "W2-DELTA-003 CEMAC/BVMAC deployment preflight",
+    "W2-DELTA-004 Country pipeline lineage adoption",
+    "W2-DELTA-005 Country Panel governed import contract",
+    "W2-DELTA-006 Kenya/Ghana source feasibility",
+    "W2-DELTA-007 Country pipeline observability"
+  ],
+  "next_actions_in_order": [
+    "Integrate CEMAC extended dry-run evidence; advance to L4 only if deterministic insert/skip/reject and strict as-of FX are proven.",
+    "Integrate S2 Ghana/Kenya source-pilot reachability without upgrading source semantics from marker counts alone.",
+    "Deepen Egypt/South Africa/Mauritius official-universe reproducibility; keep them L1 until deterministic universe extraction is proven.",
+    "Continue W1 manager identity evidence through country authorities where it directly supports W2 mapping.",
+    "When AF-TASK-028 releases queue surfaces: reobserve both heads, deduplicate W1/W2 deltas against intervening work, then promote only verified non-duplicate scopes."
+  ],
+  "prohibited": [
+    "No connector activation from taxonomy or web research alone.",
+    "No CEMAC staging DDL/cron activation before dry-run proof.",
+    "No country data import from Ghana/Kenya pilots.",
+    "No task-queue change while AF-TASK-028 owns it.",
+    "No edits to AF-TASK-017 surfaces.",
+    "No Codex unless user explicitly requests or direct GitHub capabilities are insufficient."
+  ]
+}

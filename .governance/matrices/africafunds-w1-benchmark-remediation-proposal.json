@@ -1,0 +1,110 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_BENCHMARK_REMEDIATION_PROPOSAL_NOT_TASK",
+  "observed_heads": {
+    "api": "32298a14cf148a751d11198e9889ac962b4eb2c6",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "evidence": {
+    "source": "docs/DIAG_ONDEMAND.md / diag_w1_benchmark_lookahead_scope.js",
+    "observed_at": "2026-10-05T21:40:31.735Z"
+  },
+  "high_confidence_scope": {
+    "total_rows": 2027,
+    "distinct_funds": 685,
+    "distinct_vl_dates": 10,
+    "MAROC": {
+      "rows": 1919,
+      "distinct_funds": 627,
+      "dates": [
+        "2026-09-21",
+        "2026-09-22",
+        "2026-09-23",
+        "2026-09-24",
+        "2026-09-25"
+      ],
+      "future_date": "2026-09-28",
+      "gaps_days": [
+        7,
+        6,
+        5,
+        4,
+        3
+      ],
+      "index": "MASI"
+    },
+    "UEMOA": {
+      "rows": 108,
+      "distinct_funds": 58,
+      "dates": [
+        "2026-06-19",
+        "2026-06-22",
+        "2026-06-23",
+        "2026-06-24",
+        "2026-06-25"
+      ],
+      "future_date": "2026-06-26",
+      "gaps_days": [
+        7,
+        4,
+        3,
+        2,
+        1
+      ],
+      "index": "BRVM"
+    }
+  },
+  "root_cause": {
+    "code": "scripts/scraper/scrape_indices_daily.js",
+    "current_rule": "exact date, otherwise absolute-nearest index date within 7 days",
+    "defect": "Absolute nearest searches both before and after the valuation date, so a future market observation can be attached to an earlier fund valuation.",
+    "target_rule": "exact date, otherwise latest valid index observation <= valuation date within declared tolerance; never future."
+  },
+  "remediation_design": {
+    "phase_1_code_dry_run": [
+      "Extract one tested date-matching helper without changing execution mode.",
+      "Create fixtures exact/prior/future-only/equidistant/weekend/holiday/no-prior.",
+      "Add --dry-run or diagnostic comparison old-vs-new over the exact 2,027-row high-confidence scope.",
+      "Verify unaffected exact/prior rows remain bit-equivalent."
+    ],
+    "phase_2_data_if_authorized": [
+      "Snapshot exactly affected valorisations rows and current indRef/indRef_EUR/indRef_USD/indice metadata.",
+      "Recompute prior-date benchmark values only for rows proven contaminated.",
+      "Use transaction/bounded batch with rollback artifact.",
+      "Recompute indRef_EUR/USD using date-correct FX where required.",
+      "Recompute only dependent benchmark-relative analytics after source correction.",
+      "Re-run C6/C9 plus new temporal validity check and compare unrelated countries/funds."
+    ],
+    "phase_3_quality_gate": [
+      "Add invariant: stored benchmark source date must be <= valuation date.",
+      "Report gap_days and exact/prior carry status.",
+      "Keep coverage and temporal validity as separate controls."
+    ]
+  },
+  "dependencies_and_links": {
+    "preferred_parents": [
+      "AF-PROP-005",
+      "AF-PROP-006",
+      "AF-PROP-025"
+    ],
+    "related_existing_tasks": [
+      "AF-OPS-007",
+      "AF-OPS-008",
+      "AF-TASK-020"
+    ],
+    "blocker": "Do not promote while AF-TASK-028 claims task-queue.json; do not recompute performances/rankings before upstream data chain permits it."
+  },
+  "explicit_exclusions": [
+    "Tunisia 126 future-value coincidences are not in this high-confidence correction scope.",
+    "Nigeria has no measured recent future benchmark contamination.",
+    "C7 scale breaks and C2/C8 are separate issues."
+  ],
+  "no_actions_taken": [
+    "No benchmark value changed",
+    "No source code matcher changed",
+    "No dependent analytics recalculated",
+    "No task queue change"
+  ],
+  "next_action": "After queue/claim gate allows, promote a bounded benchmark temporal-integrity task starting with tested helper + dry-run only; require explicit governed data phase before any row update."
+}

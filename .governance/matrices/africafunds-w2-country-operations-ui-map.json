@@ -1,0 +1,159 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W2_COUNTRY_OPERATIONS_UI_MAP_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "617bacd1c7c6f1868525843d9f72cb5ac96c9e8b",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "frontend_surface": {
+    "root": "src/app/country-panel",
+    "screens": [
+      "dashboard",
+      "fonds",
+      "fonds/details",
+      "fonds/update",
+      "validated-funds",
+      "validated-funds/details",
+      "validated-funds/update",
+      "import-nav",
+      "add-nav",
+      "anomalies",
+      "anomalies/nav-anomalies",
+      "news",
+      "login",
+      "login/register"
+    ],
+    "intent": "Existing country/manager operational workspace for fund review, import, anomalies and maintenance. Reuse as W2 back-office candidate instead of creating a second country admin application."
+  },
+  "observed_frontend_contracts": [
+    {
+      "screen": "dashboard/fonds",
+      "method": "GET",
+      "endpoint": "/api/getfondbyuser/:id?pays=:pays",
+      "client": "direct fetch"
+    },
+    {
+      "screen": "validated-funds",
+      "method": "GET",
+      "endpoint": "/api/getfondbyuservalide/:id?pays=:pays",
+      "client": "direct fetch"
+    },
+    {
+      "screen": "anomalies",
+      "method": "GET",
+      "endpoint": "/api/getallfondsvlanomalie?pays=:pays",
+      "client": "direct fetch"
+    },
+    {
+      "screen": "import-nav",
+      "method": "POST",
+      "endpoint": "/api/importfondsvl",
+      "client": "direct multipart fetch"
+    },
+    {
+      "screen": "country setup",
+      "method": "GET",
+      "endpoint": "/api/getPays",
+      "client": "direct fetch"
+    },
+    {
+      "screen": "country setup",
+      "method": "GET",
+      "endpoint": "/api/getRegulateur?pays=:pays",
+      "client": "direct fetch"
+    },
+    {
+      "screen": "country setup",
+      "method": "GET",
+      "endpoint": "/api/getDevise?pays=:pays",
+      "client": "direct fetch"
+    },
+    {
+      "screen": "login",
+      "method": "POST",
+      "endpoint": "/api/userlogin",
+      "client": "direct fetch"
+    }
+  ],
+  "api_runtime_findings": [
+    {
+      "id": "W2-UI-001",
+      "finding": "Current app.js mounts routes_vl.js, and routes_vl.js transitively mounts routes_vl_admin.js. Country Panel fund-list routes are therefore part of the current monolith route graph.",
+      "state": "CURRENT_RUNTIME_CONTRACT_PRESENT",
+      "proof": "src/routes/routes_vl.js contains require('./routes_vl_admin')(app) around line 5729; live GET probes return HTTP 200."
+    },
+    {
+      "id": "W2-UI-002",
+      "finding": "services/funds/routes.js also contains TODO placeholders for overlapping routes, but that microservice scaffold is not the current production authority.",
+      "state": "LEGACY_DUPLICATE_DO_NOT_ACTIVATE",
+      "proof": "Current PM2 production authority remains app.js monolith; overlapping microservice TODOs must not replace working monolith routes."
+    },
+    {
+      "id": "W2-UI-003",
+      "finding": "Frontend calls /api/importfondsvl but current API repository search did not find an active implementation with that route name.",
+      "state": "CONTRACT_MISSING_OR_RENAMED_CANDIDATE",
+      "rule": "Do not create a new upload route until historical equivalent uploadsfilevl/import logic is mapped and authorization/validation semantics are compared."
+    },
+    {
+      "id": "W2-UI-004",
+      "finding": "routes_vl_admin.js itself contains multiple admin/user mutation/read routes without authenticate at declaration level, while newer PUT routes in the same file use authenticate.",
+      "state": "SECURITY_REVIEW_REQUIRED_BEFORE_MOUNTING",
+      "rule": "Never fix the panel by simply mounting the whole legacy file. Route-by-route RBAC/ownership review is mandatory."
+    },
+    {
+      "id": "W2-UI-005",
+      "finding": "src/lib/api.ts provides a centralized authenticated GET/POST/upload client, but many Country Panel pages still use direct fetch and therefore bypass this common auth/error-handling layer.",
+      "state": "FRONTEND_CONVERGENCE_CANDIDATE",
+      "rule": "Migrate incrementally after API contracts are certified; do not rewrite all screens at once."
+    }
+  ],
+  "target_w2_operational_model": {
+    "keep": [
+      "Existing Country Panel URLs and user workflows where valid.",
+      "Fund Master and country/regulator/currency reference APIs.",
+      "Existing country-specific automated pipelines and audit staging."
+    ],
+    "extend": [
+      "Pipeline health/freshness by country.",
+      "Unmatched fund/alias review.",
+      "Source artifact/lineage review.",
+      "Quality/quarantine review.",
+      "Dry-run import preview before write.",
+      "Country-specific publication lag and source status."
+    ],
+    "migrate": [
+      "Direct fetch calls toward shared authenticated API clients.",
+      "Legacy text identity toward stable fund/societe IDs after reconciliation.",
+      "Generic file import toward country adapter contracts rather than one untyped upload endpoint."
+    ],
+    "do_not": [
+      "Do not migrate Country Panel to inactive services/funds TODO routes; harden the currently mounted monolith routes in place or behind additive compatible adapters.",
+      "Do not create a second Country Panel.",
+      "Do not let a country operator bypass canonical pipeline quality gates.",
+      "Do not allow arbitrary country/pays query parameters to grant cross-country access without RBAC ownership checks."
+    ]
+  },
+  "proposed_view_models": [
+    "CountryPipelineStatusViewModel",
+    "CountryFundReviewViewModel",
+    "UnmatchedFundCandidateViewModel",
+    "SourceArtifactReviewViewModel",
+    "CountryQualityIssueViewModel",
+    "ImportDryRunViewModel"
+  ],
+  "related_intakes": [
+    "AF-INTAKE-CAND-009",
+    "AF-INTAKE-CAND-019",
+    "AF-INTAKE-CAND-020",
+    "AF-INTAKE-CAND-033",
+    "AF-INTAKE-CAND-034"
+  ],
+  "related_proposals": [
+    "AF-PROP-007",
+    "AF-PROP-015",
+    "AF-PROP-023",
+    "AF-PROP-024"
+  ],
+  "next_action": "Certify route-by-route auth/RBAC and import contract semantics for the currently mounted Country Panel. Preserve working URLs; repair security/ownership and missing import contracts additively before frontend convergence."
+}

@@ -1,0 +1,114 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "W1_TEMPORAL_INTEGRITY_PROVEN_READ_ONLY",
+  "observed_heads": {
+    "api": "cb877a2b41a14b0ad246840677b168e10717f52c",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "evidence": {
+    "source": "docs/DIAG_ONDEMAND.md / scripts/diag/ondemand/diag_w1_temporal_integrity.js",
+    "observed_at": "2026-10-05T21:32:55.052Z",
+    "production_mutation_performed": false
+  },
+  "fx_findings": {
+    "code_contract_issue": "Shared/Maroc/Tunisia rate lookup can fall forward to first future rate when no historical prior exists; Morocco also has hardcoded fallback rates.",
+    "measured_historical_exposure": {
+      "MAROC_EUR_MAD_before_first_rate": 0,
+      "MAROC_USD_MAD_before_first_rate": 0,
+      "TUNISIE_EUR_TND_before_first_rate": 0,
+      "TUNISIE_USD_TND_before_first_rate": 0
+    },
+    "verdict": "CODE_DEFECT_PRESENT_BUT_NO_PREHISTORY_EXPOSURE_MEASURED_FOR_MAROC_TUNISIA",
+    "action": "Remove future fallback in shared/historical paths before Allocation backtesting or any data backfill, with null/fail-closed semantics and reference tests. No emergency rewrite of current Morocco/Tunisia values is justified by this specific prehistory check."
+  },
+  "benchmark_findings": {
+    "window_days": 120,
+    "by_country": {
+      "MAROC": {
+        "rows": 19022,
+        "exact": 15865,
+        "stored_matches_latest_prior": 17103,
+        "stored_matches_future": 1919,
+        "future_nearest_candidate": 1919,
+        "no_series": 0
+      },
+      "TUNISIE": {
+        "rows": 6419,
+        "exact": 6293,
+        "stored_matches_latest_prior": 6293,
+        "stored_matches_future": 126,
+        "future_nearest_candidate": 0,
+        "no_series": 0
+      },
+      "UEMOA": {
+        "rows": 1605,
+        "exact": 1489,
+        "stored_matches_latest_prior": 1489,
+        "stored_matches_future": 116,
+        "future_nearest_candidate": 108,
+        "no_series": 0
+      },
+      "NIGERIA": {
+        "rows": 211,
+        "exact": 211,
+        "stored_matches_latest_prior": 211,
+        "stored_matches_future": 0,
+        "future_nearest_candidate": 0,
+        "no_series": 0
+      }
+    },
+    "proven_examples": "UEMOA rows dated 2026-06-19 store BRVM values from 2026-06-26, gap +7 days, across multiple fund IDs.",
+    "verdict": "BENCHMARK_TEMPORAL_LOOKAHEAD_PROVEN",
+    "interpretation": [
+      "MAROC: the 1,919 stored future matches equal the 1,919 rows for which absolute-nearest would choose a future point; strong direct evidence of current matching-rule contamination.",
+      "UEMOA: 116 stored future matches and 108 future-nearest candidates; direct examples show +7-day future BRVM value.",
+      "TUNISIE: 126 stored values match a future observation, but current absolute-nearest candidate count is zero; do not attribute all 126 to the current nearest-date algorithm without separate historical-path analysis.",
+      "NIGERIA: no future benchmark match measured in the window."
+    ]
+  },
+  "impact": {
+    "affects": [
+      "benchmark comparison",
+      "base-100 benchmark curves",
+      "tracking error",
+      "relative ratios potentially consuming indRef",
+      "future institutional/allocation benchmark analytics if reused"
+    ],
+    "does_not_directly_prove": [
+      "C7 NAV scale breaks",
+      "C2 orphan performance heads",
+      "C8 local performance staleness"
+    ],
+    "current_quality_metrics_caveat": "C6/C9 measure benchmark presence, not temporal validity. A populated future benchmark can pass coverage while being wrong for the valuation date."
+  },
+  "remediation_candidate": {
+    "priority": "P0_DATA_INTEGRITY",
+    "status": "PROPOSAL_NOT_TASK",
+    "parent_candidates": [
+      "AF-PROP-005",
+      "AF-PROP-006",
+      "AF-PROP-025"
+    ],
+    "code_rule": "Exact date first; otherwise latest index observation <= valuation date within the declared tolerance. Never choose a future observation.",
+    "data_rule": "Do not bulk overwrite existing indRef blindly. First identify exact contaminated rows, snapshot them, recompute expected prior-date value, compare outputs, and define rollback.",
+    "derived_rule": "After any approved correction, recompute only dependent benchmark-derived values/ratios necessary for affected rows and verify equivalence elsewhere.",
+    "quality_rule": "Add a future benchmark temporal-integrity invariant distinct from simple C6/C9 coverage.",
+    "promotion_gate": [
+      "AF-TASK-028 releases task-queue/projection claim or existing task is explicitly extended through governed queue.",
+      "Exact contaminated row scope and unique fund/date counts measured.",
+      "Dry-run old-vs-new match comparison available.",
+      "Snapshot/rollback path defined.",
+      "Consumers of indRef/indRef_EUR/indRef_USD mapped.",
+      "No collision with AF-TASK-017."
+    ]
+  },
+  "no_actions_taken": [
+    "No index values changed",
+    "No valorisations updated",
+    "No scraper behavior changed",
+    "No rankings/ratios recalculated",
+    "No task queue mutation"
+  ],
+  "next_action": "Measure exact contaminated row/fund/date scope and recent provenance; prepare a dry-run remediation contract, but do not alter data or active scraper until governed promotion/claim is available."
+}

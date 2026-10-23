@@ -1,0 +1,459 @@
+/**
+ * Combien de categories ont un classement qui n est PAS une permutation de
+ * 1..N ? Et par quel mecanisme ?
+ *
+ * CE QUE LA MESURE A ETABLI. Le 2026-10-15 19:08 UTC, sur DIVERSIFIE MAROC :
+ *
+ *   141 lignes | 140 rangs distincts | rang max 141
+ *   doublon : rang 81 porte par [594] WG DYNAMIC ET [828] FCP CAPITAL BALANCE
+ *   trou    : rang 80 porte par personne
+ *   aucun fonds ecarte pour ytd nul : le denominateur n est pas la cause
+ *
+ * Ce n est donc pas « un fonds mal classe ». C est une **numerotation
+ * invalide** : le rang 80 est vacant et le rang 81 est double.
+ *
+ * ET VOICI CE QUE CELA DIT DU CALCUL. `rankFundInList` fait
+ * `validPerformances.findIndex(f => f.fond_id === fundId) + 1` : dans UN appel,
+ * deux fonds distincts occupent forcement deux indices distincts. Un doublon ne
+ * peut donc pas naitre d un seul appel. Or la route appelle `calculateRankNational`
+ * **une fois par fonds**, en rejouant sa requete SQL a chaque fois
+ * (`ranking.service.js:87-100`). Les rangs ecrits ne proviennent pas d un
+ * classement unique : ils proviennent de ~1 245 classements independants.
+ *
+ * DEUX MECANISMES PLAUSIBLES, ET IL NE FAUT PAS CHOISIR PAR PREFERENCE.
+ *
+ *   (i) COMPARATEUR QUI REND NaN. `ytd` est un `varchar(255)` (mesure L0.d) et
+ *       le tri fait `b[period] - a[period]`. Une valeur non numerique qui n est
+ *       ni `null`, ni `'-'`, ni vide — par exemple « 1,234 » avec une virgule,
+ *       ou une chaine d espaces — donne NaN. Un comparateur qui rend NaN produit
+ *       un ordre **non specifie** : deux appels successifs peuvent classer
+ *       differemment, d ou un rang double et un rang vacant.
+ *
+ *  (ii) INSTANTANE INCOHERENT. Entre le premier et le dernier des 1 245 appels,
+ *       la table `performences` peut etre ecrite — le cron recalcule les
+ *       performances juste avant les classements. Chaque appel voit alors un
+ *       jeu de donnees legerement different, et l union des rangs n est plus une
+ *       permutation.
+ *
+ * L ENJEU. Si c est (i), le correctif est local : assainir le comparateur. Si
+ * c est (ii), le correctif est structurel : calculer le classement d une
+ * categorie en UNE passe au lieu d un appel par fonds. Les deux sont du gros
+ * oeuvre sur une route de production : ce script ne fait que mesurer, pour que
+ * la decision repose sur des chiffres et non sur une intuition.
+ *
+ * CE QU IL MESURE :
+ *   1. l ampleur — combien de categories, sur les trois tables de classement,
+ *      ont des doublons ou des trous, et combien de rangs sont concernes ;
+ *   2. les valeurs `ytd` non numeriques, qui testent le mecanisme (i) ;
+ *   3. pour la categorie temoin, si les deux fonds du rang double ont des `ytd`
+ *      qui se comparent proprement.
+ *
+ * CONCLUSION MESUREE LE 2026-10-21 20:1x UTC, apres reparation de ce controle.
+ *
+ * Ce script rendait « 0 categorie d au moins 5 fonds → toutes les numerotations
+ * sont propres » sur les deux tables devise, qui portent 3 643 lignes chacune.
+ * Critere VIDE affiche en vert. Cause : il choisissait la colonne de categorie
+ * par PRESENCE, et `categorie_nationale` — premiere de la liste — est nulle sur
+ * 3 643 lignes sur 3 643 dans ces tables.
+ *
+ * Une fois le perimetre rempli, il a affiche l inverse : 13 groupes sur 19 hors
+ * permutation, 233 rangs doubles, « defaut STRUCTUREL ». C etait faux aussi. La
+ * vraie cle de regroupement n est stockee dans aucune des deux tables : c est la
+ * categorie nationale du FONDS. Mesure finale :
+ *
+ *   classementfonds_eurs  JOIN fond_investissements.categorie_national
+ *     → 22 groupes, 0 hors permutation, 0 doublon, 0 trou   PROPRE
+ *   classementfonds_usds  idem                              PROPRE
+ *   classementfonds       categorie_nationale (stockee, 3622/3622)
+ *     → 22 groupes, 1 hors permutation, 7 doublons, 7 trous
+ *
+ * Donc : les classements EUR et USD sont des permutations propres de 1..N. Le
+ * seul defaut de numerotation reel est en devise LOCALE, sur une categorie sur
+ * vingt-deux — DIVERSIFIE MAROC, rang 80 vacant et rang 81 double.
+ *
+ * Les deux erreurs etaient les miennes, dans ce script, et dans les deux sens :
+ * un controle qui dort et un controle qui crie au loup se valent. Il essaie
+ * maintenant chaque cle disponible — colonnes stockees, leur composee, et les
+ * categories du fonds par jointure — NOMME celle qu il retient, et ne parle de
+ * defaut que sous la cle la plus propre existante.
+ *
+ * LECTURE SEULE : uniquement des SELECT.
+ *
+ * USAGE  node scripts/diag/ondemand/diag_rangs_permutation_invalide.js
+ */
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../../.env') });
+const mysql = require('mysql2/promise');
+
+const DB = {
+  host: process.env.DB_HOST || '127.0.0.1',
+  user: process.env.DB_USER || 'fund_opcvm',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'fund_opcvm',
+  charset: 'utf8mb4',
+};
+
+// Les trois tables, et la colonne de rang qui correspond a `ytd`.
+const TABLES = [
+  { t: 'classementfonds', r: 'rank1erJanvier', p: 'performences' },
+  { t: 'classementfonds_eurs', r: 'rank1erJanvier', p: 'performences_eurs' },
+  { t: 'classementfonds_usds', r: 'rank1erJanvier', p: 'performences_usds' },
+];
+
+// Colonnes de categorie possibles, par ordre de preference. La requete
+// d origine prenait `categorie_nationale` pour acquis sur les trois tables ;
+// sur les tables devise elle rendait zero categorie, et le script concluait
+// « toutes les numerotations sont propres ». Zero categorie JUGEE ne veut pas
+// dire zero defaut : cela veut dire que le critere est VIDE. On decouvre donc
+// la colonne reellement presente, et on le dit.
+const CANDIDATS_CATEGORIE = [
+  'categorie_nationale', 'categorie_national', 'categorie',
+  'categorie_regionale', 'categorie_afrique', 'categorie_globale',
+  'categorie_interne', 'categorie_fundafrica',
+];
+
+// Sortie non nulle si un perimetre se revele vide : un controle vide doit
+// echouer bruyamment, pas rendre du vert. C est exactement le piege que ce
+// depot a deja paye deux fois (perimetre de C10, seuils de C4).
+let perimetresVides = 0;
+
+// Statistiques de permutation pour UNE cle de regroupement donnee.
+// Existe parce que la mesure du 2026-10-21 19:57 UTC est ambigue : groupees par
+// `categorie_regionale`, les tables devise montrent 13 categories sur 19 hors
+// permutation et 233 rangs doubles — mais avec `max = distincts` et ZERO trou,
+// ce qui est la signature d une AGREGATION de plusieurs groupes de classement,
+// pas d une numerotation cassee. Si les rangs ont ete calcules par categorie
+// nationale et qu on les regroupe par region, les doublons sont attendus par
+// construction. La bonne cle est celle sous laquelle la numerotation EST une
+// permutation : on les essaie toutes et on laisse les chiffres trancher.
+async function statsPourCle(conn, t, r, exprCle, clauseType) {
+  const [rows] = await conn.query(
+    `SELECT ${exprCle} AS cat, COUNT(*) AS n,
+            COUNT(DISTINCT \`${r}\`) AS distincts,
+            MAX(CAST(\`${r}\` AS UNSIGNED)) AS maxrang
+       FROM \`${t}\`
+      WHERE ${clauseType} ${exprCle} IS NOT NULL AND ${exprCle} <> ''
+        AND \`${r}\` IS NOT NULL
+      GROUP BY ${exprCle}
+     HAVING n >= 5
+      ORDER BY n DESC`);
+  let invalides = 0, doublons = 0, trous = 0;
+  for (const c of rows) {
+    const n = Number(c.n), d = Number(c.distincts), mx = Number(c.maxrang);
+    if (n === d && mx === n) continue;
+    invalides++; doublons += (n - d); trous += (mx - d);
+  }
+  return { groupes: rows.length, invalides, doublons, trous, rows };
+}
+
+async function colonnesDe(conn, table) {
+  const [rows] = await conn.query(
+    `SELECT COLUMN_NAME AS c, DATA_TYPE AS t
+       FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?
+      ORDER BY ORDINAL_POSITION`, [table]);
+  return rows.map(r => ({ c: String(r.c), t: String(r.t) }));
+}
+
+(async () => {
+  console.log('=== LES CLASSEMENTS STOCKES SONT-ILS DES PERMUTATIONS DE 1..N ? ===');
+  console.log(`Mesure le ${new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC — LECTURE SEULE\n`);
+
+  const conn = await mysql.createConnection(DB);
+  try {
+    // ---- 1. Ampleur, sur les trois tables -------------------------------
+    for (const { t, r } of TABLES) {
+      console.log(`## ${t}`);
+      let categories = [];
+      let colCat = null, totalLignes = 0;
+      try {
+        const cols = await colonnesDe(conn, t);
+        if (!cols.length) {
+          console.log(`  ECHEC : table absente ou illisible. CRITERE VIDE.\n`);
+          perimetresVides++;
+          continue;
+        }
+        const noms = new Set(cols.map(x => x.c));
+        // MESURE DU 2026-10-21 19:50 UTC : sur les tables devise, les colonnes
+        // reellement renseignees sont `categorie` (3 590/3 643) et
+        // `categorie_regionale` (3 621/3 643) ; `categorie_nationale` est a
+        // 0/3 643. Choisir par PRESENCE tombait donc sur la seule colonne vide
+        // des trois, et vidait le perimetre. On choisit par REMPLISSAGE, et on
+        // dit lequel.
+        const presentsCat = CANDIDATS_CATEGORIE.filter(x => noms.has(x));
+        let remplissage = {};
+        if (presentsCat.length) {
+          const sel = presentsCat
+            .map(x => `SUM(\`${x}\` IS NOT NULL AND \`${x}\` <> '') AS \`${x}\``)
+            .join(', ');
+          const [rem] = await conn.query(`SELECT ${sel} FROM \`${t}\``);
+          for (const x of presentsCat) remplissage[x] = Number(rem[0][x]);
+          const trie = presentsCat.slice().sort((a, b) => remplissage[b] - remplissage[a]);
+          colCat = remplissage[trie[0]] > 0 ? trie[0] : null;
+        }
+        const aTypeClassement = noms.has('type_classement');
+        // `conn.query` rend [rows, fields] : un niveau d enveloppe de trop
+        // donnait `NaN lignes` dans la sortie du 2026-10-21 19:37 UTC.
+        const [cnt] = await conn.query(`SELECT COUNT(*) AS n FROM \`${t}\``);
+        totalLignes = Number(cnt[0].n);
+
+        if (!noms.has(r)) {
+          console.log(`  ECHEC : colonne de rang \`${r}\` absente.`
+            + ` Colonnes presentes : ${cols.map(x => x.c).join(', ')}`);
+          console.log(`  CRITERE VIDE — rien n a ete juge sur ${totalLignes} lignes.\n`);
+          perimetresVides++;
+          continue;
+        }
+        if (!colCat) {
+          console.log(`  ECHEC : aucune colonne de categorie RENSEIGNEE.`
+            + ` Remplissage mesure : ${JSON.stringify(remplissage)}.`
+            + ` Colonnes presentes : ${cols.map(x => x.c).join(', ')}`);
+          console.log(`  CRITERE VIDE — rien n a ete juge sur ${totalLignes} lignes.\n`);
+          perimetresVides++;
+          continue;
+        }
+        console.log(`  ${totalLignes} lignes | categorie lue dans \`${colCat}\``
+          + ` (rempli ${remplissage[colCat]}/${totalLignes})`
+          + ` | type_classement ${aTypeClassement ? 'present' : 'ABSENT (filtre omis)'}`);
+        const vides = Object.entries(remplissage).filter(([, v]) => v === 0).map(([k]) => k);
+        if (vides.length) {
+          console.log(`  colonne(s) de categorie presente(s) mais JAMAIS renseignee(s) : `
+            + vides.join(', ') + ' — a signaler, pas a contourner en silence');
+        }
+
+        // Le filtre sur `type_classement` n est applique que si la colonne
+        // existe : l imposer a une table qui ne l a pas vidait le perimetre.
+        const clauseType = aTypeClassement ? 'type_classement = 1 AND' : '';
+
+        // Quelle cle de regroupement rend la numerotation propre ?
+        const remplis = presentsCat.filter(x => remplissage[x] > 0);
+        const cles = remplis.map(x => ({ nom: x, expr: `\`${x}\`` }));
+        if (remplis.length > 1) {
+          cles.push({
+            nom: remplis.join(' + '),
+            expr: `CONCAT_WS('\u241F', ${remplis.map(x => `\`${x}\``).join(', ')})`,
+          });
+        }
+        // DERNIERE POSSIBILITE avant de conclure au defaut : la vraie cle n est
+        // peut-etre pas STOCKEE dans la table de classement, mais lue par
+        // jointure depuis le fonds. `classementfonds` porte
+        // `categorie_nationale` et s avere propre avec elle (1/22, contre 8/11
+        // et 9/15 pour les autres cles) ; les tables devise ne la portent pas.
+        // Mesure du 2026-10-21 20:0x UTC : affiner la cle avec la composee ne
+        // nettoie PAS (233 → 201 doublons, toujours 13 groupes sur 19), donc
+        // l hypothese « cle trop grossiere » est ecartee. Il reste a verifier
+        // que le defaut ne vient pas d une cle externe a la table.
+        try {
+          const colsF = await colonnesDe(conn, 'fond_investissements');
+          const catsF = colsF.map(x => x.c).filter(c => /categorie/i.test(c));
+          for (const cf of catsF) {
+            cles.push({
+              nom: `JOIN fond_investissements.${cf}`,
+              expr: `(SELECT f.\`${cf}\` FROM fond_investissements f
+                       WHERE f.id = \`${t}\`.fond_id)`,
+            });
+          }
+          if (catsF.length) {
+            console.log(`  (cles externes essayees aussi, depuis`
+              + ` fond_investissements : ${catsF.join(', ')})`);
+          }
+        } catch (e) {
+          console.log(`  (cles externes indisponibles : ${e.message})`);
+        }
+
+        // MESURE DU 2026-10-21 20:1x UTC — LE VERDICT SE REND SUR LA BONNE CLE.
+        // Resultat decisif : sur classementfonds_eurs ET _usds,
+        //   JOIN fond_investissements.categorie_national
+        //     → 22 groupes, 0 hors permutation, 0 doublon, 0 trou.
+        // Les classements devise SONT des permutations propres de 1..N. La vraie
+        // cle est la categorie nationale du FONDS, que ces tables ne
+        // denormalisent pas. Mes « 233 doublons structurels » etaient l artefact
+        // d un regroupement par `categorie_regionale` — une alerte fausse, et un
+        // controle qui crie au loup ne vaut pas mieux qu un controle qui dort.
+        // On retient donc la cle la plus propre, on la NOMME, et c est elle qui
+        // porte le verdict.
+        console.log('  Cles de regroupement essayees — la bonne est celle qui rend'
+          + ' une permutation propre :');
+        let meilleure = null;
+        for (const k of cles) {
+          try {
+            const st = await statsPourCle(conn, t, r, k.expr, clauseType);
+            const propre = st.groupes > 0 && st.invalides === 0;
+            console.log(`    ${k.nom.padEnd(38)} ${String(st.groupes).padStart(4)} groupes`
+              + ` | ${String(st.invalides).padStart(4)} hors permutation`
+              + ` | ${String(st.doublons).padStart(4)} doublon(s)`
+              + ` | ${String(st.trous).padStart(4)} trou(s)`
+              + (propre ? '   ← PROPRE' : ''));
+            if (!st.groupes) continue;
+            if (!meilleure
+                || st.invalides < meilleure.st.invalides
+                || (st.invalides === meilleure.st.invalides
+                    && st.doublons < meilleure.st.doublons)) {
+              meilleure = { k, st };
+            }
+          } catch (e) {
+            console.log(`    ${k.nom.padEnd(38)} (echec : ${e.message})`);
+          }
+        }
+        if (!meilleure) {
+          console.log('  ECHEC : aucune cle de regroupement ne rend de groupe'
+            + ` d au moins 5 fonds sur ${totalLignes} lignes. CRITERE VIDE.\n`);
+          perimetresVides++;
+          continue;
+        }
+        console.log(`  Cle retenue pour le verdict : ${meilleure.k.nom}`
+          + (meilleure.st.invalides === 0
+            ? ' — numerotation propre sous cette cle.'
+            : ` — ${meilleure.st.invalides} groupe(s) hors permutation subsistent`
+              + ' sous la cle la PLUS propre disponible : c est un vrai defaut.'));
+        categories = meilleure.st.rows;
+      } catch (e) {
+        console.log(`  ECHEC : table non interrogeable : ${e.message}`);
+        console.log(`  CRITERE VIDE — rien n a ete juge.\n`);
+        perimetresVides++;
+        continue;
+      }
+
+      if (!categories.length) {
+        // MESURE DU 2026-10-21 19:37 UTC : sur les tables devise, les colonnes
+        // `categorie_nationale` ET `type_classement` sont bien PRESENTES. Ma
+        // cause supposee — une colonne manquante — est donc FAUSSE. Le
+        // perimetre se vide ailleurs, et seul un decompte clause par clause
+        // peut dire ou. Pas de nouvelle hypothese : des chiffres.
+        try {
+          const colCatE = colCat, rE = r;
+          const [d] = await conn.query(
+            `SELECT COUNT(*) AS total,
+                    SUM(type_classement = 1) AS type1,
+                    SUM(\`${colCatE}\` IS NOT NULL AND \`${colCatE}\` <> '') AS avecCat,
+                    SUM(\`${rE}\` IS NOT NULL) AS avecRang,
+                    COUNT(DISTINCT type_classement) AS typesDistincts,
+                    COUNT(DISTINCT \`${colCatE}\`) AS catsDistinctes
+               FROM \`${t}\``);
+          const x = d[0];
+          console.log(`  Decompte clause par clause, pour savoir OU le perimetre se vide :`);
+          console.log(`    lignes totales                         ${x.total}`);
+          console.log(`    dont type_classement = 1               ${x.type1}`);
+          console.log(`    dont categorie non vide                ${x.avecCat}`);
+          console.log(`    dont \`${rE}\` non nul   ${x.avecRang}`);
+          console.log(`    valeurs distinctes de type_classement  ${x.typesDistincts}`);
+          console.log(`    categories distinctes                  ${x.catsDistinctes}`);
+          const [vals] = await conn.query(
+            `SELECT type_classement AS v, COUNT(*) AS n FROM \`${t}\`
+              GROUP BY type_classement ORDER BY n DESC LIMIT 6`);
+          console.log(`    repartition de type_classement : `
+            + vals.map(v => `${JSON.stringify(v.v)}=${v.n}`).join(', '));
+          const [cats] = await conn.query(
+            `SELECT \`${colCatE}\` AS c, COUNT(*) AS n FROM \`${t}\`
+              GROUP BY \`${colCatE}\` ORDER BY n DESC LIMIT 6`);
+          console.log(`    categories les plus peuplees : `
+            + cats.map(c => `${JSON.stringify(c.c)}=${c.n}`).join(', '));
+          // MESURE DU 2026-10-21 19:44 UTC : `categorie_nationale` est nulle
+          // sur 3 643 lignes sur 3 643, dans les deux tables devise. La colonne
+          // existe, elle n est jamais renseignee. La question devient donc :
+          // quelle colonne porte reellement le regroupement ici ? On compte le
+          // remplissage de CHAQUE colonne candidate, et on liste la structure,
+          // plutot que de deviner laquelle essayer ensuite.
+          const cols2 = await colonnesDe(conn, t);
+          const presents = CANDIDATS_CATEGORIE.filter(x => cols2.some(y => y.c === x));
+          if (presents.length) {
+            const sel = presents
+              .map(x => `SUM(\`${x}\` IS NOT NULL AND \`${x}\` <> '') AS \`${x}\``)
+              .join(', ');
+            const [rem] = await conn.query(`SELECT ${sel} FROM \`${t}\``);
+            console.log('    remplissage des colonnes de categorie candidates :');
+            for (const k of presents) {
+              const v = Number(rem[0][k]);
+              console.log(`      ${k.padEnd(24)} ${v} / ${x.total}`
+                + (v === 0 ? '   ← jamais renseignee' : ''));
+            }
+          }
+          console.log(`    structure de la table : `
+            + cols2.map(y => `${y.c}:${y.t}`).join(', '));
+        } catch (e) {
+          console.log(`    (decompte impossible : ${e.message})`);
+        }
+        // LE POINT DE CE LOT. Zero categorie d au moins 5 fonds sur une table
+        // qui porte des milliers de lignes n est pas un resultat vert, c est un
+        // controle qui ne mesure rien. On le dit, et on sort non nul.
+        console.log(`  ECHEC : 0 categorie d au moins 5 fonds retenue, alors que la`
+          + ` table porte ${totalLignes} lignes.`);
+        console.log(`  CRITERE VIDE — ce n est PAS « toutes propres ». Le perimetre`
+          + ` est vide : filtre ou colonne de categorie a revoir.\n`);
+        perimetresVides++;
+        continue;
+      }
+      let invalides = 0, rangsEnTrop = 0;
+      const exemples = [];
+      for (const c of categories) {
+        const n = Number(c.n), d = Number(c.distincts), mx = Number(c.maxrang);
+        // Une permutation propre de 1..N : N lignes, N rangs distincts, max = N.
+        const propre = n === d && mx === n;
+        if (propre) continue;
+        invalides++;
+        rangsEnTrop += (n - d);
+        if (exemples.length < 8) {
+          exemples.push(`${String(c.cat).slice(0, 30)} : ${n} lignes, ${d} distincts, max ${mx}`
+            + ` → ${n - d} doublon(s), ${mx - d} trou(s)`);
+        }
+      }
+      console.log(`  ${categories.length} categories d au moins 5 fonds`
+        + ` | ${invalides} dont la numerotation n est PAS une permutation de 1..N`
+        + ` | ${rangsEnTrop} rang(s) double(s) au total`);
+      for (const e of exemples) console.log(`    ${e}`);
+      console.log(`  → ${invalides === 0
+        ? `toutes les numerotations sont propres sur les ${categories.length} categories JUGEES.`
+        : invalides > categories.length * 0.1
+          ? 'ce n est pas un accident isole : le defaut est STRUCTUREL.'
+          : 'defaut circonscrit a quelques categories.'}\n`);
+    }
+
+    // ---- 2. Le mecanisme (i) : des ytd non numeriques ? -----------------
+    // `null`, `'-'` et `''` sont deja ecartes par `rankFundInList`. Ce qui
+    // casserait le tri, c est une valeur qui PASSE ce filtre et donne NaN.
+    console.log('## Mecanisme (i) — valeurs ytd qui passent le filtre et donnent NaN');
+    for (const { p } of TABLES) {
+      try {
+        const [d] = await conn.query(
+          `SELECT COUNT(*) AS suspectes
+             FROM \`${p}\`
+            WHERE ytd IS NOT NULL AND ytd <> '-' AND ytd <> ''
+              AND ytd NOT REGEXP '^-?[0-9]+(\\\\.[0-9]+)?([eE][-+]?[0-9]+)?$'`);
+        const [ech] = await conn.query(
+          `SELECT DISTINCT ytd FROM \`${p}\`
+            WHERE ytd IS NOT NULL AND ytd <> '-' AND ytd <> ''
+              AND ytd NOT REGEXP '^-?[0-9]+(\\\\.[0-9]+)?([eE][-+]?[0-9]+)?$'
+            LIMIT 5`);
+        console.log(`  ${p.padEnd(20)} ${d[0].suspectes} valeur(s) non numerique(s)`
+          + (ech.length ? ` | exemples : ${ech.map(x => JSON.stringify(x.ytd)).join(', ')}` : ''));
+      } catch (e) {
+        console.log(`  ${p.padEnd(20)} non interrogeable : ${e.message}`);
+      }
+    }
+    console.log('  → si ce compte est nul partout, le mecanisme (i) est ecarte et il reste');
+    console.log('    (ii) : un instantane incoherent entre les ~1 245 appels de la route.\n');
+
+    // ---- 3. La categorie temoin -----------------------------------------
+    const [temoin] = await conn.execute(`
+      SELECT fond_id, ytd FROM performences
+       WHERE fond_id IN (594, 828)
+         AND date = (SELECT MAX(date) FROM performences p2 WHERE p2.fond_id = performences.fond_id)`);
+    console.log('## Categorie temoin — les deux fonds du rang double');
+    for (const r of temoin) {
+      const n = Number(r.ytd);
+      console.log(`  [${r.fond_id}] ytd = ${JSON.stringify(r.ytd)}`
+        + ` | Number() = ${n} | numerique : ${Number.isFinite(n) ? 'OUI' : 'NON'}`);
+    }
+    console.log('  → deux ytd numeriques et differents ne peuvent pas donner le meme rang');
+    console.log('    dans un seul appel : la cause est dans le fait qu il y a 1 245 appels.');
+  } finally {
+    await conn.end();
+  }
+  if (perimetresVides) {
+    console.log(`\n=== ECHEC DU CONTROLE : ${perimetresVides} perimetre(s) VIDE(S) ===`);
+    console.log('Un controle qui ne juge rien ne doit pas rendre du vert. Tant qu un');
+    console.log('perimetre est vide, cette table n est PAS attestee : elle est');
+    console.log('simplement non mesuree, et la difference est tout le sujet.');
+  }
+  console.log('\n=== FIN — aucune ecriture effectuee ===');
+  if (perimetresVides) process.exitCode = 2;
+})().catch(e => { console.error('ECHEC :', e.message); process.exit(1); });

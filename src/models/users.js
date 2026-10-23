@@ -41,6 +41,14 @@ module.exports = (sequelize, DataTypes) => {
     typeusers_id: {
       type: DataTypes.STRING(255),
     },
+    reset_token: {
+      type: DataTypes.STRING(255),
+      defaultValue: null,
+    },
+    reset_token_expiry: {
+      type: DataTypes.DATE,
+      defaultValue: null,
+    },
     created_at: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -54,6 +62,7 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: 'updated_at',
     indexes: [
       { unique: true, fields: ['email'] },
+      { fields: ['reset_token'] },
     ]
   });
 };

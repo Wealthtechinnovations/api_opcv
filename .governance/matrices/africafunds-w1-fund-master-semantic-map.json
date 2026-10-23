@@ -1,0 +1,221 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "FUND_MASTER_SEMANTIC_MAP_NON_AUTHORITATIVE",
+  "observed_heads": {
+    "api": "2ebb5d67d528986f2856d0fbd77bd56a53c1bf1b",
+    "frontend": "1d21989ad6c6de8713bbcf8e767facfaa06901cc"
+  },
+  "authority": "src/models/fond.js / live table fond_investissements",
+  "rule": "This map classifies current semantics without moving, renaming or deleting columns.",
+  "groups": [
+    {
+      "group": "CORE_FUND_IDENTITY",
+      "fields": [
+        "id",
+        "nom_fond",
+        "code",
+        "active"
+      ],
+      "decision": "KEEP",
+      "note": "Current runtime identity. Do not create a replacement master."
+    },
+    {
+      "group": "IDENTIFIER_OR_SHARE_CLASS_CANDIDATES",
+      "fields": [
+        "code_ISIN",
+        "dev_libelle",
+        "minimum_investissement",
+        "frais_gestion",
+        "frais_souscription",
+        "frais_entree",
+        "frais_sortie",
+        "frais_rachat",
+        "affectation",
+        "nombre_part"
+      ],
+      "decision": "KEEP_IN_PLACE_PENDING_ENTITY_GRAIN_AUDIT",
+      "note": "Several fields can be share-class specific in fund data models, but current AfricaFunds grain is not certified as Fund vs ShareClass. Do not move or split by assumption."
+    },
+    {
+      "group": "MANAGER_RELATIONSHIP",
+      "fields": [
+        "societe_id",
+        "societe_gestion",
+        "nom_gerant"
+      ],
+      "decision": "KEEP_ID_PLUS_LEGACY_TEXT_DURING_MIGRATION",
+      "note": "societe_id is the preferred relational direction, but 71 live funds lack it and name-based consumers remain."
+    },
+    {
+      "group": "GEOGRAPHY_REGULATION",
+      "fields": [
+        "pays",
+        "pays_one",
+        "region",
+        "regulateur"
+      ],
+      "decision": "KEEP_AND_RECONCILE_REDUNDANCY",
+      "note": "pays is heavily consumed; pays_one requires consumer/source audit before any deprecation."
+    },
+    {
+      "group": "LEGAL_VEHICLE_LIFECYCLE",
+      "fields": [
+        "structure_fond",
+        "date_creation",
+        "date_agrement",
+        "numero_agrement",
+        "date_cloture"
+      ],
+      "decision": "KEEP",
+      "note": "Candidate core legal-vehicle attributes for Institutional/DDQ."
+    },
+    {
+      "group": "PRODUCT_TERMS",
+      "fields": [
+        "periodicite",
+        "sensibilite",
+        "souscripteur",
+        "horizonplacement",
+        "duree_investissement_recommande",
+        "heure_cutt_off",
+        "delai_reglement"
+      ],
+      "decision": "KEEP_AND_QUALIFY_SOURCE",
+      "note": "Need source/provenance and controlled vocabularies before hard institutional gates."
+    },
+    {
+      "group": "CLASSIFICATION_LEGACY_AND_CANONICAL_MAPPINGS",
+      "fields": [
+        "classification",
+        "type_investissement",
+        "categorie_libelle",
+        "categorie_globale",
+        "categorie_national",
+        "categorie_regional",
+        "categorie_fundafrica_locale",
+        "categorie_fundafrica_regionale",
+        "categorie_fundafrica_globale"
+      ],
+      "decision": "KEEP_ALL_DURING_REFERENCE_CONVERGENCE",
+      "note": "String categories and FundAfrica mapped categories coexist. Reference tables exist live; migration must be adapter-first."
+    },
+    {
+      "group": "BENCHMARK_MAPPING",
+      "fields": [
+        "indice_benchmark",
+        "indice",
+        "indice_fundafrica",
+        "indice_fundafrica_id"
+      ],
+      "decision": "KEEP_BUT_DECLARE_SEMANTIC_LAYERS",
+      "note": "Must distinguish declared benchmark, legacy index label and FundAfrica analytical mapping. Do not collapse them without evidence."
+    },
+    {
+      "group": "INVESTMENT_POLICY_DESCRIPTION",
+      "fields": [
+        "description",
+        "strategie_politique_invest",
+        "philosophie_fond"
+      ],
+      "decision": "KEEP",
+      "note": "Reusable by fund pages, SEO text, Due Diligence and Institutional workflows; source/version lineage should be added rather than copied."
+    },
+    {
+      "group": "SERVICE_PROVIDERS",
+      "fields": [
+        "depositaire",
+        "teneur_registre",
+        "valorisateur",
+        "centralisateur",
+        "agent_transfert",
+        "agent_payeur",
+        "reseau_placeur"
+      ],
+      "decision": "KEEP_AND_CONSIDER_FUTURE_ORGANIZATION_RELATIONS",
+      "note": "Currently strings. Do not normalize into organization entities until identity/source coverage is audited."
+    },
+    {
+      "group": "DENORMALIZED_OR_SNAPSHOT_CANDIDATES",
+      "fields": [
+        "date_premiere_vl",
+        "montant_premier_vl",
+        "montant_actif_net",
+        "datejour",
+        "datemoispre",
+        "dividende"
+      ],
+      "decision": "KEEP_COMPATIBILITY_AND_DEFINE_SOURCE_OF_TRUTH",
+      "note": "Some fields are caches/snapshots while detailed time-series values live in valorisations. Never treat cache freshness as source data without reconciliation."
+    },
+    {
+      "group": "OPERATIONAL_PAYMENT_FIELDS",
+      "fields": [
+        "banque",
+        "IBAN",
+        "RIB"
+      ],
+      "decision": "KEEP_RESTRICTED_UNTIL_USAGE_SECURITY_AUDIT",
+      "note": "Do not surface through new public/institutional view models by default; audit purpose, permissions and consumers first."
+    }
+  ],
+  "organization_master": {
+    "authority": "societes",
+    "fields": [
+      "id",
+      "nom",
+      "pays",
+      "email",
+      "tel",
+      "description",
+      "numeroagrement",
+      "regulateur",
+      "dateimmatriculation",
+      "devise",
+      "site_web"
+    ],
+    "decision": "KEEP_AND_EXTEND_WITH_ALIASES_HISTORY_IF_PROVEN",
+    "caveat": "Manager aliases/history and hard FK coverage are not yet canonical."
+  },
+  "target_conceptual_entities_not_yet_schema_decisions": [
+    {
+      "entity": "Fund",
+      "source_now": "fond_investissements",
+      "confidence": "HIGH"
+    },
+    {
+      "entity": "ShareClass",
+      "source_now": "NOT_CANONICALLY_MODELED",
+      "confidence": "HIGH_ABSENCE_OF_EXPLICIT_MODEL",
+      "warning": "Do not infer rows/classes solely from ISIN, currency or name."
+    },
+    {
+      "entity": "SubFund",
+      "source_now": "NOT_CANONICALLY_MODELED",
+      "confidence": "HIGH_ABSENCE_OF_EXPLICIT_MODEL",
+      "warning": "Only create if source evidence and real umbrella structures require it."
+    },
+    {
+      "entity": "ManagementOrganization",
+      "source_now": "societes + legacy fond.societe_gestion",
+      "confidence": "HIGH"
+    },
+    {
+      "entity": "ServiceProviderOrganization",
+      "source_now": "string fields on fund",
+      "confidence": "PARTIAL"
+    }
+  ],
+  "institutional_reuse": [
+    "Mandates/Eligibility must query this canonical authority through versioned view models.",
+    "DDQ should reference fund/manager IDs and canonical documents, not copy master data.",
+    "RFP responses may add mandate-specific answers but must not redefine fund identity.",
+    "Investment Committee snapshots must retain exact fund/master version or data cutoff used."
+  ],
+  "frontend_reuse": [
+    "FundIdentityViewModel should hide storage redundancy while preserving route compatibility.",
+    "SEO/Schema.org should consume stable entity semantics, not raw legacy field names.",
+    "Atomic organisms should receive normalized business concepts while legacy routes are migrated incrementally."
+  ],
+  "next_action": "Use live identity-gap diagnostic to decide whether societe_id normalization and explicit ShareClass/SubFund entities are warranted; no schema split before that evidence."
+}

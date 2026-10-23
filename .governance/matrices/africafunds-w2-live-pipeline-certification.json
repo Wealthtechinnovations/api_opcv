@@ -1,0 +1,123 @@
+{
+  "schema_version": "0.1.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "W2_LIVE_PIPELINES_CERTIFIED_READ_ONLY",
+  "observed_heads": {
+    "api": "0a263f6702a8fb6643ea152dba951d3ce07a2500",
+    "frontend": "840678a8e5b25db45224994e6e7fadaf93d346b6"
+  },
+  "evidence": {
+    "source": "docs/DIAG_ONDEMAND.md / scripts/diag/ondemand/diag_w2_country_pipelines.js",
+    "observed_at": "2026-10-05T23:02:39.045Z",
+    "mutation_performed": false
+  },
+  "markets": {
+    "MAROC": {
+      "funds": 644,
+      "active_funds": 644,
+      "vl_rows": 565299,
+      "latest_vl": "2026-10-02",
+      "vl_30d": 7708,
+      "cron": "ACTIVE cron_daily_update.sh",
+      "staging_or_evidence": "No generic source staging certified; ASFIM daily path is active.",
+      "classification": "ACTIVE_PRODUCTION"
+    },
+    "NIGERIA": {
+      "funds": 333,
+      "active_funds": 332,
+      "vl_rows": 78098,
+      "latest_vl": "2026-09-25",
+      "vl_30d": 71,
+      "cron": "ACTIVE cron_nigeria_weekly.sh",
+      "staging_or_evidence": "sec_ng_downloads present (562 files); sec_ng_corrections_audit live; sec_ng_observations/fund_aliases absent.",
+      "classification": "ACTIVE_WEEKLY_WITH_SOURCE_LAG_AND_QUALITY_GAPS"
+    },
+    "TUNISIE": {
+      "funds": 131,
+      "active_funds": 131,
+      "vl_rows": 311215,
+      "latest_vl": "2026-10-05",
+      "vl_30d": 2392,
+      "cron": "ACTIVE cron_tunisie_daily.sh",
+      "staging_or_evidence": "cmf_import_audit=48 exact rows; extreme-variation and new-fund queue tables live; data/tunisie_cmf present.",
+      "classification": "ACTIVE_DAILY_WITH_AUDIT"
+    },
+    "UEMOA": {
+      "funds": 118,
+      "active_funds": 111,
+      "vl_rows": 48154,
+      "latest_vl": "2026-10-01",
+      "vl_30d": 335,
+      "cron": "ACTIVE cron_brvm_daily.sh",
+      "staging_or_evidence": "brvm_boc_sources=1175 exact rows, brvm_boc_navs_raw=122088 exact rows; aliases/import logs/missing tables live; data/brvm_boc present.",
+      "classification": "ACTIVE_DAILY_WITH_STRONG_STAGING"
+    },
+    "CEMAC": {
+      "funds": 34,
+      "active_funds": 34,
+      "vl_rows": 2134,
+      "latest_vl": "2024-12-12",
+      "vl_30d": 0,
+      "cron": "NO_ACTIVE_BVMAC_CRON",
+      "staging_or_evidence": "No bvmac_* staging live, but 2026-10-05 BVMAC BOC read-only preflight succeeded: 802 index refs, PDF HTTP 200, 23 parsed rows, 0 parse failures, 19 matched (18 exact + 1 fuzzy), 4 unmatched, 19 OK + 4 SUSPECT_VARIATION.",
+      "classification": "SOURCE_AND_IDENTITY_PREFLIGHT_PASS_PIPELINE_NOT_DEPLOYED"
+    }
+  },
+  "certified_decisions": [
+    {
+      "id": "W2-CERT-001",
+      "decision": "FOUR_CURRENT_PIPELINES_ACTIVE",
+      "rationale": "Maroc, Nigeria, Tunisia and UEMOA have active crontab entries and live canonical data."
+    },
+    {
+      "id": "W2-CERT-002",
+      "decision": "CEMAC_IS_NOT_AN_ACTIVE_PIPELINE",
+      "rationale": "Code exists, but no active cron, no bvmac_* staging tables and no evidence directory are deployed; latest canonical VL remains 2024-12-12."
+    },
+    {
+      "id": "W2-CERT-003",
+      "decision": "UEMOA_STAGING_IS_REFERENCE_PATTERN",
+      "rationale": "BRVM keeps source/artifact/raw/matching/import/missing-state surfaces at production scale and should be reused as a design pattern, not duplicated."
+    },
+    {
+      "id": "W2-CERT-004",
+      "decision": "TUNISIA_AUDIT_IS_DEPLOYED_BUT_CANONICAL_LINEAGE_REMAINS_PARTIAL",
+      "rationale": "CMF audit/quarantine/new-fund tables exist, but generic canonical valuation provenance is still zero in the W1 measurement."
+    },
+    {
+      "id": "W2-CERT-005",
+      "decision": "NIGERIA_STAGING_DESIGN_IS_PARTIALLY_HISTORICAL",
+      "rationale": "Current source files and correction audit exist, while sec_ng_observations and sec_ng_fund_aliases are not deployed live."
+    },
+    {
+      "id": "W2-CERT-006",
+      "decision": "DO_NOT_INFER_PIPELINE_FROM_REFERENCE_TAXONOMY",
+      "rationale": "AfricaFunds lists 29 country/region reference values, but current runtime certifies only four active ingestion paths plus the undeployed CEMAC candidate."
+    },
+    {
+      "id": "W2-CERT-007",
+      "decision": "CEMAC_OFFICIAL_SOURCE_AND_CANONICAL_IDENTITY_MAPPING_ARE_TECHNICALLY_FEASIBLE",
+      "rationale": "Production no-write probe fetched the 2026-10-05 BVMAC bulletin, parsed 23 OPCVM rows with zero parse failures, and matched 19 to canonical CEMAC funds. This proves source/matcher feasibility but does not authorize deployment or import."
+    }
+  ],
+  "stale_or_superseded_assumptions": [
+    "Historical docs that describe Tunisia/UEMOA cron setup as not yet active are superseded by live crontab evidence.",
+    "The existence of bvmac_boc_daily.py is not proof that CEMAC is deployed.",
+    "information_schema TABLE_ROWS is approximate; exact audit counts are preferred where measured separately."
+  ],
+  "related_existing_work": [
+    "AF-OPS-007",
+    "AF-OPS-008",
+    "AF-OPS-009",
+    "AF-PROP-003",
+    "AF-PROP-007",
+    "AF-PROP-008",
+    "AF-PROP-009",
+    "AF-PROP-010",
+    "W1-DELTA-002",
+    "W1-DELTA-004",
+    "W1-DELTA-008"
+  ],
+  "next_action": "CEMAC: extend the no-write preflight to would_insert/skip/reject, duplicate fund/date and date-specific XAF FX scope; resolve 4 unmatched/suspect rows before any deployment. Ghana/Kenya: await S2 technical source probes. No queue mutation."
+}
