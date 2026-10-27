@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-10-27 19:28 UTC**
+Derniere verification : **2026-10-27 19:56 UTC**
 
 ```
 
@@ -26,9 +26,9 @@ Derniere verification : **2026-10-27 19:28 UTC**
 [OK   ] C4.TUNISIE   Fraicheur VL TUNISIE (budget 9 j)
              derniere VL Tue Oct 27, soit 0 j
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
-             derniere VL Fri Oct 23, soit 4 j
+             derniere VL Mon Oct 26, soit 1 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-10-27T19:00, soit 0.4 h
+             runtime: genere le 2026-10-27T19:00, soit 0.9 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1531x [100.00 .. 153145] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1524x [1.09 .. 1662] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1499x [10.65 .. 15963] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1495x [1.01 .. 1504] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1481x [1.00 .. 1481] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1472x [1.08 .. 1593] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1467x [114.47 .. 167885] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1457x [1.05 .. 1523] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1455x [1.15 .. 1673] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1452x [1.16 .. 1684] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182] | [2765] CARDINALSTONE DOLLAR FUND (NIGERIA/USD) 1425x [1.26 .. 1799]
 [ECHEC] C8           Les performances suivent les VL
@@ -42,7 +42,7 @@ Derniere verification : **2026-10-27 19:28 UTC**
 [OK   ] C6.TUNISIE   Couverture indRef TUNISIE
              100.0 % (0 VL sans benchmark sur 313101)
 [OK   ] C6.UEMOA     Couverture indRef UEMOA
-             100.0 % (0 VL sans benchmark sur 48404)
+             100.0 % (0 VL sans benchmark sur 48409)
 [OK   ] C9.MAROC     Couverture indRef des VL recentes MAROC (30 j)
              100.0 % (0 VL sans benchmark sur 7733 entrees en 30 j)
 [OK   ] C9.NIGERIA   Couverture indRef des VL recentes NIGERIA (30 j)
@@ -50,7 +50,7 @@ Derniere verification : **2026-10-27 19:28 UTC**
 [OK   ] C9.TUNISIE   Couverture indRef des VL recentes TUNISIE (30 j)
              100.0 % (0 VL sans benchmark sur 2514 entrees en 30 j)
 [OK   ] C9.UEMOA     Couverture indRef des VL recentes UEMOA (30 j)
-             100.0 % (0 VL sans benchmark sur 306 entrees en 30 j)
+             100.0 % (0 VL sans benchmark sur 311 entrees en 30 j)
 [OK   ] C10.MONIA    Fraicheur de l indice MONIA
              derniere valeur le Thu May 14, soit 166 j — non juge : aucune VL ne porte cet indice, ce n est pas un benchmark de fonds mais une statistique.
 [OK   ] C10.Tunindex Fraicheur de l indice Tunindex
