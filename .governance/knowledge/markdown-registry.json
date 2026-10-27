@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "92146df2952b856d9d97c7df2032f6243f5c84cc"
+      "head": "5af8fcddf96d3e783f4fa51b0ab9e57b7be62b1e"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "cda3b5ecde8739302a568d1e1e7c6a8026957b6e"
+      "head": "85f27fdfe24e158a2c20af0d7ed8c5df3c2a5dd6"
     }
   },
   "summary": {
@@ -10080,6 +10080,14 @@
       "canonical_authority": "docs/DIAG_ONDEMAND.md",
       "unique_information": [
         "Diagnostics a la demande — sortie de production",
+        "LA SOURCE",
+        "(b) APPARIEMENT PAR NOM",
+        "FONDS 1141 — AFRINVEST DOLLAR FUND",
+        "FONDS 1196 — EMERGING AFRICA EUROBOND FUND",
+        "FONDS 2743 — APEL WEALTH MONEY MARKET FUND",
+        "FONDS 1141 — AFRINVEST DOLLAR FUND",
+        "FONDS 1196 — EMERGING AFRICA EUROBOND FUND",
+        "FONDS 2743 — APEL WEALTH MONEY MARKET FUND",
         "A. Derniere VL vs derniere VL portant un benchmark",
         "B. Le niveau du benchmark varie-t-il ? (90 derniers jours)",
         "C. Table source `indice_references` — l import des indices vit-il ?",
@@ -10090,15 +10098,7 @@
         "C. Ruptures hors Nigeria — quelles chaines d import ?",
         "1. Index existants sur `performences`",
         "2. Taille de `performences`",
-        "3. Cinq plus grosses categories nationales (selectivite)",
-        "4. Plan et duree de la sous-requete reelle (ranking.service.js:87-100)",
-        "5. Fonds actifs sans categorie (perimetre de la garde L7)",
-        "6. Cron reellement deploye sur ce serveur",
-        "A. Tables de classement",
-        "B. Retard des performances par pays",
-        "C. Le classement suit-il les performances actuelles ?",
-        "0. Type REEL des colonnes en cause (la base fait foi, pas le modele)",
-        "0bis. Les cinq plus grands ytd selon chacun des deux tris SQL"
+        "3. Cinq plus grosses categories nationales (selectivite)"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10114,15 +10114,47 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "33e2fa1d8af9d215f501b81cda0401ab84b86569",
-      "last_validated_sha": "33e2fa1d8af9d215f501b81cda0401ab84b86569",
-      "content_sha256": "88250b25a2c6cd9342c44451ce34c823b5534e38a503de8a6f0671231b530e91",
-      "line_count": 2943,
-      "byte_count": 199673,
+      "git_blob_sha": "6f570fd44f7c56dcd502a0260593fdf053ebdd1a",
+      "last_validated_sha": "6f570fd44f7c56dcd502a0260593fdf053ebdd1a",
+      "content_sha256": "a80129cb3817ab31628f7a4aaa113939ef90272288bb11ce2657733750e7514c",
+      "line_count": 3479,
+      "byte_count": 233879,
       "headings": [
         {
           "level": 1,
           "text": "Diagnostics a la demande — sortie de production"
+        },
+        {
+          "level": 2,
+          "text": "LA SOURCE"
+        },
+        {
+          "level": 2,
+          "text": "(b) APPARIEMENT PAR NOM"
+        },
+        {
+          "level": 2,
+          "text": "FONDS 1141 — AFRINVEST DOLLAR FUND"
+        },
+        {
+          "level": 2,
+          "text": "FONDS 1196 — EMERGING AFRICA EUROBOND FUND"
+        },
+        {
+          "level": 2,
+          "text": "FONDS 2743 — APEL WEALTH MONEY MARKET FUND"
+        },
+        {
+          "level": 2,
+          "text": "FONDS 1141 — AFRINVEST DOLLAR FUND"
+        },
+        {
+          "level": 2,
+          "text": "FONDS 1196 — EMERGING AFRICA EUROBOND FUND"
+        },
+        {
+          "level": 2,
+          "text": "FONDS 2743 — APEL WEALTH MONEY MARKET FUND"
         },
         {
           "level": 2,
@@ -10247,38 +10279,6 @@
         {
           "level": 2,
           "text": "A. Appariement"
-        },
-        {
-          "level": 2,
-          "text": "B. Nature des ecarts"
-        },
-        {
-          "level": 2,
-          "text": "C. Changements d echelle — ce qu une correction ecrirait"
-        },
-        {
-          "level": 2,
-          "text": "D. Devise que l extracteur corrige attribue a ces mesures"
-        },
-        {
-          "level": 2,
-          "text": "1. Page tearsheet et extraction de l identifiant interne"
-        },
-        {
-          "level": 2,
-          "text": "2. Point d acces historique"
-        },
-        {
-          "level": 2,
-          "text": "3. Verdict"
-        },
-        {
-          "level": 2,
-          "text": "4. Jonction avec notre propre serie"
-        },
-        {
-          "level": 2,
-          "text": "1. Type REEL des colonnes longues (la base fait foi)"
         }
       ]
     },
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "4bf5973c4ac9192534e4edd1d82d85e691a7574a",
-      "last_validated_sha": "4bf5973c4ac9192534e4edd1d82d85e691a7574a",
-      "content_sha256": "d2a8e96e18b6091b6b3f679e10275f1638d0eb7a4c63e956c264ef0715430f59",
+      "git_blob_sha": "3e5be128266365fcff2233e2bc972280645e9d79",
+      "last_validated_sha": "3e5be128266365fcff2233e2bc972280645e9d79",
+      "content_sha256": "ba6c9d886d3a119346859a629390c651ae2a1b1d4218541f3898594bd5429ea5",
       "line_count": 96,
-      "byte_count": 7530,
+      "byte_count": 7847,
       "headings": [
         {
           "level": 1,
@@ -13388,6 +13388,15 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-27 20:05 UTC — Lot CI : deux de mes hypotheses naira sont tombees",
+        "Front 1 — pourquoi 1141 echappe au correctif naira",
+        "Front 2 — pourquoi les VL nigerianes s'arretent au 2026-10-09",
+        "POINT DE REPRISE COURANT — 2026-10-27 19:20 UTC — Lot CH : BASCULE DU CRON DEPLOYEE EN PRODUCTION",
+        "Ce qui est en production",
+        "Incident résolu — le dépôt serveur était en conflit non résolu",
+        "Correction d'une affirmation que j'ai faite — le fuseau du serveur",
+        "Prochaine action — la vérification qui compte",
+        "Reste ouvert",
         "POINT DE REPRISE COURANT — 2026-10-22 03:35 UTC — Lot CG : dry-run naira, et un ecart entre promesse et perimetre",
         "Perimetre mesure aujourd'hui",
         "Correction d'une affirmation que j'ai faite",
@@ -13396,16 +13405,7 @@
         "Si l'execute est valide un jour : l'enchainement obligatoire",
         "POINT DE REPRISE COURANT — 2026-10-22 00:00 UTC — Lot CF : RATTRAPAGE DES PERFORMANCES EXECUTE",
         "Résultat mesuré",
-        "Canal utilisé, et un écart avec le plan",
-        "Migration des index : AUCUN CANAL — non exécutée",
-        "DÉCOUVERTE — `C3` est `C7`, et le correctif existe sans avoir jamais tourné",
-        "Prochaine action recommandée",
-        "Risques connus",
-        "POINT DE REPRISE COURANT — 2026-10-21 20:15 UTC — Lot CE : l'angle mort EUR/USD instruit, et il etait sain",
-        "Deux erreurs à moi, dans le même script, en sens inverse",
-        "Conclusion mesurée",
-        "Étapes de la mesure, pour ne pas refaire le chemin",
-        "Le contrôle ne peut plus se tromper en silence"
+        "Canal utilisé, et un écart avec le plan"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13416,16 +13416,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "47a6ac6af11d55fb7a70ce32c43b71d18260ce43",
-      "last_validated_sha": "47a6ac6af11d55fb7a70ce32c43b71d18260ce43",
-      "content_sha256": "c636609c810d8e9975b4210aea569d23c2efa8e9dbb7f8f263fa7b43c1fa6f94",
-      "line_count": 8901,
-      "byte_count": 587696,
+      "git_blob_sha": "49041de4962e3fba2cd53c5afa9a6105b9e4bf80",
+      "last_validated_sha": "49041de4962e3fba2cd53c5afa9a6105b9e4bf80",
+      "content_sha256": "2fb1546e603fb98f594be7f52264de496296f15227b583a2612e01a6a52ae113",
+      "line_count": 9072,
+      "byte_count": 597266,
       "headings": [
         {
           "level": 1,
@@ -13434,6 +13434,42 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-27 20:05 UTC — Lot CI : deux de mes hypotheses naira sont tombees"
+        },
+        {
+          "level": 3,
+          "text": "Front 1 — pourquoi 1141 echappe au correctif naira"
+        },
+        {
+          "level": 3,
+          "text": "Front 2 — pourquoi les VL nigerianes s'arretent au 2026-10-09"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-27 19:20 UTC — Lot CH : BASCULE DU CRON DEPLOYEE EN PRODUCTION"
+        },
+        {
+          "level": 3,
+          "text": "Ce qui est en production"
+        },
+        {
+          "level": 3,
+          "text": "Incident résolu — le dépôt serveur était en conflit non résolu"
+        },
+        {
+          "level": 3,
+          "text": "Correction d'une affirmation que j'ai faite — le fuseau du serveur"
+        },
+        {
+          "level": 3,
+          "text": "Prochaine action — la vérification qui compte"
+        },
+        {
+          "level": 3,
+          "text": "Reste ouvert"
         },
         {
           "level": 2,
@@ -13550,42 +13586,6 @@
         {
           "level": 3,
           "text": "Correction d'une affirmation que j'ai faite"
-        },
-        {
-          "level": 3,
-          "text": "Lot traité"
-        },
-        {
-          "level": 3,
-          "text": "Invariant désormais imprimé à chaque exécution"
-        },
-        {
-          "level": 3,
-          "text": "Prochaine action recommandée"
-        },
-        {
-          "level": 3,
-          "text": "Risques connus"
-        },
-        {
-          "level": 3,
-          "text": "À ne pas faire à la reprise"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-09-22 — Programme Directeur actif / AF-OPS-003 POST_FIX_VALIDATION"
-        },
-        {
-          "level": 3,
-          "text": "Continuité préservée"
-        },
-        {
-          "level": 3,
-          "text": "AF-OPS-003 — correctif déployé, RCA en validation post-fix"
-        },
-        {
-          "level": 3,
-          "text": "Programme Directeur AfricaFunds — actif en lecture seule"
         }
       ]
     },
