@@ -23,11 +23,18 @@
  *   (b) NOMS  — `normalizeNameForMatch` n apparie pas « AFRINVEST DOLLAR FUND »,
  *       et alors AUCUNE de ses dates ne matcherait jamais.
  *
- * L indice local penche pour (a) : le rapport du dry-run ne couvre que 17 dates
- * (2022-05-06, 2022-05-27, 2024-06-14, puis hebdomadaire 2026-05-15 au
- * 2026-08-14), alors que les cinq VL suspectes de 1141 sont au 2022-03-25,
- * 2023-12-15, 2025-12-12, 2025-12-19 et 2025-12-24. Mais le CSV vit sur le
- * serveur et n est pas dans le depot : l indice n est pas une mesure.
+ * MESURE DU 2026-10-27 19:23 UTC — LA CAUSE (a) EST REFUTEE.
+ * J avais deduit un trou de dates du rapport de dry-run, qui ne montre que 17
+ * dates. C etait une erreur de lecture : ces 17 dates sont celles ou des
+ * corrections ont ete TROUVEES, pas la couverture de la source. Le CSV porte
+ * 41 626 lignes et 238 dates distinctes, et les cinq dates fautives de 1141
+ * — 2022-03-25, 2023-12-15, 2025-12-12, 2025-12-19, 2025-12-24 — y sont
+ * TOUTES LES CINQ. Le rapport base = 114,68 contre un prix publie de l ordre
+ * de 165 000 donne un rapport d environ 1 441, tres au-dela du seuil de 100.
+ * Donc si la ligne existait et s appariait, elle serait corrigee.
+ *
+ * Il reste (b) : l appariement par nom, ou l absence des lignes AFRINVEST a ces
+ * dates precises dans le CSV. C est ce que cette execution tranche.
  *
  * CE QUE CE SCRIPT TRANCHE, en chiffres : si (a), la correction de 1141 demande
  * d ETENDRE LA SOURCE a ces cinq dates, pas de toucher au code du correctif —
@@ -41,6 +48,11 @@
  */
 const path = require('path');
 const fs = require('fs');
+// Sans cette ligne le script rend « Access denied ... (using password: NO) » :
+// `DB_PASSWORD` vit dans le `.env` du serveur, pas dans l environnement du
+// workflow. Mesure du 2026-10-27 19:23 UTC — c est exactement ce qui s est
+// produit a la premiere execution.
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 const mysql = require('mysql2/promise');
 const { normalizeNameForMatch, lireCSV } = require('../../../src/lib/sec_csv');
 
