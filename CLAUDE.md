@@ -137,6 +137,14 @@ fix_tsr_per_country.js        — TSR par pays (Nigeria, Tunisie, UEMOA, CEMAC)
 
 ### Crons actifs en production
 
+> **LES HEURES CI-DESSOUS SONT EN UTC.** Mesure du 2026-10-27 : `timedatectl` sur S2
+> rend `Local time: ... UTC`. Le serveur n est pas en heure de Paris. Le cron
+> quotidien de « 20 h » tombe donc a 21 h heure de Paris en hiver, 22 h en ete.
+> Cette ligne existe parce que l oubli a coute une fausse alerte : une session a
+> annonce « le cron tourne en ce moment, ne lancez rien » a 20 h 02 heure de
+> Paris, alors qu il etait 19 h 02 sur le serveur et que rien ne tournait.
+> Fenetre de maintenance propre, en heure de Paris : minuit - 19 h.
+
 Liste relevee sur `crontab -l` du serveur S2 le 2026-08-21. Les quatre dernieres
 lignes manquaient a ce document : trois crons d import (Tunisie, BRVM, indices)
 tournaient sans etre documentes ici. Reverifier par `diag_import_nigeria.js`
