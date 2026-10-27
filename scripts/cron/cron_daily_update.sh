@@ -101,14 +101,40 @@ run_step "3/9" "Recalcul EUR/USD daily rates" \
 run_step "4/9" "Recalcul VL Ajuste (tous fonds actifs)" \
   node scripts/recalc/recalc_vl_ajuste.js
 
-run_curl "5/9" "Recalcul performances locale (fonds 1-600)" \
-  "http://localhost:3005/api/saveperfdatemysql/1/600"
-
-run_curl "6/9" "Recalcul performances locale (fonds 601-1200)" \
-  "http://localhost:3005/api/saveperfdatemysql/601/1200"
-
-run_curl "7/9" "Recalcul performances locale (fonds 1201-3000)" \
-  "http://localhost:3005/api/saveperfdatemysql/1201/3000"
+# CALCUL DIRECT, et non plus la route HTTP. Les trois etapes precedentes —
+# saveperfdatemysql sur 1-600, 601-1200 et 1201-3000 — appelaient une route qui
+# n effectue AUCUN calcul : pour chaque fonds ET chaque date, elle emet une
+# requete HTTP interne vers sa propre API, dans le processus qui sert deja la
+# requete. D ou le « [5b/8] ERREUR (HTTP 000) » recurrent sur le lot 601-1200,
+# la ou l etape EUR/USD ci-dessous traitait ses 586 fonds sans incident : elle,
+# appelle node directement.
+#
+# Consequence mesuree le 2026-10-21 : 826 fonds portaient des performances plus
+# anciennes que leur derniere VL — MAROC 625 avec des chiffres de juin pour des
+# VL d octobre. Le site affichait des performances plausibles et fausses.
+#
+# Le pendant direct en devise locale existe depuis le 10 septembre et n avait
+# jamais ete branche. Il est desormais valide : dry-run compare champ par champ
+# a la route sur 90 colonnes, NIGERIA et UEMOA, DIVERGENT = 0 et PERDU = 0, avec
+# l invariant de somme du juge verifie. Le rattrapage execute le 2026-10-21 via
+# `ops-recalc-derives` a corrige les 826 fonds avec 0 erreur — mais c etait un
+# one-shot : sans cette bascule, la derive revient des le lendemain.
+#
+# `--force` est ce que passe deja le canal gouverne : sans lui, un fonds dont la
+# perf porte deja la date de sa derniere VL est ignore, ce qui est le cas voulu
+# en rattrapage mais pas dans un cron quotidien qui doit aussi rafraichir les
+# colonnes de ratios.
+#
+# Les etiquettes 6/9 et 7/9 disparaissent sans renumerotation deliberement :
+# `diag_classements.js` cite litteralement « [9a/9] », et les journaux de
+# plusieurs mois portent « 8/9 » et « 9a/9 ». Renumeroter casserait la lecture
+# de l historique pour un gain cosmetique.
+#
+# `run_step` n a pas de plafond de temps, contrairement a `run_curl` et ses
+# 300 s par defaut : la coupure qui produisait le HTTP 000 disparait avec la
+# route.
+run_step "5/9" "Recalcul performances locale (calcul direct, tous pays)" \
+  node scripts/fix/fix_populate_performances.js --force
 
 run_step "8/9" "Recalcul performances EUR/USD" \
   node scripts/fix/fix_populate_performances_eur_usd.js --devise BOTH
