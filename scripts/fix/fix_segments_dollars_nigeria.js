@@ -147,13 +147,32 @@ async function main() {
     for (const f of fonds) parNom.set(normalizeNameForMatch(f.nom_fond), f);
     const parId = new Map(fonds.map(f => [f.id, f]));
 
+    // Ce que la source ne nous donne PAS est aussi un resultat. Jusqu'au
+    // 2026-10-27 ces quatre abandons etaient silencieux, et leur silence a
+    // coute deux fausses hypotheses sur le fonds 1141 : « ses dates sont
+    // absentes de la source », puis « l'appariement par nom echoue » — toutes
+    // deux refutees par la mesure. Un correctif muet sur ce qu'il n'a pas pu
+    // lire laisse croire qu'il n'y avait rien a lire.
+    const ecartes = { nom: 0, dateIllisible: 0, prixIllisible: 0, prixNegatif: 0 };
+    const nomsInconnus = new Map();
+
     const naira = new Map();
     for (const l of lignes) {
       const f = parNom.get(normalizeNameForMatch(l.fund_name_clean || ''));
-      if (!f) continue;
+      if (!f) {
+        ecartes.nom++;
+        const k = l.fund_name_clean || '(vide)';
+        nomsInconnus.set(k, (nomsInconnus.get(k) || 0) + 1);
+        continue;
+      }
       const d = j(l.valuation_date);
+      if (d === '?') { ecartes.dateIllisible++; continue; }
       const p = parseFloat(l.vl_price_ngn);
-      if (d === '?' || !Number.isFinite(p) || p <= 0) continue;
+      // Pour un fonds libelle en dollars, la SEC peut ne rien publier dans la
+      // colonne naira. `parseFloat('')` rend NaN, et `NaN >= RAPPORT_DEVISE`
+      // est faux : la ligne disparaissait sans laisser de trace.
+      if (!Number.isFinite(p)) { ecartes.prixIllisible++; continue; }
+      if (p <= 0) { ecartes.prixNegatif++; continue; }
       naira.set(`${f.id}|${d}`, p);
     }
 
@@ -166,12 +185,16 @@ async function main() {
     `);
 
     const corrections = [];
+    const sansSource = [];
+    let sousSeuil = 0;
     for (const v of vls) {
       const src = naira.get(`${v.fund_id}|${v.date}`);
-      if (src === undefined) continue;
+      if (src === undefined) { sansSource.push(v); continue; }
       const rapport = src / Number(v.value);
       if (rapport >= RAPPORT_DEVISE) {
         corrections.push({ ...v, naira: src, rapport });
+      } else {
+        sousSeuil++;
       }
     }
 
@@ -181,7 +204,41 @@ async function main() {
     console.log(`Critere   : prix_naira_publie / valeur_en_base >= ${RAPPORT_DEVISE}`);
     console.log(`A corriger: ${corrections.length} VL sur ${new Set(corrections.map(c => c.fund_id)).size} fonds\n`);
 
-    if (!corrections.length) { console.log('Rien a corriger.\n'); return; }
+    // Le perimetre reellement examine, et ce qui en est tombe.
+    console.log('--- CE QUE LE CORRECTIF N A PAS PU LIRE ---');
+    console.log(`Source  : ${lignes.length} lignes, ${naira.size} couples (fonds, date) retenus`);
+    console.log(`  ecartees faute d appariement par nom : ${ecartes.nom}`
+      + (nomsInconnus.size ? ` (${nomsInconnus.size} nom(s) distinct(s))` : ''));
+    console.log(`  ecartees pour date illisible         : ${ecartes.dateIllisible}`);
+    console.log(`  ecartees pour prix naira illisible   : ${ecartes.prixIllisible}`
+      + (ecartes.prixIllisible ? '  <-- colonne naira vide : typique d un fonds libelle en dollars' : ''));
+    console.log(`  ecartees pour prix negatif ou nul    : ${ecartes.prixNegatif}`);
+    const perdues = ecartes.nom + ecartes.dateIllisible + ecartes.prixIllisible + ecartes.prixNegatif;
+    console.log(`  INVARIANT : ${naira.size} + ${perdues} = ${naira.size + perdues}`
+      + ` / ${lignes.length} ligne(s) — ${naira.size + perdues === lignes.length
+        ? 'VERIFIE' : 'INCOHERENT, ne pas se fier aux comptes ci-dessus'}`);
+    if (nomsInconnus.size) {
+      console.log('  noms du CSV sans fonds actif correspondant (5 premiers) :');
+      for (const [n, c] of [...nomsInconnus].sort((a, b) => b[1] - a[1]).slice(0, 5)) {
+        console.log(`    ${String(n).slice(0, 46).padEnd(48)} ${c} ligne(s)`);
+      }
+    }
+    console.log(`Base    : ${vls.length} VL nigerianes actives examinees`);
+    console.log(`  sans prix publie a leur date  : ${sansSource.length}`);
+    console.log(`  rapport sous le seuil de ${RAPPORT_DEVISE}  : ${sousSeuil}`);
+    console.log(`  retenues pour correction      : ${corrections.length}`);
+    console.log(`  INVARIANT : ${sansSource.length} + ${sousSeuil} + ${corrections.length}`
+      + ` = ${sansSource.length + sousSeuil + corrections.length} / ${vls.length} VL — `
+      + (sansSource.length + sousSeuil + corrections.length === vls.length
+        ? 'VERIFIE' : 'INCOHERENT, ne pas se fier aux comptes ci-dessus'));
+    console.log('');
+
+    if (!corrections.length) {
+      console.log('Rien a corriger — mais lire les comptes ci-dessus avant d en conclure que la');
+      console.log('source est muette : un prix naira illisible produit le meme « rien » qu une');
+      console.log('date absente, pour une raison entierement differente.\n');
+      return;
+    }
 
     console.log(`  ${'fonds'.padStart(5)} ${'date'.padEnd(10)} ${'en base'.padStart(13)} ${'-> naira'.padStart(14)} ${'rapport'.padStart(8)}  nom`);
     console.log(`  ${'-'.repeat(5)} ${'-'.repeat(10)} ${'-'.repeat(13)} ${'-'.repeat(14)} ${'-'.repeat(8)}  ---`);
