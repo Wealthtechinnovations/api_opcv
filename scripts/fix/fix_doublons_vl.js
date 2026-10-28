@@ -125,9 +125,15 @@ async function rollback(conn, fichier) {
     console.log(`\n--- A SUPPRIMER : ${aSupprimer.length} ligne(s) a zero ---`);
     console.log(`  ${'id'.padStart(9)} ${'fonds'.padStart(6)} ${'date'.padEnd(12)}`
       + `${'garde l id'.padStart(11)}${'valeur gardee'.padStart(16)}`);
+    // `SELECT *` rend un objet Date : `String(date).slice(0, 10)` donnait
+    // « Tue Oct 01 » — sans l annee. Le proprietaire lit ce tableau pour
+    // valider une suppression : une date sans annee n est pas verifiable.
+    const jour = d => (d instanceof Date
+      ? new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10)
+      : String(d).slice(0, 10));
     for (const l of aSupprimer.slice(0, 30)) {
       console.log(`  ${String(l.id).padStart(9)} ${String(l.fund_id).padStart(6)} `
-        + `${String(l.date).slice(0, 10).padEnd(12)}${String(l._garde).padStart(11)}`
+        + `${jour(l.date).padEnd(12)}${String(l._garde).padStart(11)}`
         + `${String(l._valeur).padStart(16)}`);
     }
     if (aSupprimer.length > 30) console.log(`  ... et ${aSupprimer.length - 30} autre(s)`);
