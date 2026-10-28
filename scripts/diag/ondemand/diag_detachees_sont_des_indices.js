@@ -92,22 +92,40 @@ const BASE = process.env.DB_NAME || 'fund_opcvm';
       const [cols] = await conn.query(`
         SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.COLUMNS
          WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`, [BASE, t]);
-      const cle = cols.find(c => c.COLUMN_NAME === 'id'
+      // TEST INVALIDE CORRIGE LE 2026-10-28 06:15 UTC, ET VOICI POURQUOI.
+      // La premiere version interrogeait `id IN (...)`, c est-a-dire la CLE
+      // PRIMAIRE de chaque table. Or toute table comptant plus de 1 443 lignes
+      // possede des cles primaires dans la plage 1418-1443 : le test rendait
+      // donc « 17/17 » pour `performences`, `performences_eurs` et
+      // `sec_ng_corrections_audit` sans qu aucune ne rattache quoi que ce soit.
+      // Il mesurait la TAILLE des tables, pas un rattachement.
+      //
+      // Le seul test qui ait un sens porte sur une cle ETRANGERE vers un fonds
+      // ou un indice. `diag_vl_detachees_rattachables.js` le faisait
+      // correctement — via `fond_id` — et rendait 0 retrouve.
+      const cle = cols.find(c => /^(fond_id|fund_id|indice_id|id_indice|ID_indice)$/i.test(c.COLUMN_NAME)
         && /int|bigint|smallint/i.test(c.DATA_TYPE));
       if (!cle) continue;
       try {
         const [[r]] = await conn.query(
-          `SELECT COUNT(*) AS n FROM \`${t}\` WHERE id IN (?)`, [liste]);
+          `SELECT COUNT(DISTINCT \`${cle.COLUMN_NAME}\`) AS n FROM \`${t}\`
+            WHERE \`${cle.COLUMN_NAME}\` IN (?)`, [liste]);
         if (Number(r.n) === 0) continue;
-        const nomCol = cols.find(c => /^(nom_indice|nom|libelle|nom_fond|titre|label)$/i.test(c.COLUMN_NAME))
-          || cols.find(c => /nom|libel|titre/i.test(c.COLUMN_NAME));
-        console.log(`  ${t.padEnd(28)} ${String(r.n).padStart(3)}/${liste.length} identifiant(s) presents`
+        // `anomalie` contient la sous-chaine « nom » : le repli large
+        // attrapait cette colonne et imprimait des `null` en guise de noms.
+        // Les candidats sont donc EXPLICITES, sans repli par sous-chaine.
+        const nomCol = cols.find(c =>
+          /^(fond|nom_fond|nom_indice|nom|libelle|libelle_fond|titre|label)$/i.test(c.COLUMN_NAME));
+        console.log(`  ${t.padEnd(28)} ${String(r.n).padStart(3)}/${liste.length} via \`${cle.COLUMN_NAME}\``
           + `${nomCol ? ` | nom dans \`${nomCol.COLUMN_NAME}\`` : ''}`);
         if (Number(r.n) >= liste.length * 0.5 && !trouvee) trouvee = { t, nomCol };
         if (nomCol) {
           const [ex] = await conn.query(
-            `SELECT id, \`${nomCol.COLUMN_NAME}\` AS nom FROM \`${t}\`
-              WHERE id IN (?) ORDER BY id LIMIT 20`, [liste]);
+            `SELECT DISTINCT \`${cle.COLUMN_NAME}\` AS id, \`${nomCol.COLUMN_NAME}\` AS nom
+               FROM \`${t}\` WHERE \`${cle.COLUMN_NAME}\` IN (?)
+                AND \`${nomCol.COLUMN_NAME}\` IS NOT NULL
+                AND TRIM(\`${nomCol.COLUMN_NAME}\`) <> ''
+              ORDER BY 1 LIMIT 20`, [liste]);
           for (const e of ex) {
             console.log(`  ${' '.repeat(28)}  ${String(e.id).padStart(6)} → ${String(e.nom).slice(0, 46)}`);
           }
