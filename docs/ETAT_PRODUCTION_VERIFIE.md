@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-10-27 20:13 UTC**
+Derniere verification : **2026-10-28 00:00 UTC**
 
 ```
 
@@ -16,7 +16,7 @@ Derniere verification : **2026-10-27 20:13 UTC**
 [ECHEC] C2           Aucune performance orpheline en tete de serie
              performences:12, performences_eurs:23, performences_usds:23 fonds dont la perf la plus recente porte une date sans VL — c'est elle que l'API sert. Instruire fonds par fonds AVANT toute suppression.
 [ECHEC] C3           Aucune performance recente au-dela de 500 %
-             [1141] AFRINVEST DOLLAR FUND (NIGERIA) YTD 143958 % au Fri Jul 10 | [1196] EMERGING AFRICA EUROBOND FUND (NIGERIA) YTD 9339 % au Fri Jul 10 | [2743] APEL WEALTH MONEY MARKET FUND (NIGERIA) YTD 809 % au Fri Jul 10 | [757] FCP MAROC CREANCES (MAROC) YTD 586 % au Mon Oct 19
+             [1141] AFRINVEST DOLLAR FUND (NIGERIA) YTD 143958 % au Fri Jul 10 | [1196] EMERGING AFRICA EUROBOND FUND (NIGERIA) YTD 9339 % au Fri Jul 10 | [1113] AL BARID ISTITMAR (MAROC) YTD 1955 % au Mon Oct 26 | [953] CDG SOLIDARITE (MAROC) YTD 1186 % au Mon Oct 26 | [2743] APEL WEALTH MONEY MARKET FUND (NIGERIA) YTD 809 % au Fri Jul 10
 [ALERTE] C4.CEMAC     Fraicheur VL CEMAC (budget 400 j)
              derniere VL Thu Dec 12, soit 684 j
 [OK   ] C4.MAROC     Fraicheur VL MAROC (budget 6 j)
@@ -28,11 +28,11 @@ Derniere verification : **2026-10-27 20:13 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Mon Oct 26, soit 1 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-10-27T20:00, soit 0.1 h
+             runtime: genere le 2026-10-27T23:00, soit 0.9 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1531x [100.00 .. 153145] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1524x [1.09 .. 1662] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1499x [10.65 .. 15963] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1495x [1.01 .. 1504] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1481x [1.00 .. 1481] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1472x [1.08 .. 1593] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1467x [114.47 .. 167885] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1457x [1.05 .. 1523] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1455x [1.15 .. 1673] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1452x [1.16 .. 1684] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182] | [2765] CARDINALSTONE DOLLAR FUND (NIGERIA/USD) 1425x [1.26 .. 1799]
-[ECHEC] C8           Les performances suivent les VL
-             TUNISIE : 5/131 a jour (3.8 %), retard moyen 5.7 j | MAROC : 93/646 a jour (14.4 %), retard moyen 3.5 j — VL fraiches mais performances perimees : le site affiche des chiffres plausibles et faux
+[OK   ] C8           Les performances suivent les VL
+             tous les pays a jour
 [ALERTE] C6.CEMAC     Couverture indRef CEMAC
              0.0 % (2134 VL sans benchmark sur 2134)
 [OK   ] C6.MAROC     Couverture indRef MAROC
@@ -62,23 +62,23 @@ Derniere verification : **2026-10-27 20:13 UTC**
 [OK   ] C10.NSE All Share Fraicheur de l indice NSE All Share
              derniere valeur le Tue Oct 27, soit 0 j (porte par 54147 VL)
 [OK   ] C11.classementfonds Fraicheur de reconstruction de classementfonds
-             3637 lignes (attendu ≈ 3717), dernier recalcul il y a 0 h, fenetre du run : Tue Oct 27 2026 19: → Tue Oct 27 2026 19:
-[OK   ] C11.classementfonds_eurs Fraicheur de reconstruction de classementfonds_eurs
-             3644 lignes (attendu ≈ 3717), dernier recalcul il y a 0 h, fenetre du run : Tue Oct 27 2026 19: → Tue Oct 27 2026 19:
-[OK   ] C11.classementfonds_usds Fraicheur de reconstruction de classementfonds_usds
-             3644 lignes (attendu ≈ 3717), dernier recalcul il y a 0 h, fenetre du run : Tue Oct 27 2026 19: → Tue Oct 27 2026 19:
-[ALERTE] C12.OBLIGATIONS MAROC Les rangs correspondent aux performances
-             192/300 fonds au rang que leur performance stockee leur donne (64.0 %) — les rangs affiches ne derivent pas des performances affichees : soit la table de classement est perimee, soit les ex aequo ne sont pas departages (le SQL du classement n a pas d ORDER BY). Voir diag_classement_vs_perf.js.
-[ALERTE] C12.DIVERSIFIE MAROC Les rangs correspondent aux performances
-             96/143 fonds au rang que leur performance stockee leur donne (67.1 %) — les rangs affiches ne derivent pas des performances affichees : soit la table de classement est perimee, soit les ex aequo ne sont pas departages (le SQL du classement n a pas d ORDER BY). Voir diag_classement_vs_perf.js.
-[ALERTE] C12.ACTIONS MAROC Les rangs correspondent aux performances
-             93/123 fonds au rang que leur performance stockee leur donne (75.6 %) — les rangs affiches ne derivent pas des performances affichees : soit la table de classement est perimee, soit les ex aequo ne sont pas departages (le SQL du classement n a pas d ORDER BY). Voir diag_classement_vs_perf.js.
+             3648 lignes (attendu ≈ 3750), dernier recalcul il y a 2 h, fenetre du run : Tue Oct 27 2026 21: → Tue Oct 27 2026 21:
+[ALERTE] C11.classementfonds_eurs Fraicheur de reconstruction de classementfonds_eurs
+             2880 lignes (attendu ≈ 3750), dernier recalcul il y a 1 h, fenetre du run : Tue Oct 27 2026 21: → Tue Oct 27 2026 22: — table incomplete : une purge a reussi la ou les insertions ont echoue.
+[ALERTE] C11.classementfonds_usds Fraicheur de reconstruction de classementfonds_usds
+             2890 lignes (attendu ≈ 3750), dernier recalcul il y a 1 h, fenetre du run : Tue Oct 27 2026 21: → Tue Oct 27 2026 22: — table incomplete : une purge a reussi la ou les insertions ont echoue.
+[OK   ] C12.OBLIGATIONS MAROC Les rangs correspondent aux performances
+             300/300 fonds au rang que leur performance stockee leur donne (100.0 %)
+[OK   ] C12.DIVERSIFIE MAROC Les rangs correspondent aux performances
+             143/143 fonds au rang que leur performance stockee leur donne (100.0 %)
+[OK   ] C12.ACTIONS MAROC Les rangs correspondent aux performances
+             123/123 fonds au rang que leur performance stockee leur donne (100.0 %)
 [OK   ] C12.OBLIGATIONS NIGERIA Les rangs correspondent aux performances
-             85/87 fonds au rang que leur performance stockee leur donne (97.7 %)
-[OK   ] C12.DIVERSIFIE TUNISIE Les rangs correspondent aux performances
-             70/70 fonds au rang que leur performance stockee leur donne (100.0 %)
+             87/87 fonds au rang que leur performance stockee leur donne (100.0 %)
+[OK   ] C12.MONETAIRE MAROC Les rangs correspondent aux performances
+             71/71 fonds au rang que leur performance stockee leur donne (100.0 %)
 
-23/33 controles OK — 5 echec(s) critique(s), 5 alerte(s).
+25/33 controles OK — 4 echec(s) critique(s), 4 alerte(s).
 
 Un echec critique signifie que la production contredit ce que la
 documentation affirme. Corriger la production OU corriger le document,
