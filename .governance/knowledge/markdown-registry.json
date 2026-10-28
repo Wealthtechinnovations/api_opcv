@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "5af8fcddf96d3e783f4fa51b0ab9e57b7be62b1e"
+      "head": "67c160758ef78614e454a39f3c39017219d7a86c"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "85f27fdfe24e158a2c20af0d7ed8c5df3c2a5dd6"
+      "head": "646d92cbe8f90b916360874812116f13b624a3ad"
     }
   },
   "summary": {
@@ -10088,17 +10088,17 @@
         "FONDS 1141 — AFRINVEST DOLLAR FUND",
         "FONDS 1196 — EMERGING AFRICA EUROBOND FUND",
         "FONDS 2743 — APEL WEALTH MONEY MARKET FUND",
+        "P1-02 — fonds 2825, YTD 239,20 % sur historique troue",
+        "P2-03 — index UNIQUE sur valorisations(fund_id, date)",
+        "P2-04 — performances orphelines (date sans VL correspondante)",
+        "P2-01 — CEMAC : 34 fonds sans VL depuis 2024-12-12, 0 % indRef",
+        "P1-03 — /api/listeopcvm : colonnes DB manquantes",
+        "LA PREMISSE DE LA SECTION 4 DU BACKLOG",
         "A. Derniere VL vs derniere VL portant un benchmark",
         "B. Le niveau du benchmark varie-t-il ? (90 derniers jours)",
         "C. Table source `indice_references` — l import des indices vit-il ?",
         "D. Maroc — a quelle semaine l ecriture du benchmark a-t-elle cesse ?",
-        "E. Nigeria — la SEC publie-t-elle plus recent que notre base ?",
-        "A. Fonds dont la rupture n est pas un taux de change",
-        "B. Les 25 lignes sans provenance, en detail",
-        "C. Ruptures hors Nigeria — quelles chaines d import ?",
-        "1. Index existants sur `performences`",
-        "2. Taille de `performences`",
-        "3. Cinq plus grosses categories nationales (selectivite)"
+        "E. Nigeria — la SEC publie-t-elle plus recent que notre base ?"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "6f570fd44f7c56dcd502a0260593fdf053ebdd1a",
-      "last_validated_sha": "6f570fd44f7c56dcd502a0260593fdf053ebdd1a",
-      "content_sha256": "a80129cb3817ab31628f7a4aaa113939ef90272288bb11ce2657733750e7514c",
-      "line_count": 3479,
-      "byte_count": 233879,
+      "git_blob_sha": "6afd7e6bb8ea34a3bb7f40f95652ea45e9f18d72",
+      "last_validated_sha": "6afd7e6bb8ea34a3bb7f40f95652ea45e9f18d72",
+      "content_sha256": "30001489a8787ccebf1120109687633e8e895341e5709d2f698e6da77e1577bd",
+      "line_count": 3093,
+      "byte_count": 215467,
       "headings": [
         {
           "level": 1,
@@ -10155,6 +10155,30 @@
         {
           "level": 2,
           "text": "FONDS 2743 — APEL WEALTH MONEY MARKET FUND"
+        },
+        {
+          "level": 2,
+          "text": "P1-02 — fonds 2825, YTD 239,20 % sur historique troue"
+        },
+        {
+          "level": 2,
+          "text": "P2-03 — index UNIQUE sur valorisations(fund_id, date)"
+        },
+        {
+          "level": 2,
+          "text": "P2-04 — performances orphelines (date sans VL correspondante)"
+        },
+        {
+          "level": 2,
+          "text": "P2-01 — CEMAC : 34 fonds sans VL depuis 2024-12-12, 0 % indRef"
+        },
+        {
+          "level": 2,
+          "text": "P1-03 — /api/listeopcvm : colonnes DB manquantes"
+        },
+        {
+          "level": 2,
+          "text": "LA PREMISSE DE LA SECTION 4 DU BACKLOG"
         },
         {
           "level": 2,
@@ -10255,30 +10279,6 @@
         {
           "level": 2,
           "text": "E. L etiquette de devise correspond-elle a l echelle ?"
-        },
-        {
-          "level": 2,
-          "text": "F. Ce que cela implique pour l etape 0"
-        },
-        {
-          "level": 2,
-          "text": "Etiquette en desaccord avec le contenu de `value`"
-        },
-        {
-          "level": 2,
-          "text": "Indetermines — a NE PAS basculer automatiquement (205 avec VL)"
-        },
-        {
-          "level": 2,
-          "text": "Les 33 fonds declares USD — les deux taux, cote a cote"
-        },
-        {
-          "level": 2,
-          "text": "Consequence mesuree"
-        },
-        {
-          "level": 2,
-          "text": "A. Appariement"
         }
       ]
     },
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "3e5be128266365fcff2233e2bc972280645e9d79",
-      "last_validated_sha": "3e5be128266365fcff2233e2bc972280645e9d79",
-      "content_sha256": "ba6c9d886d3a119346859a629390c651ae2a1b1d4218541f3898594bd5429ea5",
+      "git_blob_sha": "4ac2c6f4fd1a5e8601162892228cc1e33e3f408f",
+      "last_validated_sha": "4ac2c6f4fd1a5e8601162892228cc1e33e3f408f",
+      "content_sha256": "324bdc823086035ef8cda85e07a6a6ce830e7fab003a9c4ae8705e864a931e1f",
       "line_count": 96,
-      "byte_count": 7847,
+      "byte_count": 7202,
       "headings": [
         {
           "level": 1,
@@ -13388,24 +13388,24 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
-        "POINT DE REPRISE COURANT — 2026-10-27 20:05 UTC — Lot CI : deux de mes hypotheses naira sont tombees",
-        "Front 1 — pourquoi 1141 echappe au correctif naira",
-        "Front 2 — pourquoi les VL nigerianes s'arretent au 2026-10-09",
-        "POINT DE REPRISE COURANT — 2026-10-27 19:20 UTC — Lot CH : BASCULE DU CRON DEPLOYEE EN PRODUCTION",
-        "Ce qui est en production",
-        "Incident résolu — le dépôt serveur était en conflit non résolu",
-        "Correction d'une affirmation que j'ai faite — le fuseau du serveur",
-        "Prochaine action — la vérification qui compte",
-        "Reste ouvert",
-        "POINT DE REPRISE COURANT — 2026-10-22 03:35 UTC — Lot CG : dry-run naira, et un ecart entre promesse et perimetre",
-        "Perimetre mesure aujourd'hui",
-        "Correction d'une affirmation que j'ai faite",
-        "LE POINT BLOQUANT — le fonds 1141 n'est PAS dans les 157 lignes",
-        "EXECUTE NON LANCE, et pour cette raison precise",
-        "Si l'execute est valide un jour : l'enchainement obligatoire",
-        "POINT DE REPRISE COURANT — 2026-10-22 00:00 UTC — Lot CF : RATTRAPAGE DES PERFORMANCES EXECUTE",
-        "Résultat mesuré",
-        "Canal utilisé, et un écart avec le plan"
+        "POINT DE REPRISE COURANT — 2026-10-28 00:45 UTC — Lot CM : le correctif est ecrit, teste, et attend le deploiement",
+        "Mesure qui ferme l'instruction",
+        "Correctif livre : `[1b/8]` controle de couverture",
+        "Defaut trouve par mon propre test, avant mise en service",
+        "Trois scenarios verifies",
+        "POINT DE REPRISE COURANT — 2026-10-28 00:35 UTC — Lot CL : CORRECTION DU LOT CK — la cadence n'est pas le defaut",
+        "Le lot CK ci-dessous contient une conclusion FAUSSE. La voici corrigee.",
+        "LE DEFAUT REEL, mesure a la ligne pres",
+        "CORRECTIF RECOMMANDE, et la cadence n'est plus premiere",
+        "POINT DE REPRISE COURANT — 2026-10-28 00:15 UTC — Lot CK : la source nigeriane n'est pas muette, c'est la cadence qui ne tient pas",
+        "Source primaire : la SEC a bien publie",
+        "Cinq de mes pistes sont ecartees par la mesure",
+        "La conclusion structurelle, qui ne depend d'aucune piste restante",
+        "DECISION QUI REVIENT AU PROPRIETAIRE",
+        "POINT DE REPRISE COURANT — 2026-10-27 20:20 UTC — Lot CJ : les deux fronts Nigeria sont tranches, et aucun n'etait ou je le cherchais",
+        "Front 1 — le correctif naira ne peut rien pour 1141 ni 1196",
+        "Front 2 — l'importeur est innocent : il n'a rien recu",
+        "POINT DE REPRISE COURANT — 2026-10-27 20:05 UTC — Lot CI : deux de mes hypotheses naira sont tombees"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13421,11 +13421,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "49041de4962e3fba2cd53c5afa9a6105b9e4bf80",
-      "last_validated_sha": "49041de4962e3fba2cd53c5afa9a6105b9e4bf80",
-      "content_sha256": "2fb1546e603fb98f594be7f52264de496296f15227b583a2612e01a6a52ae113",
-      "line_count": 9072,
-      "byte_count": 597266,
+      "git_blob_sha": "61472bd3393422ce5407fd3c15d5639ca383f2f8",
+      "last_validated_sha": "61472bd3393422ce5407fd3c15d5639ca383f2f8",
+      "content_sha256": "9722b4dfd3e08928f7a4489c748dbbd7aa6c4ff6c21b61dddb83232405eedafa",
+      "line_count": 9460,
+      "byte_count": 616397,
       "headings": [
         {
           "level": 1,
@@ -13434,6 +13434,74 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 00:45 UTC — Lot CM : le correctif est ecrit, teste, et attend le deploiement"
+        },
+        {
+          "level": 3,
+          "text": "Mesure qui ferme l'instruction"
+        },
+        {
+          "level": 3,
+          "text": "Correctif livre : `[1b/8]` controle de couverture"
+        },
+        {
+          "level": 3,
+          "text": "Defaut trouve par mon propre test, avant mise en service"
+        },
+        {
+          "level": 3,
+          "text": "Trois scenarios verifies"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 00:35 UTC — Lot CL : CORRECTION DU LOT CK — la cadence n'est pas le defaut"
+        },
+        {
+          "level": 3,
+          "text": "Le lot CK ci-dessous contient une conclusion FAUSSE. La voici corrigee."
+        },
+        {
+          "level": 3,
+          "text": "LE DEFAUT REEL, mesure a la ligne pres"
+        },
+        {
+          "level": 3,
+          "text": "CORRECTIF RECOMMANDE, et la cadence n'est plus premiere"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 00:15 UTC — Lot CK : la source nigeriane n'est pas muette, c'est la cadence qui ne tient pas"
+        },
+        {
+          "level": 3,
+          "text": "Source primaire : la SEC a bien publie"
+        },
+        {
+          "level": 3,
+          "text": "Cinq de mes pistes sont ecartees par la mesure"
+        },
+        {
+          "level": 3,
+          "text": "La conclusion structurelle, qui ne depend d'aucune piste restante"
+        },
+        {
+          "level": 3,
+          "text": "DECISION QUI REVIENT AU PROPRIETAIRE"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-27 20:20 UTC — Lot CJ : les deux fronts Nigeria sont tranches, et aucun n'etait ou je le cherchais"
+        },
+        {
+          "level": 3,
+          "text": "Front 1 — le correctif naira ne peut rien pour 1141 ni 1196"
+        },
+        {
+          "level": 3,
+          "text": "Front 2 — l'importeur est innocent : il n'a rien recu"
         },
         {
           "level": 2,
@@ -13518,74 +13586,6 @@
         {
           "level": 3,
           "text": "Prochaine action recommandée"
-        },
-        {
-          "level": 3,
-          "text": "Risques connus"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-21 20:15 UTC — Lot CE : l'angle mort EUR/USD instruit, et il etait sain"
-        },
-        {
-          "level": 3,
-          "text": "Deux erreurs à moi, dans le même script, en sens inverse"
-        },
-        {
-          "level": 3,
-          "text": "Conclusion mesurée"
-        },
-        {
-          "level": 3,
-          "text": "Étapes de la mesure, pour ne pas refaire le chemin"
-        },
-        {
-          "level": 3,
-          "text": "Le contrôle ne peut plus se tromper en silence"
-        },
-        {
-          "level": 3,
-          "text": "Prochaine action recommandée"
-        },
-        {
-          "level": 3,
-          "text": "À ne pas faire à la reprise"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-21 19:30 UTC — Lot CD : critere de bascule ATTEINT et mesure"
-        },
-        {
-          "level": 3,
-          "text": "Le juge compte juste, et le critère est atteint"
-        },
-        {
-          "level": 3,
-          "text": "Le deuxième défaut de classificateur, trouvé en instruisant le premier"
-        },
-        {
-          "level": 3,
-          "text": "Ce que le critère couvre, et ce qu'il ne couvre pas"
-        },
-        {
-          "level": 3,
-          "text": "Prochaine action recommandée — décision du propriétaire"
-        },
-        {
-          "level": 3,
-          "text": "Risques connus"
-        },
-        {
-          "level": 3,
-          "text": "À ne pas faire à la reprise"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-21 — Lot CC : le juge du rattrapage savait pas compter"
-        },
-        {
-          "level": 3,
-          "text": "Correction d'une affirmation que j'ai faite"
         }
       ]
     },
