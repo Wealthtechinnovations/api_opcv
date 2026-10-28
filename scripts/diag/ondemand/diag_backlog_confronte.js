@@ -50,6 +50,24 @@ const DB = {
 };
 const BASE = process.env.DB_NAME || 'fund_opcvm';
 
+/**
+ * Le nom de la colonne de date, demande a la base et jamais suppose.
+ *
+ * Ma premiere version ecrivait `datejour` en dur et mourait sur
+ * `Unknown column 'datejour' in 'SELECT'` : dans `performences` la colonne
+ * s appelle `date`. Je l avais deduite du vocabulaire des autres scripts au
+ * lieu de la lire. Un diagnostic qui suppose un schema ne mesure pas la
+ * production : il mesure ma memoire de la production.
+ */
+const colonneDate = async (conn, table) => {
+  const [cols] = await conn.query(`
+    SELECT COLUMN_NAME FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`, [BASE, table]);
+  const noms = cols.map(c => c.COLUMN_NAME);
+  for (const c of ['date', 'datejour', 'date_jour', 'dateJour']) if (noms.includes(c)) return c;
+  return noms.find(n => /date/i.test(n)) || null;
+};
+
 const verdict = (id, etat, detail) => {
   const marque = { RESOLU: '✔ RESOLU      ', VRAI: '✘ TOUJOURS VRAI', AGGRAVE: '!! AGGRAVE    ',
     PARTIEL: '~ PARTIEL     ', INDETERMINE: '? INDETERMINE ' }[etat] || etat;
@@ -78,13 +96,17 @@ const verdict = (id, etat, detail) => {
       const [[trou]] = await conn.query(`
         SELECT COUNT(*) AS n FROM valorisations
          WHERE fund_id = 2825 AND value > 0 AND date BETWEEN '2022-11-01' AND '2026-05-31'`);
-      const [[p]] = await conn.query(
-        'SELECT ytd, datejour FROM performences WHERE fond_id = 2825 ORDER BY datejour DESC LIMIT 1');
+      const cd = await colonneDate(conn, 'performences');
+      const [[p]] = cd
+        ? await conn.query(`SELECT ytd, \`${cd}\` AS d FROM performences
+             WHERE fond_id = 2825 ORDER BY \`${cd}\` DESC LIMIT 1`)
+        : [[null]];
       const ytd = p ? Number(p.ytd) : null;
       const det = [
         `${f2825.nom_fond} | active=${f2825.active} | ${vl.n} VL de ${vl.mn} a ${vl.mx}`,
         `VL dans la fenetre du trou annonce (2022-11 → 2026-05) : ${trou.n}`,
-        `YTD stockee la plus recente : ${p ? `${p.ytd} au ${String(p.datejour).slice(0, 10)}` : '(aucune)'}`,
+        `colonne de date de \`performences\` : \`${cd || '(introuvable)'}\` (lue dans le schema)`,
+        `YTD stockee la plus recente : ${p ? `${p.ytd} au ${String(p.d).slice(0, 10)}` : '(aucune)'}`,
       ];
       if (ytd !== null && Math.abs(ytd) > 100) {
         det.push(`→ |YTD| = ${Math.abs(ytd).toFixed(2)} % reste aberrante.`);
@@ -133,13 +155,16 @@ const verdict = (id, etat, detail) => {
     let totalOrph = 0;
     for (const [t, lib] of tables) {
       try {
+        const cd = await colonneDate(conn, t);
+        if (!cd) { det4.push(`${lib.padEnd(14)} aucune colonne de date : non mesurable`); continue; }
         const [[o]] = await conn.query(`
           SELECT COUNT(*) AS n FROM \`${t}\` p
            WHERE NOT EXISTS (
              SELECT 1 FROM valorisations v
-              WHERE v.fund_id = p.fond_id AND v.date = p.datejour)`);
+              WHERE v.fund_id = p.fond_id AND v.date = p.\`${cd}\`)`);
         totalOrph += Number(o.n);
-        det4.push(`${lib.padEnd(14)} ${String(o.n).padStart(7)} ligne(s) orpheline(s)`);
+        det4.push(`${lib.padEnd(14)} ${String(o.n).padStart(7)} ligne(s) orpheline(s)`
+          + `  (date = \`${cd}\`)`);
       } catch (e) { det4.push(`${lib.padEnd(14)} illisible : ${e.message.slice(0, 60)}`); }
     }
     det4.push(totalOrph === 0
