@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "67c160758ef78614e454a39f3c39017219d7a86c"
+      "head": "2518d6fc974d1fa59406baa62fcf93831e7942db"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "646d92cbe8f90b916360874812116f13b624a3ad"
+      "head": "a2c0540ea41407aae5e2ac8878c261678899fc91"
     }
   },
   "summary": {
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "6afd7e6bb8ea34a3bb7f40f95652ea45e9f18d72",
-      "last_validated_sha": "6afd7e6bb8ea34a3bb7f40f95652ea45e9f18d72",
-      "content_sha256": "30001489a8787ccebf1120109687633e8e895341e5709d2f698e6da77e1577bd",
-      "line_count": 3093,
-      "byte_count": 215467,
+      "git_blob_sha": "70524dbe93841f51a9114eeb359bd20e1def7e4b",
+      "last_validated_sha": "70524dbe93841f51a9114eeb359bd20e1def7e4b",
+      "content_sha256": "f469ee36f04d133710ef38ccb769c448334e7b0258fa3942eea1c9db689221a9",
+      "line_count": 3502,
+      "byte_count": 235331,
       "headings": [
         {
           "level": 1,
@@ -10305,9 +10305,9 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "4ac2c6f4fd1a5e8601162892228cc1e33e3f408f",
-      "last_validated_sha": "4ac2c6f4fd1a5e8601162892228cc1e33e3f408f",
-      "content_sha256": "324bdc823086035ef8cda85e07a6a6ce830e7fab003a9c4ae8705e864a931e1f",
+      "git_blob_sha": "6b3aeb1ac04804b87b052fbb27f3bd4b1c2dabc4",
+      "last_validated_sha": "6b3aeb1ac04804b87b052fbb27f3bd4b1c2dabc4",
+      "content_sha256": "e2f742a1f424f470d05cb15e810f1fd094447db8e5b3437613f85bca0a15eddb",
       "line_count": 96,
       "byte_count": 7202,
       "headings": [
@@ -13388,24 +13388,24 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
-        "POINT DE REPRISE COURANT — 2026-10-28 00:45 UTC — Lot CM : le correctif est ecrit, teste, et attend le deploiement",
-        "Mesure qui ferme l'instruction",
-        "Correctif livre : `[1b/8]` controle de couverture",
-        "Defaut trouve par mon propre test, avant mise en service",
-        "Trois scenarios verifies",
-        "POINT DE REPRISE COURANT — 2026-10-28 00:35 UTC — Lot CL : CORRECTION DU LOT CK — la cadence n'est pas le defaut",
-        "Le lot CK ci-dessous contient une conclusion FAUSSE. La voici corrigee.",
-        "LE DEFAUT REEL, mesure a la ligne pres",
-        "CORRECTIF RECOMMANDE, et la cadence n'est plus premiere",
-        "POINT DE REPRISE COURANT — 2026-10-28 00:15 UTC — Lot CK : la source nigeriane n'est pas muette, c'est la cadence qui ne tient pas",
-        "Source primaire : la SEC a bien publie",
-        "Cinq de mes pistes sont ecartees par la mesure",
-        "La conclusion structurelle, qui ne depend d'aucune piste restante",
-        "DECISION QUI REVIENT AU PROPRIETAIRE",
-        "POINT DE REPRISE COURANT — 2026-10-27 20:20 UTC — Lot CJ : les deux fronts Nigeria sont tranches, et aucun n'etait ou je le cherchais",
-        "Front 1 — le correctif naira ne peut rien pour 1141 ni 1196",
-        "Front 2 — l'importeur est innocent : il n'a rien recu",
-        "POINT DE REPRISE COURANT — 2026-10-27 20:05 UTC — Lot CI : deux de mes hypotheses naira sont tombees"
+        "POINT DE REPRISE COURANT — 2026-10-28 06:55 UTC — Lot CS : les cinq indices morts ne nuisent a RIEN, et les deux chantiers n'en font qu'un",
+        "Mon alerte « cinq indices morts » est annulee — en entier",
+        "LES DEUX CHANTIERS N'EN FONT QU'UN",
+        "NOS CONTROLES AVAIENT RAISON",
+        "Bilan de mes propres faux signalements, aujourd'hui",
+        "POINT DE REPRISE COURANT — 2026-10-28 06:45 UTC — Lot CR : S5 clos — 39 785 VL archivables, et un test a moi qui ne mesurait rien",
+        "S5 — verdict : (A) ARCHIVABLES, les deux formes",
+        "DEUX ERREURS A MOI, dans le meme lot",
+        "CE QUI TIENT, ET QUI RESTE A INSTRUIRE",
+        "Bilan des sept actions sans decision",
+        "POINT DE REPRISE COURANT — 2026-10-28 06:35 UTC — Lot CQ : S5 et S7 livres — et « cinq indices morts » etait une mauvaise priorisation, la mienne",
+        "S7 — deduplication des 19 doublons : phase seche PASSEE sur la production",
+        "« Cinq indices morts » : MA priorisation etait fausse",
+        "MONIA — hypothese du lot CO CONFIRMEE",
+        "`Tunindex` / `TUNINDEX` : dette, pas donnee fausse",
+        "S5 — rattachabilite des 39 785 VL detachees : pousse, non execute",
+        "POINT DE REPRISE COURANT — 2026-10-28 06:20 UTC — Lot CP : S4 — deux defauts SEO visibles en production, CORRIGES",
+        "Ce que S4 cherchait, et ce qu'il a trouve a la place"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13421,11 +13421,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "61472bd3393422ce5407fd3c15d5639ca383f2f8",
-      "last_validated_sha": "61472bd3393422ce5407fd3c15d5639ca383f2f8",
-      "content_sha256": "9722b4dfd3e08928f7a4489c748dbbd7aa6c4ff6c21b61dddb83232405eedafa",
-      "line_count": 9460,
-      "byte_count": 616397,
+      "git_blob_sha": "facf26b0531211a5204363e60341dcfd39363b32",
+      "last_validated_sha": "facf26b0531211a5204363e60341dcfd39363b32",
+      "content_sha256": "33f261d9a5feca47f59ea1112908998c43e188fc6870819b975fb56cd710ce16",
+      "line_count": 10116,
+      "byte_count": 649772,
       "headings": [
         {
           "level": 1,
@@ -13434,6 +13434,146 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:55 UTC — Lot CS : les cinq indices morts ne nuisent a RIEN, et les deux chantiers n'en font qu'un"
+        },
+        {
+          "level": 3,
+          "text": "Mon alerte « cinq indices morts » est annulee — en entier"
+        },
+        {
+          "level": 3,
+          "text": "LES DEUX CHANTIERS N'EN FONT QU'UN"
+        },
+        {
+          "level": 3,
+          "text": "NOS CONTROLES AVAIENT RAISON"
+        },
+        {
+          "level": 3,
+          "text": "Bilan de mes propres faux signalements, aujourd'hui"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:45 UTC — Lot CR : S5 clos — 39 785 VL archivables, et un test a moi qui ne mesurait rien"
+        },
+        {
+          "level": 3,
+          "text": "S5 — verdict : (A) ARCHIVABLES, les deux formes"
+        },
+        {
+          "level": 3,
+          "text": "DEUX ERREURS A MOI, dans le meme lot"
+        },
+        {
+          "level": 3,
+          "text": "CE QUI TIENT, ET QUI RESTE A INSTRUIRE"
+        },
+        {
+          "level": 3,
+          "text": "Bilan des sept actions sans decision"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:35 UTC — Lot CQ : S5 et S7 livres — et « cinq indices morts » etait une mauvaise priorisation, la mienne"
+        },
+        {
+          "level": 3,
+          "text": "S7 — deduplication des 19 doublons : phase seche PASSEE sur la production"
+        },
+        {
+          "level": 3,
+          "text": "« Cinq indices morts » : MA priorisation etait fausse"
+        },
+        {
+          "level": 3,
+          "text": "MONIA — hypothese du lot CO CONFIRMEE"
+        },
+        {
+          "level": 3,
+          "text": "`Tunindex` / `TUNINDEX` : dette, pas donnee fausse"
+        },
+        {
+          "level": 3,
+          "text": "S5 — rattachabilite des 39 785 VL detachees : pousse, non execute"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:20 UTC — Lot CP : S4 — deux defauts SEO visibles en production, CORRIGES"
+        },
+        {
+          "level": 3,
+          "text": "Ce que S4 cherchait, et ce qu'il a trouve a la place"
+        },
+        {
+          "level": 3,
+          "text": "La correction factorise au lieu de recopier"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:00 UTC — Lot CO : S3 et S6 — le frontend est invisible aux moteurs, et P2-06 chiffre"
+        },
+        {
+          "level": 3,
+          "text": "S3 — `P2-06` chiffre, et il n'etait pas ou le backlog le disait"
+        },
+        {
+          "level": 3,
+          "text": "S6 — inventaire frontend : le prealable au chantier de conception"
+        },
+        {
+          "level": 3,
+          "text": "Ce que cela dit du chantier « concevoir le frontend »"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 05:45 UTC — Lot CN : S1 et S2 instruits — P1-03 resolu, P2-02 bien plus grave"
+        },
+        {
+          "level": 3,
+          "text": "S1 — `P1-03` est RESOLU, et sa description etait fausse"
+        },
+        {
+          "level": 3,
+          "text": "S2 — `P2-02` : le backlog nommait 4 routes, il y en a **35**"
+        },
+        {
+          "level": 3,
+          "text": "L'ORDRE DU CORRECTIF EST L'INVERSE DE L'INTUITION"
+        },
+        {
+          "level": 2,
+          "text": "PLAN UNIQUE MESURE — 2026-10-28 05:30 UTC — remplace le backlog du 2026-08-12"
+        },
+        {
+          "level": 3,
+          "text": "Pourquoi ce plan existe"
+        },
+        {
+          "level": 3,
+          "text": "A. MES PROPRES CHIFFRES, REFUTES PAR LA MESURE"
+        },
+        {
+          "level": 3,
+          "text": "B. DEFAUT MAJEUR JAMAIS NOMME DANS AUCUN DOCUMENT"
+        },
+        {
+          "level": 3,
+          "text": "C. CE QUI RESTE VRAI, ET AGGRAVE"
+        },
+        {
+          "level": 3,
+          "text": "D. CE QUE JE PEUX FAIRE SEUL — aucune decision requise"
+        },
+        {
+          "level": 3,
+          "text": "E. CE QUI ATTEND UN MOT DE VOUS — et seulement cela"
+        },
+        {
+          "level": 3,
+          "text": "F. ORDRE RECOMMANDE"
         },
         {
           "level": 2,
@@ -13446,146 +13586,6 @@
         {
           "level": 3,
           "text": "Correctif livre : `[1b/8]` controle de couverture"
-        },
-        {
-          "level": 3,
-          "text": "Defaut trouve par mon propre test, avant mise en service"
-        },
-        {
-          "level": 3,
-          "text": "Trois scenarios verifies"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 00:35 UTC — Lot CL : CORRECTION DU LOT CK — la cadence n'est pas le defaut"
-        },
-        {
-          "level": 3,
-          "text": "Le lot CK ci-dessous contient une conclusion FAUSSE. La voici corrigee."
-        },
-        {
-          "level": 3,
-          "text": "LE DEFAUT REEL, mesure a la ligne pres"
-        },
-        {
-          "level": 3,
-          "text": "CORRECTIF RECOMMANDE, et la cadence n'est plus premiere"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 00:15 UTC — Lot CK : la source nigeriane n'est pas muette, c'est la cadence qui ne tient pas"
-        },
-        {
-          "level": 3,
-          "text": "Source primaire : la SEC a bien publie"
-        },
-        {
-          "level": 3,
-          "text": "Cinq de mes pistes sont ecartees par la mesure"
-        },
-        {
-          "level": 3,
-          "text": "La conclusion structurelle, qui ne depend d'aucune piste restante"
-        },
-        {
-          "level": 3,
-          "text": "DECISION QUI REVIENT AU PROPRIETAIRE"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-27 20:20 UTC — Lot CJ : les deux fronts Nigeria sont tranches, et aucun n'etait ou je le cherchais"
-        },
-        {
-          "level": 3,
-          "text": "Front 1 — le correctif naira ne peut rien pour 1141 ni 1196"
-        },
-        {
-          "level": 3,
-          "text": "Front 2 — l'importeur est innocent : il n'a rien recu"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-27 20:05 UTC — Lot CI : deux de mes hypotheses naira sont tombees"
-        },
-        {
-          "level": 3,
-          "text": "Front 1 — pourquoi 1141 echappe au correctif naira"
-        },
-        {
-          "level": 3,
-          "text": "Front 2 — pourquoi les VL nigerianes s'arretent au 2026-10-09"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-27 19:20 UTC — Lot CH : BASCULE DU CRON DEPLOYEE EN PRODUCTION"
-        },
-        {
-          "level": 3,
-          "text": "Ce qui est en production"
-        },
-        {
-          "level": 3,
-          "text": "Incident résolu — le dépôt serveur était en conflit non résolu"
-        },
-        {
-          "level": 3,
-          "text": "Correction d'une affirmation que j'ai faite — le fuseau du serveur"
-        },
-        {
-          "level": 3,
-          "text": "Prochaine action — la vérification qui compte"
-        },
-        {
-          "level": 3,
-          "text": "Reste ouvert"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-22 03:35 UTC — Lot CG : dry-run naira, et un ecart entre promesse et perimetre"
-        },
-        {
-          "level": 3,
-          "text": "Perimetre mesure aujourd'hui"
-        },
-        {
-          "level": 3,
-          "text": "Correction d'une affirmation que j'ai faite"
-        },
-        {
-          "level": 3,
-          "text": "LE POINT BLOQUANT — le fonds 1141 n'est PAS dans les 157 lignes"
-        },
-        {
-          "level": 3,
-          "text": "EXECUTE NON LANCE, et pour cette raison precise"
-        },
-        {
-          "level": 3,
-          "text": "Si l'execute est valide un jour : l'enchainement obligatoire"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-22 00:00 UTC — Lot CF : RATTRAPAGE DES PERFORMANCES EXECUTE"
-        },
-        {
-          "level": 3,
-          "text": "Résultat mesuré"
-        },
-        {
-          "level": 3,
-          "text": "Canal utilisé, et un écart avec le plan"
-        },
-        {
-          "level": 3,
-          "text": "Migration des index : AUCUN CANAL — non exécutée"
-        },
-        {
-          "level": 3,
-          "text": "DÉCOUVERTE — `C3` est `C7`, et le correctif existe sans avoir jamais tourné"
-        },
-        {
-          "level": 3,
-          "text": "Prochaine action recommandée"
         }
       ]
     },
