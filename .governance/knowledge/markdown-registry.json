@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "2518d6fc974d1fa59406baa62fcf93831e7942db"
+      "head": "aef51d8d78245f48e69e27b033ba3c3fb9cbc0e5"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "a2c0540ea41407aae5e2ac8878c261678899fc91"
+      "head": "c31e525d9fc902e40a59f6b679d72925e08c1997"
     }
   },
   "summary": {
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "70524dbe93841f51a9114eeb359bd20e1def7e4b",
-      "last_validated_sha": "70524dbe93841f51a9114eeb359bd20e1def7e4b",
-      "content_sha256": "f469ee36f04d133710ef38ccb769c448334e7b0258fa3942eea1c9db689221a9",
+      "git_blob_sha": "a9fed943d757ad529a2ba79cc8a3488786048eb5",
+      "last_validated_sha": "a9fed943d757ad529a2ba79cc8a3488786048eb5",
+      "content_sha256": "9b6aefc64d8a64c09cf83e981846174025a0962e2bb3ec87de02bf7606da76b6",
       "line_count": 3502,
-      "byte_count": 235331,
+      "byte_count": 235266,
       "headings": [
         {
           "level": 1,
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "6b3aeb1ac04804b87b052fbb27f3bd4b1c2dabc4",
-      "last_validated_sha": "6b3aeb1ac04804b87b052fbb27f3bd4b1c2dabc4",
-      "content_sha256": "e2f742a1f424f470d05cb15e810f1fd094447db8e5b3437613f85bca0a15eddb",
+      "git_blob_sha": "cd0c0baf48197f422401632d4dbed22637c2b003",
+      "last_validated_sha": "cd0c0baf48197f422401632d4dbed22637c2b003",
+      "content_sha256": "5bc6016255242466d4f102f6de37eed4c60e159243b70c042fbcec9118208263",
       "line_count": 96,
-      "byte_count": 7202,
+      "byte_count": 7205,
       "headings": [
         {
           "level": 1,
@@ -13388,6 +13388,12 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-28 13:20 UTC — Lot CT : DEPLOYE ET VERIFIE — deux routes fermees, deux defauts SEO corriges",
+        "Verifications en production, apres deploiement",
+        "Ce qui a ete ferme",
+        "L'ordre a ete respecte, et il etait obligatoire",
+        "Parti dans le meme deploiement — `D5` et les deux defauts SEO",
+        "CE QUI RESTE OUVERT — a ne pas croire resolu",
         "POINT DE REPRISE COURANT — 2026-10-28 06:55 UTC — Lot CS : les cinq indices morts ne nuisent a RIEN, et les deux chantiers n'en font qu'un",
         "Mon alerte « cinq indices morts » est annulee — en entier",
         "LES DEUX CHANTIERS N'EN FONT QU'UN",
@@ -13399,13 +13405,7 @@
         "CE QUI TIENT, ET QUI RESTE A INSTRUIRE",
         "Bilan des sept actions sans decision",
         "POINT DE REPRISE COURANT — 2026-10-28 06:35 UTC — Lot CQ : S5 et S7 livres — et « cinq indices morts » etait une mauvaise priorisation, la mienne",
-        "S7 — deduplication des 19 doublons : phase seche PASSEE sur la production",
-        "« Cinq indices morts » : MA priorisation etait fausse",
-        "MONIA — hypothese du lot CO CONFIRMEE",
-        "`Tunindex` / `TUNINDEX` : dette, pas donnee fausse",
-        "S5 — rattachabilite des 39 785 VL detachees : pousse, non execute",
-        "POINT DE REPRISE COURANT — 2026-10-28 06:20 UTC — Lot CP : S4 — deux defauts SEO visibles en production, CORRIGES",
-        "Ce que S4 cherchait, et ce qu'il a trouve a la place"
+        "S7 — deduplication des 19 doublons : phase seche PASSEE sur la production"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13421,11 +13421,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "facf26b0531211a5204363e60341dcfd39363b32",
-      "last_validated_sha": "facf26b0531211a5204363e60341dcfd39363b32",
-      "content_sha256": "33f261d9a5feca47f59ea1112908998c43e188fc6870819b975fb56cd710ce16",
-      "line_count": 10116,
-      "byte_count": 649772,
+      "git_blob_sha": "f82322700e1e5897ffcd3e7c7d395b591bc297ff",
+      "last_validated_sha": "f82322700e1e5897ffcd3e7c7d395b591bc297ff",
+      "content_sha256": "2b86e43c6810cb06519f155b9971fce120f11f84d23914cdc4ec50d3f7050c68",
+      "line_count": 10196,
+      "byte_count": 653972,
       "headings": [
         {
           "level": 1,
@@ -13434,6 +13434,30 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-28 13:20 UTC — Lot CT : DEPLOYE ET VERIFIE — deux routes fermees, deux defauts SEO corriges"
+        },
+        {
+          "level": 3,
+          "text": "Verifications en production, apres deploiement"
+        },
+        {
+          "level": 3,
+          "text": "Ce qui a ete ferme"
+        },
+        {
+          "level": 3,
+          "text": "L'ordre a ete respecte, et il etait obligatoire"
+        },
+        {
+          "level": 3,
+          "text": "Parti dans le meme deploiement — `D5` et les deux defauts SEO"
+        },
+        {
+          "level": 3,
+          "text": "CE QUI RESTE OUVERT — a ne pas croire resolu"
         },
         {
           "level": 2,
@@ -13562,30 +13586,6 @@
         {
           "level": 3,
           "text": "C. CE QUI RESTE VRAI, ET AGGRAVE"
-        },
-        {
-          "level": 3,
-          "text": "D. CE QUE JE PEUX FAIRE SEUL — aucune decision requise"
-        },
-        {
-          "level": 3,
-          "text": "E. CE QUI ATTEND UN MOT DE VOUS — et seulement cela"
-        },
-        {
-          "level": 3,
-          "text": "F. ORDRE RECOMMANDE"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 00:45 UTC — Lot CM : le correctif est ecrit, teste, et attend le deploiement"
-        },
-        {
-          "level": 3,
-          "text": "Mesure qui ferme l'instruction"
-        },
-        {
-          "level": 3,
-          "text": "Correctif livre : `[1b/8]` controle de couverture"
         }
       ]
     },
