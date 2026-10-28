@@ -123,7 +123,22 @@ const jour = s => String(s || '').slice(0, 10);
     };
     parcourir(DOWNLOADS);
     console.log(`  ${sur.length} classeur(s) sur le disque`);
+    // CONTROLE MAL CALIBRE, CORRIGE LE 2026-10-28, ET VOICI POURQUOI.
+    // Ma premiere version comparait TOUT le cache aux classeurs du CSV et
+    // annoncait « 523 classeurs telecharges mais absents du CSV → parsing en
+    // echec ». C'etait faux, et l'erreur etait dans le perimetre, pas dans les
+    // donnees : le cron extrait avec `--years $YEAR`, donc `sec_ng_latest.csv`
+    // ne couvre que l'annee courante, tandis que `sec_ng_downloads/` conserve
+    // les millesimes depuis 2022. Les 523 « orphelins » etaient surtout des
+    // annees anterieures, legitimement absentes.
+    // Un invariant non confronte aux donnees reelles n'est qu'une affirmation
+    // de plus. La comparaison se fait desormais a perimetre egal : seuls les
+    // classeurs de l'annee couverte par le CSV sont candidats.
     const lus = new Set([...fichiers.keys()].map(f => path.basename(String(f))));
+    const anneesCsv = new Set([...fichiers.values()]
+      .flatMap(e => [...e.dates]).map(d => d.slice(0, 4)));
+    const dansPerimetre = s => anneesCsv.size === 0
+      || [...anneesCsv].some(a => s.nom.includes(`_${a}.`) || s.nom.includes(`_${a}.`.toUpperCase()));
     const recents = sur.sort((a, b) => b.mtime - a.mtime).slice(0, 12);
     console.log(`  ${'telecharge le'.padEnd(18)}${'Mo'.padStart(7)}  lu ?   nom`);
     for (const s of recents) {
@@ -131,16 +146,21 @@ const jour = s => String(s || '').slice(0, 10);
       console.log(`  ${s.mtime.toISOString().slice(0, 16).replace('T', ' ').padEnd(18)}`
         + `${(s.taille / 1e6).toFixed(1).padStart(7)}  ${lu ? 'oui ' : 'NON '}  ${s.nom.slice(0, 54)}`);
     }
-    const orphelins = sur.filter(s => !lus.has(s.nom));
+    const candidats = sur.filter(dansPerimetre);
+    const orphelins = candidats.filter(s => !lus.has(s.nom));
+    console.log(`\n  perimetre de comparaison : annee(s) ${[...anneesCsv].sort().join(', ') || '(aucune)'}`
+      + ` — ${candidats.length} classeur(s) sur ${sur.length} en cache`);
     if (orphelins.length) {
-      console.log(`\n  ${orphelins.length} classeur(s) TELECHARGE(S) MAIS ABSENT(S) DU CSV.`);
+      console.log(`  ${orphelins.length} classeur(s) TELECHARGE(S) MAIS ABSENT(S) DU CSV.`);
       console.log('  → piste (B) sous sa forme la plus silencieuse : le fichier est la, son');
       console.log('    contenu n est pas dans le CSV. Parsing en echec, feuille au nom');
       console.log('    inattendu, ou format change. Reparable chez nous.');
-    } else if (sur.length) {
-      console.log('\n  Aucun orphelin : tout ce qui est telecharge est lu.');
-      console.log('  → l extraction ne perd rien. Le defaut est AVANT le telechargement :');
-      console.log('    soit la SEC n a rien publie, soit la page d index n est pas relue.');
+    } else if (candidats.length) {
+      console.log('  Aucun orphelin dans le perimetre : tout ce qui est telecharge est lu.');
+      console.log('  → l extraction ne perd rien au parsing. Le defaut est AVANT le');
+      console.log('    telechargement. Mesure du 2026-10-28 sur la page d index de la SEC :');
+      console.log('    le document 1537 (donnees du 16 octobre) y est, mis en ligne le 25,');
+      console.log('    et notre cron du 26 ne l a pas pris. La source N EST PAS muette.');
     }
   }
 
