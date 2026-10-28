@@ -12,6 +12,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const path = require('path');
 const express = require('express');
+const { authenticate } = require('../middleware/auth');
 const router = express.Router();
 
 const app = express();
@@ -83,7 +84,24 @@ function generateApiKey() {
   }
   
   // Route pour générer une clé API pour un utilisateur avec expiration et limites
-  router.post('/api/generate-api-key', async (req, res) => {
+  // `authenticate` ajoute le 2026-10-28. Sans lui, cette route prenait un
+  // `user_id` dans le CORPS de la requete et creait une cle d API pour ce
+  // compte : elle EMETTAIT UNE CLE POUR N IMPORTE QUI, sans verifier que
+  // l appelant soit ce compte, ni qu il soit administrateur, ni qu il soit
+  // authentifie du tout. Seul un plafond de debit s y opposait, et un plafond
+  // de debit n est pas de l authentification.
+  //
+  // `authenticate` garantit desormais un appelant authentifie. Il ne garantit
+  // PAS que `user_id` soit le sien : un utilisateur authentifie peut encore
+  // demander une cle pour le compte d un autre. La restriction au proprietaire
+  // ou a l administrateur — via `authorize('admin')` ou une comparaison a
+  // `req.user.id` — est un lot distinct, car elle change le COMPORTEMENT de la
+  // route et pas seulement son acces. Elle est signalee ici pour ne pas etre
+  // oubliee, et pour que personne ne croie ce trou entierement ferme.
+  //
+  // L APPELANT ENVOIE DEJA LE JETON : `src/app/panel/admin/api-management/page.tsx`
+  // a recu `enTetesAuth()` dans le depot frontend, a deployer AVANT ce commit.
+  router.post('/api/generate-api-key', authenticate, async (req, res) => {
     const { user_id, duration_in_days, rate_limit } = req.body;
   
     if (!user_id || !duration_in_days || !rate_limit) {

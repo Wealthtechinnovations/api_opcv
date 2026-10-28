@@ -74,7 +74,21 @@ module.exports = (app) => {
       });
   })
 
-  app.post('/api/activate-user/:id', (req, res) => {
+  // `authenticate` ajoute le 2026-10-28. Sans lui, cette route prenait un
+  // identifiant dans l URL et faisait `user.update({ active: 1 })` : elle
+  // ACTIVAIT N IMPORTE QUEL COMPTE, sans aucune verification. Mesure du jour :
+  // aucune attenuation n existait — pas de `router.use()`, pas de garde global
+  // dans `app.js` (seulement un plafond de debit, qui n est pas de
+  // l authentification), et aucun controle dans le corps du gestionnaire.
+  //
+  // Les quatre routes PUT de ce fichier portent `authenticate` depuis
+  // longtemps ; cette route POST et `reject-user` avaient ete oubliees.
+  //
+  // L APPELANT ENVOIE DEJA LE JETON : `src/app/panel/admin/users/page.tsx` et
+  // `pending-accounts/page.tsx` ont recu `enTetesAuth()` dans le depot
+  // frontend. Cet ordre est obligatoire — proteger avant d envoyer l en-tete
+  // aurait casse les deux pages.
+  app.post('/api/activate-user/:id', authenticate, (req, res) => {
     const userId = req.params.id;
 
     users.findOne({
