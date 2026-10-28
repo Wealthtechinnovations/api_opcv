@@ -55,6 +55,29 @@ const DB = {
 };
 const BASE = process.env.DB_NAME || 'fund_opcvm';
 
+/**
+ * Resoudre un nom de colonne dans le schema, jamais le supposer.
+ *
+ * DEUXIEME FOIS CE JOUR-LA. `diag_backlog_confronte.js` est mort sur
+ * `Unknown column 'datejour'` (la colonne s appelle `date`), j ai ecrit un
+ * resolveur pour ce script-la, et j ai recommence ici avec `indice` — la
+ * colonne de `valorisations` s appelle `indice_name`. La lecon n avait pas ete
+ * generalisee, seulement rustinee a un endroit.
+ *
+ * `colonne(conn, table, candidats, motif)` essaie les noms connus par ordre de
+ * probabilite, puis retombe sur la premiere colonne correspondant au motif, et
+ * rend `null` si rien ne colle — pour que l appelant DISE qu il ne peut pas
+ * mesurer, au lieu de compter zero et de laisser croire a un resultat.
+ */
+const colonne = async (conn, table, candidats, motif) => {
+  const [cols] = await conn.query(`
+    SELECT COLUMN_NAME FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`, [BASE, table]);
+  const noms = cols.map(c => c.COLUMN_NAME);
+  for (const c of candidats) if (noms.includes(c)) return c;
+  return noms.find(n => motif.test(n)) || null;
+};
+
 (async () => {
   console.log('=== INDEX_CONFIG EN TROIS COPIES : DETTE, OU DONNEE FAUSSE ? ===');
   console.log(`Mesure le ${new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC — LECTURE SEULE\n`);
@@ -118,6 +141,14 @@ const BASE = process.env.DB_NAME || 'fund_opcvm';
 
     // ---- 2. MONIA : mort faute de source, ou faute de destination ? --
     console.log('\n## 2. MONIA — mort faute de SOURCE, ou faute de DESTINATION ?');
+    // `valorisations` porte le libelle d indice dans `indice_name`, pas `indice`.
+    const cvl = await colonne(conn, 'valorisations',
+      ['indice_name', 'indice', 'libelle_indice', 'indice_libelle'], /indice/i);
+    console.log(`  (colonne de libelle sur \`valorisations\` : \`${cvl || 'INTROUVABLE'}\`, lue dans le schema)`);
+    if (!cvl) {
+      console.log('  → aucune colonne de libelle d indice : la question « a-t-il une');
+      console.log('    destination ? » n est PAS mesurable ici. Ne rien conclure.');
+    }
     const [[monia]] = await conn.query(`
       SELECT COUNT(*) AS n, DATE_FORMAT(MAX(date), '%Y-%m-%d') AS derniere,
              DATE_FORMAT(MIN(date), '%Y-%m-%d') AS premiere
@@ -126,11 +157,12 @@ const BASE = process.env.DB_NAME || 'fund_opcvm';
       ? Math.round((Date.now() - Date.parse(monia.derniere)) / 86400000) : null;
     console.log(`  dans \`${table}\` : ${monia.n} valeur(s), de ${monia.premiere || '—'}`
       + ` a ${monia.derniere || '—'}${age === null ? '' : ` (age ${age} j)`}`);
-    const [[attache]] = await conn.query(`
-      SELECT COUNT(*) AS n FROM valorisations
-       WHERE LOWER(COALESCE(indice, '')) LIKE '%monia%'`);
-    console.log(`  VL portant MONIA comme indice : ${attache.n}`);
-    if (Number(monia.n) > 0 && Number(attache.n) === 0) {
+    const [[attache]] = cvl
+      ? await conn.query(`SELECT COUNT(*) AS n FROM valorisations
+           WHERE LOWER(COALESCE(\`${cvl}\`, '')) LIKE '%monia%'`)
+      : [{ n: null }];
+    console.log(`  VL portant MONIA comme indice : ${attache.n === null ? 'non mesurable' : attache.n}`);
+    if (attache.n !== null && Number(monia.n) > 0 && Number(attache.n) === 0) {
       console.log('  → HYPOTHESE CONFIRMEE. La SOURCE a produit des valeurs, mais AUCUNE VL');
       console.log('    ne porte MONIA. Le propagateur ne le connait pas, et son `pays` est');
       console.log('    un tableau vide dans les deux copies ou il figure : la propagation');
@@ -138,7 +170,7 @@ const BASE = process.env.DB_NAME || 'fund_opcvm';
       console.log('    est mort faute de DESTINATION. Le remede n est pas de reparer un');
       console.log('    scraper qui marche, c est de lui donner un pays et de l ajouter au');
       console.log('    propagateur.');
-    } else if (Number(attache.n) > 0) {
+    } else if (attache.n !== null && Number(attache.n) > 0) {
       console.log(`  → ${attache.n} VL portent MONIA : il EST propage malgre son absence du`);
       console.log('    propagateur. Un autre chemin l attache — a identifier.');
     } else {
@@ -155,11 +187,12 @@ const BASE = process.env.DB_NAME || 'fund_opcvm';
       const [[src]] = await conn.query(`
         SELECT COUNT(*) AS n, DATE_FORMAT(MAX(date), '%Y-%m-%d') AS d
           FROM \`${table}\` WHERE LOWER(\`${c}\`) LIKE ?`, [`%${m}%`]);
-      const [[dst]] = await conn.query(`
-        SELECT COUNT(*) AS n FROM valorisations
-         WHERE LOWER(COALESCE(indice, '')) LIKE ?`, [`%${m}%`]);
+      const [[dst]] = cvl
+        ? await conn.query(`SELECT COUNT(*) AS n FROM valorisations
+             WHERE LOWER(COALESCE(\`${cvl}\`, '')) LIKE ?`, [`%${m}%`])
+        : [{ n: null }];
       console.log(`  ${m.padEnd(32)}${String(src.n).padStart(9)}${String(src.d || '—').padStart(12)}`
-        + `${String(dst.n).padStart(15)}`);
+        + `${String(dst.n === null ? '?' : dst.n).padStart(15)}`);
     }
     console.log('\n  Lire la derniere colonne avant de reparer une source : un indice a zero VL');
     console.log('  rattachee ne manque a personne tant qu il n a pas de destination.');
