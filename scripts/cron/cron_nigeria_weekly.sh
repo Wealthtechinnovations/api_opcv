@@ -123,6 +123,24 @@ if [ ! -f sec_ng_latest.csv ] || [ "$(wc -l < sec_ng_latest.csv)" -lt 2 ]; then
 else
   log "[1/8] OK"
 
+  # Le « OK » ci-dessus ne prouve que ceci : un CSV existe et fait plus d une
+  # ligne. Il ne dit RIEN de ce que la page d index offrait. Le 2026-10-26,
+  # cette etape a rapporte OK avec 41 classeurs lus, alors que la SEC en
+  # offrait 42 : le document 1537, donnees du 16 octobre, mis en ligne le 25,
+  # n a jamais ete vu. Trois semaines de VL nigerianes manquantes derriere un
+  # OK, et aucune ligne de journal pour le dire — l etape n imprime que les
+  # fichiers qu elle a LUS, jamais les liens qu elle a VUS. Un lien absent de
+  # la page etait donc indistinguable d un lien absent de notre lecture.
+  #
+  # Ce controle compare ce que la page OFFRE a ce que le CSV CONTIENT et nomme
+  # l ecart. Sortie non nulle quand le plus recent manque : le compteur
+  # d erreurs s incremente et le rapport final dit « TERMINEE AVEC N
+  # ERREUR(S) » au lieu d un OK trompeur. Il ne telecharge rien, ne touche pas
+  # a la base, et ne bloque pas la suite : l import et les recalculs sur les
+  # donnees presentes restent utiles.
+  run_step "1b/8" "Controle de couverture : la page offre-t-elle plus que le CSV ?" \
+    node scripts/diag/check_sec_ng_coverage.js --annee "$YEAR" --csv sec_ng_latest.csv
+
   run_step "2/8" "Import VL Nigeria dans MySQL" \
     node scripts/import/import_vl_nigeria_sec.js sec_ng_latest.csv
 fi
