@@ -27,7 +27,27 @@
  *   (B2) la page le listait et l extraction a echoue sans le dire — requete en
  *        erreur, telechargement refuse, ou quality gate qui l a ecarte.
  *
- * MAIS LA CONCLUSION STRUCTURELLE NE DEPEND D AUCUNE DES DEUX. Delais de
+ * CE QUE CE SCRIPT A MESURE, ET QUI REFUTE MA PROPRE CONCLUSION — ajoute le
+ * 2026-10-28 00:30 UTC, apres sa premiere execution.
+ *
+ * J avais ecrit ci-dessous que la cadence hebdomadaire donnait 14 a 24 jours et
+ * que le budget de 14 jours etait « inatteignable par construction ». Le
+ * calcul, fait par la section 2 de ce script, rend **10 jours, pire cas 10
+ * jours — DANS le budget** : donnees du 16/10 mises en ligne le 25, premier
+ * lundi le 26. La cadence n est donc PAS le defaut. Je raisonnais sur l ecart
+ * entre la date de valorisation et aujourd hui en l imputant a la frequence,
+ * sans jamais calculer ce que la frequence produit.
+ *
+ * Le defaut mesure est ailleurs, et la section 6 le montre a la ligne pres : le
+ * journal du 26/10 liste les 41 classeurs par ordre alphabetique et passe de
+ * `16th_January_2026` directement a `17th_April_2026`. `16th_October_2026` n y
+ * figure nulle part. L extracteur ne l a pas ecarte, ni mal lu : IL NE L A PAS
+ * VU. Suite de l instruction dans `diag_nigeria_liens_vus.js`.
+ *
+ * Le raisonnement ci-dessous est conserve tel quel, faux, parce qu un document
+ * qui efface ses erreurs ne previent plus personne de les refaire.
+ *
+ * RAISONNEMENT INITIAL — FAUX, conserve pour memoire. Delais de
  * publication lus sur la page : donnees du 25/09 publiees le 02/10, du 02/10
  * publiees le 09/10, du 09/10 publiees le 16/10, du 16/10 publiees le 25/10 —
  * soit NEUF A DIX JOURS, a des jours variables de la semaine. Un cron
