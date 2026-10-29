@@ -60,7 +60,14 @@ module.exports = (app) => {
       });
   });
 
-  app.post('/api/reject-user/:id', (req, res) => {
+  // `authenticate` ajoute le 2026-10-29, dans la foulee d `activate-user`.
+  // Celle-ci est la plus destructrice des deux : la page d administration
+  // annonce « Le compte a ete supprime ». Elle DETRUISAIT un compte a partir
+  // d un simple identifiant d URL, sans aucune verification.
+  //
+  // L appelant envoie deja le jeton : `panel/admin/pending-accounts/page.tsx`
+  // a recu `enTetesAuth()` dans le depot frontend, a deployer AVANT ce commit.
+  app.post('/api/reject-user/:id', authenticate, (req, res) => {
     const userId = req.params.id;
     users.destroy({ where: { id: userId, active: 0 } })
       .then(deleted => {

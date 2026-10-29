@@ -134,7 +134,22 @@ function generateApiKey() {
   });
   
   // Route pour renouveler une clé API expirée
-  router.post('/api/renew-api-key', async (req, res) => {
+  //
+  // `authenticate` ajoute le 2026-10-29 — mais soyons exact sur ce qu il
+  // apporte, car j avais range cette route avec les routes « grandes ouvertes »
+  // et c etait FAUX.
+  //
+  // Elle n etait PAS sans protection : elle exige le couple `api_key` +
+  // `renewal_token` et rend 403 si la paire ne correspond a rien en base. C est
+  // une protection par POSSESSION de jeton — qui detient la cle et son jeton de
+  // renouvellement peut la prolonger. A la difference d `activate-user`, de
+  // `reject-user` et de `generate-api-key`, aucun inconnu ne pouvait agir ici
+  // sans detenir deja un secret valide.
+  //
+  // `authenticate` est donc ici une couche SUPPLEMENTAIRE, pas un trou bouche :
+  // il exige en plus une session authentifiee. Le gain reel est qu une paire
+  // cle/jeton fuitee ne suffit plus a prolonger indefiniment un acces.
+  router.post('/api/renew-api-key', authenticate, async (req, res) => {
     const { api_key, renewal_token, duration_in_days } = req.body;
   
     if (!api_key || !renewal_token || !duration_in_days) {
