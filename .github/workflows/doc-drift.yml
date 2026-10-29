@@ -176,11 +176,40 @@ jobs:
             set -u
             cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api || exit 3
             shopt -s nullglob
+
+            # CHOISIR LE MEME NODE QUE LA PRODUCTION, et dire lequel.
+            #
+            # Jusqu au 2026-10-29 cette boucle lançait `node "$f"` et heritait
+            # donc du `node` du PATH de la session SSH. Mesure du jour : les
+            # chemins standards de ce serveur portent v14.16.0 et v12.22.9,
+            # tandis que `api-monolith` tourne sous Node 22. Le canal de
+            # diagnostic n utilisait donc PAS l interpreteur de la production.
+            #
+            # Les quarante et quelques diagnostics existants ne chargent que
+            # `mysql2` et `dotenv` : ils s en accommodaient, et c est pourquoi
+            # personne ne l avait vu. Le premier a vouloir monter du code
+            # applicatif est mort sur `Cannot find module 'node:crypto'` — le
+            # prefixe `node:` exige Node >= 16. Un diagnostic qui echoue pour la
+            # version de son interpreteur mesure l interpreteur, pas la
+            # production.
+            NODE_BIN=node
+            for c in /root/.nvm/versions/node/*/bin/node /usr/local/bin/node /usr/bin/node; do
+              [ -x "$c" ] || continue
+              MAJ="$("$c" --version 2>/dev/null | sed 's/^v\([0-9]*\).*/\1/')"
+              case "$MAJ" in ''|*[!0-9]*) continue;; esac
+              [ "$MAJ" -ge 16 ] && NODE_BIN="$c" && break
+            done
+            echo "########## INTERPRETEUR DES DIAGNOSTICS ##########"
+            echo "node retenu : $NODE_BIN ($("$NODE_BIN" --version 2>/dev/null))"
+            echo "(la version est imprimee parce qu un resultat obtenu sous un"
+            echo " autre interpreteur que la production doit etre pondere)"
+            echo ""
+
             found=0
             for f in scripts/diag/ondemand/*.js; do
               found=1
               echo "########## $f ##########"
-              node "$f"
+              "$NODE_BIN" "$f"
               echo ""
             done
             [ "$found" = "0" ] && echo "(aucun script dans scripts/diag/ondemand/)"
