@@ -48,6 +48,7 @@
  *   node scripts/fix/fix_doublons_vl.js                 # dry-run, rien n est ecrit
  *   node scripts/fix/fix_doublons_vl.js --execute       # supprime, apres instantane
  *   node scripts/fix/fix_doublons_vl.js --rollback <f>  # reinsere l instantane
+ *   node scripts/fix/fix_doublons_vl.js --creer-index   # index UNIQUE, geste separe
  */
 const path = require('path');
 const fs = require('fs');
@@ -68,7 +69,59 @@ const args = process.argv.slice(2);
 const opts = {
   execute: args.includes('--execute'),
   rollback: args.includes('--rollback') ? args[args.indexOf('--rollback') + 1] : null,
+  creerIndex: args.includes('--creer-index'),
 };
+
+const INDEX_NOM = 'uq_valorisations_fund_date';
+
+/**
+ * Creer l index UNIQUE (fund_id, date), et refuser si le terrain n est pas net.
+ *
+ * GESTE SEPARE DE LA SUPPRESSION, DELIBEREMENT. La suppression des lignes a
+ * zero est reversible par instantane ; la creation d un index ne l est que par
+ * `DROP INDEX`, et elle modifie le SCHEMA — donc le contrat de la table pour
+ * tout le code qui ecrit dedans. Les deux n ont pas le meme profil de risque.
+ *
+ * Une fois l index pose, toute insertion d un doublon echouera au lieu de
+ * passer en silence. C est le but. Les chemins d ecriture connus — le cron
+ * quotidien et l import Nigeria — utilisent `INSERT IGNORE`, qui reste
+ * compatible : l insertion en conflit est ignoree, pas rejetee.
+ *
+ * MySQL autorise plusieurs NULL dans un index UNIQUE : les 18 087 lignes a
+ * `fund_id = NULL` ne bloquent donc pas sa creation.
+ */
+async function creerIndex(conn) {
+  console.log('\n=== CREATION DE L INDEX UNIQUE ===');
+  const [deja] = await conn.query(`
+    SELECT INDEX_NAME FROM information_schema.STATISTICS
+     WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'valorisations'
+       AND NON_UNIQUE = 0
+     GROUP BY INDEX_NAME
+    HAVING GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) = 'fund_id,date'`, [BASE]);
+  if (deja.length) {
+    console.log(`  Deja present : ${deja[0].INDEX_NAME}. Rien a faire.`);
+    return;
+  }
+
+  // Ne jamais lancer un ALTER qui echouera : le dire avant coute une requete
+  // et evite une erreur MySQL brute dans un journal d operation.
+  const [[reste]] = await conn.query(`
+    SELECT COUNT(*) AS n FROM (
+      SELECT fund_id, date FROM valorisations WHERE fund_id IS NOT NULL
+       GROUP BY fund_id, date HAVING COUNT(*) > 1) t`);
+  if (Number(reste.n) > 0) {
+    console.error(`  REFUS : ${reste.n} paire(s) encore en double entre fonds reels.`);
+    console.error('  La creation echouerait. Lancer la deduplication d abord.');
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log('  Aucun doublon restant entre fonds reels. Creation…');
+  await conn.query(
+    `ALTER TABLE valorisations ADD UNIQUE INDEX \`${INDEX_NOM}\` (fund_id, date)`);
+  console.log(`  Index \`${INDEX_NOM}\` cree.`);
+  console.log(`  Retour arriere : DROP INDEX \`${INDEX_NOM}\` ON valorisations;`);
+}
 
 async function rollback(conn, fichier) {
   if (!fs.existsSync(fichier)) { console.error(`Instantane introuvable : ${fichier}`); process.exit(1); }
@@ -92,6 +145,7 @@ async function rollback(conn, fichier) {
   const conn = await mysql.createConnection(DB);
   try {
     if (opts.rollback) return await rollback(conn, opts.rollback);
+    if (opts.creerIndex) return await creerIndex(conn);
 
     console.log('=== DOUBLONS DE VL PORTANT ZERO ===');
     console.log(`Mode : ${opts.execute ? 'EXECUTION' : 'DRY-RUN (aucune ecriture)'}`);

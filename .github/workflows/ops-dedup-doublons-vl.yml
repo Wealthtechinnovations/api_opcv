@@ -1,0 +1,283 @@
+# OPERATION — supprimer les 19 VL en doublon qui portent zero, puis rendre
+# l index UNIQUE (fund_id, date) creable.
+#
+# CE QUE CE WORKFLOW ECRIT, ET SUR QUELLE FOI
+# -------------------------------------------
+# Mesure du 2026-10-28 05:55 UTC, phase seche executee contre la production :
+# 19 paires (fund_id, date) dupliquees entre fonds reels, 19 lignes en trop, et
+# les 19 ont la MEME forme — une ligne a `0` en regard d une valeur reelle.
+#
+#   fonds 1552  2024-10-01   3175143:0  contre  3243394:827269.72
+#   fonds 2597  2022-07-14   3183723:0  contre  3196676:1791.27
+#   … 16 des 19 portent sur le seul fonds 2597 (FCPE FORCE PAD)
+#
+# Une VL de zero n est pas une valorisation. Il n y a donc AUCUN arbitrage
+# financier a rendre : on garde la valeur, on supprime le zero.
+#
+# AUCUNE DE CES PAIRES N EST RECENTE — zero sur les 400 derniers jours. C est un
+# heritage inerte, pas une fuite active : l index UNIQUE empechera les futurs,
+# il ne ferme pas un robinet ouvert.
+#
+# CORRECTION D UN CHIFFRE QUE J AVAIS PORTE AU BACKLOG
+# ----------------------------------------------------
+# `P2-03` a d abord ete annonce a « 1 909 paires, 16 144 lignes, arbitrage
+# financier necessaire ». C etait FAUX, et l erreur etait dans ma requete, pas
+# dans les donnees : mon `GROUP BY fund_id, date` regroupait toutes les lignes a
+# `fund_id = NULL` tombant a la meme date et les comptait comme des doublons.
+# 1 890 paires sur 1 909 et 16 125 lignes sur 16 144 etaient de ce type. Le NULL
+# exclu, il reste 19 paires.
+#
+# Ces lignes a `fund_id = NULL` — 18 087 au total — ne sont PAS touchees ici.
+# Elles relevent d un autre chantier, et MySQL autorisant plusieurs NULL dans un
+# index UNIQUE, elles ne bloquent pas la migration.
+#
+# CE QUE LE SCRIPT REFUSE DE FAIRE, et c est l essentiel
+# ------------------------------------------------------
+# Il ne touche QUE les paires dont exactement une ligne porte une valeur > 0 et
+# toutes les autres portent 0 ou NULL. Toute autre forme — deux valeurs non
+# nulles differentes — est imprimee et LAISSEE EN PLACE, et le script SORT EN
+# ECHEC meme en mode execute. Mieux vaut un nettoyage interrompu qu une valeur
+# financiere choisie au hasard : trancher entre deux VL non nulles serait decider
+# laquelle est juste, et cela n appartient pas a un script de nettoyage.
+#
+# DEUX VERROUS
+# 1. Un `push` sur ce fichier ne declenche QUE le dry-run. Il est donc impossible
+#    d ecrire quoi que ce soit en poussant du code.
+# 2. Le mode `execute` exige la phrase exacte ci-dessous, verifiee AVANT toute
+#    connexion SSH.
+#
+#    Phrase requise : VALIDER DEDUPLICATION DOUBLONS VL
+#
+# L INDEX UNIQUE EST UNE ETAPE SEPAREE, ET CE N EST PAS UN OUBLI
+# ---------------------------------------------------------------
+# `creer_index` est une entree distincte, par defaut a false. La suppression des
+# 19 lignes est reversible par instantane ; la creation d un index ne l est que
+# par `DROP INDEX`, et elle modifie le SCHEMA, donc le contrat de la table pour
+# tout le code qui ecrit dedans. Les deux gestes n ont pas le meme profil de
+# risque et ne doivent pas etre imposes ensemble.
+#
+# Une fois l index pose, toute tentative d insertion d un doublon echouera au
+# lieu de passer en silence. C est le but — mais si un import mal ecrit s appuie
+# aujourd hui sur cette tolerance, il tombera. Le cron quotidien de 20 h et
+# l import Nigeria utilisent `INSERT IGNORE`, qui reste compatible : l insertion
+# en conflit est ignoree, pas rejetee.
+#
+# ROLLBACK
+# --------
+# Chaque ligne est photographiee en entier avant suppression dans
+# `data/doublons_snapshots/<horodatage>.json`, et reinseree telle quelle, id
+# compris, par :
+#
+#   node scripts/fix/fix_doublons_vl.js --rollback data/doublons_snapshots/<f>.json
+#
+# Pour l index : DROP INDEX uq_valorisations_fund_date ON valorisations;
+
+name: ops-dedup-doublons-vl
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "dry-run (aucune ecriture) ou execute"
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - execute
+      creer_index:
+        description: "Apres suppression, creer l index UNIQUE (fund_id, date) — modifie le SCHEMA"
+        required: false
+        default: false
+        type: boolean
+      confirmation:
+        description: "Pour execute uniquement — taper : VALIDER DEDUPLICATION DOUBLONS VL"
+        required: false
+        default: ""
+        type: string
+  push:
+    paths:
+      - '.github/workflows/ops-dedup-doublons-vl.yml'
+
+permissions:
+  # `write` parce que le rapport est consigne dans le depot : le resume GitHub
+  # n est lisible que dans l onglet Actions, donc invisible a toute session sans
+  # acces API. Une operation qui touche la production laisse sa trace la ou vit
+  # le projet.
+  contents: write
+
+concurrency:
+  group: ops-dedup-doublons-vl
+  cancel-in-progress: false
+
+jobs:
+  dedup:
+    name: Perimetre puis, sur validation, suppression
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Determiner le mode et verifier la validation
+        id: mode
+        env:
+          MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'dry-run' }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -u
+          PHRASE="VALIDER DEDUPLICATION DOUBLONS VL"
+          if [ "$MODE" != "execute" ]; then
+            echo "Mode : dry-run (aucune ecriture)."
+            echo "mode=dry-run" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Comparaison stricte, sans normalisation : une phrase approximative
+          # doit echouer, sinon le verrou ne verrouille rien.
+          if [ "$CONFIRMATION" != "$PHRASE" ]; then
+            echo "::error::Mode execute demande sans la phrase exacte. Attendu : $PHRASE"
+            exit 1
+          fi
+          echo "Mode : EXECUTE — validation reconnue."
+          echo "mode=execute" >> "$GITHUB_OUTPUT"
+
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+        with:
+          # Un workflow_dispatch peut partir de n importe quelle branche ; le
+          # rapport doit toujours atterrir sur celle-ci.
+          ref: claude/code-review-improvements-ikvuj
+
+      - name: Verifier les secrets
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          KEY: ${{ secrets.S2_SSH_KEY }}
+        run: |
+          # Presence uniquement : aucune valeur n est affichee.
+          if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+            echo "::error::Secrets S2_HOST / S2_SSH_KEY manquants."
+            exit 1
+          fi
+          echo "Secrets presents."
+
+      - name: Preparer la connexion SSH epinglee
+        env:
+          S2_HOST: ${{ secrets.S2_HOST }}
+          S2_SSH_KEY: ${{ secrets.S2_SSH_KEY }}
+          S2_KNOWN_HOSTS: ${{ secrets.S2_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          bash scripts/governance/prepare_s2_ssh.sh
+
+      - name: Executer
+        env:
+          HOST: ${{ secrets.S2_HOST }}
+          USER_SSH: ${{ secrets.S2_USER }}
+          MODE: ${{ steps.mode.outputs.mode }}
+          CREER_INDEX: ${{ inputs.creer_index }}
+        run: |
+          set -o pipefail
+          SSH_USER="${USER_SSH:-root}"
+          ssh -i ~/.ssh/id_deploy -o BatchMode=yes \
+              -o ServerAliveInterval=30 -o ServerAliveCountMax=120 \
+              "$SSH_USER@$HOST" \
+            "MODE='$MODE' CREER_INDEX='$CREER_INDEX' bash -s" <<'REMOTE' 2>&1 | tee rapport-dedup.txt
+            set -u
+            API_DIR=/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api
+            cd "$API_DIR" || exit 3
+
+            # Le serveur doit executer le code POUSSE, pas celui qu il avait.
+            echo "Commit avant mise a jour : $(git log -1 --oneline)"
+            git pull --rebase origin claude/code-review-improvements-ikvuj \
+              || echo "AVERTISSEMENT : pull impossible, le code du serveur peut etre en retard."
+            echo "Commit retenu        : $(git log -1 --oneline)"
+            echo ""
+
+            echo "=============================================="
+            echo " 1. PERIMETRE (dry-run de controle)"
+            echo "=============================================="
+            # Toujours execute, y compris avant une ecriture : si le perimetre a
+            # bouge depuis la mesure du 2026-10-28, on le voit AVANT d ecrire.
+            # Et si une paire exige un arbitrage, le script le dit ici.
+            node scripts/fix/fix_doublons_vl.js || exit 4
+
+            if [ "${MODE:-dry-run}" != "execute" ]; then
+              echo ""
+              echo "Mode dry-run — aucune ecriture. Fin."
+              exit 0
+            fi
+
+            echo ""
+            echo "=============================================="
+            echo " 2. SUPPRESSION DES LIGNES A ZERO"
+            echo "=============================================="
+            # Le script refuse de tourner si une paire exige un arbitrage : un
+            # echec ici est donc un refus deliberé, pas une panne.
+            node scripts/fix/fix_doublons_vl.js --execute || exit 5
+
+            echo ""
+            echo "=============================================="
+            echo " 3. VERIFICATION — le script est idempotent"
+            echo "=============================================="
+            # Relance : il ne doit plus rien trouver a supprimer, et annoncer
+            # que l index serait creable.
+            node scripts/fix/fix_doublons_vl.js || true
+
+            if [ "${CREER_INDEX:-false}" = "true" ]; then
+              echo ""
+              echo "=============================================="
+              echo " 4. CREATION DE L INDEX UNIQUE (demandee explicitement)"
+              echo "=============================================="
+              echo "Modifie le SCHEMA. Retour arriere :"
+              echo "  DROP INDEX uq_valorisations_fund_date ON valorisations;"
+              # L index est cree par le script Node, qui porte les credentials
+              # du .env : aucun mot de passe ne transite par cette commande.
+              node scripts/fix/fix_doublons_vl.js --creer-index \
+                || echo "AVERTISSEMENT : creation de l index en echec. Les 19 lignes"
+              echo "  restent supprimees — ce sont deux gestes independants."
+            else
+              echo ""
+              echo "Index NON demande. La table reste sans contrainte :"
+              echo "rien n empeche encore un futur doublon d y entrer."
+            fi
+
+            echo ""
+            echo "Instantanes disponibles pour rollback :"
+            ls -1t data/doublons_snapshots/*.json 2>/dev/null | head -3 || echo "  aucun"
+          REMOTE
+
+      - name: Consigner le rapport dans le depot
+        if: always()
+        run: |
+          set -u
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mkdir -p docs
+          {
+            echo "# Deduplication des VL en doublon — journal des operations"
+            echo
+            echo "> Genere par \`ops-dedup-doublons-vl.yml\`. Ne pas modifier a la main."
+            echo
+            echo "Derniere execution : **$(date -u '+%Y-%m-%d %H:%M UTC')**"
+            echo "Mode : **${{ steps.mode.outputs.mode }}**"
+            echo "Index UNIQUE demande : **${{ inputs.creer_index }}**"
+            echo "Declencheur : \`${{ github.event_name }}\` — par \`${{ github.actor }}\`"
+            echo
+            echo '```'
+            cat rapport-dedup.txt 2>/dev/null || echo "(aucune sortie — la connexion au serveur a echoue)"
+            echo '```'
+          } > docs/OPS_DEDUP_DOUBLONS_VL.md
+
+          git add docs/OPS_DEDUP_DOUBLONS_VL.md
+          if git diff --cached --quiet; then
+            echo "Rapport inchange, aucun commit."
+          else
+            git commit -m "chore(ops): dedup doublons VL — ${{ steps.mode.outputs.mode }} $(date -u '+%Y-%m-%d %H:%M UTC') [skip ci]"
+            # Rebase avant push : ne jamais ecraser un commit pousse entre-temps.
+            git pull --rebase origin claude/code-review-improvements-ikvuj || true
+            git push origin HEAD:claude/code-review-improvements-ikvuj
+            echo "Rapport consigne dans le depot."
+          fi
+
+      - name: Effacer la cle SSH
+        if: always()
+        run: rm -f ~/.ssh/id_deploy
