@@ -126,6 +126,48 @@ const chrono = async (etiquette, fn) => {
         + '    est donc un BALAYAGE COMPLET de la table. Repete en boucle, c est le\n'
         + '    candidat le plus serieux pour les 120 s.');
 
+    // ---- 1bis. LES RATIOS REPOSENT-ILS SUR UN TAUX REEL ? ------------
+    // Question plus grave que la lenteur, et decouverte en l instruisant.
+    // `taux_sans_risques` est VIDE. La route interroge d abord `tsrhistos`,
+    // puis retombe sur `TSR_DEFAULTS` — des taux ECRITS EN DUR dans le code :
+    // MAROC 2,75 %, NIGERIA 27,5 %, TUNISIE 8 %, UEMOA 3,5 %, CEMAC 5 %,
+    // utilises SEPT fois comme repli. Si `tsrhistos` est vide aussi, alors tout
+    // Sharpe, Sortino et Calmar affiche repose sur une CONSTANTE, et non sur un
+    // taux observe — ce que la regle du projet interdit explicitement :
+    // « ne jamais inventer un taux ». Un repli documente est defendable ; un
+    // repli SILENCIEUX ne l est pas.
+    console.log('\n## 1bis. LES RATIOS REPOSENT-ILS SUR UN TAUX REEL ?');
+    const HIST = await resoudreTable(conn, ['tsrhistos', 'tsrhisto'], /tsrhist/i);
+    console.log(`  table historique : \`${HIST || 'INTROUVABLE'}\``);
+    if (!HIST) {
+      console.log('  → introuvable : le repli en dur est alors la SEULE source possible.');
+    } else {
+      const [[h]] = await conn.query(`SELECT COUNT(*) AS n FROM \`${HIST}\``);
+      console.log(`  ${h.n} ligne(s)`);
+      if (Number(h.n) === 0) {
+        console.log('  → VIDE ELLE AUSSI. Les deux sources de taux sans risque sont vides :');
+        console.log('    tout Sharpe, Sortino et Calmar affiche repose donc sur les');
+        console.log('    constantes de `TSR_DEFAULTS`, pas sur un taux observe.');
+      } else {
+        try {
+          const [parPays] = await conn.query(`
+            SELECT pays, COUNT(*) AS n, DATE_FORMAT(MAX(date), '%Y-%m-%d') AS derniere,
+                   DATEDIFF(CURDATE(), MAX(date)) AS age
+              FROM \`${HIST}\` GROUP BY pays ORDER BY n DESC`);
+          console.log(`  ${'pays'.padEnd(12)}${'lignes'.padStart(8)}${'derniere'.padStart(12)}${'age'.padStart(8)}`);
+          for (const r of parPays) {
+            console.log(`  ${String(r.pays || '(vide)').slice(0, 11).padEnd(12)}${String(r.n).padStart(8)}`
+              + `${String(r.derniere || '—').padStart(12)}${String(r.age == null ? '—' : r.age + ' j').padStart(8)}`);
+          }
+          const perimes = parPays.filter(r => Number(r.age) > 400);
+          console.log(perimes.length
+            ? `  → ${perimes.length} pays dont le taux a plus de 400 jours : pour ceux-la le\n`
+              + '    repli en dur s applique en pratique, meme si la table n est pas vide.'
+            : '  → les taux sont alimentes : le repli en dur ne devrait pas s appliquer.');
+        } catch (e) { console.log(`  decoupage par pays impossible : ${e.message.slice(0, 60)}`); }
+      }
+    }
+
     // ---- 2. Le cout reel d UN appel, puis extrapolation --------------
     console.log('\n## 2. LE COUT D UN SEUL APPEL, MESURE');
     const [[pays1]] = await conn.query(
