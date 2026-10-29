@@ -115,7 +115,7 @@ jobs:
               npm ci --no-audit --no-fund
               npm run build:next
               echo "frontend_build_head=$(git rev-parse HEAD)"
-            REMOTE
+          REMOTE
 
       - name: Restart frontend only for explicit deploy
         if: steps.mode.outputs.action == 'deploy'
@@ -145,7 +145,7 @@ jobs:
               echo "public_frontend_http=$PUBLIC"
               case "$PUBLIC" in 2*|3*) ;; *) exit 41;; esac
               pm2 describe fundafrique-frontend | grep -E 'status|restarts|exec interpreter|script path' || true
-            REMOTE
+          REMOTE
 
       - name: Publish report
         if: always()

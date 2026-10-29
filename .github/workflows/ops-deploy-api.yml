@@ -124,7 +124,7 @@ jobs:
               echo "public_api_http=$PUBLIC"
               case "$PUBLIC" in 2*) ;; *) exit 41;; esac
               pm2 describe api-monolith | grep -E 'status|restarts|exec interpreter|script path' || true
-            REMOTE
+          REMOTE
 
       - name: Publish report
         if: always()
