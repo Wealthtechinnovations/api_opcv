@@ -89,9 +89,39 @@ const SECONDES = 15;
         { host: '127.0.0.1', port, path: '/api/ratiosnew/2026/1141' },
         res => { res.resume(); res.on('end', () => console.error('repondu ' + res.statusCode)); }
       ).on('error', e => console.error('requete en erreur : ' + e.message));
-      // On laisse le CPU chauffer, puis on meurt proprement pour que V8 ecrive
-      // le profil : un process.exit() brutal le perdrait.
-      setTimeout(() => { try { srv.close(); } catch {} process.exit(0); }, ${SECONDES * 1000});
+      // LA SONDE DIT CE QU ELLE ATTEND, au lieu de nous laisser le deviner.
+      //
+      // Six hypotheses ont ete refutees par la mesure — volume, index, N+1 sur
+      // 'tsr', boucle infinie, CPU JavaScript (82,5 % '(idle)'), et pool epuise
+      // (8 connexions sur 20, et 'acquire' plafonne a 30 s quand le blocage
+      // dure 120 s). Le processus attend donc un 'await' qui ne se resout NI ne
+      // rejette jamais. Plutot que d en formuler une septieme, on demande a
+      // Node ce qui reste en suspens dans sa boucle d evenements.
+      //
+      // 'getActiveResourcesInfo()' nomme le TYPE des ressources vivantes :
+      // 'TCPSocketWrap' pointe vers un socket ouvert, 'Timeout' vers une
+      // minuterie, et l absence de toute ressource liee a la requete vers une
+      // promesse jamais reglee — trois causes distinctes, trois corrections
+      // distinctes.
+      setTimeout(() => {
+        try {
+          const ressources = typeof process.getActiveResourcesInfo === 'function'
+            ? process.getActiveResourcesInfo()
+            : (process._getActiveHandles ? process._getActiveHandles().map(h =>
+                (h && h.constructor && h.constructor.name) || typeof h) : null);
+          if (!ressources) {
+            console.error('RESSOURCES_INDISPONIBLES (Node trop ancien pour cette introspection)');
+          } else {
+            const parType = {};
+            for (const r of ressources) parType[r] = (parType[r] || 0) + 1;
+            console.error('RESSOURCES_EN_SUSPENS ' + JSON.stringify(parType));
+          }
+        } catch (e) {
+          console.error('RESSOURCES_ERREUR ' + e.message);
+        }
+        try { srv.close(); } catch {}
+        process.exit(0);
+      }, ${SECONDES * 1000});
     });
   `);
 
@@ -183,6 +213,33 @@ const SECONDES = 15;
   const trace = String(r.stderr || '');
   const monte = trace.includes('ROUTEUR_MONTE');
   const ecoute = trace.includes('SONDE_ECOUTE');
+  // ---- 1ter. CE QUE LA SONDE ATTENDAIT -----------------------------
+  const suspens = (String(r.stderr || '').match(/RESSOURCES_EN_SUSPENS (\{.*\})/) || [])[1];
+  console.log('\n## 1ter. CE QUE LA SONDE ATTENDAIT, AU MOMENT DU BLOCAGE');
+  if (suspens) {
+    console.log(`  ressources vivantes dans la boucle d evenements : ${suspens}`);
+    const t = (() => { try { return JSON.parse(suspens); } catch { return {}; } })();
+    const types = Object.keys(t);
+    if (types.some(k => /TCP|Socket|Pipe/i.test(k))) {
+      console.log('  → un SOCKET est ouvert. La route attend une reponse reseau : connexion');
+      console.log('    a la base jamais rendue, ou appel sortant sans delai d expiration.');
+      console.log('    C est la seule piste compatible avec un processus inactif, une base');
+      console.log('    sans requete active et un pool non sature.');
+    } else if (types.some(k => /Timeout|Immediate/i.test(k))) {
+      console.log('  → une MINUTERIE est vivante. Un `setTimeout` ou un `setInterval` tient');
+      console.log('    la boucle ouverte sans que la requete avance.');
+    } else if (!types.length) {
+      console.log('  → AUCUNE ressource vivante, et la requete n a pourtant pas repondu :');
+      console.log('    une promesse n a jamais ete reglee. Ni resolue, ni rejetee — le cas');
+      console.log('    le plus silencieux, et celui qu aucun delai cote serveur ne rattrape.');
+    } else {
+      console.log('  → types inattendus : les lire avant de conclure.');
+    }
+  } else {
+    console.log('  non releve (sonde interrompue avant le releve, ou Node sans cette');
+    console.log('  introspection). Ne rien en deduire.');
+  }
+
   console.log(`\n## 1bis. LA MESURE A-T-ELLE EU LIEU ?`);
   console.log(`  routeur monte : ${monte ? 'OUI' : 'NON'} | sonde en ecoute : ${ecoute ? 'OUI' : 'NON'}`);
   if (!monte || !ecoute) {
