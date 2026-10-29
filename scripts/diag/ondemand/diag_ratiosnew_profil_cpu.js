@@ -238,6 +238,41 @@ const SECONDES = 15;
   const chaudes = lignes.filter(l => l.ou.includes('apigestionratios'));
   const t1 = lignes[0];
   console.log(`  fonction la plus chaude : ${t1.nom} (${t1.pct.toFixed(1)} %) — ${t1.ou}`);
+
+  // L INACTIVITE PASSE AVANT TOUT, et c est la correction du 2026-10-29.
+  // Ma version precedente a designe des lignes a 0,1 % comme « le point chaud »
+  // alors que `(idle)` pesait 82,5 %. C est faux et trompeur : un processus
+  // inactif ne calcule pas, il ATTEND, et chercher sa fonction la plus chaude
+  // n a aucun sens. Troisieme fois qu une de mes logiques de verdict conclut de
+  // travers — elle verifie desormais l inactivite AVANT de parler de point
+  // chaud.
+  const inactif = lignes.find(l => l.nom === '(idle)');
+  const partInactive = inactif ? inactif.pct : 0;
+  if (partInactive > 50) {
+    console.log(`\n  → LA ROUTE N EST PAS LENTE : ELLE ATTEND. \`(idle)\` represente`);
+    console.log(`    ${partInactive.toFixed(1)} % du temps. Le processus ne calcule pas, il est bloque sur`);
+    console.log('    un `await` qui ne revient pas.');
+    console.log('\n    Ce qui est donc ECARTE : le CPU JavaScript (ce profil), le volume de');
+    console.log('    donnees, l index, et une requete SQL lente — la base montrait 0 requete');
+    console.log('    active sur vingt echantillons.');
+    console.log('\n    ANGLE MORT A LEVER EN PRIORITE : cette mesure de la base filtrait');
+    console.log('    `COMMAND <> \'Sleep\'`. Elle ne pouvait donc pas voir des connexions');
+    console.log('    DETENUES MAIS INACTIVES. « Base au repos » et « pool de connexions');
+    console.log('    epuise » rendent exactement le meme resultat sous ce filtre, et');
+    console.log('    menent a des corrections opposees. La mesure suivante doit compter');
+    console.log('    TOUTES les connexions, Sleep comprises, et les comparer a la taille du');
+    console.log('    pool configure.');
+    console.log('\n    Les lignes ci-dessous ne sont PAS un point chaud : a moins de 1 %');
+    console.log('    elles ne disent qu ou le profileur a surpris la pile, pas ou passe le');
+    console.log('    temps.');
+    for (const l of chaudes.slice(0, 5)) {
+      console.log(`      ${(l.pct.toFixed(1) + ' %').padStart(6)}  ligne ${l.ou.split(':').pop()}  ${l.nom}`);
+    }
+    try { fs.rmSync(tmp, { recursive: true, force: true }); } catch {}
+    console.log('\n=== FIN — aucune ecriture effectuee ===');
+    return;
+  }
+
   if (chaudes.length) {
     const part = chaudes.reduce((s, l) => s + l.pct, 0);
     console.log(`  ${part.toFixed(1)} % du temps propre est dans \`apigestionratios.js\` :`);
