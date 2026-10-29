@@ -95,8 +95,56 @@ const SECONDES = 15;
     });
   `);
 
-  console.log(`## 1. PROFILAGE DE ${SECONDES} SECONDES`);
-  const r = spawnSync(process.execPath,
+  // ---- 0bis. QUEL NODE ? Le canal et la production diffèrent --------
+  // DECOUVERT EN ECHOUANT. La sonde est morte sur
+  // `Cannot find module 'node:crypto'` : le prefixe `node:` exige Node >= 16,
+  // or le canal a la demande lance les diagnostics par un simple `node "$f"` et
+  // herite donc du `node` du PATH de la session SSH — un Node ancien. La
+  // production, elle, tourne sur Node 22. Un diagnostic peut ainsi echouer pour
+  // une raison ETRANGERE a ce qu il mesure, et c est un piege a consigner.
+  //
+  // On cherche donc un Node >= 16 avant de profiler, et on IMPRIME lequel : un
+  // profil obtenu sous un autre interprete que la production ne mesure pas tout
+  // a fait la production, et le lecteur doit le savoir.
+  const versionDe = bin => {
+    try {
+      const v = spawnSync(bin, ['--version'], { encoding: 'utf8', timeout: 8000 });
+      const m = String(v.stdout || '').match(/^v(\d+)\./);
+      return m ? { bin, majeure: Number(m[1]), texte: v.stdout.trim() } : null;
+    } catch { return null; }
+  };
+  const candidats = [process.execPath, 'node', '/usr/local/bin/node', '/usr/bin/node'];
+  // Les installations gerees par nvm ou n vivent hors des chemins standards.
+  for (const racine of ['/root/.nvm/versions/node', '/usr/local/n/versions/node']) {
+    try {
+      for (const d of fs.readdirSync(racine).sort().reverse()) {
+        candidats.push(path.join(racine, d, 'bin/node'));
+      }
+    } catch { /* absent, on passe */ }
+  }
+  console.log('## 0bis. QUEL INTERPRETE NODE ?');
+  let choisi = null;
+  for (const c of candidats) {
+    const v = versionDe(c);
+    if (!v) continue;
+    const ok = v.majeure >= 16;
+    console.log(`  ${ok ? 'retenu ' : 'ecarte '} ${v.texte.padEnd(10)} ${c}`);
+    if (ok) { choisi = v; break; }
+  }
+  if (!choisi) {
+    console.log('  → AUCUN Node >= 16 trouve sur ce serveur depuis ce canal. Le profilage');
+    console.log('    est impossible ici : les modules de l application utilisent le prefixe');
+    console.log('    `node:`, refuse par les versions anterieures. NE RIEN CONCLURE sur la');
+    console.log('    cause des 120 s — et noter que le canal a la demande tourne sur un');
+    console.log('    Node plus ancien que la production, ce qui merite d etre corrige dans');
+    console.log('    `doc-drift.yml` independamment de ce diagnostic.');
+    process.exitCode = 2;
+    return;
+  }
+  const NODE = choisi.bin;
+
+  console.log(`\n## 1. PROFILAGE DE ${SECONDES} SECONDES (avec ${choisi.texte})`);
+  const r = spawnSync(NODE,
     ['--cpu-prof', '--cpu-prof-dir', tmp, '--cpu-prof-name', 'ratios.cpuprofile', sonde],
     { cwd: RACINE, encoding: 'utf8', timeout: (SECONDES + 25) * 1000 });
   for (const l of String(r.stderr || '').split('\n').slice(0, 8)) if (l.trim()) console.log(`  | ${l}`);
