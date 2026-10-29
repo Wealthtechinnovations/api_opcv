@@ -61,3 +61,4 @@ Thumbs.db
 .idea/
 logs/
 __pycache__/
+.diag-profil-*/

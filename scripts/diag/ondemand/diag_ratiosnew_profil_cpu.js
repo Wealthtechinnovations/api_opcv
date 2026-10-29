@@ -56,18 +56,26 @@ const SECONDES = 15;
   console.log('Profilage CPU dans un processus jetable. La route et la production');
   console.log('ne sont pas modifiees.\n');
 
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'profil-ratios-'));
+  // LA SONDE DOIT VIVRE DANS LE PROJET, et c est la correction du 2026-10-29.
+  // Ma premiere version l ecrivait dans /tmp : Node resout alors `require` par
+  // rapport a /tmp, n y trouve aucun `node_modules`, et la sonde est morte sur
+  // `Cannot find module 'dotenv'` sans jamais atteindre la route. Mettre la
+  // sonde dans le projet rend la resolution naturelle, au lieu de devoir donner
+  // un chemin absolu a chaque dependance — et d en oublier une.
+  const tmp = fs.mkdtempSync(path.join(RACINE, '.diag-profil-'));
   const sonde = path.join(tmp, 'sonde.js');
 
   // La sonde monte le VRAI routeur et emet une requete contre lui.
   fs.writeFileSync(sonde, `
     require('dotenv').config({ path: ${JSON.stringify(path.join(RACINE, '.env'))} });
+    console.error('SONDE_DEMARREE');
     process.chdir(${JSON.stringify(RACINE)});
-    const express = require(${JSON.stringify(path.join(RACINE, 'node_modules/express'))});
+    const express = require('express');
     const app = express();
     app.use(express.json());
     try {
       const r = require(${JSON.stringify(path.join(RACINE, 'src/routes/apigestionratios'))});
+      console.error('ROUTEUR_MONTE');
       // Le module exporte soit un routeur, soit une fonction (app) => {…}.
       if (typeof r === 'function' && r.length >= 1 && !r.stack) { r(app); } else { app.use(r); }
     } catch (e) {
@@ -111,6 +119,33 @@ const SECONDES = 15;
     fs.renameSync(path.join(tmp, autres[0]), profil);
   }
 
+  // ---- 1bis. LA MESURE A-T-ELLE REELLEMENT EU LIEU ? ---------------
+  // GARDE-FOU AJOUTE APRES UN ECHEC DE CE SCRIPT LUI-MEME. Sa premiere version
+  // a rendu un VERDICT — « aucun temps propre dans apigestionratios.js » —
+  // alors que la sonde etait morte avant d atteindre la route : un profil avait
+  // bien ete ecrit, mais il ne contenait que 37 echantillons du chargement des
+  // modules de Node, sur 0,0 s. Mes controles verifiaient l existence du profil
+  // et mon propre code de sortie ; ni l un ni l autre ne verifiait que la ROUTE
+  // avait tourne.
+  //
+  // Un profil vide et un profil montrant « aucun cout dans la route » se
+  // ressemblent exactement, et menent a des conclusions opposees. On exige donc
+  // trois preuves : la sonde a monte le routeur, elle a ecoute, et le profil
+  // couvre une duree plausible.
+  const trace = String(r.stderr || '');
+  const monte = trace.includes('ROUTEUR_MONTE');
+  const ecoute = trace.includes('SONDE_ECOUTE');
+  console.log(`\n## 1bis. LA MESURE A-T-ELLE EU LIEU ?`);
+  console.log(`  routeur monte : ${monte ? 'OUI' : 'NON'} | sonde en ecoute : ${ecoute ? 'OUI' : 'NON'}`);
+  if (!monte || !ecoute) {
+    console.log('  → LA MESURE A ECHOUE. La sonde n a pas atteint la route : le profil ne');
+    console.log('    contient que le demarrage de Node. NE RIEN CONCLURE — un profil vide');
+    console.log('    et un profil « aucun cout dans la route » se ressemblent exactement,');
+    console.log('    et menent a des conclusions opposees. Voir la trace ci-dessus.');
+    process.exitCode = 2;
+    return;
+  }
+
   // ---- 2. Depouillement : temps PROPRE par fonction -----------------
   const p = JSON.parse(fs.readFileSync(profil, 'utf8'));
   const parId = new Map(p.nodes.map(n => [n.id, n]));
@@ -122,6 +157,12 @@ const SECONDES = 15;
   const total = (p.samples || []).length;
   const duree = (p.endTime - p.startTime) / 1e6;
   console.log(`\n## 2. ${total} echantillon(s) sur ${duree.toFixed(1)} s de profil`);
+  if (duree < 5) {
+    console.log(`  → profil de ${duree.toFixed(1)} s seulement alors que ${SECONDES} s etaient`);
+    console.log('    demandees : la sonde est morte prematurement. NE RIEN CONCLURE.');
+    process.exitCode = 2;
+    return;
+  }
   if (!total) {
     console.log('  aucun echantillon : rien a depouiller.');
     process.exitCode = 2;
