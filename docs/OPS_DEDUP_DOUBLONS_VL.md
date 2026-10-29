@@ -4,33 +4,27 @@
 
 Derniere execution : **2026-10-29 18:09 UTC**
 Mode : **dry-run**
-Index UNIQUE demande : ****
-Declencheur : `push` — par `Wealthtechinnovations`
+Index UNIQUE demande : **false**
+Declencheur : `workflow_dispatch` — par `Wealthtechinnovations`
 
 ```
-Commit avant mise a jour : 4afd7f569 chore(governance): certify all current Markdown [skip ci]
+Commit avant mise a jour : ec5674ac4 feat(ops): workflow gouverne pour V2 — dedup des 19 doublons puis index UNIQUE
 From https://github.com/Wealthtechinnovations/api_opcv
  * branch                claude/code-review-improvements-ikvuj -> FETCH_HEAD
-   4afd7f569..ec5674ac4  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
-Updating 4afd7f569..ec5674ac4
+   ec5674ac4..6cccc5a73  claude/code-review-improvements-ikvuj -> origin/claude/code-review-improvements-ikvuj
+Updating ec5674ac4..6cccc5a73
 Fast-forward
- .github/workflows/ops-dedup-doublons-vl.yml  | 283 +++++++++++
- .governance/knowledge/markdown-registry.json |  16 +-
- docs/DIAG_ONDEMAND.md                        | 684 +++++++++++++--------------
- docs/ETAT_PRODUCTION_VERIFIE.md              |  48 +-
- scripts/fix/fix_doublons_vl.js               |  54 +++
- src/routes/apigestionapikey.js               |  17 +-
- src/routes/routes_vl_admin.js                |   9 +-
- 7 files changed, 735 insertions(+), 376 deletions(-)
- create mode 100644 .github/workflows/ops-dedup-doublons-vl.yml
-Commit retenu        : ec5674ac4 feat(ops): workflow gouverne pour V2 — dedup des 19 doublons puis index UNIQUE
+ docs/OPS_DEDUP_DOUBLONS_VL.md | 71 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
+ create mode 100644 docs/OPS_DEDUP_DOUBLONS_VL.md
+Commit retenu        : 6cccc5a73 chore(ops): dedup doublons VL — dry-run 2026-10-29 18:09 UTC [skip ci]
 
 ==============================================
  1. PERIMETRE (dry-run de controle)
 ==============================================
 === DOUBLONS DE VL PORTANT ZERO ===
 Mode : DRY-RUN (aucune ecriture)
-Mesure le 2026-10-29 18:09:02 UTC
+Mesure le 2026-10-29 18:09:17 UTC
 
 19 paire(s) dupliquee(s), fonds reels uniquement.
 
