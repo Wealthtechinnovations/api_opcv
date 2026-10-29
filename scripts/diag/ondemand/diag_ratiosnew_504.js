@@ -57,6 +57,32 @@ const BASE = process.env.DB_NAME || 'fund_opcvm';
 // contraste qui disqualifie l explication par le volume.
 const FONDS = [1141, 2743];
 
+/**
+ * Resoudre le NOM REEL de la table, jamais le deduire du nom du modele.
+ *
+ * QUATRIEME SUPPOSITION DE SCHEMA DE CE CYCLE, et la plus instructive. Ce
+ * script est mort sur `Table 'fund_opcvm.tsr' doesn't exist` parce que j avais
+ * pris `tsr` pour un nom de table. Ce n en est pas un : dans
+ * `src/db/sequelize.js`, `tsr` est un ALIAS (`const tsr = taux`) vers le modele
+ * `src/models/tsr.js`, qui fait `sequelize.define('taux_sans_risques', …)`.
+ *
+ * Les trois precedentes etaient `datejour` (la colonne s appelle `date`),
+ * `indice` (c est `indice_name`) et une comparaison sur cle primaire au lieu de
+ * cle etrangere. A chaque fois le meme mecanisme : j ai lu le vocabulaire du
+ * code applicatif et je l ai pris pour le vocabulaire de la base. Les deux ne
+ * coincident pas, et rien n oblige qu ils coincident.
+ *
+ * Le nom retenu est IMPRIME a cote des chiffres : un resultat dont on ignore la
+ * table source n est pas verifiable.
+ */
+const resoudreTable = async (conn, candidats, motif) => {
+  const [tt] = await conn.query(
+    'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?', [BASE]);
+  const noms = tt.map(r => r.TABLE_NAME);
+  for (const c of candidats) if (noms.includes(c)) return c;
+  return noms.find(n => motif.test(n)) || null;
+};
+
 const chrono = async (etiquette, fn) => {
   const t0 = process.hrtime.bigint();
   const r = await fn();
@@ -70,14 +96,24 @@ const chrono = async (etiquette, fn) => {
 
   const conn = await mysql.createConnection(DB);
   try {
-    // ---- 1. La table `tsr`, suspecte principale ----------------------
-    console.log('## 1. LA TABLE `tsr` — taille et index');
-    const [[t]] = await conn.query('SELECT COUNT(*) AS n FROM tsr');
+    // ---- 1. La table du taux sans risque, suspecte principale --------
+    const TSR = await resoudreTable(conn,
+      ['taux_sans_risques', 'taux_sans_risque', 'tsr'], /taux.*risqu|^tsr$/i);
+    console.log(`## 1. LA TABLE DU TAUX SANS RISQUE — \`${TSR || 'INTROUVABLE'}\``);
+    console.log('  (nom lu dans `information_schema`, pas deduit du nom du modele :');
+    console.log('   `tsr` est un alias de code vers `taux_sans_risques`.)');
+    if (!TSR) {
+      console.log('  → table introuvable. La question n est PAS mesurable ici : ne rien');
+      console.log('    conclure, et verifier d abord a quoi le modele `tsr` est rattache.');
+      process.exitCode = 2;
+      return;
+    }
+    const [[t]] = await conn.query(`SELECT COUNT(*) AS n FROM \`${TSR}\``);
     const [idx] = await conn.query(`
       SELECT INDEX_NAME, NON_UNIQUE, GROUP_CONCAT(COLUMN_NAME ORDER BY SEQ_IN_INDEX) AS cols
         FROM information_schema.STATISTICS
-       WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'tsr'
-       GROUP BY INDEX_NAME, NON_UNIQUE`, [BASE]);
+       WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+       GROUP BY INDEX_NAME, NON_UNIQUE`, [BASE, TSR]);
     console.log(`  ${t.n} ligne(s) | ${idx.length} index :`);
     for (const i of idx) {
       console.log(`    ${String(i.INDEX_NAME).padEnd(26)} (${i.cols})`
@@ -96,9 +132,9 @@ const chrono = async (etiquette, fn) => {
       'SELECT pays FROM fond_investissements WHERE id = ? ', [FONDS[0]]);
     const p = pays1 ? pays1.pays : 'NIGERIA';
     const m1 = await chrono('tsr.max(date) par pays', () =>
-      conn.query('SELECT MAX(date) AS d FROM tsr WHERE pays = ?', [p]));
+      conn.query(`SELECT MAX(date) AS d FROM \`${TSR}\` WHERE pays = ?`, [p]));
     const m2 = await chrono('tsr.findOne par pays+date', () =>
-      conn.query('SELECT * FROM tsr WHERE pays = ? ORDER BY date DESC LIMIT 1', [p]));
+      conn.query(`SELECT * FROM \`${TSR}\` WHERE pays = ? ORDER BY date DESC LIMIT 1`, [p]));
     console.log(`  pays du fonds ${FONDS[0]} : ${p}`);
     console.log(`  ${m1.etiquette.padEnd(28)} ${m1.ms.toFixed(1).padStart(8)} ms`);
     console.log(`  ${m2.etiquette.padEnd(28)} ${m2.ms.toFixed(1).padStart(8)} ms`);
@@ -134,7 +170,7 @@ const chrono = async (etiquette, fn) => {
     console.log('\n## 4. PLAN D EXECUTION DE LA REQUETE EN BOUCLE');
     try {
       const [plan] = await conn.query(
-        'EXPLAIN SELECT MAX(date) AS d FROM tsr WHERE pays = ?', [p]);
+        `EXPLAIN SELECT MAX(date) AS d FROM \`${TSR}\` WHERE pays = ?`, [p]);
       for (const r of plan) {
         console.log(`  type=${r.type} | cle=${r.key || '(AUCUNE)'}`
           + ` | lignes=${r.rows} | extra=${r.Extra || ''}`);
@@ -155,7 +191,7 @@ const chrono = async (etiquette, fn) => {
     console.log('     boucle suffirait. Changement local, aucun effet sur les FORMULES,');
     console.log('     donc aucun risque sur les valeurs financieres affichees.');
     if (!surPays) {
-      console.log('  2. INDEX sur `tsr(pays, date)`. Additif, reversible par DROP INDEX, et');
+      console.log(`  2. INDEX sur \`${TSR}(pays, date)\`. Additif, reversible par DROP INDEX, et`);
       console.log('     il profiterait a toute requete filtrant par pays — pas seulement a');
       console.log('     cette route.');
     }
