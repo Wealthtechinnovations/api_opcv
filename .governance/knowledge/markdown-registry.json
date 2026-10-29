@@ -6,24 +6,24 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "bf329a43b36c7f31d231d240a5babe3d04041e82"
+      "head": "760a3aaa57cdc80749ca6084e320bced668310e2"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "c31e525d9fc902e40a59f6b679d72925e08c1997"
+      "head": "add4a5d3f6e2e5fc05462043b92ca3acccb16a82"
     }
   },
   "summary": {
-    "total_md_discovered": 248,
-    "total_md_certified": 248,
+    "total_md_discovered": 249,
+    "total_md_certified": 249,
     "by_repository": {
-      "API": 223,
+      "API": 224,
       "FRONTEND": 25
     },
     "by_status": {
       "TEMPLATE": 5,
       "CURRENT_CANONICAL": 21,
-      "CURRENT_SPECIALIZED": 196,
+      "CURRENT_SPECIALIZED": 197,
       "ADAPTER": 7,
       "HISTORICAL": 3,
       "DIAGNOSTIC_SNAPSHOT": 3,
@@ -10387,6 +10387,42 @@
         {
           "level": 2,
           "text": "F. Ce que cela implique pour l etape 0"
+        }
+      ]
+    },
+    {
+      "role": "operations",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/07-operations/RUNBOOK.md",
+      "unique_information": [
+        "Deduplication des VL en doublon — journal des operations"
+      ],
+      "consumers": [
+        "CI",
+        "OPERATIONS",
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "NONE",
+      "production_impact": "NO",
+      "title": "Deduplication des VL en doublon — journal des operations",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/OPS_DEDUP_DOUBLONS_VL.md",
+      "git_blob_sha": "06dfad31051aea4c7b03109414fc0930c6c94987",
+      "last_validated_sha": "06dfad31051aea4c7b03109414fc0930c6c94987",
+      "content_sha256": "545a69223465be6b03d64b19c195826896bce1ec24094e3c36ccfff92b7ba18a",
+      "line_count": 68,
+      "byte_count": 2431,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Deduplication des VL en doublon — journal des operations"
         }
       ]
     },
