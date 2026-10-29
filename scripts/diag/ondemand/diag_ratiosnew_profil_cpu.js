@@ -84,7 +84,7 @@ const SECONDES = 15;
     }
     const srv = app.listen(0, '127.0.0.1', () => {
       const port = srv.address().port;
-      console.error('sonde ecoute sur ' + port);
+      console.error('SONDE_ECOUTE ' + port);
       require('http').get(
         { host: '127.0.0.1', port, path: '/api/ratiosnew/2026/1141' },
         res => { res.resume(); res.on('end', () => console.error('repondu ' + res.statusCode)); }
