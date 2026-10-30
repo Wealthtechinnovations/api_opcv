@@ -99,6 +99,17 @@ async function colonne(conn, table, candidates) {
 // — l erreur de diagnostic la plus trompeuse qui soit.
 let conn;
 
+// `String(date).slice(0, 10)` rend « Fri Aug 12 » : les dix premiers caracteres
+// du `toString()` d un objet Date JS, qui PERDENT L ANNEE. Ma sortie annonçait
+// « du Fri Aug 12 au Fri Jun 26 », soit un intervalle sans annees — illisible,
+// et trompeur puisqu il laisse croire a une plage de quelques mois.
+const jour = (d) => {
+  if (d == null) return '—';
+  const t = new Date(d);
+  return Number.isNaN(t.getTime()) ? String(d).slice(0, 10)
+    : t.toISOString().slice(0, 10);
+};
+
 (async () => {
   conn = await mysql.createConnection(DB);
   console.log('=== ECHELLE DE DEVISE DES VL NIGERIANNES — LECTURE SEULE ===');
@@ -144,8 +155,8 @@ let conn;
     console.log(`  [${r.fund_id}] ${String(r.nom_fond).slice(0, 30).padEnd(30)} `
       + `declare=${String(r.devise_declaree).padEnd(5)} `
       + `bas=${String(r.n_bas).padStart(4)} haut=${String(r.n_haut).padStart(4)} `
-      + `ratio=${r.ratio_frontiere}  bloc bas ${String(r.bas_debut).slice(0, 10)}`
-      + ` -> ${String(r.bas_fin).slice(0, 10)}`);
+      + `ratio=${r.ratio_frontiere}  bloc bas ${jour(r.bas_debut)}`
+      + ` -> ${jour(r.bas_fin)}`);
   }
 
   // 2. Volumetrie a corriger. Le chiffre qui dimensionne l operation.
@@ -159,8 +170,8 @@ let conn;
              GROUP BY fund_id) s ON s.fund_id = v.fund_id
      WHERE v.${colVal} > 0 AND v.fund_id IN (${ids})
        AND v.${colVal} < s.seuil`);
-  console.log(`  ${vol[0].n} ligne(s), du ${String(vol[0].d1).slice(0, 10)} `
-    + `au ${String(vol[0].d2).slice(0, 10)}`);
+  console.log(`  ${vol[0].n} ligne(s), du ${jour(vol[0].d1)} `
+    + `au ${jour(vol[0].d2)}`);
 
   // 3. VL a ZERO. Defaut DISTINCT, invisible a C7 qui filtre `value > 0`, mais
   //    servi au graphique par l API — un point a 0 sur une courbe de VL.
@@ -179,7 +190,7 @@ let conn;
       FROM valorisations v JOIN fond_investissements f ON f.id = v.fund_id
      WHERE v.${colVal} <= 0`);
   console.log(`  TOUS PAYS : ${ztot[0].n} ligne(s) sur ${ztot[0].nf} fonds, `
-    + `du ${String(ztot[0].d1).slice(0, 10)} au ${String(ztot[0].d2).slice(0, 10)}`);
+    + `du ${jour(ztot[0].d1)} au ${jour(ztot[0].d2)}`);
   const [zpays] = await conn.query(`
     SELECT f.pays, COUNT(*) AS n, COUNT(DISTINCT v.fund_id) AS nf
       FROM valorisations v JOIN fond_investissements f ON f.id = v.fund_id
@@ -219,7 +230,7 @@ let conn;
     } else {
       for (const r of ngn) {
         console.log(`  ${String(r.paire).padEnd(9)} ${String(r.n).padStart(6)} pts  `
-          + `${String(r.d1).slice(0, 10)} -> ${String(r.d2).slice(0, 10)}  `
+          + `${jour(r.d1)} -> ${jour(r.d2)}  `
           + `[${Number(r.vmin).toFixed(2)} .. ${Number(r.vmax).toFixed(2)}]`);
       }
     }
@@ -279,6 +290,54 @@ let conn;
     console.log('  Un OPCVM ne triple pas en une seance : ces valeurs sont fausses,');
     console.log('  et elles sont SERVIES. Leur date commune designe un import, pas');
     console.log('  un defaut par fonds.');
+  }
+
+  // ------------------------------------------------------------------
+  // 6. LE TAUX PUBLIE CONTRE LE TAUX IMPLICITE — la validation decisive.
+  //
+  // J'ai deduit des series un taux implicite de ~1 375 en mai 2026, par
+  // coherence interne entre douze fonds (dispersion 4,2 %). La paire USD/NGN
+  // EXISTE en base — 5 982 points. Si le taux PUBLIE a ces dates vaut aussi
+  // ~1 375, le diagnostic est complet ET le facteur de correction devient un
+  // taux publie, non une constante deduite. Le mandat l'exige : aucune
+  // constante en dur tenue pour un taux reellement publie.
+  //
+  // ET UNE ALERTE SUR LA TABLE ELLE-MEME : le minimum de USD/NGN est 1,00. Un
+  // taux dollar/naira n'a jamais valu 1. Un taux a 1 rend toute conversion
+  // SILENCIEUSEMENT neutre — c'est le genre de valeur qui cree le defaut
+  // qu'on cherche a corriger. On compte donc les valeurs implausibles.
+  // ------------------------------------------------------------------
+  console.log('\n--- 6. Taux USD/NGN publie aux dates de frontiere ---');
+  const [tauxDates] = await conn.query(`
+    SELECT date, value FROM devisedechanges
+     WHERE paire = 'USD/NGN'
+       AND date IN ('2026-05-15','2026-07-10','2026-07-24','2026-10-09',
+                    '2023-12-15','2022-03-25')
+     ORDER BY date`);
+  if (tauxDates.length === 0) {
+    console.log('  aucune de ces dates n est renseignee pour USD/NGN.');
+  } else {
+    for (const r of tauxDates) {
+      console.log(`  ${jour(r.date)}  taux publie = ${Number(r.value).toFixed(2)}`);
+    }
+    console.log('  Taux IMPLICITE deduit des series (mediane, 12 fonds) :');
+    console.log('    2026-05 : 1374,9   2026-06 : 1369,3   2026-07 : 1378,7');
+    console.log('    2023-12 :   997,0');
+  }
+  const [implausibles] = await conn.query(`
+    SELECT COUNT(*) AS n,
+           SUM(CASE WHEN value <= 1.01 THEN 1 ELSE 0 END) AS a_un,
+           SUM(CASE WHEN value < 100 THEN 1 ELSE 0 END) AS sous_100,
+           MIN(date) AS d1, MAX(date) AS d2
+      FROM devisedechanges WHERE paire = 'USD/NGN'`);
+  const i0 = implausibles[0];
+  console.log(`\n  USD/NGN : ${i0.n} points, du ${jour(i0.d1)} au ${jour(i0.d2)}`);
+  console.log(`    valeurs a 1,00 ou moins : ${i0.a_un}`);
+  console.log(`    valeurs sous 100        : ${i0.sous_100}`);
+  if (Number(i0.a_un) > 0) {
+    console.log('    >> UN TAUX A 1,00 REND TOUTE CONVERSION NEUTRE, en silence.');
+    console.log('       A instruire avant de se servir de cette table pour');
+    console.log('       corriger quoi que ce soit.');
   }
 
   console.log('\nLECTURE SEULE : aucune ecriture effectuee.');
