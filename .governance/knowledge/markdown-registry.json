@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "1ba727d23e7231e6500a85f7f257c39f542663de"
+      "head": "76a2c7d7caca7eef9e70e546558fd4a41a4fa2da"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -2943,6 +2943,10 @@
       "unique_information": [
         "NEXT_ACTION — AfricaFunds API",
         "Projection gérée — prochaine action",
+        "Prochaine action — mandat du 2026-10-30",
+        "1. À APPLIQUER PAR LE PROPRIÉTAIRE — M1",
+        "2. SANS DÉCISION REQUISE — ce qui avance en attendant",
+        "3. À NE PAS FAIRE",
         "Priorité opérationnelle pré-V2 — AF-OPS-003",
         "Ce qui est prouvé",
         "Historique A/B à ne pas rejouer",
@@ -2965,16 +2969,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "NEXT_ACTION — AfricaFunds API",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "NEXT_ACTION.md",
-      "git_blob_sha": "123fa144f72a876c1b63dd50ec37de10914f36b3",
-      "last_validated_sha": "123fa144f72a876c1b63dd50ec37de10914f36b3",
-      "content_sha256": "f4494e56d1b4309e88b52a8c3352174b148478a9ff54f8e27c3fd7e4fc589cd5",
-      "line_count": 131,
-      "byte_count": 8793,
+      "git_blob_sha": "73a25c87942d3a06ccddec642f183b1ec197fed3",
+      "last_validated_sha": "73a25c87942d3a06ccddec642f183b1ec197fed3",
+      "content_sha256": "de7aef2aa4e20cf341ac2a3d476927fdc2325f970e87952fa12ee54420c6c512",
+      "line_count": 169,
+      "byte_count": 10382,
       "headings": [
         {
           "level": 1,
@@ -2983,6 +2987,22 @@
         {
           "level": 3,
           "text": "Projection gérée — prochaine action"
+        },
+        {
+          "level": 2,
+          "text": "Prochaine action — mandat du 2026-10-30"
+        },
+        {
+          "level": 3,
+          "text": "1. À APPLIQUER PAR LE PROPRIÉTAIRE — M1"
+        },
+        {
+          "level": 3,
+          "text": "2. SANS DÉCISION REQUISE — ce qui avance en attendant"
+        },
+        {
+          "level": 3,
+          "text": "3. À NE PAS FAIRE"
         },
         {
           "level": 2,
@@ -3672,6 +3692,7 @@
       "unique_information": [
         "STATUS — AfricaFunds API",
         "Projection gérée — statut",
+        "Mandat du 2026-10-30 — état au lot DC",
         "Baseline historique Regulatory Plus",
         "Gouvernance actuelle",
         "Checkpoint Git réobservé pendant la réconciliation du 2026-09-10",
@@ -3704,11 +3725,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "STATUS.md",
-      "git_blob_sha": "6607e2e672892fc8772773ef68f23ba07fa5a50f",
-      "last_validated_sha": "6607e2e672892fc8772773ef68f23ba07fa5a50f",
-      "content_sha256": "6c8dfb366c1e26cde2f87092a8c08d31856d96a0749a75dcf87a04f6881bf4fd",
-      "line_count": 187,
-      "byte_count": 12925,
+      "git_blob_sha": "94491932aebf8e275984cd726365cecda399cde3",
+      "last_validated_sha": "94491932aebf8e275984cd726365cecda399cde3",
+      "content_sha256": "5d8ec45d0c7ca9153cbb224f3b5beae38ac18b015df8789c29e20c67a50cec4c",
+      "line_count": 205,
+      "byte_count": 13827,
       "headings": [
         {
           "level": 1,
@@ -3717,6 +3738,10 @@
         {
           "level": 3,
           "text": "Projection gérée — statut"
+        },
+        {
+          "level": 2,
+          "text": "Mandat du 2026-10-30 — état au lot DC"
         },
         {
           "level": 2,
@@ -4172,6 +4197,7 @@
       "canonical_authority": "WORK_LOG.md",
       "unique_information": [
         "WORK_LOG — AfricaFunds API",
+        "2026-10-30 — Mandat du propriétaire : D1 sources, D2 F4/M2 pilote Maroc, D3 frontend",
         "2026-09-10 — AF-GOV-REGULATORY-PLUS-001",
         "2026-09-10 — lots CI et gouvernance (suite de AF-GOV-REGULATORY-PLUS-001)",
         "2026-09-11 — AF-GOV-FINAL-CERT-20260911-01",
@@ -4188,20 +4214,24 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "WORK_LOG — AfricaFunds API",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "3ca218f22a975278c3f3051f2bc9a15bb8745a4f",
-      "last_validated_sha": "3ca218f22a975278c3f3051f2bc9a15bb8745a4f",
-      "content_sha256": "3e09a6e9ef4bb2a0821c86a35bcabfea14198e448972502eeb91cee7b155b658",
-      "line_count": 79,
-      "byte_count": 6304,
+      "git_blob_sha": "48efe0f5f2b5fd6a0ae1bf37582c4b4c863341dc",
+      "last_validated_sha": "48efe0f5f2b5fd6a0ae1bf37582c4b4c863341dc",
+      "content_sha256": "aaf3facd64f6ee0ac42c2e5de1802abb19367ead352e5f9695c1e77cf58013ef",
+      "line_count": 112,
+      "byte_count": 8203,
       "headings": [
         {
           "level": 1,
           "text": "WORK_LOG — AfricaFunds API"
+        },
+        {
+          "level": 2,
+          "text": "2026-10-30 — Mandat du propriétaire : D1 sources, D2 F4/M2 pilote Maroc, D3 frontend"
         },
         {
           "level": 2,
@@ -10025,7 +10055,10 @@
         "DEC-AF-002 — Branches canoniques",
         "DEC-AF-003 — Mémoire et checkpoint",
         "DEC-AF-004 — Regulatory Plus",
-        "DEC-AF-005 — GitHub / S2 / runtime"
+        "DEC-AF-005 — GitHub / S2 / runtime",
+        "DEC-AF-006 — Périmètre GitHub exclusif (mandat du 2026-10-30)",
+        "DEC-AF-007 — Sources de taux sans risque UEMOA / CEMAC",
+        "DEC-AF-008 — Engagement F4 / M2, pilote Maroc / MONIA"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10041,11 +10074,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DECISIONS.md",
-      "git_blob_sha": "d54b7d7e292f2ad207930e42368191a77bafa0ea",
-      "last_validated_sha": "d54b7d7e292f2ad207930e42368191a77bafa0ea",
-      "content_sha256": "8c028c1b66699f06723f5b8ee622006f59ef123e61bce0f4aae4a014ad37e52c",
-      "line_count": 18,
-      "byte_count": 1253,
+      "git_blob_sha": "9fb9437b53399870f2e9047b9a30621fac88c54a",
+      "last_validated_sha": "9fb9437b53399870f2e9047b9a30621fac88c54a",
+      "content_sha256": "58625dbc6b9fb648172821de297d68bf101903f8e26952da01b2ef763fc4fb28",
+      "line_count": 47,
+      "byte_count": 3977,
       "headings": [
         {
           "level": 1,
@@ -10070,6 +10103,18 @@
         {
           "level": 2,
           "text": "DEC-AF-005 — GitHub / S2 / runtime"
+        },
+        {
+          "level": 2,
+          "text": "DEC-AF-006 — Périmètre GitHub exclusif (mandat du 2026-10-30)"
+        },
+        {
+          "level": 2,
+          "text": "DEC-AF-007 — Sources de taux sans risque UEMOA / CEMAC"
+        },
+        {
+          "level": 2,
+          "text": "DEC-AF-008 — Engagement F4 / M2, pilote Maroc / MONIA"
         }
       ]
     },
