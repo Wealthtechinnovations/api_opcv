@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "3f3577f2b2be4d0f1e5f17ff47419414d3e9a0e7"
+      "head": "218a26a9f3e925d494fc9e44fb03569b01ea3813"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -10907,7 +10907,8 @@
         "Structure : STABLE sur toute la periode et sur les trois nomenclatures",
         "TROIS PIEGES D'EXTRACTION, mesures et non supposes",
         "Ce qui reste a verifier",
-        "Journal des mesures"
+        "CEMAC / BEAC — AUCUN canal d'alimentation ne fonctionne aujourd'hui",
+        "Les cinq series XLSX du marche monetaire : toutes perimees"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10923,11 +10924,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "414751004e5ade215e2103d3875611444af91e0b",
-      "last_validated_sha": "414751004e5ade215e2103d3875611444af91e0b",
-      "content_sha256": "21844ee0ea8b94defa61189fe3b044110712cf68f3bb96434e028fb4c6cae94d",
-      "line_count": 237,
-      "byte_count": 12031,
+      "git_blob_sha": "b93d95d34fd3766d42f2093683ca6667da5c255a",
+      "last_validated_sha": "b93d95d34fd3766d42f2093683ca6667da5c255a",
+      "content_sha256": "f64987ad692034dbcedfd5ac751d22f942d63b090d9d13323bb5dbb36aa498a2",
+      "line_count": 326,
+      "byte_count": 16569,
       "headings": [
         {
           "level": 1,
@@ -11000,6 +11001,30 @@
         {
           "level": 4,
           "text": "Ce qui reste a verifier"
+        },
+        {
+          "level": 3,
+          "text": "CEMAC / BEAC — AUCUN canal d'alimentation ne fonctionne aujourd'hui"
+        },
+        {
+          "level": 4,
+          "text": "Les cinq series XLSX du marche monetaire : toutes perimees"
+        },
+        {
+          "level": 4,
+          "text": "Deux TIMP distincts, et le mandat interdit de les confondre"
+        },
+        {
+          "level": 4,
+          "text": "La base BDEMF : backend en panne a l'instant de la mesure"
+        },
+        {
+          "level": 4,
+          "text": "Les titres publics : donnees structurees arretees en 2017"
+        },
+        {
+          "level": 4,
+          "text": "Ce que cela signifie pour la CEMAC"
         },
         {
           "level": 2,
