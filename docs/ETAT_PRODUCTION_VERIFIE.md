@@ -5,7 +5,7 @@
 > documentation. En cas de contradiction avec un autre .md, c'est ce fichier qui
 > fait foi : les autres decrivent ce qu'on croyait vrai a leur date de redaction.
 
-Derniere verification : **2026-10-30 00:59 UTC**
+Derniere verification : **2026-10-30 12:39 UTC**
 
 ```
 
@@ -28,7 +28,7 @@ Derniere verification : **2026-10-30 00:59 UTC**
 [OK   ] C4.UEMOA     Fraicheur VL UEMOA (budget 6 j)
              derniere VL Wed Oct 28, soit 2 j
 [OK   ] C5           Snapshot production runtime frais (< 6 h)
-             runtime: genere le 2026-10-30T00:00, soit 0.9 h
+             runtime: genere le 2026-10-30T12:00, soit 0.5 h
 [ECHEC] C7           Aucune serie de VL melangeant deux echelles (12 mois)
              [2592] FCP BRIDGE EQUILIBRE (UEMOA/XOF) 5067x [8775.53 .. 44467985] | [1239] NOVA DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1536x [1.26 .. 1935] | [2809] MYRTLE DOLLAR SHIELD FUND (NIGERIA/USD) 1535x [1.00 .. 1535] | [2773] GUARANTY TRUST DOLLAR FUND (NIGERIA/USD) 1531x [100.00 .. 153145] | [2766] COMERCIO PARTNERS DOLLAR FUND (NIGERIA/USD) 1524x [1.09 .. 1662] | [2774] MERISTEM DOLLAR FUND (NIGERIA/USD) 1499x [10.65 .. 15963] | [2771] CORONATION DOLLAR FUND (NIGERIA/USD) 1495x [1.01 .. 1504] | [2768] FSL EUROBOND FUND (NIGERIA/NGN) 1481x [1.00 .. 1481] | [2775] PARTHIAN DOLLAR FIXED INCOME F (NIGERIA/USD) 1472x [1.08 .. 1593] | [1141] AFRINVEST DOLLAR FUND (NIGERIA/NGN) 1467x [114.47 .. 167885] | [2772] GREENWICH FIXED INCOME DOLLAR  (NIGERIA/USD) 1457x [1.05 .. 1523] | [2856] LEAD DOLLAR FIXED INCOME FUND (NIGERIA/NGN) 1455x [1.15 .. 1673] | [2777] VETIVA USD FIXED INCOME FUND (NIGERIA/USD) 1452x [1.16 .. 1684] | [2778] ZEDCREST DOLLAR FUND (NIGERIA/USD) 1426x [1.53 .. 2182] | [2765] CARDINALSTONE DOLLAR FUND (NIGERIA/USD) 1425x [1.26 .. 1799]
 [OK   ] C8           Les performances suivent les VL
@@ -62,11 +62,11 @@ Derniere verification : **2026-10-30 00:59 UTC**
 [OK   ] C10.BRVM Composite Fraicheur de l indice BRVM Composite
              derniere valeur le Thu Oct 29, soit 1 j (porte par 45359 VL)
 [OK   ] C11.classementfonds Fraicheur de reconstruction de classementfonds
-             3651 lignes (attendu ≈ 3759), dernier recalcul il y a 3 h, fenetre du run : Thu Oct 29 2026 21: → Thu Oct 29 2026 21:
+             3651 lignes (attendu ≈ 3759), dernier recalcul il y a 15 h, fenetre du run : Thu Oct 29 2026 21: → Thu Oct 29 2026 21:
 [ALERTE] C11.classementfonds_eurs Fraicheur de reconstruction de classementfonds_eurs
-             2868 lignes (attendu ≈ 3759), dernier recalcul il y a 2 h, fenetre du run : Thu Oct 29 2026 21: → Thu Oct 29 2026 22: — table incomplete : une purge a reussi la ou les insertions ont echoue.
+             2868 lignes (attendu ≈ 3759), dernier recalcul il y a 14 h, fenetre du run : Thu Oct 29 2026 21: → Thu Oct 29 2026 22: — table incomplete : une purge a reussi la ou les insertions ont echoue.
 [ALERTE] C11.classementfonds_usds Fraicheur de reconstruction de classementfonds_usds
-             2876 lignes (attendu ≈ 3759), dernier recalcul il y a 2 h, fenetre du run : Thu Oct 29 2026 22: → Thu Oct 29 2026 22: — table incomplete : une purge a reussi la ou les insertions ont echoue.
+             2876 lignes (attendu ≈ 3759), dernier recalcul il y a 14 h, fenetre du run : Thu Oct 29 2026 22: → Thu Oct 29 2026 22: — table incomplete : une purge a reussi la ou les insertions ont echoue.
 [OK   ] C12.OBLIGATIONS MAROC Les rangs correspondent aux performances
              300/300 fonds au rang que leur performance stockee leur donne (100.0 %)
 [OK   ] C12.DIVERSIFIE MAROC Les rangs correspondent aux performances
