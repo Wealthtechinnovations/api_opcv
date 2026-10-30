@@ -278,7 +278,7 @@ tel.
 **Extraction** : `pdftotext -layout` rend un tableau aligne et lisible. **Aucun
 OCR n'est necessaire.**
 
-#### QUATRE PIEGES, mesures
+#### CINQ PIEGES, mesures
 
 **1. Le nom de fichier ne porte NI la date NI le type reel.** Les documents
 anciens s'appellent `05-Situation des Prets interbancaires par maturites_0.pdf`,
@@ -309,6 +309,41 @@ inventee**.
 virgule decimale (`4,21`). A la BEAC, **fractions** (`0.0325` pour 3,25 %). Un
 extracteur commun aux deux zones qui ne distingue pas les deux conventions
 produirait une **erreur d'un facteur 100**.
+
+**5. La date de PUBLICATION n'existe QUE sur les documents anciens.** Mesure du
+2026-10-30, sur le document de 2026 et celui de 2017 :
+
+| document | mention « Dakar, le … » | date de publication |
+|---|---|---|
+| semaine du 31 oct. au 06 nov. **2017** | `Dakar, le 10 novembre 2017` | **presente** |
+| semaine du 07 au 13 juillet **2026** | **0 occurrence de « Dakar »** | **ABSENTE** |
+
+Le format a change, et la direction emettrice avec lui : « Operations et
+Activites Fiduciaires » en 2017, « Economie et Monnaie » en 2026. Le seul
+millesime du PDF recent est `13 juillet 2026`, qui est la **fin de la semaine de
+reference** — donc `as_of_date`, pas une date de publication.
+
+Consequence pour M2, et elle est dictee par le mandat (« dates d'observation et
+de publication distinctes ») : `publication_date` est renseignee quand elle
+existe et vaut `NULL` sinon. Elle ne doit **PAS** etre deduite du chemin de
+stockage de l'URL (`/sites/default/files/2026-07/`), qui porte un **mois** et
+decrit **ou** le fichier est range, non **quand** il a ete publie. Quand la date
+de publication n'est pas publiee, la reponse honnete est `NULL` : une
+approximation inscrirait dans `benchmark_series` une date que la source n'a
+jamais donnee.
+
+#### Extracteur livre — `scripts/extract/extract_bceao_interbancaire.py`
+
+En **dry-run**, aucune ecriture : M1 est livree mais non appliquee, donc
+`benchmark_series` n'existe pas encore. Le dry-run valide le parsing, les dates,
+les conventions numeriques et les statuts **avant** que la table existe, ce qui
+separe les erreurs de LECTURE des erreurs d'ECRITURE. Resultat sur 5 documents :
+40 lignes, 26 avec valeur, 14 en `NO_VALUE_MARKET_CLOSED`.
+
+Les codes `UMOA_INTERBANK_WAR_1D` … `_12M` sont une **PROPOSITION** du script,
+marquee comme telle : F3 definit le schema mais ne nomme aucun indicateur pour
+les taux interbancaires UMOA par maturite. A valider avant toute ecriture reelle,
+de meme que `category = RFR` pour le 1 jour et `MONETAIRE` pour les autres.
 
 #### Ce qui reste a faire
 
@@ -415,3 +450,4 @@ une source arretee en 2020 ne produirait rien.
 | 2026-10-30 | session Claude Code | structure verifiee sur **9** fichiers couvrant 2020-2026 et les 3 nomenclatures : stable. 55 liens protocole-relatifs identifies |
 | 2026-10-30 | session Claude Code | BEAC : 5 series de taux ouvertes, la plus recente s'arrete **2020-09** ; BDEMF rend **HTTP 502** (navigateur sans interface) ; titres publics XLSX **2015-2017** |
 | 2026-10-30 | session Claude Code | BCEAO : serie hebdomadaire **2017-10 → 2026-10**, ≈531 PDF sur 27 pages, 8 maturites, extraction `pdftotext -layout` validee |
+| 2026-10-30 | session Claude Code | BCEAO : date de publication **absente** des PDF recents (0 « Dakar ») alors que 2017 la porte ; extracteur dry-run livre, 40 lignes / 26 valeurs sur 5 documents |
