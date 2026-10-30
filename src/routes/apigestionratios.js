@@ -1983,6 +1983,19 @@ const {
   })
   router.get('/api/ratiosnewithdate/:year/:id/:date', async (req, res) => {
     try {
+      // Meme garde que `/api/ratiosnew` : un `:year` inconnu ne doit pas pendre.
+      // Ces quatre routes soeurs portaient le meme piege — sept branches
+      // d horizon et aucune branche finale — verifie par audit du fichier le
+      // 2026-10-30. Laisser la garde sur une seule route aurait laisse le meme
+      // piege aux quatre autres, et au prochain appelant.
+      if (!HORIZONS_RATIOS.has(String(req.params.year))) {
+        return res.status(400).json({
+          code: 400,
+          message: "Horizon invalide : `:year` attend un horizon, pas une annee calendaire.",
+          horizons_acceptes: [...HORIZONS_RATIOS],
+          recu: req.params.year,
+        });
+      }
       const fonds = await fond.findOne({ where: { id: req.params.id } });
       if (!fonds) return res.status(404).json({ message: "Fond non trouvé" });
       const paysFond = fonds.pays;
@@ -2242,6 +2255,19 @@ const {
   ////////////////////////////////////////////////////
   router.get('/api/ratiosnewithdate1/:year/:id/:date', async (req, res) => {
     try {
+      // Meme garde que `/api/ratiosnew` : un `:year` inconnu ne doit pas pendre.
+      // Ces quatre routes soeurs portaient le meme piege — sept branches
+      // d horizon et aucune branche finale — verifie par audit du fichier le
+      // 2026-10-30. Laisser la garde sur une seule route aurait laisse le meme
+      // piege aux quatre autres, et au prochain appelant.
+      if (!HORIZONS_RATIOS.has(String(req.params.year))) {
+        return res.status(400).json({
+          code: 400,
+          message: "Horizon invalide : `:year` attend un horizon, pas une annee calendaire.",
+          horizons_acceptes: [...HORIZONS_RATIOS],
+          recu: req.params.year,
+        });
+      }
       const fonds = await fond.findOne({ where: { id: req.params.id } });
       if (!fonds) return res.status(404).json({ message: "Fond non trouvé" });
       const paysFond = fonds.pays;
@@ -3815,6 +3841,19 @@ const {
 
   router.get('/api/ratiosnewdev/:year/:id/:devise', async (req, res) => {
     try {
+      // Meme garde que `/api/ratiosnew` : un `:year` inconnu ne doit pas pendre.
+      // Ces quatre routes soeurs portaient le meme piege — sept branches
+      // d horizon et aucune branche finale — verifie par audit du fichier le
+      // 2026-10-30. Laisser la garde sur une seule route aurait laisse le meme
+      // piege aux quatre autres, et au prochain appelant.
+      if (!HORIZONS_RATIOS.has(String(req.params.year))) {
+        return res.status(400).json({
+          code: 400,
+          message: "Horizon invalide : `:year` attend un horizon, pas une annee calendaire.",
+          horizons_acceptes: [...HORIZONS_RATIOS],
+          recu: req.params.year,
+        });
+      }
       const fonds = await fond.findOne({ where: { id: req.params.id } });
       if (!fonds) {
         return res.status(404).json({ message: "Fond non trouvé" });
@@ -5432,6 +5471,19 @@ const {
 
   router.get('/api/ratiosnewdevwithdate/:year/:id/:devise/:date', async (req, res) => {
     try {
+      // Meme garde que `/api/ratiosnew` : un `:year` inconnu ne doit pas pendre.
+      // Ces quatre routes soeurs portaient le meme piege — sept branches
+      // d horizon et aucune branche finale — verifie par audit du fichier le
+      // 2026-10-30. Laisser la garde sur une seule route aurait laisse le meme
+      // piege aux quatre autres, et au prochain appelant.
+      if (!HORIZONS_RATIOS.has(String(req.params.year))) {
+        return res.status(400).json({
+          code: 400,
+          message: "Horizon invalide : `:year` attend un horizon, pas une annee calendaire.",
+          horizons_acceptes: [...HORIZONS_RATIOS],
+          recu: req.params.year,
+        });
+      }
       const fonds = await fond.findOne({ where: { id: req.params.id } });
       if (!fonds) {
         return res.status(404).json({ message: "Fond non trouvé" });
