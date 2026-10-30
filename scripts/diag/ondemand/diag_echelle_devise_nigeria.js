@@ -38,6 +38,23 @@
  *   3. la confrontation au taux REELLEMENT stocke dans `devisedechanges`, seule
  *      facon de passer d'un taux « implicite » a un taux « publie ».
  *
+ * CE QUE LA BASE A REPONDU LE 2026-10-30 14:49 UTC, et qui RENVERSE une partie
+ * de l'analyse faite depuis l'API seule :
+ *
+ *   **DIX des quatorze fonds sont declares en USD**, quatre seulement en NGN
+ *   (1141, 1239, 2768, 2856).
+ *
+ * Le sens de la correction est donc INVERSE selon le fonds :
+ *   - fonds declare USD  -> les valeurs BASSES (~1 a 1 000) sont les BONNES,
+ *                           les HAUTES (~150 000) sont du NGN contaminant ;
+ *   - fonds declare NGN  -> l'inverse exactement.
+ *
+ * L'enonce « des VL en USD dans une serie declaree en NGN » ne valait donc que
+ * pour 4 fonds sur 14. **C'est exactement le risque que l'avertissement ci-dessous
+ * annonçait**, et la base l'a confirme avant qu'une seule ligne ne soit touchee.
+ *
+ * Volumetrie : **182 lignes** dans le groupe bas, du 2026-03-25 au 2026-10-09.
+ *
  * CE SCRIPT NE CORRIGE RIEN, DELIBEREMENT. Rien ne doit etre converti avant que
  * la devise de reference de chaque fonds soit tranchee : diviser une ligne saine
  * par 1 375 fabriquerait le defaut symetrique, et plus discret car il
@@ -147,19 +164,34 @@ let conn;
 
   // 3. VL a ZERO. Defaut DISTINCT, invisible a C7 qui filtre `value > 0`, mais
   //    servi au graphique par l API — un point a 0 sur une courbe de VL.
+  // Defaut DISTINCT, invisible a C7 qui filtre `value > 0`, mais servi au
+  // graphique par l API — un point a zero sur une courbe de valeur liquidative.
+  //
+  // COMPTE SANS PLAFOND. Ma premiere version s arretait a 25 lignes et les 25
+  // etaient remplies : un plafond atteint ne dit RIEN de l ampleur reelle, et
+  // j aurais pu lire « 25 » comme un total. Les zeros touchent d ailleurs bien
+  // plus de fonds que les quatorze de C7 — STANBIC IBTC ABSOLUTE en portait
+  // cinq a lui seul.
   console.log('\n--- 3. VL a ZERO (defaut distinct, hors perimetre de C7) ---');
-  const [zeros] = await conn.query(`
-    SELECT v.fund_id, f.nom_fond, v.${colDate} AS d, v.${colVal} AS val
-      FROM valorisations v
-      JOIN fond_investissements f ON f.id = v.fund_id
-     WHERE v.${colVal} <= 0 AND f.pays = 'NIGERIA'
-     ORDER BY v.${colDate} DESC
-     LIMIT 25`);
-  console.log(`  ${zeros.length} ligne(s) (plafond 25) :`);
-  for (const r of zeros) {
-    console.log(`    [${r.fund_id}] ${String(r.d).slice(0, 10)} = ${r.val}  `
-      + `${String(r.nom_fond).slice(0, 34)}`);
+  const [ztot] = await conn.query(`
+    SELECT COUNT(*) AS n, COUNT(DISTINCT v.fund_id) AS nf,
+           MIN(v.${colDate}) AS d1, MAX(v.${colDate}) AS d2
+      FROM valorisations v JOIN fond_investissements f ON f.id = v.fund_id
+     WHERE v.${colVal} <= 0`);
+  console.log(`  TOUS PAYS : ${ztot[0].n} ligne(s) sur ${ztot[0].nf} fonds, `
+    + `du ${String(ztot[0].d1).slice(0, 10)} au ${String(ztot[0].d2).slice(0, 10)}`);
+  const [zpays] = await conn.query(`
+    SELECT f.pays, COUNT(*) AS n, COUNT(DISTINCT v.fund_id) AS nf
+      FROM valorisations v JOIN fond_investissements f ON f.id = v.fund_id
+     WHERE v.${colVal} <= 0 GROUP BY f.pays ORDER BY n DESC`);
+  for (const r of zpays) {
+    console.log(`    ${String(r.pays).padEnd(10)} ${String(r.n).padStart(6)} ligne(s) `
+      + `sur ${r.nf} fonds`);
   }
+  const [zrecent] = await conn.query(`
+    SELECT COUNT(*) AS n FROM valorisations v
+     WHERE v.${colVal} <= 0 AND v.${colDate} >= DATE_SUB(CURDATE(), INTERVAL 400 DAY)`);
+  console.log(`  dont ${zrecent[0].n} sur les 400 derniers jours`);
 
   // 4. Le taux PUBLIE, pour passer de « implicite » a « publie ».
   console.log('\n--- 4. Taux USD/NGN stocke dans devisedechanges ---');
@@ -168,12 +200,29 @@ let conn;
       `SELECT COLUMN_NAME FROM information_schema.COLUMNS
         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'devisedechanges'`);
     console.log(`  colonnes : ${cols.map(c => c.COLUMN_NAME).join(', ')}`);
-    // Un echantillon brut, sans supposer AUCUN nom de colonne : la forme de
-    // cette table n'a pas ete verifiee ici, et deviner son schema serait la
-    // cinquieme fois sur ce projet.
-    const [tx] = await conn.query(
-      'SELECT * FROM devisedechanges ORDER BY 1 DESC LIMIT 3');
-    console.log(`  echantillon brut : ${JSON.stringify(tx)}`);
+    // Schema releve le 2026-10-30 : id, paire, date, value, test.
+    // LA QUESTION QUI COMPTE : la paire USD/NGN existe-t-elle ? Sans elle, la
+    // plateforme n a AUCUN taux stocke pour arbitrer les deux echelles, et le
+    // seul taux disponible serait celui que j ai deduit des series — un taux
+    // implicite, non publie, qui ne doit pas servir a ecrire en base.
+    const [ngn] = await conn.query(`
+      SELECT paire, COUNT(*) AS n, MIN(date) AS d1, MAX(date) AS d2,
+             MIN(value) AS vmin, MAX(value) AS vmax
+        FROM devisedechanges
+       WHERE paire LIKE '%NGN%'
+       GROUP BY paire ORDER BY n DESC`);
+    if (ngn.length === 0) {
+      console.log('  AUCUNE paire contenant NGN. La plateforme ne stocke donc pas');
+      console.log('  de taux naira : aucun arbitrage par taux publie n est possible');
+      console.log('  en l etat, et le taux implicite deduit des series NE DOIT PAS');
+      console.log('  servir a ecrire en base.');
+    } else {
+      for (const r of ngn) {
+        console.log(`  ${String(r.paire).padEnd(9)} ${String(r.n).padStart(6)} pts  `
+          + `${String(r.d1).slice(0, 10)} -> ${String(r.d2).slice(0, 10)}  `
+          + `[${Number(r.vmin).toFixed(2)} .. ${Number(r.vmax).toFixed(2)}]`);
+      }
+    }
   } catch (e) {
     console.log(`  table illisible ou absente : ${e.message.slice(0, 90)}`);
   }
