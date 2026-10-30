@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "43c61325e983141675ba74f1bc393c258da3e9e9"
+      "head": "0251efdbb74e2b089b9db6b9a69e40d256d891a4"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "e7feb097effc8b5339a6fda7c75aae2c56c414ba"
+      "head": "47a01e8f6aa0d1516732141dd2506a816624fca7"
     }
   },
   "summary": {
@@ -10911,9 +10911,9 @@
         "Livrable 2 — profondeur et structure, source par source",
         "UMOA-Titres — courbes de taux : EXPLOITABLE, STRUCTURE STABLE SUR 8 ANS",
         "Structure : STABLE sur toute la periode et sur les trois nomenclatures",
-        "TROIS PIEGES D'EXTRACTION, mesures et non supposes",
-        "Ce qui reste a verifier",
-        "UEMOA / BCEAO — taux interbancaires par maturite : QUALIFIE ET EXPLOITABLE"
+        "Structure verifiee sur les 402 classeurs — et « un seul parseur suffit » etait PREMATURE",
+        "CONVENTION NUMERIQUE : des FRACTIONS, a l'oppose de la BCEAO",
+        "TROIS PIEGES D'EXTRACTION, mesures et non supposes"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10929,11 +10929,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "b3116bde29ed45fa89542f99da1b7e6b70f1f99e",
-      "last_validated_sha": "b3116bde29ed45fa89542f99da1b7e6b70f1f99e",
-      "content_sha256": "fd3c6a56f5e6fa70d3fb130776b9b465246c7477a82053068ef180ac4335268f",
-      "line_count": 598,
-      "byte_count": 31674,
+      "git_blob_sha": "2bfa065af02a536ac97daf16b3bd9ad93b5441fa",
+      "last_validated_sha": "2bfa065af02a536ac97daf16b3bd9ad93b5441fa",
+      "content_sha256": "7eb65c446376dd5201507b473c60348afd1a0297010e4b09b34fa5d7fbb12d6f",
+      "line_count": 667,
+      "byte_count": 35453,
       "headings": [
         {
           "level": 1,
@@ -11002,6 +11002,14 @@
         {
           "level": 4,
           "text": "Structure : STABLE sur toute la periode et sur les trois nomenclatures"
+        },
+        {
+          "level": 4,
+          "text": "Structure verifiee sur les 402 classeurs — et « un seul parseur suffit » etait PREMATURE"
+        },
+        {
+          "level": 4,
+          "text": "CONVENTION NUMERIQUE : des FRACTIONS, a l'oppose de la BCEAO"
         },
         {
           "level": 4,
@@ -13659,6 +13667,10 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DH : la regle de date de MONIA est insatisfiable, pas trop stricte",
+        "MONIA — ce que la page offre reellement, lu le 30 octobre",
+        "Pourquoi RIEN n'est modifie dans ce lot",
+        "BDEMF retestee — toujours 502",
         "POINT DE REPRISE COURANT — 2026-10-30 — Lot DG : le proxy sans risque UEMOA tranche par la mesure (DEC-AF-009)",
         "La couverture par maturite tranche a elle seule",
         "Les trois defauts du recenseur portes dans l'extracteur",
@@ -13672,11 +13684,7 @@
         "CEMAC / BEAC — rien ne fonctionne, et c'est mesure",
         "CINQ PIEGES D'EXTRACTION, tous mesures",
         "Mes propres chiffres corriges dans ce lot",
-        "POINT DE REPRISE COURANT — 2026-10-30 02:10 UTC — Lot DB : MANDAT DU 2026-10-30 — reconciliation faite, livrable 1 livre, deux blocages renvoyes",
-        "MANDAT RECU — quatre decisions",
-        "LA RECONCILIATION D'ABORD — et elle a trouve deux blocages",
-        "LIVRABLE 1 LIVRE — registre des sources, mesure",
-        "POINT DE REPRISE COURANT — 2026-10-30 01:40 UTC — Lot DA : la chaine complete du taux sans risque marocain, et pourquoi le correctif evident fabriquerait une donnee"
+        "POINT DE REPRISE COURANT — 2026-10-30 02:10 UTC — Lot DB : MANDAT DU 2026-10-30 — reconciliation faite, livrable 1 livre, deux blocages renvoyes"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13692,11 +13700,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "10c2211b927a8a432894f6ba9613a316a76f107e",
-      "last_validated_sha": "10c2211b927a8a432894f6ba9613a316a76f107e",
-      "content_sha256": "c8db3a0ca29dda77d2516a2cbf944d79550a8ae3f05eaf571018fb5aff656dc5",
-      "line_count": 11261,
-      "byte_count": 708334,
+      "git_blob_sha": "a415ca8f55794777d27af3ffeec87fad7f22ef25",
+      "last_validated_sha": "a415ca8f55794777d27af3ffeec87fad7f22ef25",
+      "content_sha256": "185b87700f35accdbe6bcdf82fbe4417a8783aaf0cfb88ff278778477267d693",
+      "line_count": 11322,
+      "byte_count": 711494,
       "headings": [
         {
           "level": 1,
@@ -13705,6 +13713,22 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DH : la regle de date de MONIA est insatisfiable, pas trop stricte"
+        },
+        {
+          "level": 3,
+          "text": "MONIA — ce que la page offre reellement, lu le 30 octobre"
+        },
+        {
+          "level": 3,
+          "text": "Pourquoi RIEN n'est modifie dans ce lot"
+        },
+        {
+          "level": 3,
+          "text": "BDEMF retestee — toujours 502"
         },
         {
           "level": 2,
@@ -13841,22 +13865,6 @@
         {
           "level": 3,
           "text": "TROISIEME REGLE DE CETTE SESSION POINTANT VERS QUELQUE CHOSE DE MORT"
-        },
-        {
-          "level": 3,
-          "text": "Hygiene relevee au passage"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 00:00 UTC — Lot CX : pool refute, Node du canal corrige, et la route attend un SOCKET"
-        },
-        {
-          "level": 3,
-          "text": "1. Le Node du canal est corrige"
-        },
-        {
-          "level": 3,
-          "text": "2. Le pool de connexions est REFUTE — c'etait mon hypothese"
         }
       ]
     },
