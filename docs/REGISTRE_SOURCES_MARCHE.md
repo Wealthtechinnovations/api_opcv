@@ -225,10 +225,77 @@ Verification par telechargement et ouverture de **9 fichiers** couvrant 2020,
 | `YC-19.mai_.25` | 9 | **8** | oui | oui | oui |
 | `…au_.14.08.2026` | 9 | **8** | oui | oui | oui |
 
-**Un seul parseur suffit.** Les 8 feuilles pays — Benin, Burkina, Cote d'Ivoire,
-Guinee-Bissau, Mali, Niger, Senegal, Togo — et les trois colonnes sont presentes
-partout. Les fichiers a 9 feuilles portent une `Feuil1` supplementaire, a
-ignorer. Maturites : 1 mois, 3, 6, 9 mois, puis 1 a 17 ans.
+#### Structure verifiee sur les 402 classeurs — et « un seul parseur suffit » etait PREMATURE
+
+> Mesure du 2026-10-30 par `scripts/diag/structure_umoatitres_courbes.py`.
+> **402 classeurs ouverts sur 402, zero echec.** La version precedente de ce
+> paragraphe affirmait « un seul parseur suffit » sur la base de **neuf
+> fichiers** — 2 % de la population. Elle etait juste sur le fond et fausse sur
+> trois details qui auraient suffi a perdre des donnees.
+
+**Six pays sont presents dans les 402** : Benin, Burkina, Mali, Niger, Senegal,
+Togo. Les deux autres ne le sont pas sous un nom stable :
+
+| feuille | classeurs | remarque |
+|---|---|---|
+| `Cote d'ivoire` | **220** | sans accents |
+| `Côte d'Ivoire` | **170** | deux accents, I majuscule |
+| `Cote d'Ivoire` | **11** | sans accent, I majuscule |
+| `Côte d'ivoire` | **1** | accents, i minuscule |
+| `Guinée-Bissau` | 401 | trait d'union |
+| `Guinée Bissau` | **1** | **espace** au lieu du trait d'union |
+
+**QUATRE orthographes pour la Cote d'Ivoire**, qui totalisent bien 402. Un
+parseur cale sur un nom de feuille exact perdrait **silencieusement la premiere
+economie de l'UEMOA** sur 182 a 401 classeurs selon l'orthographe retenue — et
+la perte ne ressemblerait pas a une erreur, seulement a un pays absent. La
+selection des feuilles doit se faire sur un nom **normalise** : accents retires,
+casse ignoree, trait d'union et espace equivalents.
+
+**Deux formes d'en-tete, pas une** : `Maturité | Zero Coupon | Taux Après
+Lissage` (3 200 feuilles) et **`Maturité | ZC | NSS`** (16 feuilles) — `NSS`
+designant vraisemblablement un lissage Nelson-Siegel-Svensson. Le second n'etait
+pas documente.
+
+**Le tableau n'est PAS en colonne A** : l'en-tete est en **colonne 11**, le titre
+du pays en colonne 6, et les colonnes A a K sont vides. Un parseur qui lit la
+premiere colonne ne trouve rien du tout — c'est l'erreur qu'a commise la
+premiere version de mon propre script, qui a rendu « 0 maturite » sur les 402
+classeurs.
+
+**Maturites reellement cotees** (nombre de feuilles pays, sur ~3 200) :
+
+```
+9 mois 3223   3 ans 3215   6 ans 2999    10 ans 1622   13-15 ans  530
+6 mois 3216   4 ans 3179   7 ans 2754    1 mois 1370   16-20 ans    3
+1 an   3215   5 ans 3179   8-9 ans 1622  11-12 ans 530
+```
+
+Le noyau ferme va de **3 mois a 7 ans**. Au-dela de 15 ans, **3 occurrences** :
+ce n'est pas une courbe, c'est une anecdote. Et le **1 mois n'existe que dans
+43 %** des feuilles — « 1 mois a 17 ans » decrivait l'enveloppe des maturites
+vues, pas une couverture.
+
+#### CONVENTION NUMERIQUE : des FRACTIONS, a l'oppose de la BCEAO
+
+Sur **80 410 valeurs**, **100 % sont inferieures a 1**. `0,0597` vaut **5,97 %**.
+
+**C'est l'inverse de la BCEAO, dans la MEME ZONE.** Les PDF hebdomadaires du
+marche interbancaire publient `4,21` pour 4,21 % ; les courbes d'UMOA-Titres
+publient `0,0421`. Le registre notait deja une divergence de convention entre
+**BCEAO et BEAC** ; elle existe aussi **entre deux sources de l'UEMOA**. Un
+collecteur commun aux deux se tromperait d'un **facteur 100** — et une erreur de
+facteur 100 sur un taux sans risque ne se voit pas forcement dans un Sharpe, qui
+resterait un nombre d'apparence normale.
+
+Amplitude mesuree : **0,34 % a 11,78 %**, toutes des valeurs plausibles.
+
+> **Fausse alerte de ma part, et sa cause.** La premiere sortie annoncait un
+> minimum de `0.000000`, que j'ai lu comme des zeros exacts — donc comme des
+> absences ecrites en zero, le piege inverse du tiret BCEAO. Verification sur
+> 9 944 points : **aucune valeur exactement nulle**. Le `0.000000` venait de mon
+> format `.6f`, trop court pour 0,0034. Le format est corrige ; l'alerte
+> n'existait que dans mon affichage.
 
 #### TROIS PIEGES D'EXTRACTION, mesures et non supposes
 
@@ -596,3 +663,5 @@ une source arretee en 2020 ne produirait rien.
 | 2026-10-30 | session Claude Code | BCEAO, 391 documents ouverts : **379 semaines distinctes**, 2017-11-06 → 2026-10-19, **18 % manquantes**, 15 trous, le plus long **49 jours** ; debut reellement continu **2018-02** |
 | 2026-10-30 | session Claude Code | MONIA : reference la plus recente **28/10** lue le **30/10** ; `iso === targetDate` est **insatisfiable**, et « J-1 » echoue aussi le lundi (vendredi publie lundi) |
 | 2026-10-30 | session Claude Code | BDEMF retestee : **toujours 502**, 174 octets, zero lien. Deux mesures le meme jour — ecarte un incident momentane, pas une panne de plusieurs jours |
+| 2026-10-30 | session Claude Code | UMOA-Titres, **402 classeurs ouverts sur 402**, 0 echec : **4 orthographes** de feuille pour la Cote d'Ivoire, 2 formes d'en-tete, tableau en **colonne 11** |
+| 2026-10-30 | session Claude Code | UMOA-Titres : **100 % de FRACTIONS** sur 80 410 valeurs (0,0597 = 5,97 %), a l'**oppose de la BCEAO** dans la meme zone — facteur 100 |
