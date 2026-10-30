@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "218a26a9f3e925d494fc9e44fb03569b01ea3813"
+      "head": "bb7c199d09b630c3a62c49f52d5ebc7201aa8be4"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -10907,8 +10907,8 @@
         "Structure : STABLE sur toute la periode et sur les trois nomenclatures",
         "TROIS PIEGES D'EXTRACTION, mesures et non supposes",
         "Ce qui reste a verifier",
-        "CEMAC / BEAC — AUCUN canal d'alimentation ne fonctionne aujourd'hui",
-        "Les cinq series XLSX du marche monetaire : toutes perimees"
+        "UEMOA / BCEAO — taux interbancaires par maturite : QUALIFIE ET EXPLOITABLE",
+        "Deux pages, deux natures a ne pas confondre"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10924,11 +10924,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "b93d95d34fd3766d42f2093683ca6667da5c255a",
-      "last_validated_sha": "b93d95d34fd3766d42f2093683ca6667da5c255a",
-      "content_sha256": "f64987ad692034dbcedfd5ac751d22f942d63b090d9d13323bb5dbb36aa498a2",
-      "line_count": 326,
-      "byte_count": 16569,
+      "git_blob_sha": "8804a1dca68ecffba247044e92ea24508fcd3547",
+      "last_validated_sha": "8804a1dca68ecffba247044e92ea24508fcd3547",
+      "content_sha256": "a5ff9c702253f55614808ef70c27c663aed5daf533310b84db0b47d2baeebd80",
+      "line_count": 417,
+      "byte_count": 21020,
       "headings": [
         {
           "level": 1,
@@ -11001,6 +11001,30 @@
         {
           "level": 4,
           "text": "Ce qui reste a verifier"
+        },
+        {
+          "level": 3,
+          "text": "UEMOA / BCEAO — taux interbancaires par maturite : QUALIFIE ET EXPLOITABLE"
+        },
+        {
+          "level": 4,
+          "text": "Deux pages, deux natures a ne pas confondre"
+        },
+        {
+          "level": 4,
+          "text": "Profondeur mesuree : 2017-10 → 2026-10, neuf annees"
+        },
+        {
+          "level": 4,
+          "text": "Contenu d'un document — exactement la liste du mandat"
+        },
+        {
+          "level": 4,
+          "text": "QUATRE PIEGES, mesures"
+        },
+        {
+          "level": 4,
+          "text": "Ce qui reste a faire"
         },
         {
           "level": 3,
