@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "76a2c7d7caca7eef9e70e546558fd4a41a4fa2da"
+      "head": "3f3577f2b2be4d0f1e5f17ff47419414d3e9a0e7"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -10903,7 +10903,10 @@
         "Statut de collecte — ce qui existe DEJA, a ne pas reconstruire",
         "Points ouverts, et a qui ils reviennent",
         "Livrable 2 — profondeur et structure, source par source",
-        "UMOA-Titres — courbes de taux : EXPLOITABLE IMMEDIATEMENT",
+        "UMOA-Titres — courbes de taux : EXPLOITABLE, STRUCTURE STABLE SUR 8 ANS",
+        "Structure : STABLE sur toute la periode et sur les trois nomenclatures",
+        "TROIS PIEGES D'EXTRACTION, mesures et non supposes",
+        "Ce qui reste a verifier",
         "Journal des mesures"
       ],
       "consumers": [
@@ -10920,11 +10923,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "fde2577851a692880d27a3a23a41262be9884c4e",
-      "last_validated_sha": "fde2577851a692880d27a3a23a41262be9884c4e",
-      "content_sha256": "ce86ef29f9f1be02cdff6c577e6b9b0f1672940c6548f428d1c4632d1371c9c5",
-      "line_count": 208,
-      "byte_count": 10528,
+      "git_blob_sha": "414751004e5ade215e2103d3875611444af91e0b",
+      "last_validated_sha": "414751004e5ade215e2103d3875611444af91e0b",
+      "content_sha256": "21844ee0ea8b94defa61189fe3b044110712cf68f3bb96434e028fb4c6cae94d",
+      "line_count": 237,
+      "byte_count": 12031,
       "headings": [
         {
           "level": 1,
@@ -10984,7 +10987,19 @@
         },
         {
           "level": 3,
-          "text": "UMOA-Titres — courbes de taux : EXPLOITABLE IMMEDIATEMENT"
+          "text": "UMOA-Titres — courbes de taux : EXPLOITABLE, STRUCTURE STABLE SUR 8 ANS"
+        },
+        {
+          "level": 4,
+          "text": "Structure : STABLE sur toute la periode et sur les trois nomenclatures"
+        },
+        {
+          "level": 4,
+          "text": "TROIS PIEGES D'EXTRACTION, mesures et non supposes"
+        },
+        {
+          "level": 4,
+          "text": "Ce qui reste a verifier"
         },
         {
           "level": 2,
