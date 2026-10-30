@@ -434,8 +434,23 @@ de meme que `category = RFR` pour le 1 jour et `MONETAIRE` pour les autres.
 - verifier que le tableau garde la meme forme sur les neuf annees — **4 documents
   ouverts sur 391** par lecture integrale a ce stade ; la passe
   `--dates-du-contenu` ouvre les 391 pour trancher la continuite ;
-- decider et **documenter** le proxy retenu : taux moyen pondere au jour le jour,
-  ou une autre maturite selon l'usage analytique.
+- ~~decider et documenter le proxy retenu~~ **FAIT** — `DEC-AF-009`, fondee sur
+  l'extraction des 388 documents (3 104 points). Couverture par maturite :
+
+  | maturite | semaines cotees | couverture |
+  |---|---|---|
+  | 1 jour / 1 sem. / 2 sem. / 1 mois | 379 | **100 %** |
+  | 3 mois | 370 | 97,6 % |
+  | 6 mois | 264 | 69,7 % |
+  | 9 mois | 95 | 25,1 % |
+  | **12 mois** | **25** | **6,6 %** |
+
+  Un proxy adosse au **12 mois** aurait ete absent **93 % du temps**, et son
+  absence serait passee pour un trou de donnees. Retenu : le **1 jour** (100 %,
+  meme convention que MONIA au Maroc, donc comparabilite entre zones), avec le
+  **1 mois** comme benchmark monetaire distinct. Le 1 jour est 88 points de base
+  sous le 1 mois en mediane : le choix n'est **pas neutre sur les Sharpe
+  affiches** et doit etre documente a l'affichage.
 
 ### CEMAC / BEAC — AUCUN canal d'alimentation ne fonctionne aujourd'hui
 
