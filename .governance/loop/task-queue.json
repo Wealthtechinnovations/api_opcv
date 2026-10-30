@@ -153,13 +153,13 @@
     {
       "id": "AF-OPS-003",
       "title": "MariaDB — RCA des OOM répétés et durcissement de résilience",
-      "status": "OPEN",
+      "status": "IN_PROGRESS",
       "incident_refs": [
         "AF-INC-20260817-001"
       ],
       "depends_on": [],
-      "next_action": "Le correctif protocolaire execute()->query des deux UPDATE dynamiques massifs est RED->GREEN et déployé par GOV-006. Ne pas le rejouer et ne pas restart MariaDB. Mesurer les prochains vrais passages étape 3/4 avec le sampler gouverné; comparer RSS/RssAnon/Private_Dirty, Prepared_stmt_count et Com_stmt_* au baseline pré-fix, vérifier l'équivalence des sorties, puis seulement réévaluer le niveau de confiance RCA.",
-      "phase": "POST_FIX_VALIDATION",
+      "next_action": "Trois des quatre preuves requises sont acquises (AF-EVD-071) sur une fenetre REELLE de 38,5 jours sans redemarrage : la memoire s est stabilisee a 3,88 GiB de rssanon contre 14,4 GiB au kill du 21/09, aucun OOM noyau sur 14 jours, NRestarts=0 ; et les UPDATE dynamiques ne preparent plus (18 004 preparations cumulees quand environ 27 passages en produiraient ~227 000 si le chemin preparait encore), avec CONTRACT=GREEN et le parametrage des SELECT preserve. RESTE POUR CLORE, et uniquement cela : POST_FIX_DATA_OUTPUT_EQUIVALENCE par une comparaison DIRECTE avant/apres des sorties de recalcul — C8 ne l etablit qu indirectement. NE PAS promouvoir la causalite RCA au-dela de la preuve : Com_stmt_prepare est un compteur serveur global et cumulatif, donc correlation et non identite causale ; swap_kb reste a 1,84 GiB et performance_schema est OFF. Ne pas rejouer le correctif, ne pas redemarrer MariaDB.",
+      "phase": "POST_FIX_VALIDATION_MEMORY_AND_STATEMENTS_OBSERVED",
       "evidence_refs": [
         "AF-EVD-040",
         "AF-EVD-041",
@@ -177,7 +177,8 @@
         "AF-EVD-057",
         "AF-EVD-058",
         "AF-EVD-059",
-        "AF-EVD-060"
+        "AF-EVD-060",
+        "AF-EVD-071"
       ],
       "stream": "OPS",
       "program": "PRODUCTION_STABILITY",
