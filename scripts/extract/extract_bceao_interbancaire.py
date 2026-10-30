@@ -101,12 +101,29 @@ MOIS = {"janvier":1,"fevrier":2,"février":2,"mars":3,"avril":4,"mai":5,"juin":6
 
 
 def curl(url, dest=None, timeout=90):
+    """Avec `dest`, rend `(ok, code_http)` — et le code HTTP est VERIFIE.
+
+    Ma premiere version rendait `returncode == 0`, qui vaut VRAI sur un 404 :
+    curl a fait son travail, c est le serveur qui a refuse. Trois URL `.pdf` du
+    portail BCEAO rendent **404 avec une page HTML** « Page non trouvee ! », et
+    passaient donc pour des PDF valides puis pour des documents illisibles —
+    diagnostic qui envoie chercher un probleme d OCR inexistant. « Lien mort »
+    et « document illisible » n appellent pas la meme action.
+    """
     cmd = ["curl", "-s", "-L", "--compressed", "--max-time", str(timeout),
            "-H", f"User-Agent: {UA}", "-H", "Accept-Language: fr-FR,fr;q=0.9"]
-    cmd += ["-o", dest] if dest else []
+    if dest:
+        cmd += ["-o", dest, "-w", "%{http_code}"]
     cmd.append(url)
     r = subprocess.run(cmd, capture_output=True, timeout=timeout + 20)
-    return r.stdout.decode("utf-8", "replace") if not dest else (r.returncode == 0)
+    sortie = r.stdout.decode("utf-8", "replace")
+    if not dest:
+        return sortie
+    try:
+        code = int(sortie.strip()[-3:])
+    except ValueError:
+        code = 0
+    return (r.returncode == 0 and code == 200, code)
 
 
 def liens_pdf(page):
@@ -135,8 +152,37 @@ def texte_pdf(chemin):
         return ""
 
 
+def mois_tolerant(mot):
+    """Le numero du mois, en tolerant les FAUTES DE L EMETTEUR.
+
+    Mesure du 2026-10-30, sur les 391 documents du listing : quatre documents de
+    fevrier 2025 ecrivent « fevriérr » — fevrier mal orthographie a la source.
+    Une correspondance exacte les rejette, et quatre semaines CONSECUTIVES
+    disparaissent : la forme exacte d un faux trou d un mois, cree par la
+    lecture et non par la source.
+
+    La tolerance est BORNEE : accents retires, puis la cle la plus longue dont
+    le mot est un prefixe etendu. Aucun nom de mois francais n est prefixe d un
+    autre, la levee d ambiguite est donc sans risque — et un mot qui ne commence
+    par aucun mois rend None, jamais un mois devine.
+    """
+    if not mot:
+        return None
+    norm = (mot.lower().strip()
+            .replace("é", "e").replace("è", "e").replace("ê", "e")
+            .replace("û", "u").replace("ù", "u").replace("ô", "o")
+            .replace("î", "i").replace("ï", "i").replace("à", "a"))
+    if norm in MOIS:
+        return MOIS[norm]
+    for k in sorted({x.replace("é", "e").replace("û", "u").replace("ô", "o")
+                     for x in MOIS}, key=len, reverse=True):
+        if norm.startswith(k):
+            return MOIS.get(k)
+    return None
+
+
 def iso(jour, mois_mot, annee):
-    m = MOIS.get(mois_mot.lower())
+    m = mois_tolerant(mois_mot)
     return f"{annee}-{m:02d}-{int(jour):02d}" if m else None
 
 
@@ -144,7 +190,12 @@ def dates_du_texte(t):
     """Periode de reference (fin de semaine) et date de publication."""
     ref = pub = None
     # « Semaine du 31 octobre au 06 novembre 2017 » — le mois du debut peut differer
-    m = re.search(r"Semaine\s+du\s+(\d{1,2})\s+(\w+)?\s*(?:\d{4})?\s*au\s+(\d{1,2})\s+(\w+)\s+(\d{4})",
+    # `au\s*` et `\s*(\d{4})` et non `\s+` : les documents de 2019 ecrivent
+    # « au 1er juillet2019 » sans espace avant l annee, et un de janvier 2026
+    # « du 6 au12 janvier 2026 » sans espace apres « au ». Avec `\s+`, onze
+    # documents sur 391 etaient perdus EN SILENCE.
+    m = re.search(r"Semaine\s+du\s+(\d{1,2})\s*(?:er)?\s*(\w+)?\s*(?:\d{4})?"
+                  r"\s*au\s*(\d{1,2})\s*(?:er)?\s*(\w+)\s*(\d{4})",
                   t, re.I)
     if m:
         ref = iso(m.group(3), m.group(4), m.group(5))      # FIN de semaine
@@ -221,6 +272,14 @@ def main():
     ap.add_argument("--pages", type=int, default=1)
     ap.add_argument("--max-docs", type=int, default=6)
     ap.add_argument("--json")
+    ap.add_argument("--liste", default="",
+                    help="fichier d URL (une par ligne) a traiter au lieu de "
+                         "parcourir le listing — typiquement le candidats.txt "
+                         "produit par scripts/diag/recensement_bceao_interbancaire.py")
+    ap.add_argument("--tsv", default="",
+                    help="deverse les lignes en TSV, pour analyse hors ligne. "
+                         "Ecrire un TSV n est PAS ecrire en base : le dry-run "
+                         "reste entier.")
     a = ap.parse_args()
 
     print("=== EXTRACTEUR BCEAO INTERBANCAIRE — DRY-RUN ===")
@@ -228,10 +287,15 @@ def main():
     print("`benchmark_series`, qui n existe pas encore (M1 non appliquee).\n")
 
     urls = []
-    for p in range(a.pages):
-        l = liens_pdf(p)
-        print(f"  page {p} : {len(l)} PDF")
-        urls += l
+    if a.liste:
+        with open(a.liste, encoding="utf-8") as fh:
+            urls = [x.strip() for x in fh if x.strip()]
+        print(f"  {len(urls)} URL lues dans {a.liste}")
+    else:
+        for p in range(a.pages):
+            l = liens_pdf(p)
+            print(f"  page {p} : {len(l)} PDF")
+            urls += l
     # NE PAS prendre les N premiers par ordre alphabetique : c est arbitraire, et
     # cela avait fait traiter cinq rapports de politique monetaire au lieu des
     # tableaux hebdomadaires. On privilegie les noms qui ressemblent a la serie,
@@ -243,15 +307,19 @@ def main():
         if "maturit" in n or "interbancaire" in n:
             return 0
         return 1
-    urls = sorted(set(urls), key=lambda u: (pertinence(u), u))[: a.max_docs]
+    urls = sorted(set(urls), key=lambda u: (pertinence(u), u))
+    if a.max_docs > 0:
+        urls = urls[: a.max_docs]
     print(f"\n{len(urls)} document(s) retenu(s) (plafond --max-docs)\n")
 
     toutes, echecs = [], []
     with tempfile.TemporaryDirectory() as d:
         for u in urls:
             f = os.path.join(d, "x.pdf")
-            if not curl(u, f) or not os.path.getsize(f):
-                echecs.append((u, "TELECHARGEMENT")); continue
+            ok, code = curl(u, f)
+            if not ok or not os.path.getsize(f):
+                echecs.append((u, f"HTTP_{code}_LIEN_MORT" if code
+                                  else "TELECHARGEMENT")); continue
             t = texte_pdf(f)
             # LE FILTRE DOIT PORTER SUR LA SIGNATURE DU DOCUMENT, pas sur un mot
             # qu il partage avec d autres. Ma premiere version acceptait tout PDF
@@ -286,6 +354,15 @@ def main():
         print("\n=== exemple de ligne complete ===")
         for k, v in x.items():
             print(f"  {k:<20} {v}")
+    if a.tsv:
+        with open(a.tsv, "w", encoding="utf-8") as fh:
+            fh.write("as_of_date\tindicator_code\tvalue\tstatus\n")
+            for x in toutes:
+                v = "" if x["value"] is None else x["value"]
+                fh.write(f'{x["as_of_date"]}\t{x["indicator_code"]}\t{v}\t'
+                         f'{x["status"]}\n')
+        print(f"\n{len(toutes)} ligne(s) en TSV dans {a.tsv} "
+              f"(fichier local — la base n est pas touchee)")
     if a.json:
         json.dump(toutes, open(a.json, "w"), indent=1, ensure_ascii=False)
         print(f"\n{len(toutes)} ligne(s) ecrite(s) dans {a.json} (fichier local, pas la base)")
