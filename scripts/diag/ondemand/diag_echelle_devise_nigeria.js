@@ -295,30 +295,33 @@ const jour = (d) => {
   // ------------------------------------------------------------------
   // 5bis. LES VL DU 26 OCTOBRE SONT-ELLES CELLES D AUTRES FONDS ?
   //
-  // Mesure du 2026-10-30 : les sept fonds marocains bougent dans les DEUX
-  // sens, et les valeurs se repondent —
+  // MA PREMIERE VERSION DE CE TEST ETAIT NULLE, et il faut le dire parce que sa
+  // sortie AVAIT L AIR d un resultat. Avec une tolerance de 1 %, le fonds 949
+  // « recevait la VL precedente » de TREIZE fonds differents — AD COMPACT
+  // OBLIGATAIRE, TWIN BOND TRESOR, FCP EMERGENCE OPTIMUM, SECURITE TRESO PLUS…
+  // Les fonds monetaires marocains se massent tous entre 1 000 et 1 200 MAD : a
+  // 1 % pres, des dizaines partagent la meme valeur. Un appariement contre
+  // treize candidats ne prouve rien — sinon que le test ne discrimine pas.
   //
-  //   1113 AL BARID      148,93 ->   3 080,32   (monte)
-  //   953  CDG SOLIDARITE 177,08 ->  2 328,10   (monte)
-  //   1092 ATLANTA      2 327,26 ->    752,37   (descend)
-  //   967  CDG IZDIHAR  3 818,34 ->  1 098,56   (descend)
+  // Et la coincidence qui avait suggere l hypothese — 2 328,10 pour 953 contre
+  // 2 327,26 pour 1092, a 0,04 % — peut relever du meme entassement.
   //
-  // La valeur d arrivee de 953 (2 328,10) est la valeur de DEPART de 1092
-  // (2 327,26). Cela suggere des VL REAFFECTEES ENTRE FONDS — une erreur
-  // d IDENTITE, non d echelle. C est une hypothese, et elle se teste : pour
-  // chaque fonds, la VL du 26 octobre correspond-elle a la VL precedente d un
-  // AUTRE fonds, a 1 % pres ?
-  //
-  // Si oui, aucune correction par facteur ne convient : il faut re-apparier.
-  // Diviser par un facteur une valeur qui appartient a un autre fonds
-  // produirait un troisieme chiffre, faux pour les deux.
+  // CE QUE LE TEST CORRIGE EXIGE DESORMAIS, et sans quoi il ne conclut pas :
+  //   - une tolerance de 0,05 % et non 1 % ;
+  //   - le NOMBRE de candidats imprime a chaque fois, pour que la dilution soit
+  //     visible au lieu d etre masquee par une liste ;
+  //   - un appariement retenu SEULEMENT s il est UNIQUE. Un appariement unique
+  //     est un indice ; un appariement multiple est un artefact.
   // ------------------------------------------------------------------
   console.log('\n--- 5bis. Les VL du 26 octobre appartiennent-elles a d autres fonds ? ---');
-  const [perm] = await conn.query(`
-    SELECT v.fund_id AS recu_par, f.nom_fond AS nom_recu,
-           v.${colVal} AS val_26,
-           p2.fund_id AS valeur_de, f2.nom_fond AS nom_source,
-           p2.val_prec AS val_prec_source
+  console.log('  Tolerance 0,05 %. Un appariement ne compte que s il est UNIQUE :');
+  console.log('  les fonds monetaires marocains se massant entre 1 000 et 1 200 MAD,');
+  console.log('  une tolerance lache apparie n importe quoi avec n importe quoi.');
+  const [cand] = await conn.query(`
+    SELECT v.fund_id, f.nom_fond, v.${colVal} AS val_26,
+           COUNT(*) AS n_candidats,
+           MIN(p2.fund_id) AS un_candidat,
+           MIN(f2.nom_fond) AS nom_candidat
       FROM valorisations v
       JOIN fond_investissements f ON f.id = v.fund_id
       JOIN (SELECT v2.fund_id, v2.${colVal} AS val_prec
@@ -331,23 +334,31 @@ const jour = (d) => {
       JOIN fond_investissements f2 ON f2.id = p2.fund_id AND f2.pays = 'MAROC'
      WHERE v.${colDate} = '2026-10-26' AND v.${colVal} > 0 AND f.pays = 'MAROC'
        AND v.fund_id IN (1113, 953, 1092, 967, 975, 949, 963)
-       AND ABS(v.${colVal} - p2.val_prec) / p2.val_prec < 0.01
-     ORDER BY v.fund_id
-     LIMIT 40`);
-  if (perm.length === 0) {
-    console.log('  Aucune correspondance a 1 % pres : les valeurs du 26 octobre ne');
-    console.log('  sont PAS les VL precedentes d autres fonds. L hypothese de');
-    console.log('  reaffectation est ECARTEE — chercher ailleurs.');
+       AND ABS(v.${colVal} - p2.val_prec) / p2.val_prec < 0.0005
+     GROUP BY v.fund_id, f.nom_fond, v.${colVal}
+     ORDER BY n_candidats, v.fund_id`);
+  const uniques = cand.filter(r => Number(r.n_candidats) === 1);
+  if (cand.length === 0) {
+    console.log('\n  Aucun appariement a 0,05 % pres. L hypothese de reaffectation');
+    console.log('  entre fonds est ECARTEE : les valeurs du 26 octobre ne sont pas');
+    console.log('  les VL precedentes d autres fonds. Chercher ailleurs.');
   } else {
-    console.log(`  ${perm.length} correspondance(s) a 1 % pres :`);
-    for (const r of perm) {
-      console.log(`    [${r.recu_par}] ${String(r.nom_recu).slice(0, 22).padEnd(22)}`
-        + ` recoit ${Number(r.val_26).toFixed(2)}`
-        + ` = VL precedente de [${r.valeur_de}] ${String(r.nom_source).slice(0, 22)}`);
+    for (const r of cand) {
+      const n = Number(r.n_candidats);
+      const verdict = n === 1
+        ? `UNIQUE -> [${r.un_candidat}] ${String(r.nom_candidat).slice(0, 26)}`
+        : `${n} candidats — NON DISCRIMINANT, artefact d entassement`;
+      console.log(`    [${r.fund_id}] ${String(r.nom_fond).slice(0, 22).padEnd(22)}`
+        + ` ${Number(r.val_26).toFixed(2).padStart(11)}  ${verdict}`);
     }
-    console.log('  >> ERREUR D IDENTITE, pas d echelle. Aucune correction par');
-    console.log('     facteur ne convient : diviser une valeur qui appartient a un');
-    console.log('     autre fonds produirait un troisieme chiffre, faux pour les deux.');
+    console.log(`\n  appariements UNIQUES : ${uniques.length} sur ${cand.length} fonds apparies`);
+    if (uniques.length === 0) {
+      console.log('  >> AUCUN appariement unique : le test NE CONCLUT PAS. Ce n est');
+      console.log('     pas une refutation, c est une absence de pouvoir separateur.');
+    } else {
+      console.log('  >> Appariement(s) unique(s) : INDICE de reaffectation, a');
+      console.log('     confirmer par le sens inverse — une permutation est un cycle.');
+    }
   }
 
   // ------------------------------------------------------------------
