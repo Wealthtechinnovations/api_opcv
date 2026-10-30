@@ -293,73 +293,58 @@ const jour = (d) => {
   }
 
   // ------------------------------------------------------------------
-  // 5bis. LES VL DU 26 OCTOBRE SONT-ELLES CELLES D AUTRES FONDS ?
+  // 5bis. HYPOTHESE DE REAFFECTATION ENTRE FONDS — **REFUTEE** LE 2026-10-30.
   //
-  // MA PREMIERE VERSION DE CE TEST ETAIT NULLE, et il faut le dire parce que sa
-  // sortie AVAIT L AIR d un resultat. Avec une tolerance de 1 %, le fonds 949
-  // « recevait la VL precedente » de TREIZE fonds differents — AD COMPACT
-  // OBLIGATAIRE, TWIN BOND TRESOR, FCP EMERGENCE OPTIMUM, SECURITE TRESO PLUS…
-  // Les fonds monetaires marocains se massent tous entre 1 000 et 1 200 MAD : a
-  // 1 % pres, des dizaines partagent la meme valeur. Un appariement contre
-  // treize candidats ne prouve rien — sinon que le test ne discrimine pas.
+  // Le test ne tourne plus : la question est tranchee, et la relancer ferait
+  // perdre du temps a la prochaine session.
   //
-  // Et la coincidence qui avait suggere l hypothese — 2 328,10 pour 953 contre
-  // 2 327,26 pour 1092, a 0,04 % — peut relever du meme entassement.
+  // CE QUI AVAIT SUGGERE L HYPOTHESE : la VL du 26 octobre du fonds 953
+  // (2 328,10) est la VL precedente du fonds 1092 (2 327,26), a 0,04 % pres. A
+  // 0,05 % de tolerance, SIX des sept fonds avaient un appariement UNIQUE, et
+  // une chaine apparaissait : 953 <- 1092 <- 1112.
   //
-  // CE QUE LE TEST CORRIGE EXIGE DESORMAIS, et sans quoi il ne conclut pas :
-  //   - une tolerance de 0,05 % et non 1 % ;
-  //   - le NOMBRE de candidats imprime a chaque fois, pour que la dilution soit
-  //     visible au lieu d etre masquee par une liste ;
-  //   - un appariement retenu SEULEMENT s il est UNIQUE. Un appariement unique
-  //     est un indice ; un appariement multiple est un artefact.
+  // CE QUI L A REFUTEE : un TEMOIN. Le meme test applique aux huit seances du
+  // 19 au 28 octobre donne, par jour, le nombre de fonds marocains ayant un
+  // appariement unique :
+  //
+  //   19 oct 59 | 20 oct 58 | 21 oct 52 | 22 oct 51
+  //   23 oct 102 | **26 oct 56** | 27 oct 44 | 28 oct 62
+  //
+  // Le 26 octobre est AU MILIEU de la plage normale. Une cinquantaine de fonds
+  // marocains portent chaque jour, par hasard, une valeur a 0,05 % pres de la
+  // VL precedente d un autre — les fonds monetaires se massant entre 1 000 et
+  // 1 200 MAD. Les six appariements « uniques » du 26 octobre ne sont que ce
+  // taux de base, et la chaine 953 <- 1092 <- 1112 une coincidence.
+  //
+  // **Sans ce temoin j aurais annonce un import desaligne.** Un resultat sans
+  // taux de base n est pas un resultat.
+  //
+  // CE QUI EST ETABLI A LA PLACE, et qui tient :
+  //
+  //   Trois dates portent des variations > x3, depuis le 2026-08-01 :
+  //     19 oct : 6 fonds | 23 oct : 6 fonds | 26 oct : 7 fonds
+  //     (1er et 2 oct : 1 chacun ; tous les autres jours : zero)
+  //
+  //   LE 19 ET LE 23 SONT LE MEME EVENEMENT. Les six fonds du 19 sont les six
+  //   du 23, et ils REVIENNENT a leur valeur d origine :
+  //     636 SICAV MAROC CROISSANCE  4 840,88 -> 143,02 -> 4 836,23
+  //     834 FCP CAM INVESTISSEMENT  4 313,25 -> 128,38 -> 4 314,17
+  //     757 FCP MAROC CREANCES        152,42 -> 1 053,20 -> 152,07
+  //   Seul le 19 est fautif ; le 23 est le RETOUR A LA NORMALE. Ses six
+  //   « anomalies » n en sont pas, et les corriger abimerait des valeurs saines.
+  //
+  //   LE 26 OCTOBRE, LUI, NE S EST PAS AUTO-CORRIGE. Les 16 et 23 octobre sont
+  //   stables et coherents, le 26 decroche, et AUCUNE valeur posterieure ne le
+  //   rattrape — ces valeurs fausses sont **ce que le site sert aujourd hui** :
+  //     949 CDG-SECUR        4 326,77 | 4 314,85 | 1 121,63
+  //     953 CDG SOLIDARITE     177,58 |   177,08 | 2 328,10
+  //     1113 AL BARID          149,30 |   148,93 | 3 080,32
+  //
+  //   CAS A PART — le fonds 963 CDG OBLIG PLUS porte 208 220 puis 207 575 avant
+  //   le 26, valeurs implausibles pour une VL en MAD et STABLES sur deux dates :
+  //   ce n est donc pas l evenement du 26 mais une echelle ancienne. Ce fonds
+  //   demande un examen separe, et ne doit pas etre traite avec les six autres.
   // ------------------------------------------------------------------
-  console.log('\n--- 5bis. Les VL du 26 octobre appartiennent-elles a d autres fonds ? ---');
-  console.log('  Tolerance 0,05 %. Un appariement ne compte que s il est UNIQUE :');
-  console.log('  les fonds monetaires marocains se massant entre 1 000 et 1 200 MAD,');
-  console.log('  une tolerance lache apparie n importe quoi avec n importe quoi.');
-  const [cand] = await conn.query(`
-    SELECT v.fund_id, f.nom_fond, v.${colVal} AS val_26,
-           COUNT(*) AS n_candidats,
-           MIN(p2.fund_id) AS un_candidat,
-           MIN(f2.nom_fond) AS nom_candidat
-      FROM valorisations v
-      JOIN fond_investissements f ON f.id = v.fund_id
-      JOIN (SELECT v2.fund_id, v2.${colVal} AS val_prec
-              FROM valorisations v2
-              JOIN (SELECT fund_id, MAX(${colDate}) AS d FROM valorisations
-                     WHERE ${colDate} < '2026-10-26' AND ${colVal} > 0
-                     GROUP BY fund_id) m
-                ON m.fund_id = v2.fund_id AND m.d = v2.${colDate}
-             WHERE v2.${colVal} > 0) p2 ON p2.fund_id <> v.fund_id
-      JOIN fond_investissements f2 ON f2.id = p2.fund_id AND f2.pays = 'MAROC'
-     WHERE v.${colDate} = '2026-10-26' AND v.${colVal} > 0 AND f.pays = 'MAROC'
-       AND v.fund_id IN (1113, 953, 1092, 967, 975, 949, 963)
-       AND ABS(v.${colVal} - p2.val_prec) / p2.val_prec < 0.0005
-     GROUP BY v.fund_id, f.nom_fond, v.${colVal}
-     ORDER BY n_candidats, v.fund_id`);
-  const uniques = cand.filter(r => Number(r.n_candidats) === 1);
-  if (cand.length === 0) {
-    console.log('\n  Aucun appariement a 0,05 % pres. L hypothese de reaffectation');
-    console.log('  entre fonds est ECARTEE : les valeurs du 26 octobre ne sont pas');
-    console.log('  les VL precedentes d autres fonds. Chercher ailleurs.');
-  } else {
-    for (const r of cand) {
-      const n = Number(r.n_candidats);
-      const verdict = n === 1
-        ? `UNIQUE -> [${r.un_candidat}] ${String(r.nom_candidat).slice(0, 26)}`
-        : `${n} candidats — NON DISCRIMINANT, artefact d entassement`;
-      console.log(`    [${r.fund_id}] ${String(r.nom_fond).slice(0, 22).padEnd(22)}`
-        + ` ${Number(r.val_26).toFixed(2).padStart(11)}  ${verdict}`);
-    }
-    console.log(`\n  appariements UNIQUES : ${uniques.length} sur ${cand.length} fonds apparies`);
-    if (uniques.length === 0) {
-      console.log('  >> AUCUN appariement unique : le test NE CONCLUT PAS. Ce n est');
-      console.log('     pas une refutation, c est une absence de pouvoir separateur.');
-    } else {
-      console.log('  >> Appariement(s) unique(s) : INDICE de reaffectation, a');
-      console.log('     confirmer par le sens inverse — une permutation est un cycle.');
-    }
-  }
 
   // ------------------------------------------------------------------
   // 6. LE TAUX PUBLIE CONTRE LE TAUX IMPLICITE — la validation decisive.
