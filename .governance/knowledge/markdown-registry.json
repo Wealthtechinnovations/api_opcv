@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "6799ae1a8ae40a4eb0a9a0a597abf5de7b40f64b"
+      "head": "2e66316eacf9cebf3c0a0d66d1f0c0bfdbd2cd83"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "6a823202225df84958748e02f14d4c683f3fe3dc"
+      "head": "8e28d30d45af998bceaf30c0ab555e04520666ff"
     }
   },
   "summary": {
@@ -13650,6 +13650,9 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DF : la serie UEMOA recensee document par document, et elle n'est PAS continue",
+        "Ce qu'il faut retenir, et cela corrige le registre",
+        "Trois defauts de mon propre recenseur, trouves en l'executant",
         "POINT DE REPRISE COURANT — 2026-10-30 — Lot DE : extracteur UEMOA livre en dry-run, et la date de publication a disparu de la source",
         "POINT DE REPRISE COURANT — 2026-10-30 06:00 UTC — Lot DD : D1 qualifiee sur les trois zones — et les trois sont tres inegales",
         "SYNTHESE — la seule chose a retenir pour decider",
@@ -13664,10 +13667,7 @@
         "POINT DE REPRISE COURANT — 2026-10-30 01:40 UTC — Lot DA : la chaine complete du taux sans risque marocain, et pourquoi le correctif evident fabriquerait une donnee",
         "LA CHAINE, MAILLON PAR MAILLON",
         "POURQUOI LE MAILLON 7 CASSE TOUT",
-        "ET POURQUOI JE N'AI PAS APPLIQUE CE CORRECTIF",
-        "UN SECOND TROU, INDEPENDANT",
-        "CE QUI VOUS REVIENT, ET C'EST COURT",
-        "POINT DE REPRISE COURANT — 2026-10-30 01:20 UTC — Lot CZ : **RETRACTATION** — `ratiosnew` n'a jamais ete morte, c'etait MA requete"
+        "ET POURQUOI JE N'AI PAS APPLIQUE CE CORRECTIF"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13683,11 +13683,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "949bd669da82376d781c1561f285b58183a5f7cb",
-      "last_validated_sha": "949bd669da82376d781c1561f285b58183a5f7cb",
-      "content_sha256": "bf50ac1309b5ec73e7bb7b8d03ba42e6d10e9fe69f766454ea4dbd24a1ce53d6",
-      "line_count": 11123,
-      "byte_count": 700745,
+      "git_blob_sha": "fa374b9b5c8a9ca6c34568b7755c84053735b5d1",
+      "last_validated_sha": "fa374b9b5c8a9ca6c34568b7755c84053735b5d1",
+      "content_sha256": "24b7f8b0b8b8b3e8b0cf18e135fe597005dee86115441955af89784da1cdbb45",
+      "line_count": 11190,
+      "byte_count": 704641,
       "headings": [
         {
           "level": 1,
@@ -13696,6 +13696,18 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DF : la serie UEMOA recensee document par document, et elle n'est PAS continue"
+        },
+        {
+          "level": 3,
+          "text": "Ce qu'il faut retenir, et cela corrige le registre"
+        },
+        {
+          "level": 3,
+          "text": "Trois defauts de mon propre recenseur, trouves en l'executant"
         },
         {
           "level": 2,
@@ -13836,18 +13848,6 @@
         {
           "level": 3,
           "text": "5. QUATRE DEFAUTS DANS MON PROPRE OUTILLAGE, DANS CE SEUL LOT"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-29 23:30 UTC — Lot CW : `ratiosnew` n'est pas lente, elle ATTEND — cinq hypotheses a moi refutees"
-        },
-        {
-          "level": 3,
-          "text": "CE QUI EST ETABLI, ET PAR QUELLE MESURE"
-        },
-        {
-          "level": 3,
-          "text": "ANGLE MORT QUE J'AI CREE, A LEVER EN PRIORITE"
         }
       ]
     },
