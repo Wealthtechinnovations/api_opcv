@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "612b1fb530b9d892542accacb6c529562e22f2d0"
+      "head": "43c61325e983141675ba74f1bc393c258da3e9e9"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "8e28d30d45af998bceaf30c0ab555e04520666ff"
+      "head": "e7feb097effc8b5339a6fda7c75aae2c56c414ba"
     }
   },
   "summary": {
@@ -10906,14 +10906,14 @@
         "3. BEAC offre du CSV, mais sa base n'est pas accessible directement",
         "4. Casablanca est le seul blocage, et il est deja contourne",
         "Statut de collecte — ce qui existe DEJA, a ne pas reconstruire",
+        "Mesure du 2026-10-30 : la regle est INSATISFIABLE, pas seulement stricte",
         "Points ouverts, et a qui ils reviennent",
         "Livrable 2 — profondeur et structure, source par source",
         "UMOA-Titres — courbes de taux : EXPLOITABLE, STRUCTURE STABLE SUR 8 ANS",
         "Structure : STABLE sur toute la periode et sur les trois nomenclatures",
         "TROIS PIEGES D'EXTRACTION, mesures et non supposes",
         "Ce qui reste a verifier",
-        "UEMOA / BCEAO — taux interbancaires par maturite : QUALIFIE ET EXPLOITABLE",
-        "Deux pages, deux natures a ne pas confondre"
+        "UEMOA / BCEAO — taux interbancaires par maturite : QUALIFIE ET EXPLOITABLE"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10929,11 +10929,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "1c31230f2b2cee208e81170fbc19a8c8f99bb205",
-      "last_validated_sha": "1c31230f2b2cee208e81170fbc19a8c8f99bb205",
-      "content_sha256": "5665832a53507e6fd0ce39b13ef413ea9d1c0bd91348b0420b8127e76722fb29",
-      "line_count": 554,
-      "byte_count": 29004,
+      "git_blob_sha": "b3116bde29ed45fa89542f99da1b7e6b70f1f99e",
+      "last_validated_sha": "b3116bde29ed45fa89542f99da1b7e6b70f1f99e",
+      "content_sha256": "fd3c6a56f5e6fa70d3fb130776b9b465246c7477a82053068ef180ac4335268f",
+      "line_count": 598,
+      "byte_count": 31674,
       "headings": [
         {
           "level": 1,
@@ -10982,6 +10982,10 @@
         {
           "level": 2,
           "text": "Statut de collecte — ce qui existe DEJA, a ne pas reconstruire"
+        },
+        {
+          "level": 4,
+          "text": "Mesure du 2026-10-30 : la regle est INSATISFIABLE, pas seulement stricte"
         },
         {
           "level": 2,
@@ -13655,6 +13659,9 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DG : le proxy sans risque UEMOA tranche par la mesure (DEC-AF-009)",
+        "La couverture par maturite tranche a elle seule",
+        "Les trois defauts du recenseur portes dans l'extracteur",
         "POINT DE REPRISE COURANT — 2026-10-30 — Lot DF : la serie UEMOA recensee document par document, et elle n'est PAS continue",
         "Ce qu'il faut retenir, et cela corrige le registre",
         "Trois defauts de mon propre recenseur, trouves en l'executant",
@@ -13669,10 +13676,7 @@
         "MANDAT RECU — quatre decisions",
         "LA RECONCILIATION D'ABORD — et elle a trouve deux blocages",
         "LIVRABLE 1 LIVRE — registre des sources, mesure",
-        "POINT DE REPRISE COURANT — 2026-10-30 01:40 UTC — Lot DA : la chaine complete du taux sans risque marocain, et pourquoi le correctif evident fabriquerait une donnee",
-        "LA CHAINE, MAILLON PAR MAILLON",
-        "POURQUOI LE MAILLON 7 CASSE TOUT",
-        "ET POURQUOI JE N'AI PAS APPLIQUE CE CORRECTIF"
+        "POINT DE REPRISE COURANT — 2026-10-30 01:40 UTC — Lot DA : la chaine complete du taux sans risque marocain, et pourquoi le correctif evident fabriquerait une donnee"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13688,11 +13692,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "fa374b9b5c8a9ca6c34568b7755c84053735b5d1",
-      "last_validated_sha": "fa374b9b5c8a9ca6c34568b7755c84053735b5d1",
-      "content_sha256": "24b7f8b0b8b8b3e8b0cf18e135fe597005dee86115441955af89784da1cdbb45",
-      "line_count": 11190,
-      "byte_count": 704641,
+      "git_blob_sha": "10c2211b927a8a432894f6ba9613a316a76f107e",
+      "last_validated_sha": "10c2211b927a8a432894f6ba9613a316a76f107e",
+      "content_sha256": "c8db3a0ca29dda77d2516a2cbf944d79550a8ae3f05eaf571018fb5aff656dc5",
+      "line_count": 11261,
+      "byte_count": 708334,
       "headings": [
         {
           "level": 1,
@@ -13701,6 +13705,18 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DG : le proxy sans risque UEMOA tranche par la mesure (DEC-AF-009)"
+        },
+        {
+          "level": 3,
+          "text": "La couverture par maturite tranche a elle seule"
+        },
+        {
+          "level": 3,
+          "text": "Les trois defauts du recenseur portes dans l'extracteur"
         },
         {
           "level": 2,
@@ -13841,18 +13857,6 @@
         {
           "level": 3,
           "text": "2. Le pool de connexions est REFUTE — c'etait mon hypothese"
-        },
-        {
-          "level": 3,
-          "text": "3. SEPT HYPOTHESES REFUTEES, TOUTES PAR LA MESURE"
-        },
-        {
-          "level": 3,
-          "text": "4. CE QUE LA SONDE A FINALEMENT REPONDU"
-        },
-        {
-          "level": 3,
-          "text": "5. QUATRE DEFAUTS DANS MON PROPRE OUTILLAGE, DANS CE SEUL LOT"
         }
       ]
     },
