@@ -159,22 +159,57 @@ const jour = (d) => {
       + ` -> ${jour(r.bas_fin)}`);
   }
 
-  // 2. Volumetrie a corriger. Le chiffre qui dimensionne l operation.
-  console.log('\n--- 2. Nombre de lignes du groupe BAS (candidates) ---');
-  const [vol] = await conn.query(`
-    SELECT COUNT(*) AS n, MIN(v.${colDate}) AS d1, MAX(v.${colDate}) AS d2
+  // 2. VOLUMETRIE — ET UN DOUTE SUR MON PROPRE CHIFFRE.
+  //
+  // J'ai annonce « 182 lignes dans le groupe BAS » comme la volumetrie a
+  // corriger. **Ce chiffre est peut-etre le mauvais ensemble.** La devise
+  // declaree decide quel groupe est fautif, et DIX des quatorze fonds sont
+  // declares en USD : pour ceux-la, c'est le groupe HAUT qui contamine, donc
+  // le groupe bas n'est pas a corriger du tout.
+  //
+  // Exemple qui le montre, fonds 2765 CARDINALSTONE DOLLAR FUND, declare USD,
+  // amplitude [1,26 .. 1 799] : une VL de 1,26 USD est credible pour un fonds
+  // lance a 1,00, et 1 799 vaut precisement 1,26 x ~1 428. Ce sont donc les
+  // valeurs HAUTES qui sont du naira — et elles sont 119 contre 12 basses.
+  // Corriger « le groupe bas » y toucherait 12 lignes saines et en laisserait
+  // 119 fausses.
+  //
+  // On imprime donc LES DEUX groupes avec leurs bornes et la devise declaree,
+  // sans designer d'avance lequel corriger. Le volume reel suit de cet
+  // arbitrage, pas l'inverse.
+  console.log('\n--- 2. Les DEUX groupes, avec la devise declaree ---');
+  const [deux] = await conn.query(`
+    SELECT v.fund_id, f.${colDev} AS declare,
+           SUM(CASE WHEN v.${colVal} < s.seuil THEN 1 ELSE 0 END) AS n_bas,
+           ROUND(MIN(CASE WHEN v.${colVal} < s.seuil THEN v.${colVal} END),2) AS bas_min,
+           ROUND(MAX(CASE WHEN v.${colVal} < s.seuil THEN v.${colVal} END),2) AS bas_max,
+           SUM(CASE WHEN v.${colVal} >= s.seuil THEN 1 ELSE 0 END) AS n_haut,
+           ROUND(MIN(CASE WHEN v.${colVal} >= s.seuil THEN v.${colVal} END),2) AS haut_min,
+           ROUND(MAX(CASE WHEN v.${colVal} >= s.seuil THEN v.${colVal} END),2) AS haut_max
       FROM valorisations v
-      JOIN (SELECT fund_id, SQRT(MIN(${colVal}) * MAX(${colVal})) AS seuil
-              FROM valorisations
-             WHERE ${colVal} > 0 AND fund_id IN (${ids})
+      JOIN fond_investissements f ON f.id = v.fund_id
+      JOIN (SELECT fund_id, SQRT(MIN(${colVal})*MAX(${colVal})) AS seuil
+              FROM valorisations WHERE ${colVal} > 0 AND fund_id IN (${ids})
              GROUP BY fund_id) s ON s.fund_id = v.fund_id
      WHERE v.${colVal} > 0 AND v.fund_id IN (${ids})
-       AND v.${colVal} < s.seuil`);
-  console.log(`  ${vol[0].n} ligne(s), du ${jour(vol[0].d1)} `
-    + `au ${jour(vol[0].d2)}`);
+     GROUP BY v.fund_id, f.${colDev}
+     ORDER BY f.${colDev}, v.fund_id`);
+  console.log('   id  decl |  n_bas       bornes basses |  n_haut      bornes hautes');
+  let totBas = 0, totHaut = 0, basUsd = 0, hautUsd = 0;
+  for (const r of deux) {
+    totBas += Number(r.n_bas); totHaut += Number(r.n_haut);
+    if (String(r.declare) === 'USD') { basUsd += Number(r.n_bas); hautUsd += Number(r.n_haut); }
+    console.log(`  ${String(r.fund_id).padStart(4)} ${String(r.declare).padEnd(4)} |`
+      + ` ${String(r.n_bas).padStart(5)} ${String(r.bas_min).padStart(9)}..${String(r.bas_max).padEnd(9)} |`
+      + ` ${String(r.n_haut).padStart(5)} ${String(r.haut_min).padStart(10)}..${r.haut_max}`);
+  }
+  console.log(`\n  TOTAL  bas ${totBas}  |  haut ${totHaut}`);
+  console.log(`  dont fonds declares USD : bas ${basUsd}  |  haut ${hautUsd}`);
+  console.log('  Pour un fonds declare USD, c est le groupe HAUT qui contamine ;');
+  console.log('  pour un fonds declare NGN, le groupe BAS. Le volume a corriger');
+  console.log(`  est donc ${hautUsd} + (bas des fonds NGN) = ${hautUsd + (totBas - basUsd)},`);
+  console.log('  et NON les 182 que j avais annonces.');
 
-  // 3. VL a ZERO. Defaut DISTINCT, invisible a C7 qui filtre `value > 0`, mais
-  //    servi au graphique par l API — un point a 0 sur une courbe de VL.
   // Defaut DISTINCT, invisible a C7 qui filtre `value > 0`, mais servi au
   // graphique par l API — un point a zero sur une courbe de valeur liquidative.
   //
