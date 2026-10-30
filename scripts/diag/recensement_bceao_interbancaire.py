@@ -119,7 +119,12 @@ def semaine_du_contenu(t):
     m = re.search(r"[Ss]emaine\s+du\s+(\d{1,2})\s*(?:er)?\s*"
                   r"([A-Za-zéèûôA-ZÀ-ſ]+)?\s*"
                   r"(?:\d{4})?\s*au\s+(\d{1,2})\s*(?:er)?\s*"
-                  r"([A-Za-zéèûôA-ZÀ-ſ]+)\s+(\d{4})", t)
+                  # `\s*` et non `\s+` avant l annee : les documents de 2019
+                  # ecrivent « au 1er juillet2019 », SANS espace. Avec `\s+`,
+                  # 5 documents sur les 150 premiers etaient classes
+                  # SERIE_DATE_ILLISIBLE — une perte de 3 % qui aurait creuse
+                  # un faux trou dans la serie, du fait de MA lecture.
+                  r"([A-Za-zéèûôA-ZÀ-ſ]+)\s*(\d{4})", t)
     if not m:
         return None
     _, _, jf, mf, an = m.groups()
