@@ -158,7 +158,7 @@ plutot que par ce tableau — la mesure prime sur la prose.
 30 19 * * 1-5 cron_brvm_daily.sh       — Import BRVM / UEMOA
 30 18 * * 1-5 cron_indices_daily.sh    — Import indices de reference
 0 22 * * *    cron_health_check.sh     — Controle de sante, sortie non nulle si probleme
-0 * * * *     sync_production.sh       — Snapshot horaire (PRODUCTION_STATE.json)
+0 * * * *     sync_production.sh       — Snapshot horaire HORS GIT (/var/lib/fundafrica/runtime/)
 */5 * * * *   fix-brvm-nginx.py        — Fix Nginx BRVM
 ```
 
@@ -244,16 +244,43 @@ Un invariant non confronte aux donnees reelles n'est qu'une affirmation de plus.
 
 ## Regle obligatoire — Lecture du snapshot production avant toute action
 
-Le fichier `PRODUCTION_STATE.json` est genere automatiquement par `sync_production.sh` (cron horaire).
-Il contient l'etat reel de la production : tables, counts, derniere VL, dernier classement, git log, PM2 status.
+> **CORRIGEE LE 2026-10-30.** La version precedente de cette regle designait
+> `PRODUCTION_STATE.json` **du depot** comme « la source de verite sur l'etat de
+> production », generee par un cron horaire. C'etait faux depuis le 2026-09-10,
+> et la copie du depot est figee a `generated_at: 2026-08-02T14:00Z` — **89 jours**
+> au moment de la correction. Une session suivant la regle a la lettre prenait
+> donc des donnees d'aout pour l'etat du jour.
+>
+> La production n'etait pas en panne : elle avait **change de conception**.
+> `scripts/deploy/sync_production.sh` declare desormais, en toutes lettres,
+> qu'il « n'effectue AUCUN git add, commit, push » — c'est le remede de
+> **GOV-006**, l'incident ou les commits automatiques de S2 provenaient
+> precisement de ce snapshot horaire. Restaurer le commit **recreerait
+> l'incident resolu**. Seule la regle devait etre corrigee.
 
-A chaque reprise de session ou nouvelle tache, Claude doit :
-1. Verifier que `PRODUCTION_STATE.json` existe et sa date de derniere modification
-2. Considerer ce fichier comme la source de verite sur l'etat de production
-3. Ne jamais supposer un etat de production sans l'avoir verifie (via ce fichier ou via curl API)
-4. En cas de doute, interroger directement l'API de production (`curl https://africafunds.chainsolutions.fr/api/...`)
+**Le snapshot vivant n'est PAS dans le depot.** Il est ecrit hors du working
+tree, a `/var/lib/fundafrica/runtime/PRODUCTION_STATE.json` (ou sous
+`$FUNDAFRICA_RUNTIME_STATE_DIR`), par `sync_production.sh` sur S2.
 
-Ce fichier NE DOIT PAS etre modifie manuellement. Il est genere automatiquement.
+`PRODUCTION_STATE.json` **a la racine du depot est un fallback documentaire
+HISTORIQUE**, ni rafraichi ni commite depuis S2. **Ne jamais le citer comme
+l'etat courant.** Il n'est pas a supprimer — il garde une valeur d'archive —
+mais sa date interne doit etre lue avant toute citation.
+
+A chaque reprise de session ou nouvelle tache, dans cet ordre :
+1. `docs/ETAT_PRODUCTION_VERIFIE.md` — genere quotidiennement contre la
+   production par `doc-drift.yml`. C'est la **source de verite n°1** ;
+2. `docs/DIAG_ONDEMAND.md` — sortie des diagnostics a la demande, incluant le
+   snapshot runtime via `diag_runtime_state_vivant.js` ;
+3. l'API de production en direct : `curl https://africafunds.chainsolutions.fr/api/...`
+4. ne jamais supposer un etat de production sans l'avoir verifie par l'un des trois.
+
+Pour lire le snapshot vivant depuis une session : deposer ou relancer un script
+dans `scripts/diag/ondemand/`, qui s'execute **sur S2** et dont la sortie revient
+dans `docs/DIAG_ONDEMAND.md`. Lire n'est pas commiter : ce canal ne recree pas
+GOV-006.
+
+Aucun de ces fichiers ne doit etre modifie a la main.
 
 ## Regle obligatoire — Moyens d acces reels : ne jamais travailler a l aveugle
 
