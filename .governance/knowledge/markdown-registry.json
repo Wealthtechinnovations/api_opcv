@@ -6,24 +6,24 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "e40dd78a12fb7adb1d687b26abc04c16e87c2fb0"
+      "head": "d6c8374414a676bb91ea5de82b594ff7066a0ba1"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "b331d1e0d70cea2cd900c34a0ca5a7c670d5ae89"
+      "head": "38b74857f0a05e96c8bdf61ad7ffaa3f22670650"
     }
   },
   "summary": {
-    "total_md_discovered": 249,
-    "total_md_certified": 249,
+    "total_md_discovered": 250,
+    "total_md_certified": 250,
     "by_repository": {
-      "API": 224,
+      "API": 225,
       "FRONTEND": 25
     },
     "by_status": {
       "TEMPLATE": 5,
       "CURRENT_CANONICAL": 21,
-      "CURRENT_SPECIALIZED": 197,
+      "CURRENT_SPECIALIZED": 198,
       "ADAPTER": 7,
       "HISTORICAL": 3,
       "DIAGNOSTIC_SNAPSHOT": 3,
@@ -10114,11 +10114,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "0b38fcf64a926242b54f7ed5069e7e9ca0c7aac4",
-      "last_validated_sha": "0b38fcf64a926242b54f7ed5069e7e9ca0c7aac4",
-      "content_sha256": "cb1810b993ce1c7dfd0f8edc7b58e00c0940bf292ff77d05ad8b7b2664a0081c",
-      "line_count": 3689,
-      "byte_count": 243516,
+      "git_blob_sha": "ebb2f748e50b51ebbe15b545ca30d6055d86704d",
+      "last_validated_sha": "ebb2f748e50b51ebbe15b545ca30d6055d86704d",
+      "content_sha256": "a95eeaf66ffd297582112c92b24f30cce424eedd5cfdaaafe10a9975c0ca759c",
+      "line_count": 3797,
+      "byte_count": 281291,
       "headings": [
         {
           "level": 1,
@@ -10305,9 +10305,9 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "8ab65d16855c947db1ffd01a0ccd140651df2f4f",
-      "last_validated_sha": "8ab65d16855c947db1ffd01a0ccd140651df2f4f",
-      "content_sha256": "fde79f4cc623e242d28fd9c0dac8ff916a82a7a215c798a8b19e7512b2397170",
+      "git_blob_sha": "1e3ec989267336f6dec833366ce5ec9c61f31bf7",
+      "last_validated_sha": "1e3ec989267336f6dec833366ce5ec9c61f31bf7",
+      "content_sha256": "03058c53ec7694b5231ef4be69737ba5993bde16a57c647ee95df15b5f0d9854",
       "line_count": 96,
       "byte_count": 7202,
       "headings": [
@@ -10835,6 +10835,105 @@
         {
           "level": 2,
           "text": "Livrables attendus"
+        }
+      ]
+    },
+    {
+      "role": "specialized_documentation",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "docs/REGISTRE_SOURCES_MARCHE.md",
+      "unique_information": [
+        "Registre des sources institutionnelles de marche — UEMOA, CEMAC, Maroc",
+        "Ce que ce document est, et ce qu'il n'est pas",
+        "Resultat — 23 sources sur 25 repondent 200",
+        "UEMOA",
+        "CEMAC",
+        "Maroc",
+        "Ce que la mesure change dans l'approche",
+        "1. UMOA-Titres est structuree — pas de PDF a eplucher",
+        "2. BRVM `bfin` porte un historique profond",
+        "3. BEAC offre du CSV, mais sa base n'est pas accessible directement",
+        "4. Casablanca est le seul blocage, et il est deja contourne",
+        "Statut de collecte — ce qui existe DEJA, a ne pas reconstruire",
+        "Points ouverts, et a qui ils reviennent",
+        "Journal des mesures"
+      ],
+      "consumers": [
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "NONE",
+      "production_impact": "YES",
+      "title": "Registre des sources institutionnelles de marche — UEMOA, CEMAC, Maroc",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": "docs/REGISTRE_SOURCES_MARCHE.md",
+      "git_blob_sha": "fe1345d125ba294b9b41499db39e15bb4cb85a9a",
+      "last_validated_sha": "fe1345d125ba294b9b41499db39e15bb4cb85a9a",
+      "content_sha256": "a07d69bb8c9e3c33f63aa3fb23b8fe7d33787554e946a9966b71bc55d689e6c8",
+      "line_count": 140,
+      "byte_count": 7436,
+      "headings": [
+        {
+          "level": 1,
+          "text": "Registre des sources institutionnelles de marche — UEMOA, CEMAC, Maroc"
+        },
+        {
+          "level": 2,
+          "text": "Ce que ce document est, et ce qu'il n'est pas"
+        },
+        {
+          "level": 2,
+          "text": "Resultat — 23 sources sur 25 repondent 200"
+        },
+        {
+          "level": 3,
+          "text": "UEMOA"
+        },
+        {
+          "level": 3,
+          "text": "CEMAC"
+        },
+        {
+          "level": 3,
+          "text": "Maroc"
+        },
+        {
+          "level": 2,
+          "text": "Ce que la mesure change dans l'approche"
+        },
+        {
+          "level": 3,
+          "text": "1. UMOA-Titres est structuree — pas de PDF a eplucher"
+        },
+        {
+          "level": 3,
+          "text": "2. BRVM `bfin` porte un historique profond"
+        },
+        {
+          "level": 3,
+          "text": "3. BEAC offre du CSV, mais sa base n'est pas accessible directement"
+        },
+        {
+          "level": 3,
+          "text": "4. Casablanca est le seul blocage, et il est deja contourne"
+        },
+        {
+          "level": 2,
+          "text": "Statut de collecte — ce qui existe DEJA, a ne pas reconstruire"
+        },
+        {
+          "level": 2,
+          "text": "Points ouverts, et a qui ils reviennent"
+        },
+        {
+          "level": 2,
+          "text": "Journal des mesures"
         }
       ]
     },
@@ -11828,11 +11927,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "CLAUDE.md",
-      "git_blob_sha": "c76ffcdbf742f5bfc17c8037331d2097067f0037",
-      "last_validated_sha": "c76ffcdbf742f5bfc17c8037331d2097067f0037",
-      "content_sha256": "7415a446bc5dc4b77d5fed271fa2928c931137d8cf73b652f389b03f31cb642f",
-      "line_count": 462,
-      "byte_count": 20320,
+      "git_blob_sha": "3956cad175eb967abea7eba080d8565d95a372b2",
+      "last_validated_sha": "3956cad175eb967abea7eba080d8565d95a372b2",
+      "content_sha256": "90d40ce13e2922566ead2b8608540e5cfc4c7a1018d7eb36d8265907f76cd1cd",
+      "line_count": 483,
+      "byte_count": 21419,
       "headings": [
         {
           "level": 1,
@@ -13424,24 +13523,24 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
-        "POINT DE REPRISE COURANT — 2026-10-30 00:00 UTC — Lot CX : pool refute, Node du canal corrige, et la route attend un SOCKET",
-        "1. Le Node du canal est corrige",
-        "2. Le pool de connexions est REFUTE — c'etait mon hypothese",
-        "3. SEPT HYPOTHESES REFUTEES, TOUTES PAR LA MESURE",
-        "4. CE QUE LA SONDE A FINALEMENT REPONDU",
-        "5. QUATRE DEFAUTS DANS MON PROPRE OUTILLAGE, DANS CE SEUL LOT",
-        "POINT DE REPRISE COURANT — 2026-10-29 23:30 UTC — Lot CW : `ratiosnew` n'est pas lente, elle ATTEND — cinq hypotheses a moi refutees",
-        "CE QUI EST ETABLI, ET PAR QUELLE MESURE",
-        "ANGLE MORT QUE J'AI CREE, A LEVER EN PRIORITE",
-        "TROIS DEFAUTS DANS MES PROPRES OUTILS, CORRIGES",
-        "FAIT D'INFRASTRUCTURE DECOUVERT EN ECHOUANT",
-        "POINT DE REPRISE COURANT — 2026-10-29 22:30 UTC — Lot CV : `ratiosnew` instruit — quatre hypotheses a moi refutees, et un taux sans risque perime partout",
-        "QUATRE HYPOTHESES A MOI, TOUTES REFUTEES PAR LA MESURE",
-        "CE QUE L'INSTRUCTION A TROUVE A LA PLACE — et c'est plus grave",
-        "Pourquoi cela n'avait jamais ete vu",
-        "POINT DE REPRISE COURANT — 2026-10-29 18:40 UTC — Lot CU : V2 EXECUTE, 4 routes fermees, le canal de deploiement REPARE, et `ratiosnew` est mort depuis juin",
-        "1. `V2` EXECUTE — 19 lignes supprimees, index UNIQUE pose",
-        "2. Les quatre routes sont fermees"
+        "POINT DE REPRISE COURANT — 2026-10-30 01:40 UTC — Lot DA : la chaine complete du taux sans risque marocain, et pourquoi le correctif evident fabriquerait une donnee",
+        "LA CHAINE, MAILLON PAR MAILLON",
+        "POURQUOI LE MAILLON 7 CASSE TOUT",
+        "ET POURQUOI JE N'AI PAS APPLIQUE CE CORRECTIF",
+        "UN SECOND TROU, INDEPENDANT",
+        "CE QUI VOUS REVIENT, ET C'EST COURT",
+        "POINT DE REPRISE COURANT — 2026-10-30 01:20 UTC — Lot CZ : **RETRACTATION** — `ratiosnew` n'a jamais ete morte, c'etait MA requete",
+        "JE RETIRE CE QUE LES LOTS CU, CV, CW ET CX AFFIRMENT",
+        "CE QUE CETTE ERREUR A COUTE",
+        "CE QUI RESTE VRAI, ET QUI EST REEL",
+        "CE QUI RESTE VRAI DES LOTS CV-CX, ET QU'IL NE FAUT PAS JETER",
+        "POINT DE REPRISE COURANT — 2026-10-30 00:50 UTC — Lot CY : la regle du snapshot production designait un fichier mort depuis 89 jours",
+        "LE DEFAUT",
+        "MON PREMIER DIAGNOSTIC ETAIT FAUX, ET LE CODE L'A RETOURNE",
+        "LE SNAPSHOT VIVANT EST FRAIS — ET IL CONFIRME DEUX CONSTATS",
+        "CE QUI A CHANGE",
+        "TROISIEME REGLE DE CETTE SESSION POINTANT VERS QUELQUE CHOSE DE MORT",
+        "Hygiene relevee au passage"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13457,11 +13556,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "b4228a8b84bc98efc191f89bc6001c45b411fee6",
-      "last_validated_sha": "b4228a8b84bc98efc191f89bc6001c45b411fee6",
-      "content_sha256": "92dc328ffa79be7e4852da10cd8c531555583995508023aafcd6c721ef6d6278",
-      "line_count": 10576,
-      "byte_count": 672963,
+      "git_blob_sha": "e4a3280db9eafbb4d3f31a676f2c15414e417d6c",
+      "last_validated_sha": "e4a3280db9eafbb4d3f31a676f2c15414e417d6c",
+      "content_sha256": "f65e8daad31094249b0de71cf2f361ba79b8a11e48c61b4ff10b75e4ad3d1867",
+      "line_count": 10869,
+      "byte_count": 686844,
       "headings": [
         {
           "level": 1,
@@ -13470,6 +13569,78 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 01:40 UTC — Lot DA : la chaine complete du taux sans risque marocain, et pourquoi le correctif evident fabriquerait une donnee"
+        },
+        {
+          "level": 3,
+          "text": "LA CHAINE, MAILLON PAR MAILLON"
+        },
+        {
+          "level": 3,
+          "text": "POURQUOI LE MAILLON 7 CASSE TOUT"
+        },
+        {
+          "level": 3,
+          "text": "ET POURQUOI JE N'AI PAS APPLIQUE CE CORRECTIF"
+        },
+        {
+          "level": 3,
+          "text": "UN SECOND TROU, INDEPENDANT"
+        },
+        {
+          "level": 3,
+          "text": "CE QUI VOUS REVIENT, ET C'EST COURT"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 01:20 UTC — Lot CZ : **RETRACTATION** — `ratiosnew` n'a jamais ete morte, c'etait MA requete"
+        },
+        {
+          "level": 3,
+          "text": "JE RETIRE CE QUE LES LOTS CU, CV, CW ET CX AFFIRMENT"
+        },
+        {
+          "level": 3,
+          "text": "CE QUE CETTE ERREUR A COUTE"
+        },
+        {
+          "level": 3,
+          "text": "CE QUI RESTE VRAI, ET QUI EST REEL"
+        },
+        {
+          "level": 3,
+          "text": "CE QUI RESTE VRAI DES LOTS CV-CX, ET QU'IL NE FAUT PAS JETER"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 00:50 UTC — Lot CY : la regle du snapshot production designait un fichier mort depuis 89 jours"
+        },
+        {
+          "level": 3,
+          "text": "LE DEFAUT"
+        },
+        {
+          "level": 3,
+          "text": "MON PREMIER DIAGNOSTIC ETAIT FAUX, ET LE CODE L'A RETOURNE"
+        },
+        {
+          "level": 3,
+          "text": "LE SNAPSHOT VIVANT EST FRAIS — ET IL CONFIRME DEUX CONSTATS"
+        },
+        {
+          "level": 3,
+          "text": "CE QUI A CHANGE"
+        },
+        {
+          "level": 3,
+          "text": "TROISIEME REGLE DE CETTE SESSION POINTANT VERS QUELQUE CHOSE DE MORT"
+        },
+        {
+          "level": 3,
+          "text": "Hygiene relevee au passage"
         },
         {
           "level": 2,
@@ -13550,78 +13721,6 @@
         {
           "level": 3,
           "text": "4. RISQUE QUE J'AI CREE, ET CORRIGE DANS LE MEME LOT"
-        },
-        {
-          "level": 3,
-          "text": "5. DEFAUT MAJEUR TROUVE EN VERIFIANT — `ratiosnew` EST MORT DEPUIS JUIN"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 13:20 UTC — Lot CT : DEPLOYE ET VERIFIE — deux routes fermees, deux defauts SEO corriges"
-        },
-        {
-          "level": 3,
-          "text": "Verifications en production, apres deploiement"
-        },
-        {
-          "level": 3,
-          "text": "Ce qui a ete ferme"
-        },
-        {
-          "level": 3,
-          "text": "L'ordre a ete respecte, et il etait obligatoire"
-        },
-        {
-          "level": 3,
-          "text": "Parti dans le meme deploiement — `D5` et les deux defauts SEO"
-        },
-        {
-          "level": 3,
-          "text": "CE QUI RESTE OUVERT — a ne pas croire resolu"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:55 UTC — Lot CS : les cinq indices morts ne nuisent a RIEN, et les deux chantiers n'en font qu'un"
-        },
-        {
-          "level": 3,
-          "text": "Mon alerte « cinq indices morts » est annulee — en entier"
-        },
-        {
-          "level": 3,
-          "text": "LES DEUX CHANTIERS N'EN FONT QU'UN"
-        },
-        {
-          "level": 3,
-          "text": "NOS CONTROLES AVAIENT RAISON"
-        },
-        {
-          "level": 3,
-          "text": "Bilan de mes propres faux signalements, aujourd'hui"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:45 UTC — Lot CR : S5 clos — 39 785 VL archivables, et un test a moi qui ne mesurait rien"
-        },
-        {
-          "level": 3,
-          "text": "S5 — verdict : (A) ARCHIVABLES, les deux formes"
-        },
-        {
-          "level": 3,
-          "text": "DEUX ERREURS A MOI, dans le meme lot"
-        },
-        {
-          "level": 3,
-          "text": "CE QUI TIENT, ET QUI RESTE A INSTRUIRE"
-        },
-        {
-          "level": 3,
-          "text": "Bilan des sept actions sans decision"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:35 UTC — Lot CQ : S5 et S7 livres — et « cinq indices morts » etait une mauvaise priorisation, la mienne"
         }
       ]
     },
