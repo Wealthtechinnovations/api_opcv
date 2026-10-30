@@ -16,6 +16,24 @@
 > Statut : `APPLICABLE`.
 > Règle : les SHA inscrits ici sont des **checkpoints observés**. Le commit qui met à jour ce fichier avance nécessairement le HEAD ; toute nouvelle écriture doit donc réobserver GitHub au lieu de supposer que ce fichier contient le HEAD auto-référentiel du commit courant.
 
+## Mandat du 2026-10-30 — état au lot DC
+
+| Décision | État | Preuve |
+|---|---|---|
+| **DEC-AF-006** périmètre GitHub exclusif | **CLOS** | les deux dépôts externes écartés sur mesure (front vide, pipeline inaccessible) |
+| **DEC-AF-007** sources UEMOA/CEMAC | **registre livré** | `docs/REGISTRE_SOURCES_MARCHE.md` — 23/25 à 200 |
+| **DEC-AF-008** F4/M2 pilote Maroc | **M1 livré, non appliqué** | `src/db/migrations/20261030000001-…` |
+
+**Préalable vérifié, et il bloquait** : M1 n'avait jamais été exécuté —
+`benchmark_series` absent de tout le code, 6 migrations dont aucune benchmark,
+`BENCHMARKS_V2_ENABLED` présent dans le seul document F3. M2 ne peut pas écrire
+dans une table inexistante.
+
+**`BENCHMARKS_V2_ENABLED` : désactivé par défaut.** Aucun comportement modifié.
+
+**Production inchangée par ce lot** : aucune écriture en base, aucun déploiement.
+
+
 ## Baseline historique Regulatory Plus
 
 - Repository : `Wealthtechinnovations/api_opcv`.

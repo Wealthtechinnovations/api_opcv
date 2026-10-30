@@ -13,6 +13,44 @@
 
 <!-- PROGRAMME_DIRECTOR:END -->
 
+## Prochaine action — mandat du 2026-10-30
+
+### 1. À APPLIQUER PAR LE PROPRIÉTAIRE — M1
+
+```bash
+cd /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api \
+  && git pull --rebase origin claude/code-review-improvements-ikvuj \
+  && npx sequelize-cli db:migrate
+```
+
+Deux `CREATE TABLE` sur des tables vides : instantané, aucun verrou sur les
+tables de production. Retour arrière : `db:migrate:undo` (sans perte tant que M2
+n'a pas écrit).
+
+**M2 ne peut pas démarrer avant.** Il écrit dans `benchmark_series`.
+
+### 2. SANS DÉCISION REQUISE — ce qui avance en attendant
+
+- rejouer `scripts/diag/registre_sources_marche.py` **depuis S2** : le réseau du
+  datacenter peut différer (`BENCHMARKS_F3_MAPPING_SCHEMA.md` note déjà une
+  source « injoignable datacenter ») ;
+- vérifier que les **702** fichiers UMOA-Titres partagent la structure du seul
+  qui ait été ouvert — les noms `YC-*` sont probablement d'un autre format ;
+- instruire les conditions d'accès réelles à la **BDEMF** de la BEAC : sa page
+  d'accès ne rend que **1 349 octets** ;
+- inventorier les séries BCEAO et BEAC admissibles comme taux sans risque, en
+  distinguant taux directeur, interbancaire et rendement souverain — le mandat
+  interdit de les confondre.
+
+### 3. À NE PAS FAIRE
+
+- ne pas engager M2 avant application de M1 ;
+- ne jamais supprimer `iso !== targetDate` sans corriger la date d'insertion —
+  interdiction explicite du mandat ;
+- ne pas activer `BENCHMARKS_V2_ENABLED` avant validation ;
+- ne pas toucher `valLiq`, `valLiqdev` ni `valorisations.indRef`.
+
+
 ## Priorité opérationnelle pré-V2 — AF-OPS-003
 
 La boucle de certification de gouvernance reste fermée :

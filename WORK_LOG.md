@@ -1,5 +1,38 @@
 # WORK_LOG — AfricaFunds API
 
+## 2026-10-30 — Mandat du propriétaire : D1 sources, D2 F4/M2 pilote Maroc, D3 frontend
+
+**Réconciliation d'abord, conformément à l'instruction finale du mandat.**
+
+- HEAD des deux dépôts relus avant et immédiatement avant écriture, concordants
+  (api `7303413`, front `dbb9733`) — Single Writer, étapes 1 et 4.
+- Lecture de `SOURCE_OF_TRUTH.md`, `GOVERNANCE.md` (Single Writer, protocole
+  bi-repository), `docs/BENCHMARKS_F3_MAPPING_SCHEMA.md` §2.1-2.2 et §127.
+- `chainsolutions-wealthtech/front` attaché et cloné : **1 fichier**, README du
+  2026-07-08, migration jamais effectuée. `africafunds-market-data-pipeline` :
+  **accès refusé**. Les deux écartés par DEC-AF-006.
+
+**Livrables.**
+
+- `docs/REGISTRE_SOURCES_MARCHE.md` + `scripts/diag/registre_sources_marche.py` :
+  25 sources institutionnelles testées, **23 répondent 200**. UMOA-Titres porte
+  **702 fichiers `.xlsx`** de courbes de taux, **2019-2026** — huit années, pas
+  dix. Structure vérifiée par téléchargement : **8 feuilles par État émetteur**,
+  colonnes `Maturité` / `Zero Coupon` / `Taux Après Lissage`, maturités 1 mois à
+  17 ans. Casablanca Bourse : seul échec, déjà contourné (MASI via FT).
+- `src/db/migrations/20261030000001-create-benchmark-series-and-mapping.js` :
+  **M1**, strictement additif, deux `CREATE TABLE`, aucune ligne écrite, aucune
+  table existante touchée. **Non appliquée** — l'application relève du
+  propriétaire.
+
+**Preuves de non-régression.** Aucune écriture en base, aucun déploiement dans
+ce lot. `node --check` sur la migration ; convention identique aux six
+précédentes ; schéma repris littéralement de sa source canonique F3.
+
+**Ce qui n'a pas été fait, et pourquoi.** M2 n'est pas engagé : il écrit dans
+`benchmark_series`, qui n'existe pas avant application de M1. Enchaîner aurait
+produit un collecteur écrivant dans le vide.
+
 ## 2026-09-10 — AF-GOV-REGULATORY-PLUS-001
 
 - comparaison directe de `chainsolutions-wealthtech/Regulatory` via GitHub ;
