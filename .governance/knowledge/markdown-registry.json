@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "2e66316eacf9cebf3c0a0d66d1f0c0bfdbd2cd83"
+      "head": "612b1fb530b9d892542accacb6c529562e22f2d0"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -10058,7 +10058,8 @@
         "DEC-AF-005 — GitHub / S2 / runtime",
         "DEC-AF-006 — Périmètre GitHub exclusif (mandat du 2026-10-30)",
         "DEC-AF-007 — Sources de taux sans risque UEMOA / CEMAC",
-        "DEC-AF-008 — Engagement F4 / M2, pilote Maroc / MONIA"
+        "DEC-AF-008 — Engagement F4 / M2, pilote Maroc / MONIA",
+        "DEC-AF-009 — Proxy sans risque UEMOA : le taux moyen pondéré **au jour le jour**"
       ],
       "consumers": [
         "TASK_DEPENDENT"
@@ -10074,11 +10075,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DECISIONS.md",
-      "git_blob_sha": "9fb9437b53399870f2e9047b9a30621fac88c54a",
-      "last_validated_sha": "9fb9437b53399870f2e9047b9a30621fac88c54a",
-      "content_sha256": "58625dbc6b9fb648172821de297d68bf101903f8e26952da01b2ef763fc4fb28",
-      "line_count": 47,
-      "byte_count": 3977,
+      "git_blob_sha": "0668c90cd7a5055d15527cdc9187883255d6894b",
+      "last_validated_sha": "0668c90cd7a5055d15527cdc9187883255d6894b",
+      "content_sha256": "e4e5c04a660ec1004445a4e93dfdfb74bb088609604ee604327cea9744565546",
+      "line_count": 115,
+      "byte_count": 7791,
       "headings": [
         {
           "level": 1,
@@ -10115,6 +10116,10 @@
         {
           "level": 2,
           "text": "DEC-AF-008 — Engagement F4 / M2, pilote Maroc / MONIA"
+        },
+        {
+          "level": 2,
+          "text": "DEC-AF-009 — Proxy sans risque UEMOA : le taux moyen pondéré **au jour le jour**"
         }
       ]
     },
@@ -10924,11 +10929,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "8010ac88d4c4d5d0528a840d775cb828550aa3fb",
-      "last_validated_sha": "8010ac88d4c4d5d0528a840d775cb828550aa3fb",
-      "content_sha256": "f5b49e7f0ea556bdc69a881365a6320a4fa2badde83c182b6115933a4db34a47",
-      "line_count": 539,
-      "byte_count": 28294,
+      "git_blob_sha": "1c31230f2b2cee208e81170fbc19a8c8f99bb205",
+      "last_validated_sha": "1c31230f2b2cee208e81170fbc19a8c8f99bb205",
+      "content_sha256": "5665832a53507e6fd0ce39b13ef413ea9d1c0bd91348b0420b8127e76722fb29",
+      "line_count": 554,
+      "byte_count": 29004,
       "headings": [
         {
           "level": 1,
