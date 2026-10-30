@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "0251efdbb74e2b089b9db6b9a69e40d256d891a4"
+      "head": "29c7fda87183911f3384b1453bda017588e22511"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "47a01e8f6aa0d1516732141dd2506a816624fca7"
+      "head": "e237e02bdb680bfa80aca672f8ffab9c0338d239"
     }
   },
   "summary": {
@@ -10164,11 +10164,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "ebb2f748e50b51ebbe15b545ca30d6055d86704d",
-      "last_validated_sha": "ebb2f748e50b51ebbe15b545ca30d6055d86704d",
-      "content_sha256": "a95eeaf66ffd297582112c92b24f30cce424eedd5cfdaaafe10a9975c0ca759c",
-      "line_count": 3797,
-      "byte_count": 281291,
+      "git_blob_sha": "1041122aa61419e06393416fed97ea5a367c4654",
+      "last_validated_sha": "1041122aa61419e06393416fed97ea5a367c4654",
+      "content_sha256": "461d27c1af1378ddf7e2a95513fcab5e2fa9d0d56019d2fe715ae48481ea3891",
+      "line_count": 3778,
+      "byte_count": 280479,
       "headings": [
         {
           "level": 1,
@@ -10355,11 +10355,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "1e3ec989267336f6dec833366ce5ec9c61f31bf7",
-      "last_validated_sha": "1e3ec989267336f6dec833366ce5ec9c61f31bf7",
-      "content_sha256": "03058c53ec7694b5231ef4be69737ba5993bde16a57c647ee95df15b5f0d9854",
+      "git_blob_sha": "b6ff0b93a28212dcf84063835754d3fb3b2eed52",
+      "last_validated_sha": "b6ff0b93a28212dcf84063835754d3fb3b2eed52",
+      "content_sha256": "afc764902d1ad86fa2b52afaea59a889af08ee5629694472ec80f168d95faf33",
       "line_count": 96,
-      "byte_count": 7202,
+      "byte_count": 7205,
       "headings": [
         {
           "level": 1,
@@ -13667,24 +13667,24 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DH : la regle de date de MONIA est insatisfiable, pas trop stricte",
-        "MONIA — ce que la page offre reellement, lu le 30 octobre",
-        "Pourquoi RIEN n'est modifie dans ce lot",
-        "BDEMF retestee — toujours 502",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DG : le proxy sans risque UEMOA tranche par la mesure (DEC-AF-009)",
-        "La couverture par maturite tranche a elle seule",
-        "Les trois defauts du recenseur portes dans l'extracteur",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DF : la serie UEMOA recensee document par document, et elle n'est PAS continue",
-        "Ce qu'il faut retenir, et cela corrige le registre",
-        "Trois defauts de mon propre recenseur, trouves en l'executant",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DE : extracteur UEMOA livre en dry-run, et la date de publication a disparu de la source",
-        "POINT DE REPRISE COURANT — 2026-10-30 06:00 UTC — Lot DD : D1 qualifiee sur les trois zones — et les trois sont tres inegales",
-        "SYNTHESE — la seule chose a retenir pour decider",
-        "UEMOA / BCEAO — le meilleur etat des trois",
-        "CEMAC / BEAC — rien ne fonctionne, et c'est mesure",
-        "CINQ PIEGES D'EXTRACTION, tous mesures",
-        "Mes propres chiffres corriges dans ce lot",
-        "POINT DE REPRISE COURANT — 2026-10-30 02:10 UTC — Lot DB : MANDAT DU 2026-10-30 — reconciliation faite, livrable 1 livre, deux blocages renvoyes"
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DL : pages outils documentees, et le sitemap de production est FIGE",
+        "Le resultat qui depasse le lot : le sitemap de production est fige",
+        "Observation distincte, pour un lot a venir",
+        "Le lot proprement dit",
+        "Correction d'un de mes chiffres, de nouveau",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DK : les sept fiches fonds tolerent le slug, plus aucun appel NaN",
+        "La correction ne cree rien : elle reutilise l'existant",
+        "Verifie, et non suppose",
+        "Deux defauts de mon propre harnais",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DJ : les canoniques des fiches fonds designent des pages SANS DONNEES",
+        "Le resultat principal n'est pas celui que j'allais chercher",
+        "Ce que j'en ai fait, et ce que je n'en ai pas fait",
+        "Pourquoi la page Performances avait ete oubliee",
+        "Correction d'un chiffre a moi",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DI : 402 classeurs UMOA-Titres ouverts, et deux conventions opposees dans la MEME zone",
+        "Le resultat le plus lourd : des FRACTIONS, a l'oppose de la BCEAO",
+        "Quatre orthographes pour la Cote d'Ivoire",
+        "Deux defauts de mon propre script, corriges"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13695,16 +13695,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "NO",
+      "production_impact": "YES",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "a415ca8f55794777d27af3ffeec87fad7f22ef25",
-      "last_validated_sha": "a415ca8f55794777d27af3ffeec87fad7f22ef25",
-      "content_sha256": "185b87700f35accdbe6bcdf82fbe4417a8783aaf0cfb88ff278778477267d693",
-      "line_count": 11322,
-      "byte_count": 711494,
+      "git_blob_sha": "8e47957fe9a0a67a8fc5e7b678c51928f5b5de0c",
+      "last_validated_sha": "8e47957fe9a0a67a8fc5e7b678c51928f5b5de0c",
+      "content_sha256": "260caa1cc5f9d9430c86b37541edf40c680e7cd4d0c85edc0c25ce959778af9c",
+      "line_count": 11638,
+      "byte_count": 727505,
       "headings": [
         {
           "level": 1,
@@ -13713,6 +13713,78 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DL : pages outils documentees, et le sitemap de production est FIGE"
+        },
+        {
+          "level": 3,
+          "text": "Le resultat qui depasse le lot : le sitemap de production est fige"
+        },
+        {
+          "level": 3,
+          "text": "Observation distincte, pour un lot a venir"
+        },
+        {
+          "level": 3,
+          "text": "Le lot proprement dit"
+        },
+        {
+          "level": 3,
+          "text": "Correction d'un de mes chiffres, de nouveau"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DK : les sept fiches fonds tolerent le slug, plus aucun appel NaN"
+        },
+        {
+          "level": 3,
+          "text": "La correction ne cree rien : elle reutilise l'existant"
+        },
+        {
+          "level": 3,
+          "text": "Verifie, et non suppose"
+        },
+        {
+          "level": 3,
+          "text": "Deux defauts de mon propre harnais"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DJ : les canoniques des fiches fonds designent des pages SANS DONNEES"
+        },
+        {
+          "level": 3,
+          "text": "Le resultat principal n'est pas celui que j'allais chercher"
+        },
+        {
+          "level": 3,
+          "text": "Ce que j'en ai fait, et ce que je n'en ai pas fait"
+        },
+        {
+          "level": 3,
+          "text": "Pourquoi la page Performances avait ete oubliee"
+        },
+        {
+          "level": 3,
+          "text": "Correction d'un chiffre a moi"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DI : 402 classeurs UMOA-Titres ouverts, et deux conventions opposees dans la MEME zone"
+        },
+        {
+          "level": 3,
+          "text": "Le resultat le plus lourd : des FRACTIONS, a l'oppose de la BCEAO"
+        },
+        {
+          "level": 3,
+          "text": "Quatre orthographes pour la Cote d'Ivoire"
+        },
+        {
+          "level": 3,
+          "text": "Deux defauts de mon propre script, corriges"
         },
         {
           "level": 2,
@@ -13793,78 +13865,6 @@
         {
           "level": 3,
           "text": "LA RECONCILIATION D'ABORD — et elle a trouve deux blocages"
-        },
-        {
-          "level": 3,
-          "text": "LIVRABLE 1 LIVRE — registre des sources, mesure"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 01:40 UTC — Lot DA : la chaine complete du taux sans risque marocain, et pourquoi le correctif evident fabriquerait une donnee"
-        },
-        {
-          "level": 3,
-          "text": "LA CHAINE, MAILLON PAR MAILLON"
-        },
-        {
-          "level": 3,
-          "text": "POURQUOI LE MAILLON 7 CASSE TOUT"
-        },
-        {
-          "level": 3,
-          "text": "ET POURQUOI JE N'AI PAS APPLIQUE CE CORRECTIF"
-        },
-        {
-          "level": 3,
-          "text": "UN SECOND TROU, INDEPENDANT"
-        },
-        {
-          "level": 3,
-          "text": "CE QUI VOUS REVIENT, ET C'EST COURT"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 01:20 UTC — Lot CZ : **RETRACTATION** — `ratiosnew` n'a jamais ete morte, c'etait MA requete"
-        },
-        {
-          "level": 3,
-          "text": "JE RETIRE CE QUE LES LOTS CU, CV, CW ET CX AFFIRMENT"
-        },
-        {
-          "level": 3,
-          "text": "CE QUE CETTE ERREUR A COUTE"
-        },
-        {
-          "level": 3,
-          "text": "CE QUI RESTE VRAI, ET QUI EST REEL"
-        },
-        {
-          "level": 3,
-          "text": "CE QUI RESTE VRAI DES LOTS CV-CX, ET QU'IL NE FAUT PAS JETER"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 00:50 UTC — Lot CY : la regle du snapshot production designait un fichier mort depuis 89 jours"
-        },
-        {
-          "level": 3,
-          "text": "LE DEFAUT"
-        },
-        {
-          "level": 3,
-          "text": "MON PREMIER DIAGNOSTIC ETAIT FAUX, ET LE CODE L'A RETOURNE"
-        },
-        {
-          "level": 3,
-          "text": "LE SNAPSHOT VIVANT EST FRAIS — ET IL CONFIRME DEUX CONSTATS"
-        },
-        {
-          "level": 3,
-          "text": "CE QUI A CHANGE"
-        },
-        {
-          "level": 3,
-          "text": "TROISIEME REGLE DE CETTE SESSION POINTANT VERS QUELQUE CHOSE DE MORT"
         }
       ]
     },
