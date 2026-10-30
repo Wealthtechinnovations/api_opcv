@@ -49,16 +49,33 @@ UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
 
 
 def curl(url, dest=None, timeout=90):
+    """Telecharge, et quand `dest` est fourni rend `(ok, code_http)`.
+
+    LE CODE HTTP EST RENDU, et ce n est pas cosmetique. Ma premiere version
+    rendait `returncode == 0`, qui vaut VRAI sur un 404 : curl a bien fait son
+    travail, c est le serveur qui a refuse. Trois URL `.pdf` du portail BCEAO
+    rendent **HTTP 404 avec une page HTML** « Page non trouvee ! ». Elles
+    etaient donc classees PDF_ILLISIBLE — un diagnostic qui aurait fait
+    chercher un probleme d OCR la ou il y a trois liens morts a la source.
+    « Document illisible » et « lien mort » n appellent pas la meme action.
+    """
     cmd = ["curl", "-s", "-L", "--compressed", "--max-time", str(timeout),
            "-H", f"User-Agent: {UA}", "-H", "Accept-Language: fr-FR,fr;q=0.9"]
     if dest:
-        cmd += ["-o", dest]
+        cmd += ["-o", dest, "-w", "%{http_code}"]
     cmd.append(url)
     try:
         r = subprocess.run(cmd, capture_output=True, timeout=timeout + 20)
     except subprocess.TimeoutExpired:
-        return None if not dest else False
-    return r.stdout.decode("utf-8", "replace") if not dest else (r.returncode == 0)
+        return (False, 0) if dest else None
+    sortie = r.stdout.decode("utf-8", "replace")
+    if not dest:
+        return sortie
+    try:
+        code = int(sortie.strip()[-3:])
+    except ValueError:
+        code = 0
+    return (r.returncode == 0 and code == 200, code)
 
 
 def liens_pdf(page):
@@ -109,6 +126,36 @@ MOIS = {"janvier": 1, "fevrier": 2, "février": 2, "mars": 3, "avril": 4,
         "décembre": 12}
 
 
+def mois_tolerant(mot):
+    """Le numero du mois, en tolerant les FAUTES DE L EMETTEUR.
+
+    Mesure du 2026-10-30 : quatre documents de fevrier 2025 ecrivent
+    « fevriérr » — « fevrier » mal orthographie a la source. Une correspondance
+    exacte les rejette, et quatre semaines consecutives disparaissent de la
+    serie : exactement la forme d un faux trou d un mois.
+
+    La tolerance est BORNEE : accents retires, puis on retient la cle la plus
+    longue dont le mot est un PREFIXE etendu. Aucun nom de mois francais n est
+    prefixe d un autre, la levee d ambiguite est donc sans risque — et un mot
+    qui ne commence par aucun mois rend toujours None, plutot qu un mois
+    devine.
+    """
+    if not mot:
+        return None
+    norm = (mot.lower().strip()
+            .replace("é", "e").replace("è", "e").replace("ê", "e")
+            .replace("û", "u").replace("ù", "u").replace("ô", "o")
+            .replace("î", "i").replace("ï", "i").replace("à", "a"))
+    if norm in MOIS:
+        return MOIS[norm]
+    cles = sorted({k.replace("é", "e").replace("û", "u").replace("ô", "o")
+                   for k in MOIS}, key=len, reverse=True)
+    for k in cles:
+        if norm.startswith(k):
+            return MOIS.get(k) or MOIS.get(k.replace("fevrier", "février"))
+    return None
+
+
 def semaine_du_contenu(t):
     """Fin de la semaine de reference, lue DANS le texte. C est `as_of_date`.
 
@@ -118,7 +165,9 @@ def semaine_du_contenu(t):
     """
     m = re.search(r"[Ss]emaine\s+du\s+(\d{1,2})\s*(?:er)?\s*"
                   r"([A-Za-zéèûôA-ZÀ-ſ]+)?\s*"
-                  r"(?:\d{4})?\s*au\s+(\d{1,2})\s*(?:er)?\s*"
+                  # `au\s*` et non `au\s+` : un document de janvier 2026 ecrit
+                  # « Semaine du 6 au12 janvier 2026 », sans espace apres « au ».
+                  r"(?:\d{4})?\s*au\s*(\d{1,2})\s*(?:er)?\s*"
                   # `\s*` et non `\s+` avant l annee : les documents de 2019
                   # ecrivent « au 1er juillet2019 », SANS espace. Avec `\s+`,
                   # 5 documents sur les 150 premiers etaient classes
@@ -128,7 +177,7 @@ def semaine_du_contenu(t):
     if not m:
         return None
     _, _, jf, mf, an = m.groups()
-    mois = MOIS.get((mf or "").lower().strip())
+    mois = mois_tolerant(mf)
     if not mois:
         return None
     try:
@@ -166,8 +215,14 @@ def passe_contenu(cache, debut, fin):
             u = cands[i]
             if u in deja:
                 continue
-            if not curl(u, dest=d, timeout=60):
-                etat, date = "TELECHARGEMENT_ECHOUE", ""
+            ok, code = curl(u, dest=d, timeout=60)
+            if not ok:
+                # Un 404 n est pas un echec de telechargement : c est un lien
+                # mort a la SOURCE, et le dire ainsi evite de chercher un
+                # probleme d OCR qui n existe pas.
+                etat = (f"HTTP_{code}_LIEN_MORT" if code
+                        else "TELECHARGEMENT_ECHOUE")
+                date = ""
             else:
                 t = texte_pdf(d)
                 if not t.strip():
@@ -345,9 +400,11 @@ def main():
         for an in annees:
             for u in sorted(par_an[an])[:a.echantillon]:
                 d = os.path.join(tmp, "x.pdf")
-                if not curl(u, dest=d):
+                ok, code = curl(u, dest=d)
+                if not ok:
                     hors[an] += 1
-                    print(f"  {an}  TELECHARGEMENT ECHOUE  {os.path.basename(u)[:60]}")
+                    print(f"  {an}  HTTP {code or 'ECHEC':>4}  "
+                          f"{os.path.basename(u)[:58]}")
                     continue
                 t = texte_pdf(d)
                 if est_de_la_serie(t):

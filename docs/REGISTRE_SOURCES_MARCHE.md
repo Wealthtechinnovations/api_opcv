@@ -289,7 +289,7 @@ tel.
 **Extraction** : `pdftotext -layout` rend un tableau aligne et lisible. **Aucun
 OCR n'est necessaire.**
 
-#### CINQ PIEGES, mesures
+#### SEPT PIEGES, mesures
 
 **1. Le nom de fichier ne porte NI la date NI le type reel.** Les documents
 anciens s'appellent `05-Situation des Prets interbancaires par maturites_0.pdf`,
@@ -342,6 +342,66 @@ decrit **ou** le fichier est range, non **quand** il a ete publie. Quand la date
 de publication n'est pas publiee, la reponse honnete est `NULL` : une
 approximation inscrirait dans `benchmark_series` une date que la source n'a
 jamais donnee.
+
+**6. Trois orthographes fautives de l'emetteur, et deux espaces manquants.** Les
+documents de fevrier 2025 ecrivent **`fevriérr`** — « fevrier » mal orthographie
+a la source. Ceux de 2019 ecrivent **`juillet2019`**, sans espace avant l'annee,
+y compris dans `au 1er juillet2019`. Un de janvier 2026 ecrit **`au12 janvier`**,
+sans espace apres « au ». Une correspondance exacte rejetait **11 documents** —
+dont quatre semaines consecutives de fevrier 2025, soit la forme exacte d'un faux
+trou d'un mois **cree par la lecture, pas par la source**.
+
+**7. Trois URL `.pdf` du portail rendent HTTP 404 avec une page HTML.** Ce sont
+les trois `05-Situation des Prets interbancaires par maturites_{0,1,2}.pdf` de
+`2022-04`. `curl` reussit (le serveur a bien repondu), et un controle fonde sur
+le code de retour de `curl` les prend pour des PDF valides puis pour des
+documents **illisibles** — diagnostic qui envoie chercher un probleme d'OCR
+inexistant. **Le code HTTP doit etre verifie, pas le code de retour de `curl`.**
+Ces 404 confirment au passage que l'extraction n'exige **aucun OCR** : le seul
+cas « illisible » rencontre sur 391 documents n'etait pas un PDF.
+
+#### La serie n'est PAS continue — 379 semaines sur ~465 attendues
+
+> Mesure du 2026-10-30, les **391 documents ouverts un par un**, date lue dans
+> le contenu. C'est le resultat le plus important de la qualification UEMOA, et
+> il corrige ce document.
+
+| Grandeur | Valeur **mesuree** |
+|---|---|
+| documents ouverts | **391** — 388 exploitables, **3 en HTTP 404** |
+| semaines DISTINCTES datees | **379** |
+| doublons de semaine | **9** (deux fichiers pour la meme semaine) |
+| couverture | **2017-11-06 → 2026-10-19** |
+| semaines attendues sur l'intervalle | ~465 |
+| **manquantes** | **~86, soit 18 %** |
+| trous de plus de 14 jours | **15**, le plus long **49 jours (7 semaines)** |
+
+**2017 ne compte qu'UNE semaine**, suivie d'un trou de **105 jours**. Dire
+« profondeur 2017-10 » est donc trompeur : le point de 2017 est isole. **Le debut
+reellement continu est 2018-02-19.**
+
+Semaines par annee — aucune annee n'atteint 52 :
+
+```
+2017 :  1     2020 : 42     2023 : 40     2026 : 37 (annee en cours)
+2018 : 44     2021 : 48     2024 : 41
+2019 : 48     2022 : 37     2025 : 41
+```
+
+**Ce que la mesure ne dit pas** : si les ~86 semaines absentes n'ont jamais ete
+publiees, ou si elles existent hors de ce listing. Le listing en offre 379 ;
+le reste est inconnu, et ne doit pas etre presume.
+
+**CONSEQUENCE POUR LE CALCUL DE RISQUE, et elle est structurelle.** La regle
+retenue par F3/M2 — « derniere valeur disponible a une date anterieure ou egale
+a la date cible » — reste la bonne, et ces trous en sont la justification
+chiffree. Mais ils en fixent aussi le **budget de peremption** : un taux sans
+risque UEMOA peut etre **vieux de 49 jours** et rester le dernier publie. Un
+Sharpe ou un Sortino calcule sur cette base herite de cette anciennete. Elle
+doit etre **portee jusqu'a l'affichage** — `as_of_date` et le statut
+`OK_PREVIOUS_AVAILABLE_DATE` sont dans `benchmark_series` pour cela — et non
+absorbee silencieusement. Un taux de 7 semaines presente comme le taux du jour
+serait une donnee financiere faussement datee.
 
 #### Extracteur livre — `scripts/extract/extract_bceao_interbancaire.py`
 
@@ -476,3 +536,4 @@ une source arretee en 2020 ne produirait rien.
 | 2026-10-30 | session Claude Code | BCEAO : serie hebdomadaire **2017-10 → 2026-10**, ≈531 PDF sur 27 pages, 8 maturites, extraction `pdftotext -layout` validee |
 | 2026-10-30 | session Claude Code | BCEAO : date de publication **absente** des PDF recents (0 « Dakar ») alors que 2017 la porte ; extracteur dry-run livre, 40 lignes / 26 valeurs sur 5 documents |
 | 2026-10-30 | session Claude Code | BCEAO recensement reel : **391** documents (et non ≈531, extrapolation erronee de 26 %) ; 5 PDF de barre laterale vus 27x ; **330/391 sans annee dans le nom** |
+| 2026-10-30 | session Claude Code | BCEAO, 391 documents ouverts : **379 semaines distinctes**, 2017-11-06 → 2026-10-19, **18 % manquantes**, 15 trous, le plus long **49 jours** ; debut reellement continu **2018-02** |
