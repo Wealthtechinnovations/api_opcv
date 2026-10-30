@@ -242,8 +242,19 @@ lire — et non echouer en silence.
 
 #### Profondeur mesuree : 2017-10 → 2026-10, neuf annees
 
-- **27 pages** de listing (`?page=0` a `?page=26`), 20 documents par page, 11 sur
-  la derniere → **≈ 531 documents** ;
+- **27 pages** de listing (`?page=0` a `?page=26`). **391 documents**, mesure du
+  2026-10-30 par `scripts/diag/recensement_bceao_interbancaire.py`, et non
+  « ≈ 531 » comme l affirmait ce document.
+
+  > **Correction d un chiffre de moi.** « ≈ 531 » etait une EXTRAPOLATION
+  > (27 pages x ~20 liens), pas un comptage — elle surestimait de **26 %**. Le
+  > recensement reel : 396 liens PDF distincts sur les 27 pages, moins les **5**
+  > « Rapport sur la politique monetaire » de la barre laterale, presents
+  > **27 fois chacun**. Ce sont exactement les cinq documents qui avaient fait
+  > echouer l extracteur a sa premiere execution, et ils expliquent pourquoi
+  > « 2022 » et « 2023 » apparaissaient sur toutes les pages du listing.
+  > La mesure prime sur la prose, y compris sur la mienne.
+
 - document le plus recent : « Semaine du 13 au 19 octobre 2026 » ;
 - documents de la **derniere** page, dates lues **dans leur contenu** :
   « Semaine du 31 octobre au 06 novembre **2017** », « du 13 au 19 fevrier 2018 »,
@@ -347,9 +358,22 @@ de meme que `category = RFR` pour le 1 jour et `MONETAIRE` pour les autres.
 
 #### Ce qui reste a faire
 
-- parcourir les 27 pages pour constituer la liste complete des ≈ 531 documents ;
+- ~~parcourir les 27 pages~~ **FAIT** le 2026-10-30 : 391 documents, liste
+  complete etablie ;
+
+  **Et le nom de fichier ne permet PAS de dater la serie.** Sur les 391,
+  **330 (84 %)** ne portent aucune annee lisible dans leur nom. La distribution
+  par annee tiree des noms est donc sans valeur : elle montre « 2020, 2021 et
+  2023 absentes », ce qui ne prouve **aucun trou** — seulement que les noms ne
+  portent pas de date. Un recensement chronologique exige d ouvrir les
+  documents, ce que fait `--dates-du-contenu` du meme script. Conclure a un
+  trou depuis les noms aurait ete une erreur de la meme famille que le
+  « 2019 inaccessible » d UMOA-Titres : prendre un defaut de ma lecture pour
+  une propriete de la source ;
+
 - verifier que le tableau garde la meme forme sur les neuf annees — **4 documents
-  ouverts sur ≈ 531** a ce stade (un de 2026, trois de 2017-2018) ;
+  ouverts sur 391** par lecture integrale a ce stade ; la passe
+  `--dates-du-contenu` ouvre les 391 pour trancher la continuite ;
 - decider et **documenter** le proxy retenu : taux moyen pondere au jour le jour,
   ou une autre maturite selon l'usage analytique.
 
@@ -451,3 +475,4 @@ une source arretee en 2020 ne produirait rien.
 | 2026-10-30 | session Claude Code | BEAC : 5 series de taux ouvertes, la plus recente s'arrete **2020-09** ; BDEMF rend **HTTP 502** (navigateur sans interface) ; titres publics XLSX **2015-2017** |
 | 2026-10-30 | session Claude Code | BCEAO : serie hebdomadaire **2017-10 → 2026-10**, ≈531 PDF sur 27 pages, 8 maturites, extraction `pdftotext -layout` validee |
 | 2026-10-30 | session Claude Code | BCEAO : date de publication **absente** des PDF recents (0 « Dakar ») alors que 2017 la porte ; extracteur dry-run livre, 40 lignes / 26 valeurs sur 5 documents |
+| 2026-10-30 | session Claude Code | BCEAO recensement reel : **391** documents (et non ≈531, extrapolation erronee de 26 %) ; 5 PDF de barre laterale vus 27x ; **330/391 sans annee dans le nom** |
