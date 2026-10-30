@@ -345,18 +345,19 @@
     {
       "id": "AF-OPS-009",
       "title": "Data freshness — rétablir les pipelines VL Nigeria et Tunisie",
-      "status": "OPEN",
-      "phase": "READ_ONLY_RCA",
+      "status": "IN_PROGRESS",
+      "phase": "READ_ONLY_RCA_DONE_FIX_REQUIRED",
       "requirements": [
         "AF-REQ-015"
       ],
       "depends_on": [],
-      "next_action": "La fraîcheur C4 Nigeria/Tunisie est de nouveau dans le budget au 2026-09-22 (Nigeria VL 2026-09-11; Tunisie VL 2026-09-22). Ne pas backfiller. Maintenir la tâche OPEN pour fiabiliser le pipeline: le cron Nigeria du 21/09 a extrait des artefacts frais puis ses étapes aval ont échoué après l'OOM MariaDB; le cron Tunisie est sain. Vérifier le prochain cycle Nigeria et séparer disponibilité DB, extraction source et calculs dérivés.",
+      "next_action": "RCA TERMINEE (AF-EVD-072) : transition FIX_REQUIRED. La fraicheur a REGRESSE — C4.NIGERIA en echec a 21 jours pour un budget de 14, derniere VL 2026-10-09 ; C4.TUNISIE OK a 1 jour. L etage fautif est l ACQUISITION DE SOURCE, etape [1/8] : nos propres filtres retiennent 42 classeurs sur la page aujourd hui quand le cron du 26/10 n en avait lu que 41, et le classeur du 16 octobre (/documents/1539/) etait EN LIGNE AVANT ce cron sans etre pris. NI la cadence NI l OOM ne sont en cause : le cron hebdomadaire du lundi rend un age a l arrivee de 10 jours au pire, dans le budget ; et MariaDB tourne depuis 38,5 jours sans OOM ni redemarrage. CORRECTIF DE FOND RESTANT, et il n est pas couvert par le mode AUTO_READ_ONLY_RCA de cette tache : instrumenter l etape [1/8] pour imprimer les liens VUS, TELECHARGES et DEJA EN CACHE. Sans ce compteur, un lien absent de la page reste indistinguable d un lien absent de notre lecture — c est ce qui a rendu le trou muet trois semaines. La recommandation complementaire est DEJA livree et a fonctionne : l etape [1b/8] du 2026-10-29 a bien echoue en comparant l offre a l importe. NE PAS BACKFILLER. Preuve NEXT_SCHEDULED_PIPELINE_CYCLE encore manquante : elle exige d observer le cron du lundi 2026-11-02, qui dira si le classeur du 16/10 est enfin pris.",
       "evidence_refs": [
         "AF-EVD-011",
         "AF-EVD-052",
         "AF-EVD-055",
-        "AF-EVD-053"
+        "AF-EVD-053",
+        "AF-EVD-072"
       ],
       "stream": "DATA",
       "program": "DATA_QUALITY",
