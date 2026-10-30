@@ -227,6 +227,60 @@ let conn;
     console.log(`  table illisible ou absente : ${e.message.slice(0, 90)}`);
   }
 
+  // ------------------------------------------------------------------
+  // 5. LE 26 OCTOBRE MAROCAIN — une cause de C3 qui n'a RIEN a voir avec
+  //    les devises nigeriannes, et que C7 ne voit pas.
+  //
+  // Mesure du 2026-10-30 depuis l'API : les deux fonds marocains signales
+  // par C3 portent chacun UNE valeur aberrante, a la MEME date.
+  //
+  //   [1113] AL BARID ISTITMAR  2026-10-26  148,93 -> 3 080,32   x20,7
+  //   [953]  CDG SOLIDARITE     2026-10-26  177,08 -> 2 328,10   x13,1
+  //
+  // Sur 413 et 418 points, un seul est haut. Ce n'est pas un melange
+  // d'echelles mais UNE DATE D'IMPORT qui a produit des valeurs fausses, et
+  // C3 datait justement leur YTD « au Mon Oct 26 ».
+  //
+  // C7 ne les signale pas, et pour deux raisons cumulees : son `LIMIT 15`
+  // ne garde que les pires ratios — tous nigerians — et son seuil de 20
+  // laisse passer le fonds 953 (ratio 22 au global, mais 13 au saut).
+  // **Un controle plafonne ne dit rien de ce qu'il tronque.**
+  //
+  // La question qui compte : combien d'AUTRES fonds marocains ont recu une
+  // valeur aberrante ce jour-la ? C'est le rayon d'action d'un seul import.
+  // ------------------------------------------------------------------
+  console.log('\n--- 5. Le 26 octobre marocain : rayon d action d un import ---');
+  const [mar] = await conn.query(`
+    SELECT v.fund_id, f.nom_fond, v.${colVal} AS val_jour, p.val_prec,
+           ROUND(v.${colVal} / p.val_prec, 1) AS facteur
+      FROM valorisations v
+      JOIN fond_investissements f ON f.id = v.fund_id
+      JOIN (SELECT v2.fund_id, v2.${colVal} AS val_prec
+              FROM valorisations v2
+              JOIN (SELECT fund_id, MAX(${colDate}) AS d
+                      FROM valorisations
+                     WHERE ${colDate} < '2026-10-26' AND ${colVal} > 0
+                     GROUP BY fund_id) m
+                ON m.fund_id = v2.fund_id AND m.d = v2.${colDate}
+             WHERE v2.${colVal} > 0) p ON p.fund_id = v.fund_id
+     WHERE v.${colDate} = '2026-10-26' AND v.${colVal} > 0
+       AND f.pays = 'MAROC'
+       AND (v.${colVal} / p.val_prec > 3 OR v.${colVal} / p.val_prec < 0.34)
+     ORDER BY facteur DESC
+     LIMIT 60`);
+  if (mar.length === 0) {
+    console.log('  aucun fonds marocain ne varie de plus de x3 ce jour-la.');
+  } else {
+    console.log(`  ${mar.length} fonds (plafond 60) varient de plus de x3 :`);
+    for (const r of mar) {
+      console.log(`    [${r.fund_id}] x${r.facteur}  ${Number(r.val_prec).toFixed(2)}`
+        + ` -> ${Number(r.val_jour).toFixed(2)}  ${String(r.nom_fond).slice(0, 32)}`);
+    }
+    console.log('  Un OPCVM ne triple pas en une seance : ces valeurs sont fausses,');
+    console.log('  et elles sont SERVIES. Leur date commune designe un import, pas');
+    console.log('  un defaut par fonds.');
+  }
+
   console.log('\nLECTURE SEULE : aucune ecriture effectuee.');
   console.log('NE RIEN CONVERTIR avant d avoir tranche la devise de reference de');
   console.log('chaque fonds : diviser une ligne saine par ~1 375 fabriquerait le');
