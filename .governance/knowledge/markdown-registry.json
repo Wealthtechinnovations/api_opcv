@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "760a3aaa57cdc80749ca6084e320bced668310e2"
+      "head": "4e07b1af15e4e9373767cbd456bcbb0dcacb89c9"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "add4a5d3f6e2e5fc05462043b92ca3acccb16a82"
+      "head": "b331d1e0d70cea2cd900c34a0ca5a7c670d5ae89"
     }
   },
   "summary": {
@@ -10108,17 +10108,17 @@
       "contradictions": [],
       "duplication_risk": "NONE",
       "stale_state": [],
-      "security_impact": "NONE",
+      "security_impact": "HIGH",
       "production_impact": "YES",
       "title": "Diagnostics a la demande — sortie de production",
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "679e19eb78348f16047dc08258d109e5efd3d763",
-      "last_validated_sha": "679e19eb78348f16047dc08258d109e5efd3d763",
-      "content_sha256": "bc899ad03465f3305e7a12264935871a7ccc68d4cb6dca2cd9727156387d4f01",
-      "line_count": 3502,
-      "byte_count": 235271,
+      "git_blob_sha": "0b38fcf64a926242b54f7ed5069e7e9ca0c7aac4",
+      "last_validated_sha": "0b38fcf64a926242b54f7ed5069e7e9ca0c7aac4",
+      "content_sha256": "cb1810b993ce1c7dfd0f8edc7b58e00c0940bf292ff77d05ad8b7b2664a0081c",
+      "line_count": 3689,
+      "byte_count": 243516,
       "headings": [
         {
           "level": 1,
@@ -10305,11 +10305,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "94eac78afbecaf13244801b6bb1d2ee9a2f1684d",
-      "last_validated_sha": "94eac78afbecaf13244801b6bb1d2ee9a2f1684d",
-      "content_sha256": "6ea9b9f4ac2b591a154416d6361543da3d6ab777099988c0bcabf34abd80f8d0",
+      "git_blob_sha": "8ab65d16855c947db1ffd01a0ccd140651df2f4f",
+      "last_validated_sha": "8ab65d16855c947db1ffd01a0ccd140651df2f4f",
+      "content_sha256": "fde79f4cc623e242d28fd9c0dac8ff916a82a7a215c798a8b19e7512b2397170",
       "line_count": 96,
-      "byte_count": 7205,
+      "byte_count": 7202,
       "headings": [
         {
           "level": 1,
@@ -13424,24 +13424,24 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
-        "POINT DE REPRISE COURANT — 2026-10-28 13:20 UTC — Lot CT : DEPLOYE ET VERIFIE — deux routes fermees, deux defauts SEO corriges",
-        "Verifications en production, apres deploiement",
-        "Ce qui a ete ferme",
-        "L'ordre a ete respecte, et il etait obligatoire",
-        "Parti dans le meme deploiement — `D5` et les deux defauts SEO",
-        "CE QUI RESTE OUVERT — a ne pas croire resolu",
-        "POINT DE REPRISE COURANT — 2026-10-28 06:55 UTC — Lot CS : les cinq indices morts ne nuisent a RIEN, et les deux chantiers n'en font qu'un",
-        "Mon alerte « cinq indices morts » est annulee — en entier",
-        "LES DEUX CHANTIERS N'EN FONT QU'UN",
-        "NOS CONTROLES AVAIENT RAISON",
-        "Bilan de mes propres faux signalements, aujourd'hui",
-        "POINT DE REPRISE COURANT — 2026-10-28 06:45 UTC — Lot CR : S5 clos — 39 785 VL archivables, et un test a moi qui ne mesurait rien",
-        "S5 — verdict : (A) ARCHIVABLES, les deux formes",
-        "DEUX ERREURS A MOI, dans le meme lot",
-        "CE QUI TIENT, ET QUI RESTE A INSTRUIRE",
-        "Bilan des sept actions sans decision",
-        "POINT DE REPRISE COURANT — 2026-10-28 06:35 UTC — Lot CQ : S5 et S7 livres — et « cinq indices morts » etait une mauvaise priorisation, la mienne",
-        "S7 — deduplication des 19 doublons : phase seche PASSEE sur la production"
+        "POINT DE REPRISE COURANT — 2026-10-30 00:00 UTC — Lot CX : pool refute, Node du canal corrige, et la route attend un SOCKET",
+        "1. Le Node du canal est corrige",
+        "2. Le pool de connexions est REFUTE — c'etait mon hypothese",
+        "3. SEPT HYPOTHESES REFUTEES, TOUTES PAR LA MESURE",
+        "4. CE QUE LA SONDE A FINALEMENT REPONDU",
+        "5. QUATRE DEFAUTS DANS MON PROPRE OUTILLAGE, DANS CE SEUL LOT",
+        "POINT DE REPRISE COURANT — 2026-10-29 23:30 UTC — Lot CW : `ratiosnew` n'est pas lente, elle ATTEND — cinq hypotheses a moi refutees",
+        "CE QUI EST ETABLI, ET PAR QUELLE MESURE",
+        "ANGLE MORT QUE J'AI CREE, A LEVER EN PRIORITE",
+        "TROIS DEFAUTS DANS MES PROPRES OUTILS, CORRIGES",
+        "FAIT D'INFRASTRUCTURE DECOUVERT EN ECHOUANT",
+        "POINT DE REPRISE COURANT — 2026-10-29 22:30 UTC — Lot CV : `ratiosnew` instruit — quatre hypotheses a moi refutees, et un taux sans risque perime partout",
+        "QUATRE HYPOTHESES A MOI, TOUTES REFUTEES PAR LA MESURE",
+        "CE QUE L'INSTRUCTION A TROUVE A LA PLACE — et c'est plus grave",
+        "Pourquoi cela n'avait jamais ete vu",
+        "POINT DE REPRISE COURANT — 2026-10-29 18:40 UTC — Lot CU : V2 EXECUTE, 4 routes fermees, le canal de deploiement REPARE, et `ratiosnew` est mort depuis juin",
+        "1. `V2` EXECUTE — 19 lignes supprimees, index UNIQUE pose",
+        "2. Les quatre routes sont fermees"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13457,11 +13457,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "f82322700e1e5897ffcd3e7c7d395b591bc297ff",
-      "last_validated_sha": "f82322700e1e5897ffcd3e7c7d395b591bc297ff",
-      "content_sha256": "2b86e43c6810cb06519f155b9971fce120f11f84d23914cdc4ec50d3f7050c68",
-      "line_count": 10196,
-      "byte_count": 653972,
+      "git_blob_sha": "b4228a8b84bc98efc191f89bc6001c45b411fee6",
+      "last_validated_sha": "b4228a8b84bc98efc191f89bc6001c45b411fee6",
+      "content_sha256": "92dc328ffa79be7e4852da10cd8c531555583995508023aafcd6c721ef6d6278",
+      "line_count": 10576,
+      "byte_count": 672963,
       "headings": [
         {
           "level": 1,
@@ -13470,6 +13470,90 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 00:00 UTC — Lot CX : pool refute, Node du canal corrige, et la route attend un SOCKET"
+        },
+        {
+          "level": 3,
+          "text": "1. Le Node du canal est corrige"
+        },
+        {
+          "level": 3,
+          "text": "2. Le pool de connexions est REFUTE — c'etait mon hypothese"
+        },
+        {
+          "level": 3,
+          "text": "3. SEPT HYPOTHESES REFUTEES, TOUTES PAR LA MESURE"
+        },
+        {
+          "level": 3,
+          "text": "4. CE QUE LA SONDE A FINALEMENT REPONDU"
+        },
+        {
+          "level": 3,
+          "text": "5. QUATRE DEFAUTS DANS MON PROPRE OUTILLAGE, DANS CE SEUL LOT"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-29 23:30 UTC — Lot CW : `ratiosnew` n'est pas lente, elle ATTEND — cinq hypotheses a moi refutees"
+        },
+        {
+          "level": 3,
+          "text": "CE QUI EST ETABLI, ET PAR QUELLE MESURE"
+        },
+        {
+          "level": 3,
+          "text": "ANGLE MORT QUE J'AI CREE, A LEVER EN PRIORITE"
+        },
+        {
+          "level": 3,
+          "text": "TROIS DEFAUTS DANS MES PROPRES OUTILS, CORRIGES"
+        },
+        {
+          "level": 3,
+          "text": "FAIT D'INFRASTRUCTURE DECOUVERT EN ECHOUANT"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-29 22:30 UTC — Lot CV : `ratiosnew` instruit — quatre hypotheses a moi refutees, et un taux sans risque perime partout"
+        },
+        {
+          "level": 3,
+          "text": "QUATRE HYPOTHESES A MOI, TOUTES REFUTEES PAR LA MESURE"
+        },
+        {
+          "level": 3,
+          "text": "CE QUE L'INSTRUCTION A TROUVE A LA PLACE — et c'est plus grave"
+        },
+        {
+          "level": 3,
+          "text": "Pourquoi cela n'avait jamais ete vu"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-29 18:40 UTC — Lot CU : V2 EXECUTE, 4 routes fermees, le canal de deploiement REPARE, et `ratiosnew` est mort depuis juin"
+        },
+        {
+          "level": 3,
+          "text": "1. `V2` EXECUTE — 19 lignes supprimees, index UNIQUE pose"
+        },
+        {
+          "level": 3,
+          "text": "2. Les quatre routes sont fermees"
+        },
+        {
+          "level": 3,
+          "text": "3. LE CANAL DE DEPLOIEMENT GOUVERNE ETAIT ROMPU — et je l'ai repare"
+        },
+        {
+          "level": 3,
+          "text": "4. RISQUE QUE J'AI CREE, ET CORRIGE DANS LE MEME LOT"
+        },
+        {
+          "level": 3,
+          "text": "5. DEFAUT MAJEUR TROUVE EN VERIFIANT — `ratiosnew` EST MORT DEPUIS JUIN"
         },
         {
           "level": 2,
@@ -13538,90 +13622,6 @@
         {
           "level": 2,
           "text": "POINT DE REPRISE COURANT — 2026-10-28 06:35 UTC — Lot CQ : S5 et S7 livres — et « cinq indices morts » etait une mauvaise priorisation, la mienne"
-        },
-        {
-          "level": 3,
-          "text": "S7 — deduplication des 19 doublons : phase seche PASSEE sur la production"
-        },
-        {
-          "level": 3,
-          "text": "« Cinq indices morts » : MA priorisation etait fausse"
-        },
-        {
-          "level": 3,
-          "text": "MONIA — hypothese du lot CO CONFIRMEE"
-        },
-        {
-          "level": 3,
-          "text": "`Tunindex` / `TUNINDEX` : dette, pas donnee fausse"
-        },
-        {
-          "level": 3,
-          "text": "S5 — rattachabilite des 39 785 VL detachees : pousse, non execute"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:20 UTC — Lot CP : S4 — deux defauts SEO visibles en production, CORRIGES"
-        },
-        {
-          "level": 3,
-          "text": "Ce que S4 cherchait, et ce qu'il a trouve a la place"
-        },
-        {
-          "level": 3,
-          "text": "La correction factorise au lieu de recopier"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 06:00 UTC — Lot CO : S3 et S6 — le frontend est invisible aux moteurs, et P2-06 chiffre"
-        },
-        {
-          "level": 3,
-          "text": "S3 — `P2-06` chiffre, et il n'etait pas ou le backlog le disait"
-        },
-        {
-          "level": 3,
-          "text": "S6 — inventaire frontend : le prealable au chantier de conception"
-        },
-        {
-          "level": 3,
-          "text": "Ce que cela dit du chantier « concevoir le frontend »"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-28 05:45 UTC — Lot CN : S1 et S2 instruits — P1-03 resolu, P2-02 bien plus grave"
-        },
-        {
-          "level": 3,
-          "text": "S1 — `P1-03` est RESOLU, et sa description etait fausse"
-        },
-        {
-          "level": 3,
-          "text": "S2 — `P2-02` : le backlog nommait 4 routes, il y en a **35**"
-        },
-        {
-          "level": 3,
-          "text": "L'ORDRE DU CORRECTIF EST L'INVERSE DE L'INTUITION"
-        },
-        {
-          "level": 2,
-          "text": "PLAN UNIQUE MESURE — 2026-10-28 05:30 UTC — remplace le backlog du 2026-08-12"
-        },
-        {
-          "level": 3,
-          "text": "Pourquoi ce plan existe"
-        },
-        {
-          "level": 3,
-          "text": "A. MES PROPRES CHIFFRES, REFUTES PAR LA MESURE"
-        },
-        {
-          "level": 3,
-          "text": "B. DEFAUT MAJEUR JAMAIS NOMME DANS AUCUN DOCUMENT"
-        },
-        {
-          "level": 3,
-          "text": "C. CE QUI RESTE VRAI, ET AGGRAVE"
         }
       ]
     },
