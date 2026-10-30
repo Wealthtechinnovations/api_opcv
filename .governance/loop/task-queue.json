@@ -266,18 +266,20 @@
     {
       "id": "AF-OPS-007",
       "title": "Data integrity — C7/C3 ruptures d'échelle et performances absurdes",
-      "status": "OPEN",
-      "phase": "READ_ONLY_PREFLIGHT",
+      "status": "BLOCKED_HUMAN_APPROVAL",
+      "phase": "READ_ONLY_PREFLIGHT_DONE_AWAITING_WRITE_AUTHORIZATION",
       "requirements": [
         "AF-REQ-011",
         "AF-REQ-012"
       ],
       "depends_on": [],
-      "next_action": "Rejouer le dry-run existant des segments Nigeria sans écriture, confronter son périmètre au C7 live du 2026-09-16 et séparer explicitement les cas Nigeria des anomalies hors Nigeria (dont FCP BRIDGE EQUILIBRE/UEMOA). N'exécuter aucune correction si le scope diverge. Toute écriture doit conserver snapshot, transaction, rollback et vérification C7/C3 post-write.",
+      "next_action": "Preflight en lecture seule TERMINE (AF-EVD-069, AF-EVD-070) : chaque rupture est classee par pays, fonds et provenance, les cas hors Nigeria sont separes (2592 UEMOA = marche unique du 2023-06-26, mecanisme distinct), et le perimetre de correction est PROUVE avant toute ecriture. BLOQUE SUR DECISION DU PROPRIETAIRE, car le sens de la correction S INVERSE selon la devise declaree : 10 des 14 fonds nigerians sont declares USD (groupe HAUT contaminant), 4 declares NGN (groupe BAS). Une conversion uniforme abimerait 10 fonds sur 14. Trois conditions a tenir si une ecriture est autorisee : taux USD/NGN pris DATE PAR DATE depuis devisedechanges et jamais en facteur unique (2023-12-15 s ecarte de 26 %) ; ecarter au prealable les 11 valeurs de cette table sous 100 et celle a 1,00 ; cote Maroc, corriger les 6 VL du 26 octobre et la seule restante du 19, mais NE PAS toucher aux six lignes du 23 octobre qui sont des retours a la normale, ni traiter le fonds 963 avec les autres. Conserver snapshot, transaction, rollback et remesure C7/C3 post-ecriture.",
       "evidence_refs": [
         "AF-EVD-011",
         "AF-EVD-052",
-        "AF-EVD-055"
+        "AF-EVD-055",
+        "AF-EVD-069",
+        "AF-EVD-070"
       ],
       "stream": "DATA",
       "program": "DATA_QUALITY",
