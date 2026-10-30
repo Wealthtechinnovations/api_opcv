@@ -138,71 +138,100 @@ demandee, relacher l'egalite seule **fabriquerait** un point de donnee.
 > Mesure du 2026-10-30. Ne couvre pour l'instant que la source la plus
 > prometteuse du registre. Les autres restent a instruire.
 
-### UMOA-Titres — courbes de taux : EXPLOITABLE IMMEDIATEMENT
+### UMOA-Titres — courbes de taux : EXPLOITABLE, STRUCTURE STABLE SUR 8 ANS
 
-**702 fichiers, tous `.xlsx`, tous des courbes de taux.** Repartition par annee,
-d'apres les noms de fichiers :
+> **Deux de mes chiffres corriges le 2026-10-30.** J'avais annonce « 702
+> fichiers » et une repartition de 185 a 210 par an. Les deux etaient faux :
+> 702 est le nombre d'**occurrences `href`** dans la page, doublons compris.
+> Le comptage sur URL uniques donne **402 fichiers**, soit **51 a 53 par an** —
+> une publication **hebdomadaire**, ce qui est un fait plus utile et plus
+> exact que mes chiffres gonfles quatre fois.
 
-| annee | fichiers | lecture |
+**402 fichiers `.xlsx` uniques**, tous des courbes de taux.
+
+| annee (dossier) | fichiers | rythme |
 |---|---|---|
-| 2018 | **2** | marginal |
-| 2019 | 202 | |
-| 2020 | 210 | |
-| 2021 | 208 | |
-| 2022 | 202 | |
-| 2023 | 186 | |
-| 2024 | 185 | |
-| 2025 | 99 | |
-| 2026 | 68 | en cours |
+| 2019 | 51 | hebdomadaire |
+| 2020 | 52 | hebdomadaire |
+| 2021 | 52 | hebdomadaire |
+| 2022 | 51 | hebdomadaire |
+| 2023 | 52 | hebdomadaire |
+| 2024 | 50 | hebdomadaire |
+| 2025 | 53 | hebdomadaire |
+| 2026 | 41 | en cours |
 
-**HUIT annees continues (2019-2026), pas dix.** Le mandat fixe « au moins dix
-annees » : **cet objectif n'est pas atteignable depuis cette page seule**. 2018
-n'y porte que deux fichiers. Il faudra soit trouver des archives plus anciennes,
-soit retenir huit ans et le documenter — mais pas presenter huit ans comme dix.
+L'observation la plus ancienne porte sur le **2018-12-31**
+(`COURBES-DES-TAUX-au-31.12.2018.xlsx`, deposee dans le dossier 2019). La
+profondeur reelle couvre donc **fin 2018 a 2026, soit huit annees** — et non
+dix. L'objectif du mandat n'est pas atteignable depuis cette page seule ; il
+faudra chercher des archives anterieures, ou retenir huit ans et le documenter.
 
-**Deux nomenclatures coexistent**, et tout extracteur doit gerer les deux :
+#### Structure : STABLE sur toute la periode et sur les trois nomenclatures
+
+Verification par telechargement et ouverture de **9 fichiers** couvrant 2020,
+2021, 2022 (trois variantes de nom), 2024, 2025 et 2026 :
+
+| Fichier | Feuilles | Pays | `Maturite` | `Zero Coupon` | `Taux Apres Lissage` |
+|---|---|---|---|---|---|
+| `…au-13.03.2020` | 8 | **8** | oui | oui | oui |
+| `…au-25.06.2021` | 8 | **8** | oui | oui | oui |
+| `…au-25.11.2022` | 8 | **8** | oui | oui | oui |
+| `YC-05-08-2022` | 8 | **8** | oui | oui | oui |
+| `COURBES-DES-TAUX-au-30.12.2022` | 8 | **8** | oui | oui | oui |
+| `…au.16.09.2024` | 9 | **8** | oui | oui | oui |
+| `…au.10.02.2025` | 9 | **8** | oui | oui | oui |
+| `YC-19.mai_.25` | 9 | **8** | oui | oui | oui |
+| `…au_.14.08.2026` | 9 | **8** | oui | oui | oui |
+
+**Un seul parseur suffit.** Les 8 feuilles pays — Benin, Burkina, Cote d'Ivoire,
+Guinee-Bissau, Mali, Niger, Senegal, Togo — et les trois colonnes sont presentes
+partout. Les fichiers a 9 feuilles portent une `Feuil1` supplementaire, a
+ignorer. Maturites : 1 mois, 3, 6, 9 mois, puis 1 a 17 ans.
+
+#### TROIS PIEGES D'EXTRACTION, mesures et non supposes
+
+**1. 55 liens sont PROTOCOLE-RELATIFS, et ils portent toute l'annee 2019.**
+
+| forme du `href` | fichiers | annees |
+|---|---|---|
+| `https://…` | 347 | 2020-2026 |
+| **`//www.umoatitres.org/…`** | **55** | **2019 (51), 2020 (4)** |
+
+Un extracteur qui ne prefixe pas le schema obtient **HTTP 000 instantane** sur
+ces 55 fichiers — et **perd l'annee la plus ancienne en entier**. C'est
+exactement l'erreur que j'ai commise : j'ai d'abord conclu « 2019 inaccessible »
+avant de voir que l'URL commencait par `//`. Les cinq memes fichiers rendent
+**200** une fois `https:` prefixe (707 Ko a 1,8 Mo).
+
+**2. Trois orthographes du nom, dont une faute de l'emetteur.**
 
 ```
-COURBES-DE-TAUX.au_.23.10.2026.xlsx     COURBES-DE-TAUX-au-04.09.2026.xlsx
-YC-09.oct_.26.xlsx                       YC-16.oct_.26.xlsx
+COURBES-DE-TAUX-au-13.03.2020.xlsx     COURBES-DES-TAUX-au-30.12.2022.xlsx
+COURBES-DE-TAUX-au.10.02.2025.xlsx     COURBES-DE-TAUX.au_.14.08.2026.xlsx
+YC-05-08-2022.xlsx                      YC-19.mai_.25.xlsx
 ```
 
-On relève aussi `coubes` (faute de frappe de l'emetteur) et `copie` dans
-certains noms : le filtre ne peut donc pas se fonder sur une orthographe exacte.
+383 en `COURBES-DE(S)-TAUX…`, **19 en `YC-…`**. Separateurs `-`, `.` et `_`
+melanges ; mois en lettres dans les `YC-` recents (`mai_`, `mars_`). On releve
+aussi `coubes` et `copie` dans certains noms.
 
-**Structure d'un fichier, verifiee par telechargement** (`au 23.10.2026`,
-143 378 octets) :
+**Consequence** : la date de reference doit etre lue **dans le contenu** du
+fichier — chaque feuille la porte dans son titre — et **jamais deduite du nom**.
 
-- **17 feuilles**, dont **8 nommees par Etat emetteur** : Benin, Burkina,
-  Cote d'Ivoire, Guinee-Bissau, Mali, Niger, Senegal, Togo — les huit pays de
-  l'UEMOA ;
-- colonnes : **`Maturite`**, **`Zero Coupon`**, **`Taux Apres Lissage`** ;
-- maturites : 1 mois, 3, 6, 9 mois, puis **1 a 17 ans** ;
-- date de reference portee dans le titre de chaque feuille (`23/10/2026`).
+**3. Les tailles varient d'un facteur 11** : de 156 Ko a 1,8 Mo. Un controle de
+qualite fonde sur un seuil de taille rejetterait des fichiers valides.
 
-**Consequences pour la conception** :
+#### Ce qui reste a verifier
 
-1. **La granularite par Etat emetteur est native.** Le mandat exige que « les
-   donnees restent identifiees par Etat emetteur, meme si la banque centrale et
-   la devise sont communes » : la source le fournit deja, une feuille par pays.
-2. **Deux series par maturite, a ne jamais fusionner.** `Zero Coupon` et
-   `Taux Apres Lissage` sont deux objets distincts. Le mandat l'impose :
-   « distinguer les taux effectivement observes des donnees derivees » et
-   « conserver separement les courbes officielles et les courbes eventuellement
-   recalculees ». Les stocker dans une meme colonne perdrait l'information.
-3. **Pas d'extraction de PDF a prevoir** pour l'obligataire UEMOA. Le mandat la
-   prevoyait en secours ; elle est inutile ici.
-4. La date de reference est dans le **titre de la feuille**, pas seulement dans
-   le nom du fichier : elle doit etre lue du contenu, le nom pouvant etre fautif
-   (`coubes`, `copie`).
-
-**Ce qui reste a verifier avant de collecter** : que les 702 fichiers partagent
-cette structure. Un seul a ete ouvert. Les nomenclatures `YC-*` sont
-probablement d'un format different, et 2019-2022 peut l'etre aussi.
+9 fichiers ouverts sur 402. La stabilite est etablie sur un echantillon
+couvrant toutes les annees et toutes les nomenclatures, **pas sur l'exhaustif**.
+Un extracteur doit donc rapporter, fichier par fichier, ce qu'il n'a pas su
+lire — et non echouer en silence.
 
 ## Journal des mesures
 
 | Date | Depuis | Resultat |
 |---|---|---|
 | 2026-10-30 | session Claude Code | 23/25 a 200 ; Casablanca x2 en echec de connexion |
-| 2026-10-30 | session Claude Code | UMOA-Titres : 702 xlsx, 2019-2026, structure verifiee sur 1 fichier (8 pays x maturites 1 mois - 17 ans) |
+| 2026-10-30 | session Claude Code | UMOA-Titres : **402** xlsx uniques (et non 702 — doublons `href`), hebdomadaire, fin 2018 a 2026 |
+| 2026-10-30 | session Claude Code | structure verifiee sur **9** fichiers couvrant 2020-2026 et les 3 nomenclatures : stable. 55 liens protocole-relatifs identifies |
