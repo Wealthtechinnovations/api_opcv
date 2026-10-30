@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "bb7c199d09b630c3a62c49f52d5ebc7201aa8be4"
+      "head": "5026f4fa661b284511be7631b3eddb6d827a49e5"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "dbb9733d61675f6389c8d23b564fd5569d93ecf1"
+      "head": "6a823202225df84958748e02f14d4c683f3fe3dc"
     }
   },
   "summary": {
@@ -10924,11 +10924,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "8804a1dca68ecffba247044e92ea24508fcd3547",
-      "last_validated_sha": "8804a1dca68ecffba247044e92ea24508fcd3547",
-      "content_sha256": "a5ff9c702253f55614808ef70c27c663aed5daf533310b84db0b47d2baeebd80",
-      "line_count": 417,
-      "byte_count": 21020,
+      "git_blob_sha": "575628f7b591395025b5f7b72038b22e0c30ff71",
+      "last_validated_sha": "575628f7b591395025b5f7b72038b22e0c30ff71",
+      "content_sha256": "724332d1a062aefd6dd53f8037371498c8a6ea3d1c005180232aca5890c1f3b5",
+      "line_count": 453,
+      "byte_count": 23236,
       "headings": [
         {
           "level": 1,
@@ -11020,7 +11020,11 @@
         },
         {
           "level": 4,
-          "text": "QUATRE PIEGES, mesures"
+          "text": "CINQ PIEGES, mesures"
+        },
+        {
+          "level": 4,
+          "text": "Extracteur livre — `scripts/extract/extract_bceao_interbancaire.py`"
         },
         {
           "level": 4,
@@ -13642,6 +13646,13 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DE : extracteur UEMOA livre en dry-run, et la date de publication a disparu de la source",
+        "POINT DE REPRISE COURANT — 2026-10-30 06:00 UTC — Lot DD : D1 qualifiee sur les trois zones — et les trois sont tres inegales",
+        "SYNTHESE — la seule chose a retenir pour decider",
+        "UEMOA / BCEAO — le meilleur etat des trois",
+        "CEMAC / BEAC — rien ne fonctionne, et c'est mesure",
+        "CINQ PIEGES D'EXTRACTION, tous mesures",
+        "Mes propres chiffres corriges dans ce lot",
         "POINT DE REPRISE COURANT — 2026-10-30 02:10 UTC — Lot DB : MANDAT DU 2026-10-30 — reconciliation faite, livrable 1 livre, deux blocages renvoyes",
         "MANDAT RECU — quatre decisions",
         "LA RECONCILIATION D'ABORD — et elle a trouve deux blocages",
@@ -13652,14 +13663,7 @@
         "ET POURQUOI JE N'AI PAS APPLIQUE CE CORRECTIF",
         "UN SECOND TROU, INDEPENDANT",
         "CE QUI VOUS REVIENT, ET C'EST COURT",
-        "POINT DE REPRISE COURANT — 2026-10-30 01:20 UTC — Lot CZ : **RETRACTATION** — `ratiosnew` n'a jamais ete morte, c'etait MA requete",
-        "JE RETIRE CE QUE LES LOTS CU, CV, CW ET CX AFFIRMENT",
-        "CE QUE CETTE ERREUR A COUTE",
-        "CE QUI RESTE VRAI, ET QUI EST REEL",
-        "CE QUI RESTE VRAI DES LOTS CV-CX, ET QU'IL NE FAUT PAS JETER",
-        "POINT DE REPRISE COURANT — 2026-10-30 00:50 UTC — Lot CY : la regle du snapshot production designait un fichier mort depuis 89 jours",
-        "LE DEFAUT",
-        "MON PREMIER DIAGNOSTIC ETAIT FAUX, ET LE CODE L'A RETOURNE"
+        "POINT DE REPRISE COURANT — 2026-10-30 01:20 UTC — Lot CZ : **RETRACTATION** — `ratiosnew` n'a jamais ete morte, c'etait MA requete"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13670,16 +13674,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "d41e008053db58cdd477da353528eda938ac1a0d",
-      "last_validated_sha": "d41e008053db58cdd477da353528eda938ac1a0d",
-      "content_sha256": "40d6d5f2a190c280bc096f5f5767a4897fbb24ab4c09b84c65df14d8917c7884",
-      "line_count": 10969,
-      "byte_count": 691993,
+      "git_blob_sha": "949bd669da82376d781c1561f285b58183a5f7cb",
+      "last_validated_sha": "949bd669da82376d781c1561f285b58183a5f7cb",
+      "content_sha256": "bf50ac1309b5ec73e7bb7b8d03ba42e6d10e9fe69f766454ea4dbd24a1ce53d6",
+      "line_count": 11123,
+      "byte_count": 700745,
       "headings": [
         {
           "level": 1,
@@ -13688,6 +13692,34 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DE : extracteur UEMOA livre en dry-run, et la date de publication a disparu de la source"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 06:00 UTC — Lot DD : D1 qualifiee sur les trois zones — et les trois sont tres inegales"
+        },
+        {
+          "level": 3,
+          "text": "SYNTHESE — la seule chose a retenir pour decider"
+        },
+        {
+          "level": 3,
+          "text": "UEMOA / BCEAO — le meilleur etat des trois"
+        },
+        {
+          "level": 3,
+          "text": "CEMAC / BEAC — rien ne fonctionne, et c'est mesure"
+        },
+        {
+          "level": 3,
+          "text": "CINQ PIEGES D'EXTRACTION, tous mesures"
+        },
+        {
+          "level": 3,
+          "text": "Mes propres chiffres corriges dans ce lot"
         },
         {
           "level": 2,
@@ -13812,34 +13844,6 @@
         {
           "level": 3,
           "text": "ANGLE MORT QUE J'AI CREE, A LEVER EN PRIORITE"
-        },
-        {
-          "level": 3,
-          "text": "TROIS DEFAUTS DANS MES PROPRES OUTILS, CORRIGES"
-        },
-        {
-          "level": 3,
-          "text": "FAIT D'INFRASTRUCTURE DECOUVERT EN ECHOUANT"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-29 22:30 UTC — Lot CV : `ratiosnew` instruit — quatre hypotheses a moi refutees, et un taux sans risque perime partout"
-        },
-        {
-          "level": 3,
-          "text": "QUATRE HYPOTHESES A MOI, TOUTES REFUTEES PAR LA MESURE"
-        },
-        {
-          "level": 3,
-          "text": "CE QUE L'INSTRUCTION A TROUVE A LA PLACE — et c'est plus grave"
-        },
-        {
-          "level": 3,
-          "text": "Pourquoi cela n'avait jamais ete vu"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-29 18:40 UTC — Lot CU : V2 EXECUTE, 4 routes fermees, le canal de deploiement REPARE, et `ratiosnew` est mort depuis juin"
         }
       ]
     },
