@@ -133,8 +133,76 @@ demandee, relacher l'egalite seule **fabriquerait** un point de donnee.
 | 4 | Conditions d'acces reelles a la BDEMF de la BEAC | a instruire |
 | 5 | Rejouer ce registre **depuis S2** | a conduire |
 
+## Livrable 2 — profondeur et structure, source par source
+
+> Mesure du 2026-10-30. Ne couvre pour l'instant que la source la plus
+> prometteuse du registre. Les autres restent a instruire.
+
+### UMOA-Titres — courbes de taux : EXPLOITABLE IMMEDIATEMENT
+
+**702 fichiers, tous `.xlsx`, tous des courbes de taux.** Repartition par annee,
+d'apres les noms de fichiers :
+
+| annee | fichiers | lecture |
+|---|---|---|
+| 2018 | **2** | marginal |
+| 2019 | 202 | |
+| 2020 | 210 | |
+| 2021 | 208 | |
+| 2022 | 202 | |
+| 2023 | 186 | |
+| 2024 | 185 | |
+| 2025 | 99 | |
+| 2026 | 68 | en cours |
+
+**HUIT annees continues (2019-2026), pas dix.** Le mandat fixe « au moins dix
+annees » : **cet objectif n'est pas atteignable depuis cette page seule**. 2018
+n'y porte que deux fichiers. Il faudra soit trouver des archives plus anciennes,
+soit retenir huit ans et le documenter — mais pas presenter huit ans comme dix.
+
+**Deux nomenclatures coexistent**, et tout extracteur doit gerer les deux :
+
+```
+COURBES-DE-TAUX.au_.23.10.2026.xlsx     COURBES-DE-TAUX-au-04.09.2026.xlsx
+YC-09.oct_.26.xlsx                       YC-16.oct_.26.xlsx
+```
+
+On relève aussi `coubes` (faute de frappe de l'emetteur) et `copie` dans
+certains noms : le filtre ne peut donc pas se fonder sur une orthographe exacte.
+
+**Structure d'un fichier, verifiee par telechargement** (`au 23.10.2026`,
+143 378 octets) :
+
+- **17 feuilles**, dont **8 nommees par Etat emetteur** : Benin, Burkina,
+  Cote d'Ivoire, Guinee-Bissau, Mali, Niger, Senegal, Togo — les huit pays de
+  l'UEMOA ;
+- colonnes : **`Maturite`**, **`Zero Coupon`**, **`Taux Apres Lissage`** ;
+- maturites : 1 mois, 3, 6, 9 mois, puis **1 a 17 ans** ;
+- date de reference portee dans le titre de chaque feuille (`23/10/2026`).
+
+**Consequences pour la conception** :
+
+1. **La granularite par Etat emetteur est native.** Le mandat exige que « les
+   donnees restent identifiees par Etat emetteur, meme si la banque centrale et
+   la devise sont communes » : la source le fournit deja, une feuille par pays.
+2. **Deux series par maturite, a ne jamais fusionner.** `Zero Coupon` et
+   `Taux Apres Lissage` sont deux objets distincts. Le mandat l'impose :
+   « distinguer les taux effectivement observes des donnees derivees » et
+   « conserver separement les courbes officielles et les courbes eventuellement
+   recalculees ». Les stocker dans une meme colonne perdrait l'information.
+3. **Pas d'extraction de PDF a prevoir** pour l'obligataire UEMOA. Le mandat la
+   prevoyait en secours ; elle est inutile ici.
+4. La date de reference est dans le **titre de la feuille**, pas seulement dans
+   le nom du fichier : elle doit etre lue du contenu, le nom pouvant etre fautif
+   (`coubes`, `copie`).
+
+**Ce qui reste a verifier avant de collecter** : que les 702 fichiers partagent
+cette structure. Un seul a ete ouvert. Les nomenclatures `YC-*` sont
+probablement d'un format different, et 2019-2022 peut l'etre aussi.
+
 ## Journal des mesures
 
 | Date | Depuis | Resultat |
 |---|---|---|
 | 2026-10-30 | session Claude Code | 23/25 a 200 ; Casablanca x2 en echec de connexion |
+| 2026-10-30 | session Claude Code | UMOA-Titres : 702 xlsx, 2019-2026, structure verifiee sur 1 fichier (8 pays x maturites 1 mois - 17 ans) |
