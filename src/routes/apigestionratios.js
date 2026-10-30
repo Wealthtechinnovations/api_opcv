@@ -223,8 +223,42 @@ const {
     const annualYield = math.mean(valueArray);
     return annualYield;
   }
+  // `:year` est un HORIZON — '1', '3', '5', '8', '10', '12' ou 'origine' — et
+  // NON une annee calendaire. Chaque valeur a sa branche dans le corps de la
+  // route, et il n en existait aucune pour les autres : une valeur inconnue
+  // traversait les 1 700 lignes sans qu une seule reponse soit emise, et la
+  // requete restait ouverte jusqu au delai de la passerelle Nginx — 120 s, puis
+  // 504.
+  //
+  // CE SILENCE M A COUTE UNE NUIT DE DIAGNOSTIC le 2026-10-29. J ai appele
+  // `/api/ratiosnew/2026/1141` en prenant `:year` pour une annee, obtenu un 504,
+  // et conclu que la route etait morte depuis juin — puis elimine HUIT
+  // hypotheses (volume, index, N+1, boucle infinie, CPU, requete SQL lente,
+  // pool de connexions, attente reseau) pour un symptome que ma propre requete
+  // fabriquait. Mesure du 2026-10-30 : les horizons valides repondent 200 en
+  // 0,83 a 1,09 s. La route n avait rien.
+  //
+  // Un parametre invalide qui PEND est bien pire qu un parametre invalide qui
+  // ECHOUE : l echec se lit en une seconde, l attente se lit comme une panne.
+  //
+  // La validation est placee EN ENTREE, et c est deliberé. Une garde de
+  // fall-through en fin de route — `if (!res.headersSent) res.status(400)` —
+  // aurait pu partir PAR-DESSUS une reponse encore en vol dans un callback, et
+  // casser une branche qui fonctionne. Valider avant tout travail ne peut
+  // interferer avec rien.
+  const HORIZONS_RATIOS = new Set(['1', '3', '5', '8', '10', '12', 'origine']);
+
   router.get('/api/ratiosnew/:year/:id', async (req, res) => {
     try {
+      if (!HORIZONS_RATIOS.has(String(req.params.year))) {
+        return res.status(400).json({
+          code: 400,
+          message: "Horizon invalide : `:year` attend un horizon, pas une annee calendaire.",
+          horizons_acceptes: [...HORIZONS_RATIOS],
+          recu: req.params.year,
+        });
+      }
+
       const fonds = await fond.findOne({
         where: {
           id: req.params.id, // Supposons que vous récupériez l'ID du fond depuis les paramètres de l'URL
@@ -1942,11 +1976,6 @@ const {
             })
           }
 
-
-
-
-
-      
     } catch (error) {
       console.error('Erreur route /api/ratiosnew:', error);
       res.status(500).json({ message: 'Erreur serveur' });
