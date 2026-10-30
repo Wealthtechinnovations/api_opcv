@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "4e07b1af15e4e9373767cbd456bcbb0dcacb89c9"
+      "head": "e40dd78a12fb7adb1d687b26abc04c16e87c2fb0"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -1067,11 +1067,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "CLAUDE.md",
-      "git_blob_sha": "6a111752c04f3e7c627dbfb77ca33c10ac60389e",
-      "last_validated_sha": "6a111752c04f3e7c627dbfb77ca33c10ac60389e",
-      "content_sha256": "815daf7af2873adbca79e7a77c3d41822614c95bf523fcaae667a72d14b9ae19",
-      "line_count": 533,
-      "byte_count": 24646,
+      "git_blob_sha": "5c978c5de0d76227ff51032764b9490d2fde1a5f",
+      "last_validated_sha": "5c978c5de0d76227ff51032764b9490d2fde1a5f",
+      "content_sha256": "2185dfb525149342c4b8b07179776bdd66e11aafa7dd53353cfb203f0ccd0738",
+      "line_count": 560,
+      "byte_count": 26144,
       "headings": [
         {
           "level": 1,
