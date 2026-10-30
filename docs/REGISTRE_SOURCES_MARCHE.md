@@ -228,6 +228,96 @@ couvrant toutes les annees et toutes les nomenclatures, **pas sur l'exhaustif**.
 Un extracteur doit donc rapporter, fichier par fichier, ce qu'il n'a pas su
 lire — et non echouer en silence.
 
+### UEMOA / BCEAO — taux interbancaires par maturite : QUALIFIE ET EXPLOITABLE
+
+> Mesure du 2026-10-30. C'est la source du **taux sans risque UEMOA**, et elle
+> est en bien meilleur etat que son equivalent CEMAC.
+
+#### Deux pages, deux natures a ne pas confondre
+
+| Page | Nature | Utilite |
+|---|---|---|
+| « **Evolution** du marche interbancaire de l'UMOA » | **rapports ANNUELS** (« Situation … en 2021 », « … en 2022 ») | contexte, **pas** une serie |
+| « **Operations** effectuees sur le marche interbancaire » | **PDF HEBDOMADAIRES** | **la serie exploitable** |
+
+#### Profondeur mesuree : 2017-10 → 2026-10, neuf annees
+
+- **27 pages** de listing (`?page=0` a `?page=26`), 20 documents par page, 11 sur
+  la derniere → **≈ 531 documents** ;
+- document le plus recent : « Semaine du 13 au 19 octobre 2026 » ;
+- documents de la **derniere** page, dates lues **dans leur contenu** :
+  « Semaine du 31 octobre au 06 novembre **2017** », « du 13 au 19 fevrier 2018 »,
+  « du 20 au 26 fevrier 2018 ».
+
+**Neuf annees de donnees hebdomadaires.** L'objectif de dix ans du mandat est
+presque atteint, et de loin le meilleur des trois zones.
+
+#### Contenu d'un document — exactement la liste du mandat
+
+Extrait de « Semaine du 07 au 13 juillet 2026 », via `pdftotext -layout` :
+
+| | UN JOUR | 1 SEM | 2 SEM | 1 MOIS | 3 MOIS | 6 / 9 / 12 MOIS |
+|---|---|---|---|---|---|---|
+| **Taux moyen pondere (%)** | **4,21** | 3,94 | 3,95 | 5,12 | 5,03 | **–** |
+| Taux minimum (%) | 3,00 | 3,00 | 3,05 | 4,00 | 4,75 | – |
+| Taux maximum (%) | 6,00 | 6,50 | 7,00 | 6,75 | 5,50 | – |
+
+Plus les **volumes prets / emprunts par pays** pour les huit Etats et l'agregat
+UMOA, en millions de FCFA.
+
+Les huit maturites — un jour, une semaine, deux semaines, un mois, trois mois,
+six mois, neuf mois, douze mois — correspondent **mot pour mot** a ce que le
+mandat demande.
+
+**Le taux moyen pondere AU JOUR LE JOUR est le candidat naturel au taux sans
+risque overnight UEMOA.** Le mandat impose cependant de ne pas confondre les
+natures : ce taux est une **moyenne de transactions interbancaires**, pas un taux
+directeur BCEAO ni un rendement souverain. Le choix doit etre documente comme
+tel.
+
+**Extraction** : `pdftotext -layout` rend un tableau aligne et lisible. **Aucun
+OCR n'est necessaire.**
+
+#### QUATRE PIEGES, mesures
+
+**1. Le nom de fichier ne porte NI la date NI le type reel.** Les documents
+anciens s'appellent `05-Situation des Prets interbancaires par maturites_0.pdf`,
+`…-177.pdf` — sans aucune date — alors que leur contenu est bien
+« Operations par maturites effectuees sur le marche interbancaire de l'UMOA ».
+**Le nom mente sur le type autant que sur la date.** La date et la nature doivent
+donc etre lues **dans le contenu**, systematiquement.
+
+**2. Au moins quatre nomenclatures coexistent** :
+
+```
+01-Opérations-par-maturité-effectuées-du-7-au-13-juillet-2026.pdf
+01 Opérations par maturité effectuées du 13 au 19 octobre 2026.pdf
+01-Opérations-par-maturité-effectuées-sur-le-marché-interbancaire-de-l-UMOA-du-17-au-2….pdf
+05-Situation des Prêts interbancaires par maturités_1.pdf
+```
+
+Accents encodes en URL (`Op%C3%A9rations`), separateurs espace / tiret /
+soulignement melanges, suffixes `_0`, `_1`, `-177`.
+
+**3. Le tiret « – » signifie AUCUNE TRANSACTION, jamais zero.** Les maturites 6,
+9 et 12 mois sont vides sur la semaine mesuree. Le mandat l'exige : « ne jamais
+assimiler une absence de transaction a une cotation valable ou a un rendement
+observe ». Un `0` ecrit a la place d'un tiret serait une **valeur financiere
+inventee**.
+
+**4. Convention numerique OPPOSEE a celle de la BEAC.** Ici, pourcentages a
+virgule decimale (`4,21`). A la BEAC, **fractions** (`0.0325` pour 3,25 %). Un
+extracteur commun aux deux zones qui ne distingue pas les deux conventions
+produirait une **erreur d'un facteur 100**.
+
+#### Ce qui reste a faire
+
+- parcourir les 27 pages pour constituer la liste complete des ≈ 531 documents ;
+- verifier que le tableau garde la meme forme sur les neuf annees — **4 documents
+  ouverts sur ≈ 531** a ce stade (un de 2026, trois de 2017-2018) ;
+- decider et **documenter** le proxy retenu : taux moyen pondere au jour le jour,
+  ou une autre maturite selon l'usage analytique.
+
 ### CEMAC / BEAC — AUCUN canal d'alimentation ne fonctionne aujourd'hui
 
 > Mesure du 2026-10-30. Conclusion la plus lourde du registre, et elle
@@ -324,3 +414,4 @@ une source arretee en 2020 ne produirait rien.
 | 2026-10-30 | session Claude Code | UMOA-Titres : **402** xlsx uniques (et non 702 — doublons `href`), hebdomadaire, fin 2018 a 2026 |
 | 2026-10-30 | session Claude Code | structure verifiee sur **9** fichiers couvrant 2020-2026 et les 3 nomenclatures : stable. 55 liens protocole-relatifs identifies |
 | 2026-10-30 | session Claude Code | BEAC : 5 series de taux ouvertes, la plus recente s'arrete **2020-09** ; BDEMF rend **HTTP 502** (navigateur sans interface) ; titres publics XLSX **2015-2017** |
+| 2026-10-30 | session Claude Code | BCEAO : serie hebdomadaire **2017-10 → 2026-10**, ≈531 PDF sur 27 pages, 8 maturites, extraction `pdftotext -layout` validee |
