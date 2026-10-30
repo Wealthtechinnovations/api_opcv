@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "29c7fda87183911f3384b1453bda017588e22511"
+      "head": "82ba7ee269a90756ddd8da66787add59bebc181c"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "e237e02bdb680bfa80aca672f8ffab9c0338d239"
+      "head": "02df06ed729d5a35132056b22cdc4593b8c4b96c"
     }
   },
   "summary": {
@@ -10164,11 +10164,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "1041122aa61419e06393416fed97ea5a367c4654",
-      "last_validated_sha": "1041122aa61419e06393416fed97ea5a367c4654",
-      "content_sha256": "461d27c1af1378ddf7e2a95513fcab5e2fa9d0d56019d2fe715ae48481ea3891",
-      "line_count": 3778,
-      "byte_count": 280479,
+      "git_blob_sha": "2e388d6d5b08db1cb747f3d30dc4eb11c1757d24",
+      "last_validated_sha": "2e388d6d5b08db1cb747f3d30dc4eb11c1757d24",
+      "content_sha256": "edf1e2dd8ba2bd5e3e32aac5d77350790dbd33798eac2fc7a85ad2c601d11c18",
+      "line_count": 3806,
+      "byte_count": 282982,
       "headings": [
         {
           "level": 1,
@@ -10355,9 +10355,9 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "b6ff0b93a28212dcf84063835754d3fb3b2eed52",
-      "last_validated_sha": "b6ff0b93a28212dcf84063835754d3fb3b2eed52",
-      "content_sha256": "afc764902d1ad86fa2b52afaea59a889af08ee5629694472ec80f168d95faf33",
+      "git_blob_sha": "c2bf1bde29a5fab85bd45e01eea2d9d028fad4b5",
+      "last_validated_sha": "c2bf1bde29a5fab85bd45e01eea2d9d028fad4b5",
+      "content_sha256": "b1eae388eb129664e0a160e6781dffc73c0c434ff805abc579dd54000054a5a3",
       "line_count": 96,
       "byte_count": 7205,
       "headings": [
@@ -13667,24 +13667,24 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DL : pages outils documentees, et le sitemap de production est FIGE",
-        "Le resultat qui depasse le lot : le sitemap de production est fige",
-        "Observation distincte, pour un lot a venir",
-        "Le lot proprement dit",
-        "Correction d'un de mes chiffres, de nouveau",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DK : les sept fiches fonds tolerent le slug, plus aucun appel NaN",
-        "La correction ne cree rien : elle reutilise l'existant",
-        "Verifie, et non suppose",
-        "Deux defauts de mon propre harnais",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DJ : les canoniques des fiches fonds designent des pages SANS DONNEES",
-        "Le resultat principal n'est pas celui que j'allais chercher",
-        "Ce que j'en ai fait, et ce que je n'en ai pas fait",
-        "Pourquoi la page Performances avait ete oubliee",
-        "Correction d'un chiffre a moi",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DI : 402 classeurs UMOA-Titres ouverts, et deux conventions opposees dans la MEME zone",
-        "Le resultat le plus lourd : des FRACTIONS, a l'oppose de la BCEAO",
-        "Quatre orthographes pour la Cote d'Ivoire",
-        "Deux defauts de mon propre script, corriges"
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DP : le 26 octobre marocain ne s'est pas auto-corrige, et la file gouvernee MCP ne concerne PAS ce chantier",
+        "La file de taches gouvernee MCP ne porte AUCUNE tache de ce chantier",
+        "Hypothese de reaffectation entre fonds : REFUTEE par un temoin",
+        "Ce qui est etabli, et qui tient",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DO : le facteur de contamination EST le taux publie, a 0,18 % pres",
+        "La validation decisive — et elle n'est pas uniforme",
+        "La table de taux porte elle-meme des valeurs fausses",
+        "Les zeros, mesures sans plafond",
+        "Le 26 octobre marocain : sept fonds, et DEUX limites de controle",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DN : la base renverse mon analyse — 10 des 14 fonds sont declares en USD",
+        "La devise DECLAREE n'est pas celle que je supposais",
+        "Les zeros depassent tres largement les fonds de C7",
+        "Et le taux publie, existe-t-il ?",
+        "Un piege de metrique, signale",
+        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DM : la performance de 143 958 % affichee EST le taux de change",
+        "Les deux echecs critiques n'en font qu'UN",
+        "Preuve par coherence interne, sans donnee exterieure",
+        "Deux de mes propres conclusions, retirees en cours de route"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13700,11 +13700,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "8e47957fe9a0a67a8fc5e7b678c51928f5b5de0c",
-      "last_validated_sha": "8e47957fe9a0a67a8fc5e7b678c51928f5b5de0c",
-      "content_sha256": "260caa1cc5f9d9430c86b37541edf40c680e7cd4d0c85edc0c25ce959778af9c",
-      "line_count": 11638,
-      "byte_count": 727505,
+      "git_blob_sha": "6acd3fe6e182caa485f7f0060909de8588453405",
+      "last_validated_sha": "6acd3fe6e182caa485f7f0060909de8588453405",
+      "content_sha256": "f20bdcf45f95a8bfbbc03dcdad04dfd09127796edf48dc5194a114e48563ec92",
+      "line_count": 11987,
+      "byte_count": 745304,
       "headings": [
         {
           "level": 1,
@@ -13713,6 +13713,86 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DP : le 26 octobre marocain ne s'est pas auto-corrige, et la file gouvernee MCP ne concerne PAS ce chantier"
+        },
+        {
+          "level": 3,
+          "text": "La file de taches gouvernee MCP ne porte AUCUNE tache de ce chantier"
+        },
+        {
+          "level": 3,
+          "text": "Hypothese de reaffectation entre fonds : REFUTEE par un temoin"
+        },
+        {
+          "level": 3,
+          "text": "Ce qui est etabli, et qui tient"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DO : le facteur de contamination EST le taux publie, a 0,18 % pres"
+        },
+        {
+          "level": 3,
+          "text": "La validation decisive — et elle n'est pas uniforme"
+        },
+        {
+          "level": 3,
+          "text": "La table de taux porte elle-meme des valeurs fausses"
+        },
+        {
+          "level": 3,
+          "text": "Les zeros, mesures sans plafond"
+        },
+        {
+          "level": 3,
+          "text": "Le 26 octobre marocain : sept fonds, et DEUX limites de controle"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DN : la base renverse mon analyse — 10 des 14 fonds sont declares en USD"
+        },
+        {
+          "level": 3,
+          "text": "La devise DECLAREE n'est pas celle que je supposais"
+        },
+        {
+          "level": 3,
+          "text": "Les zeros depassent tres largement les fonds de C7"
+        },
+        {
+          "level": 3,
+          "text": "Et le taux publie, existe-t-il ?"
+        },
+        {
+          "level": 3,
+          "text": "Un piege de metrique, signale"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DM : la performance de 143 958 % affichee EST le taux de change"
+        },
+        {
+          "level": 3,
+          "text": "Les deux echecs critiques n'en font qu'UN"
+        },
+        {
+          "level": 3,
+          "text": "Preuve par coherence interne, sans donnee exterieure"
+        },
+        {
+          "level": 3,
+          "text": "Deux de mes propres conclusions, retirees en cours de route"
+        },
+        {
+          "level": 3,
+          "text": "Defaut distinct, releve au passage"
+        },
+        {
+          "level": 3,
+          "text": "Livrable"
         },
         {
           "level": 2,
@@ -13785,86 +13865,6 @@
         {
           "level": 3,
           "text": "Deux defauts de mon propre script, corriges"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DH : la regle de date de MONIA est insatisfiable, pas trop stricte"
-        },
-        {
-          "level": 3,
-          "text": "MONIA — ce que la page offre reellement, lu le 30 octobre"
-        },
-        {
-          "level": 3,
-          "text": "Pourquoi RIEN n'est modifie dans ce lot"
-        },
-        {
-          "level": 3,
-          "text": "BDEMF retestee — toujours 502"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DG : le proxy sans risque UEMOA tranche par la mesure (DEC-AF-009)"
-        },
-        {
-          "level": 3,
-          "text": "La couverture par maturite tranche a elle seule"
-        },
-        {
-          "level": 3,
-          "text": "Les trois defauts du recenseur portes dans l'extracteur"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DF : la serie UEMOA recensee document par document, et elle n'est PAS continue"
-        },
-        {
-          "level": 3,
-          "text": "Ce qu'il faut retenir, et cela corrige le registre"
-        },
-        {
-          "level": 3,
-          "text": "Trois defauts de mon propre recenseur, trouves en l'executant"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DE : extracteur UEMOA livre en dry-run, et la date de publication a disparu de la source"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 06:00 UTC — Lot DD : D1 qualifiee sur les trois zones — et les trois sont tres inegales"
-        },
-        {
-          "level": 3,
-          "text": "SYNTHESE — la seule chose a retenir pour decider"
-        },
-        {
-          "level": 3,
-          "text": "UEMOA / BCEAO — le meilleur etat des trois"
-        },
-        {
-          "level": 3,
-          "text": "CEMAC / BEAC — rien ne fonctionne, et c'est mesure"
-        },
-        {
-          "level": 3,
-          "text": "CINQ PIEGES D'EXTRACTION, tous mesures"
-        },
-        {
-          "level": 3,
-          "text": "Mes propres chiffres corriges dans ce lot"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 02:10 UTC — Lot DB : MANDAT DU 2026-10-30 — reconciliation faite, livrable 1 livre, deux blocages renvoyes"
-        },
-        {
-          "level": 3,
-          "text": "MANDAT RECU — quatre decisions"
-        },
-        {
-          "level": 3,
-          "text": "LA RECONCILIATION D'ABORD — et elle a trouve deux blocages"
         }
       ]
     },
