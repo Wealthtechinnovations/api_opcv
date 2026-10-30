@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "5026f4fa661b284511be7631b3eddb6d827a49e5"
+      "head": "a7c7897e7092d0795492a444af09d21ab98e3e56"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -10924,11 +10924,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "575628f7b591395025b5f7b72038b22e0c30ff71",
-      "last_validated_sha": "575628f7b591395025b5f7b72038b22e0c30ff71",
-      "content_sha256": "724332d1a062aefd6dd53f8037371498c8a6ea3d1c005180232aca5890c1f3b5",
-      "line_count": 453,
-      "byte_count": 23236,
+      "git_blob_sha": "6fd7530a55891ced0288f00e7ea8b1e535b0e6b5",
+      "last_validated_sha": "6fd7530a55891ced0288f00e7ea8b1e535b0e6b5",
+      "content_sha256": "3069a729fbacac019db8e21f02d6aaa0dbf6464894d9b62a0894d43f8f7706e6",
+      "line_count": 478,
+      "byte_count": 24843,
       "headings": [
         {
           "level": 1,
