@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "d6c8374414a676bb91ea5de82b594ff7066a0ba1"
+      "head": "1ba727d23e7231e6500a85f7f257c39f542663de"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "38b74857f0a05e96c8bdf61ad7ffaa3f22670650"
+      "head": "dbb9733d61675f6389c8d23b564fd5569d93ecf1"
     }
   },
   "summary": {
@@ -10857,6 +10857,8 @@
         "4. Casablanca est le seul blocage, et il est deja contourne",
         "Statut de collecte — ce qui existe DEJA, a ne pas reconstruire",
         "Points ouverts, et a qui ils reviennent",
+        "Livrable 2 — profondeur et structure, source par source",
+        "UMOA-Titres — courbes de taux : EXPLOITABLE IMMEDIATEMENT",
         "Journal des mesures"
       ],
       "consumers": [
@@ -10873,11 +10875,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/REGISTRE_SOURCES_MARCHE.md",
-      "git_blob_sha": "fe1345d125ba294b9b41499db39e15bb4cb85a9a",
-      "last_validated_sha": "fe1345d125ba294b9b41499db39e15bb4cb85a9a",
-      "content_sha256": "a07d69bb8c9e3c33f63aa3fb23b8fe7d33787554e946a9966b71bc55d689e6c8",
-      "line_count": 140,
-      "byte_count": 7436,
+      "git_blob_sha": "fde2577851a692880d27a3a23a41262be9884c4e",
+      "last_validated_sha": "fde2577851a692880d27a3a23a41262be9884c4e",
+      "content_sha256": "ce86ef29f9f1be02cdff6c577e6b9b0f1672940c6548f428d1c4632d1371c9c5",
+      "line_count": 208,
+      "byte_count": 10528,
       "headings": [
         {
           "level": 1,
@@ -10930,6 +10932,14 @@
         {
           "level": 2,
           "text": "Points ouverts, et a qui ils reviennent"
+        },
+        {
+          "level": 2,
+          "text": "Livrable 2 — profondeur et structure, source par source"
+        },
+        {
+          "level": 3,
+          "text": "UMOA-Titres — courbes de taux : EXPLOITABLE IMMEDIATEMENT"
         },
         {
           "level": 2,
@@ -13523,6 +13533,10 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-30 02:10 UTC — Lot DB : MANDAT DU 2026-10-30 — reconciliation faite, livrable 1 livre, deux blocages renvoyes",
+        "MANDAT RECU — quatre decisions",
+        "LA RECONCILIATION D'ABORD — et elle a trouve deux blocages",
+        "LIVRABLE 1 LIVRE — registre des sources, mesure",
         "POINT DE REPRISE COURANT — 2026-10-30 01:40 UTC — Lot DA : la chaine complete du taux sans risque marocain, et pourquoi le correctif evident fabriquerait une donnee",
         "LA CHAINE, MAILLON PAR MAILLON",
         "POURQUOI LE MAILLON 7 CASSE TOUT",
@@ -13536,11 +13550,7 @@
         "CE QUI RESTE VRAI DES LOTS CV-CX, ET QU'IL NE FAUT PAS JETER",
         "POINT DE REPRISE COURANT — 2026-10-30 00:50 UTC — Lot CY : la regle du snapshot production designait un fichier mort depuis 89 jours",
         "LE DEFAUT",
-        "MON PREMIER DIAGNOSTIC ETAIT FAUX, ET LE CODE L'A RETOURNE",
-        "LE SNAPSHOT VIVANT EST FRAIS — ET IL CONFIRME DEUX CONSTATS",
-        "CE QUI A CHANGE",
-        "TROISIEME REGLE DE CETTE SESSION POINTANT VERS QUELQUE CHOSE DE MORT",
-        "Hygiene relevee au passage"
+        "MON PREMIER DIAGNOSTIC ETAIT FAUX, ET LE CODE L'A RETOURNE"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13556,11 +13566,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "e4a3280db9eafbb4d3f31a676f2c15414e417d6c",
-      "last_validated_sha": "e4a3280db9eafbb4d3f31a676f2c15414e417d6c",
-      "content_sha256": "f65e8daad31094249b0de71cf2f361ba79b8a11e48c61b4ff10b75e4ad3d1867",
-      "line_count": 10869,
-      "byte_count": 686844,
+      "git_blob_sha": "d41e008053db58cdd477da353528eda938ac1a0d",
+      "last_validated_sha": "d41e008053db58cdd477da353528eda938ac1a0d",
+      "content_sha256": "40d6d5f2a190c280bc096f5f5767a4897fbb24ab4c09b84c65df14d8917c7884",
+      "line_count": 10969,
+      "byte_count": 691993,
       "headings": [
         {
           "level": 1,
@@ -13569,6 +13579,22 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-30 02:10 UTC — Lot DB : MANDAT DU 2026-10-30 — reconciliation faite, livrable 1 livre, deux blocages renvoyes"
+        },
+        {
+          "level": 3,
+          "text": "MANDAT RECU — quatre decisions"
+        },
+        {
+          "level": 3,
+          "text": "LA RECONCILIATION D'ABORD — et elle a trouve deux blocages"
+        },
+        {
+          "level": 3,
+          "text": "LIVRABLE 1 LIVRE — registre des sources, mesure"
         },
         {
           "level": 2,
@@ -13705,22 +13731,6 @@
         {
           "level": 2,
           "text": "POINT DE REPRISE COURANT — 2026-10-29 18:40 UTC — Lot CU : V2 EXECUTE, 4 routes fermees, le canal de deploiement REPARE, et `ratiosnew` est mort depuis juin"
-        },
-        {
-          "level": 3,
-          "text": "1. `V2` EXECUTE — 19 lignes supprimees, index UNIQUE pose"
-        },
-        {
-          "level": 3,
-          "text": "2. Les quatre routes sont fermees"
-        },
-        {
-          "level": 3,
-          "text": "3. LE CANAL DE DEPLOIEMENT GOUVERNE ETAIT ROMPU — et je l'ai repare"
-        },
-        {
-          "level": 3,
-          "text": "4. RISQUE QUE J'AI CREE, ET CORRIGE DANS LE MEME LOT"
         }
       ]
     },
