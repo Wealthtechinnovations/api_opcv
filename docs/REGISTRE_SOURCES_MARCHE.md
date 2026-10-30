@@ -228,6 +228,94 @@ couvrant toutes les annees et toutes les nomenclatures, **pas sur l'exhaustif**.
 Un extracteur doit donc rapporter, fichier par fichier, ce qu'il n'a pas su
 lire — et non echouer en silence.
 
+### CEMAC / BEAC — AUCUN canal d'alimentation ne fonctionne aujourd'hui
+
+> Mesure du 2026-10-30. Conclusion la plus lourde du registre, et elle
+> conditionne la decision 1 pour la CEMAC.
+
+#### Les cinq series XLSX du marche monetaire : toutes perimees
+
+La page « Statistiques du marche monetaire » offre 11 fichiers `.xlsx`. Les cinq
+qui portent des taux ont ete telecharges et ouverts :
+
+| Fichier | Contenu | Couverture **mesuree** |
+|---|---|---|
+| `Evolution-des-taux-interbancaires-moyens-ponderes-a-7-jours.xlsx` | **TIMP 7 jours** — la serie que le mandat nomme | **2018-06-11 → 2020-09-06** |
+| `dctimp.xlsx` | TIMP sous-regional | **ANNEE 2010** |
+| `dcrdbmm.xlsx` | donnees de base du marche monetaire, par pays | **nov. 2008 → nov. 2010** |
+| `dceticb.xlsx` | taux d'interet BEAC et conditions de banque | depuis 1996, **s'arrete ~2010** |
+| `Evolution-des-taux-dintervention-de-la-BEAC…xlsx` | taux directeurs, appels d'offres, pensions | **2000 → 2009** |
+
+**La plus recente s'arrete en septembre 2020 — il y a six ans.** Le mandat
+demande de « prevoir leur alimentation reguliere » : **aucune de ces cinq
+series ne le permet**.
+
+**Piege a ne pas manquer** : prendre `dctimp.xlsx` pour « le TIMP » donnerait des
+donnees de **2010**. Les noms courts (`dctimp`, `dcrdbmm`, `dceticb`) sont des
+archives, pas des series vivantes.
+
+#### Deux TIMP distincts, et le mandat interdit de les confondre
+
+Le fichier TIMP 7 jours porte **deux** colonnes :
+
+```
+TIMP a 7 jours (Operations en blanc)
+TIMP a 7 jours (Operations collateralisees / pension-livree)
+```
+
+Le mandat l'exige : « ne pas confondre taux directeur, taux interbancaire, **taux
+repo**, rendement d'un titre souverain et taux sans risque ». La source
+distingue elle-meme le **non garanti** (« en blanc ») du **repo**
+(collateralise). Le choix du proxy de taux sans risque devra donc etre
+**delibere et documente**, pas pris par defaut.
+
+**Second piege, numerique** : les valeurs sont des **fractions**, non des
+pourcentages — `0.0325` signifie 3,25 %. Les ecrire telles quelles dans une
+colonne attendant des pourcentages produirait une **erreur d'un facteur 100**.
+
+#### La base BDEMF : backend en panne a l'instant de la mesure
+
+Le mandat demandait de « tester les possibilites d'export de la base BEAC » et
+notait que « ses conditions et son fonctionnement technique doivent etre
+verifies ». Verifie, en deux temps :
+
+1. `curl` sur `https://www.beac.int/bdemfcemac` rend **1 349 octets** — une
+   coquille JavaScript, references `ps/portal/js/`, `ps/mobile/js/mobilelaunch.js`
+   et un `window.location.replace(...)`. Signature d'un portail de type
+   **IBM Cognos / Planning Analytics**. Aucune donnee n'y est atteignable par
+   requete simple ;
+2. chargement avec un **navigateur sans interface** (Chromium/Playwright) :
+   **HTTP 502, « upstream request failed »**. Zero lien, zero tableau, zero
+   iframe, zero requete de donnees. **Le backend du portail ne repond pas.**
+
+**A retester, et non a declarer mort.** Un 502 est un etat, pas une propriete :
+la regle du projet veut qu'« une capacite declaree indisponible sans test du
+jour soit une capacite abandonnee, pas une capacite absente ». La mesure doit
+etre rejouee avant toute conclusion definitive.
+
+#### Les titres publics : donnees structurees arretees en 2017
+
+La page « Statistiques des titres publics » offre 10 `.xlsx` et 268 PDF. **Les
+dix XLSX datent de 2015 a 2017** (`Donnees_CBT_octobre-2016`,
+`CBT-CMR-GA-TDfevrier-2017`…), et les PDF les plus visibles aussi. Les
+rendements BTA/OTA et les courbes souveraines CEMAC que le mandat demande ne
+sont donc pas disponibles sous forme recente par cette voie.
+
+#### Ce que cela signifie pour la CEMAC
+
+| Canal | Etat mesure |
+|---|---|
+| XLSX marche monetaire | perimes — le plus recent s'arrete **2020-09** |
+| XLSX titres publics | perimes — **2015-2017** |
+| portail BDEMF | **HTTP 502** a l'instant de la mesure |
+| VL des fonds CEMAC en base | derniere le **2024-12-12** |
+| couverture benchmark CEMAC | **0 %** |
+
+**Aucun canal d'alimentation CEMAC ne fonctionne aujourd'hui.** Ce n'est pas un
+defaut de notre collecte : c'est l'etat des sources. Le constat doit remonter
+avant tout engagement de developpement sur la CEMAC — construire un adapteur sur
+une source arretee en 2020 ne produirait rien.
+
 ## Journal des mesures
 
 | Date | Depuis | Resultat |
@@ -235,3 +323,4 @@ lire — et non echouer en silence.
 | 2026-10-30 | session Claude Code | 23/25 a 200 ; Casablanca x2 en echec de connexion |
 | 2026-10-30 | session Claude Code | UMOA-Titres : **402** xlsx uniques (et non 702 — doublons `href`), hebdomadaire, fin 2018 a 2026 |
 | 2026-10-30 | session Claude Code | structure verifiee sur **9** fichiers couvrant 2020-2026 et les 3 nomenclatures : stable. 55 liens protocole-relatifs identifies |
+| 2026-10-30 | session Claude Code | BEAC : 5 series de taux ouvertes, la plus recente s'arrete **2020-09** ; BDEMF rend **HTTP 502** (navigateur sans interface) ; titres publics XLSX **2015-2017** |
