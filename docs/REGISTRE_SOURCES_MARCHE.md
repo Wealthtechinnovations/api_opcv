@@ -53,6 +53,7 @@ Legende : `tbl` = tableaux HTML · `csv` = liens CSV/XLS/XLSX · `pdf` = liens P
 | monetaire | BEAC | Stats marche monetaire | 200 | 21 144 | 1 | **11** | 4 | — |
 | monetaire | BEAC | Base BDEMF (presentation) | 200 | 20 579 | 0 | 0 | 1 | — |
 | monetaire | BEAC | **Base BDEMF (acces)** | 200 | **1 349** | 0 | 0 | 0 | — |
+| monetaire | BEAC | **BDEMF, navigateur sans interface** | **502** (retest 2026-10-30) | 174 | 0 | 0 | 0 | — |
 | obligataire | BEAC | Stats titres publics | 200 | 27 169 | 1 | **10** | 268 | — |
 | obligataire | BEAC | Marche des titres publics | 200 | 20 733 | 0 | 0 | 0 | — |
 | obligataire | BEAC | Annonces et communiques | 200 | 45 702 | 1 | 0 | **1 007** | — |
@@ -122,6 +123,47 @@ Releve dans le code, non suppose :
 (lot DA de `SUIVI.md`) : le parseur exige une egalite stricte de date alors que
 MONIA du jour J est publie en J+1 — et l'insertion etant indexee sur la date
 demandee, relacher l'egalite seule **fabriquerait** un point de donnee.
+
+#### Mesure du 2026-10-30 : la regle est INSATISFIABLE, pas seulement stricte
+
+Lecture directe de la page BKAM, le **30 octobre**. Les dix seances offertes,
+avec leurs **deux** dates :
+
+| date de reference | date de publication | MONIA |
+|---|---|---|
+| **28/10/2026** | 29/10/2026 | 2,171 % |
+| 27/10/2026 | 28/10/2026 | 2,198 % |
+| 26/10/2026 | 27/10/2026 | 2,184 % |
+| **23/10/2026** (vendredi) | **26/10/2026** (lundi) | 2,177 % |
+| 22/10/2026 | 23/10/2026 | 2,169 % |
+
+**La reference la plus recente est le 28 octobre, lue le 30.** Un collecteur
+lance avec `targetDate = aujourd'hui` ne peut donc **jamais** trouver de ligne :
+la condition `iso === targetDate` de `parseMoniaHtml()` n'est pas trop stricte,
+elle est **insatisfiable par construction**. Ce n'est pas un reglage a assouplir
+mais une regle a remplacer.
+
+**Et « J-1 » ne suffit pas non plus** : les dates de reference sautent les
+week-ends — vendredi 23/10 publie le lundi 26/10. Un lundi, `targetDate = J-1`
+tombe sur un dimanche et echoue a son tour. **Seule la regle « derniere
+reference a une date ≤ date cible » aboutit**, celle precisement retenue par
+F3/M2.
+
+**Point favorable, contrairement a la BCEAO** : la page porte les **deux** dates,
+reference et publication, cote a cote. `publication_date` est donc reellement
+disponible pour MONIA — ce que le mandat exige (« dates d'observation et de
+publication distinctes ») est ici atteignable sans approximation.
+
+**Ce que cette mesure ne resout PAS, et pourquoi rien n'est modifie ici.**
+`parseMoniaHtml()` ne rend aujourd'hui que la **valeur** : la date de reference
+lue est jetee avant d'atteindre l'appelant, qui insere sous la date demandee.
+Relacher la comparaison sans faire remonter la date de reference ecrirait une
+valeur sous une date qui n'est pas la sienne — **exactement ce que le mandat
+interdit explicitement**. Le correctif est structurel : la fonction doit rendre
+`{ valeur, date_de_reference, date_de_publication }` et l'insertion doit se
+faire sous la date de reference. Il touche un script d'import en production :
+diagnostic d'abord, modification ensuite, conformement a la regle des taches
+sensibles.
 
 ## Points ouverts, et a qui ils reviennent
 
@@ -552,3 +594,5 @@ une source arretee en 2020 ne produirait rien.
 | 2026-10-30 | session Claude Code | BCEAO : date de publication **absente** des PDF recents (0 « Dakar ») alors que 2017 la porte ; extracteur dry-run livre, 40 lignes / 26 valeurs sur 5 documents |
 | 2026-10-30 | session Claude Code | BCEAO recensement reel : **391** documents (et non ≈531, extrapolation erronee de 26 %) ; 5 PDF de barre laterale vus 27x ; **330/391 sans annee dans le nom** |
 | 2026-10-30 | session Claude Code | BCEAO, 391 documents ouverts : **379 semaines distinctes**, 2017-11-06 → 2026-10-19, **18 % manquantes**, 15 trous, le plus long **49 jours** ; debut reellement continu **2018-02** |
+| 2026-10-30 | session Claude Code | MONIA : reference la plus recente **28/10** lue le **30/10** ; `iso === targetDate` est **insatisfiable**, et « J-1 » echoue aussi le lundi (vendredi publie lundi) |
+| 2026-10-30 | session Claude Code | BDEMF retestee : **toujours 502**, 174 octets, zero lien. Deux mesures le meme jour — ecarte un incident momentane, pas une panne de plusieurs jours |
