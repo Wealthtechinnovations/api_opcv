@@ -293,6 +293,64 @@ const jour = (d) => {
   }
 
   // ------------------------------------------------------------------
+  // 5bis. LES VL DU 26 OCTOBRE SONT-ELLES CELLES D AUTRES FONDS ?
+  //
+  // Mesure du 2026-10-30 : les sept fonds marocains bougent dans les DEUX
+  // sens, et les valeurs se repondent —
+  //
+  //   1113 AL BARID      148,93 ->   3 080,32   (monte)
+  //   953  CDG SOLIDARITE 177,08 ->  2 328,10   (monte)
+  //   1092 ATLANTA      2 327,26 ->    752,37   (descend)
+  //   967  CDG IZDIHAR  3 818,34 ->  1 098,56   (descend)
+  //
+  // La valeur d arrivee de 953 (2 328,10) est la valeur de DEPART de 1092
+  // (2 327,26). Cela suggere des VL REAFFECTEES ENTRE FONDS — une erreur
+  // d IDENTITE, non d echelle. C est une hypothese, et elle se teste : pour
+  // chaque fonds, la VL du 26 octobre correspond-elle a la VL precedente d un
+  // AUTRE fonds, a 1 % pres ?
+  //
+  // Si oui, aucune correction par facteur ne convient : il faut re-apparier.
+  // Diviser par un facteur une valeur qui appartient a un autre fonds
+  // produirait un troisieme chiffre, faux pour les deux.
+  // ------------------------------------------------------------------
+  console.log('\n--- 5bis. Les VL du 26 octobre appartiennent-elles a d autres fonds ? ---');
+  const [perm] = await conn.query(`
+    SELECT v.fund_id AS recu_par, f.nom_fond AS nom_recu,
+           v.${colVal} AS val_26,
+           p2.fund_id AS valeur_de, f2.nom_fond AS nom_source,
+           p2.val_prec AS val_prec_source
+      FROM valorisations v
+      JOIN fond_investissements f ON f.id = v.fund_id
+      JOIN (SELECT v2.fund_id, v2.${colVal} AS val_prec
+              FROM valorisations v2
+              JOIN (SELECT fund_id, MAX(${colDate}) AS d FROM valorisations
+                     WHERE ${colDate} < '2026-10-26' AND ${colVal} > 0
+                     GROUP BY fund_id) m
+                ON m.fund_id = v2.fund_id AND m.d = v2.${colDate}
+             WHERE v2.${colVal} > 0) p2 ON p2.fund_id <> v.fund_id
+      JOIN fond_investissements f2 ON f2.id = p2.fund_id AND f2.pays = 'MAROC'
+     WHERE v.${colDate} = '2026-10-26' AND v.${colVal} > 0 AND f.pays = 'MAROC'
+       AND v.fund_id IN (1113, 953, 1092, 967, 975, 949, 963)
+       AND ABS(v.${colVal} - p2.val_prec) / p2.val_prec < 0.01
+     ORDER BY v.fund_id
+     LIMIT 40`);
+  if (perm.length === 0) {
+    console.log('  Aucune correspondance a 1 % pres : les valeurs du 26 octobre ne');
+    console.log('  sont PAS les VL precedentes d autres fonds. L hypothese de');
+    console.log('  reaffectation est ECARTEE — chercher ailleurs.');
+  } else {
+    console.log(`  ${perm.length} correspondance(s) a 1 % pres :`);
+    for (const r of perm) {
+      console.log(`    [${r.recu_par}] ${String(r.nom_recu).slice(0, 22).padEnd(22)}`
+        + ` recoit ${Number(r.val_26).toFixed(2)}`
+        + ` = VL precedente de [${r.valeur_de}] ${String(r.nom_source).slice(0, 22)}`);
+    }
+    console.log('  >> ERREUR D IDENTITE, pas d echelle. Aucune correction par');
+    console.log('     facteur ne convient : diviser une valeur qui appartient a un');
+    console.log('     autre fonds produirait un troisieme chiffre, faux pour les deux.');
+  }
+
+  // ------------------------------------------------------------------
   // 6. LE TAUX PUBLIE CONTRE LE TAUX IMPLICITE — la validation decisive.
   //
   // J'ai deduit des series un taux implicite de ~1 375 en mai 2026, par
