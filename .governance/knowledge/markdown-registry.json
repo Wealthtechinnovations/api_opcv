@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "5ef503053d9da4a43edb11d68748819e3b1b1a1e"
+      "head": "88717aff5b4e999e1785d6b93584cc24f635be1a"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
