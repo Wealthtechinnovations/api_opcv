@@ -4,7 +4,7 @@
 > `scripts/diag/ondemand/`. **Lecture seule** : ces scripts n executent que des SELECT.
 > Ne pas modifier a la main.
 
-Derniere execution : **2026-10-30 17:50 UTC**
+Derniere execution : **2026-10-31 03:51 UTC**
 
 ```
 ########## INTERPRETEUR DES DIAGNOSTICS ##########
@@ -14,7 +14,7 @@ node retenu : /root/.nvm/versions/node/v18.20.8/bin/node (v18.20.8)
 
 ########## scripts/diag/ondemand/diag_1141_hors_perimetre_naira.js ##########
 === POURQUOI 1141 ECHAPPE-T-IL AU CORRECTIF NAIRA ? ===
-Mesure le 2026-10-30 17:42:26 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:43:15 UTC — LECTURE SEULE
 
 ## LA SOURCE
   /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
@@ -75,7 +75,7 @@ Mesure le 2026-10-30 17:42:26 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_1141_rapport_naira_calcul.js ##########
 === LE RAPPORT DU CORRECTIF, CALCULE DATE PAR DATE ===
-Mesure le 2026-10-30 17:42:32 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:43:20 UTC — LECTURE SEULE
 
 Source : 41626 lignes | colonne vl_price_ngn : presente
 
@@ -132,7 +132,7 @@ Source : 41626 lignes | colonne vl_price_ngn : presente
 
 ########## scripts/diag/ondemand/diag_backlog_confronte.js ##########
 === LE BACKLOG DU 2026-08-12, CONFRONTE A LA PRODUCTION ===
-Mesure le 2026-10-30 17:42:36 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:43:25 UTC — LECTURE SEULE
 Verdict par les chiffres du jour, pas par la prose d aout.
 
 ## P1-02 — fonds 2825, YTD 239,20 % sur historique troue
@@ -176,7 +176,7 @@ Verdict par les chiffres du jour, pas par la prose d aout.
 
 ## LA PREMISSE DE LA SECTION 4 DU BACKLOG
      Le backlog affirme : « le vrai blocage de D2/D3/D5 est l acces MCP/DB ».
-     Ce script vient de lire 1053932 lignes de valorisations sur la base de
+     Ce script vient de lire 1054387 lignes de valorisations sur la base de
      PRODUCTION. L acces en lecture existe, par le canal a la demande.
      → PREMISSE PERIMEE. D2 (CEMAC), D3 (fonds dormants) et D5 (build) ne
        sont plus bloques par l acces. Corriger cette ligne du backlog, et
@@ -186,16 +186,16 @@ Verdict par les chiffres du jour, pas par la prose d aout.
 
 ########## scripts/diag/ondemand/diag_benchmark_fraicheur.js ##########
 === FRAICHEUR DU BENCHMARK ET VITALITE DE LA SOURCE NIGERIANE ===
-Mesure le 2026-10-30 17:42:38 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:43:27 UTC — LECTURE SEULE
 
 ## A. Derniere VL vs derniere VL portant un benchmark
 
   pays       derniere VL   dernier benchmark   retard du benchmark
   ---------- ------------  -----------------   -------------------
   CEMAC      2024-12-12    ?                   JAMAIS AUCUN
-  MAROC      2026-10-28    2026-10-27          1 j
+  MAROC      2026-10-29    2026-10-28          1 j
   NIGERIA    2026-10-09    2026-10-09          0 j
-  TUNISIE    2026-10-29    2026-10-29          0 j
+  TUNISIE    2026-10-30    2026-10-30          0 j
   UEMOA      2026-10-28    2026-10-28          0 j
 
 ## B. Le niveau du benchmark varie-t-il ? (90 derniers jours)
@@ -216,33 +216,32 @@ Mesure le 2026-10-30 17:42:38 UTC — LECTURE SEULE
   Rattachement reel des VL a un indice :
     libelle porte par la VL              VL        derniere VL
     -----------------------------------  --------  -----------
-    MASI                                 561196    2026-10-27
-    Tunindex                             313353    2026-10-29
-    (aucun)                              73633     2026-10-28
+    MASI                                 561525    2026-10-28
+    Tunindex                             313479    2026-10-30
+    (aucun)                              73617     2026-10-29
     NSE All Share                        54147     2026-10-09
-    BRVM Composite                       45359     2026-10-27
+    BRVM Composite                       45375     2026-10-28
     Sovereign_bond_index                 6243      2018-02-20
     BRVM Composite (BRVMCI)              1         2023-02-27
 
   indice                          derniere date     valeur          age     lignes/30j   total
   ------------------------------  --------------    ------------    -----   ----------   -----
-  MASI                            2026-10-29        16801.43        2 j     22           6954
-  Tunindex                        2026-10-29        18458.24        2 j     21           6990
-  BRVM Composite                  2026-10-29        528.25          2 j     22           6968
-  NSE All Share                   2026-10-28        252882.78       3 j     20           6993
+  MASI                            2026-10-30        16537.91        1 j     22           6955
+  Tunindex                        2026-10-30        18622.76        1 j     21           6991
+  NSE All Share                   2026-10-29        254083.02       2 j     20           6994
+  BRVM Composite                  2026-10-29        528.25          2 j     21           6968
   MONIA                           2026-05-14        2.20            170 j   0            1000
   masi_all_shares                 2024-10-28        14211.68        733 j   0            5689
-  Sovereign_bond_index            2024-10-25        170.66          736 j   0            243
   Indice_monetaire_maroc          2024-10-25        2.70            736 j   0            231
+  Sovereign_bond_index            2024-10-25        170.66          736 j   0            243
   S&P Tunisia Sovereign Bond Ind  2024-03-01        161.79          974 j   0            2556
-  S&P Morocco Sovereign Bond Ind  2023-11-17        157.06          1079 j   0            2609
   INDICE MONETAIRE MAROC          2023-11-17        2.90            1079 j   0            971
+  S&P Morocco Sovereign Bond Ind  2023-11-17        157.06          1079 j   0            2609
 
 ## D. Maroc — a quelle semaine l ecriture du benchmark a-t-elle cesse ?
 
   semaine du    VL      avec benchmark   couverture
   ----------    -----   --------------   ----------
-  2026-06-26    624     624              100.0 %
   2026-06-29    1913    1913             100.0 %
   2026-07-06    1896    1896             100.0 %
   2026-07-13    1900    1900             100.0 %
@@ -260,7 +259,7 @@ Mesure le 2026-10-30 17:42:38 UTC — LECTURE SEULE
   2026-10-05    1920    1920             100.0 %
   2026-10-12    1924    1924             100.0 %
   2026-10-19    1941    1941             100.0 %
-  2026-10-26    1005    676              67.3 %
+  2026-10-26    1334    1005             75.3 %
 
 ## E. Nigeria — la SEC publie-t-elle plus recent que notre base ?
 
@@ -297,7 +296,7 @@ Mesure le 2026-10-30 17:42:38 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_cas_isoles.js ##########
 
 === CAS ISOLES — ruptures hors defaut de devise SEC ===
-Mesure le 2026-10-30 17:42:52 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:43:41 UTC — LECTURE SEULE
 
 ## A. Fonds dont la rupture n est pas un taux de change
 
@@ -382,13 +381,13 @@ Mesure le 2026-10-30 17:42:52 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_classement_index_plan.js ##########
 === L0.b — PLAN D EXECUTION DU CLASSEMENT LOCAL, ET CONTENU REEL DU CRON ===
-Mesure le 2026-10-30 17:43:56 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:44:45 UTC — LECTURE SEULE
 
 ## 1. Index existants sur `performences`
-  PRIMARY                            (id) [UNIQUE] cardinalite ≈ 87153
-  idx_perf_fond_id                   (fond_id) cardinalite ≈ 3112
-  idx_perf_code_isin                 (code_ISIN) cardinalite ≈ 1708
-  idx_perf_date                      (date) cardinalite ≈ 4150
+  PRIMARY                            (id) [UNIQUE] cardinalite ≈ 87608
+  idx_perf_fond_id                   (fond_id) cardinalite ≈ 3128
+  idx_perf_code_isin                 (code_ISIN) cardinalite ≈ 1684
+  idx_perf_date                      (date) cardinalite ≈ 3982
   idx_perf_nat_fond_date             (categorie_nationale, fond_id, date) cardinalite ≈ 70
   idx_perf_reg_fond_date             (categorie_fundafrica_regionale, fond_id, date) cardinalite ≈ 16
   idx_perf_glo_fond_date             (categorie_fundafrica_globale, fond_id, date) cardinalite ≈ 8
@@ -396,28 +395,28 @@ Mesure le 2026-10-30 17:43:56 UTC — LECTURE SEULE
   → L6 n a de sens que si cette reponse est NON.
 
 ## 2. Taille de `performences`
-  ≈ 87153 lignes | donnees 121.8 Mo | index 22.1 Mo | ratio index/donnees 0.18
+  ≈ 87608 lignes | donnees 121.8 Mo | index 22.1 Mo | ratio index/donnees 0.18
 
 ## 3. Cinq plus grosses categories nationales (selectivite)
-  OBLIGATIONS MAROC                           34951 lignes |  300 fonds | 40.1 % de la table
-  DIVERSIFIE MAROC                            15695 lignes |  145 fonds | 18.0 % de la table
-  ACTIONS MAROC                               15376 lignes |  124 fonds | 17.6 % de la table
-  MONETAIRE MAROC                              7776 lignes |   71 fonds | 8.9 % de la table
+  OBLIGATIONS MAROC                           35103 lignes |  300 fonds | 40.1 % de la table
+  DIVERSIFIE MAROC                            15750 lignes |  145 fonds | 18.0 % de la table
+  ACTIONS MAROC                               15420 lignes |  124 fonds | 17.6 % de la table
+  MONETAIRE MAROC                              7847 lignes |   71 fonds | 9.0 % de la table
   OBLIGATIONS NIGERIA                          3436 lignes |   87 fonds | 3.9 % de la table
 
 ## 4. Plan et duree de la sous-requete reelle (ranking.service.js:87-100)
-  OBLIGATIONS MAROC                  type=ref    key=idx_perf_nat_fond_date rows=  43576 extra="Using where; Using index"
-                                     cout=? | 22 ms | 300 lignes rendues
-  DIVERSIFIE MAROC                   type=ref    key=idx_perf_nat_fond_date rows=  31960 extra="Using where; Using index"
-                                     cout=? | 8 ms | 145 lignes rendues
-  ACTIONS MAROC                      type=ref    key=idx_perf_nat_fond_date rows=  32912 extra="Using where; Using index"
+  OBLIGATIONS MAROC                  type=ref    key=idx_perf_nat_fond_date rows=  43804 extra="Using where; Using index"
+                                     cout=? | 19 ms | 300 lignes rendues
+  DIVERSIFIE MAROC                   type=ref    key=idx_perf_nat_fond_date rows=  31988 extra="Using where; Using index"
+                                     cout=? | 9 ms | 145 lignes rendues
+  ACTIONS MAROC                      type=ref    key=idx_perf_nat_fond_date rows=  33000 extra="Using where; Using index"
                                      cout=? | 8 ms | 124 lignes rendues
-  MONETAIRE MAROC                    type=ref    key=idx_perf_nat_fond_date rows=  16238 extra="Using where; Using index"
+  MONETAIRE MAROC                    type=ref    key=idx_perf_nat_fond_date rows=  16322 extra="Using where; Using index"
                                      cout=? | 4 ms | 71 lignes rendues
   OBLIGATIONS NIGERIA                type=ref    key=idx_perf_nat_fond_date rows=   6870 extra="Using where; Using index"
                                      cout=? | 3 ms | 87 lignes rendues
   moyenne : 9 ms par sous-requete
-  → projection : 1 245 fonds x 3 niveaux x 9 ms ≈ 0.6 min de SQL seul — a comparer au --max-time du cron ci-dessous.
+  → projection : 1 245 fonds x 3 niveaux x 9 ms ≈ 0.5 min de SQL seul — a comparer au --max-time du cron ci-dessous.
 
 ## 5. Fonds actifs sans categorie (perimetre de la garde L7)
   sur 1261 fonds actifs : categorie_national nulle 8 | fundafrica_regionale nulle 59 | fundafrica_globale nulle 59
@@ -467,16 +466,16 @@ Mesure le 2026-10-30 17:43:56 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_classements.js ##########
 
 === FRAICHEUR DES CLASSEMENTS ET DES PERFORMANCES ===
-Mesure le 2026-10-30 17:43:56 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:44:45 UTC — LECTURE SEULE
 
 ## A. Tables de classement
 
-  classementfonds             3651 lignes — updated_at max =  hu Oct 29 2026 21: (0.9 j)
-  classementfonds_eurs        2868 lignes — updated_at max =  hu Oct 29 2026 22: (0.8 j)
-  classementfonds_usds        2876 lignes — updated_at max =  hu Oct 29 2026 22: (0.8 j)
-  performences               92148 lignes — updated_at max = aucune (?)
-  performences_eurs          48376 lignes — date max =  hu Oct 29 2026 00: (1.7 j)
-  performences_usds          48609 lignes — date max =  hu Oct 29 2026 00: (1.7 j)
+  classementfonds             3651 lignes — updated_at max = Fri Oct 30 2026 21: (0.3 j)
+  classementfonds_eurs        2858 lignes — updated_at max = Fri Oct 30 2026 22: (0.2 j)
+  classementfonds_usds        2865 lignes — updated_at max = Fri Oct 30 2026 22: (0.2 j)
+  performences               92603 lignes — updated_at max = aucune (?)
+  performences_eurs          48831 lignes — date max = Fri Oct 30 2026 00: (1.2 j)
+  performences_usds          49064 lignes — date max = Fri Oct 30 2026 00: (1.2 j)
 
 ## B. Retard des performances par pays
 
@@ -504,7 +503,7 @@ Mesure le 2026-10-30 17:43:56 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_classement_tri_texte.js ##########
 === L0.d — LE TRI DU COMPARATEUR EST-IL LA CAUSE DU « DIVERGE » ? ===
-Mesure le 2026-10-30 17:44:05 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:44:54 UTC — LECTURE SEULE
 
 ## 0. Type REEL des colonnes en cause (la base fait foi, pas le modele)
   classementfonds.rank1erJanvier         varchar(255)
@@ -521,21 +520,21 @@ Mesure le 2026-10-30 17:44:05 UTC — LECTURE SEULE
 
 ########## OBLIGATIONS MAROC — 300 fonds classes
   type JS du rang stocke : string | egalite STRICTE (===) : A 0, B 0, C 0 ← le rang est une chaine : tout === contre un nombre est faux
-    A. ORDER BY ytd DESC (ancien comparateur)      52/300  exacts ( 17.3 %) | rho  0.646 | ecart max  166
+    A. ORDER BY ytd DESC (ancien comparateur)      50/300  exacts ( 16.7 %) | rho  0.645 | ecart max  166
     B. ORDER BY CAST(ytd AS DECIMAL) DESC         300/300  exacts (100.0 %) | rho  1.000 | ecart max    0
     C. rankFundInList — code de la production     300/300  exacts (100.0 %) | rho  1.000 | ecart max    0
   → VERDICT : les rangs stockes correspondent EXACTEMENT a l ordre que la production calcule. Le « DIVERGE » venait du TRI du comparateur, pas de la base.
 
 ########## DIVERSIFIE MAROC — 145 fonds classes
   type JS du rang stocke : string | egalite STRICTE (===) : A 0, B 0, C 0 ← le rang est une chaine : tout === contre un nombre est faux
-    A. ORDER BY ytd DESC (ancien comparateur)      10/145  exacts (  6.9 %) | rho  0.199 | ecart max  121
+    A. ORDER BY ytd DESC (ancien comparateur)      11/145  exacts (  7.6 %) | rho  0.220 | ecart max  121
     B. ORDER BY CAST(ytd AS DECIMAL) DESC         145/145  exacts (100.0 %) | rho  1.000 | ecart max    0
     C. rankFundInList — code de la production     145/145  exacts (100.0 %) | rho  1.000 | ecart max    0
   → VERDICT : les rangs stockes correspondent EXACTEMENT a l ordre que la production calcule. Le « DIVERGE » venait du TRI du comparateur, pas de la base.
 
 ########## ACTIONS MAROC — 124 fonds classes
   type JS du rang stocke : string | egalite STRICTE (===) : A 0, B 0, C 0 ← le rang est une chaine : tout === contre un nombre est faux
-    A. ORDER BY ytd DESC (ancien comparateur)      14/124  exacts ( 11.3 %) | rho  0.249 | ecart max  110
+    A. ORDER BY ytd DESC (ancien comparateur)      14/124  exacts ( 11.3 %) | rho  0.282 | ecart max  110
     B. ORDER BY CAST(ytd AS DECIMAL) DESC         124/124  exacts (100.0 %) | rho  1.000 | ecart max    0
     C. rankFundInList — code de la production     124/124  exacts (100.0 %) | rho  1.000 | ecart max    0
   → VERDICT : les rangs stockes correspondent EXACTEMENT a l ordre que la production calcule. Le « DIVERGE » venait du TRI du comparateur, pas de la base.
@@ -558,7 +557,7 @@ Mesure le 2026-10-30 17:44:05 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_classement_vs_perf.js ##########
 === L0.c — RANGS STOCKES CONTRE PERFORMANCES STOCKEES : QUATRE HYPOTHESES ===
-Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:45:13 UTC — LECTURE SEULE
 
 ## 0. Volumetrie de `classementfonds`
   type 1 (national) : 1249 lignes, 1249 fonds
@@ -569,16 +568,16 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
 ########## OBLIGATIONS MAROC — 300 fonds classes
   H4 perimetre : 300 fonds cote performances, 300 cote classement | absents du classement : 0 | classes mais hors performances : 0
   H1 fraicheur : total stocke le plus frequent = 300 (sur 300 lignes) | total recalcule aujourd hui = 300 | CONCORDE → la table n est pas perimee sur ce point
-               dates des performances lues : 6 distinctes, de Fri Oct 23 a Wed Oct 28
+               dates des performances lues : 6 distinctes, de Fri Oct 23 a Thu Oct 29
   H2 champ :
     ytd           300/300  exacts (100.0 %) | rho = 1.000
-    ytdm           14/300  exacts (  4.7 %) | rho = 0.948
-    perfveille      6/300  exacts (  2.0 %) | rho = 0.617
-    perfveillem     0/300  exacts (  0.0 %) | rho = 0.415
-    perf3m          9/300  exacts (  3.0 %) | rho = 0.860
-    perf6m         17/300  exacts (  5.7 %) | rho = 0.870
+    ytdm           15/300  exacts (  5.0 %) | rho = 0.948
+    perfveille      6/300  exacts (  2.0 %) | rho = 0.360
+    perfveillem     0/300  exacts (  0.0 %) | rho = 0.419
+    perf3m         14/300  exacts (  4.7 %) | rho = 0.863
+    perf6m         15/300  exacts (  5.0 %) | rho = 0.867
     perf1an        19/292  exacts (  6.5 %) | rho = 0.986
-    perf3ans        6/274  exacts (  2.2 %) | rho = -0.045
+    perf3ans        7/274  exacts (  2.6 %) | rho = -0.047
     → meilleur candidat : ytd (rho 1.000, 100.0 % exacts) — c est bien le champ attendu, H2 ecartee
   H3 ex aequo sur ytd : 0/300 fonds dans 0 paquet(s), plus gros paquet = 0 fonds
                ecart de rang max = 0 | 0/300 ecarts STRICTEMENT superieurs au plus gros paquet → H3 suffit a tout expliquer : le correctif est le departage deterministe (L7), pas la reconstruction
@@ -586,16 +585,16 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
 ########## DIVERSIFIE MAROC — 145 fonds classes
   H4 perimetre : 145 fonds cote performances, 145 cote classement | absents du classement : 0 | classes mais hors performances : 0
   H1 fraicheur : total stocke le plus frequent = 145 (sur 145 lignes) | total recalcule aujourd hui = 145 | CONCORDE → la table n est pas perimee sur ce point
-               dates des performances lues : 9 distinctes, de Fri Apr 12 a Wed Oct 28
+               dates des performances lues : 9 distinctes, de Fri Apr 12 a Thu Oct 29
   H2 champ :
     ytd           145/145  exacts (100.0 %) | rho = 1.000
-    ytdm           14/145  exacts (  9.7 %) | rho = 0.957
-    perfveille      6/145  exacts (  4.1 %) | rho = 0.220
-    perfveillem     0/145  exacts (  0.0 %) | rho = -0.075
-    perf3m          5/145  exacts (  3.4 %) | rho = 0.707
-    perf6m         13/145  exacts (  9.0 %) | rho = 0.585
-    perf1an        11/137  exacts (  8.0 %) | rho = 0.948
-    perf3ans        4/130  exacts (  3.1 %) | rho = 0.058
+    ytdm           12/145  exacts (  8.3 %) | rho = 0.957
+    perfveille      9/145  exacts (  6.2 %) | rho = 0.133
+    perfveillem     1/145  exacts (  0.7 %) | rho = -0.069
+    perf3m          6/145  exacts (  4.1 %) | rho = 0.702
+    perf6m         13/145  exacts (  9.0 %) | rho = 0.588
+    perf1an        13/137  exacts (  9.5 %) | rho = 0.945
+    perf3ans        2/130  exacts (  1.5 %) | rho = 0.057
     → meilleur candidat : ytd (rho 1.000, 100.0 % exacts) — c est bien le champ attendu, H2 ecartee
   H3 ex aequo sur ytd : 2/145 fonds dans 1 paquet(s), plus gros paquet = 2 fonds
                ecart de rang max = 0 | 0/145 ecarts STRICTEMENT superieurs au plus gros paquet → H3 suffit a tout expliquer : le correctif est le departage deterministe (L7), pas la reconstruction
@@ -603,16 +602,16 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
 ########## ACTIONS MAROC — 124 fonds classes
   H4 perimetre : 124 fonds cote performances, 124 cote classement | absents du classement : 0 | classes mais hors performances : 0
   H1 fraicheur : total stocke le plus frequent = 124 (sur 124 lignes) | total recalcule aujourd hui = 124 | CONCORDE → la table n est pas perimee sur ce point
-               dates des performances lues : 4 distinctes, de Fri Oct 23 a Wed Oct 28
+               dates des performances lues : 4 distinctes, de Fri Oct 23 a Thu Oct 29
   H2 champ :
     ytd           124/124  exacts (100.0 %) | rho = 1.000
-    ytdm           28/124  exacts ( 22.6 %) | rho = 0.993
-    perfveille      3/124  exacts (  2.4 %) | rho = -0.098
-    perfveillem     3/124  exacts (  2.4 %) | rho = -0.229
-    perf3m          4/124  exacts (  3.2 %) | rho = 0.365
-    perf6m          9/124  exacts (  7.3 %) | rho = 0.511
-    perf1an         6/117  exacts (  5.1 %) | rho = 0.951
-    perf3ans        2/111  exacts (  1.8 %) | rho = 0.210
+    ytdm           17/124  exacts ( 13.7 %) | rho = 0.991
+    perfveille      2/124  exacts (  1.6 %) | rho = -0.062
+    perfveillem     4/124  exacts (  3.2 %) | rho = -0.206
+    perf3m          4/124  exacts (  3.2 %) | rho = 0.355
+    perf6m         10/124  exacts (  8.1 %) | rho = 0.521
+    perf1an        10/117  exacts (  8.5 %) | rho = 0.945
+    perf3ans        1/111  exacts (  0.9 %) | rho = 0.201
     → meilleur candidat : ytd (rho 1.000, 100.0 % exacts) — c est bien le champ attendu, H2 ecartee
   H3 ex aequo sur ytd : 0/124 fonds dans 0 paquet(s), plus gros paquet = 0 fonds
                ecart de rang max = 0 | 0/124 ecarts STRICTEMENT superieurs au plus gros paquet → H3 suffit a tout expliquer : le correctif est le departage deterministe (L7), pas la reconstruction
@@ -637,16 +636,16 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
 ########## MONETAIRE MAROC — 71 fonds classes
   H4 perimetre : 71 fonds cote performances, 71 cote classement | absents du classement : 0 | classes mais hors performances : 0
   H1 fraicheur : total stocke le plus frequent = 71 (sur 71 lignes) | total recalcule aujourd hui = 71 | CONCORDE → la table n est pas perimee sur ce point
-               dates des performances lues : 1 distinctes, de Wed Oct 28 a Wed Oct 28
+               dates des performances lues : 1 distinctes, de Thu Oct 29 a Thu Oct 29
   H2 champ :
     ytd            71/71   exacts (100.0 %) | rho = 1.000
     ytdm           60/71   exacts ( 84.5 %) | rho = 1.000
-    perfveille      3/71   exacts (  4.2 %) | rho = 0.109
+    perfveille      0/71   exacts (  0.0 %) | rho = 0.059
     perfveillem     2/71   exacts (  2.8 %) | rho = 0.174
-    perf3m          1/71   exacts (  1.4 %) | rho = 0.240
-    perf6m         26/71   exacts ( 36.6 %) | rho = 0.919
-    perf1an        33/69   exacts ( 47.8 %) | rho = 0.978
-    perf3ans        4/67   exacts (  6.0 %) | rho = 0.710
+    perf3m          1/71   exacts (  1.4 %) | rho = 0.236
+    perf6m         25/71   exacts ( 35.2 %) | rho = 0.915
+    perf1an        33/69   exacts ( 47.8 %) | rho = 0.981
+    perf3ans        4/67   exacts (  6.0 %) | rho = 0.709
     → meilleur candidat : ytd (rho 1.000, 100.0 % exacts) — c est bien le champ attendu, H2 ecartee
   H3 ex aequo sur ytd : 0/71 fonds dans 0 paquet(s), plus gros paquet = 0 fonds
                ecart de rang max = 0 | 0/71 ecarts STRICTEMENT superieurs au plus gros paquet → H3 suffit a tout expliquer : le correctif est le departage deterministe (L7), pas la reconstruction
@@ -659,13 +658,13 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
 
   cron                   cadence              journal le plus recent                  age  verdict
   ---------------------- -------------------- ---------------------------------- --------  ------------------------
-  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20261026.log      4.3 j  ECHEC — 1 erreur(s)
-  cron_daily_update      lun-ven 20:00        africafunds_daily_20261029.log       20.3 h  OK
-  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                     19.6 h  ECHEC — 2 erreur(s)
-  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                     22.7 h  OK
-  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                        22.2 h  OK
-  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log               23.2 h  OK  (reserve : Echecs scraping: 17)
-  cron_health_check      tous les j 22:00     africafunds_health_20261029.log      19.7 h  ECHEC — 2 probleme(s)
+  cron_nigeria_weekly    lundi 10:00          africafunds_nigeria_20261026.log      4.7 j  ECHEC — 1 erreur(s)
+  cron_daily_update      lun-ven 20:00        africafunds_daily_20261030.log        5.9 h  OK
+  cron_daily_eur_usd     tous les j 21:30     cron_eur_usd.log                      5.5 h  ECHEC — 2 erreur(s)
+  cron_tunisie_daily     lun-ven 19:00        cron_tunisie.log                      8.7 h  OK
+  cron_brvm_daily        lun-ven 19:30        cron_brvm.log                         8.3 h  OK
+  cron_indices_daily     lun-ven 18:30        cron_indices_daily.log                9.2 h  OK  (reserve : Echecs scraping: 18)
+  cron_health_check      tous les j 22:00     africafunds_health_20261030.log       5.8 h  ECHEC — 2 probleme(s)
   sync_production        toutes les heures    sync_production.log                   0.7 h  aucun marqueur de fin
 
 
@@ -697,26 +696,26 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
   | 000
   | [2b/3] ERREUR (HTTP 000)
   | --- [3/3] Verification ---
-  |   performences_eurs        48376 lignes / 1253 fonds
-  |   performences_usds        48609 lignes / 1253 fonds
-  |   classementfonds_eurs     2868 lignes / 1124 fonds
-  |   classementfonds_usds     2876 lignes / 1124 fonds
-  | CRON EUR/USD TERMINE AVEC 2 ERREUR(S) — 2026-10-29 22:08:19
+  |   performences_eurs        48831 lignes / 1253 fonds
+  |   performences_usds        49064 lignes / 1253 fonds
+  |   classementfonds_eurs     2858 lignes / 1122 fonds
+  |   classementfonds_usds     2865 lignes / 1121 fonds
+  | CRON EUR/USD TERMINE AVEC 2 ERREUR(S) — 2026-10-30 22:16:15
 
---- cron_health_check (ECHEC — 2 probleme(s)) — /var/log/africafunds_health_20261029.log
-  |   eur_usd      /var/log/cron_eur_usd.log — 185 Ko, modifie il y a 0h
+--- cron_health_check (ECHEC — 2 probleme(s)) — /var/log/africafunds_health_20261030.log
+  |   eur_usd      /var/log/cron_eur_usd.log — 186 Ko, modifie il y a 0h
   |   nigeria      pas attendu aujourd'hui (pas lundi)
   | === RESUME ===
   | STATUT: 2 PROBLEME(S) DETECTE(S)
-  |   [!] NIGERIA: derniere VL il y a 20 jours (budget 14j)
-  |   [!] CEMAC: derniere VL il y a 686 jours (budget 400j)
+  |   [!] NIGERIA: derniere VL il y a 21 jours (budget 14j)
+  |   [!] CEMAC: derniere VL il y a 687 jours (budget 400j)
   |   [OK] TUNISIE: VL a jour
   |   [OK] MAROC: VL a jour
   |   [OK] UEMOA: VL a jour
   |   [OK] Classement local peuple
   |   [OK] Performances a jour sur 99.6 % des fonds
   |   [OK] Forex a jour
-  | === HEALTH CHECK TERMINE Thu Oct 29 10:00:03 PM UTC 2026 ===
+  | === HEALTH CHECK TERMINE Fri Oct 30 10:00:03 PM UTC 2026 ===
   | ========================================
 
 --- sync_production (aucun marqueur de fin) — /var/log/sync_production.log
@@ -724,13 +723,13 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
   | ============================================
-  | SNAPSHOT PRODUCTION — 2026-10-30 17:00:01
+  | SNAPSHOT PRODUCTION — 2026-10-31 03:00:01
   | ============================================
   | --- Generation du snapshot base de donnees ---
-  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44945 octets)
+  |   -> Snapshot runtime genere: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json (44972 octets)
   |   -> Git non modifie: aucun add/commit/push
   | ============================================
-  | SNAPSHOT TERMINE — 2026-10-30 17:00:18
+  | SNAPSHOT TERMINE — 2026-10-31 03:00:19
   | ============================================
   | Etat production runtime: /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   | Le depot Git reste une source de code canonique, pas une sortie de cron.
@@ -744,14 +743,14 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
 
 ============================================================
  DEVISE EMISE PAR L EXTRACTEUR SEC — MESURE
- Genere le 2026-10-30T17:44:24.861Z — LECTURE SEULE
+ Genere le 2026-10-31T03:45:14.354Z — LECTURE SEULE
 ============================================================
 
 ## A. Etat du CSV
 
    fichier   : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_latest.csv
    taille    : 11.40 Mo
-   modifie   : 2026-10-26T10:00:40.048Z (il y a 103.7 h)
+   modifie   : 2026-10-26T10:00:40.048Z (il y a 113.7 h)
    lignes    : 9084
    colonnes  : 59
 
@@ -853,7 +852,7 @@ Mesure le 2026-10-30 17:44:24 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_detachees_sont_des_indices.js ##########
 === LES VL DETACHEES SONT-ELLES DES INDICES, ET NON DES FONDS ? ===
-Mesure le 2026-10-30 17:44:25 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:45:15 UTC — LECTURE SEULE
 
 ## 1. LES 17 IDENTIFIANTS, ET LEUR REGULARITE
    fund_id      VL  periode
@@ -904,7 +903,7 @@ Mesure le 2026-10-30 17:44:25 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_devise_declaree_nigeria.js ##########
 
 === DEVISE DECLAREE vs CONTENU REEL DE `value` — NIGERIA ===
-Mesure le 2026-10-30 17:44:26 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:45:16 UTC — LECTURE SEULE
 
 Fonds Nigeria examines : 337
   etiquette CONFORME au contenu : 122
@@ -1068,7 +1067,7 @@ Fonds Nigeria examines : 337
 
 ########## scripts/diag/ondemand/diag_doublons_et_orphelines_forme.js ##########
 === DOUBLONS ET ORPHELINES : DEFAUTS OU ARTEFACTS ? ===
-Mesure le 2026-10-30 17:44:32 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:45:21 UTC — LECTURE SEULE
 
 ## A. DOUBLONS DE VL — ou sont-ils, et portent-ils la meme valeur ?
   1890 paire(s) dupliquee(s) | 16125 ligne(s) en surnombre | pire paire : 14 exemplaires
@@ -1102,13 +1101,13 @@ Mesure le 2026-10-30 17:44:32 UTC — LECTURE SEULE
   Si oui, mon controle mesure un calendrier et non une corruption.
 
   pays       lignes perf  orphelines    taux  dates VL/an  rythme
-  MAROC            74775       52177  69.8 %          242  quotidien
+  MAROC            75104       52177  69.5 %          242  quotidien
   NIGERIA          10687        8072  75.5 %           50  hebdomadaire
-  UEMOA             2062        1151  55.8 %          257  quotidien
-  TUNISIE           4093         652  15.9 %          218  quotidien
+  UEMOA             2062        1151  55.8 %          256  quotidien
+  TUNISIE           4219         652  15.5 %          218  quotidien
   CEMAC              531         425  80.0 %            ?  ?
 
-  taux moyen, pays a VL quotidiennes   : 66.7 %
+  taux moyen, pays a VL quotidiennes   : 66.3 %
   taux moyen, pays a VL hebdomadaires  : 75.5 %
   → pas d artefact de calendrier : les taux ne suivent pas la frequence.
     Les orphelines sont alors un defaut reel, a instruire.
@@ -1122,12 +1121,12 @@ Mesure le 2026-10-30 17:44:32 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_doublons_vl_dryrun.js ##########
 === PHASE SECHE DE fix_doublons_vl.js ===
-Appel le 2026-10-30 17:44:57 UTC
+Appel le 2026-10-31 03:45:47 UTC
 Invoque SANS --execute : aucune ecriture possible.
 
 === DOUBLONS DE VL PORTANT ZERO ===
 Mode : DRY-RUN (aucune ecriture)
-Mesure le 2026-10-30 17:44:57 UTC
+Mesure le 2026-10-31 03:45:47 UTC
 
 0 paire(s) dupliquee(s), fonds reels uniquement.
 Rien a faire.
@@ -1138,7 +1137,7 @@ Rien a faire.
 ########## scripts/diag/ondemand/diag_ecart_csv_base.js ##########
 
 === ECART ENTRE LE FICHIER SEC RELU ET LA BASE ===
-Mesure le 2026-10-30 17:44:57 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:45:47 UTC — LECTURE SEULE
 CSV : /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/sec_ng_replay.csv
 
 Lignes CSV : 41626
@@ -1235,7 +1234,7 @@ VL Nigeria en base : 77568
 
 ########## scripts/diag/ondemand/diag_echelle_devise_nigeria.js ##########
 === ECHELLE DE DEVISE DES VL NIGERIANNES — LECTURE SEULE ===
-horodatage : 2026-10-30T17:45:03.946Z
+horodatage : 2026-10-31T03:45:54.052Z
 Aucune ecriture. SELECT uniquement.
 
 colonnes retenues : valorisations.date, valorisations.value, fond_investissements.dev_libelle
@@ -1357,17 +1356,17 @@ ECHEC DU DIAGNOSTIC : You have an error in your SQL syntax; check the manual tha
   cron_health_check.sh       statut-commande:oui  curl-non-melange:oui  sortie-non-nulle:oui
 
 [7bis] Version du code REELLEMENT deployee
-  HEAD : d7985072e — chore(diag): etat de production verifie 2026-10-30 17:41 UTC [skip ci]
+  HEAD : fd3f1905f — diag(sitemap): mon hypothese du « figement a la construction » est REFUTEE
   present          correctif C8 (lots de performances non menteurs)
   present          budgets de fraicheur en source unique
   present          health check corrige
   present          correctif #73 (present, NON execute)
 
   Process PM2 :
-    api-monolith             online     redemarrages  174  depuis 16.6 h
-    fundafrique-frontend     online     redemarrages   50  depuis 23.4 h
-    worker-recalculation     online     redemarrages    3  depuis 1167.5 h
-    worker-data-import       online     redemarrages    3  depuis 1167.5 h
+    api-monolith             online     redemarrages  174  depuis 26.6 h
+    fundafrique-frontend     online     redemarrages   50  depuis 33.5 h
+    worker-recalculation     online     redemarrages    3  depuis 1177.6 h
+    worker-data-import       online     redemarrages    3  depuis 1177.6 h
 
 [8] Entrees crontab actives
   0 10 * * 1 /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/scripts/cron/cron_nigeria_weekly.sh >> /var/log/africafunds_nigeria.log 2>&1
@@ -1383,7 +1382,7 @@ ECHEC DU DIAGNOSTIC : You have an error in your SQL syntax; check the manual tha
 
 ########## scripts/diag/ondemand/diag_index_config_divergence.js ##########
 === INDEX_CONFIG EN TROIS COPIES : DETTE, OU DONNEE FAUSSE ? ===
-Mesure le 2026-10-30 17:45:05 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:45:55 UTC — LECTURE SEULE
 
 ## 0. TABLES D INDICES : indices, indice_categorie, indice_references, indice_comparaison, ref_indices_fundafrica, type_indice
   table retenue : `indice_references` | colonne d identite : `nom_indice`
@@ -1394,10 +1393,10 @@ Mesure le 2026-10-30 17:45:05 UTC — LECTURE SEULE
 
 ## 1. `Tunindex` ET `TUNINDEX` COEXISTENT-ILS EN BASE ?
   valeur exacte (casse respectee)       lignes  derniere
-  NSE All Share                           6993  2026-10-28
-  Tunindex                                6990  2026-10-29
+  NSE All Share                           6994  2026-10-29
+  Tunindex                                6991  2026-10-30
   BRVM Composite                          6968  2026-10-29
-  MASI                                    6954  2026-10-29
+  MASI                                    6955  2026-10-30
   MONIA                                   1000  2026-05-14
 
   → chaque indice n existe que sous une seule casse : la divergence des
@@ -1432,7 +1431,7 @@ Mesure le 2026-10-30 17:45:05 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_mariadb_incident_timeline.js ##########
 
 === MARIADB — TIMELINE INCIDENTS RECENTS (LECTURE SEULE) ===
-Mesure le 2026-10-30T17:45:30.884Z
+Mesure le 2026-10-31T03:46:22.409Z
 
 
 --- etat systemd courant ---
@@ -1441,14 +1440,14 @@ Result=success
 NRestarts=0
 ExecMainStartTimestamp=Tue 2026-09-22 06:25:02 UTC
 ExecMainPID=3041009
-MemoryCurrent=4284719104
+MemoryCurrent=4298657792
 ActiveState=active
 SubState=running
 StateChangeTimestamp=Tue 2026-09-22 06:25:02 UTC
 ActiveEnterTimestamp=Tue 2026-09-22 06:25:02 UTC
 
 --- processus mariadbd courant ---
-MARIADB_PROCESS pid=3041009 uptime_s=3324029 rss_kb=4072692 rssanon_kb=4062284 private_dirty_kb=4063440 swap_kb=1928648
+MARIADB_PROCESS pid=3041009 uptime_s=3360081 rss_kb=4072444 rssanon_kb=4062328 private_dirty_kb=4063488 swap_kb=1928664
 
 --- listener TCP 3306 courant ---
 LISTEN 0      80                                       127.0.0.1:3306       0.0.0.0:*    users:(("mariadbd",pid=3041009,fd=19))
@@ -1482,7 +1481,7 @@ SEP21_MARIADB_START_OR_READY_PRESENT=YES
 
 ########## scripts/diag/ondemand/diag_masi_historique_ft.js ##########
 === SERIE HISTORIQUE MASI — ACCES DEPUIS S2 ===
-Mesure le 2026-10-30 17:45:31 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:46:23 UTC — LECTURE SEULE
 
 ## 1. Page tearsheet et extraction de l identifiant interne
   https://markets.ft.com/data/indices/tearsheet/historical?s=MASI:CAS
@@ -1530,7 +1529,7 @@ Mesure le 2026-10-30 17:45:31 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_nigeria_cadence_extraction.js ##########
 === NIGERIA : LA CADENCE D EXTRACTION TIENT-ELLE LE BUDGET ? ===
-Mesure le 2026-10-30 17:45:32 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:46:24 UTC — LECTURE SEULE
 
 ## 1. DELAI PUBLICATION - VALORISATION (releve sur la page d index)
   valorisation  mise en ligne  delai
@@ -1607,7 +1606,7 @@ Mesure le 2026-10-30 17:45:32 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_nigeria_csv_vers_base.js ##########
 === NIGERIA : POURQUOI LE CSV N ARRIVE-T-IL PAS EN BASE ? ===
-Mesure le 2026-10-30 17:45:32 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:46:24 UTC — LECTURE SEULE
 
 ## 1. LA BASE
   78152 VL nigerianes | derniere date : 2026-10-09
@@ -1631,7 +1630,7 @@ Mesure le 2026-10-30 17:45:32 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_nigeria_extraction_amont.js ##########
 === NIGERIA : L EXTRACTION A-T-ELLE RATE QUELQUE CHOSE EN AMONT ? ===
-Mesure le 2026-10-30 17:45:33 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:46:25 UTC — LECTURE SEULE
 
 CSV : 9084 lignes, modifie le 2026-10-26 10:00
 
@@ -1694,7 +1693,7 @@ CSV : 9084 lignes, modifie le 2026-10-26 10:00
 
 ########## scripts/diag/ondemand/diag_nigeria_liens_vus.js ##########
 === LA PAGE D INDEX LIVRE-T-ELLE LE 1537 A NOTRE CODE ? ===
-Mesure le 2026-10-30 17:45:34 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:46:26 UTC — LECTURE SEULE
 Une requete GET sur la page publique que le cron interroge chaque lundi.
 
 ## 1. REPONSE : HTTP 200, 119988 octets
@@ -1745,7 +1744,7 @@ Une requete GET sur la page publique que le cron interroge chaque lundi.
 ########## scripts/diag/ondemand/diag_perf10ans_zero_ou_ancrage.js ##########
 === perf10ans : ZERO ARTEFACT EN BASE, OU ANCRAGE TROP COURT ? ===
 Fonds instruit : 1543
-Mesure le 2026-10-30 17:45:38 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:46:27 UTC — LECTURE SEULE
 
 ## 1. Type REEL des colonnes longues (la base fait foi)
   perf10ans      double
@@ -1754,10 +1753,10 @@ Mesure le 2026-10-30 17:45:38 UTC — LECTURE SEULE
   perf8ans       double
 
 ## 2. Distribution des zeros exacts sur toute la table
-  perf5ans     92148 lignes | NULL    787 | '-'  12672 | zero exact  27199 (29.5 %) | autre  64162
-  perf8ans     92148 lignes | NULL   1178 | '-'  35083 | zero exact  35083 (38.1 %) | autre  55887
-  perf10ans    92148 lignes | NULL   1304 | '-'  41493 | zero exact  41493 (45.0 %) | autre  49351
-  perf10ansm   92148 lignes | NULL  42487 | '-'      0 | zero exact    368 (0.4 %) | autre  49293
+  perf5ans     92603 lignes | NULL    873 | '-'  12672 | zero exact  27199 (29.4 %) | autre  64531
+  perf8ans     92603 lignes | NULL   1318 | '-'  35083 | zero exact  35083 (37.9 %) | autre  56202
+  perf10ans    92603 lignes | NULL   1463 | '-'  41493 | zero exact  41493 (44.8 %) | autre  49647
+  perf10ansm   92603 lignes | NULL  42646 | '-'      0 | zero exact    368 (0.4 %) | autre  49589
   → une part elevee de zeros exacts, surtout si les tirets sont a 0,
     indique une coercition de la chaine '-' vers 0 (sql_mode non strict).
 
@@ -1776,10 +1775,10 @@ Mesure le 2026-10-30 17:45:38 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_perf_colonnes_manquantes.js ##########
 === L0.a — RATIOS MANQUANTS SUR LA LIGNE MAX(date), ET COUT D UN APPEL DE RATIOS ===
-Mesure le 2026-10-30 17:45:47 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:46:36 UTC — LECTURE SEULE
 
 ## 1. Volumetrie de `performences`
-  92148 lignes | 1255 fonds distincts | de NaN-NaN-NaN a 2026-10-29
+  92603 lignes | 1255 fonds distincts | de NaN-NaN-NaN a 2026-10-30
 
 ## 2. Ligne MAX(date) de chaque fonds actif — ratios absents (NULL ou `-`)
    LIGNE DE BASE : apres le rattrapage, ces nombres ne doivent pas augmenter.
@@ -1798,12 +1797,12 @@ Mesure le 2026-10-30 17:45:47 UTC — LECTURE SEULE
 
 ## 4. Temps de reponse de `/api/ratiosnewithdate/3/:fond/:date`
    Ce chiffre seul dicte la duree de L3 : il sera multiplie par le perimetre ci-dessus.
-  fonds   569 (MAROC   ) date=2026-10-23 → HTTP 200 en    204 ms, 1236 octets
-  fonds  1141 (NIGERIA ) date=2026-07-10 → HTTP 200 en    392 ms, 1713 octets
-  fonds  1539 (UEMOA   ) date=2024-11-01 → HTTP 200 en   1055 ms, 2116 octets
-  moyenne : 550 ms sur 3 appel(s) reussi(s)
-  → projection L3 : 24 fonds x 1 appel(s) ≈ 0.00 h
-  → projection L3 : 24 fonds x 3 appel(s) ≈ 0.01 h
+  fonds   569 (MAROC   ) date=2026-10-23 → HTTP 200 en    187 ms, 1236 octets
+  fonds  1141 (NIGERIA ) date=2026-07-10 → HTTP 200 en    680 ms, 1713 octets
+  fonds  1539 (UEMOA   ) date=2024-11-01 → HTTP 200 en   1423 ms, 2116 octets
+  moyenne : 763 ms sur 3 appel(s) reussi(s)
+  → projection L3 : 24 fonds x 1 appel(s) ≈ 0.01 h
+  → projection L3 : 24 fonds x 3 appel(s) ≈ 0.02 h
 
 ## 4bis. Type REEL des colonnes de ratios, et mode SQL
   alpha3an         double         nullable=YES
@@ -1815,21 +1814,21 @@ Mesure le 2026-10-30 17:45:47 UTC — LECTURE SEULE
   table performences : 97 colonnes au total — c est le denominateur du « 0 divergence sur N colonnes » attendu en L1.
   sql_mode : IGNORE_SPACE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
   → mode strict : NON (une ecriture de `-` dans un DOUBLE donnerait 0 — faux ratio valide)
-  volatility3an sur 92148 lignes : 8036 NULL | 11714 exactement 0 | 72398 > 0 | 0 < 0
+  volatility3an sur 92603 lignes : 8095 NULL | 11714 exactement 0 | 72794 > 0 | 0 < 0
   → des zeros exacts existent : a instruire, une volatilite nulle n a pas de sens financier
 
 ## 5. Prerequis de la migration L2 (horodatage des classements)
   DB_SYNC_ALTER  : ABSENTE | vaut 'true' : non
   DB_SYNC        : ABSENTE | vaut 'true' : non
-  classementfonds        ≈ 3629 lignes | donnees 2.0 Mo | index 0.5 Mo
-  classementfonds_eurs   ≈ 2606 lignes | donnees 2.0 Mo | index NaN Mo
-  classementfonds_usds   ≈ 2904 lignes | donnees 2.0 Mo | index NaN Mo
+  classementfonds        ≈ 3690 lignes | donnees 2.0 Mo | index 0.5 Mo
+  classementfonds_eurs   ≈ 2863 lignes | donnees 2.0 Mo | index NaN Mo
+  classementfonds_usds   ≈ 2829 lignes | donnees 2.0 Mo | index NaN Mo
 
 === FIN L0.a — aucune ecriture effectuee ===
 
 ########## scripts/diag/ondemand/diag_perf_locale_equivalence.js ##########
 === PERFORMANCES LOCALES — EQUIVALENCE CALCUL DIRECT / ROUTE API ===
-Mesure le 2026-10-30 17:45:52 UTC — DRY-RUN, AUCUNE ECRITURE
+Mesure le 2026-10-31 03:46:42 UTC — DRY-RUN, AUCUNE ECRITURE
 
 ########## NIGERIA
 Options: pays=NIGERIA, force=false, mode=DRY-RUN (aucune ecriture), limit=10
@@ -1966,7 +1965,7 @@ Termine.
 ########## scripts/diag/ondemand/diag_plan_dollar.js ##########
 
 === OPTION DOLLAR — COUT MESURE AVANT ECRITURE ===
-Mesure le 2026-10-30 17:46:25 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:15 UTC — LECTURE SEULE
 
 Fonds pour lesquels la SEC publie au moins une mesure en dollars : 41
 
@@ -2035,7 +2034,7 @@ Les VL hors de cette periode ne sont pas jugees ici — le rejeu ne les couvre p
 ########## scripts/diag/ondemand/diag_plan_naira.js ##########
 
 === CORRECTION VERS LE NAIRA — CE QUI SERAIT ECRIT ===
-Mesure le 2026-10-30 17:46:30 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:20 UTC — LECTURE SEULE
 
 Lignes CSV portant un prix naira explicite : 40867 sur 41626
 Fenetre couverte par le rejeu : 2022-01-07 -> 2026-08-14
@@ -2138,7 +2137,7 @@ Ruptures d echelle Nigeria encore en base : 140
 ########## scripts/diag/ondemand/diag_plateaux_nigeria.js ##########
 
 === SEGMENTS EN DOLLARS DANS DES SERIES EN NAIRA — NIGERIA ===
-Mesure le 2026-10-30 17:46:36 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:26 UTC — LECTURE SEULE
 
 ## Ce que la source revele
 
@@ -2228,13 +2227,13 @@ Mesure le 2026-10-30 17:46:36 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_pool_connexions.js ##########
 === LE POOL DE CONNEXIONS MYSQL EST-IL EPUISE ? ===
-Mesure le 2026-10-30 17:46:41 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:31 UTC — LECTURE SEULE
 Cette mesure compte les connexions `Sleep`, que ma mesure precedente
 ecartait — et c est tout l enjeu.
 
 ## 1. TOUTES LES CONNEXIONS, PAR UTILISATEUR ET PAR ETAT
   utilisateur       etat         nombre  plus vieille
-  fund_opcvm        Sleep             7        9980 s
+  fund_opcvm        Sleep             7       20828 s
   fund_opcvm        Query             1           0 s
 
   total : 8 connexion(s) | dont 8 pour `fund_opcvm`
@@ -2259,10 +2258,10 @@ ecartait — et c est tout l enjeu.
   Une connexion en `Sleep` depuis des heures est detenue par du code qui
   ne l a jamais relachee. C est la signature d une fuite.
         idutilisateur            age  etat
-    291883fund_opcvm         166 min  Sleep
-    291884fund_opcvm          46 min  Sleep
-    291856fund_opcvm          46 min  Sleep
-    294267fund_opcvm          46 min  Sleep
+    291856fund_opcvm         347 min  Sleep
+    294267fund_opcvm          47 min  Sleep
+    291883fund_opcvm          47 min  Sleep
+    291885fund_opcvm          47 min  Sleep
 
 ## CE QUE CELA IMPLIQUE
   Si le pool est sature ou proche de l etre, la correction porte sur les
@@ -2277,7 +2276,7 @@ ecartait — et c est tout l enjeu.
 ########## scripts/diag/ondemand/diag_rang_decale_diversifie_maroc.js ##########
 === QUEL FONDS EST DECALE, ET POURQUOI ? ===
 Categorie : DIVERSIFIE MAROC
-Mesure le 2026-10-30 17:46:41 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:31 UTC — LECTURE SEULE
 
 ## Fonds compares : 145 | decales : 0
   Aucun decalage : les rangs stockes correspondent exactement a l ordre de la production sur cette categorie.
@@ -2285,7 +2284,7 @@ Mesure le 2026-10-30 17:46:41 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_rang_doublon_ou_trou.js ##########
 === DOUBLON OU TROU DANS LES RANGS STOCKES ? ===
 Categorie : DIVERSIFIE MAROC
-Mesure le 2026-10-30 17:46:42 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:31 UTC — LECTURE SEULE
 
 ## 1. La suite des rangs stockes
   145 lignes | 145 rangs distincts | rang max 145
@@ -2294,11 +2293,11 @@ Mesure le 2026-10-30 17:46:42 UTC — LECTURE SEULE
   → la suite est une permutation propre de 1..N : l explication est ailleurs.
 
 ## 2. Autour du rang 80
-  rang  78 | en base : [705] IRGAM DISTRIEQUILIBRE              | attendu : [705] IRGAM DISTRIEQUILIBRE
-  rang  79 | en base : [909] CIH EPARGNE                        | attendu : [909] CIH EPARGNE
-  rang  80 | en base : [1071] ATTIJARI FINANCES CORP            | attendu : [1071] ATTIJARI FINANCES CORP
+  rang  78 | en base : [909] CIH EPARGNE                        | attendu : [909] CIH EPARGNE
+  rang  79 | en base : [1071] ATTIJARI FINANCES CORP            | attendu : [1071] ATTIJARI FINANCES CORP
+  rang  80 | en base : [710] INVEST EQUILIBRE                   | attendu : [710] INVEST EQUILIBRE
   rang  81 | en base : [594] WG DYNAMIC                         | attendu : [594] WG DYNAMIC
-  rang  82 | en base : [932] CFG DIVERSIFIE                     | attendu : [932] CFG DIVERSIFIE
+  rang  82 | en base : [673] PROFIL HARMONIE                    | attendu : [673] PROFIL HARMONIE
 
 ## 3. Denominateurs
   fonds de la categorie cote performances : 145
@@ -2311,7 +2310,7 @@ Mesure le 2026-10-30 17:46:42 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_rangs_permutation_invalide.js ##########
 === LES CLASSEMENTS STOCKES SONT-ILS DES PERMUTATIONS DE 1..N ? ===
-Mesure le 2026-10-30 17:46:42 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:32 UTC — LECTURE SEULE
 
 ## classementfonds
   3651 lignes | categorie lue dans `categorie_nationale` (rempli 3651/3651) | type_classement present
@@ -2319,33 +2318,33 @@ Mesure le 2026-10-30 17:46:42 UTC — LECTURE SEULE
   Cles de regroupement essayees — la bonne est celle qui rend une permutation propre :
     categorie_nationale                      22 groupes |    0 hors permutation |    0 doublon(s) |    0 trou(s)   ← PROPRE
     categorie                                11 groupes |    8 hors permutation |  463 doublon(s) |   74 trou(s)
-    categorie_regionale                      19 groupes |   14 hors permutation |  233 doublon(s) |  152 trou(s)
+    categorie_regionale                      19 groupes |   14 hors permutation |  232 doublon(s) |  151 trou(s)
     categorie_nationale + categorie + categorie_regionale   26 groupes |   16 hors permutation |    0 doublon(s) |  131 trou(s)
     JOIN fond_investissements.categorie_id    0 groupes |    0 hors permutation |    0 doublon(s) |    0 trou(s)
     JOIN fond_investissements.categorie_libelle   11 groupes |    8 hors permutation |  463 doublon(s) |   74 trou(s)
     JOIN fond_investissements.categorie_globale    9 groupes |    6 hors permutation |  508 doublon(s) |   32 trou(s)
     JOIN fond_investissements.categorie_national   22 groupes |    0 hors permutation |    0 doublon(s) |    0 trou(s)   ← PROPRE
-    JOIN fond_investissements.categorie_regional   19 groupes |   14 hors permutation |  233 doublon(s) |  152 trou(s)
-    JOIN fond_investissements.categorie_fundafrica_locale   15 groupes |   13 hors permutation |   96 doublon(s) |  118 trou(s)
-    JOIN fond_investissements.categorie_fundafrica_regionale    8 groupes |    8 hors permutation |  355 doublon(s) |   91 trou(s)
-    JOIN fond_investissements.categorie_fundafrica_globale    4 groupes |    4 hors permutation |  557 doublon(s) |   33 trou(s)
+    JOIN fond_investissements.categorie_regional   19 groupes |   14 hors permutation |  232 doublon(s) |  151 trou(s)
+    JOIN fond_investissements.categorie_fundafrica_locale   15 groupes |   13 hors permutation |   97 doublon(s) |  119 trou(s)
+    JOIN fond_investissements.categorie_fundafrica_regionale    8 groupes |    8 hors permutation |  356 doublon(s) |   92 trou(s)
+    JOIN fond_investissements.categorie_fundafrica_globale    4 groupes |    4 hors permutation |  560 doublon(s) |   36 trou(s)
   Cle retenue pour le verdict : categorie_nationale — numerotation propre sous cette cle.
   22 categories d au moins 5 fonds | 0 dont la numerotation n est PAS une permutation de 1..N | 0 rang(s) double(s) au total
   → toutes les numerotations sont propres sur les 22 categories JUGEES.
 
 ## classementfonds_eurs
-  2868 lignes | categorie lue dans `categorie_regionale` (rempli 2846/2868) | type_classement present
+  2858 lignes | categorie lue dans `categorie_regionale` (rempli 2836/2858) | type_classement present
   colonne(s) de categorie presente(s) mais JAMAIS renseignee(s) : categorie_nationale — a signaler, pas a contourner en silence
   (cles externes essayees aussi, depuis fond_investissements : categorie_id, categorie_libelle, categorie_globale, categorie_national, categorie_regional, categorie_fundafrica_locale, categorie_fundafrica_regionale, categorie_fundafrica_globale)
   Cles de regroupement essayees — la bonne est celle qui rend une permutation propre :
     categorie                                11 groupes |    8 hors permutation |  461 doublon(s) |   73 trou(s)
-    categorie_regionale                      19 groupes |   14 hors permutation |  231 doublon(s) |   99 trou(s)
+    categorie_regionale                      19 groupes |   14 hors permutation |  231 doublon(s) |  102 trou(s)
     categorie + categorie_regionale          19 groupes |   14 hors permutation |  199 doublon(s) |   88 trou(s)
     JOIN fond_investissements.categorie_id    0 groupes |    0 hors permutation |    0 doublon(s) |    0 trou(s)
     JOIN fond_investissements.categorie_libelle   11 groupes |    8 hors permutation |  461 doublon(s) |   73 trou(s)
     JOIN fond_investissements.categorie_globale    9 groupes |    6 hors permutation |  506 doublon(s) |   31 trou(s)
     JOIN fond_investissements.categorie_national   22 groupes |    0 hors permutation |    0 doublon(s) |    0 trou(s)   ← PROPRE
-    JOIN fond_investissements.categorie_regional   19 groupes |   14 hors permutation |  231 doublon(s) |   99 trou(s)
+    JOIN fond_investissements.categorie_regional   19 groupes |   14 hors permutation |  231 doublon(s) |  102 trou(s)
     JOIN fond_investissements.categorie_fundafrica_locale   15 groupes |   12 hors permutation |   92 doublon(s) |   69 trou(s)
     JOIN fond_investissements.categorie_fundafrica_regionale    8 groupes |    8 hors permutation |  354 doublon(s) |   47 trou(s)
     JOIN fond_investissements.categorie_fundafrica_globale    4 groupes |    4 hors permutation |  555 doublon(s) |    7 trou(s)
@@ -2354,18 +2353,18 @@ Mesure le 2026-10-30 17:46:42 UTC — LECTURE SEULE
   → toutes les numerotations sont propres sur les 22 categories JUGEES.
 
 ## classementfonds_usds
-  2876 lignes | categorie lue dans `categorie_regionale` (rempli 2854/2876) | type_classement present
+  2865 lignes | categorie lue dans `categorie_regionale` (rempli 2843/2865) | type_classement present
   colonne(s) de categorie presente(s) mais JAMAIS renseignee(s) : categorie_nationale — a signaler, pas a contourner en silence
   (cles externes essayees aussi, depuis fond_investissements : categorie_id, categorie_libelle, categorie_globale, categorie_national, categorie_regional, categorie_fundafrica_locale, categorie_fundafrica_regionale, categorie_fundafrica_globale)
   Cles de regroupement essayees — la bonne est celle qui rend une permutation propre :
     categorie                                11 groupes |    8 hors permutation |  461 doublon(s) |   87 trou(s)
-    categorie_regionale                      19 groupes |   14 hors permutation |  231 doublon(s) |   99 trou(s)
+    categorie_regionale                      19 groupes |   14 hors permutation |  231 doublon(s) |  100 trou(s)
     categorie + categorie_regionale          19 groupes |   14 hors permutation |  199 doublon(s) |  105 trou(s)
     JOIN fond_investissements.categorie_id    0 groupes |    0 hors permutation |    0 doublon(s) |    0 trou(s)
     JOIN fond_investissements.categorie_libelle   11 groupes |    8 hors permutation |  461 doublon(s) |   87 trou(s)
     JOIN fond_investissements.categorie_globale    9 groupes |    6 hors permutation |  506 doublon(s) |   31 trou(s)
     JOIN fond_investissements.categorie_national   22 groupes |    0 hors permutation |    0 doublon(s) |    0 trou(s)   ← PROPRE
-    JOIN fond_investissements.categorie_regional   19 groupes |   14 hors permutation |  231 doublon(s) |   99 trou(s)
+    JOIN fond_investissements.categorie_regional   19 groupes |   14 hors permutation |  231 doublon(s) |  100 trou(s)
     JOIN fond_investissements.categorie_fundafrica_locale   15 groupes |   12 hors permutation |   92 doublon(s) |   70 trou(s)
     JOIN fond_investissements.categorie_fundafrica_regionale    8 groupes |    8 hors permutation |  354 doublon(s) |   48 trou(s)
     JOIN fond_investissements.categorie_fundafrica_globale    4 groupes |    4 hors permutation |  555 doublon(s) |    7 trou(s)
@@ -2382,7 +2381,7 @@ Mesure le 2026-10-30 17:46:42 UTC — LECTURE SEULE
 
 ## Categorie temoin — les deux fonds du rang double
   [594] ytd = "-6.3295157896060275" | Number() = -6.3295157896060275 | numerique : OUI
-  [828] ytd = "-7.444067311671574" | Number() = -7.444067311671574 | numerique : OUI
+  [828] ytd = "-7.8040938112568705" | Number() = -7.8040938112568705 | numerique : OUI
   → deux ytd numeriques et differents ne peuvent pas donner le meme rang
     dans un seul appel : la cause est dans le fait qu il y a 1 245 appels.
 
@@ -2390,7 +2389,7 @@ Mesure le 2026-10-30 17:46:42 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_ratiosnew_504.js ##########
 === ratiosnew : OU PASSENT LES 120 SECONDES ? ===
-Mesure le 2026-10-30 17:46:44 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:34 UTC — LECTURE SEULE
 
 ## 1. LA TABLE DU TAUX SANS RISQUE — `taux_sans_risques`
   (nom lu dans `information_schema`, pas deduit du nom du modele :
@@ -2405,11 +2404,11 @@ Mesure le 2026-10-30 17:46:44 UTC — LECTURE SEULE
   table historique : `tsrhistos`
   7739 ligne(s)
   pays          lignes    derniere     age
-  Maroc           7191  2024-06-07   875 j
-  NIGERIA          137  2026-05-01   182 j
-  TUNISIE          137  2026-05-01   182 j
-  UEMOA            137  2026-05-01   182 j
-  CEMAC            137  2026-05-01   182 j
+  Maroc           7191  2024-06-07   876 j
+  NIGERIA          137  2026-05-01   183 j
+  TUNISIE          137  2026-05-01   183 j
+  UEMOA            137  2026-05-01   183 j
+  CEMAC            137  2026-05-01   183 j
   → 1 pays dont le taux a plus de 400 jours : pour ceux-la le
     repli en dur s applique en pratique, meme si la table n est pas vide.
 
@@ -2417,8 +2416,8 @@ Mesure le 2026-10-30 17:46:44 UTC — LECTURE SEULE
   pays du fonds 1141 : NIGERIA
   tsr.max(date) par pays            0.9 ms
   tsr.findOne par pays+date         1.0 ms
-  cout cumule par iteration : ~1.8 ms
-  → il suffit de ~65535 iteration(s) pour depasser 120 s.
+  cout cumule par iteration : ~1.9 ms
+  → il suffit de ~62470 iteration(s) pour depasser 120 s.
 
 ## 3. COMBIEN D ITERATIONS, APRES COMBLEMENT DES TROUS ?
   La route etend les VL en jours CALENDAIRES avant de boucler :
@@ -2460,7 +2459,7 @@ Mesure le 2026-10-30 17:46:44 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_ratiosnew_ou_passe_le_temps.js ##########
 === ratiosnew : LES 120 SECONDES SONT-ELLES EN SQL OU EN JAVASCRIPT ? ===
-Mesure le 2026-10-30 17:46:44 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:34 UTC — LECTURE SEULE
 
 ## 0. AVANT LA REQUETE — 0 requete(s) active(s)
   (aucune — le bruit de fond est nul, la mesure sera lisible)
@@ -2471,7 +2470,7 @@ Mesure le 2026-10-30 17:46:44 UTC — LECTURE SEULE
 ## 2. CE QUE FAIT MYSQL PENDANT 20 SECONDES
      t  actives  plus longue  requete
     1s        0            —  
-  (la requete HTTP a repondu : 400 en 0.007s)
+  (la requete HTTP a repondu : 400 en 0.008s)
 
 ## 3. VERDICT
   1 echantillon(s) | 0.0 requete(s) active(s) en moyenne
@@ -2484,13 +2483,13 @@ Mesure le 2026-10-30 17:46:44 UTC — LECTURE SEULE
     route qu il faut — pas une optimisation SQL. Aucune des quatre
     hypotheses SQL que j avais avancees ne pouvait donc tenir.
 
-  reponse HTTP : 400 apres 0.007s
+  reponse HTTP : 400 apres 0.008s
 
 === FIN — aucune ecriture effectuee ===
 
 ########## scripts/diag/ondemand/diag_ratiosnew_pairs_sockets.js ##########
 === ratiosnew : QUEL PAIR LE PROCESSUS ATTEND-IL ? ===
-Mesure le 2026-10-30 17:46:45 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:35 UTC — LECTURE SEULE
 
 ## 1. LE PROCESSUS api-monolith
   pid 1198895 — node /var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js
@@ -2509,13 +2508,13 @@ Mesure le 2026-10-30 17:46:45 UTC — LECTURE SEULE
     Ne pas conclure a une attente reseau faute de mieux : cette mesure
     l ecarte explicitement.
 
-  reponse HTTP : 400 apres 0.015s
+  reponse HTTP : 400 apres 0.012s
 
 === FIN — aucune ecriture effectuee ===
 
 ########## scripts/diag/ondemand/diag_ratiosnew_profil_cpu.js ##########
 === ratiosnew : QUELLE FONCTION CONSOMME LES 120 SECONDES ? ===
-Mesure le 2026-10-30 17:46:46 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:36 UTC — LECTURE SEULE
 Profilage CPU dans un processus jetable. La route et la production
 ne sont pas modifiees.
 
@@ -2525,7 +2524,7 @@ ne sont pas modifiees.
 ## 1. PROFILAGE DE 15 SECONDES (avec v18.20.8)
   | SONDE_DEMARREE
   | ROUTEUR_MONTE
-  | SONDE_ECOUTE 44821
+  | SONDE_ECOUTE 40577
   | repondu 400
   | RESSOURCES_EN_SUSPENS {"PipeWrap":3,"TCPServerWrap":1,"Timeout":1}
 
@@ -2539,29 +2538,29 @@ ne sont pas modifiees.
 ## 1bis. LA MESURE A-T-ELLE EU LIEU ?
   routeur monte : OUI | sonde en ecoute : OUI
 
-## 2. 16072 echantillon(s) sur 17.7 s de profil
+## 2. 16164 echantillon(s) sur 17.8 s de profil
 
      part  fonction                      fichier:ligne
-   84.6 %  (idle)                        (inconnu):0
+   84.0 %  (idle)                        (inconnu):0
     0.6 %  (garbage collector)           (inconnu):0
     0.3 %  internalCompileFunction       node:internal/vm:72
     0.2 %  refreshAttributes             node_modules/sequelize/lib/model.js:777
+    0.2 %  internalCompileFunction       node:internal/vm:72
     0.1 %  assertAndCreate               node_modules/mathjs/lib/cjs/utils/factory.js:39
-    0.1 %  internalCompileFunction       node:internal/vm:72
     0.1 %  internalCompileFunction       node:internal/vm:72
     0.1 %  internalCompileFunction       node:internal/vm:72
     0.1 %  internalCompileFunction       node:internal/vm:72
     0.1 %  internalCompileFunction       node:internal/vm:72
     0.1 %  refreshAttributes             node_modules/sequelize/lib/model.js:777
     0.1 %  internalCompileFunction       node:internal/vm:72
-    0.1 %  internalCompileFunction       node:internal/vm:72
     0.1 %  (anonyme)                     node_modules/mathjs/lib/cjs/entry/pureFunctionsAny.generated.js:1
+    0.1 %  read                          (inconnu):0
 
 ## 3. VERDICT
-  fonction la plus chaude : (idle) (84.6 %) — (inconnu):0
+  fonction la plus chaude : (idle) (84.0 %) — (inconnu):0
 
   → LA ROUTE N EST PAS LENTE : ELLE ATTEND. `(idle)` represente
-    84.6 % du temps. Le processus ne calcule pas, il est bloque sur
+    84.0 % du temps. Le processus ne calcule pas, il est bloque sur
     un `await` qui ne revient pas.
 
     Ce qui est donc ECARTE : le CPU JavaScript (ce profil), le volume de
@@ -2579,13 +2578,13 @@ ne sont pas modifiees.
     Les lignes ci-dessous ne sont PAS un point chaud : a moins de 1 %
     elles ne disent qu ou le profileur a surpris la pile, pas ou passe le
     temps.
-       0.0 %  ligne 251  (anonyme)
+       0.0 %  ligne 1  (anonyme)
 
 === FIN — aucune ecriture effectuee ===
 
 ########## scripts/diag/ondemand/diag_rattrapage_masi_dryrun.js ##########
 === RATTRAPAGE MASI — CE QU IL COUVRIRAIT, SANS RIEN ECRIRE ===
-Mesure le 2026-10-30 17:47:04 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:47:55 UTC — LECTURE SEULE
 
 ## A. Ce que la source publie, en UNE requete
 
@@ -2594,7 +2593,7 @@ Mesure le 2026-10-30 17:47:04 UTC — LECTURE SEULE
 
 ## B. Croisement avec indice_references
 
-  deja en base sur la periode : 25
+  deja en base sur la periode : 26
   seances a inserer           : 34
 
 ## C. Coherence de la serie
@@ -2634,19 +2633,19 @@ Mesure le 2026-10-30 17:47:04 UTC — LECTURE SEULE
 ########## scripts/diag/ondemand/diag_recalc_prepared_stmt_pressure.js ##########
 
 === PREPARED STATEMENT PRESSURE — READ ONLY ===
-Mesure: 2026-10-30T17:47:05.841Z
-STEP3_RECALC_EUR_USD funds=1259 vl_rows=1008615 dynamic_update_statements=2629 batch_size=500
-STEP4_RECALC_VL_AJUSTE funds=1260 vl_rows=1009200 dynamic_update_statements=5779 batch_size=200
-COMBINED_DYNAMIC_UPDATE_STATEMENTS=8408
+Mesure: 2026-10-31T03:47:55.937Z
+STEP3_RECALC_EUR_USD funds=1259 vl_rows=1009070 dynamic_update_statements=2629 batch_size=500
+STEP4_RECALC_VL_AJUSTE funds=1260 vl_rows=1009655 dynamic_update_statements=5781 batch_size=200
+COMBINED_DYNAMIC_UPDATE_STATEMENTS=8410
 MYSQL_MAX_PREPARED_STMT_COUNT=16382
 MYSQL_PERFORMANCE_SCHEMA=OFF
-MYSQL_PREPARED_STMT_COUNT_NOW=0
-MYSQL_COM_STMT_PREPARE_SINCE_RESTART=18004
-MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=1482291
+MYSQL_PREPARED_STMT_COUNT_NOW=8
+MYSQL_COM_STMT_PREPARE_SINCE_RESTART=18153
+MYSQL_COM_STMT_EXECUTE_SINCE_RESTART=1527357
 MYSQL_COM_STMT_CLOSE_SINCE_RESTART=12
-MYSQL_MEMORY_USED_NOW=482142560
-MYSQL_UPTIME=3324132
-PREPARE_MINUS_THEORETICAL_DYNAMIC=9596
+MYSQL_MEMORY_USED_NOW=482704056
+MYSQL_UPTIME=3360183
+PREPARE_MINUS_THEORETICAL_DYNAMIC=9743
 NOTE=Step3 count is an upper geometry bound before currency/rate skips; current daily log reported 1249 funds and 994766 VL actually processed. Step4 geometry is exact for active-fund row batches. Com_stmt_prepare is server-global and cumulative, so numerical proximity is evidence for correlation, not causal identity.
 MUTATION=NONE
 
@@ -2660,22 +2659,22 @@ CONTRACT=GREEN
 
 ########## scripts/diag/ondemand/diag_runtime_state_vivant.js ##########
 === SNAPSHOT RUNTIME VIVANT (hors depot) ===
-Mesure le 2026-10-30 17:47:14 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:48:05 UTC — LECTURE SEULE
 
 ## 1. LE SNAPSHOT VIVANT
   /var/lib/fundafrica/runtime/PRODUCTION_STATE.json
   43.9 Ko
-  generated_at declare : 2026-10-30T17:00:02.176Z  — 0.8 h
-  derniere ecriture du fichier : 2026-10-30 17:00  — 0.8 h
+  generated_at declare : 2026-10-31T03:00:01.948Z  — 0.8 h
+  derniere ecriture du fichier : 2026-10-31 03:00  — 0.8 h
   → FRAIS (cron horaire). Utilisable comme etat courant.
 
 ## 2. CE QU IL CONTIENT
 
   derniere VL par pays
     0                               {"pays":"CEMAC","nb_fonds":34,"nb_vl":2134,"derniere_date":"2024-12-12T00:00:00.000Z","premiere_
-    1                               {"pays":"MAROC","nb_fonds":649,"nb_vl":572088,"derniere_date":"2026-10-28T00:00:00.000Z","premie
+    1                               {"pays":"MAROC","nb_fonds":649,"nb_vl":572417,"derniere_date":"2026-10-29T00:00:00.000Z","premie
     2                               {"pays":"NIGERIA","nb_fonds":335,"nb_vl":77905,"derniere_date":"2026-10-09T00:00:00.000Z","premi
-    3                               {"pays":"TUNISIE","nb_fonds":131,"nb_vl":313353,"derniere_date":"2026-10-29T00:00:00.000Z","prem
+    3                               {"pays":"TUNISIE","nb_fonds":131,"nb_vl":313479,"derniere_date":"2026-10-30T00:00:00.000Z","prem
     4                               {"pays":"UEMOA","nb_fonds":111,"nb_vl":43720,"derniere_date":"2026-10-28T00:00:00.000Z","premier
 
   PM2
@@ -2684,14 +2683,14 @@ Mesure le 2026-10-30 17:47:14 UTC — LECTURE SEULE
 In memory PM2 version: 6.0.14
 Local PM2 version: 6.0.13
 
-[{"pid":1198895,"name":"api-monolith","pm2_env":{"kill_retry_time":100,"windowsHide":true,"username":"root","treekill":true,"automation":true,"pmx":true,"instance_var":"NODE_APP_INSTANCE","watch":false,"autorestart":true,"autostart":true,"vizion":true,"merge_logs":true,"env":{"SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 65128 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"198992","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 65128 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","PM2_USAGE":"CLI","PM2_HOME":"/root/.pm2","api-monolith":{},"unique_id":"93da940b-463a-4b50-8b7c-aed399ed76ee"},"args":["--port","3005"],"namespace":"default","filter_env":[],"name":"api-monolith","node_args":[],"pm_exec_path":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js","pm_cwd":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","exec_interpreter":"/root/.nvm/versions/node/v18.20.8/bin/node","exec_mode":"fork_mode","instances":1,"pm_out_log_path":"/root/.pm2/logs/api-monolith-out.log","pm_err_log_path":"/root/.pm2/logs/api-monolith-error.log","pm_pid_path":"/root/.pm2/pids/api-monolith-0.pid","km_link":false,"vizion_running":false,"NODE_APP_INSTANCE":0,"SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 65128 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"198992","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 65128 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","PM2_USAGE":"CLI","PM2_HOME":"/root/.pm2","unique_id":"93da940b-463a-4b50-8b7c-aed399ed76ee","status":"online","pm_uptime":1793322529446,"axm_actions":[{"action_name":"km:heapdump","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:start","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:stop","action_type":"internal","arity":1},{"action_name":"km:heap:sampling:start","action_type":"internal","arity":2},{"action_name":"km:heap:sampling:stop","action_type":"internal","arity":1}],"axm_monitor":{"Used Heap Size":{"value":"129.26","type":"internal/v8/heap/used","unit":"MiB","historic":true},"Heap Usage":{"value":95.65,"type":"internal/v8/heap/usage","unit":"%","historic":true},"Heap Size":{"value":"135.14","type":"internal/v8/heap/total","unit":"MiB","historic":true},"Event Loop Latency p95":{"value":"1.11","type":"internal/libuv/latency/p95","unit":"ms","historic":true},"Event Loop Latency":{"value":"0.36","type":"internal/libuv/latency/p50","unit":"ms","historic":true},"Active handles":{"value":10,"type":"internal/libuv/handles","historic":true},"Active requests":{"value":0,"type":"internal/libuv/requests","historic":true},"HTTP":{"value":0,"type":"internal/http/builtin/reqs","unit":"req/min","historic":true},"HTTP P95 Latency":{"value":1805.9499999999996,"type":"internal/http/builtin/latency/p95","unit":"ms","historic":true},"HTTP Mean Latency":{"value":410,"type":"internal/http/builtin/latency/p50","unit":"ms","historic":true}},"axm_options":{"error":true,"heapdump":true,"feature.profiler.heapsnapshot":false,"feature.profiler.heapsampling":true,"feature.profiler.cpu_js":true,"latency":true,"catchExceptions":true,"profiling":true,"metrics":{"http":true,"runtime":true,"eventLoop":true,"network":false,"v8":true},"standalone":false,"module_conf":{},"apm":{"version":"6.1.0","type":"node"},"module_name":"api-monolith","module_version":"6.0.14"},"axm_dynamic":{},"created_at":1793322529322,"pm_id":0,"restart_time":174,"unstable_restarts":0,"version":"1.0.0","node_version":"18.20.8","prev_restart_delay":0,"exit_code":0},"pm_id":0,"monit":{"memory":315813888,"cpu":0.3}},{"pid":821168,"name":"fundafrique-frontend","pm2_env":{"kill_retry_time":100,"windowsHide":true,"username":"root","treekill":true,"automation":true,"pmx":true,"instance_var":"NODE_APP_INSTANCE","watch":false,"autorestart":true,"autostart":true,"vizion":true,"merge_logs":true,"env":{"SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"212.227.212.33 41638 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"352608","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"212.227.212.33 41638 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/usr/local/bin/pm2","OLDPWD":"/root","PM2_USAGE":"CLI","PM2_HOME":"/root/.pm2","fundafrique-frontend":{},"unique_id":"cb1aaa84-c745-4eff-892a-dbc51148ee79"},"args":["start"],"namespace":"default","filter_env":[],"name":"fundafrique-frontend","node_args":[],"pm_exec_path":"/root/.nvm/versions/node/v18.20.8/bin/npm","pm_cwd":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","exec_interpreter":"/root/.nvm/versions/node/v18.20.8/bin/node","exec_mode":"fork_mode","instances":1,"pm_out_log_path":"/root/.pm2/logs/fundafrique-frontend-out.log","pm_err_log_path":"/root/.pm2/logs/fundafrique-frontend-error.log","pm_pid_path":"/root/.pm2/pids/fundafrique-frontend-1.pid","km_link":false,"vizion_running":false,"NODE_APP_INSTANCE":0,"SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"212.227.212.33 41638 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"352608","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"212.227.212.33 41638 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/usr/local/bin/pm2","OLDPWD":"/root","PM2_USAGE":"CLI","PM2_HOME":"/root/.pm2","unique_id":"cb1aaa84-c745-4eff-892a-dbc51148ee79","status":"online","pm_uptime":1793297911366,"axm_actions":[{"action_name":"km:heapdump","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:start","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:stop","action_type":"internal","arity":1},{"action_name":"km:heap:sampling:start","action_type":"internal","arity":2},{"action_name":"km:heap:sampling:stop","action_type":"internal","arity":1}],"axm_monitor":{"Used Heap Size":{"value":"10.52","type":"internal/v8/heap/used","unit":"MiB","historic":true},"Heap Usage":{"value":75.87,"type":"internal/v8/heap/usage","unit":"%","historic":true},"Heap Size":{"value":"13.86","type":"internal/v8/heap/total","unit":"MiB","historic":true},"Event Loop Latency p95":{"value":"1.06","type":"internal/libuv/latency/p95","unit":"ms","historic":true},"Event Loop Latency":{"value":"0.33","type":"internal/libuv/latency/p50","unit":"ms","historic":true},"Active handles":{"value":5,"type":"internal/libuv/handles","historic":true},"Active requests":{"value":0,"type":"internal/libuv/requests","historic":true}},"axm_options":{"error":true,"heapdump":true,"feature.profiler.heapsnapshot":false,"feature.profiler.heapsampling":true,"feature.profiler.cpu_js":true,"latency":true,"catchExceptions":true,"profiling":true,"metrics":{"http":true,"runtime":true,"eventLoop":true,"network":false,"v8":true},"standalone":false,"module_conf":{},"apm":{"version":"6.1.0","type":"node"},"module_name":"fundafrique-frontend","module_version":"6.0.14"},"axm_dynamic":{},"created_at":1793297911177,"pm_id":1,"restart_time":50,"unstable_restarts":0,"version":"0.39.0","node_version":"18.20.8","prev_restart_delay":0,"exit_code":0},"pm_id":1,"monit":{"memory":61931520,"cpu":0.2}},{"pid":3269585,"name":"worker-recalculation","pm2_env":{"exit_code":0,"filter_env":[],"prev_restart_delay":0,"node_version":"18.20.8","version":"1.0.0","unstable_restarts":0,"restart_time":3,"pm_id":2,"created_at":1789179159768,"axm_dynamic":{},"axm_options":{"error":true,"heapdump":true,"feature.profiler.heapsnapshot":false,"feature.profiler.heapsampling":true,"feature.profiler.cpu_js":true,"latency":true,"catchExceptions":true,"profiling":true,"metrics":{"http":true,"runtime":true,"eventLoop":true,"network":false,"v8":true},"standalone":false,"module_conf":{},"apm":{"version":"6.1.0","type":"node"},"module_name":"worker-recalculation","module_version":"6.0.14"},"axm_monitor":{"Used Heap Size":{"value":"13.94","type":"internal/v8/heap/used","unit":"MiB","historic":true},"Heap Usage":{"value":74.9,"type":"internal/v8/heap/usage","unit":"%","historic":true},"Heap Size":{"value":"18.61","type":"internal/v8/heap/total","unit":"MiB","historic":true},"Event Loop Latency p95":{"value":"1.05","type":"internal/libuv/latency/p95","unit":"ms","historic":true},"Event Loop Latency":{"value":"0.32","type":"internal/libuv/latency/p50","unit":"ms","historic":true},"Active handles":{"value":5,"type":"internal/libuv/handles","historic":true},"Active requests":{"value":0,"type":"internal/libuv/requests","historic":true}},"axm_actions":[{"action_name":"km:heapdump","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:start","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:stop","action_type":"internal","arity":1},{"action_name":"km:heap:sampling:start","action_type":"internal","arity":2},{"action_name":"km:heap:sampling:stop","action_type":"internal","arity":1}],"pm_uptime":1789179161501,"status":"online","unique_id":"aa04a894-7dee-498b-82e4-7b766715173a","SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 60918 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"22402","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 60918 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","PM2_USAGE":"CLI","PM2_JSON_PROCESSING":"true","WORKER_ID":"recalc-1","WORKER_LOCK_TIMEOUT":300000,"WORKER_POLL_INTERVAL":10000,"NODE_ENV":"production","PM2_HOME":"/root/.pm2","worker-recalculation":"{}","NODE_APP_INSTANCE":0,"vizion_running":false,"km_link":false,"pm_pid_path":"/root/.pm2/pids/worker-recalculation-2.pid","pm_err_log_path":"/root/.pm2/logs/worker-recalculation-error.log","pm_out_log_path":"/root/.pm2/logs/worker-recalculation-out.log","instances":1,"exec_mode":"fork_mode","exec_interpreter":"node","pm_cwd":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","pm_exec_path":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/worker-recalculation.js","node_args":[],"name":"worker-recalculation","env":{"unique_id":"aa04a894-7dee-498b-82e4-7b766715173a","SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 60918 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"22402","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 60918 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","PM2_USAGE":"CLI","PM2_JSON_PROCESSING":"true","WORKER_ID":"recalc-1","WORKER_LOCK_TIMEOUT":300000,"WORKER_POLL_INTERVAL":10000,"NODE_ENV":"production","PM2_HOME":"/root/.pm2","worker-recalculation":"{}"},"restart_delay":5000,"merge_logs":true,"vizion":true,"autostart":true,"autorestart":true,"max_restarts":10,"instance_var":"NODE_APP_INSTANCE","pmx":true,"automation":true,"treekill":true,"username":"root","windowsHide":true,"kill_retry_time":100,"namespace":"default"},"pm_id":2,"monit":{"memory":35532800,"cpu":0.3}},{"pid":3269605,"name":"worker-data-import","pm2_env":{"exit_code":0,"filter_env":[],"prev_restart_delay":0,"node_version":"18.20.8","version":"1.0.0","unstable_restarts":0,"restart_time":3,"pm_id":3,"created_at":1789179161729,"axm_dynamic":{},"axm_options":{"error":true,"heapdump":true,"feature.profiler.heapsnapshot":false,"feature.profiler.heapsampling":true,"feature.profiler.cpu_js":true,"latency":true,"catchExceptions":true,"profiling":true,"metrics":{"http":true,"runtime":true,"eventLoop":true,"network":false,"v8":true},"standalone":false,"module_conf":{},"apm":{"version":"6.1.0","type":"node"},"module_name":"worker-data-import","module_version":"6.0.14"},"axm_monitor":{"Used Heap Size":{"value":"17.82","type":"internal/v8/heap/used","unit":"MiB","historic":true},"Heap Usage":{"value":90.9,"type":"internal/v8/heap/usage","unit":"%","historic":true},"Heap Size":{"value":"19.61","type":"internal/v8/heap/total","unit":"MiB","historic":true},"Event Loop Latency p95":{"value":"1.12","type":"internal/libuv/latency/p95","unit":"ms","historic":true},"Event Loop Latency":{"value":"0.43","type":"internal/libuv/latency/p50","unit":"ms","historic":true},"Active handles":{"value":5,"type":"internal/libuv/handles","historic":true},"Active requests":{"value":0,"type":"internal/libuv/requests","historic":true}},"axm_actions":[{"action_name":"km:heapdump","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:start","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:stop","action_type":"internal","arity":1},{"action_name":"km:heap:sampling:start","action_type":"internal","arity":2},{"action_name":"km:heap:sampling:stop","action_type":"internal","arity":1}],"pm_uptime":1789179163466,"status":"online","unique_id":"bfea68c1-1cef-4efe-87f5-9aba7ad122b1","SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 60918 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"22402","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 60918 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","PM2_USAGE":"CLI","PM2_JSON_PROCESSING":"true","WORKER_ID":"import-1","IMPORT_POLL_INTERVAL":30000,"NODE_ENV":"production","PM2_HOME":"/root/.pm2","worker-data-import":"{}","NODE_APP_INSTANCE":0,"vizion_running":false,"km_link":false,"pm_pid_path":"/root/.pm2/pids/worker-data-import-3.pid","pm_err_log_path":"/root/.pm2/logs/worker-data-import-error.log","pm_out_log_path":"/root/.pm2/logs/worker-data-import-out.log","instances":1,"exec_mode":"fork_mode","exec_interpreter":"node","pm_cwd":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","pm_exec_path":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/worker-data-import.js","node_args":[],"name":"worker-data-import","env":{"unique_id":"bfea68c1-1cef-4efe-87f5-9aba7ad122b1","SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 60918 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"22402","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 60918 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","PM2_USAGE":"CLI","PM2_JSON_PROCESSING":"true","WORKER_ID":"import-1","IMPORT_POLL_INTERVAL":30000,"NODE_ENV":"production","PM2_HOME":"/root/.pm2","worker-data-import":"{}"},"restart_delay":5000,"merge_logs":true,"vizion":true,"autostart":true,"autorestart":true,"max_restarts":10,"instance_var":"NODE_APP_INSTANCE","pmx":true,"automation":true,"treekill":true,"username":"root","windowsHide":true,"kill_retry_time":100,"namespace":"default"},"pm_id":3,"monit":{"memory":35549184,"cpu":0.2}}]
+[{"pid":1198895,"name":"api-monolith","pm2_env":{"kill_retry_time":100,"windowsHide":true,"username":"root","treekill":true,"automation":true,"pmx":true,"instance_var":"NODE_APP_INSTANCE","watch":false,"autorestart":true,"autostart":true,"vizion":true,"merge_logs":true,"env":{"SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 65128 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"198992","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 65128 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","PM2_USAGE":"CLI","PM2_HOME":"/root/.pm2","api-monolith":{},"unique_id":"93da940b-463a-4b50-8b7c-aed399ed76ee"},"args":["--port","3005"],"namespace":"default","filter_env":[],"name":"api-monolith","node_args":[],"pm_exec_path":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/app.js","pm_cwd":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","exec_interpreter":"/root/.nvm/versions/node/v18.20.8/bin/node","exec_mode":"fork_mode","instances":1,"pm_out_log_path":"/root/.pm2/logs/api-monolith-out.log","pm_err_log_path":"/root/.pm2/logs/api-monolith-error.log","pm_pid_path":"/root/.pm2/pids/api-monolith-0.pid","km_link":false,"vizion_running":false,"NODE_APP_INSTANCE":0,"SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 65128 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"198992","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 65128 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","PM2_USAGE":"CLI","PM2_HOME":"/root/.pm2","unique_id":"93da940b-463a-4b50-8b7c-aed399ed76ee","status":"online","pm_uptime":1793322529446,"axm_actions":[{"action_name":"km:heapdump","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:start","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:stop","action_type":"internal","arity":1},{"action_name":"km:heap:sampling:start","action_type":"internal","arity":2},{"action_name":"km:heap:sampling:stop","action_type":"internal","arity":1}],"axm_monitor":{"Used Heap Size":{"value":"110.03","type":"internal/v8/heap/used","unit":"MiB","historic":true},"Heap Usage":{"value":78.69,"type":"internal/v8/heap/usage","unit":"%","historic":true},"Heap Size":{"value":"139.83","type":"internal/v8/heap/total","unit":"MiB","historic":true},"Event Loop Latency p95":{"value":"1.10","type":"internal/libuv/latency/p95","unit":"ms","historic":true},"Event Loop Latency":{"value":"0.34","type":"internal/libuv/latency/p50","unit":"ms","historic":true},"Active handles":{"value":10,"type":"internal/libuv/handles","historic":true},"Active requests":{"value":0,"type":"internal/libuv/requests","historic":true},"HTTP":{"value":0,"type":"internal/http/builtin/reqs","unit":"req/min","historic":true},"HTTP P95 Latency":{"value":1783.1999999999998,"type":"internal/http/builtin/latency/p95","unit":"ms","historic":true},"HTTP Mean Latency":{"value":592,"type":"internal/http/builtin/latency/p50","unit":"ms","historic":true}},"axm_options":{"error":true,"heapdump":true,"feature.profiler.heapsnapshot":false,"feature.profiler.heapsampling":true,"feature.profiler.cpu_js":true,"latency":true,"catchExceptions":true,"profiling":true,"metrics":{"http":true,"runtime":true,"eventLoop":true,"network":false,"v8":true},"standalone":false,"module_conf":{},"apm":{"version":"6.1.0","type":"node"},"module_name":"api-monolith","module_version":"6.0.14"},"axm_dynamic":{},"created_at":1793322529322,"pm_id":0,"restart_time":174,"unstable_restarts":0,"version":"1.0.0","node_version":"18.20.8","prev_restart_delay":0,"exit_code":0},"pm_id":0,"monit":{"memory":309792768,"cpu":0.5}},{"pid":821168,"name":"fundafrique-frontend","pm2_env":{"kill_retry_time":100,"windowsHide":true,"username":"root","treekill":true,"automation":true,"pmx":true,"instance_var":"NODE_APP_INSTANCE","watch":false,"autorestart":true,"autostart":true,"vizion":true,"merge_logs":true,"env":{"SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"212.227.212.33 41638 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"352608","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"212.227.212.33 41638 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/usr/local/bin/pm2","OLDPWD":"/root","PM2_USAGE":"CLI","PM2_HOME":"/root/.pm2","fundafrique-frontend":{},"unique_id":"cb1aaa84-c745-4eff-892a-dbc51148ee79"},"args":["start"],"namespace":"default","filter_env":[],"name":"fundafrique-frontend","node_args":[],"pm_exec_path":"/root/.nvm/versions/node/v18.20.8/bin/npm","pm_cwd":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","exec_interpreter":"/root/.nvm/versions/node/v18.20.8/bin/node","exec_mode":"fork_mode","instances":1,"pm_out_log_path":"/root/.pm2/logs/fundafrique-frontend-out.log","pm_err_log_path":"/root/.pm2/logs/fundafrique-frontend-error.log","pm_pid_path":"/root/.pm2/pids/fundafrique-frontend-1.pid","km_link":false,"vizion_running":false,"NODE_APP_INSTANCE":0,"SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/frontend","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"212.227.212.33 41638 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"352608","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"212.227.212.33 41638 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/usr/local/bin/pm2","OLDPWD":"/root","PM2_USAGE":"CLI","PM2_HOME":"/root/.pm2","unique_id":"cb1aaa84-c745-4eff-892a-dbc51148ee79","status":"online","pm_uptime":1793297911366,"axm_actions":[{"action_name":"km:heapdump","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:start","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:stop","action_type":"internal","arity":1},{"action_name":"km:heap:sampling:start","action_type":"internal","arity":2},{"action_name":"km:heap:sampling:stop","action_type":"internal","arity":1}],"axm_monitor":{"Used Heap Size":{"value":"14.17","type":"internal/v8/heap/used","unit":"MiB","historic":true},"Heap Usage":{"value":87.97,"type":"internal/v8/heap/usage","unit":"%","historic":true},"Heap Size":{"value":"16.11","type":"internal/v8/heap/total","unit":"MiB","historic":true},"Event Loop Latency p95":{"value":"1.12","type":"internal/libuv/latency/p95","unit":"ms","historic":true},"Event Loop Latency":{"value":"0.33","type":"internal/libuv/latency/p50","unit":"ms","historic":true},"Active handles":{"value":5,"type":"internal/libuv/handles","historic":true},"Active requests":{"value":0,"type":"internal/libuv/requests","historic":true}},"axm_options":{"error":true,"heapdump":true,"feature.profiler.heapsnapshot":false,"feature.profiler.heapsampling":true,"feature.profiler.cpu_js":true,"latency":true,"catchExceptions":true,"profiling":true,"metrics":{"http":true,"runtime":true,"eventLoop":true,"network":false,"v8":true},"standalone":false,"module_conf":{},"apm":{"version":"6.1.0","type":"node"},"module_name":"fundafrique-frontend","module_version":"6.0.14"},"axm_dynamic":{},"created_at":1793297911177,"pm_id":1,"restart_time":50,"unstable_restarts":0,"version":"0.39.0","node_version":"18.20.8","prev_restart_delay":0,"exit_code":0},"pm_id":1,"monit":{"memory":64602112,"cpu":0.2}},{"pid":3269585,"name":"worker-recalculation","pm2_env":{"exit_code":0,"filter_env":[],"prev_restart_delay":0,"node_version":"18.20.8","version":"1.0.0","unstable_restarts":0,"restart_time":3,"pm_id":2,"created_at":1789179159768,"axm_dynamic":{},"axm_options":{"error":true,"heapdump":true,"feature.profiler.heapsnapshot":false,"feature.profiler.heapsampling":true,"feature.profiler.cpu_js":true,"latency":true,"catchExceptions":true,"profiling":true,"metrics":{"http":true,"runtime":true,"eventLoop":true,"network":false,"v8":true},"standalone":false,"module_conf":{},"apm":{"version":"6.1.0","type":"node"},"module_name":"worker-recalculation","module_version":"6.0.14"},"axm_monitor":{"Used Heap Size":{"value":"14.78","type":"internal/v8/heap/used","unit":"MiB","historic":true},"Heap Usage":{"value":78.36,"type":"internal/v8/heap/usage","unit":"%","historic":true},"Heap Size":{"value":"18.86","type":"internal/v8/heap/total","unit":"MiB","historic":true},"Event Loop Latency p95":{"value":"1.14","type":"internal/libuv/latency/p95","unit":"ms","historic":true},"Event Loop Latency":{"value":"0.41","type":"internal/libuv/latency/p50","unit":"ms","historic":true},"Active handles":{"value":5,"type":"internal/libuv/handles","historic":true},"Active requests":{"value":0,"type":"internal/libuv/requests","historic":true}},"axm_actions":[{"action_name":"km:heapdump","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:start","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:stop","action_type":"internal","arity":1},{"action_name":"km:heap:sampling:start","action_type":"internal","arity":2},{"action_name":"km:heap:sampling:stop","action_type":"internal","arity":1}],"pm_uptime":1789179161501,"status":"online","unique_id":"aa04a894-7dee-498b-82e4-7b766715173a","SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 60918 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"22402","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 60918 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","PM2_USAGE":"CLI","PM2_JSON_PROCESSING":"true","WORKER_ID":"recalc-1","WORKER_LOCK_TIMEOUT":300000,"WORKER_POLL_INTERVAL":10000,"NODE_ENV":"production","PM2_HOME":"/root/.pm2","worker-recalculation":"{}","NODE_APP_INSTANCE":0,"vizion_running":false,"km_link":false,"pm_pid_path":"/root/.pm2/pids/worker-recalculation-2.pid","pm_err_log_path":"/root/.pm2/logs/worker-recalculation-error.log","pm_out_log_path":"/root/.pm2/logs/worker-recalculation-out.log","instances":1,"exec_mode":"fork_mode","exec_interpreter":"node","pm_cwd":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","pm_exec_path":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/worker-recalculation.js","node_args":[],"name":"worker-recalculation","env":{"unique_id":"aa04a894-7dee-498b-82e4-7b766715173a","SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 60918 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"22402","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 60918 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","PM2_USAGE":"CLI","PM2_JSON_PROCESSING":"true","WORKER_ID":"recalc-1","WORKER_LOCK_TIMEOUT":300000,"WORKER_POLL_INTERVAL":10000,"NODE_ENV":"production","PM2_HOME":"/root/.pm2","worker-recalculation":"{}"},"restart_delay":5000,"merge_logs":true,"vizion":true,"autostart":true,"autorestart":true,"max_restarts":10,"instance_var":"NODE_APP_INSTANCE","pmx":true,"automation":true,"treekill":true,"username":"root","windowsHide":true,"kill_retry_time":100,"namespace":"default"},"pm_id":2,"monit":{"memory":35536896,"cpu":0.3}},{"pid":3269605,"name":"worker-data-import","pm2_env":{"exit_code":0,"filter_env":[],"prev_restart_delay":0,"node_version":"18.20.8","version":"1.0.0","unstable_restarts":0,"restart_time":3,"pm_id":3,"created_at":1789179161729,"axm_dynamic":{},"axm_options":{"error":true,"heapdump":true,"feature.profiler.heapsnapshot":false,"feature.profiler.heapsampling":true,"feature.profiler.cpu_js":true,"latency":true,"catchExceptions":true,"profiling":true,"metrics":{"http":true,"runtime":true,"eventLoop":true,"network":false,"v8":true},"standalone":false,"module_conf":{},"apm":{"version":"6.1.0","type":"node"},"module_name":"worker-data-import","module_version":"6.0.14"},"axm_monitor":{"Used Heap Size":{"value":"16.24","type":"internal/v8/heap/used","unit":"MiB","historic":true},"Heap Usage":{"value":87.26,"type":"internal/v8/heap/usage","unit":"%","historic":true},"Heap Size":{"value":"18.61","type":"internal/v8/heap/total","unit":"MiB","historic":true},"Event Loop Latency p95":{"value":"1.08","type":"internal/libuv/latency/p95","unit":"ms","historic":true},"Event Loop Latency":{"value":"0.39","type":"internal/libuv/latency/p50","unit":"ms","historic":true},"Active handles":{"value":5,"type":"internal/libuv/handles","historic":true},"Active requests":{"value":0,"type":"internal/libuv/requests","historic":true}},"axm_actions":[{"action_name":"km:heapdump","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:start","action_type":"internal","arity":2},{"action_name":"km:cpu:profiling:stop","action_type":"internal","arity":1},{"action_name":"km:heap:sampling:start","action_type":"internal","arity":2},{"action_name":"km:heap:sampling:stop","action_type":"internal","arity":1}],"pm_uptime":1789179163466,"status":"online","unique_id":"bfea68c1-1cef-4efe-87f5-9aba7ad122b1","SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 60918 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"22402","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 60918 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","PM2_USAGE":"CLI","PM2_JSON_PROCESSING":"true","WORKER_ID":"import-1","IMPORT_POLL_INTERVAL":30000,"NODE_ENV":"production","PM2_HOME":"/root/.pm2","worker-data-import":"{}","NODE_APP_INSTANCE":0,"vizion_running":false,"km_link":false,"pm_pid_path":"/root/.pm2/pids/worker-data-import-3.pid","pm_err_log_path":"/root/.pm2/logs/worker-data-import-error.log","pm_out_log_path":"/root/.pm2/logs/worker-data-import-out.log","instances":1,"exec_mode":"fork_mode","exec_interpreter":"node","pm_cwd":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api","pm_exec_path":"/var/www/vhosts/chainsolutions.fr/africafunds.chainsolutions.fr/api/src/workers/worker-data-import.js","node_args":[],"name":"worker-data-import","env":{"unique_id":"bfea68c1-1cef-4efe-87f5-9aba7ad122b1","SHELL":"/bin/bash","NVM_INC":"/root/.nvm/versions/node/v18.20.8/include/node","PWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","LOGNAME":"root","XDG_SESSION_TYPE":"tty","MOTD_SHOWN":"pam","HOME":"/root","LANG":"en_US.UTF-8","LS_COLORS":"rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:","SSH_CONNECTION":"78.193.250.55 60918 217.160.249.254 22","NVM_DIR":"/root/.nvm","LESSCLOSE":"/usr/bin/lesspipe %s %s","XDG_SESSION_CLASS":"user","TERM":"xterm-256color","LESSOPEN":"| /usr/bin/lesspipe %s","USER":"root","SHLVL":"1","NVM_CD_FLAGS":"","XDG_SESSION_ID":"22402","XDG_RUNTIME_DIR":"/run/user/0","SSH_CLIENT":"78.193.250.55 60918 22","XDG_DATA_DIRS":"/usr/local/share:/usr/share:/var/lib/snapd/desktop","PATH":"/root/.nvm/versions/node/v18.20.8/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin","DOCKER_API_VERSION":"1.43","DBUS_SESSION_BUS_ADDRESS":"unix:path=/run/user/0/bus","NVM_BIN":"/root/.nvm/versions/node/v18.20.8/bin","SSH_TTY":"/dev/pts/0","_":"/root/.nvm/versions/node/v18.20.8/bin/pm2","OLDPWD":"/opt/apps/brvmchain/BRVMCHAINSOLUTION","PM2_USAGE":"CLI","PM2_JSON_PROCESSING":"true","WORKER_ID":"import-1","IMPORT_POLL_INTERVAL":30000,"NODE_ENV":"production","PM2_HOME":"/root/.pm2","worker-data-import":"{}"},"restart_delay":5000,"merge_logs":true,"vizion":true,"autostart":true,"autorestart":true,"max_restarts":10,"instance_var":"NODE_APP_INSTANCE","pmx":true,"automation":true,"treekill":true,"username":"root","windowsHide":true,"kill_retry_time":100,"namespace":"default"},"pm_id":3,"monit":{"memory":34742272,"cpu":0.3}}]
 
   git API
-    a38fef91d fix(diag): mon test d appariement etait nul — 13 candidats pour un seul fonds
-f8455c35d chore(diag): etat de production verifie 2026-10-30 15:31 UTC [skip ci]
-d3826a08a chore(diag): etat de production verifie 2026-10-30 15:22 UTC [skip ci]
-0ced2b03b diag(C3): sept fonds marocains touches le 26 octobre, DANS LES DEUX SENS
-33b6513d3 chore(diag): etat de production verifie 2026-10-30 15:13 UTC [skip ci]
+    d7985072e chore(diag): etat de production verifie 2026-10-30 17:41 UTC [skip ci]
+a5cca6100 fix(diag): mes « 182 lignes a corriger » designent probablement le MAUVAIS ensemble
+352b72d63 measure(C3): le 26 octobre marocain ne s est PAS auto-corrige, contrairement au 19
+761a4f46a chore(diag): etat de production verifie 2026-10-30 15:42 UTC [skip ci]
+a38fef91d fix(diag): mon test d appariement etait nul — 13 candidats pour un seul fonds
 
   git frontend
     add4a5d feat(auth): etape 1/2 — jeton sur reject-user et renew-api-key
@@ -2704,41 +2703,41 @@ a2c0540 feat(auth): etape 1/2 — envoyer le jeton sur activate-user et generate
     0                               {"id_indice":"BRVM","nom_indice":"BRVM Composite","nb_entrees":6968,"date_min":"2000-01-03T00:00
     1                               {"id_indice":"Indice_monetaire_maroc","nom_indice":null,"nb_entrees":231,"date_min":"2023-11-20T
     2                               {"id_indice":"Indice_monetaire_maroc","nom_indice":"INDICE MONETAIRE MAROC","nb_entrees":971,"da
-    3                               {"id_indice":"MASI","nom_indice":"MASI","nb_entrees":6954,"date_min":"2000-01-03T00:00:00.000Z",
+    3                               {"id_indice":"MASI","nom_indice":"MASI","nb_entrees":6955,"date_min":"2000-01-03T00:00:00.000Z",
     4                               {"id_indice":"masi_all_shares","nom_indice":null,"nb_entrees":5689,"date_min":"2002-01-03T00:00:
     5                               {"id_indice":"MONIA","nom_indice":"MONIA","nb_entrees":1000,"date_min":"2019-12-31T00:00:00.000Z
-    6                               {"id_indice":"NSE","nom_indice":"NSE All Share","nb_entrees":6993,"date_min":"2000-01-03T00:00:0
+    6                               {"id_indice":"NSE","nom_indice":"NSE All Share","nb_entrees":6994,"date_min":"2000-01-03T00:00:0
     7                               {"id_indice":"S&P Tunisia Sovereign Bond Index","nom_indice":null,"nb_entrees":2556,"date_min":"
     8                               {"id_indice":"Sovereign_bond_index","nom_indice":null,"nb_entrees":243,"date_min":"2023-11-20T00
     9                               {"id_indice":"Sovereign_bond_index","nom_indice":"S&P Morocco Sovereign Bond Index","nb_entrees"
-    10                              {"id_indice":"Tunindex","nom_indice":"Tunindex","nb_entrees":6990,"date_min":"2000-01-03T00:00:0
+    10                              {"id_indice":"Tunindex","nom_indice":"Tunindex","nb_entrees":6991,"date_min":"2000-01-03T00:00:0
 
   performances
-    0                               {"tbl":"performences","cnt":92148,"nb_fonds":1255}
-    1                               {"tbl":"performences_eurs","cnt":48376,"nb_fonds":1253}
-    2                               {"tbl":"performences_usds","cnt":48609,"nb_fonds":1253}
+    0                               {"tbl":"performences","cnt":92603,"nb_fonds":1255}
+    1                               {"tbl":"performences_eurs","cnt":48831,"nb_fonds":1253}
+    2                               {"tbl":"performences_usds","cnt":49064,"nb_fonds":1253}
 
   tables : 13 | les 10 plus volumineuses
-    valorisations                            1053932
-    devisedechanges                           133256
-    performences                               92148
-    performences_usds                          48609
-    performences_eurs                          48376
-    indice_references                          41204
+    valorisations                            1054387
+    devisedechanges                           133277
+    performences                               92603
+    performences_usds                          49064
+    performences_eurs                          48831
+    indice_references                          41207
     classementfonds                             3651
-    classementfonds_usds                        2876
-    classementfonds_eurs                        2868
+    classementfonds_usds                        2865
+    classementfonds_eurs                        2858
     fond_investissements                        1269
 
   autres cles presentes : devisedechanges_stats, valorisations_indref_coverage, routes_test, fonds_par_pays
 
 ## 3. LA COPIE DU DEPOT — FALLBACK HISTORIQUE, PAS L ETAT COURANT
-  generated_at : 2026-08-02T14:00:01.894Z  — 89 jours
+  generated_at : 2026-08-02T14:00:01.894Z  — 90 jours
   Elle n est plus rafraichie ni commitee depuis S2 : c est le remede de
   GOV-006, ou les commits automatiques du serveur venaient de ce snapshot.
   Elle garde une valeur d ARCHIVE. Ne jamais la citer comme l etat du jour.
 
-  ecart entre les deux : 89 jours.
+  ecart entre les deux : 90 jours.
   C est exactement la quantite d erreur qu une session commettait en
   suivant l ancienne regle a la lettre.
 
@@ -2747,7 +2746,7 @@ a2c0540 feat(auth): etape 1/2 — envoyer le jeton sur activate-user et generate
 ########## scripts/diag/ondemand/diag_ruptures_restantes.js ##########
 
 === RUPTURES D ECHELLE RESTANTES — toutes dates confondues ===
-Mesure le 2026-10-30 17:47:15 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:48:05 UTC — LECTURE SEULE
 Critere : saut d un facteur >= 10 par rapport a la VL precedente du meme fonds
 
 TOTAL : 156 ligne(s) sur 70 fonds
@@ -2849,9 +2848,32 @@ TOTAL : 156 ligne(s) sur 70 fonds
   135 ligne(s) AVEC provenance — a corriger a la source, jamais par suppression aveugle
 
 
+########## scripts/diag/ondemand/diag_sitemap_854_vs_1260.js ##########
+=== SITEMAP : 854 FONDS SERVIS CONTRE 1 260 ATTENDUS — LECTURE SEULE ===
+horodatage : 2026-10-31T03:48:44.088Z
+Requetes GET uniquement. Aucune mutation.
+
+--- A. /api/searchFunds vu depuis S2 ---
+  via le nom public    1260 fonds, dont 1260 avec slug
+  via localhost:3005   1260 fonds, dont 1260 avec slug
+
+--- B. /sitemap.xml : application directe contre nom public ---
+  application :3000    976 URL (855 fonds, 85 societes) — 197016 octets
+  via le nom public    976 URL (855 fonds, 85 societes) — 197016 octets
+
+--- LECTURE DU RESULTAT ---
+  A donne 854 et B donne 854 partout  -> l API tronque pour S2.
+  A donne 1260 et B:3000 donne 1260    -> Nginx sert du cache.
+  A donne 1260 et B:3000 donne 854     -> l application tronque :
+      cache de donnees Next persistant malgre force-dynamic.
+  :3000 injoignable                    -> le port differe ; relever
+      le port reel dans la config PM2 avant de conclure.
+
+LECTURE SEULE : aucune ecriture effectuee.
+
 ########## scripts/diag/ondemand/diag_source_masi.js ##########
 === SOURCE MASI — POURQUOI LE SCRAPING ECHOUE ===
-Mesure le 2026-10-30 17:47:52 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:48:44 UTC — LECTURE SEULE
 URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=json
 
 ## A. Client HTTPS de Node — celui que `scrapeMASI` utilise aujourd hui
@@ -2871,7 +2893,7 @@ URL : https://medias24.com/content/api?method=getMasiHistory&periode=1m&format=j
 
 ########## scripts/diag/ondemand/diag_source_monia.js ##########
 === MONIA — ENJEU REEL ET ACCES A LA SOURCE ===
-Mesure le 2026-10-30 17:47:53 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:48:44 UTC — LECTURE SEULE
 
 ## A. Qui se refere a MONIA ?
 
@@ -2885,17 +2907,17 @@ Mesure le 2026-10-30 17:47:53 UTC — LECTURE SEULE
 
   page EN (voie principale)
     https://www.bkam.ma/en/Markets/Key-indicators/Money-market/Monia-index-moroccan-overnight-index-average
-    HTTP 403 | 919 o | ip 3.160.39.78
+    HTTP 403 | 919 o | ip 3.160.39.72
     page de blocage : OUI
 
   page FR (voie secondaire)
     https://www.bkam.ma/Marche-monetaire/Taux-du-marche-interbancaire-MONIA
-    HTTP 403 | 919 o | ip 3.160.39.56
+    HTTP 403 | 919 o | ip 3.160.39.72
     page de blocage : OUI
 
   racine bkam.ma
     https://www.bkam.ma/
-    HTTP 403 | 919 o | ip 3.160.39.72
+    HTTP 403 | 919 o | ip 3.160.39.78
     page de blocage : OUI
 
 ## D. Conclusion a tirer, et celle a ne pas tirer
@@ -2909,7 +2931,7 @@ Mesure le 2026-10-30 17:47:53 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_sources_masi_alternatives.js ##########
 === SOURCES MASI ALTERNATIVES — CE QUI REPOND DEPUIS S2 ===
-Mesure le 2026-10-30 17:47:57 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:48:49 UTC — LECTURE SEULE
 
 ## African Markets — page indices
   https://www.african-markets.com/en/stock-markets/bvc/indices
@@ -2932,7 +2954,7 @@ Mesure le 2026-10-30 17:47:57 UTC — LECTURE SEULE
 
 ## WSJ — historique MASI
   https://www.wsj.com/market-data/quotes/index/MA/MASI/historical-prices
-  reponse : HTTP 401 | text/html | 767 o | ip 18.66.2.24
+  reponse : HTTP 401 | text/html | 767 o | ip 18.66.2.68
       → candidats « MASI + nombre > 1000 » : aucun
       → serie datee : aucune date reperable — source inutilisable telle quelle
 
@@ -2944,7 +2966,7 @@ Mesure le 2026-10-30 17:47:57 UTC — LECTURE SEULE
 
 ## Yahoo — nouvelle tentative MASI.CS
   https://query2.finance.yahoo.com/v8/finance/chart/MASI.CS?range=3mo&interval=1d
-  reponse : HTTP 429 | text/html | 23 o | ip 87.248.119.252
+  reponse : HTTP 429 | text/html | 23 o | ip 87.248.119.251
       → candidats « MASI + nombre > 1000 » : aucun
       → serie datee : aucune date reperable — source inutilisable telle quelle
 
@@ -2956,7 +2978,7 @@ date de VL a une date d indice a +/- 7 jours.
 
 ########## scripts/diag/ondemand/diag_sovereign_bond_fige.js ##########
 === Sovereign_bond_index : 6 243 VL, UN INDICE FIGE DEPUIS 2023 ===
-Mesure le 2026-10-30 17:47:58 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:48:50 UTC — LECTURE SEULE
 
 ## 1. CES VL SONT-ELLES ANCIENNES OU RECENTES ?
   6243 VL | de 2011-05-25 a 2018-02-20 | la plus recente a 3175 jours
@@ -2981,10 +3003,10 @@ Mesure le 2026-10-30 17:47:58 UTC — LECTURE SEULE
 ## 4. EXISTE-T-IL UN INDICE VIVANT POUR LES MEMES PAYS ?
   pays concernes : (aucun)
   indices vivants (moins de 30 jours) : 4
+    MASI                                   6955 valeurs  2026-10-30
+    Tunindex                               6991 valeurs  2026-10-30
     BRVM Composite                         6968 valeurs  2026-10-29
-    MASI                                   6954 valeurs  2026-10-29
-    Tunindex                               6990 valeurs  2026-10-29
-    NSE All Share                          6993 valeurs  2026-10-28
+    NSE All Share                          6994 valeurs  2026-10-29
 
   NE JAMAIS INVENTER UN BENCHMARK. Si aucun indice vivant ne correspond au
   pays ET a la categorie de ces fonds, la reponse honnete est de RETIRER la
@@ -3053,13 +3075,14 @@ Mode: DRY-RUN
 
 ########## scripts/diag/ondemand/diag_vl_detachees_rattachables.js ##########
 === LES VL DETACHEES SONT-ELLES RECUPERABLES ? ===
-Mesure le 2026-10-30 17:48:50 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:49:45 UTC — LECTURE SEULE
 
 ## A. CELLES QUI PORTENT UN `fund_id` VERS UN FONDS DISPARU
   21698 ligne(s), reparties sur 17 identifiant(s) de fonds disparus.
 
   Les 10 identifiants les plus charges :
    fund_id      VL  periode
+      1419    1548  2011-05-25 → 2018-02-20
       1421    1548  2011-05-25 → 2018-02-20
       1438    1548  2011-05-25 → 2018-02-20
       1422    1548  2011-05-25 → 2018-02-20
@@ -3069,7 +3092,6 @@ Mesure le 2026-10-30 17:48:50 UTC — LECTURE SEULE
       1443    1548  2011-05-25 → 2018-02-20
       1425    1548  2011-05-25 → 2018-02-20
       1429    1548  2011-05-25 → 2018-02-20
-      1430    1548  2011-05-25 → 2018-02-20
 
   CES IDENTIFIANTS LAISSENT-ILS UNE TRACE NOMMEE AILLEURS ?
   performences             0 identifiant(s) retrouve(s) | nom disponible dans `fond`
@@ -3111,7 +3133,7 @@ Mesure le 2026-10-30 17:48:50 UTC — LECTURE SEULE
 ## CE QUE COUTE L INACTION
   Aucun chiffre affiche a l utilisateur n est faux : toute requete joignant
   `fond_investissements` exclut ces lignes.
-  Mais tout COUNT(*) brut les inclut. La table annonce 1053932 VL ;
+  Mais tout COUNT(*) brut les inclut. La table annonce 1054387 VL ;
   39785 ne se rattachent a rien, soit 3.77 %.
   Tout document du projet citant une volumetrie les compte sans le dire —
   y compris `PRODUCTION_STATE.json` et `ROADMAP.md`.
@@ -3120,10 +3142,10 @@ Mesure le 2026-10-30 17:48:50 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_vl_sans_fonds.js ##########
 === VALORISATIONS RATTACHEES A AUCUN FONDS ===
-Mesure le 2026-10-30 17:48:54 UTC — LECTURE SEULE
+Mesure le 2026-10-31 03:49:49 UTC — LECTURE SEULE
 
 ## 1. COMBIEN, ET DE QUELLE FORME ?
-  total valorisations          : 1053932
+  total valorisations          : 1054387
   fund_id IS NULL              : 18087 (1.72 %)
   fund_id vers un fonds absent : 21698
   Les deux formes sont distinctes : la premiere n a jamais eu de fonds,
@@ -3166,7 +3188,7 @@ Mesure le 2026-10-30 17:48:54 UTC — LECTURE SEULE
 ## 5. FAUSSENT-ELLES UN CHIFFRE AFFICHE ?
   Toute requete joignant `fond_investissements` les exclut d office :
   elles sont donc absentes des fiches, performances et classements.
-  Elles ne pesent que sur un COUNT(*) brut : 18087/1053932 = 1.72 %.
+  Elles ne pesent que sur un COUNT(*) brut : 18087/1054387 = 1.72 %.
   → impact affichage NUL, impact sur les comptes de pilotage REEL.
   Gravite : faible pour l utilisateur, mais tout chiffre de volumetrie
   cite dans un document les inclut sans le dire.
@@ -3192,7 +3214,7 @@ Mesure le 2026-10-30 17:48:54 UTC — LECTURE SEULE
 
 ########## scripts/diag/ondemand/diag_w1_benchmark_lookahead_scope.js ##########
 === W1 BENCHMARK LOOK-AHEAD — HIGH CONFIDENCE SCOPE ===
-Mesure le 2026-10-30T17:49:21.470Z — LECTURE SEULE
+Mesure le 2026-10-31T03:50:16.379Z — LECTURE SEULE
 
 ## A. Scope par pays
   pays   rows  distinct_funds  distinct_vl_dates  min_vl_date  max_vl_date
@@ -3226,7 +3248,7 @@ VERDICT=W1_BENCHMARK_LOOKAHEAD_SCOPE_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_foundations.js ##########
 === W1 FOUNDATIONS — LIVE SCHEMA / RELATIONSHIPS / PROVENANCE ===
-Mesure le 2026-10-30T17:49:23.790Z — LECTURE SEULE
+Mesure le 2026-10-31T03:50:18.848Z — LECTURE SEULE
 
 ## A. Tables canoniques / referentielles presentes
   table                      present  approx_rows
@@ -3235,9 +3257,9 @@ Mesure le 2026-10-30T17:49:23.790Z — LECTURE SEULE
   societes                   YES      156        
   documents                  YES      5          
   personnel_sgs              YES      5          
-  valorisations              YES      1039393    
-  indice_references          YES      40649      
-  devisedechanges            YES      130302     
+  valorisations              YES      1039774    
+  indice_references          YES      40652      
+  devisedechanges            YES      130323     
   ref_asset_classes          YES      4          
   ref_geo_zones              YES      29         
   ref_categories_fundafrica  YES      140        
@@ -3289,12 +3311,12 @@ Mesure le 2026-10-30T17:49:23.790Z — LECTURE SEULE
 Global:
   total    with_currency  with_price_type  with_source  with_report_date  with_quality  with_batch
   -------  -------------  ---------------  -----------  ----------------  ------------  ----------
-  1053932  68746          68442            68442        68442             76124         52003     
+  1054387  68746          68442            68442        68442             76124         52003     
 Par pays:
   pays     total   with_currency  with_price_type  with_source  with_quality
   -------  ------  -------------  ---------------  -----------  ------------
-  MAROC    572088  0              0                0            0           
-  TUNISIE  313353  0              0                0            0           
+  MAROC    572417  0              0                0            0           
+  TUNISIE  313479  0              0                0            0           
   NIGERIA  78152   68746          68442            68442        76124       
   UEMOA    48420   0              0                0            0           
   CEMAC    2134    0              0                0            0           
@@ -3311,8 +3333,8 @@ Par pays:
 ## H. Indices / FX — bornes temporelles
   authority          rows_count  series_count  min_date                                                        max_date                                                      
   -----------------  ----------  ------------  --------------------------------------------------------------  --------------------------------------------------------------
-  indice_references  41204       9             Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Thu Oct 29 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
-  devisedechanges    133256      21            Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Thu Oct 29 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
+  indice_references  41207       9             Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Fri Oct 30 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
+  devisedechanges    133277      21            Mon Jan 03 2000 00:00:00 GMT+0000 (Coordinated Universal Time)  Fri Oct 30 2026 00:00:00 GMT+0000 (Coordinated Universal Time)
 
 ## I. Colonnes documents — capacité de provenance documentaire
   id, nom, fichier, societe, date, annee, mois, type_fichier, fond_id, objet, fond, created_at, updated_at, societe_id
@@ -3321,7 +3343,7 @@ VERDICT=W1_FOUNDATION_SCHEMA_OBSERVED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_identity_gaps.js ##########
 === W1 FUND / MANAGER IDENTITY GAPS ===
-Mesure le 2026-10-30T17:49:35.745Z — LECTURE SEULE
+Mesure le 2026-10-31T03:50:31.619Z — LECTURE SEULE
 
 ## A. Completude par pays
   pays     total  active  missing_isin  missing_societe_id  missing_manager_text  text_without_id
@@ -3354,7 +3376,7 @@ VERDICT=W1_IDENTITY_GAPS_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_manager_alias_candidates.js ##########
 === W1 MANAGER ALIAS CANDIDATES — READ ONLY ===
-Mesure le 2026-10-30T17:49:35.913Z
+Mesure le 2026-10-31T03:50:31.830Z
 
 ## A. Classification des labels
   classification         count
@@ -3393,7 +3415,7 @@ VERDICT=W1_MANAGER_ALIAS_CANDIDATES_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_nigeria_transport_readiness.js ##########
 === W1 NIGERIA METADATA TRANSPORT READINESS ===
-Mesure le 2026-10-30T17:49:36.019Z — LECTURE SEULE
+Mesure le 2026-10-31T03:50:31.940Z — LECTURE SEULE
 CSV_PRESENT=YES
 CSV_SIZE_BYTES=11951498
 CSV_MTIME=2026-10-26T10:00:40.048Z
@@ -3439,31 +3461,31 @@ VERDICT=W1_NIGERIA_METADATA_TRANSPORT_READINESS_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_recent_provenance.js ##########
 === W1 RECENT PROVENANCE — CANONICAL VALUATIONS ===
-Mesure le 2026-10-30T17:49:36.610Z — LECTURE SEULE
+Mesure le 2026-10-31T03:50:32.618Z — LECTURE SEULE
 
 ## Fenetre 30 jours
   pays     total  currency  price_type  source  report_date  quality  batch 
   -------  -----  --------  ----------  ------  -----------  -------  ------
-  MAROC    8063   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
+  MAROC    8069   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
   TUNISIE  2516   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
-  UEMOA    311    0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
+  UEMOA    291    0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
   NIGERIA  54     100.0%    0.0%        0.0%    0.0%         100.0%   100.0%
 
 ## Fenetre 90 jours
   pays     total  currency  price_type  source  report_date  quality  batch 
   -------  -----  --------  ----------  ------  -----------  -------  ------
-  MAROC    22461  0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
-  TUNISIE  7297   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
+  MAROC    22790  0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
+  TUNISIE  7423   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
   UEMOA    1239   0.0%      0.0%        0.0%    0.0%         0.0%     0.0%  
   NIGERIA  238    100.0%    0.0%        0.0%    0.0%         100.0%   100.0%
 
 ## Fenetre 365 jours
   pays     total  currency  price_type  source  report_date  quality  batch
   -------  -----  --------  ----------  ------  -----------  -------  -----
-  MAROC    68267  0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
-  TUNISIE  27342  0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
+  MAROC    68408  0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
+  TUNISIE  27343  0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
   NIGERIA  8529   98.5%     94.9%       94.9%   94.9%        98.5%    80.8%
-  UEMOA    6178   0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
+  UEMOA    6159   0.0%      0.0%        0.0%    0.0%         0.0%     0.0% 
 
 ## Nigeria — statuts data_quality par annee de VL
   year  quality      rows_count
@@ -3556,7 +3578,7 @@ VERDICT=W1_RECENT_PROVENANCE_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_runtime_schema_gate.js ##########
 === W1 RUNTIME SCHEMA GATE ===
-Mesure le 2026-10-30T17:49:38.719Z — LECTURE SEULE
+Mesure le 2026-10-31T03:50:35.085Z — LECTURE SEULE
 DB_SYNC_ALTER_TRUE=NO
 DB_SYNC_TRUE=NO
 NODE_ENV=production
@@ -3565,19 +3587,19 @@ VERDICT=W1_RUNTIME_SCHEMA_GATE_OBSERVED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w1_temporal_integrity.js ##########
 === W1 TEMPORAL INTEGRITY — FX / BENCHMARK LOOK-AHEAD ===
-Mesure le 2026-10-30T17:49:38.866Z — LECTURE SEULE
+Mesure le 2026-10-31T03:50:35.259Z — LECTURE SEULE
 
 ## A. Bornes des series FX pertinentes
   paire    min_date    max_date    rows_count
   -------  ----------  ----------  ----------
-  EUR/MAD  2000-01-03  2026-10-29  7557      
-  EUR/TND  2003-12-01  2026-10-29  6089      
-  EUR/XAF  2000-01-03  2026-10-29  7000      
-  EUR/XOF  2000-01-03  2026-10-29  7000      
-  USD/MAD  2000-01-03  2026-10-29  7659      
-  USD/TND  2003-12-01  2026-10-29  6412      
-  USD/XAF  2000-01-03  2026-10-29  6929      
-  USD/XOF  2000-01-03  2026-10-29  6918      
+  EUR/MAD  2000-01-03  2026-10-30  7558      
+  EUR/TND  2003-12-01  2026-10-30  6090      
+  EUR/XAF  2000-01-03  2026-10-30  7001      
+  EUR/XOF  2000-01-03  2026-10-30  7001      
+  USD/MAD  2000-01-03  2026-10-30  7660      
+  USD/TND  2003-12-01  2026-10-30  6413      
+  USD/XAF  2000-01-03  2026-10-30  6930      
+  USD/XOF  2000-01-03  2026-10-30  6919      
 
 ## B. Exposition historique avant le premier taux disponible
   pays     pair     first_fx    vl_before_first_fx
@@ -3590,9 +3612,9 @@ Mesure le 2026-10-30T17:49:38.866Z — LECTURE SEULE
 ## C. Benchmark recent — comparaison stored vs latest<=VL vs nearest absolu
   pays     rows   exact  stored_matches_latest_prior  stored_matches_future  future_nearest_candidate  no_series
   -------  -----  -----  ---------------------------  ---------------------  ------------------------  ---------
-  MAROC    19806  16649  17887                        1919                   1919                      0        
-  TUNISIE  7171   7045   7045                         126                    0                         0        
-  UEMOA    1704   1696   1696                         8                      0                         0        
+  MAROC    19817  16660  17898                        1919                   1919                      0        
+  TUNISIE  7297   7171   7171                         126                    0                         0        
+  UEMOA    1709   1701   1701                         8                      0                         0        
   NIGERIA  88     88     88                           0                      0                         0        
   Nigeria  54     54     54                           0                      0                         0        
 
@@ -3676,16 +3698,16 @@ PYTHON_EXIT_CODE=0
 
 ########## scripts/diag/ondemand/diag_w2_country_panel_contracts.js ##########
 === W2 COUNTRY PANEL CONTRACTS — LIVE GET PROBE ===
-Mesure le 2026-10-30T17:49:54.945Z — GET ONLY
+Mesure le 2026-10-31T03:50:51.295Z — GET ONLY
   name                         path                                   status  content_type      json_top_keys  body_bytes_seen
   ---------------------------  -------------------------------------  ------  ----------------  -------------  ---------------
   getPays                      /api/getPays                           200     application/json  code,data      1189           
   getRegulateur_MAROC          /api/getRegulateur?pays=MAROC          200     application/json  code,data      154            
   getDevise_MAROC              /api/getDevise?pays=MAROC              200     application/json  code,data      61             
   getfondbyuser_MAROC          /api/getfondbyuser/0?pays=MAROC        200     application/json  code,data      32             
-  getfondbyuservalide_MAROC    /api/getfondbyuservalide/0?pays=MAROC  200     application/json  NON_JSON       64585          
+  getfondbyuservalide_MAROC    /api/getfondbyuservalide/0?pays=MAROC  200     application/json  NON_JSON       31817          
   getallfondsvlanomalie_MAROC  /api/getallfondsvlanomalie?pays=MAROC  200     application/json  NON_JSON       64584          
-  getfondbypays_MAROC          /api/getfondbypays/MAROC               200     application/json  NON_JSON       64584          
+  getfondbypays_MAROC          /api/getfondbypays/MAROC               200     application/json  NON_JSON       31816          
 
 STATIC_FINDING=app.js mounts routes_vl.js and routes_vl.js transitively mounts routes_vl_admin.js
 STATIC_FINDING=/api/importfondsvl has no current API implementation found by repository search
@@ -3694,27 +3716,27 @@ VERDICT=W2_COUNTRY_PANEL_CONTRACTS_OBSERVED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w2_country_pipelines.js ##########
 === W2 COUNTRY PIPELINES — LIVE READ-ONLY INVENTORY ===
-Mesure le 2026-10-30T17:49:58.012Z — LECTURE SEULE
+Mesure le 2026-10-31T03:50:54.339Z — LECTURE SEULE
 
 ## A. Canonical fund/VL state by market
   pays     funds  active_funds  vl_rows  latest_vl   vl_30d
   -------  -----  ------------  -------  ----------  ------
-  MAROC    649    649           572088   2026-10-28  8063  
+  MAROC    649    649           572417   2026-10-29  8069  
   NIGERIA  337    336           78152    2026-10-09  54    
-  TUNISIE  131    131           313353   2026-10-29  2516  
-  UEMOA    118    111           48420    2026-10-28  311   
+  TUNISIE  131    131           313479   2026-10-30  2516  
+  UEMOA    118    111           48420    2026-10-28  291   
   CEMAC    34     34            2134     2024-12-12  0     
 
 ## B. Staging/audit tables
   table                     present  approx_rows
   ------------------------  -------  -----------
-  cmf_import_audit          YES      65         
+  cmf_import_audit          YES      66         
   cmf_extreme_variations    YES      2          
   cmf_new_funds_queue       YES      0          
   brvm_boc_sources          YES      1129       
   brvm_boc_navs_raw         YES      114440     
   brvm_fund_aliases         YES      103        
-  brvm_import_logs          YES      132        
+  brvm_import_logs          YES      133        
   brvm_missing_navs         YES      2          
   bvmac_boc_sources         NO       -          
   bvmac_boc_navs_raw        NO       -          
@@ -3737,15 +3759,15 @@ Mesure le 2026-10-30T17:49:58.012Z — LECTURE SEULE
 ## D. Evidence/artifact directories
   path              present  files
   ----------------  -------  -----
-  data/tunisie_cmf  YES      376  
-  data/brvm_boc     YES      1558 
+  data/tunisie_cmf  YES      380  
+  data/brvm_boc     YES      1561 
   data/bvmac_boc    NO       0    
   sec_ng_downloads  YES      564  
 
 ## E. Source-specific recent audit counts
   surface                    table                     present  rows  
   -------------------------  ------------------------  -------  ------
-  TUNISIA_AUDIT              cmf_import_audit          YES      65    
+  TUNISIA_AUDIT              cmf_import_audit          YES      66    
   UEMOA_SOURCES              brvm_boc_sources          YES      1193  
   UEMOA_RAW                  brvm_boc_navs_raw         YES      123798
   CEMAC_SOURCES              bvmac_boc_sources         NO       -     
@@ -3765,23 +3787,23 @@ VERDICT=W2_COUNTRY_PIPELINES_OBSERVED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w2_p1_source_pilots.js ##########
 === W2 P1 GHANA / KENYA SOURCE PILOTS — TECHNICAL REACHABILITY ===
-Mesure le 2026-10-30T17:49:59.214Z — HTTP GET ONLY / NO WRITE
+Mesure le 2026-10-31T03:50:55.438Z — HTTP GET ONLY / NO WRITE
 IMPLEMENTATION=NODE_CORE_HTTP_ONLY
-{"market":"GHANA","manager":"CAL Asset Management","role":"DAILY_PRICE_HISTORY_CANDIDATE","status":200,"content_type":"text/html","bytes_seen":855352,"elapsed_ms":370,"marker_counts":{"PRICE":4,"GHS":2,"Performance":18},"final_url":"https://calassetmanagement.net/about-us/reports-2/performance-update"}
-{"market":"GHANA","manager":"EDC / Ecobank","role":"DATED_FUND_VALUES_CANDIDATE","status":"ERROR","content_type":"-","bytes_seen":0,"elapsed_ms":1195,"marker_counts":{"fund":0,"GHS":0,"GHC":0},"error":"too many redirects"}
-{"market":"KENYA","manager":"NCBA","role":"DIRECT_DAILY_PRICE_CANDIDATE","status":200,"content_type":"text/html","bytes_seen":362559,"elapsed_ms":1423,"marker_counts":{"Buy Price":1,"Sell Price":1,"daily price":1,"KES":7},"final_url":"https://ncbagroup.com/investment-banking/equity-fund/"}
+{"market":"GHANA","manager":"CAL Asset Management","role":"DAILY_PRICE_HISTORY_CANDIDATE","status":200,"content_type":"text/html","bytes_seen":855352,"elapsed_ms":379,"marker_counts":{"PRICE":4,"GHS":2,"Performance":18},"final_url":"https://calassetmanagement.net/about-us/reports-2/performance-update"}
+{"market":"GHANA","manager":"EDC / Ecobank","role":"DATED_FUND_VALUES_CANDIDATE","status":"ERROR","content_type":"-","bytes_seen":0,"elapsed_ms":1202,"marker_counts":{"fund":0,"GHS":0,"GHC":0},"error":"too many redirects"}
+{"market":"KENYA","manager":"NCBA","role":"DIRECT_DAILY_PRICE_CANDIDATE","status":200,"content_type":"text/html","bytes_seen":362563,"elapsed_ms":3052,"marker_counts":{"Buy Price":1,"Sell Price":1,"daily price":1,"KES":7},"final_url":"https://ncbagroup.com/investment-banking/equity-fund/"}
 REACHABLE_SOURCES=2/3
 RULE=HTTP reachability and markers prove only technical source feasibility, not NAV semantics, licence, identity mapping or permission to import.
 VERDICT=W2_P1_SOURCE_PILOTS_MEASURED_READ_ONLY
 
 ########## scripts/diag/ondemand/diag_w2_runtime_route_drift.js ##########
 === W2 RUNTIME ROUTE DRIFT — READ ONLY ===
-Mesure le 2026-10-30T17:50:02.299Z
+Mesure le 2026-10-31T03:51:00.139Z
 
 ## A. Process vs checkout
-  git_head      head_message                                                            pm2_script  pm2_cwd  process_started  restart_count  commits_since_process_start
-  ------------  ----------------------------------------------------------------------  ----------  -------  ---------------  -------------  ---------------------------
-  d7985072e4b5  chore(diag): etat de production verifie 2026-10-30 17:41 UTC [skip ci]  -           -        -                -              UNKNOWN                    
+  git_head      head_message                                                                pm2_script  pm2_cwd  process_started  restart_count  commits_since_process_start
+  ------------  --------------------------------------------------------------------------  ----------  -------  ---------------  -------------  ---------------------------
+  fd3f1905ff2c  diag(sitemap): mon hypothese du « figement a la construction » est REFUTEE  -           -        -                -              UNKNOWN                    
 
 FIRST_COMMIT_AFTER_PROCESS_START=-
 
