@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "1c42c72821f600f0913f0bcb98065f6ecdf4098e"
+      "head": "6a0cd4427caf4d1c07113e59c39e82bf342eaa43"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "02df06ed729d5a35132056b22cdc4593b8c4b96c"
+      "head": "a2cc791605234b563be8ebcc96d82602124b6509"
     }
   },
   "summary": {
@@ -10164,11 +10164,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "2e388d6d5b08db1cb747f3d30dc4eb11c1757d24",
-      "last_validated_sha": "2e388d6d5b08db1cb747f3d30dc4eb11c1757d24",
-      "content_sha256": "edf1e2dd8ba2bd5e3e32aac5d77350790dbd33798eac2fc7a85ad2c601d11c18",
-      "line_count": 3806,
-      "byte_count": 282982,
+      "git_blob_sha": "b98e06cf68c3268d6d230112f3cfe16581741dd1",
+      "last_validated_sha": "b98e06cf68c3268d6d230112f3cfe16581741dd1",
+      "content_sha256": "20092a4309af46f473a108733bb5d7631921efbac1c6f06982384acc5a962503",
+      "line_count": 3828,
+      "byte_count": 284013,
       "headings": [
         {
           "level": 1,
@@ -10355,11 +10355,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "c2bf1bde29a5fab85bd45e01eea2d9d028fad4b5",
-      "last_validated_sha": "c2bf1bde29a5fab85bd45e01eea2d9d028fad4b5",
-      "content_sha256": "b1eae388eb129664e0a160e6781dffc73c0c434ff805abc579dd54000054a5a3",
+      "git_blob_sha": "b457741fe38c9d7c20f407c85121f1bba9f409c1",
+      "last_validated_sha": "b457741fe38c9d7c20f407c85121f1bba9f409c1",
+      "content_sha256": "cc00bedeeb26f288f8fb057d0ac8e018ce74bf09f9ca37c1e8a79962378d2841",
       "line_count": 96,
-      "byte_count": 7205,
+      "byte_count": 7202,
       "headings": [
         {
           "level": 1,
@@ -13667,6 +13667,10 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "POINT DE REPRISE COURANT — 2026-10-31 — Lot DQ : la PR frontend est fusionnee, la production ne la sert PAS, et mon hypothese du sitemap est refutee",
+        "La PR #1 du frontend a ete fusionnee — et cela a servi a mesurer",
+        "Premier constat : une fusion n'est PAS un deploiement",
+        "Second constat : mon hypothese du lot DL est REFUTEE",
         "POINT DE REPRISE COURANT — 2026-10-30 — Lot DP : le 26 octobre marocain ne s'est pas auto-corrige, et la file gouvernee MCP ne concerne PAS ce chantier",
         "La file de taches gouvernee MCP ne porte AUCUNE tache de ce chantier",
         "Hypothese de reaffectation entre fonds : REFUTEE par un temoin",
@@ -13680,11 +13684,7 @@
         "La devise DECLAREE n'est pas celle que je supposais",
         "Les zeros depassent tres largement les fonds de C7",
         "Et le taux publie, existe-t-il ?",
-        "Un piege de metrique, signale",
-        "POINT DE REPRISE COURANT — 2026-10-30 — Lot DM : la performance de 143 958 % affichee EST le taux de change",
-        "Les deux echecs critiques n'en font qu'UN",
-        "Preuve par coherence interne, sans donnee exterieure",
-        "Deux de mes propres conclusions, retirees en cours de route"
+        "Un piege de metrique, signale"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13700,11 +13700,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "6acd3fe6e182caa485f7f0060909de8588453405",
-      "last_validated_sha": "6acd3fe6e182caa485f7f0060909de8588453405",
-      "content_sha256": "f20bdcf45f95a8bfbbc03dcdad04dfd09127796edf48dc5194a114e48563ec92",
-      "line_count": 11987,
-      "byte_count": 745304,
+      "git_blob_sha": "bd054523e054fd6b5d5edf42bfa9a85d870edb6a",
+      "last_validated_sha": "bd054523e054fd6b5d5edf42bfa9a85d870edb6a",
+      "content_sha256": "f2bb6d8416e3344eba26b09452b731f3cc2a8c84aa3bf2b516dac562bb783fac",
+      "line_count": 12054,
+      "byte_count": 748689,
       "headings": [
         {
           "level": 1,
@@ -13713,6 +13713,22 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "POINT DE REPRISE COURANT — 2026-10-31 — Lot DQ : la PR frontend est fusionnee, la production ne la sert PAS, et mon hypothese du sitemap est refutee"
+        },
+        {
+          "level": 3,
+          "text": "La PR #1 du frontend a ete fusionnee — et cela a servi a mesurer"
+        },
+        {
+          "level": 3,
+          "text": "Premier constat : une fusion n'est PAS un deploiement"
+        },
+        {
+          "level": 3,
+          "text": "Second constat : mon hypothese du lot DL est REFUTEE"
         },
         {
           "level": 2,
@@ -13849,22 +13865,6 @@
         {
           "level": 3,
           "text": "Correction d'un chiffre a moi"
-        },
-        {
-          "level": 2,
-          "text": "POINT DE REPRISE COURANT — 2026-10-30 — Lot DI : 402 classeurs UMOA-Titres ouverts, et deux conventions opposees dans la MEME zone"
-        },
-        {
-          "level": 3,
-          "text": "Le resultat le plus lourd : des FRACTIONS, a l'oppose de la BCEAO"
-        },
-        {
-          "level": 3,
-          "text": "Quatre orthographes pour la Cote d'Ivoire"
-        },
-        {
-          "level": 3,
-          "text": "Deux defauts de mon propre script, corriges"
         }
       ]
     },
