@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "fcee6ac9ff61e6491113522470799185a8bafd08"
+      "head": "0b36d3c6a010032454f88cc756569f17067d8888"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -10164,11 +10164,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "63d9255cf0c9e869dc4a994e236a0cedf1f78a92",
-      "last_validated_sha": "63d9255cf0c9e869dc4a994e236a0cedf1f78a92",
-      "content_sha256": "a4d9fc44d713e6fcee78f6fe7dd1f64d4b659a7739a049dc5c3969e0054c4b32",
-      "line_count": 3840,
-      "byte_count": 283536,
+      "git_blob_sha": "f415205be8043c2a61310ced8acb1a2372489040",
+      "last_validated_sha": "f415205be8043c2a61310ced8acb1a2372489040",
+      "content_sha256": "2887b52fb1c18eadfc7f94909fdfa8da9a2cd5af3c55749c363c487f46a33b71",
+      "line_count": 3839,
+      "byte_count": 283581,
       "headings": [
         {
           "level": 1,
@@ -10355,9 +10355,9 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "62a0941f4c1524fe662d155516909564ae2f6018",
-      "last_validated_sha": "62a0941f4c1524fe662d155516909564ae2f6018",
-      "content_sha256": "8fd62017b32983f6d7fbf8fb3999168347c0031ca74d2372f744f1c2670ecb42",
+      "git_blob_sha": "e06409ad82f9a674647f6142e030c27c7ec115ba",
+      "last_validated_sha": "e06409ad82f9a674647f6142e030c27c7ec115ba",
+      "content_sha256": "d950e869f411893a4d135faec575124c47ecb6fbdb5feadbcf8f35792efdfc0c",
       "line_count": 96,
       "byte_count": 7089,
       "headings": [
