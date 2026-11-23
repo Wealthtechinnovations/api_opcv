@@ -155,6 +155,24 @@ jobs:
           set -euo pipefail
           API_SHA="$(git -C api rev-parse HEAD)"
           FRONT_SHA="$(git -C frontend rev-parse HEAD)"
+          # Do not reuse a RELEASED claim from a completed programme task.
+          # The existing queue is the only authority; ambiguous or absent ACTIVE
+          # programme claims fail closed instead of bypassing the engine guard.
+          CLAIM_TASK_ID="$(python3 - <<'PY'
+          import json
+          q=json.load(open("api/.governance/loop/task-queue.json",encoding="utf-8"))
+          active=[
+              t["id"] for t in q.get("tasks",[])
+              if t.get("program")=="PROGRAMME_DIRECTOR"
+              and t.get("status")=="IN_PROGRESS"
+              and (t.get("claim") or {}).get("status")=="ACTIVE"
+          ]
+          if len(active)!=1:
+              raise SystemExit("PROGRAMME_DIRECTOR_ACTIVE_CLAIM_AMBIGUOUS_OR_MISSING")
+          print(active[0])
+          PY
+          )"
+
 
           set +e
           python3 api/scripts/governance/program_projection_writeback.py \
@@ -163,7 +181,7 @@ jobs:
             --generator-json out/program-projection-generator.json \
             --expected-api-sha 0000000000000000000000000000000000000000 \
             --expected-frontend-sha "$FRONT_SHA" \
-            --task-id AF-TASK-027 \
+            --task-id "$CLAIM_TASK_ID" \
             --output out/program-writeback-head-mismatch.json \
             > out/program-writeback-head-mismatch.log 2>&1
           mismatch_rc=$?
@@ -182,7 +200,7 @@ jobs:
             --generator-json out/program-projection-generator.json \
             --expected-api-sha "$API_SHA" \
             --expected-frontend-sha "$FRONT_SHA" \
-            --task-id AF-TASK-027 \
+            --task-id "$CLAIM_TASK_ID" \
             --output out/program-writeback-dry-run.json \
             > out/program-writeback-dry-run.log
 
@@ -233,7 +251,7 @@ jobs:
             --generator-json "$GITHUB_WORKSPACE/out/program-projection-generator.json" \
             --expected-api-sha "$API_SHA" \
             --expected-frontend-sha "$FRONT_SHA" \
-            --task-id AF-TASK-027 \
+            --task-id "$CLAIM_TASK_ID" \
             --output out/program-writeback-apply-a.json \
             --apply \
             > out/program-writeback-apply-a.log
@@ -244,7 +262,7 @@ jobs:
             --generator-json "$GITHUB_WORKSPACE/out/program-projection-generator.json" \
             --expected-api-sha "$API_SHA" \
             --expected-frontend-sha "$FRONT_SHA" \
-            --task-id AF-TASK-027 \
+            --task-id "$CLAIM_TASK_ID" \
             --output out/program-writeback-apply-b.json \
             --apply \
             > out/program-writeback-apply-b.log
