@@ -4,7 +4,7 @@
 ### Projection gérée — itération courante
 
 - operational_priority: `AF-OPS-003`
-- operational_phase: `POST_FIX_VALIDATION`
+- operational_phase: `POST_FIX_VALIDATION_MEMORY_AND_STATEMENTS_OBSERVED`
 - programme_task: `AF-TASK-028`
 - programme_status: `IN_PROGRESS`
 - programme_phase: `MANUAL_WRITEBACK_WORKFLOW_PREFLIGHT`

@@ -4,10 +4,10 @@
 ### Projection gérée — handoff
 
 - operational_priority: `AF-OPS-003`
-- operational_phase: `POST_FIX_VALIDATION`
+- operational_phase: `POST_FIX_VALIDATION_MEMORY_AND_STATEMENTS_OBSERVED`
 - programme_task: `AF-TASK-028`
 - active_claims: `AF-TASK-017, AF-TASK-028`
-- handoff_next_action: `AF-OPS-003 remains POST_FIX_VALIDATION. Programme Director AF-TASK-028 is IN_PROGRESS / MANUAL_WRITEBACK_WORKFLOW_PREFLIGHT after AF-TASK-027 writeback engine GREEN (AF-EVD-068). Build workflow_dispatch-only projection maintenance with dry-run default, explicit confirmation for apply, expected API/frontend SHAs and immediate head rechecks. No scheduled/push auto-apply and no S2/runtime mutation.`
+- handoff_next_action: `AF-OPS-003 : trois preuves sur quatre acquises (AF-EVD-071), phase POST_FIX_VALIDATION_MEMORY_AND_STATEMENTS_OBSERVED ; obtenir une comparaison DIRECTE des sorties de recalcul avant/apres, sans redemarrage MariaDB ni mutation DB non autorisee. AF-TASK-028 : poursuivre uniquement le workflow manuel workflow_dispatch, dry-run par defaut, confirmation explicite pour apply, expected API/frontend HEADs, garde anti-collision et tests; aucun apply programme ni deploiement S2.`
 
 <!-- PROGRAMME_DIRECTOR:END -->
 

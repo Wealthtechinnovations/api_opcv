@@ -6,7 +6,7 @@
 - loop_id: `AF-GOV-FINAL-CERT-20260911-01`
 - governance_current_task: `AF-TASK-010`
 - operational_priority: `AF-OPS-003`
-- operational_phase: `POST_FIX_VALIDATION`
+- operational_phase: `POST_FIX_VALIDATION_MEMORY_AND_STATEMENTS_OBSERVED`
 - programme_task: `AF-TASK-028`
 - programme_phase: `MANUAL_WRITEBACK_WORKFLOW_PREFLIGHT`
 

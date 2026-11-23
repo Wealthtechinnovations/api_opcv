@@ -4,8 +4,8 @@
 ### Projection gérée — statut
 
 - operational_priority: `AF-OPS-003`
-- operational_phase: `POST_FIX_VALIDATION`
-- programme_task: `AF-TASK-027`
+- operational_phase: `POST_FIX_VALIDATION_MEMORY_AND_STATEMENTS_OBSERVED`
+- programme_task: `AF-TASK-028`
 - anti_regression: `ACTIVE_HARD_FAIL_EXISTING_INVARIANTS_ONLY`
 - projection_drift: `ACTIVE_FAIL_CLOSED_CURRENT_PROJECTIONS`
 - claim_enforcement: `ADVISORY_ONLY_NO_WRITE_BLOCK`
