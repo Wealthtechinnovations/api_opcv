@@ -85,6 +85,15 @@ jobs:
           active = [t for t in q['tasks'] if t.get('program') == 'PROGRAMME_DIRECTOR' and t.get('status') == 'IN_PROGRESS' and (t.get('claim') or {}).get('status') == 'ACTIVE']
           assert len(active) == 1 and active[0]['id'] == 'AF-TASK-028', 'PROGRAMME_CLAIM_MISSING_OR_AMBIGUOUS'
           PY
+          python3 - <<'PY'
+          from pathlib import Path
+          begin = '<!-- PROGRAMME_DIRECTOR:BEGIN -->'
+          end = '<!-- PROGRAMME_DIRECTOR:END -->'
+          for p in [Path('api') / n for n in ('NEXT_ACTION.md','CURRENT_ITERATION.md','LOOP_STATE.md','HANDOFF.md','STATUS.md')] + [Path('frontend/SUIVI.md')]:
+              content = p.read_text(encoding='utf-8')
+              if content.count(begin) != 1 or content.count(end) != 1 or content.index(begin) >= content.index(end):
+                  raise SystemExit('MANAGED_MARKER_DRIFT: ' + str(p))
+          PY
           for suffix in a b; do
             python3 api/scripts/governance/program_projection_generator.py --api-root api --frontend-root frontend --output "out/generator-$suffix.json" > "out/generator-$suffix.log"
           done

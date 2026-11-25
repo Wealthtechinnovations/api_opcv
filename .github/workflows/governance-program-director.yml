@@ -60,8 +60,8 @@ jobs:
           fetch-depth: 1
           token: ${{ github.token }}
 
-      - name: Test manual projection preflight contract (simulated dispatch guards)
-        run: python3 api/scripts/governance/program_manual_preflight_contract.py
+      - name: Test manual projection preflight contract and isolated Git recipe
+        run: python3 api/scripts/governance/program_manual_preflight_contract.py --api-root api --frontend-root frontend
 
       - name: Derive programme state read-only
         run: |
