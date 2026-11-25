@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "006f975218e8345bbf42ae2fe7099b216279d8d9"
+      "head": "210d74c993c292b55abc6e2222ff07ec4ce837bb"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "09c3cf780a8200f56c2b39f095f3cb0a1ea4873e"
+      "head": "b2d924a52f34b55b7a97605a3fa474b7941ad61d"
     }
   },
   "summary": {
@@ -4207,7 +4207,8 @@
         "2026-11-25 — AF-TASK-028 : préflight manuel et recette bornée",
         "2026-11-25 — AF-TASK-028 : recette CI équivalente et admission candidate",
         "2026-11-25 — AF-TASK-028 : leases et publication bi-repository",
-        "2026-11-25 — AF-TASK-028 : publication validée et raccordement du plan"
+        "2026-11-25 — AF-TASK-028 : publication validée et raccordement du plan",
+        "2026-11-25 — AF-TASK-028 : recette intégrée verte et checkpoint"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -4223,11 +4224,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "7a061cf32ee61a011da2e4b9699ad6d7d949cf8f",
-      "last_validated_sha": "7a061cf32ee61a011da2e4b9699ad6d7d949cf8f",
-      "content_sha256": "b53cd61149cab6e4bf3dab02e713c42359005544e31475f1375d2922d33675b5",
-      "line_count": 141,
-      "byte_count": 11949,
+      "git_blob_sha": "d979bac224940094b21bddbc8fdd9236685b4943",
+      "last_validated_sha": "d979bac224940094b21bddbc8fdd9236685b4943",
+      "content_sha256": "3a16984d6c3ec3d2a0f16a1e714f8f337eded15ed0b9f27c0a628288efb5981a",
+      "line_count": 148,
+      "byte_count": 12860,
       "headings": [
         {
           "level": 1,
@@ -4276,6 +4277,10 @@
         {
           "level": 2,
           "text": "2026-11-25 — AF-TASK-028 : publication validée et raccordement du plan"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-25 — AF-TASK-028 : recette intégrée verte et checkpoint"
         }
       ]
     },
@@ -13687,6 +13692,7 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "2026-11-25 — AF-TASK-028 : recette intégrée, leases/fencing et publication bi-repository",
         "2026-11-25 — AF-TASK-028 : préflight manuel et contrôle CI",
         "POINT DE REPRISE COURANT — 2026-10-31 — Lot DQ : la PR frontend est fusionnee, la production ne la sert PAS, et mon hypothese du sitemap est refutee",
         "La PR #1 du frontend a ete fusionnee — et cela a servi a mesurer",
@@ -13703,8 +13709,7 @@
         "Le 26 octobre marocain : sept fonds, et DEUX limites de controle",
         "POINT DE REPRISE COURANT — 2026-10-30 — Lot DN : la base renverse mon analyse — 10 des 14 fonds sont declares en USD",
         "La devise DECLAREE n'est pas celle que je supposais",
-        "Les zeros depassent tres largement les fonds de C7",
-        "Et le taux publie, existe-t-il ?"
+        "Les zeros depassent tres largement les fonds de C7"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13715,16 +13720,16 @@
       "duplication_risk": "NONE",
       "stale_state": [],
       "security_impact": "HIGH",
-      "production_impact": "YES",
+      "production_impact": "NO",
       "title": "Carnet de suivi - Africafunds (Fundafrique)",
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "3825032a86086530b164d26a0e98383b2af2eb87",
-      "last_validated_sha": "3825032a86086530b164d26a0e98383b2af2eb87",
-      "content_sha256": "d7e40ea91910841e2eaac195706e672c73b822dfb6479b8643c9c1fd5afc3a33",
-      "line_count": 12062,
-      "byte_count": 750193,
+      "git_blob_sha": "4b26803d4649979de6ded63c928c108f64d2c1b1",
+      "last_validated_sha": "4b26803d4649979de6ded63c928c108f64d2c1b1",
+      "content_sha256": "fcd865fd374b0617c751c19c7292296d45e71ebf76becd10664c2176ff7da54c",
+      "line_count": 12070,
+      "byte_count": 752329,
       "headings": [
         {
           "level": 1,
@@ -13733,6 +13738,10 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-25 — AF-TASK-028 : recette intégrée, leases/fencing et publication bi-repository"
         },
         {
           "level": 2,
@@ -13881,10 +13890,6 @@
         {
           "level": 3,
           "text": "Ce que j'en ai fait, et ce que je n'en ai pas fait"
-        },
-        {
-          "level": 3,
-          "text": "Pourquoi la page Performances avait ete oubliee"
         }
       ]
     },
