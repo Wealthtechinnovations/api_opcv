@@ -146,3 +146,10 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 - Run initial 45642469718 FAILURE : recette checkout dans un worktree modifié ; corrigée sans force avec worktree séparé dans `371b742e6f1b773f163921bee99ed762f3a9eff8`.
 - AF-EVD-076 : [45642729957](https://github.com/Wealthtechinnovations/api_opcv/actions/runs/45642729957), job 139305436077 SUCCESS ; wiring PASS, 7/7 leases/fencing, 6/6 publication, recette manuelle CI-equivalent PASS, 6/6 projections exactes. Frontend de recette 09c3cf780a8200f56c2b39f095f3cb0a1ea4873e ; checkpoint frontend `b2d924a52f34b55b7a97605a3fa474b7941ad61d`.
 - Automatisation ChatGPT dédiée active ; productivité autonome non démontrée. AF-TASK-028 reste IN_PROGRESS : qualification du transport distant, identité/horloge/fencing effectifs et raccordement moteur codeur. Aucune nouvelle branche, queue, mutation S2 ni claim legacy transféré.
+
+
+## 2026-11-25 — AF-TASK-028 : qualification du transport distant réel
+
+- AF-EVD-077 : API `7861694728fce6763efa95838f4c1b6db33390a0`, [45644571701](https://github.com/Wealthtechinnovations/api_opcv/actions/runs/45644571701) / job 139311954303 SUCCESS. Six tests du contrat et lecture réelle GitHub API depuis runner : IDs dépôts, HEADs, run/attempt, acteur déclencheur et cinq mesures horloge PASS. Gate d'écriture CLOSED, aucune mutation distante par le runner.
+- Installation connecteur Wealthtechinnovations 158876244, 13 dépôts accessibles ; identité exclusivement limitée aux deux dépôts non attestée. Claim legacy AF-TASK-028 sans lease, non transféré. Aucun code change indépendant admissible sous les modes/claims/dépendances actuels.
+- Checkpoint global frontend `7e82ecc6bd2f1c51d4137662951699584e7a6a3a` ; l'agent horaire doit reprendre à ces preuves, qualifier identité/transport et réconcilier claim avec autorité et preuve, puis démontrer deux cycles planifiés productifs, non-régression et reprise. Aucun faux PASS d'autonomie ; ni modification des protections, ni autre projet, ni S2.

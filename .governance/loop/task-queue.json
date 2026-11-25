@@ -1389,7 +1389,7 @@
         "MANUAL_WORKFLOW_NO_CHANGE_NO_COMMIT"
       ],
       "next_transition": "MANUAL_WRITEBACK_READY_NO_AUTO_APPLY",
-      "next_action": "AF-EVD-073/074/075/076 PASS ; recette manuelle CI-equivalent, leases/fencing CAS local, publication bi-repository isolée et plan raccordé. Les six projections sont exactes. Reste à qualifier transport distant authentifié à permissions minimales, identité/horloge/fencing effectifs, puis moteur codeur réel, deux cycles productifs et reprise réelle. Aucun claim legacy transféré ni auto-publication ou mutation S2.",
+      "next_action": "AF-EVD-073..077 PASS in their bounded scopes. Live GitHub runner read transport/identity metadata/clock/HEADs observed; writer gate CLOSED. Qualify dedicated least-privilege identity and authenticated transport, prove reconciliation and authorised handoff of legacy ACTIVE claim before enabling lease/fencing, then connect actual coding engine. Observe two distinct scheduled productive runs, their nonempty code commits, CI and recovery evidence; never count manual commits or CI alone. No auto-projection apply, shared installation changes or S2 mutation.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
         "status": "ACTIVE",
@@ -1433,7 +1433,8 @@
         "AF-EVD-073",
         "AF-EVD-074",
         "AF-EVD-075",
-        "AF-EVD-076"
+        "AF-EVD-076",
+        "AF-EVD-077"
       ]
     }
   ],
