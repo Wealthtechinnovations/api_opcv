@@ -135,13 +135,16 @@ class Contract(unittest.TestCase):
         self.assertEqual(p["status"],"PREPARED_LOCAL")
         self.assertEqual(p["candidate_objects_created"],2)
         self.assertEqual(self.g.heads(),self.g.base)
+        prepared={}
         for role,repo in self.g.repos.items():
             self.assertEqual(out(repo,"rev-parse","HEAD"),self.g.base[role])
             candidate=p["plan"]["repositories"][role]["candidate"]
             self.assertEqual(out(repo,"rev-list","--parents","-n","1",candidate).split()[1:],[self.g.base[role]])
-            git(repo,"checkout","--detach",candidate)
-        heads={role:out(repo,"rev-parse","HEAD") for role,repo in self.g.repos.items()}
-        p=plan_worktrees(self.g.repos,heads,self.g.blocks,"dry-run")
+            worktree=repo.parent/(role+"-prepared")
+            git(repo,"worktree","add","--detach",str(worktree),candidate)
+            prepared[role]=worktree
+        heads={role:out(repo,"rev-parse","HEAD") for role,repo in prepared.items()}
+        p=plan_worktrees(prepared,heads,self.g.blocks,"dry-run")
         self.assertEqual(p["status"],"NO_CHANGE")
         self.assertEqual(p["candidate_objects_created"],0)
         self.assertEqual(self.g.heads(),self.g.base)
