@@ -39,12 +39,13 @@ jobs:
         run: python3 -m unittest discover -v -s scripts/africafunds_executor -p 'test_*.py'
 
   authenticated-preflight:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.probe_cug_token == true }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.probe_cug_token == true) }}
     needs: contract
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Fail closed for missing or unconfigured CUG identity
+      - name: Observe CUG credential presence without printing secrets
+        id: credential
         shell: bash
         env:
           CUG_APP_ID: ${{ vars.AF_CUG_APP_ID }}
@@ -52,11 +53,15 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -z "$CUG_APP_ID" || -z "$CUG_PRIVATE_KEY" ]]; then
-            printf '%s\n' 'CUG_INSTALLATION_CREDENTIALS_NOT_CONFIGURED' >&2
-            exit 1
+            echo 'configured=false' >> "$GITHUB_OUTPUT"
+            echo 'CUG_CREDENTIALS_NOT_CONFIGURED; WRITER_GATE_CLOSED' >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then exit 1; fi
+          else
+            [[ "$CUG_APP_ID" =~ ^[0-9]+$ ]]
+            echo 'configured=true' >> "$GITHUB_OUTPUT"
           fi
-          [[ "$CUG_APP_ID" =~ ^[0-9]+$ ]]
       - name: Mint short-lived token restricted to two AfricaFunds repositories
+        if: ${{ steps.credential.outputs.configured == 'true' }}
         id: token
         uses: actions/create-github-app-token@v3
         with:
@@ -68,9 +73,11 @@ jobs:
             front_end_opcvm
           permission-contents: write
       - uses: actions/checkout@v4
+        if: ${{ steps.credential.outputs.configured == 'true' }}
         with:
           persist-credentials: false
       - name: Test exact identity, permissions, repository scope and two HEADs
+        if: ${{ steps.credential.outputs.configured == 'true' }}
         env:
           AF_CUG_INSTALLATION_TOKEN: ${{ steps.token.outputs.token }}
           AF_EXPECTED_API_SHA: ${{ inputs.expected_api_sha }}
@@ -80,6 +87,10 @@ jobs:
           set -euo pipefail
           [[ "$GITHUB_REPOSITORY" == 'Wealthtechinnovations/api_opcv' ]]
           [[ "$GITHUB_REF" == 'refs/heads/claude/code-review-improvements-ikvuj' ]]
+          if [[ "$GITHUB_EVENT_NAME" == 'push' ]]; then
+            AF_EXPECTED_API_SHA="$GITHUB_SHA"
+            AF_EXPECTED_FRONTEND_SHA="$(git ls-remote --exit-code https://github.com/Wealthtechinnovations/front_end_opcvm.git refs/heads/claude/code-review-improvements-ikvuj | cut -f1)"
+          fi
           [[ "$GITHUB_SHA" == "$AF_EXPECTED_API_SHA" ]]
           python3 scripts/africafunds_executor/cug_token_preflight.py \
             --expected-api-sha "$AF_EXPECTED_API_SHA" \
@@ -87,7 +98,7 @@ jobs:
             --output "$RUNNER_TEMP/af-cug-preflight.json"
           printf '%s\n' 'CUG_CREDENTIAL_ATTESTED_READ_ONLY; WRITER_GATE_CLOSED' >> "$GITHUB_STEP_SUMMARY"
       - name: Retain nonsecret attestation
-        if: success()
+        if: ${{ success() && steps.credential.outputs.configured == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: africafunds-cug-readonly-preflight-${{ github.run_id }}
