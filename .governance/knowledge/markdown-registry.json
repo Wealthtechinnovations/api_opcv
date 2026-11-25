@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "8e859434e7dc3f2e9bc03aed91503c2222ce4e8b"
+      "head": "4d6e1d34abf582d9460f3a7fe2bcea83706cf4c5"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -4205,7 +4205,8 @@
         "2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale",
         "2026-09-13 — clôture AF-TASK-011",
         "2026-11-25 — AF-TASK-028 : préflight manuel et recette bornée",
-        "2026-11-25 — AF-TASK-028 : recette CI équivalente et admission candidate"
+        "2026-11-25 — AF-TASK-028 : recette CI équivalente et admission candidate",
+        "2026-11-25 — AF-TASK-028 : leases et publication bi-repository"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -4221,11 +4222,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "096239fad4d4d7e9c5845257c78083a9ed8ecc6a",
-      "last_validated_sha": "096239fad4d4d7e9c5845257c78083a9ed8ecc6a",
-      "content_sha256": "def63889307cc3d8ed6faea6fa5e2cfe61623767f9d3ca10d43f8d14d6fb2a10",
-      "line_count": 128,
-      "byte_count": 10645,
+      "git_blob_sha": "60aa4751a9327f865337147046595a08ee9a6c2e",
+      "last_validated_sha": "60aa4751a9327f865337147046595a08ee9a6c2e",
+      "content_sha256": "a8fc6803e4064802c863dad76dc9baef1fa436e3d27b03df010eff79cd360ea9",
+      "line_count": 135,
+      "byte_count": 11400,
       "headings": [
         {
           "level": 1,
@@ -4266,6 +4267,10 @@
         {
           "level": 2,
           "text": "2026-11-25 — AF-TASK-028 : recette CI équivalente et admission candidate"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-25 — AF-TASK-028 : leases et publication bi-repository"
         }
       ]
     },
