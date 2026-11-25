@@ -107,5 +107,25 @@ class CUGTokenContract(unittest.TestCase):
             perform(data)
 
 
+    def test_workflow_reuses_cug_credential_aliases_without_accessing_secret_values(self):
+        workflow = (Path(__file__).resolve().parents[2] /
+                    ".github/workflows/africafunds-cug-access-preflight.yml").read_text(encoding="utf-8")
+        for variable in ("vars.AF_CUG_APP_ID", "vars.CUG_APP_ID", "vars.CUG_GITHUB_APP_ID"):
+            self.assertIn(variable, workflow)
+        for key in ("secrets.AF_CUG_PRIVATE_KEY", "secrets.CUG_PRIVATE_KEY",
+                    "secrets.CUG_APP_PRIVATE_KEY", "secrets.CUG_GITHUB_APP_PRIVATE_KEY"):
+            self.assertIn(key, workflow)
+        self.assertIn("CUG_CREDENTIALS_UNAVAILABLE_FOR_THIS_REPOSITORY; WRITER_GATE_CLOSED", workflow)
+
+    def test_workflow_does_not_publish_code_or_mutate_production(self):
+        workflow = (Path(__file__).resolve().parents[2] /
+                    ".github/workflows/africafunds-cug-access-preflight.yml").read_text(encoding="utf-8")
+        self.assertIn("permissions:\\n  contents: read", workflow)
+        self.assertNotIn("permissions:\\n  contents: write", workflow)
+        self.assertNotIn("git push", workflow)
+        self.assertNotIn("kubectl", workflow)
+        self.assertNotIn("docker compose", workflow)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -48,13 +48,13 @@ jobs:
         id: credential
         shell: bash
         env:
-          CUG_APP_ID: ${{ vars.AF_CUG_APP_ID }}
-          CUG_PRIVATE_KEY: ${{ secrets.AF_CUG_PRIVATE_KEY }}
+          CUG_APP_ID: ${{ vars.AF_CUG_APP_ID || vars.CUG_APP_ID || vars.CUG_GITHUB_APP_ID || secrets.CUG_APP_ID }}
+          CUG_PRIVATE_KEY: ${{ secrets.AF_CUG_PRIVATE_KEY || secrets.CUG_PRIVATE_KEY || secrets.CUG_APP_PRIVATE_KEY || secrets.CUG_GITHUB_APP_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           if [[ -z "$CUG_APP_ID" || -z "$CUG_PRIVATE_KEY" ]]; then
             echo 'configured=false' >> "$GITHUB_OUTPUT"
-            echo 'CUG_CREDENTIALS_NOT_CONFIGURED; WRITER_GATE_CLOSED' >> "$GITHUB_STEP_SUMMARY"
+            echo 'CUG_CREDENTIALS_UNAVAILABLE_FOR_THIS_REPOSITORY; WRITER_GATE_CLOSED' >> "$GITHUB_STEP_SUMMARY"
             if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then exit 1; fi
           else
             [[ "$CUG_APP_ID" =~ ^[0-9]+$ ]]
@@ -65,8 +65,8 @@ jobs:
         id: token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ vars.AF_CUG_APP_ID }}
-          private-key: ${{ secrets.AF_CUG_PRIVATE_KEY }}
+          app-id: ${{ vars.AF_CUG_APP_ID || vars.CUG_APP_ID || vars.CUG_GITHUB_APP_ID || secrets.CUG_APP_ID }}
+          private-key: ${{ secrets.AF_CUG_PRIVATE_KEY || secrets.CUG_PRIVATE_KEY || secrets.CUG_APP_PRIVATE_KEY || secrets.CUG_GITHUB_APP_PRIVATE_KEY }}
           owner: Wealthtechinnovations
           repositories: |
             api_opcv
