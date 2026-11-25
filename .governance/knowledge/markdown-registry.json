@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "210d74c993c292b55abc6e2222ff07ec4ce837bb"
+      "head": "6b14054538756d9cd12fadded817dcb09f13e4be"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "b2d924a52f34b55b7a97605a3fa474b7941ad61d"
+      "head": "7e82ecc6bd2f1c51d4137662951699584e7a6a3a"
     }
   },
   "summary": {
@@ -4208,7 +4208,8 @@
         "2026-11-25 — AF-TASK-028 : recette CI équivalente et admission candidate",
         "2026-11-25 — AF-TASK-028 : leases et publication bi-repository",
         "2026-11-25 — AF-TASK-028 : publication validée et raccordement du plan",
-        "2026-11-25 — AF-TASK-028 : recette intégrée verte et checkpoint"
+        "2026-11-25 — AF-TASK-028 : recette intégrée verte et checkpoint",
+        "2026-11-25 — AF-TASK-028 : qualification du transport distant réel"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -4224,11 +4225,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "d979bac224940094b21bddbc8fdd9236685b4943",
-      "last_validated_sha": "d979bac224940094b21bddbc8fdd9236685b4943",
-      "content_sha256": "3a16984d6c3ec3d2a0f16a1e714f8f337eded15ed0b9f27c0a628288efb5981a",
-      "line_count": 148,
-      "byte_count": 12860,
+      "git_blob_sha": "9c195f0b1dca96a34037dd6eba15c4f1e5f9324f",
+      "last_validated_sha": "9c195f0b1dca96a34037dd6eba15c4f1e5f9324f",
+      "content_sha256": "cb4f54345560530be02c9c359ce36022f9038fe45e3fcaa52ffec084650b71f5",
+      "line_count": 155,
+      "byte_count": 13989,
       "headings": [
         {
           "level": 1,
@@ -4281,6 +4282,10 @@
         {
           "level": 2,
           "text": "2026-11-25 — AF-TASK-028 : recette intégrée verte et checkpoint"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-25 — AF-TASK-028 : qualification du transport distant réel"
         }
       ]
     },
@@ -13692,6 +13697,7 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "2026-11-25 — AF-TASK-028 : raccordement distant, préflight réel",
         "2026-11-25 — AF-TASK-028 : recette intégrée, leases/fencing et publication bi-repository",
         "2026-11-25 — AF-TASK-028 : préflight manuel et contrôle CI",
         "POINT DE REPRISE COURANT — 2026-10-31 — Lot DQ : la PR frontend est fusionnee, la production ne la sert PAS, et mon hypothese du sitemap est refutee",
@@ -13708,8 +13714,7 @@
         "Les zeros, mesures sans plafond",
         "Le 26 octobre marocain : sept fonds, et DEUX limites de controle",
         "POINT DE REPRISE COURANT — 2026-10-30 — Lot DN : la base renverse mon analyse — 10 des 14 fonds sont declares en USD",
-        "La devise DECLAREE n'est pas celle que je supposais",
-        "Les zeros depassent tres largement les fonds de C7"
+        "La devise DECLAREE n'est pas celle que je supposais"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13725,11 +13730,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "4b26803d4649979de6ded63c928c108f64d2c1b1",
-      "last_validated_sha": "4b26803d4649979de6ded63c928c108f64d2c1b1",
-      "content_sha256": "fcd865fd374b0617c751c19c7292296d45e71ebf76becd10664c2176ff7da54c",
-      "line_count": 12070,
-      "byte_count": 752329,
+      "git_blob_sha": "6ab0defabe52a66d3db903377af8a5d6c052dc23",
+      "last_validated_sha": "6ab0defabe52a66d3db903377af8a5d6c052dc23",
+      "content_sha256": "afa05bd637cd5fcee1d7a2076ffe3871e0044df25c62559ddef03a8eafbd358d",
+      "line_count": 12077,
+      "byte_count": 754077,
       "headings": [
         {
           "level": 1,
@@ -13738,6 +13743,10 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-25 — AF-TASK-028 : raccordement distant, préflight réel"
         },
         {
           "level": 2,
@@ -13886,10 +13895,6 @@
         {
           "level": 3,
           "text": "Le resultat principal n'est pas celui que j'allais chercher"
-        },
-        {
-          "level": 3,
-          "text": "Ce que j'en ai fait, et ce que je n'en ai pas fait"
         }
       ]
     },
