@@ -56,8 +56,11 @@ jobs:
             echo 'configured=false' >> "$GITHUB_OUTPUT"
             echo 'CUG_CREDENTIALS_UNAVAILABLE_FOR_THIS_REPOSITORY; WRITER_GATE_CLOSED' >> "$GITHUB_STEP_SUMMARY"
             if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then exit 1; fi
+          elif [[ "$CUG_APP_ID" != '5417646' ]]; then
+            echo 'configured=false' >> "$GITHUB_OUTPUT"
+            echo 'CUG_APP_IDENTITY_MISMATCH; WRITER_GATE_CLOSED' >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then exit 1; fi
           else
-            [[ "$CUG_APP_ID" =~ ^[0-9]+$ ]]
             echo 'configured=true' >> "$GITHUB_OUTPUT"
           fi
       - name: Mint short-lived token restricted to two AfricaFunds repositories
