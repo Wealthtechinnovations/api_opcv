@@ -57,6 +57,7 @@ def full_recipe(scripts, api, frontend):
         require(clean(),'FULL_DRY_RUN_CLEAN')
         require(receipt('dry-run.json')['files_written_count']==0,'FULL_DRY_RUN_ZERO_WRITE')
         require([git(p,'rev-parse','HEAD') for p in copies]==original,'FULL_DRY_RUN_NO_COMMIT')
+        require(receipt('publication-plan.json')['candidate_objects_created']==0,'DRY_RUN_ZERO_CANDIDATE_OBJECTS')
         print('MANUAL_WORKFLOW_DRY_RUN=PASS')
         # Move only the test mirror's ref, not a real remote. The last step must fail.
         git(mirrors[1],'update-ref','-d',ref)
@@ -85,6 +86,9 @@ def full_recipe(scripts, api, frontend):
         require(clean(),'NO_CHANGE_CLEAN')
         require([git(p,'rev-parse','HEAD') for p in copies]==no_change_heads,'NO_CHANGE_NO_COMMIT')
         require(all(git(m,'rev-parse',ref)==h for m,h in zip(mirrors,no_change_heads)),'NO_CHANGE_NO_REF_UPDATE')
+        plan=receipt('publication-plan.json')
+        require(plan['status']=='NO_CHANGE' and plan['candidate_objects_created']==0 and plan['remote_publication'] is False,'PUBLICATION_NO_CHANGE_PLAN')
+        print('PUBLICATION_WORKFLOW_WIRING=PASS')
         print('MANUAL_WORKFLOW_NO_CHANGE_NO_COMMIT=PASS')
     require([git(api,'rev-parse','HEAD'),git(frontend,'rev-parse','HEAD')]==original,'SOURCE_HEADS_UNCHANGED')
     require([git(api,'status','--porcelain'),git(frontend,'status','--porcelain')]==originals,'SOURCE_WORKTREES_UNCHANGED')

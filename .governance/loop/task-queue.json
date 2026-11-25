@@ -1389,7 +1389,7 @@
         "MANUAL_WORKFLOW_NO_CHANGE_NO_COMMIT"
       ],
       "next_transition": "MANUAL_WRITEBACK_READY_NO_AUTO_APPLY",
-      "next_action": "AF-EVD-073/074 : CI-equivalent et contrat lease/CAS local verts ; six projections exactes. Publication bi-repository et reprise partielle : contrat candidat à tester, puis raccorder le transport distant avec identité, horloge et fencing de confiance. Aucun auto-apply ni S2.",
+      "next_action": "AF-EVD-073/074/075 PASS : recette manuelle CI, leases/fencing CAS et publication bi-repository isolée. Plan de publication raccordé au workflow manuel ; vérifier CI, puis qualifier le transport distant et son identité/horloge/fencing. Les six projections étaient exactes. Aucune auto-publication ni mutation S2.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
         "status": "ACTIVE",
@@ -1431,7 +1431,8 @@
       ],
       "evidence_refs": [
         "AF-EVD-073",
-        "AF-EVD-074"
+        "AF-EVD-074",
+        "AF-EVD-075"
       ]
     }
   ],

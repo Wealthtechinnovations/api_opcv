@@ -133,3 +133,9 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 - AF-EVD-074 : run 45641587680 SUCCESS, 7 tests de lease/fencing dont concurrence Git réelle en local ; 6/6 projections exactes, 0 candidat. Aucun claim actif historique migré, aucun verrou distant activé.
 - Ajout du contrat de publication préparée : validation parents/diff/bloc, confirmation du plan, recheck avant chaque CAS, receipt partiel et reprise sans rollback. Tests sur deux refs Git isolées, CI à contrôler. Aucun transport authentifié distant activé.
 - NEXT_ACTION : preuve CI exacte puis raccordement d'un transport de publication et de l'exécuteur avec identité/horloge/fencing vérifiés. Pas de DONE ni d'autonomie déclarée sur la seule recette locale.
+
+
+## 2026-11-25 — AF-TASK-028 : publication validée et raccordement du plan
+
+- AF-EVD-075 : run 45641963101 SUCCESS sur 4d6e1d34, cinq tests Git réels isolés ; aucune mutation distante.
+- Le workflow manuel produit maintenant un plan de publication vérifié à partir des six blocs et des deux HEAD, sans déplacement de référence. Dry-run sans objet de commit ; apply-local confirmé peut préparer des candidats non référencés dans le checkout isolé. Test de raccordement ajouté ; attendre CI exacte. Aucun transport distant activé.

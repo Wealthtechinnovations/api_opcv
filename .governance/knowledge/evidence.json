@@ -536,6 +536,15 @@
       "observed_at": "2026-11-25T15:07:50Z",
       "sha": "8e859434e7dc3f2e9bc03aed91503c2222ce4e8b",
       "summary": "7/7 tests including actual concurrent Git CAS, scope, legacy claim refusal, dependencies, expiry/recovery/fencing, renew/release and head/queue divergence. No live claim migration, trusted identity/clock or remote enforcement. Director generator exact_present=6; writeback_candidates=0; no actual projection update needed."
+    },
+    {
+      "id": "AF-EVD-075",
+      "type": "PROGRAMME_DIRECTOR_BI_REPOSITORY_PUBLICATION_CONTRACT",
+      "result": "PASS",
+      "provenance": "Run 45641963101 / job 139302725349; API 4d6e1d34abf582d9460f3a7fe2bcea83706cf4c5; frontend 09c3cf780a8200f56c2b39f095f3cb0a1ea4873e",
+      "observed_at": "2026-11-25T15:09:47Z",
+      "sha": "4d6e1d34abf582d9460f3a7fe2bcea83706cf4c5",
+      "summary": "5/5 tests on actual isolated Git references: two-repository publication, partial recovery without rollback, no-change/no-effect, denial/stale refs and exact parent/outside-block rejection. No authenticated remote transport or production mutation."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."

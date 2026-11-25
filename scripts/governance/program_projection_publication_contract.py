@@ -4,7 +4,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 import unittest
-from program_projection_publication import PATHS,BEGIN,END,prepare,publish
+from program_projection_publication import PATHS,BEGIN,END,prepare,publish,plan_worktrees
 
 
 def git(root,*args,input=None,check=True):
@@ -120,6 +120,31 @@ class Contract(unittest.TestCase):
             return x
         with self.assertRaisesRegex(ValueError,"OUTSIDE_BLOCK_CHANGED"):
             prepare(self.g.base,self.g.candidates,corrupt,self.g.blocks)
+
+
+    def test_worktree_plan_and_no_change(self):
+        for role,repo in self.g.repos.items():
+            git(repo,"checkout","--detach",self.g.base[role])
+        p=plan_worktrees(self.g.repos,self.g.base,self.g.blocks,"dry-run")
+        self.assertEqual(p["status"],"CHANGES_REQUIRE_CONFIRMED_LOCAL_APPLY")
+        self.assertEqual(p["candidate_objects_created"],0)
+        for role,repo in self.g.repos.items():
+            for path in PATHS[role]:
+                (repo/path).write_bytes(b"history\n"+self.g.blocks[path]+b"\nkeep\n")
+        p=plan_worktrees(self.g.repos,self.g.base,self.g.blocks,"apply-local")
+        self.assertEqual(p["status"],"PREPARED_LOCAL")
+        self.assertEqual(p["candidate_objects_created"],2)
+        self.assertEqual(self.g.heads(),self.g.base)
+        for role,repo in self.g.repos.items():
+            self.assertEqual(out(repo,"rev-parse","HEAD"),self.g.base[role])
+            candidate=p["plan"]["repositories"][role]["candidate"]
+            self.assertEqual(out(repo,"rev-list","--parents","-n","1",candidate).split()[1:],[self.g.base[role]])
+            git(repo,"checkout","--detach",candidate)
+        heads={role:out(repo,"rev-parse","HEAD") for role,repo in self.g.repos.items()}
+        p=plan_worktrees(self.g.repos,heads,self.g.blocks,"dry-run")
+        self.assertEqual(p["status"],"NO_CHANGE")
+        self.assertEqual(p["candidate_objects_created"],0)
+        self.assertEqual(self.g.heads(),self.g.base)
 
 
 if __name__=="__main__":
