@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "4d6e1d34abf582d9460f3a7fe2bcea83706cf4c5"
+      "head": "006f975218e8345bbf42ae2fe7099b216279d8d9"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -4206,7 +4206,8 @@
         "2026-09-13 — clôture AF-TASK-011",
         "2026-11-25 — AF-TASK-028 : préflight manuel et recette bornée",
         "2026-11-25 — AF-TASK-028 : recette CI équivalente et admission candidate",
-        "2026-11-25 — AF-TASK-028 : leases et publication bi-repository"
+        "2026-11-25 — AF-TASK-028 : leases et publication bi-repository",
+        "2026-11-25 — AF-TASK-028 : publication validée et raccordement du plan"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -4222,11 +4223,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "60aa4751a9327f865337147046595a08ee9a6c2e",
-      "last_validated_sha": "60aa4751a9327f865337147046595a08ee9a6c2e",
-      "content_sha256": "a8fc6803e4064802c863dad76dc9baef1fa436e3d27b03df010eff79cd360ea9",
-      "line_count": 135,
-      "byte_count": 11400,
+      "git_blob_sha": "7a061cf32ee61a011da2e4b9699ad6d7d949cf8f",
+      "last_validated_sha": "7a061cf32ee61a011da2e4b9699ad6d7d949cf8f",
+      "content_sha256": "b53cd61149cab6e4bf3dab02e713c42359005544e31475f1375d2922d33675b5",
+      "line_count": 141,
+      "byte_count": 11949,
       "headings": [
         {
           "level": 1,
@@ -4271,6 +4272,10 @@
         {
           "level": 2,
           "text": "2026-11-25 — AF-TASK-028 : leases et publication bi-repository"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-25 — AF-TASK-028 : publication validée et raccordement du plan"
         }
       ]
     },
