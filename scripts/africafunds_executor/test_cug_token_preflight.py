@@ -120,8 +120,8 @@ class CUGTokenContract(unittest.TestCase):
     def test_workflow_does_not_publish_code_or_mutate_production(self):
         workflow = (Path(__file__).resolve().parents[2] /
                     ".github/workflows/africafunds-cug-access-preflight.yml").read_text(encoding="utf-8")
-        self.assertIn("permissions:\\n  contents: read", workflow)
-        self.assertNotIn("permissions:\\n  contents: write", workflow)
+        self.assertIn("permissions:\n  contents: read", workflow)
+        self.assertNotIn("permissions:\n  contents: write", workflow)
         self.assertNotIn("git push", workflow)
         self.assertNotIn("kubectl", workflow)
         self.assertNotIn("docker compose", workflow)
