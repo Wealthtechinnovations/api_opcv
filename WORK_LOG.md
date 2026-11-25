@@ -126,3 +126,10 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 - AF-EVD-073 : Programme Director run 45641152852 / job 139299835505 SUCCESS sur API `2a3bfb5ce79dff0e9bd9d7175802d84282d88e49`, frontend `09c3cf780a8200f56c2b39f095f3cb0a1ea4873e`. Les vrais blocs du workflow manuel ont passé dry-run, recheck, apply local et no-change/no-commit sur miroirs Git isolés. Aucun dispatch réel, publication distante ni S2 attestés.
 - Nouvelle tranche : contrat de proposition de leases/fencing task-local (queue existante), legacy fail-closed, conflits et dépendances, horloge/identité explicites, CAS Git local concurrent dans les tests. CI à vérifier sur le commit de cette tranche. Ce contrat n'est pas un verrou distant ni un exécuteur ; aucune migration des claims actifs et aucun passage global d'observe-only à enforcement.
 - NEXT_ACTION : contrôler CI exacte, puis raccorder identité/horloge fiables et publication atomique au périmètre réel ; ne pas déclarer DONE avant preuve de publication gouvernée et récupération des effets partiels. Aucun changement métier/DB/S2, nouvelle branche ou seconde queue.
+
+
+## 2026-11-25 — AF-TASK-028 : leases et publication bi-repository
+
+- AF-EVD-074 : run 45641587680 SUCCESS, 7 tests de lease/fencing dont concurrence Git réelle en local ; 6/6 projections exactes, 0 candidat. Aucun claim actif historique migré, aucun verrou distant activé.
+- Ajout du contrat de publication préparée : validation parents/diff/bloc, confirmation du plan, recheck avant chaque CAS, receipt partiel et reprise sans rollback. Tests sur deux refs Git isolées, CI à contrôler. Aucun transport authentifié distant activé.
+- NEXT_ACTION : preuve CI exacte puis raccordement d'un transport de publication et de l'exécuteur avec identité/horloge/fencing vérifiés. Pas de DONE ni d'autonomie déclarée sur la seule recette locale.

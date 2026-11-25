@@ -1389,7 +1389,7 @@
         "MANUAL_WORKFLOW_NO_CHANGE_NO_COMMIT"
       ],
       "next_transition": "MANUAL_WRITEBACK_READY_NO_AUTO_APPLY",
-      "next_action": "CI-equivalent manuel prouvé AF-EVD-073. Reste : qualifier identité/permissions minimales et publication bi-repository non-force, exact HEAD et recheck, recovery des effets partiels. Contrat lease/fencing proposé sans migration des claims ACTIVE historiques ni activation globale. Aucun auto-apply ni S2.",
+      "next_action": "AF-EVD-073/074 : CI-equivalent et contrat lease/CAS local verts ; six projections exactes. Publication bi-repository et reprise partielle : contrat candidat à tester, puis raccorder le transport distant avec identité, horloge et fencing de confiance. Aucun auto-apply ni S2.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
         "status": "ACTIVE",
@@ -1430,7 +1430,8 @@
         "SUIVI.md"
       ],
       "evidence_refs": [
-        "AF-EVD-073"
+        "AF-EVD-073",
+        "AF-EVD-074"
       ]
     }
   ],

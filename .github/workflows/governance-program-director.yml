@@ -30,6 +30,8 @@ on:
       - 'scripts/governance/program_manual_preflight_contract.py'
       - 'scripts/governance/program_claim_lease.py'
       - 'scripts/governance/program_claim_lease_contract.py'
+      - 'scripts/governance/program_projection_publication.py'
+      - 'scripts/governance/program_projection_publication_contract.py'
   schedule:
     - cron: '23 * * * *'
   workflow_dispatch:
@@ -67,6 +69,9 @@ jobs:
 
       - name: Test task-local lease and fencing proposals (isolated Git CAS)
         run: python3 api/scripts/governance/program_claim_lease_contract.py
+
+      - name: Test bi-repository publication and recovery (isolated Git refs)
+        run: python3 api/scripts/governance/program_projection_publication_contract.py
 
       - name: Derive programme state read-only
         run: |

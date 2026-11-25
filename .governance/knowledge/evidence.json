@@ -527,6 +527,15 @@
       "observed_at": "2026-11-25T15:05:32Z",
       "sha": "2a3bfb5ce79dff0e9bd9d7175802d84282d88e49",
       "summary": "Actual manual-workflow shell blocks executed in isolated local Git mirrors against the existing generator, simulator and writeback engine. MANUAL_WORKFLOW_DRY_RUN, HEAD_RECHECK, LOCAL_APPLY, NO_CHANGE_NO_COMMIT and CI_EQUIVALENT all PASS. Existing Director checks and idempotence GREEN. Not a live workflow_dispatch, remote publication or S2 proof."
+    },
+    {
+      "id": "AF-EVD-074",
+      "type": "TASK_LOCAL_LEASE_FENCING_CAS_CONTRACT",
+      "result": "PASS",
+      "provenance": "GitHub Actions run 45641587680 job 139301376820, API 8e859434e7dc3f2e9bc03aed91503c2222ce4e8b, frontend 09c3cf780a8200f56c2b39f095f3cb0a1ea4873e; logs verified",
+      "observed_at": "2026-11-25T15:07:50Z",
+      "sha": "8e859434e7dc3f2e9bc03aed91503c2222ce4e8b",
+      "summary": "7/7 tests including actual concurrent Git CAS, scope, legacy claim refusal, dependencies, expiry/recovery/fencing, renew/release and head/queue divergence. No live claim migration, trusted identity/clock or remote enforcement. Director generator exact_present=6; writeback_candidates=0; no actual projection update needed."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
