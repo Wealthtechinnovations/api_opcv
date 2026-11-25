@@ -28,6 +28,8 @@ on:
       - '.github/workflows/governance-program-director.yml'
       - '.github/workflows/governance-programme-projection-writeback.yml'
       - 'scripts/governance/program_manual_preflight_contract.py'
+      - 'scripts/governance/program_claim_lease.py'
+      - 'scripts/governance/program_claim_lease_contract.py'
   schedule:
     - cron: '23 * * * *'
   workflow_dispatch:
@@ -62,6 +64,9 @@ jobs:
 
       - name: Test manual projection preflight contract and isolated Git recipe
         run: python3 api/scripts/governance/program_manual_preflight_contract.py --api-root api --frontend-root frontend
+
+      - name: Test task-local lease and fencing proposals (isolated Git CAS)
+        run: python3 api/scripts/governance/program_claim_lease_contract.py
 
       - name: Derive programme state read-only
         run: |

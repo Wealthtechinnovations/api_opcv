@@ -1389,7 +1389,7 @@
         "MANUAL_WORKFLOW_NO_CHANGE_NO_COMMIT"
       ],
       "next_transition": "MANUAL_WRITEBACK_READY_NO_AUTO_APPLY",
-      "next_action": "Construire le workflow_dispatch manuel en dry-run par défaut, avec confirmation exacte et expected HEADs ; prouver ses gates sans déclencher de write-back automatique.",
+      "next_action": "CI-equivalent manuel prouvé AF-EVD-073. Reste : qualifier identité/permissions minimales et publication bi-repository non-force, exact HEAD et recheck, recovery des effets partiels. Contrat lease/fencing proposé sans migration des claims ACTIVE historiques ni activation globale. Aucun auto-apply ni S2.",
       "claim": {
         "owner": "ChatGPT-GPT-5.6-Sol",
         "status": "ACTIVE",
@@ -1428,6 +1428,9 @@
         "HANDOFF.md",
         "STATUS.md",
         "SUIVI.md"
+      ],
+      "evidence_refs": [
+        "AF-EVD-073"
       ]
     }
   ],
