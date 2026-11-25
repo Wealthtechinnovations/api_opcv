@@ -143,5 +143,19 @@ class CUGTokenContract(unittest.TestCase):
         self.assertIn("WRITER_GATE_CLOSED", workflow)
 
 
+    def test_all_repository_installation_does_not_expand_runner_token_scope(self):
+        workflow = (Path(__file__).resolve().parents[2] /
+                    ".github/workflows/africafunds-cug-access-preflight.yml").read_text(encoding="utf-8")
+        # An existing CUG App may be installed on all repositories. This
+        # workflow must still request a token restricted to these exact two.
+        scope = "repositories: |\n            api_opcv\n            front_end_opcvm\n"
+        self.assertEqual(workflow.count("repositories: |"), 1)
+        self.assertIn(scope, workflow)
+        self.assertIn("owner: Wealthtechinnovations", workflow)
+        self.assertIn("permission-contents: write", workflow)
+        self.assertIn("permissions:\n  contents: read", workflow)
+        self.assertNotIn("git push", workflow)
+
+
 if __name__ == "__main__":
     unittest.main()
