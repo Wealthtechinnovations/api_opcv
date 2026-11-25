@@ -6,6 +6,8 @@ on:
     paths:
       - 'scripts/africafunds_executor/**'
       - '.github/workflows/africafunds-cug-access-preflight.yml'
+  schedule:
+    - cron: '41 * * * *'
   workflow_dispatch:
     inputs:
       expected_api_sha:
@@ -39,7 +41,7 @@ jobs:
         run: python3 -m unittest discover -v -s scripts/africafunds_executor -p 'test_*.py'
 
   authenticated-preflight:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.probe_cug_token == true) }}
+    if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.probe_cug_token == true) }}
     needs: contract
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -90,7 +92,7 @@ jobs:
           set -euo pipefail
           [[ "$GITHUB_REPOSITORY" == 'Wealthtechinnovations/api_opcv' ]]
           [[ "$GITHUB_REF" == 'refs/heads/claude/code-review-improvements-ikvuj' ]]
-          if [[ "$GITHUB_EVENT_NAME" == 'push' ]]; then
+          if [[ "$GITHUB_EVENT_NAME" == 'push' || "$GITHUB_EVENT_NAME" == 'schedule' ]]; then
             AF_EXPECTED_API_SHA="$GITHUB_SHA"
             AF_EXPECTED_FRONTEND_SHA="$(git ls-remote --exit-code https://github.com/Wealthtechinnovations/front_end_opcvm.git refs/heads/claude/code-review-improvements-ikvuj | cut -f1)"
           fi
