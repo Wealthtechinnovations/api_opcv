@@ -32,12 +32,15 @@ on:
       - 'scripts/governance/program_claim_lease_contract.py'
       - 'scripts/governance/program_projection_publication.py'
       - 'scripts/governance/program_projection_publication_contract.py'
+      - 'scripts/governance/program_remote_executor_preflight.py'
+      - 'scripts/governance/program_remote_executor_contract.py'
   schedule:
     - cron: '23 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: africafunds-programme-director
@@ -72,6 +75,14 @@ jobs:
 
       - name: Test bi-repository publication and recovery (isolated Git refs)
         run: python3 api/scripts/governance/program_projection_publication_contract.py
+
+      - name: Test remote executor observation contract
+        run: python3 api/scripts/governance/program_remote_executor_contract.py
+
+      - name: Observe actual remote executor runtime (read-only)
+        env:
+          AF_GITHUB_READ_TOKEN: ${{ github.token }}
+        run: python3 api/scripts/governance/program_remote_executor_preflight.py --api-root api --frontend-root frontend --output out/program-remote-executor.json
 
       - name: Derive programme state read-only
         run: |
@@ -444,6 +455,7 @@ jobs:
           name: africafunds-programme-director-${{ github.run_id }}
           path: |
             out/program-director.json
+            out/program-remote-executor.json
             out/program-director.log
             out/program-events.json
             out/program-events.log
