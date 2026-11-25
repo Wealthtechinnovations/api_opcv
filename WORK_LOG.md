@@ -139,3 +139,10 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 
 - AF-EVD-075 : run 45641963101 SUCCESS sur 4d6e1d34, cinq tests Git réels isolés ; aucune mutation distante.
 - Le workflow manuel produit maintenant un plan de publication vérifié à partir des six blocs et des deux HEAD, sans déplacement de référence. Dry-run sans objet de commit ; apply-local confirmé peut préparer des candidats non référencés dans le checkout isolé. Test de raccordement ajouté ; attendre CI exacte. Aucun transport distant activé.
+
+
+## 2026-11-25 — AF-TASK-028 : recette intégrée verte et checkpoint
+
+- Run initial 45642469718 FAILURE : recette checkout dans un worktree modifié ; corrigée sans force avec worktree séparé dans `371b742e6f1b773f163921bee99ed762f3a9eff8`.
+- AF-EVD-076 : [45642729957](https://github.com/Wealthtechinnovations/api_opcv/actions/runs/45642729957), job 139305436077 SUCCESS ; wiring PASS, 7/7 leases/fencing, 6/6 publication, recette manuelle CI-equivalent PASS, 6/6 projections exactes. Frontend de recette 09c3cf780a8200f56c2b39f095f3cb0a1ea4873e ; checkpoint frontend `b2d924a52f34b55b7a97605a3fa474b7941ad61d`.
+- Automatisation ChatGPT dédiée active ; productivité autonome non démontrée. AF-TASK-028 reste IN_PROGRESS : qualification du transport distant, identité/horloge/fencing effectifs et raccordement moteur codeur. Aucune nouvelle branche, queue, mutation S2 ni claim legacy transféré.

@@ -545,6 +545,15 @@
       "observed_at": "2026-11-25T15:09:47Z",
       "sha": "4d6e1d34abf582d9460f3a7fe2bcea83706cf4c5",
       "summary": "5/5 tests on actual isolated Git references: two-repository publication, partial recovery without rollback, no-change/no-effect, denial/stale refs and exact parent/outside-block rejection. No authenticated remote transport or production mutation."
+    },
+    {
+      "id": "AF-EVD-076",
+      "type": "PROGRAMME_DIRECTOR_MANUAL_PUBLICATION_PLAN_WIRING",
+      "result": "PASS",
+      "provenance": "GitHub Actions run 45642729957 job 139305436077, API 371b742e6f1b773f163921bee99ed762f3a9eff8, frontend 09c3cf780a8200f56c2b39f095f3cb0a1ea4873e; logs verified",
+      "observed_at": "2026-11-25T15:13:55Z",
+      "sha": "371b742e6f1b773f163921bee99ed762f3a9eff8",
+      "summary": "PUBLICATION_WORKFLOW_WIRING and MANUAL_WORKFLOW_CI_EQUIVALENT PASS, 7/7 lease/fencing and 6/6 publication tests, six exact projections, complete Director CI success. Initial run 45642469718 failed because test checkout was dirty; corrected by separate detached worktree. No live dispatch, remote publication or hosted agent activation."
     }
   ],
   "note": "Evidence is append-only in meaning; later observations may supersede operational freshness without deleting historical proof."
