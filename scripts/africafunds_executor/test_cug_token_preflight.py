@@ -127,5 +127,12 @@ class CUGTokenContract(unittest.TestCase):
         self.assertNotIn("docker compose", workflow)
 
 
+    def test_workflow_pins_existing_cug_app_identity(self):
+        workflow = (Path(__file__).resolve().parents[2] /
+                    ".github/workflows/africafunds-cug-access-preflight.yml").read_text(encoding="utf-8")
+        self.assertIn("'5417646'", workflow)
+        self.assertIn("CUG_APP_IDENTITY_MISMATCH; WRITER_GATE_CLOSED", workflow)
+
+
 if __name__ == "__main__":
     unittest.main()
