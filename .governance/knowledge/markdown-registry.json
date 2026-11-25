@@ -6,11 +6,11 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "fa881d271907088a7d774adcb8160065b08b1434"
+      "head": "8e859434e7dc3f2e9bc03aed91503c2222ce4e8b"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
-      "head": "8d8dcfd50e8a1cc7ad981aa2bb406be85074c247"
+      "head": "09c3cf780a8200f56c2b39f095f3cb0a1ea4873e"
     }
   },
   "summary": {
@@ -4204,7 +4204,8 @@
         "2026-09-11 — réconciliation du point de reprise après reprise de session",
         "2026-09-12 — AF-TASK-006→011 : SSH fallback, secrets et certification finale",
         "2026-09-13 — clôture AF-TASK-011",
-        "2026-11-25 — AF-TASK-028 : préflight manuel et recette bornée"
+        "2026-11-25 — AF-TASK-028 : préflight manuel et recette bornée",
+        "2026-11-25 — AF-TASK-028 : recette CI équivalente et admission candidate"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -4220,11 +4221,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "ac7db2313e7bed36e336ca3b7409879ac040b1e0",
-      "last_validated_sha": "ac7db2313e7bed36e336ca3b7409879ac040b1e0",
-      "content_sha256": "4fb4fa9498a33b44036273b86b97a9fb7e470e22b2dad92e7c271a8a7b1f2f2d",
-      "line_count": 121,
-      "byte_count": 9499,
+      "git_blob_sha": "096239fad4d4d7e9c5845257c78083a9ed8ecc6a",
+      "last_validated_sha": "096239fad4d4d7e9c5845257c78083a9ed8ecc6a",
+      "content_sha256": "def63889307cc3d8ed6faea6fa5e2cfe61623767f9d3ca10d43f8d14d6fb2a10",
+      "line_count": 128,
+      "byte_count": 10645,
       "headings": [
         {
           "level": 1,
@@ -4261,6 +4262,10 @@
         {
           "level": 2,
           "text": "2026-11-25 — AF-TASK-028 : préflight manuel et recette bornée"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-25 — AF-TASK-028 : recette CI équivalente et admission candidate"
         }
       ]
     },
@@ -13672,6 +13677,7 @@
       "unique_information": [
         "Carnet de suivi - Africafunds (Fundafrique)",
         "Projection gérée — checkpoint global",
+        "2026-11-25 — AF-TASK-028 : préflight manuel et contrôle CI",
         "POINT DE REPRISE COURANT — 2026-10-31 — Lot DQ : la PR frontend est fusionnee, la production ne la sert PAS, et mon hypothese du sitemap est refutee",
         "La PR #1 du frontend a ete fusionnee — et cela a servi a mesurer",
         "Premier constat : une fusion n'est PAS un deploiement",
@@ -13688,8 +13694,7 @@
         "POINT DE REPRISE COURANT — 2026-10-30 — Lot DN : la base renverse mon analyse — 10 des 14 fonds sont declares en USD",
         "La devise DECLAREE n'est pas celle que je supposais",
         "Les zeros depassent tres largement les fonds de C7",
-        "Et le taux publie, existe-t-il ?",
-        "Un piege de metrique, signale"
+        "Et le taux publie, existe-t-il ?"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -13705,11 +13710,11 @@
       "repository": "Wealthtechinnovations/front_end_opcvm",
       "repository_role": "FRONTEND",
       "path": "SUIVI.md",
-      "git_blob_sha": "af299ac37fefb7bf9caf4c1516e48b8f1a15c4ef",
-      "last_validated_sha": "af299ac37fefb7bf9caf4c1516e48b8f1a15c4ef",
-      "content_sha256": "a7bc215528956bd9dee436f93dfe1ff20921a7959608275ebad1d6aeb486dac0",
-      "line_count": 12054,
-      "byte_count": 748731,
+      "git_blob_sha": "3825032a86086530b164d26a0e98383b2af2eb87",
+      "last_validated_sha": "3825032a86086530b164d26a0e98383b2af2eb87",
+      "content_sha256": "d7e40ea91910841e2eaac195706e672c73b822dfb6479b8643c9c1fd5afc3a33",
+      "line_count": 12062,
+      "byte_count": 750193,
       "headings": [
         {
           "level": 1,
@@ -13718,6 +13723,10 @@
         {
           "level": 3,
           "text": "Projection gérée — checkpoint global"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-25 — AF-TASK-028 : préflight manuel et contrôle CI"
         },
         {
           "level": 2,
@@ -13866,10 +13875,6 @@
         {
           "level": 3,
           "text": "Pourquoi la page Performances avait ete oubliee"
-        },
-        {
-          "level": 3,
-          "text": "Correction d'un chiffre a moi"
         }
       ]
     },
