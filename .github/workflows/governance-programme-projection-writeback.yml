@@ -1,0 +1,145 @@
+name: AfricaFunds Programme Projection Writeback (manual preflight)
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_api_sha:
+        description: Exact canonical API HEAD (40 lowercase hex characters)
+        required: true
+        type: string
+      expected_frontend_sha:
+        description: Exact canonical frontend HEAD (40 lowercase hex characters)
+        required: true
+        type: string
+      mode:
+        description: Dry run or explicitly confirmed local apply (never pushes)
+        type: choice
+        options: [dry-run, apply-local]
+        default: dry-run
+        required: true
+      confirmation:
+        description: For apply-local, enter APPLY_LOCAL_CS-AFRICAFUNDS-001
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: africafunds-programme-director
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      API_SHA: ${{ inputs.expected_api_sha }}
+      FRONT_SHA: ${{ inputs.expected_frontend_sha }}
+      MODE: ${{ inputs.mode }}
+      CONFIRMATION: ${{ inputs.confirmation }}
+      CANONICAL_REF: refs/heads/claude/code-review-improvements-ikvuj
+      API_URL: https://github.com/Wealthtechinnovations/api_opcv.git
+      FRONT_URL: https://github.com/Wealthtechinnovations/front_end_opcvm.git
+    steps:
+      - name: Validate dispatch and exact remote HEADs
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REPOSITORY" == Wealthtechinnovations/api_opcv ]]
+          [[ "$GITHUB_REF" == "$CANONICAL_REF" && "$GITHUB_SHA" == "$API_SHA" ]]
+          [[ "$API_SHA" =~ ^[0-9a-f]{40}$ && "$FRONT_SHA" =~ ^[0-9a-f]{40}$ ]]
+          case "$MODE" in
+            dry-run) [[ -z "$CONFIRMATION" ]] ;;
+            apply-local) [[ "$CONFIRMATION" == APPLY_LOCAL_CS-AFRICAFUNDS-001 ]] ;;
+            *) exit 1 ;;
+          esac
+          [[ "$(git ls-remote --exit-code "$API_URL" "$CANONICAL_REF" | cut -f1)" == "$API_SHA" ]]
+          [[ "$(git ls-remote --exit-code "$FRONT_URL" "$CANONICAL_REF" | cut -f1)" == "$FRONT_SHA" ]]
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.expected_api_sha }}
+          path: api
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: Wealthtechinnovations/front_end_opcvm
+          ref: ${{ inputs.expected_frontend_sha }}
+          path: frontend
+          persist-credentials: false
+      - name: Validate existing contracts and generate deterministic proposals
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          [[ "$(git -C api rev-parse HEAD)" == "$API_SHA" ]]
+          [[ "$(git -C frontend rev-parse HEAD)" == "$FRONT_SHA" ]]
+          [[ -z "$(git -C api status --porcelain)" && -z "$(git -C frontend status --porcelain)" ]]
+          python3 api/scripts/governance/program_surface_claims.py --api-root api --output out/claims.json
+          python3 api/scripts/governance/program_invariants.py --api-root api --frontend-root frontend --output out/invariants.json
+          python3 api/scripts/governance/program_projection_drift.py --api-root api --frontend-root frontend --output out/drift.json
+          python3 - <<'PY'
+          import json
+          q = json.load(open('api/.governance/loop/task-queue.json'))
+          active = [t for t in q['tasks'] if t.get('program') == 'PROGRAMME_DIRECTOR' and t.get('status') == 'IN_PROGRESS' and (t.get('claim') or {}).get('status') == 'ACTIVE']
+          assert len(active) == 1 and active[0]['id'] == 'AF-TASK-028', 'PROGRAMME_CLAIM_MISSING_OR_AMBIGUOUS'
+          PY
+          for suffix in a b; do
+            python3 api/scripts/governance/program_projection_generator.py --api-root api --frontend-root frontend --output "out/generator-$suffix.json" > "out/generator-$suffix.log"
+          done
+          cmp out/generator-a.json out/generator-b.json
+          python3 api/scripts/governance/program_projection_writeback_simulator.py --api-root api --frontend-root frontend --generator-json out/generator-a.json --output out/simulator.json
+      - name: Dry run and explicitly confirmed local apply only
+        shell: bash
+        run: |
+          set -euo pipefail
+          recheck() {
+            [[ "$(git ls-remote --exit-code "$API_URL" "$CANONICAL_REF" | cut -f1)" == "$API_SHA" ]]
+            [[ "$(git ls-remote --exit-code "$FRONT_URL" "$CANONICAL_REF" | cut -f1)" == "$FRONT_SHA" ]]
+          }
+          engine() {
+            python3 api/scripts/governance/program_projection_writeback.py --api-root api --frontend-root frontend --generator-json out/generator-a.json --expected-api-sha "$API_SHA" --expected-frontend-sha "$FRONT_SHA" --task-id AF-TASK-028 "$@"
+          }
+          recheck
+          engine --output out/dry-run.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('out/dry-run.json'))
+          assert d['integrity']=='PASS' and d['mode']=='DRY_RUN_ONLY' and d['files_written_count']==0
+          assert d['all_outside_content_preserved'] and d['all_markers_valid']
+          PY
+          [[ -z "$(git -C api status --porcelain)" && -z "$(git -C frontend status --porcelain)" ]]
+          if [[ "$MODE" == apply-local ]]; then
+            [[ "$CONFIRMATION" == APPLY_LOCAL_CS-AFRICAFUNDS-001 ]]
+            recheck
+            engine --output out/apply-a.json --apply
+            engine --output out/apply-b.json --apply
+            python3 - <<'PY'
+          import json
+          a=json.load(open('out/apply-a.json')); b=json.load(open('out/apply-b.json'))
+          assert a['integrity']==b['integrity']=='PASS'
+          assert a['all_outside_content_preserved'] and a['all_markers_valid']
+          assert b['files_written_count']==0 and b['all_second_apply_idempotent']
+          PY
+            python3 - <<'PY'
+          import subprocess
+          for root,allowed in [('api',{'NEXT_ACTION.md','CURRENT_ITERATION.md','LOOP_STATE.md','HANDOFF.md','STATUS.md'}),('frontend',{'SUIVI.md'})]:
+              changes=set(subprocess.check_output(['git','-C',root,'diff','--name-only'],text=True).splitlines())
+              assert changes <= allowed, (root,changes)
+              assert not subprocess.check_output(['git','-C',root,'ls-files','--others','--exclude-standard'],text=True).strip()
+          PY
+            git -C api diff --binary > out/api.patch
+            git -C frontend diff --binary > out/frontend.patch
+          fi
+          recheck
+          [[ "$(git -C api rev-parse HEAD)" == "$API_SHA" && "$(git -C frontend rev-parse HEAD)" == "$FRONT_SHA" ]]
+          printf '%s\n' 'REMOTE_PUBLICATION=DISABLED' 'S2_DEPLOYMENT=DISABLED' >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve preflight evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: africafunds-projection-preflight-${{ github.run_id }}
+          path: out/
+          if-no-files-found: warn
+          retention-days: 7
