@@ -110,3 +110,12 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 - frontend SUIVI global avancé à `38a5120677ec76dcc65b5d799a5f24f8ce236328` pour consigner la clôture ;
 - persistance finale des registres dans ce commit ; une dernière réconciliation post-documentation est requise conformément à GOV-006 ;
 - `FILES_DELETED = 0` ; aucune donnée métier C2/C3/C4/C7/C8 modifiée.
+
+
+## 2026-11-25 — AF-TASK-028 : préflight manuel et recette bornée
+
+- Projet CS-AFRICAFUNDS-001, branche canonique inchangée, frontend observé `8d8dcfd50e8a1cc7ad981aa2bb406be85074c247`.
+- API `ab3353b2532940d9fa7a4e87c4edd37a3981653f` : workflow manuel de préflight publié ; dry-run par défaut, confirmation explicite pour apply-local, permissions contents:read, HEAD exacts et recheck distant, claims, invariants, génération déterministe, moteur local existant. Aucun push de projections ni S2.
+- Regulatory Plus run 45612928544 : SUCCESS sur ce SHA. Syntaxe YAML/Bash et 11 cas de dispatch simulés PASS localement ; contrat ajouté à la CI du Programme Director dans le présent commit, résultat CI à observer.
+- AF-TASK-028 reste IN_PROGRESS : recette workflow_dispatch réelle, identité et publication bi-repository gouvernée non attestées. Exécuteur IA horaire dédié non activé ; claims observe-only, ne pas déclarer exclusion atomique. Aucun changement de queue, de branche, de données ou de production.
+- NEXT_ACTION : contrôler la CI exacte du présent commit, exécuter le dry-run manuel via surface autorisée, qualifier une identité d'écriture minimale et le raccordement à la queue existante. Ne pas activer de publication ou de déploiement sans gates.

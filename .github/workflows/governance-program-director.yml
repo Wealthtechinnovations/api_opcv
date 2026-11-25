@@ -26,6 +26,8 @@ on:
       - 'HANDOFF.md'
       - 'STATUS.md'
       - '.github/workflows/governance-program-director.yml'
+      - '.github/workflows/governance-programme-projection-writeback.yml'
+      - 'scripts/governance/program_manual_preflight_contract.py'
   schedule:
     - cron: '23 * * * *'
   workflow_dispatch:
@@ -57,6 +59,9 @@ jobs:
           path: frontend
           fetch-depth: 1
           token: ${{ github.token }}
+
+      - name: Test manual projection preflight contract (simulated dispatch guards)
+        run: python3 api/scripts/governance/program_manual_preflight_contract.py
 
       - name: Derive programme state read-only
         run: |
