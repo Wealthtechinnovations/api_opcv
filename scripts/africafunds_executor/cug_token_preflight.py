@@ -82,9 +82,12 @@ def observe(get, heads: dict[str, str], now=time.time) -> dict:
                 repository.get("default_branch") == BRANCH and
                 (repository.get("owner") or {}).get("id") == OWNER_ID,
                 "APP_TOKEN_REPOSITORY_IDENTITY_DRIFT:" + role)
-        # The app token is requested with permission-contents: write.
-        require((repository.get("permissions") or {}).get("push") is True,
-                "APP_TOKEN_CONTENTS_WRITE_NOT_ATTESTED:" + role)
+        # A repository's permissions.push flag is not a reliable proof of
+        # an installation token's Contents grant. The surrounding workflow
+        # requests permission-contents: write at token issuance; GitHub rejects
+        # permission escalation there. This read-only probe never proves that
+        # an actual Git ref update would be admitted. Fail closed at the writer
+        # gate until an independently governed write is certified.
         ref = read(f"/repos/{OWNER}/{name}/git/ref/heads/{BRANCH}")
         require(ref.get("ref") == f"refs/heads/{BRANCH}" and
                 (ref.get("object") or {}).get("type") == "commit", "REMOTE_REF_IDENTITY_DRIFT:" + role)
@@ -99,7 +102,7 @@ def observe(get, heads: dict[str, str], now=time.time) -> dict:
         "observed_heads": observed,
         "clock_observations": samples,
         "app_installation_token_scope": "TWO_REPOSITORIES_ATTESTED",
-        "contents_write_permission": "ATTESTED_BUT_UNUSED",
+        "contents_write_permission": "REQUESTED_AT_TOKEN_ISSUANCE_NOT_EXERCISED",
         "writer_gate": "CLOSED_UNTIL_LEASE_FENCING_AND_CODER_ATTESTED",
         "github_write_performed": False,
         "production_mutation": False,

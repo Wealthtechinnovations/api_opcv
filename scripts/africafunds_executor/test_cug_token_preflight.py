@@ -68,11 +68,14 @@ class CUGTokenContract(unittest.TestCase):
         with self.assertRaisesRegex(AdmissionError, "REPOSITORY_SET_DRIFT"):
             perform(data)
 
-    def test_refuses_missing_push_permission(self):
+    def test_repository_push_flag_is_not_an_installation_contents_grant(self):
         data = responses()
         data[f"/repos/{OWNER}/{REPOS['API'][0]}"]["permissions"]["push"] = False
-        with self.assertRaisesRegex(AdmissionError, "CONTENTS_WRITE_NOT_ATTESTED"):
-            perform(data)
+        result, _ = perform(data)
+        self.assertEqual(result["contents_write_permission"],
+                         "REQUESTED_AT_TOKEN_ISSUANCE_NOT_EXERCISED")
+        self.assertEqual(result["writer_gate"],
+                         "CLOSED_UNTIL_LEASE_FENCING_AND_CODER_ATTESTED")
 
     def test_refuses_wrong_branch(self):
         data = responses()
