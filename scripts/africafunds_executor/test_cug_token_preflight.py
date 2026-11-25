@@ -134,5 +134,14 @@ class CUGTokenContract(unittest.TestCase):
         self.assertIn("CUG_APP_IDENTITY_MISMATCH; WRITER_GATE_CLOSED", workflow)
 
 
+    def test_hourly_probe_is_read_only_and_keeps_single_writer_gate_closed(self):
+        workflow = (Path(__file__).resolve().parents[2] /
+                    ".github/workflows/africafunds-cug-access-preflight.yml").read_text(encoding="utf-8")
+        self.assertIn("cron: '41 * * * *'", workflow)
+        self.assertIn("github.event_name == 'schedule'", workflow)
+        self.assertIn("permissions:\n  contents: read", workflow)
+        self.assertIn("WRITER_GATE_CLOSED", workflow)
+
+
 if __name__ == "__main__":
     unittest.main()
