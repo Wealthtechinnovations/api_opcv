@@ -931,3 +931,95 @@ PERSIST EVIDENCE
         ↓
 CONTINUE
 ```
+
+---
+
+## 29. Delta de continuité — RCA / CMF / DB-auth de septembre 2026
+
+Ce complément persiste des faits précis retrouvés dans la séquence de conversation opérationnelle qui avait suivi la réconciliation post-A/B.
+
+### AF-OPS-003 — état post-A/B et corrélation mémoire
+
+- Les A/B allocateur courts glibc/jemalloc ont été exécutés et rollbackés ; ils sont **non discriminants pour la dérive RSS multi-heures**. Ils ne doivent pas être rejoués comme simple étape de reprise.
+- L’écart massif entre `Memory_used` MariaDB et le RSS anonyme/privé reste un fait observé ; la cause racine ne doit pas être déclarée à partir de ce seul écart.
+- Les contextes OOM reconstruits couvrent plusieurs workloads lourds différents ; un job unique n’est donc pas une condition commune prouvée.
+- La corrélation longue durée doit relier RSS/RssAnon/Private_Dirty, uptime/PID MariaDB, compteurs de tables temporaires/connexions, crons, batchs, timeouts client, continuation réelle des handlers Node et activité SQL.
+- Le label kernel `npm start invoked oom-killer` n’identifie pas un build frontend : API et frontend possèdent tous deux un script `start`, tandis que le build frontend est distinct.
+- `AF-OPS-001` reste séparé de la RCA : une politique de redémarrage améliore la résilience mais ne prouve ni ne corrige la cause racine.
+
+### AF-OPS-009 — dérive de contrat source CMF/Tunisie
+
+Un diagnostic GitHub Actions en lecture seule a montré que la page publique CMF était actuelle, mais que le collecteur historique rejetait les nouveaux noms de fichiers.
+
+Familles effectivement observées :
+
+```text
+vl_du_16_septembre_2026.xlsx
+vl_du_14-09-26.xlsx
+vl_10_09_2026.xlsx
+vl09092026.xlsx
+```
+
+Le collecteur n’acceptait historiquement que la famille `valeurs_liquidatives*.xls[x]`. En plus, un parsing générique de six chiffres pouvait mal interpréter un nom compact comme `vl09092026.xlsx`.
+
+Correctif borné :
+- commit API `37dd9c58cb3b77dc3c4124cd3c08d4f7eda53546` ;
+- découverte élargie aux familles CMF historiques et courantes ;
+- parsing explicite des formats observés ;
+- tests dédiés ;
+- dry-run GitHub Actions `35161092905` : SUCCESS ;
+- 269 fichiers CMF découverts, 11 fichiers sélectionnés sur la fenêtre septembre, 11 téléchargés, 1 408 lignes NAV et 759 dividendes parsés, 0 erreur de parsing.
+
+Ce dry-run ne disposait pas de la base/mapping de production : `clean_nav=0` et `no_match=1408` ne constituent donc pas une preuve d’échec du correctif de découverte. Aucune écriture DB de production n’a été effectuée dans ce lot.
+
+La fraîcheur Nigeria doit rester distinguée : lors de cette investigation, la source SEC publique observée ne proposait pas de publication plus récente que le 28 août 2026. La Tunisie était un défaut de collecteur malgré une source actuelle ; le Nigeria relevait alors d’un retard amont observé.
+
+### AF-OPS-005 — refus DB post-rotation
+
+Les preuves disponibles établissent :
+- des `Access denied for user 'fund_opcvm'@'localhost'` intermittents après rotation ;
+- le `.env` runtime courant correspond au credential actif ;
+- `.env.production` et `.env.production.plan-b` portent des credentials anciens/différents ;
+- aucun consommateur actif précis n’était encore causalement attribué au moment du checkpoint ;
+- aucune nouvelle rotation DB ni restart MariaDB n’était justifiée.
+
+Le diagnostic read-only a été renforcé au commit `8d6e234eca6d2dd9ec9ba3ff7b7bdf18523f7d4d` pour examiner loaders, références aux fichiers stale, PM2, systemd, open file descriptors, processus et logs sans exposer de secrets. Le run GitHub Actions `35162750904` a terminé `SUCCESS`. Ce succès prouve l’exécution sûre du diagnostic ; il ne doit pas être transformé en attribution causale non observée.
+
+### Correction documentaire frontend
+
+Le commit frontend `3205e6c8619523150307903cdf4ed001621d0553` a réaligné le `SUIVI.md` sur les preuves RCA persistées, notamment la corrélation OOM/workload et l’ambiguïté de `npm start`.
+
+---
+
+## 30. Couverture des sources conversationnelles disponibles
+
+La consolidation sémantique a été rapprochée des instantanés de conversation/projet disponibles suivants :
+
+- `Analyse du projet AfricaFunds.txt` ;
+- `Branche · RepoAFricafunds Amelioration.txt` ;
+- `RepoAFricafunds Amelioration.txt` ;
+- `Point sur la RCA.txt` ;
+- `Souvenir du projet FundAfrica.txt` ;
+- `Branche · b1Outil de due diligence.txt`.
+
+Ces instantanés couvrent notamment identité produit, modèle Fund/SubFund/ShareClass, provenance/lineage, Atomic Design, analytics/benchmarks, collecte/automatisation, Tunisie, Nigeria, Maroc, Openfunds comme référence séparée, Regulatory Plus, Loop Engineering, GOV-006, S2, secrets, task queue, cartographie exhaustive, Due Diligence institutionnelle, autonomie, conditions d’arrêt, RCA MariaDB et règles anti-duplication.
+
+Ils sont traités comme **sources historiques de consolidation**, jamais comme autorité live. Les valeurs de secrets, données privées non nécessaires et transcriptions verbatim de chat ne sont pas copiées dans Git.
+
+---
+
+## 31. Intégration mécanique dans la reprise multi-agent
+
+La mémoire consolidée ne doit plus dépendre d’un agent qui « pense à la lire ».
+
+Le mécanisme de reprise doit donc :
+- charger le manifeste JSON et le document humain depuis Git ;
+- vérifier `project_uid == continuity_key == CS-AFRICAFUNDS-001` ;
+- calculer leurs empreintes SHA-256 ;
+- exposer dans le contexte reconstruit que la mémoire historique Git a été chargée ;
+- conserver `conversation_memory_used = false` : l’agent reprend depuis Git, pas depuis sa mémoire de chat ;
+- faire échouer le gate si la mémoire consolidée est absente ou incohérente ;
+- continuer à faire primer HEADs, queue, claims, preuves et production live sur tout checkpoint historique.
+
+Règle de communication opérationnelle issue des échanges : les messages de progression ne sont jamais des work gates. L’agent doit privilégier des séquences de travail plus longues et ne s’interrompre que pour un blocage réel, une décision irréversible/risquée nécessitant autorisation, ou un lot substantiel terminé.
+

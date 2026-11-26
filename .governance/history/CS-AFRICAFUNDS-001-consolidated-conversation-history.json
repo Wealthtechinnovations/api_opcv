@@ -212,5 +212,72 @@
     "DEDUPLICATE_AGAINST_COMPLETED_WORK",
     "SELECT_ONLY_ADMISSIBLE_UNCLAIMED_SCOPE",
     "IMPLEMENT_TEST_PERSIST_EVIDENCE"
-  ]
+  ],
+  "consolidation_revision": 2,
+  "conversation_source_coverage": {
+    "status": "COMPLETE_FOR_AVAILABLE_PROJECT_SNAPSHOTS",
+    "mode": "SEMANTIC_CONSOLIDATION_NOT_VERBATIM",
+    "continuity_key": "CS-AFRICAFUNDS-001",
+    "source_snapshots_reviewed": [
+      "Analyse du projet AfricaFunds.txt",
+      "Branche · RepoAFricafunds Amelioration.txt",
+      "RepoAFricafunds Amelioration.txt",
+      "Point sur la RCA.txt",
+      "Souvenir du projet FundAfrica.txt",
+      "Branche · b1Outil de due diligence.txt"
+    ],
+    "exclusions": [
+      "SECRET_VALUES",
+      "PRIVATE_DATA_NOT_REQUIRED_FOR_PROJECT_CONTINUITY",
+      "VERBATIM_CHAT_TRANSCRIPT",
+      "NON_AFRICAFUNDS_PROJECTS"
+    ]
+  },
+  "recent_conversation_deltas": [
+    {
+      "id": "AF-HIST-DELTA-20260916-CMF",
+      "topic": "AF-OPS-009",
+      "classification": "HISTORICAL_TECHNICAL_FACTS",
+      "facts": [
+        "CMF public source current while legacy filename discovery rejected new vl* naming families",
+        "compact filename date parsing required explicit DDMMYYYY handling",
+        "API fix commit 37dd9c58cb3b77dc3c4124cd3c08d4f7eda53546",
+        "GitHub Actions dry-run 35161092905 SUCCESS",
+        "269 files discovered; 11 selected/downloaded; 1408 NAV rows; 759 dividends; 0 parse errors",
+        "no production DB write in the dry-run"
+      ]
+    },
+    {
+      "id": "AF-HIST-DELTA-20260916-DBAUTH",
+      "topic": "AF-OPS-005",
+      "classification": "HISTORICAL_TECHNICAL_FACTS",
+      "facts": [
+        "runtime .env matched current DB credential",
+        ".env.production and .env.production.plan-b remained stale credential-bearing files",
+        "specific active stale consumer remained unproven at checkpoint",
+        "read-only attribution enhanced at 8d6e234eca6d2dd9ec9ba3ff7b7bdf18523f7d4d",
+        "diagnostic run 35162750904 SUCCESS",
+        "no DB credential rotation or MariaDB restart justified by this diagnostic"
+      ]
+    },
+    {
+      "id": "AF-HIST-DELTA-20260916-OOM",
+      "topic": "AF-OPS-003",
+      "classification": "HISTORICAL_RCA",
+      "facts": [
+        "short allocator A/B completed and non-discriminant for multi-hour RSS growth",
+        "cross-incident heavy workload contexts differ",
+        "npm start kernel label does not prove a frontend build",
+        "long-duration read-only correlation remains the required proof class"
+      ]
+    }
+  ],
+  "reconstruction_integration": {
+    "required": true,
+    "loader": "scripts/governance/reconstruct_context.py",
+    "workflow": ".github/workflows/governance-multi-agent-resume.yml",
+    "validation": "scripts/governance/validate_regulatory_plus.py",
+    "conversation_memory_used": false,
+    "live_authority_precedence": true
+  }
 }

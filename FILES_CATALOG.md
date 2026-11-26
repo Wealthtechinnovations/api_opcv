@@ -13,5 +13,6 @@
 | `docs/09-loop` | preuves, erreurs, apprentissages, métriques | `OPERATIONAL/EVIDENCE` |
 | `docs/10-ai` | gouvernance IA | `SPECIALIZED` |
 | `.governance/` | connaissance structurée machine-readable | `MACHINE_READABLE` |
+| `.governance/history/CS-AFRICAFUNDS-001-*` | historique conversationnel consolidé, humain + machine, non autoritaire pour le live | `HISTORICAL_MEMORY` |
 
 Aucun recouvrement de nom ne constitue à lui seul une duplication. Lire le contenu, le rôle et l’historique avant toute dépréciation.

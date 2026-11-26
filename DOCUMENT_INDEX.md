@@ -8,6 +8,8 @@
 ## Continuité
 `SUIVI.md` (pointeur API), `LOOP_STATE.md`, `CURRENT_ITERATION.md`, `WORK_LOG.md`, `HANDOFF.md`, `NEXT_ACTION.md`, `OPEN_QUESTIONS.md`.
 
+Mémoire historique consolidée : `.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md` + `.json`. Elle explique le passé et les décisions retrouvées ; elle ne remplace jamais les autorités live.
+
 ## Incidents
 - politique : `docs/07-operations/INCIDENT_RESPONSE.md` ;
 - registre machine : `.governance/incidents/registry.json` ;

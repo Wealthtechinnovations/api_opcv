@@ -22,27 +22,28 @@ Avant toute analyse ou écriture :
 4. `AGENTS.md`
 5. `SOURCE_OF_TRUTH.md`
 6. `PROJECT_CONTEXT.md`
-7. `STATUS.md`
-8. `front_end_opcvm/SUIVI.md` — historique/checkpoint opérationnel global
-9. `TODO.md` / `TASKS.md` pertinent selon le dépôt et la tâche
-10. `NEXT_ACTION.md`
-11. `LOOP_STATE.md`
-12. `CURRENT_ITERATION.md`
-13. `LOOP_ENGINEERING.md` et `LOOP_CONTRACT.md`
-14. `WORK_LOG.md`
-15. `HANDOFF.md`
-16. `OPEN_QUESTIONS.md` lorsque pertinent
-17. `docs/DECISIONS.md` et les ADR applicables
-18. `DOCUMENT_INDEX.md`, `FILES_CATALOG.md` et `DOCUMENT_INTEGRATION_MATRIX.md` si la tâche touche la documentation/gouvernance
-19. `docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md`
-20. `docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md`
-21. `docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md`
-22. `DIRECTIVE_TRAVAIL.md`
-23. `CLAUDE.md` des deux dépôts et tout adaptateur agent pertinent
-24. les `README*`, `ROADMAP.md`, `CODE_REVIEW.md`, `CHANGELOG.md`, `DEPLOYMENT_PRODUCTION.md` et documents spécialisés pertinents
-25. `api_opcv/docs/ETAT_PRODUCTION_VERIFIE.md` et toute mesure live disponible pour les faits de production
-26. les fichiers, migrations, scripts, routes, composants, modèles, données structurées et tests directement concernés
-27. les HEAD, commits récents, checks et travaux en cours des deux dépôts.
+7. `.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md` + `.json` — mémoire historique consolidée sous `CS-AFRICAFUNDS-001`, à réconcilier avec les autorités live ;
+8. `STATUS.md`
+9. `front_end_opcvm/SUIVI.md` — historique/checkpoint opérationnel global
+10. `TODO.md` / `TASKS.md` pertinent selon le dépôt et la tâche
+11. `NEXT_ACTION.md`
+12. `LOOP_STATE.md`
+13. `CURRENT_ITERATION.md`
+14. `LOOP_ENGINEERING.md` et `LOOP_CONTRACT.md`
+15. `WORK_LOG.md`
+16. `HANDOFF.md`
+17. `OPEN_QUESTIONS.md` lorsque pertinent
+18. `docs/DECISIONS.md` et les ADR applicables
+19. `DOCUMENT_INDEX.md`, `FILES_CATALOG.md` et `DOCUMENT_INTEGRATION_MATRIX.md` si la tâche touche la documentation/gouvernance
+20. `docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md`
+21. `docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md`
+22. `docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md`
+23. `DIRECTIVE_TRAVAIL.md`
+24. `CLAUDE.md` des deux dépôts et tout adaptateur agent pertinent
+25. les `README*`, `ROADMAP.md`, `CODE_REVIEW.md`, `CHANGELOG.md`, `DEPLOYMENT_PRODUCTION.md` et documents spécialisés pertinents
+26. `api_opcv/docs/ETAT_PRODUCTION_VERIFIE.md` et toute mesure live disponible pour les faits de production
+27. les fichiers, migrations, scripts, routes, composants, modèles, données structurées et tests directement concernés
+28. les HEAD, commits récents, checks et travaux en cours des deux dépôts.
 
 `LOOP_ENGINEERING.md` définit COMMENT le travail gouverné est exécuté. GOV-006 définit en plus comment traiter toute divergence GitHub/S2 sans perte ni raccourci destructif.
 

@@ -7,6 +7,8 @@ from pathlib import Path
 BRANCH="claude/code-review-improvements-ikvuj"
 API_REPO="Wealthtechinnovations/api_opcv"
 FRONT_REPO="Wealthtechinnovations/front_end_opcvm"
+HISTORY_MD_REL=".governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md"
+HISTORY_JSON_REL=".governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.json"
 
 def git(root,*args):
     return subprocess.check_output(["git","-C",str(root),*args],text=True).strip()
@@ -55,6 +57,15 @@ def main():
     api_sha=git(api,"rev-parse","HEAD")
     front_sha=git(front,"rev-parse","HEAD")
 
+    history_md=(api/HISTORY_MD_REL).read_text(encoding="utf-8")
+    history_meta=load_json(api/HISTORY_JSON_REL)
+    assert history_meta["project_uid"]=="CS-AFRICAFUNDS-001"
+    assert history_meta["continuity_key"]=="CS-AFRICAFUNDS-001"
+    assert "CS-AFRICAFUNDS-001" in history_md
+    history_md_sha=hashlib.sha256(history_md.encode()).hexdigest()
+    history_json_bytes=(api/HISTORY_JSON_REL).read_bytes()
+    history_json_sha=hashlib.sha256(history_json_bytes).hexdigest()
+
     queue=load_json(api/".governance/loop/task-queue.json")
     active=[x for x in queue["tasks"] if x["status"] in {"IN_PROGRESS","PENDING","BLOCKED_EXTERNAL_PROVIDER_ROTATION"}]
     current=[x for x in queue["tasks"] if x["status"]=="IN_PROGRESS"]
@@ -97,12 +108,22 @@ def main():
         "server_observation_nominal":"wealthtech_ssh_bridge",
         "server_observation_fallback":"github_actions_ssh",
         "new_branch_creation":"FORBIDDEN",
+        "historical_memory":{
+            "continuity_key":history_meta["continuity_key"],
+            "status":history_meta["status"],
+            "human_history_path":HISTORY_MD_REL,
+            "machine_manifest_path":HISTORY_JSON_REL,
+            "human_history_sha256":history_md_sha,
+            "machine_manifest_sha256":history_json_sha,
+            "authority":"HISTORICAL_ONLY_LIVE_AUTHORITIES_PREVAIL",
+        },
     }
     payload={
         "schema_version":"1.0.0",
         "agent_profile":a.agent_profile,
         "start_repository_role":a.start_repo,
         "conversation_memory_used":False,
+        "git_historical_memory_loaded":True,
         "peer_repository_discovered":start_repo["peer_repository"],
         "context_reconstruction":"PASS",
         "logical_context":logical,

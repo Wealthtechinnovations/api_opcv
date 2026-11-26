@@ -300,7 +300,10 @@
       "requirement_id": "AF-REQ-023",
       "change_refs": [
         "scripts/governance/reconstruct_context.py",
-        ".github/workflows/governance-multi-agent-resume.yml"
+        ".github/workflows/governance-multi-agent-resume.yml",
+        ".governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md",
+        ".governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.json",
+        "00_START_HERE.md"
       ],
       "test_refs": [
         ".github/workflows/governance-multi-agent-resume.yml"

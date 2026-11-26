@@ -25,6 +25,7 @@ Les HEAD ci-dessus sont des **checkpoints observés**, pas des valeurs auto-réf
 - décisions `docs/DECISIONS.md` et ADR : `PRESENT` ;
 - gouvernance `docs/01-governance/*` : `PRESENT` côté API central ;
 - couche machine-readable `.governance/*` : `PRESENT` côté API central ;
+- mémoire historique consolidée `CS-AFRICAFUNDS-001` (`.governance/history/*.md` + `.json`) : `PRESENT_AND_LOADED_BY_CONTEXT_RECONSTRUCTION` ;
 - miroir des contrats racine côté frontend : `PRESENT` et contrôlé par CI ;
 - GOV-006 GitHub ↔ S2 ↔ runtime : `PRESERVED` ;
 - règles métier Regulatory : `NOT_IMPORTED`.

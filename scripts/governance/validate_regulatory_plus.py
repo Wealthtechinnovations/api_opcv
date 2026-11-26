@@ -7,6 +7,8 @@ ROOT = Path(__file__).resolve().parents[2]
 required = [
     'GOVERNANCE.md','SOURCE_OF_TRUTH.md','AGENTS.md','LOOP_ENGINEERING.md',
     'PROJECT_CONTEXT.md','STATUS.md','NEXT_ACTION.md','LOOP_STATE.md',
+    '.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md',
+    '.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.json',
     'CURRENT_ITERATION.md','WORK_LOG.md','HANDOFF.md','OPEN_QUESTIONS.md',
     'DOCUMENT_INDEX.md','FILES_CATALOG.md','MANIFEST.md','DOCUMENT_INTEGRATION_MATRIX.md',
     'docs/01-governance/PROJECT_RULES.md','docs/01-governance/DEFINITION_OF_READY.md',
@@ -34,7 +36,7 @@ for rel in required:
     p=ROOT/rel
     if not p.exists(): errors.append(f'MISSING:{rel}')
     elif p.stat().st_size == 0: errors.append(f'EMPTY:{rel}')
-for rel in ['.governance/project.json','.governance/repository.json','.governance/branch-baseline.json','.governance/knowledge/markdown-registry.json','.governance/schemas/markdown-registry.schema.json','.governance/knowledge/authority-map.json','.governance/knowledge/requirements.json','.governance/knowledge/evidence.json','.governance/matrices/traceability.json','.governance/loop/state.json','.governance/loop/task-queue.json','.governance/loop/handoff.json','.governance/MANIFEST.json']:
+for rel in ['.governance/project.json','.governance/repository.json','.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.json','.governance/branch-baseline.json','.governance/knowledge/markdown-registry.json','.governance/schemas/markdown-registry.schema.json','.governance/knowledge/authority-map.json','.governance/knowledge/requirements.json','.governance/knowledge/evidence.json','.governance/matrices/traceability.json','.governance/loop/state.json','.governance/loop/task-queue.json','.governance/loop/handoff.json','.governance/MANIFEST.json']:
     try: json.loads((ROOT/rel).read_text(encoding='utf-8'))
     except Exception as exc: errors.append(f'JSON:{rel}:{exc}')
 req=json.loads((ROOT/'.governance/knowledge/requirements.json').read_text())['requirements']
@@ -59,6 +61,18 @@ for rel, markers in canonical_markers.items():
             errors.append(f'NONCANONICAL_PRODUCT_IDENTITY:{rel}:{marker}')
 
 
+
+
+history_meta=json.loads((ROOT/'.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.json').read_text(encoding='utf-8'))
+history_md=(ROOT/'.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md').read_text(encoding='utf-8')
+if history_meta.get('project_uid') != 'CS-AFRICAFUNDS-001':
+    errors.append('HISTORY_PROJECT_UID_MISMATCH')
+if history_meta.get('continuity_key') != 'CS-AFRICAFUNDS-001':
+    errors.append('HISTORY_CONTINUITY_KEY_MISMATCH')
+if history_meta.get('nature') != 'NON_AUTHORITATIVE_HISTORICAL_MEMORY':
+    errors.append('HISTORY_AUTHORITY_CLASSIFICATION_MISMATCH')
+if 'CS-AFRICAFUNDS-001' not in history_md:
+    errors.append('HISTORY_HUMAN_CONTINUITY_MARKER_MISSING')
 
 # Final-certification invariants: these are executable gates, not prose-only goals.
 project=json.loads((ROOT/'.governance/project.json').read_text(encoding='utf-8'))
