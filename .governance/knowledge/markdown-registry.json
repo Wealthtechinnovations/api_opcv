@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "ec4782e84cf4b0bd383afe37e4c302c48e8e8876"
+      "head": "87ca9992e569d25932d5b89a7f9fa17abf7b9b68"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -14,16 +14,16 @@
     }
   },
   "summary": {
-    "total_md_discovered": 250,
-    "total_md_certified": 250,
+    "total_md_discovered": 251,
+    "total_md_certified": 251,
     "by_repository": {
-      "API": 225,
+      "API": 226,
       "FRONTEND": 25
     },
     "by_status": {
       "TEMPLATE": 5,
+      "CURRENT_SPECIALIZED": 199,
       "CURRENT_CANONICAL": 21,
-      "CURRENT_SPECIALIZED": 198,
       "ADAPTER": 7,
       "HISTORICAL": 3,
       "DIAGNOSTIC_SNAPSHOT": 3,
@@ -416,6 +416,215 @@
         {
           "level": 2,
           "text": "Production"
+        }
+      ]
+    },
+    {
+      "role": "governance_specialized",
+      "status": "CURRENT_SPECIALIZED",
+      "authority_level": "CURRENT_SPECIALIZED",
+      "canonical_authority": "GOVERNANCE.md",
+      "unique_information": [
+        "CS-AFRICAFUNDS-001 — Historique conversationnel consolidé AfricaFunds",
+        "0. Objet de ce document",
+        "1. Identité et périmètre canonique",
+        "2. Directives permanentes issues des échanges utilisateur",
+        "3. Fondation gouvernance — septembre 2026",
+        "3.1 Regulatory Plus et Loop Engineering",
+        "3.2 Source de vérité et état bi-repository",
+        "4. Réconciliation S2, sécurité et secrets — 11 au 13 septembre 2026",
+        "5. Production MariaDB / OOM — AF-OPS-003",
+        "6. Data Quality, données dérivées et intégrité",
+        "7. Pipelines pays existants",
+        "Maroc",
+        "Nigeria",
+        "Tunisie",
+        "UEMOA",
+        "CEMAC",
+        "8. Cartographie produit exhaustive et Programme Director",
+        "9. Gap Harvester et 125 marqueurs",
+        "10. Allocation — programme AF-ALLOC-001",
+        "11. W1 — fondations canoniques"
+      ],
+      "consumers": [
+        "TASK_DEPENDENT"
+      ],
+      "read_priority": "TASK_DEPENDENT",
+      "action": "SPECIALIZED",
+      "contradictions": [],
+      "duplication_risk": "NONE",
+      "stale_state": [],
+      "security_impact": "HIGH",
+      "production_impact": "YES",
+      "title": "CS-AFRICAFUNDS-001 — Historique conversationnel consolidé AfricaFunds",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "repository_role": "API",
+      "path": ".governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md",
+      "git_blob_sha": "1168075c84698c0276ea32c0a195b417afa54220",
+      "last_validated_sha": "1168075c84698c0276ea32c0a195b417afa54220",
+      "content_sha256": "226660197e76c973a34efdc3d27cc296f1bcb166d8627fdd65c130e2bef9aac7",
+      "line_count": 933,
+      "byte_count": 29966,
+      "headings": [
+        {
+          "level": 1,
+          "text": "CS-AFRICAFUNDS-001 — Historique conversationnel consolidé AfricaFunds"
+        },
+        {
+          "level": 2,
+          "text": "0. Objet de ce document"
+        },
+        {
+          "level": 2,
+          "text": "1. Identité et périmètre canonique"
+        },
+        {
+          "level": 2,
+          "text": "2. Directives permanentes issues des échanges utilisateur"
+        },
+        {
+          "level": 2,
+          "text": "3. Fondation gouvernance — septembre 2026"
+        },
+        {
+          "level": 3,
+          "text": "3.1 Regulatory Plus et Loop Engineering"
+        },
+        {
+          "level": 3,
+          "text": "3.2 Source de vérité et état bi-repository"
+        },
+        {
+          "level": 2,
+          "text": "4. Réconciliation S2, sécurité et secrets — 11 au 13 septembre 2026"
+        },
+        {
+          "level": 2,
+          "text": "5. Production MariaDB / OOM — AF-OPS-003"
+        },
+        {
+          "level": 2,
+          "text": "6. Data Quality, données dérivées et intégrité"
+        },
+        {
+          "level": 2,
+          "text": "7. Pipelines pays existants"
+        },
+        {
+          "level": 3,
+          "text": "Maroc"
+        },
+        {
+          "level": 3,
+          "text": "Nigeria"
+        },
+        {
+          "level": 3,
+          "text": "Tunisie"
+        },
+        {
+          "level": 3,
+          "text": "UEMOA"
+        },
+        {
+          "level": 3,
+          "text": "CEMAC"
+        },
+        {
+          "level": 2,
+          "text": "8. Cartographie produit exhaustive et Programme Director"
+        },
+        {
+          "level": 2,
+          "text": "9. Gap Harvester et 125 marqueurs"
+        },
+        {
+          "level": 2,
+          "text": "10. Allocation — programme AF-ALLOC-001"
+        },
+        {
+          "level": 2,
+          "text": "11. W1 — fondations canoniques"
+        },
+        {
+          "level": 3,
+          "text": "Principales découvertes"
+        },
+        {
+          "level": 3,
+          "text": "Benchmark look-ahead"
+        },
+        {
+          "level": 3,
+          "text": "Nigeria provenance"
+        },
+        {
+          "level": 3,
+          "text": "FX"
+        },
+        {
+          "level": 3,
+          "text": "Les 8 deltas W1"
+        },
+        {
+          "level": 2,
+          "text": "12. W2 — pays, sources et expansion panafricaine"
+        },
+        {
+          "level": 3,
+          "text": "État historique W2"
+        },
+        {
+          "level": 3,
+          "text": "CEMAC/BVMAC"
+        },
+        {
+          "level": 3,
+          "text": "Ghana"
+        },
+        {
+          "level": 3,
+          "text": "Kenya"
+        },
+        {
+          "level": 3,
+          "text": "Les 7 deltas W2"
+        },
+        {
+          "level": 2,
+          "text": "13. Fund Master, SGO, ShareClass et lineage"
+        },
+        {
+          "level": 2,
+          "text": "14. Frontend, Design System et Atomic Design"
+        },
+        {
+          "level": 2,
+          "text": "15. Espaces utilisateurs"
+        },
+        {
+          "level": 2,
+          "text": "16. Due Diligence / Institutionnel"
+        },
+        {
+          "level": 2,
+          "text": "17. SEO, Schema.org, sémantique et accessibilité"
+        },
+        {
+          "level": 2,
+          "text": "18. Programme Director — AF-TASK-024 à AF-TASK-028"
+        },
+        {
+          "level": 2,
+          "text": "19. AF-TASK-028 — progression 25–26 novembre 2026"
+        },
+        {
+          "level": 3,
+          "text": "AF-EVD-073"
+        },
+        {
+          "level": 3,
+          "text": "AF-EVD-074"
         }
       ]
     },
@@ -10194,11 +10403,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/DIAG_ONDEMAND.md",
-      "git_blob_sha": "fce14258fef4ddc11ca879edba14d5a1a9b44b52",
-      "last_validated_sha": "fce14258fef4ddc11ca879edba14d5a1a9b44b52",
-      "content_sha256": "0f329d9eb79570d8d76342578834c896782c4feb24d321da4a69474d505f7fa0",
-      "line_count": 3838,
-      "byte_count": 283485,
+      "git_blob_sha": "23bf485d743a682c54202677c13eb8dcd2484285",
+      "last_validated_sha": "23bf485d743a682c54202677c13eb8dcd2484285",
+      "content_sha256": "9c987cab24c82ad2581aab78adc72cc2ff37eb84db406011aeb7caa93d45c441",
+      "line_count": 3841,
+      "byte_count": 283616,
       "headings": [
         {
           "level": 1,
@@ -10385,11 +10594,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
-      "git_blob_sha": "3d41434f351172043a02fc45ffbca303aa8d60ef",
-      "last_validated_sha": "3d41434f351172043a02fc45ffbca303aa8d60ef",
-      "content_sha256": "5fb0fe697e3fb845924ff0b296e047da5743b996bf390b26acab36a867654c3f",
+      "git_blob_sha": "63656b58737799735b0bab7f22e6c7eee7601fe1",
+      "last_validated_sha": "63656b58737799735b0bab7f22e6c7eee7601fe1",
+      "content_sha256": "5f1a8c7b7da0f0b45125abd21aeff192f1cd44cdd844828ce7a85cb9478fb514",
       "line_count": 96,
-      "byte_count": 7315,
+      "byte_count": 7206,
       "headings": [
         {
           "level": 1,
