@@ -1,0 +1,216 @@
+{
+  "schema_version": "1.0.0",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "continuity_key": "CS-AFRICAFUNDS-001",
+  "product": "AfricaFunds",
+  "status": "HISTORICAL_CONSOLIDATED_MEMORY",
+  "consolidated_at": "2026-11-26",
+  "nature": "NON_AUTHORITATIVE_HISTORICAL_MEMORY",
+  "live_state_at_consolidation": {
+    "api_head": "d27c083dd4909890959cc38a4c76f6b032bd6197",
+    "frontend_head": "7e82ecc6bd2f1c51d4137662951699584e7a6a3a",
+    "canonical_branch": "claude/code-review-improvements-ikvuj",
+    "active_claims": [
+      "AF-TASK-017",
+      "AF-TASK-028"
+    ]
+  },
+  "scope": {
+    "repositories": [
+      "Wealthtechinnovations/api_opcv",
+      "Wealthtechinnovations/front_end_opcvm"
+    ],
+    "excluded_projects": [
+      "Patricked-code/MCP",
+      "UAES",
+      "Patricked-code/africafunds-market-data-pipeline",
+      "Stablecoin",
+      "Regulatory business scope",
+      "Workers Director global"
+    ],
+    "transcript_mode": "SEMANTIC_CONSOLIDATION_NOT_VERBATIM"
+  },
+  "permanent_directives": [
+    "NO_RESTART_FROM_ZERO",
+    "REOBSERVE_BOTH_HEADS_BEFORE_WRITE",
+    "SINGLE_QUEUE_ONLY",
+    "RESPECT_ACTIVE_CLAIMS_AND_SINGLE_WRITER",
+    "REUSE_CORRECT_STRENGTHEN_EXTEND_MIGRATE_COMPATIBLY",
+    "NO_FORCE_PUSH_OR_DESTRUCTIVE_HISTORY_REWRITE",
+    "ACT_NOT_ONLY_REPORT_WHEN_WORK_IS_ADMISSIBLE",
+    "SHORT_PERSISTENT_CUMULATIVE_VERIFIABLE_UNITS",
+    "NO_FALSE_DONE_OR_PRODUCTION_ALIGNMENT",
+    "CHATGPT_DIRECT_GITHUB_DEFAULT",
+    "CODEX_EXCEPTION_ONLY"
+  ],
+  "topic_families": [
+    {
+      "id": "GOVERNANCE",
+      "status": "CONSOLIDATED",
+      "artifacts": [
+        "00_START_HERE.md",
+        "GOVERNANCE.md",
+        "SOURCE_OF_TRUTH.md",
+        "LOOP_ENGINEERING.md"
+      ]
+    },
+    {
+      "id": "S2_SECURITY",
+      "status": "CONSOLIDATED",
+      "artifacts": [
+        "WORK_LOG.md",
+        "docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md"
+      ]
+    },
+    {
+      "id": "MARIADB_OOM",
+      "status": "OPEN_HISTORICAL_RCA",
+      "artifacts": [
+        ".governance/incidents/registry.json",
+        "docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md"
+      ]
+    },
+    {
+      "id": "DATA_QUALITY",
+      "status": "ACTIVE_EXISTING_PROGRAM",
+      "queue_refs": [
+        "AF-OPS-007",
+        "AF-OPS-008",
+        "AF-OPS-009"
+      ]
+    },
+    {
+      "id": "COUNTRY_PIPELINES",
+      "status": "CONSOLIDATED_W2_HISTORY",
+      "artifacts": [
+        ".governance/matrices/africafunds-w2-checkpoint.json"
+      ]
+    },
+    {
+      "id": "ALLOCATION",
+      "status": "ACTIVE_EXISTING_PROGRAM",
+      "queue_refs": [
+        "AF-TASK-012",
+        "AF-TASK-013",
+        "AF-TASK-014",
+        "AF-TASK-015",
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-018",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021",
+        "AF-TASK-022",
+        "AF-TASK-023"
+      ]
+    },
+    {
+      "id": "PRODUCT_CARTOGRAPHY",
+      "status": "CONSOLIDATED",
+      "artifacts": [
+        ".governance/matrices/africafunds-product-intake-matrix.json",
+        ".governance/matrices/africafunds-task-promotion-plan.json"
+      ]
+    },
+    {
+      "id": "W1_FOUNDATIONS",
+      "status": "HISTORICAL_CHECKPOINT_COMPLETE",
+      "artifacts": [
+        ".governance/matrices/africafunds-w1-checkpoint.json"
+      ]
+    },
+    {
+      "id": "W2_EXPANSION",
+      "status": "HISTORICAL_CHECKPOINT_IN_PROGRESS",
+      "artifacts": [
+        ".governance/matrices/africafunds-w2-checkpoint.json"
+      ]
+    },
+    {
+      "id": "ATOMIC_DESIGN_FRONTEND",
+      "status": "PLANNED_AND_PARTIALLY_AUDITED"
+    },
+    {
+      "id": "USER_SPACES",
+      "status": "PARTIAL_EXISTING"
+    },
+    {
+      "id": "INSTITUTIONAL_DUE_DILIGENCE",
+      "status": "TARGET_ARCHITECTURE_NOT_FULLY_IMPLEMENTED"
+    },
+    {
+      "id": "SEO_SCHEMA_ACCESSIBILITY",
+      "status": "DIRECTIVE_AND_PROPOSALS_EXIST_IMPLEMENTATION_NOT_FULLY_CERTIFIED"
+    },
+    {
+      "id": "PROGRAMME_DIRECTOR",
+      "status": "ACTIVE",
+      "queue_refs": [
+        "AF-TASK-024",
+        "AF-TASK-025",
+        "AF-TASK-026",
+        "AF-TASK-027",
+        "AF-TASK-028"
+      ]
+    },
+    {
+      "id": "AUTONOMY_CAS_LEASES",
+      "status": "IN_PROGRESS_NOT_FULLY_CERTIFIED",
+      "queue_refs": [
+        "AF-TASK-028"
+      ]
+    }
+  ],
+  "programme_director_current": {
+    "af_task_017": {
+      "status": "IN_PROGRESS",
+      "phase": "CONSTRAINT_ENGINE_IMPLEMENTATION"
+    },
+    "af_task_028": {
+      "status": "IN_PROGRESS",
+      "phase": "MANUAL_WRITEBACK_WORKFLOW_PREFLIGHT",
+      "evidence_refs": [
+        "AF-EVD-073",
+        "AF-EVD-074",
+        "AF-EVD-075",
+        "AF-EVD-076",
+        "AF-EVD-077"
+      ],
+      "remaining": [
+        "DEDICATED_LEAST_PRIVILEGE_IDENTITY",
+        "AUTHENTICATED_WRITE_TRANSPORT",
+        "LEGACY_CLAIM_HANDOFF_RECONCILIATION",
+        "LEASE_FENCING_ADMISSION",
+        "ACTUAL_CODING_ENGINE_CONNECTION",
+        "TWO_DISTINCT_SCHEDULED_PRODUCTIVE_RUNS",
+        "NONEMPTY_CODE_COMMITS",
+        "CI_AND_RECOVERY_EVIDENCE"
+      ]
+    }
+  },
+  "source_artifacts": [
+    "PROJECT_CONTEXT.md",
+    "WORK_LOG.md",
+    "00_START_HERE.md",
+    "SOURCE_OF_TRUTH.md",
+    "GOVERNANCE.md",
+    "LOOP_ENGINEERING.md",
+    "docs/adr/ADR-AF-0002-operational-memory-and-loop.md",
+    ".governance/loop/task-queue.json",
+    ".governance/knowledge/requirements.json",
+    ".governance/knowledge/evidence.json",
+    ".governance/matrices/africafunds-product-intake-matrix.json",
+    ".governance/matrices/africafunds-task-promotion-plan.json",
+    ".governance/matrices/africafunds-w1-checkpoint.json",
+    ".governance/matrices/africafunds-w2-checkpoint.json"
+  ],
+  "resumption_protocol": [
+    "READ_LIVE_AUTHORITIES_FIRST",
+    "READ_THIS_MEMORY_AS_HISTORY_NOT_LIVE_STATE",
+    "REOBSERVE_BOTH_HEADS",
+    "RELOAD_QUEUE_AND_CLAIMS",
+    "DEDUPLICATE_AGAINST_COMPLETED_WORK",
+    "SELECT_ONLY_ADMISSIBLE_UNCLAIMED_SCOPE",
+    "IMPLEMENT_TEST_PERSIST_EVIDENCE"
+  ]
+}
