@@ -61,3 +61,12 @@ Avant de créer ou promouvoir une nouvelle tâche, tout agent doit :
 
 Les intakes et propositions ne donnent **aucune autorisation implicite** de modifier production, DB, secrets, crons ou ressources partagées. Les tâches et gates live restent prioritaires.
 
+## Historique conversationnel consolidé — CS-AFRICAFUNDS-001
+
+Pour éviter qu’une décision, une directive propriétaire ou un chantier historique reste uniquement dans une ancienne conversation, la mémoire consolidée du programme est versionnée ici :
+
+- `.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md` — historique humain consolidé ;
+- `.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.json` — manifeste machine-readable pour reprise agent/Programme Director.
+
+Ces fichiers utilisent **le même identifiant de continuité `CS-AFRICAFUNDS-001`**. Ils ne créent ni seconde queue ni nouvelle autorité. Ils doivent être lus comme mémoire historique, puis réconciliés avec les HEAD, la task queue, les claims, les preuves et la production live avant toute action.
+
