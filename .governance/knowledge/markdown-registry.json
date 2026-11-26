@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "87ca9992e569d25932d5b89a7f9fa17abf7b9b68"
+      "head": "7cc9efd99ed14f2264c26c412e6892492105aa5c"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -3402,7 +3402,8 @@
         "État global",
         "Héritage",
         "Principe",
-        "Matrices de découverte et de promotion"
+        "Matrices de découverte et de promotion",
+        "Historique conversationnel consolidé — CS-AFRICAFUNDS-001"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -3418,11 +3419,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "PROJECT_CONTEXT.md",
-      "git_blob_sha": "7590d43fca759c75cc82792b73120d2e73be8c1a",
-      "last_validated_sha": "7590d43fca759c75cc82792b73120d2e73be8c1a",
-      "content_sha256": "8d80ef1188ac9d69339b40dda7b4f7539b5c9948cbe080bf6549c83f1ef27e12",
-      "line_count": 63,
-      "byte_count": 3814,
+      "git_blob_sha": "4a3b216d5ce96dd8510ba8ba3950f1cf4daa42d9",
+      "last_validated_sha": "4a3b216d5ce96dd8510ba8ba3950f1cf4daa42d9",
+      "content_sha256": "5f0daf757936af2d8db0c0f316e00024e9ceeaccd37824cea052c8d3c97761d9",
+      "line_count": 72,
+      "byte_count": 4648,
       "headings": [
         {
           "level": 1,
@@ -3451,6 +3452,10 @@
         {
           "level": 2,
           "text": "Matrices de découverte et de promotion"
+        },
+        {
+          "level": 2,
+          "text": "Historique conversationnel consolidé — CS-AFRICAFUNDS-001"
         }
       ]
     },
@@ -4418,7 +4423,8 @@
         "2026-11-25 — AF-TASK-028 : leases et publication bi-repository",
         "2026-11-25 — AF-TASK-028 : publication validée et raccordement du plan",
         "2026-11-25 — AF-TASK-028 : recette intégrée verte et checkpoint",
-        "2026-11-25 — AF-TASK-028 : qualification du transport distant réel"
+        "2026-11-25 — AF-TASK-028 : qualification du transport distant réel",
+        "2026-11-26 — Consolidation de l’historique conversationnel CS-AFRICAFUNDS-001"
       ],
       "consumers": [
         "ALL_AGENTS"
@@ -4434,11 +4440,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": "WORK_LOG.md",
-      "git_blob_sha": "9c195f0b1dca96a34037dd6eba15c4f1e5f9324f",
-      "last_validated_sha": "9c195f0b1dca96a34037dd6eba15c4f1e5f9324f",
-      "content_sha256": "cb4f54345560530be02c9c359ce36022f9038fe45e3fcaa52ffec084650b71f5",
-      "line_count": 155,
-      "byte_count": 13989,
+      "git_blob_sha": "9b62ffeb90fdab222887ca4d39daf2c525cbca8a",
+      "last_validated_sha": "9b62ffeb90fdab222887ca4d39daf2c525cbca8a",
+      "content_sha256": "4cd4ef28695f35625fb0c233c8ae80dc1a65d584c56952a044ebee2fc5a62d1c",
+      "line_count": 167,
+      "byte_count": 15731,
       "headings": [
         {
           "level": 1,
@@ -4495,6 +4501,10 @@
         {
           "level": 2,
           "text": "2026-11-25 — AF-TASK-028 : qualification du transport distant réel"
+        },
+        {
+          "level": 2,
+          "text": "2026-11-26 — Consolidation de l’historique conversationnel CS-AFRICAFUNDS-001"
         }
       ]
     },
