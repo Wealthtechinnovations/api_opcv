@@ -6,7 +6,7 @@
   "repositories": {
     "API": {
       "full_name": "Wealthtechinnovations/api_opcv",
-      "head": "7c0b4f826588aa70e3613e22764479a8fb13c4a7"
+      "head": "5930a45501f6776b5d470aa0ce24e7030f919e6a"
     },
     "FRONTEND": {
       "full_name": "Wealthtechinnovations/front_end_opcvm",
@@ -460,11 +460,11 @@
       "repository": "Wealthtechinnovations/api_opcv",
       "repository_role": "API",
       "path": ".governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md",
-      "git_blob_sha": "26eefa370af258bfc6bb8e2a6612b1e09675439e",
-      "last_validated_sha": "26eefa370af258bfc6bb8e2a6612b1e09675439e",
-      "content_sha256": "69a60321732ceddc93e6e7a6509534f59511eda7905b39c8aecd5d256c32cd3a",
-      "line_count": 1080,
-      "byte_count": 39775,
+      "git_blob_sha": "3e9f560c6fbc6aa0906457b104b61511620bcead",
+      "last_validated_sha": "3e9f560c6fbc6aa0906457b104b61511620bcead",
+      "content_sha256": "ff0a66f86ba0f58f9fa0cabe7a28925cfdb39eb9c9a42725ffba9623fefe2395",
+      "line_count": 1262,
+      "byte_count": 47852,
       "headings": [
         {
           "level": 1,
