@@ -153,3 +153,15 @@ Les preuves Git supplémentaires sont enregistrées par les commits et contrôle
 - AF-EVD-077 : API `7861694728fce6763efa95838f4c1b6db33390a0`, [45644571701](https://github.com/Wealthtechinnovations/api_opcv/actions/runs/45644571701) / job 139311954303 SUCCESS. Six tests du contrat et lecture réelle GitHub API depuis runner : IDs dépôts, HEADs, run/attempt, acteur déclencheur et cinq mesures horloge PASS. Gate d'écriture CLOSED, aucune mutation distante par le runner.
 - Installation connecteur Wealthtechinnovations 158876244, 13 dépôts accessibles ; identité exclusivement limitée aux deux dépôts non attestée. Claim legacy AF-TASK-028 sans lease, non transféré. Aucun code change indépendant admissible sous les modes/claims/dépendances actuels.
 - Checkpoint global frontend `7e82ecc6bd2f1c51d4137662951699584e7a6a3a` ; l'agent horaire doit reprendre à ces preuves, qualifier identité/transport et réconcilier claim avec autorité et preuve, puis démontrer deux cycles planifiés productifs, non-régression et reprise. Aucun faux PASS d'autonomie ; ni modification des protections, ni autre projet, ni S2.
+
+## 2026-11-26 — Consolidation de l’historique conversationnel CS-AFRICAFUNDS-001
+
+- demande propriétaire : intégrer à l’historique Programme Director l’ensemble des sujets, décisions et directives AfricaFunds échangés depuis le début, sans créer une nouvelle continuité ni une seconde queue ;
+- audit live : la mémoire existait déjà dans `WORK_LOG.md`, `PROJECT_CONTEXT.md`, `SUIVI.md`, task queue, evidence/requirements, incidents, Allocation, matrices produit, W1 et W2, mais aucune mémoire conversationnelle consolidée unique ne reliait l’ensemble ;
+- création de `.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md` : synthèse chronologique et thématique couvrant identité, gouvernance, S2, secrets, MariaDB/OOM, data quality, pipelines pays, cartographie produit, Allocation, W1, W2, Fund Master/SGO, Atomic Design, espaces utilisateurs, Due Diligence institutionnelle, SEO/Schema.org, Programme Director, AF-TASK-028, CAS/leases/fencing et règle GitHub-direct/Codex-exception ;
+- création du manifeste machine-readable `.governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.json` ;
+- continuité conservée : `CS-AFRICAFUNDS-001` est l’unique clé utilisée par cette archive ;
+- aucune modification de `.governance/loop/task-queue.json`, `.governance/loop/handoff.json`, `.governance/knowledge/evidence.json`, `NEXT_ACTION.md`, `CURRENT_ITERATION.md`, `LOOP_STATE.md`, `HANDOFF.md`, `STATUS.md` ou `SUIVI.md`, surfaces encore revendiquées par AF-TASK-028 ;
+- aucun changement de données, DB, S2, cron, branche ou frontend ;
+- règle de reprise : mémoire consolidée = historique ; HEAD/queue/claims/production live restent les autorités d’exécution.
+
