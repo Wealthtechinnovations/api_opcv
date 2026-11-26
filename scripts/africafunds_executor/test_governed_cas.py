@@ -239,7 +239,9 @@ class GovernedCASContract(unittest.TestCase):
         source = (Path(__file__).resolve().parent / "governed_cas.py").read_text()
         self.assertIn('raise SystemExit("NOT_A_STANDALONE_EXECUTOR")', source)
         self.assertIn('"force": False', source)
-        self.assertNotIn("git push", source.replace("# No git push.", ""))
+        self.assertNotIn("subprocess.run(", source)
+        self.assertNotIn("os.system(", source)
+        self.assertNotIn("force\": True", source)
 
 
 if __name__ == "__main__":
