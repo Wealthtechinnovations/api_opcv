@@ -102,10 +102,29 @@ jobs:
             --expected-frontend-sha "$AF_EXPECTED_FRONTEND_SHA" \
             --output "$RUNNER_TEMP/af-cug-preflight.json"
           printf '%s\n' 'CUG_CREDENTIAL_ATTESTED_READ_ONLY; WRITER_GATE_CLOSED' >> "$GITHUB_STEP_SUMMARY"
+      - name: Observe live canonical claim and lease before any writer activation
+        if: ${{ steps.credential.outputs.configured == 'true' }}
+        env:
+          AF_CUG_INSTALLATION_TOKEN: ${{ steps.token.outputs.token }}
+          AF_EXPECTED_API_SHA: ${{ inputs.expected_api_sha }}
+          AF_EXPECTED_FRONTEND_SHA: ${{ inputs.expected_frontend_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == 'push' || "$GITHUB_EVENT_NAME" == 'schedule' ]]; then
+            AF_EXPECTED_API_SHA="$GITHUB_SHA"
+            AF_EXPECTED_FRONTEND_SHA="$(git ls-remote --exit-code https://github.com/Wealthtechinnovations/front_end_opcvm.git refs/heads/claude/code-review-improvements-ikvuj | cut -f1)"
+          fi
+          python3 scripts/africafunds_executor/claim_readiness.py \
+            --api-sha "$AF_EXPECTED_API_SHA" \
+            --frontend-sha "$AF_EXPECTED_FRONTEND_SHA" \
+            --output "$RUNNER_TEMP/af-cug-writer-readiness.json"
       - name: Retain nonsecret attestation
         if: ${{ success() && steps.credential.outputs.configured == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: africafunds-cug-readonly-preflight-${{ github.run_id }}
-          path: ${{ runner.temp }}/af-cug-preflight.json
+          path: |
+            ${{ runner.temp }}/af-cug-preflight.json
+            ${{ runner.temp }}/af-cug-writer-readiness.json
           retention-days: 7
