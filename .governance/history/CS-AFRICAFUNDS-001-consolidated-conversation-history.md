@@ -1023,3 +1023,58 @@ Le mécanisme de reprise doit donc :
 
 Règle de communication opérationnelle issue des échanges : les messages de progression ne sont jamais des work gates. L’agent doit privilégier des séquences de travail plus longues et ne s’interrompre que pour un blocage réel, une décision irréversible/risquée nécessitant autorisation, ou un lot substantiel terminé.
 
+---
+
+## 32. Décisions historiques complémentaires à ne pas reperdre
+
+### Openfunds
+
+Un chantier Openfunds a existé comme **référence architecturale et d’interopérabilité**, avec l’idée d’un modèle AfricaFunds plus riche et de mappings import/export. La décision ultérieure est cependant explicite : Openfunds ne partage ni queue, ni runtime, ni gouvernance opérationnelle avec AfricaFunds. Les tâches `OF-*`, branches ou PR Openfunds ne deviennent jamais automatiquement des tâches `CS-AFRICAFUNDS-001`. Toute idée réutilisée doit être requalifiée, dédupliquée puis promue dans la queue AfricaFunds existante.
+
+### Portfolio Allocation
+
+Les échanges sur `lequant40/portfolio_allocation_js` ont confirmé que le chantier Allocation AfricaFunds devait être compris, reconstruit et renforcé **dans la continuité du code JavaScript/Node existant**, pas remplacé par un moteur Python parallèle. Cette décision est aujourd’hui matérialisée par le programme `AF-ALLOC-001` / `AF-TASK-012..023`.
+
+### Mémoire de décision institutionnelle
+
+La cible Due Diligence/Institutionnel doit rendre une décision reconstructible dans le temps. Une décision d’approbation/rejet doit pouvoir référencer, selon ce qui existe réellement, la version du mandat, le snapshot de données, la version Fund Master, les mesures performance/risque/AUM, les hard gates, le fit mandat, la version DDQ, les findings, les évaluations RFP et la décision comité. Cette exigence ne justifie aucune base parallèle : elle doit étendre les autorités Fund/SGO/Documents/analytics/auth existantes.
+
+### Conditions d’arrêt de l’autonomie gouvernée
+
+Un agent ne s’arrête pas parce qu’un audit est terminé s’il reste un travail sûr, indépendant et admissible. Les vrais gates historiques incluent notamment :
+- approbation humaine requise pour une opération explicitement gated ;
+- permission indispensable absente ;
+- dépendance fournisseur externe ;
+- opération destructive/irréversible exigeant autorisation ;
+- writer concurrent non réconcilié ;
+- gate sécurité ;
+- source obligatoire indisponible.
+
+Même lorsqu’un gate persiste, le système doit persister le checkpoint, poursuivre les tâches indépendantes admissibles et laisser un handoff déterministe.
+
+### Décisions de gouvernance supersédées ou interdites
+
+Ne pas réintroduire :
+- un second `SUIVI`, une seconde queue ou une mémoire seulement conversationnelle ;
+- S2 comme autorité Git concurrente ;
+- l’obligation du bridge MCP comme seul moyen d’observer S2 lorsque le fallback GitHub Actions→SSH existe ;
+- la création libre de branches agent/Codex/ChatGPT ;
+- un inventaire Markdown manuel complet à chaque reprise ;
+- le vrai `.env` suivi par Git ;
+- Openfunds comme même programme opérationnel qu’AfricaFunds ;
+- des extractions Nigeria/Tunisie supposées intégrées au Fund Master sans preuve ;
+- un module institutionnel autonome dupliquant Fund/SGO/Documents/analytics ;
+- un statut `FULLY_GOVERNED` lorsqu’un gap externe vérifié subsiste.
+
+### Chaîne historique S2/GOV-006
+
+Les échanges ont établi et testé :
+- observation S2 en lecture seule ;
+- fallback GitHub Actions→SSH avec pin strict ;
+- GOV-006 pour réconcilier GitHub ↔ S2 sans reset destructif ni suppression d’untracked ;
+- fallbacks API/frontend ;
+- inventaires secrets et préflights ;
+- séparation Git / déploiement / runtime.
+
+Ces éléments sont des actifs historiques à réutiliser ; ils ne doivent pas être reconstruits comme si le projet repartait de zéro.
+

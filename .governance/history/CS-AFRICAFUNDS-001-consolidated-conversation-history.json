@@ -213,7 +213,7 @@
     "SELECT_ONLY_ADMISSIBLE_UNCLAIMED_SCOPE",
     "IMPLEMENT_TEST_PERSIST_EVIDENCE"
   ],
-  "consolidation_revision": 2,
+  "consolidation_revision": 3,
   "conversation_source_coverage": {
     "status": "COMPLETE_FOR_AVAILABLE_PROJECT_SNAPSHOTS",
     "mode": "SEMANTIC_CONSOLIDATION_NOT_VERBATIM",
@@ -279,5 +279,38 @@
     "validation": "scripts/governance/validate_regulatory_plus.py",
     "conversation_memory_used": false,
     "live_authority_precedence": true
+  },
+  "historical_decisions_not_to_lose": {
+    "openfunds": {
+      "role": "REFERENCE_AND_INTEROPERABILITY_INPUT_ONLY",
+      "same_queue_as_africafunds": false,
+      "promotion_rule": "REQUALIFY_DEDUPLICATE_AND_PROMOTE_ONLY_IN_EXISTING_AFRICAFUNDS_QUEUE"
+    },
+    "portfolio_allocation": {
+      "reference": "lequant40/portfolio_allocation_js",
+      "canonical_direction": "EXTEND_EXISTING_JAVASCRIPT_NODE_AFRICAFUNDS_ENGINE",
+      "parallel_python_engine": "FORBIDDEN_UNLESS_EXPLICITLY_DECIDED"
+    },
+    "institutional_decision_memory": {
+      "target": "RECONSTRUCTIBLE_DECISION_SNAPSHOT",
+      "parallel_fund_or_document_database": false
+    },
+    "autonomous_stop_gates": [
+      "REQUIRED_HUMAN_APPROVAL",
+      "REQUIRED_PERMISSION_MISSING",
+      "EXTERNAL_PROVIDER_REQUIRED",
+      "DESTRUCTIVE_OPERATION_REQUIRING_APPROVAL",
+      "UNRESOLVED_CONCURRENT_WRITER",
+      "SECURITY_GATE",
+      "REQUIRED_SOURCE_UNAVAILABLE"
+    ],
+    "s2_governance_assets": [
+      "READ_ONLY_S2_OBSERVER",
+      "GITHUB_ACTIONS_TO_SSH_FALLBACK",
+      "GOV_006_RECONCILIATION",
+      "API_FRONTEND_FALLBACKS",
+      "SECRET_PREFLIGHTS",
+      "GIT_DEPLOYMENT_RUNTIME_SEPARATION"
+    ]
   }
 }
