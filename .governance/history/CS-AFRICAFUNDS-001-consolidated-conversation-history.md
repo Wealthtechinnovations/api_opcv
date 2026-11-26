@@ -1078,3 +1078,185 @@ Les échanges ont établi et testé :
 
 Ces éléments sont des actifs historiques à réutiliser ; ils ne doivent pas être reconstruits comme si le projet repartait de zéro.
 
+
+
+---
+
+## 33. Delta de continuité — constats C2/C8 et directives de la conversation consolidante
+
+> Classification : `HISTORICAL_CHAT_OBSERVATION_REQUIRES_LIVE_RECHECK`
+> Intégration : 2026-11-26
+> Continuité : `CS-AFRICAFUNDS-001`
+> Autorité : mémoire historique uniquement. Les HEAD, la queue, les claims, les preuves et la production live restent supérieurs.
+
+Cette conversation de reprise a confirmé plusieurs règles et produit un diagnostic data read-only suffisamment précis pour ne plus être perdu, tout en étant désormais à réconcilier avec l'état live plus récent de novembre.
+
+### 33.1 Séparation stricte AfricaFunds / MCP
+
+Le propriétaire a réaffirmé explicitement que **AfricaFunds et `Patricked-code/MCP` sont deux projets distincts**. Le MCP peut servir de transport/outillage d'accès, mais ses tâches, sa queue, ses statuts, ses registres et son programme ne deviennent jamais ceux d'AfricaFunds.
+
+Conséquences :
+- aucune tâche MCP ne doit être promue dans la queue AfricaFunds par assimilation ;
+- aucune autorité MCP ne remplace le Programme Director `CS-AFRICAFUNDS-001` ;
+- le projet AfricaFunds conserve sa queue unique, ses claims, ses deux dépôts et son `FUND_STATE`.
+
+### 33.2 Système queue / tâches / autonomie
+
+La conversation a confirmé que la queue, le state, le handoff, le Programme Director et les mécanismes de reprise existent déjà et doivent être **étendus**, jamais recréés.
+
+Le modèle d'autonomie retenu reste :
+
+```text
+TRIGGER
+→ RECONNECT
+→ READ STATE / QUEUE / HANDOFF
+→ REOBSERVE REALITY
+→ SELECT NEXT SAFE TASK
+→ EXECUTE IF AUTHORIZED
+→ VERIFY
+→ PERSIST / CHECKPOINT
+→ NEXT
+```
+
+Cette autonomie est celle du système déclenché par agent/workflow/cron/scheduler ; elle ne signifie pas qu'une conversation ChatGPT continue à travailler hors session.
+
+### 33.3 Snapshot C2 — performances orphelines
+
+Pendant cette conversation, une mesure SQL read-only avait observé :
+- `performences` : **14 fonds** dont la dernière performance ne possédait aucune VL à la même date ;
+- `performences_eurs` : **23 fonds** ;
+- `performences_usds` : **23 fonds**.
+
+Les 14 cas locaux identifiés étaient :
+
+**Maroc**
+- 638 — SG TRESOR PLUS ;
+- 649 — SG ACTIONS PLUS ;
+- 652 — SCR RENDEMENT ;
+- 798 — FCP CAPITAL TAALIM ;
+- 840 — FCP AVENIR LONG TERME ;
+- 883 — ELAN SOLIDARITE ;
+- 976 — CAT OBLI FRONTIERES ;
+- 1048 — AXA EPARGNE ;
+- 1051 — AVENIR RENDEMENT ;
+- 2683 — CMKD CROISSANCE ;
+- 2685 — CAPITAL SUR ;
+- 2686 — CFG PERSPECTIVES.
+
+**UEMOA**
+- 1540 — SOAGA EPARGNE SERENITE ;
+- 1543 — SOAGA EPARGNE ACTIVE.
+
+Douze cas avaient le profil « performance orpheline postérieure à la dernière VL, avec une performance antérieure encore alignée sur cette dernière VL ».
+
+Deux cas nécessitaient un traitement distinct parce que la série VL avait ensuite avancé :
+- **798 FCP CAPITAL TAALIM** : performance orpheline 2026-06-09 ; dernière performance avec VL 2026-06-05 ; dernière VL observée 2026-09-11 ;
+- **1048 AXA EPARGNE** : performance orpheline 2026-05-28 ; dernière performance avec VL 2026-05-22 ; dernière VL observée 2026-09-11.
+
+Conclusion historique : pour ces deux fonds, retirer une ligne orpheline ne suffirait pas ; la couche dérivée devait ensuite être recalculée depuis les VL validées.
+
+### 33.4 Pattern Nigeria EUR/USD — 23 fonds communs
+
+Les **23 mêmes fonds Nigeria** apparaissaient à la fois dans les orphelines EUR et USD :
+
+```text
+1141  AFRINVEST DOLLAR FUND
+1154  ARM EUROBOND FUND
+1158  AVA GAM FIXED INCOME DOLLAR FUND
+1160  AXA MANSARD DOLLAR BOND FUND
+1168  NIGERIA DOLLAR INCOME FUND
+1170  NORRENBERGER DOLLAR FUND
+1175  CORDROS DOLLAR FUND
+1189  EDC DOLLAR FUND
+1196  EMERGING AFRICA EUROBOND FUND
+1213  FSDH DOLLAR FUND
+1214  FUTUREVIEW DOLLAR FUND
+1239  NOVA DOLLAR FIXED INCOME FUND
+1244  PACAM EUROBOND FUND
+1257  STANBIC IBTC DOLLAR FUND
+1274  UNITED CAPITAL GLOBAL FIXED INCOME FUND
+2764  AIICO EUROBOND FUND
+2767  COWRY EUROBOND FUND
+2768  FSL EUROBOND FUND
+2856  LEAD DOLLAR FIXED INCOME FUND
+2857  RMBN DOLLAR FIXED INCOME FUND
+2858  ARM SPECIALIZED DOLLAR FUND
+2861  ARM SHORT-TERM EUROBOND FUND
+2866  United Capital Nigerian Eurobond Fund
+```
+
+Pour chacun de ces 23 fonds, le snapshot observé était cohérent sur quatre champs :
+
+```text
+datejour              = 2026-07-10
+dernière VL réelle    = 2026-07-10
+performance locale    = 2026-07-10
+performance EUR       = 2026-07-24
+performance USD       = 2026-07-24
+```
+
+La table historique `bak_valorisations_ng_20260801_122943` avait elle aussi une VL maximale au **2026-07-10** pour ces fonds et **aucune VL 2026-07-24**. Cela avait fortement affaibli l'hypothèse « des VL du 24/07 ont existé puis ont été supprimées ».
+
+La piste de travail issue de cette observation était donc : auditer le chemin de calcul/persistance EUR/USD qui a pu enregistrer une date sans VL source correspondante, avant toute réparation de données.
+
+Cette observation historique **n'autorise pas** à restaurer artificiellement une VL 2026-07-24 : une telle VL ne peut être admise que si une source Nigeria officielle la prouve.
+
+### 33.5 Snapshot C8 et fraîcheur associé
+
+Le même diagnostic read-only avait mesuré l'alignement « dernière performance locale = dernière VL » :
+
+```text
+CEMAC    34 / 34    retard moyen 0,0 j
+MAROC     8 / 644   retard moyen 108,3 j
+NIGERIA 297 / 330   retard moyen 6,8 j
+TUNISIE   8 / 131   retard moyen 89,7 j
+UEMOA    36 / 111   retard moyen 26,8 j
+```
+
+Fraîcheur maximale des VL dans ce snapshot :
+
+```text
+CEMAC   2024-12-12
+MAROC   2026-09-11
+NIGERIA 2026-08-28
+TUNISIE 2026-08-28
+UEMOA   2026-09-11
+```
+
+Le 34/34 CEMAC n'était donc pas une preuve de fraîcheur : performances et VL étaient cohérentes entre elles, mais la VL elle-même était ancienne.
+
+Ces chiffres sont **historiques** et ne doivent jamais être réutilisés comme état courant sans nouvelle mesure.
+
+### 33.6 Règles correctives déduites de ce diagnostic
+
+Le fil a fixé les garde-fous suivants :
+1. corriger la **cause de génération** avant de nettoyer ses produits dérivés ;
+2. ne jamais faire de `DELETE` massif des performances orphelines sans attribution fonds par fonds et sauvegarde ;
+3. ne recalculer une performance qu'à partir d'une VL validée et avec une date cohérente avec la VL réellement utilisée ;
+4. ne jamais inventer une VL Nigeria ou un champ source ;
+5. après correction, remesurer C2/C8 avant de recalculer les classements ;
+6. conserver C7/C3 en amont lorsque l'intégrité de VL peut expliquer une performance aberrante.
+
+### 33.7 Réconciliation avec la queue live de novembre
+
+Ce delta **ne crée aucune nouvelle tâche**. L'autorité live actuelle possède déjà :
+- `AF-OPS-007` pour C7/C3 ;
+- `AF-OPS-008` pour C2/C8, actuellement dependency-gated ;
+- `AF-OPS-009` pour la fraîcheur/pipelines.
+
+Les constats ci-dessus enrichissent donc la mémoire et le contexte d'investigation de `AF-OPS-008` ; ils ne contournent ni ses dépendances, ni ses claims, ni ses gates.
+
+### 33.8 Cartographie exhaustive : état conceptuel à conserver
+
+La conversation a aussi rappelé que l'objectif n'est pas seulement de corriger les anomalies ponctuelles : il faut que toute capacité, lacune ou idée vérifiée puisse être dédupliquée contre les matrices/intakes et, lorsque les gates sont satisfaits, être promue **dans la queue unique existante**.
+
+Les travaux plus récents du Programme Director, des 37 intakes, du Gap Harvester, des matrices de couverture et du plan de promotion supersèdent donc l'ancien constat de septembre « backlog non encore totalement matérialisé », sans autoriser la promotion automatique de chaque idée.
+
+### 33.9 Contrat de ce delta
+
+Ce delta :
+- utilise uniquement `CS-AFRICAFUNDS-001` ;
+- ne crée aucune seconde continuité ;
+- ne modifie ni queue, ni claim, ni SUIVI, ni production ;
+- doit être chargé par le mécanisme de reconstruction déjà raccordé à cette mémoire ;
+- reste inférieur aux autorités live et exige revalidation avant exécution.

@@ -213,7 +213,7 @@
     "SELECT_ONLY_ADMISSIBLE_UNCLAIMED_SCOPE",
     "IMPLEMENT_TEST_PERSIST_EVIDENCE"
   ],
-  "consolidation_revision": 3,
+  "consolidation_revision": 4,
   "conversation_source_coverage": {
     "status": "COMPLETE_FOR_AVAILABLE_PROJECT_SNAPSHOTS",
     "mode": "SEMANTIC_CONSOLIDATION_NOT_VERBATIM",
@@ -270,6 +270,32 @@
         "npm start kernel label does not prove a frontend build",
         "long-duration read-only correlation remains the required proof class"
       ]
+    },
+    {
+      "id": "AF-HIST-DELTA-20261126-C2-C8-REPRISE",
+      "topic": "AF-OPS-008",
+      "classification": "HISTORICAL_CHAT_OBSERVATION_REQUIRES_LIVE_RECHECK",
+      "continuity_key": "CS-AFRICAFUNDS-001",
+      "facts": [
+        "Historical read-only C2 snapshot: 14 local orphan latest performances, 23 EUR and 23 USD.",
+        "Local cases: Morocco fund IDs 638,649,652,798,840,883,976,1048,1051,2683,2685,2686; UEMOA 1540,1543.",
+        "Special recalculation cases: 798 orphan 2026-06-09 / valid-with-VL 2026-06-05 / latest VL 2026-09-11; 1048 orphan 2026-05-28 / valid-with-VL 2026-05-22 / latest VL 2026-09-11.",
+        "Nigeria EUR/USD orphan set is the same 23 funds: 1141,1154,1158,1160,1168,1170,1175,1189,1196,1213,1214,1239,1244,1257,1274,2764,2767,2768,2856,2857,2858,2861,2866.",
+        "For all 23 at that snapshot: datejour=2026-07-10, latest VL=2026-07-10, local performance=2026-07-10, EUR/USD performance=2026-07-24.",
+        "bak_valorisations_ng_20260801_122943 also had max VL 2026-07-10 and no 2026-07-24 VL for these 23, weakening the later-deletion hypothesis.",
+        "Historical C8 alignment: CEMAC 34/34 avg lag 0.0d; Morocco 8/644 108.3d; Nigeria 297/330 6.8d; Tunisia 8/131 89.7d; UEMOA 36/111 26.8d.",
+        "Historical latest VL dates: CEMAC 2024-12-12, Morocco 2026-09-11, Nigeria 2026-08-28, Tunisia 2026-08-28, UEMOA 2026-09-11.",
+        "Correction rule: root cause before cleanup; no blind DELETE; no invented Nigeria VL; remeasure C2/C8 before rankings."
+      ],
+      "live_reconciliation": {
+        "queue_owner": "AF-OPS-008",
+        "current_queue_semantics": "DEPENDENCY_GATED_LIVE_QUEUE_TAKES_PRECEDENCE",
+        "related_dependencies": [
+          "AF-OPS-007",
+          "AF-OPS-009"
+        ],
+        "no_new_task_created": true
+      }
     }
   ],
   "reconstruction_integration": {
@@ -312,5 +338,18 @@
       "SECRET_PREFLIGHTS",
       "GIT_DEPLOYMENT_RUNTIME_SEPARATION"
     ]
+  },
+  "current_conversation_integration": {
+    "integrated_at": "2026-11-26",
+    "continuity_key": "CS-AFRICAFUNDS-001",
+    "same_continuity_only": true,
+    "single_queue_preserved": true,
+    "mcp_project_separation_reaffirmed": true,
+    "chat_is_live_authority": false,
+    "observed_before_write": {
+      "api_head": "d429f4713c047148b35bbbf1b04bf16ba6fd6818",
+      "frontend_head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+    },
+    "history_surface_only": true
   }
 }
