@@ -122,7 +122,7 @@ def publish(client=None, **kw):
         c, role=role, expected_heads={"API": A, "FRONTEND": B},
         candidate=C if role == "API" else D,
         task_id="AF-TASK-028", owner=OWNER, session=SESSION, generation=1,
-        effects=effect, now=NOW, **kw
+        effects=effect, **kw
     )
     return result, c
 
@@ -234,6 +234,13 @@ class GovernedCASContract(unittest.TestCase):
         r, _ = publish(c)
         self.assertEqual(r["heads"]["FRONTEND"], B)
         self.assertEqual(len(c.mutations), 1)
+
+
+    def test_writer_cannot_override_trusted_lease_clock(self):
+        c = MockGitHub()
+        with self.assertRaises(TypeError):
+            publish(c, now=NOW + 86400)
+        self.assertEqual(c.mutations, [])
 
     def test_module_cannot_self_start_as_scheduled_writer(self):
         source = (Path(__file__).resolve().parent / "governed_cas.py").read_text()

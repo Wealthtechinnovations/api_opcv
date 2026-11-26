@@ -170,7 +170,7 @@ def guarded_authorize(queue, task_id, owner, session, generation, now, heads, ro
 
 
 def publish_one(client, *, role, expected_heads, candidate, task_id, owner,
-                session, generation, effects, now=None):
+                session, generation, effects):
     """One exact-CAS effect, with fail-closed readback and partial recovery.
 
     Caller must NOT treat a success as a second-repository transaction.
@@ -181,7 +181,6 @@ def publish_one(client, *, role, expected_heads, candidate, task_id, owner,
         validate_sha(sha)
     require(role in REPOSITORIES, "UNKNOWN_REPOSITORY")
     require(isinstance(task_id, str) and task_id.startswith("AF-"), "TASK_ID_INVALID")
-    require(type(now) is int or now is None, "TRUSTED_CLOCK_REQUIRED")
     current = remote_heads(client)
     require(current == expected_heads, "HEAD_TUPLE_DRIFT")
     # Verify installation scope with the same temporary token, before any write.
@@ -193,7 +192,7 @@ def publish_one(client, *, role, expected_heads, candidate, task_id, owner,
     last = remote_heads(client)
     require(last == current, "HEAD_MOVED_BEFORE_CAS")
     guarded_authorize(queue, task_id, owner, session, generation,
-                      int(time.time()) if now is None else now, last, role, effects)
+                      int(time.time()), last, role, effects)
     inputs = {
         "repositoryId": checked_repo_id(client, role),
         "clientMutationId": str(uuid4()),
