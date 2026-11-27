@@ -15,3 +15,7 @@ Directive explicite du propriétaire : AfricaFunds et toutes ses ressources d'or
 ## Limite
 
 Ce contrat documentaire n'est pas encore un garde technique exécuté automatiquement. Les tests de non-écriture et d'isolation restent à construire dans ULEF.
+
+## Lien de finalité sans élargissement des permissions (E32)
+
+Clarification du propriétaire : ULEF est directement lié à AfricaFunds par sa finalité d'amélioration, et indépendant uniquement dans son périmètre de conception, de stockage, de programmation et d'expérimentation. AfricaFunds CS-AFRICAFUNDS-001 est le projet de référence et bénéficiaire prioritaire, pas un simple exemple interchangeable. ULEF conserve son identifiant ULEF-CONTINUITY-20261127-01 et sa branche dédiée; il ne constitue ni un deuxième AfricaFunds ni une autorité de production concurrente. À partir de l'existant réel, reconstruire le squelette, structurer les connaissances, créer les fichiers, boucles et mécanismes propres à ULEF, tester et évaluer les améliorations. Préserver les rattachements, identités existantes, références de source, versions et historique. Toute intégration future reste soumise à autorisation explicite. E31 reste intégralement applicable : aucun changement sur les branches applicatives, fichiers hérités, MCP, serveurs, données ou workflows existants. Écrire exclusivement sous ulef/. La généralisation éventuelle ne doit pas détourner du besoin AfricaFunds. Aucun nouveau projet, branche ou identifiant de continuité.

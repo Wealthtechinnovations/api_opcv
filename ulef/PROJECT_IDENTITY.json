@@ -18,7 +18,8 @@
         "Wealthtechinnovations/api_opcv",
         "Wealthtechinnovations/front_end_opcvm"
       ],
-      "mode": "READ_ONLY_DISCOVERY"
+      "mode": "READ_ONLY_DISCOVERY",
+      "relationship": "PRIMARY_REFERENCE_AND_BENEFICIARY"
     }
   ],
   "rules": {
@@ -48,8 +49,16 @@
   "original_goal": {
     "project": "AfricaFunds",
     "objective": "Reconstruct existing foundations from the two repositories and related ecosystem without rebuilding the product from scratch",
-    "ulef_role": "Progressive engineering method and independent canonical idea",
+    "ulef_role": "Independent engineering and reconstruction workspace directly linked to the improvement of AfricaFunds; no mutation of observed project",
     "first_step": "Discover, identify, classify and register N1 components from direct evidence",
     "source": "Owner clarification 2026-11-27; history R20261127-01"
+  },
+  "relationship_to_africafunds": {
+    "project_uid": "CS-AFRICAFUNDS-001",
+    "relationship": "LINKED_IMPROVEMENT_LAB",
+    "reference_and_priority_beneficiary": true,
+    "execution_scope": "ISOLATED_ULEF_ONLY",
+    "integration": "NOT_AUTHORIZED",
+    "decision": "E32"
   }
 }
