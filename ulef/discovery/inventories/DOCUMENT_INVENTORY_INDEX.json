@@ -123,7 +123,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Orienter toute entrée et reprise multi-agent",
+        "inputs": "Identité, autorités, registres de reprise, règles des agents",
+        "read_when": "Toute nouvelle session; avant analyse ou écriture",
+        "update_trigger": "Évolution approuvée des parcours, autorités ou emplacements",
+        "write_rule": "Maintenir les deux exemplaires identiques; respecter ordre prescrit; proposer des parcours spécialisés sans remplacer le socle",
+        "consumers": "Tous agents, BOOTSTRAP_CHECKLIST, PROJECT_START_PROMPT",
+        "propagation_candidates": "AGENTS; reconstruction; index et contrats consommateurs",
+        "checks": "Résolution inter-dépôts, égalité des empreintes, conditions de lecture, couverture du parcours",
+        "automation_observation": "Script reconstruct_context.py couvre partiellement le parcours; automatisation complète non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "00_START_HERE.md",
+          "blob_sha": "8a5cdc4628d5b6586e2f14c70fa4b26830198644",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -136,7 +162,33 @@
       "consumers": [
         "TASK_DEPENDENT"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Définir les critères d'acceptation du chantier Regulatory Plus",
+        "inputs": "Mandat, invariants et preuves du chantier",
+        "read_when": "Certification du chantier concerné",
+        "update_trigger": "Décision approuvée modifiant critères",
+        "write_rule": "Préserver périmètre historique; proposition: relier exigences aux preuves",
+        "consumers": "Gouvernance, évaluateurs",
+        "propagation_candidates": "DoD; evidence; tests",
+        "checks": "Critères atteints avec preuve, pas de certification production supposée",
+        "automation_observation": "Contrat documentaire; contrôle intégral non attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "ACCEPTANCE_CRITERIA.md",
+          "blob_sha": "ad720e2d94da1c0bd4ad5404a20c931e4b394790",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -149,7 +201,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Définir les règles communes des intervenants",
+        "inputs": "GOVERNANCE; SOURCE_OF_TRUTH; DIRECTIVE_TRAVAIL; décisions",
+        "read_when": "Avant intervention et reprise",
+        "update_trigger": "Changement approuvé des gates ou règles agents",
+        "write_rule": "Maintenir les règles communes alignées entre dépôts; ne pas supprimer restrictions ni déduire une permission de production",
+        "consumers": "Humains, agents et automatisations",
+        "propagation_candidates": "START; adaptateurs GPT/CLAUDE; tests de gouvernance",
+        "checks": "Double HEAD, périmètre, single writer, preuve, handoff",
+        "automation_observation": "Contrats CI existants; application intégrale à tous agents non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "AGENTS.md",
+          "blob_sha": "e90ee50c8dadfbeb5373e85164a852830e952ac0",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -175,7 +253,33 @@
       "consumers": [
         "TASK_DEPENDENT"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Encadrer les hypothèses et leur vérification",
+        "inputs": "Hypothèses explicites, raison, contexte, impact et méthode de vérification",
+        "read_when": "Quand une information nécessaire manque",
+        "update_trigger": "Hypothèse nouvelle, réfutée ou vérifiée",
+        "write_rule": "Indiquer lot/date et preuve; transférer blocage réel à OPEN_QUESTIONS; ne jamais supposer un fait observable",
+        "consumers": "Analystes, agents, décision",
+        "propagation_candidates": "OPEN_QUESTIONS; ADR; preuves",
+        "checks": "Hypothèses séparées des faits; statut de vérification",
+        "automation_observation": "Règle déclarée; registre d'hypothèses complet non attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "ASSUMPTIONS.md",
+          "blob_sha": "6171e3d081e6d44cfb4b6ed0482b2a218da45acd",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -253,7 +357,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Porter les règles historiques détaillées métier et techniques du dépôt",
+        "inputs": "DIRECTIVE_TRAVAIL; conventions financières; architecture et données observées; décisions",
+        "read_when": "Démarrage, reprise et travail spécialisé",
+        "update_trigger": "Nouvelle décision métier ou technique, changement de règle ou fait mesuré",
+        "write_rule": "Préserver règles historiques utiles; distinguer faits datés et normes; réconcilier avec pair et gouvernance; proposition: baliser les faits volatils",
+        "consumers": "Agents; développement; qualité; architecture",
+        "propagation_candidates": "Contrats métiers, tests, documentation spécialisée",
+        "checks": "Non-régression des conventions, faits runtime mesurés, compatibilité API/frontend",
+        "automation_observation": "Lecture automatique déclarée pour Claude Code; consommation effective non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "CLAUDE.md",
+          "blob_sha": "5c978c5de0d76227ff51032764b9490d2fde1a5f",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -280,7 +410,33 @@
       "consumers": [
         "TASK_DEPENDENT"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Définir les restrictions structurantes du projet",
+        "inputs": "GOVERNANCE, décisions, SOURCE_OF_TRUTH",
+        "read_when": "Avant conception, sélection ou écriture",
+        "update_trigger": "Changement autorisé d'une contrainte",
+        "write_rule": "Préserver restrictions; aucune relaxation implicite; proposition: relier contraintes aux gates",
+        "consumers": "Agents, architecture, planification",
+        "propagation_candidates": "DoR; contrats; tests",
+        "checks": "Cohérence avec autorités, droits, preuves",
+        "automation_observation": "Contrat textuel; enforcement exhaustif non attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "CONSTRAINTS.md",
+          "blob_sha": "cdcf9b6bca9e4b02776ec9578fd6f02c17102dd3",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -358,7 +514,33 @@
       "consumers": [
         "TASK_DEPENDENT"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Déterminer si un lot est réellement terminé",
+        "inputs": "Résultats, tests, preuves, HEAD, mémoire, état production si concerné",
+        "read_when": "Clôture de lot",
+        "update_trigger": "Évolution approuvée des critères de clôture",
+        "write_rule": "Ne pas assimiler code ou doc écrit à DONE; conserver limitations",
+        "consumers": "Agents, évaluateurs",
+        "propagation_candidates": "SUIVI; STATUS; queue; evidence",
+        "checks": "Résultat atteint, non-régression, état distant et reprise vérifiés",
+        "automation_observation": "Critères documentés; certification bout en bout non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "DEFINITION_OF_DONE.md",
+          "blob_sha": "b2a7779ab957684f32c8d2e32e8072f3e567fc74",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -371,7 +553,33 @@
       "consumers": [
         "TASK_DEPENDENT"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Déterminer si un lot est admissible",
+        "inputs": "Objectif, scope, autorités, HEAD, checkpoint, dépendances, impacts, writer, contrôles",
+        "read_when": "Avant engagement d'un lot",
+        "update_trigger": "Évolution approuvée des conditions d'admission",
+        "write_rule": "Ne pas déclarer READY si conflit, contexte périmé ou migration non autorisée; proposition: contrôles machine-readable",
+        "consumers": "Planification, queue, agents",
+        "propagation_candidates": "LOOP_CONTRACT; sélection; task-queue",
+        "checks": "Conditions prouvées et actuelles, pas de faux claim",
+        "automation_observation": "Gates partiels existants; application exhaustive non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "DEFINITION_OF_READY.md",
+          "blob_sha": "7962d475c6b958cc2cd76a30b5780fc290944184",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -384,7 +592,33 @@
       "consumers": [
         "TASK_DEPENDENT"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Identifier les dépendances structurantes du Backend",
+        "inputs": "Identité, architecture, manifests, code et consommateurs",
+        "read_when": "Analyse d'impact avant changement",
+        "update_trigger": "Changement de dépendance structurante",
+        "write_rule": "Proposition: actualiser références et relations vérifiées, conserver versions détaillées dans manifests",
+        "consumers": "Développement, planification, architecture",
+        "propagation_candidates": "SCOPE; architecture; lots et tests",
+        "checks": "Résolution des liens et impacts cross-repo, données/runtime",
+        "automation_observation": "Inventaire conceptuel; collecteur exhaustif non attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "DEPENDENCIES.md",
+          "blob_sha": "26faa500d2d1a117aaeb5cb123704fa2df98d49a",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -412,7 +646,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Porter le mandat permanent transversal du propriétaire",
+        "inputs": "Décisions explicites; principes métier, techniques et qualité",
+        "read_when": "Avant toute action",
+        "update_trigger": "Décision propriétaire modifiant une règle permanente",
+        "write_rule": "Répercuter toute modification dans l'autre dépôt; ne pas réécrire des normes sur simple observation",
+        "consumers": "Tous intervenants; AGENTS; CLAUDE; LOOP_ENGINEERING",
+        "propagation_candidates": "Règles, parcours, critères de validation et tests concernés",
+        "checks": "Égalité des miroirs; cohérence avec décisions; mesure prime pour faits",
+        "automation_observation": "Miroirs constatés; mise à jour automatique non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "DIRECTIVE_TRAVAIL.md",
+          "blob_sha": "c9402cdec039a1156825950fbb51b716b4b61a8a",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -464,7 +724,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Définir règles de coordination, autorités et admission des travaux",
+        "inputs": "Mandat propriétaire; SOURCE_OF_TRUTH; règles historiques et GOV-006",
+        "read_when": "Démarrage, sélection et avant écriture",
+        "update_trigger": "Évolution approuvée des règles de gouvernance",
+        "write_rule": "Maintenir invariants et cohérence des deux dépôts; décisions persistées; ne pas ouvrir un gate par simple rédaction",
+        "consumers": "Agents; workflow; contrôles d'admission",
+        "propagation_candidates": "START; AGENTS; LOOP_ENGINEERING; contrats CI",
+        "checks": "Double HEAD, single writer, absence d'autorité concurrente, preuves",
+        "automation_observation": "Contrats existants; enforcement global non attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "GOVERNANCE.md",
+          "blob_sha": "3a11150c6ec8d00b06dd128f11805a602c16601e",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -477,7 +763,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Adaptateur historique de démarrage pour assistants GPT",
+        "inputs": "MCP_AUTONOMY; CLAUDE; SUIVI; état Git",
+        "read_when": "Entrée assistant GPT",
+        "update_trigger": "Évolution des références ou du protocole d'entrée",
+        "write_rule": "Proposition: pointer vers START et suivi frontend canonique; conserver règle anti-régression; éviter mémoire concurrente",
+        "consumers": "Assistants GPT",
+        "propagation_candidates": "START; AGENTS; MCP_AUTONOMY",
+        "checks": "Liens résolus, rôle adaptateur, nom canonique, couverture des gates",
+        "automation_observation": "Fichier court historique; aucun déclencheur d'actualisation attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "GPT.md",
+          "blob_sha": "516f8da247ca79caa36405c6e263a4896361e8dd",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -542,7 +854,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Définir la méthode commune d'exécution continue",
+        "inputs": "GOVERNANCE; SOURCE_OF_TRUTH; LOOP_CONTRACT; décisions",
+        "read_when": "Sélection, réalisation, contrôle et reprise des lots",
+        "update_trigger": "Évolution approuvée du processus et de ses invariants",
+        "write_rule": "Maintenir méthode commune et miroirs; préserver transitions et conditions applicables",
+        "consumers": "Agents, orchestrateurs et automatisations",
+        "propagation_candidates": "LOOP_CONTRACT; DoR/DoD; registres état et suivi",
+        "checks": "Étapes applicables, persistance sélective, contrôle de non-régression, reprise",
+        "automation_observation": "Programme Director partiel; autonomie de bout en bout non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "LOOP_ENGINEERING.md",
+          "blob_sha": "bb5b7c68657a875749aab290d9a9fdafe47d3326",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -672,7 +1010,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Conserver les inconnues réelles non résolues",
+        "inputs": "Divergences, audits, hypothèses bloquantes, observations",
+        "read_when": "Quand une inconnue affecte une décision ou un travail",
+        "update_trigger": "Nouvelle inconnue, preuve de résolution ou changement de blocage",
+        "write_rule": "Persister résolution structurante en décision/ADR; conserver historique; ne pas confondre avec TODO",
+        "consumers": "Agents, gouvernance, qualification",
+        "propagation_candidates": "DECISIONS/ADR; ASSUMPTIONS; tâche si admissible",
+        "checks": "Preuve de résolution, état et rattachement; anciennes questions à réobserver",
+        "automation_observation": "Registre existant; automatisation de fermeture non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "OPEN_QUESTIONS.md",
+          "blob_sha": "6d9830a6dd03fae60d7a8e84e8c49e66d1a0d3c7",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -790,7 +1154,33 @@
       "consumers": [
         "TASK_DEPENDENT"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Identifier risques de gouvernance et métier/data",
+        "inputs": "Analyse d'impact, incidents, anomalies et preuves",
+        "read_when": "Préparation de lot et apparition d'un risque",
+        "update_trigger": "Risque nouveau, matérialisé, mitigé ou réévalué",
+        "write_rule": "Relier risque matérialisé à preuve, décision ou mitigation; proposition: état daté et responsable",
+        "consumers": "Planification, sécurité, qualité",
+        "propagation_candidates": "OPEN_QUESTIONS; incidents; backlog si admissible",
+        "checks": "Trace de mitigation et impact, aucune clôture supposée",
+        "automation_observation": "Liste de risques existante; suivi automatique non attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/api_opcv",
+          "path": "RISKS.md",
+          "blob_sha": "dee4ea747d23868f0071c1767f64b5d1379288f7",
+          "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/api_opcv",
@@ -3441,7 +3831,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Orienter toute entrée et reprise multi-agent",
+        "inputs": "Identité, autorités, registres de reprise, règles des agents",
+        "read_when": "Toute nouvelle session; avant analyse ou écriture",
+        "update_trigger": "Évolution approuvée des parcours, autorités ou emplacements",
+        "write_rule": "Maintenir les deux exemplaires identiques; respecter ordre prescrit; proposer des parcours spécialisés sans remplacer le socle",
+        "consumers": "Tous agents, BOOTSTRAP_CHECKLIST, PROJECT_START_PROMPT",
+        "propagation_candidates": "AGENTS; reconstruction; index et contrats consommateurs",
+        "checks": "Résolution inter-dépôts, égalité des empreintes, conditions de lecture, couverture du parcours",
+        "automation_observation": "Script reconstruct_context.py couvre partiellement le parcours; automatisation complète non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/front_end_opcvm",
+          "path": "00_START_HERE.md",
+          "blob_sha": "8a5cdc4628d5b6586e2f14c70fa4b26830198644",
+          "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/front_end_opcvm",
@@ -3454,7 +3870,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Définir les règles communes des intervenants",
+        "inputs": "GOVERNANCE; SOURCE_OF_TRUTH; DIRECTIVE_TRAVAIL; décisions",
+        "read_when": "Avant intervention et reprise",
+        "update_trigger": "Changement approuvé des gates ou règles agents",
+        "write_rule": "Maintenir les règles communes alignées entre dépôts; ne pas supprimer restrictions ni déduire une permission de production",
+        "consumers": "Humains, agents et automatisations",
+        "propagation_candidates": "START; adaptateurs GPT/CLAUDE; tests de gouvernance",
+        "checks": "Double HEAD, périmètre, single writer, preuve, handoff",
+        "automation_observation": "Contrats CI existants; application intégrale à tous agents non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/front_end_opcvm",
+          "path": "AGENTS.md",
+          "blob_sha": "e90ee50c8dadfbeb5373e85164a852830e952ac0",
+          "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/front_end_opcvm",
@@ -3480,7 +3922,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Porter les règles historiques détaillées métier et techniques du dépôt",
+        "inputs": "DIRECTIVE_TRAVAIL; conventions financières; architecture et données observées; décisions",
+        "read_when": "Démarrage, reprise et travail spécialisé",
+        "update_trigger": "Nouvelle décision métier ou technique, changement de règle ou fait mesuré",
+        "write_rule": "Préserver règles historiques utiles; distinguer faits datés et normes; réconcilier avec pair et gouvernance; proposition: baliser les faits volatils",
+        "consumers": "Agents; développement; qualité; architecture",
+        "propagation_candidates": "Contrats métiers, tests, documentation spécialisée",
+        "checks": "Non-régression des conventions, faits runtime mesurés, compatibilité API/frontend",
+        "automation_observation": "Lecture automatique déclarée pour Claude Code; consommation effective non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/front_end_opcvm",
+          "path": "CLAUDE.md",
+          "blob_sha": "3956cad175eb967abea7eba080d8565d95a372b2",
+          "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/front_end_opcvm",
@@ -3522,7 +3990,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Porter le mandat permanent transversal du propriétaire",
+        "inputs": "Décisions explicites; principes métier, techniques et qualité",
+        "read_when": "Avant toute action",
+        "update_trigger": "Décision propriétaire modifiant une règle permanente",
+        "write_rule": "Répercuter toute modification dans l'autre dépôt; ne pas réécrire des normes sur simple observation",
+        "consumers": "Tous intervenants; AGENTS; CLAUDE; LOOP_ENGINEERING",
+        "propagation_candidates": "Règles, parcours, critères de validation et tests concernés",
+        "checks": "Égalité des miroirs; cohérence avec décisions; mesure prime pour faits",
+        "automation_observation": "Miroirs constatés; mise à jour automatique non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/front_end_opcvm",
+          "path": "DIRECTIVE_TRAVAIL.md",
+          "blob_sha": "c9402cdec039a1156825950fbb51b716b4b61a8a",
+          "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/front_end_opcvm",
@@ -3535,7 +4029,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Définir règles de coordination, autorités et admission des travaux",
+        "inputs": "Mandat propriétaire; SOURCE_OF_TRUTH; règles historiques et GOV-006",
+        "read_when": "Démarrage, sélection et avant écriture",
+        "update_trigger": "Évolution approuvée des règles de gouvernance",
+        "write_rule": "Maintenir invariants et cohérence des deux dépôts; décisions persistées; ne pas ouvrir un gate par simple rédaction",
+        "consumers": "Agents; workflow; contrôles d'admission",
+        "propagation_candidates": "START; AGENTS; LOOP_ENGINEERING; contrats CI",
+        "checks": "Double HEAD, single writer, absence d'autorité concurrente, preuves",
+        "automation_observation": "Contrats existants; enforcement global non attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/front_end_opcvm",
+          "path": "GOVERNANCE.md",
+          "blob_sha": "3a11150c6ec8d00b06dd128f11805a602c16601e",
+          "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/front_end_opcvm",
@@ -3548,7 +4068,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Adaptateur historique de démarrage pour assistants GPT",
+        "inputs": "MCP_AUTONOMY; CLAUDE; SUIVI; état Git",
+        "read_when": "Entrée assistant GPT",
+        "update_trigger": "Évolution des références ou du protocole d'entrée",
+        "write_rule": "Proposition: pointer vers START et suivi frontend canonique; conserver règle anti-régression; éviter mémoire concurrente",
+        "consumers": "Assistants GPT",
+        "propagation_candidates": "START; AGENTS; MCP_AUTONOMY",
+        "checks": "Liens résolus, rôle adaptateur, nom canonique, couverture des gates",
+        "automation_observation": "Fichier court historique; aucun déclencheur d'actualisation attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/front_end_opcvm",
+          "path": "GPT.md",
+          "blob_sha": "848783de80288f8715d6b12fb8a04e3af8ab5c53",
+          "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/front_end_opcvm",
@@ -3561,7 +4107,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Définir la méthode commune d'exécution continue",
+        "inputs": "GOVERNANCE; SOURCE_OF_TRUTH; LOOP_CONTRACT; décisions",
+        "read_when": "Sélection, réalisation, contrôle et reprise des lots",
+        "update_trigger": "Évolution approuvée du processus et de ses invariants",
+        "write_rule": "Maintenir méthode commune et miroirs; préserver transitions et conditions applicables",
+        "consumers": "Agents, orchestrateurs et automatisations",
+        "propagation_candidates": "LOOP_CONTRACT; DoR/DoD; registres état et suivi",
+        "checks": "Étapes applicables, persistance sélective, contrôle de non-régression, reprise",
+        "automation_observation": "Programme Director partiel; autonomie de bout en bout non attestée",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/front_end_opcvm",
+          "path": "LOOP_ENGINEERING.md",
+          "blob_sha": "bb5b7c68657a875749aab290d9a9fdafe47d3326",
+          "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/front_end_opcvm",
@@ -3692,7 +4264,33 @@
       "consumers": [
         "ALL_AGENTS"
       ],
-      "registry_match": true
+      "registry_match": true,
+      "operating_contract": {
+        "status": "DRAFT_FROM_OBSERVED_RULES_AND_PROPOSED_COMPLETIONS",
+        "objective": "Résoudre les autorités et les contradictions",
+        "inputs": "Décision propriétaire persistée; gouvernance; autorités et mesures",
+        "read_when": "Avant toute analyse/écriture; conflit entre sources",
+        "update_trigger": "Changement approuvé d'autorité, de priorité ou de modèle de vérité",
+        "write_rule": "Modifier uniquement sur décision gouvernée; préserver les snapshots historiques; ne pas remplacer une mesure par une prose; maintenir le miroir transversal cohérent.",
+        "consumers": "GOVERNANCE.md; AGENTS.md; PROJECT_CONTEXT.md; tous agents",
+        "propagation_candidates": "authority-map.json; START et consommateurs concernés",
+        "checks": "Vérifier chemins, type d'autorité, portée et priorité; distinguer Git et runtime",
+        "automation_observation": "Matrice d'autorité et règles normatives; pas de mécanisme de mise à jour automatique attesté",
+        "source_ref": {
+          "repository": "Wealthtechinnovations/front_end_opcvm",
+          "path": "SOURCE_OF_TRUTH.md",
+          "blob_sha": "84c6798ef5cf672e9eaeb2040f5ff77bcb03ec9b",
+          "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+        },
+        "normative_sources": [
+          "api_opcv/00_START_HERE.md",
+          "api_opcv/SOURCE_OF_TRUTH.md",
+          "api_opcv/LOOP_ENGINEERING.md",
+          "api_opcv/docs/01-governance/DOCUMENTATION_POLICY.md"
+        ],
+        "approval": "NOT_APPROVED_FOR_SOURCE_WRITE",
+        "history_rule": "Preserve historical evidence; apply source-specific append-only rules where required"
+      }
     },
     {
       "repository": "Wealthtechinnovations/front_end_opcvm",
@@ -3896,11 +4494,16 @@
     "Runtime truth not verified"
   ],
   "contract_coverage": {
-    "defined_draft": 19,
+    "defined_draft": 42,
     "total": 251,
-    "remaining": 232,
+    "remaining": 209,
     "status": "PARTIAL_DRAFT",
     "schema": "ulef/discovery/inventories/DOCUMENT_CONTRACT.schema.json",
-    "rule": "A registry match is not operating-contract certification. Entries without contract are pending. Proposals are not existing rules."
+    "rule": "A registry match is not operating-contract certification. Entries without contract are pending. Proposals are not existing rules.",
+    "startup": {
+      "defined_draft": 27,
+      "total": 27
+    },
+    "next_action": "Qualify remaining foundational root documents, then specialized families; distinguish declared rules from proposed propagation, verify exact source fingerprints before reuse."
   }
 }
