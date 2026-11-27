@@ -314,6 +314,16 @@
         "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
         "document": "ulef/discovery/MARKDOWN_INVENTORY.json"
+      },
+      {
+        "id": "E29",
+        "date": "2026-11-27",
+        "title": "Actualité, consommation et cycle de vie des Markdown",
+        "detail": "Audit documentaire direct : 251/251 chemins Markdown présents correspondent aux git_blob_sha du registre .governance/knowledge/markdown-registry.json, aucun manquant ni différent, sur API eae81c5db5a4d46f3741ab6fa2922017aa2215eb et frontend 1640ad2277cb913b53782ca0a428a0b9ca44e4a6. Le registre référence un HEAD API antérieur 356bf86aeeb77615b6d71b75a63241b4173d2c52, sans divergence des blobs Markdown observés. L'audit Markdown 46003559055 est SUCCESS le 27/11 à 13:01:43 UTC; contrat frontend 45883714648 SUCCESS; Programme Director 45944313431 SUCCESS. Ces preuves ne certifient pas la vérité métier ni runtime. LOOP_STATE.md juxtapose la projection AF-TASK-028 et une section dite actuelle AF-TASK-026: candidat à qualification, pas correction automatique. Les six projections gérées proviennent des autorités JSON; writeback manuel dry-run/apply-local, sans push; SUIVI 25/11 atteste gate writer fermé et autonomie non certifiée. Proposition : PROJECT_CONTEXT reste index d'identité, vision/périmètre, constitution N0/N1, références et autorités, règles de consommation et évolution; état volatil reste dans STATUS/SUIVI/queue, liens plutôt que duplications. Réutiliser registre Markdown existant, distinguer couverture, actualité sémantique, cohérence et preuve runtime. B01 collecte les faits et mécanismes; B02 réconcilie; aucune mutation canonique.",
+        "status": "OBSERVATIONS_VERIFIEES_ET_PROPOSITION",
+        "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/discovery/DOCUMENT_LIFECYCLE_OBSERVATIONS.md"
       }
     ],
     "source_heads": {
