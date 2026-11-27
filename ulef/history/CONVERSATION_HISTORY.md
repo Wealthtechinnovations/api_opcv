@@ -189,3 +189,11 @@ Statut : `PROPOSITION_A_VALIDER`.
 Proposition de cartographie générale en douze boucles B01–B12. Les niveaux N0, N1, N2… décrivent la structure, les boucles décrivent les processus ; un processus peut intervenir à plusieurs niveaux. B01 demeure le seul travail actuel, niveau N1 strict. B02–B12 sont des propositions non validées et non implémentées. Gouvernance, sécurité, continuité et non-collision transversales. Toute boucle reprend son checkpoint, traite une unité bornée, persiste et vérifie ses résultats, puis continue, revient en arrière ou signale les blocages.
 
 Voir [LOOP_MAP.md](../LOOP_MAP.md).
+
+### E22 — Objectif et procédure B01
+
+Statut : `SPECIFICATION_PROPOSEE`.
+
+Précision proposée pour B01 : découvrir toutes les composantes N1 réelles de l'écosystème AfricaFunds, noter où elles existent, identifier, classifier et enregistrer. D'abord inventorier les chemins, noms, types, versions, outils et ressources sans présumer du contenu ; lire ensuite les manifestes, points d'entrée et extraits admissibles nécessaires pour établir la responsabilité et le rattachement, sans lancer une décomposition N2 ni une analyse exhaustive métier. Conserver séparément observations brutes, candidats, composantes qualifiées et inconnues. Déduplication manifeste en B01 ; réconciliation approfondie en B02. Tout conserver dans la branche ULEF, sources observées en lecture seule. La boucle ne peut déclarer une convergence que sur preuves et périmètre stable; les limites d'accès demeurent explicites. Le protocole est une spécification, pas un moteur déjà exécuté.
+
+Voir [N1_DISCOVERY_PROTOCOL.md](../discovery/N1_DISCOVERY_PROTOCOL.md).
