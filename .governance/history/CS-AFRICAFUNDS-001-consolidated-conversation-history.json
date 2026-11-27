@@ -4,12 +4,13 @@
   "continuity_key": "CS-AFRICAFUNDS-001",
   "product": "AfricaFunds",
   "status": "HISTORICAL_CONSOLIDATED_MEMORY",
-  "consolidated_at": "2026-11-26",
+  "consolidated_at": "2026-11-27",
   "nature": "NON_AUTHORITATIVE_HISTORICAL_MEMORY",
   "live_state_at_consolidation": {
-    "api_head": "d27c083dd4909890959cc38a4c76f6b032bd6197",
-    "frontend_head": "7e82ecc6bd2f1c51d4137662951699584e7a6a3a",
+    "api_head": "dae4c590c73318df43c11a58bc8571ceb94b6f00",
+    "frontend_head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
     "canonical_branch": "claude/code-review-improvements-ikvuj",
+    "head_semantics": "OBSERVED_IMMEDIATELY_BEFORE_HISTORY_WRITE_NOT_SELF_REFERENTIAL",
     "active_claims": [
       "AF-TASK-017",
       "AF-TASK-028"
@@ -213,7 +214,7 @@
     "SELECT_ONLY_ADMISSIBLE_UNCLAIMED_SCOPE",
     "IMPLEMENT_TEST_PERSIST_EVIDENCE"
   ],
-  "consolidation_revision": 4,
+  "consolidation_revision": 5,
   "conversation_source_coverage": {
     "status": "COMPLETE_FOR_AVAILABLE_PROJECT_SNAPSHOTS",
     "mode": "SEMANTIC_CONSOLIDATION_NOT_VERBATIM",
@@ -296,6 +297,67 @@
         ],
         "no_new_task_created": true
       }
+    },
+    {
+      "id": "AF-HIST-DELTA-20261127-CURRENT-CONVERSATION-INTEGRATION",
+      "topic": "PROGRAMME_DIRECTOR_CONTINUITY",
+      "classification": "HISTORICAL_CONVERSATION_DELTA_WITH_LIVE_PREWRITE_OBSERVATION",
+      "continuity_key": "CS-AFRICAFUNDS-001",
+      "source": {
+        "kind": "CURRENT_CHAT_CONVERSATION",
+        "conversation_url": null,
+        "referenced_historical_chat_url": "https://chatgpt.com/g/g-p-6aa849c940508191a8d4fa2fa42dedc8/c/6aa45b77-95e8-83eb-b65b-c070d16a97db",
+        "verbatim_full_transcript_available": false
+      },
+      "user_directives": [
+        "INTEGRATE_CURRENT_CONVERSATION_IN_EXISTING_PROGRAMME_DIRECTOR_HISTORY",
+        "NO_NEW_CONTINUITY_ID",
+        "NO_REGRESSION_OR_COLLISION",
+        "DO_NOT_REPLAY_COMPLETED_GOVERNANCE_WORK",
+        "SSH_S2_FALLBACK_MUST_NOT_DEPEND_ON_WEALTHTECH_SSH_BRIDGE"
+      ],
+      "facts": [
+        "Historical continuation in this thread targeted AF-TASK-011 and required live reobservation before work.",
+        "The thread investigated intermittent MariaDB Access denied events without rotating DB credentials again.",
+        "The thread reused GOV-006 guarded reconciliation and preserved API untracked runtime artifacts.",
+        "A self-introduced reconstruct_context.py syntax regression was detected and corrected before Multi-Agent Resume passed again.",
+        "A later attestation found four new Access denied events at 18:05:48/51/54/56 UTC, so the diagnostic was not falsely closed.",
+        "s2_observe.py was extended read-only toward cross-vhost DB-consumer forensics without exposing secret values.",
+        "User explicitly clarified that GitHub Actions to pinned SSH S2 is independent of wealthtech_ssh_bridge and bridge failure is not S2 inaccessibility."
+      ],
+      "historical_checkpoints": {
+        "api": [
+          "8ae99556…",
+          "ceff72e0…",
+          "4a400dbd…",
+          "322d2778…",
+          "bd0699ec…",
+          "e61afe5b…",
+          "6434c369…",
+          "9f051c035…"
+        ],
+        "frontend": [
+          "38a512067…"
+        ]
+      },
+      "observed_before_write": {
+        "api_head": "dae4c590c73318df43c11a58bc8571ceb94b6f00",
+        "frontend_head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+        "canonical_branch": "claude/code-review-improvements-ikvuj"
+      },
+      "publication_scope": "CURRENT_CONVERSATION_DELTA_ONLY",
+      "former_bulk_revision5_candidate": "NOT_PUBLISHED_BY_THIS_CHANGE",
+      "mutations_excluded": [
+        "TASK_QUEUE",
+        "CLAIMS_OR_LEASES",
+        "S2",
+        "SECRETS",
+        "BUSINESS_DATA",
+        "RUNTIME_CONFIGURATION",
+        "AUTOMATIONS",
+        "PRODUCTION"
+      ],
+      "live_authority_precedence": true
     }
   ],
   "reconstruction_integration": {
@@ -340,16 +402,20 @@
     ]
   },
   "current_conversation_integration": {
-    "integrated_at": "2026-11-26",
+    "integrated_at": "2026-11-27",
     "continuity_key": "CS-AFRICAFUNDS-001",
     "same_continuity_only": true,
     "single_queue_preserved": true,
     "mcp_project_separation_reaffirmed": true,
     "chat_is_live_authority": false,
     "observed_before_write": {
-      "api_head": "d429f4713c047148b35bbbf1b04bf16ba6fd6818",
+      "api_head": "dae4c590c73318df43c11a58bc8571ceb94b6f00",
       "frontend_head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
     },
-    "history_surface_only": true
+    "history_surface_only": true,
+    "latest_delta_id": "AF-HIST-DELTA-20261127-CURRENT-CONVERSATION-INTEGRATION",
+    "journal_persisted": true,
+    "journal_document_id": "1lu_eu57rgfKr3vUhOKdAL6XfCV_R6UAQfiUtvqEmq-E",
+    "former_bulk_revision5_candidate_published": false
   }
 }

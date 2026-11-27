@@ -1260,3 +1260,132 @@ Ce delta :
 - ne modifie ni queue, ni claim, ni SUIVI, ni production ;
 - doit être chargé par le mécanisme de reconstruction déjà raccordé à cette mémoire ;
 - reste inférieur aux autorités live et exige revalidation avant exécution.
+
+---
+
+## 34. Delta de continuité — conversation courante raccordée le 27 novembre 2026
+
+> Classification : `HISTORICAL_CONVERSATION_DELTA_WITH_LIVE_PREWRITE_OBSERVATION`  
+> Continuité : `CS-AFRICAFUNDS-001`  
+> Publication : delta explicitement autorisé par l’utilisateur dans la conversation courante.  
+> Autorité : mémoire historique uniquement ; HEADs, queue, claims, preuves et production live restent supérieurs.
+
+### 34.1 Mandat de reprise porté par ce fil
+
+La conversation courante a été ouverte comme continuation directe du travail gouverné AfricaFunds, avec interdiction explicite de rejouer Regulatory Plus, l’inventaire Markdown initial, Loop Engineering, le système multi-agent, le fallback GitHub Actions→SSH S2, les rotations DB/JWT et `AF-TASK-001→009`.
+
+Le point historique remis au fil ciblait `AF-TASK-011` / attestation finale bi-repository et imposait :
+
+```text
+RECONNECT
+→ REOBSERVE BOTH GITHUB HEADS
+→ READ GOVERNED STATE
+→ RECONCILE CURRENT REALITY
+→ CONTINUE ONLY THE STILL-OPEN TASK
+```
+
+Cette séquence est conservée comme histoire du fil. Elle ne réactive pas `AF-TASK-011` ni `AF-TASK-003` lorsque les autorités plus récentes les déclarent terminées ou supersédées.
+
+### 34.2 Travaux et constats techniques effectivement produits dans la séquence historique
+
+Le fil a exécuté ou vérifié, dans son contexte historique :
+
+- relecture des deux repositories, branches et autorités de reprise ;
+- détection d’un drift API et préservation du travail concurrent ;
+- analyse des `Access denied for user 'fund_opcvm'@'localhost'` sans nouvelle rotation DB ;
+- examen de `db_readonly()`, `db_auth_diagnostic()`, crons, PM2, workers, fichiers `.env*`, workflows GitHub et logique de retry Sequelize ;
+- confirmation que DB, PM2 et probes HTTP restaient sains aux observations concernées ;
+- réconciliation GOV-006 protégée avec préflight, fast-forward borné et préservation des untracked ;
+- persistance d’un checkpoint frontend `SUIVI.md` et de registres de clôture ;
+- correction immédiate d’une régression syntaxique introduite dans `reconstruct_context.py`, puis retour de Multi-Agent Resume à PASS ;
+- attestation post-documentation ;
+- découverte ultérieure de quatre nouveaux refus MariaDB à `18:05:48`, `18:05:51`, `18:05:54`, `18:05:56 UTC`, empêchant une clôture artificielle du sous-diagnostic ;
+- extension read-only de `s2_observe.py` vers une investigation cross-vhost afin de chercher des consommateurs DB hors du vhost canonique sans exposer de secret.
+
+Références de checkpoints historiques mentionnées dans le fil, jamais à réutiliser comme HEAD actuels sans relecture :
+
+```text
+API:
+8ae99556…
+ceff72e0…
+4a400dbd…
+322d2778…
+bd0699ec…
+e61afe5b…
+6434c369…
+S2 observé ensuite dans le fil : 9f051c035…
+
+Frontend:
+38a512067…
+```
+
+Ces références décrivent la chronologie de ce fil, pas le `FUND_STATE` actuel.
+
+### 34.3 Règle SSH S2 clarifiée par l’utilisateur
+
+L’utilisateur a corrigé explicitement une dérive de méthode : `wealthtech_ssh_bridge` ne doit pas être une précondition pour travailler sur S2 dans AfricaFunds.
+
+Le canal déjà construit et prouvé reste :
+
+```text
+GitHub Actions
+→ SSH S2
+→ StrictHostKeyChecking=yes
+→ host key pin gouverné
+→ S2
+```
+
+Donc :
+
+```text
+BRIDGE_FAILURE != S2_INACCESSIBLE
+```
+
+Le bridge peut être utilisé comme contrôle secondaire lorsqu’il est utile, mais le fallback SSH gouverné indépendant doit rester disponible et ne doit pas être reconstruit.
+
+### 34.4 Mémoire du projet et référence de conversation fournie
+
+Le propriétaire a demandé à plusieurs reprises de vérifier que le fil conserve la compréhension du projet et a fourni la référence ChatGPT suivante :
+
+```text
+https://chatgpt.com/g/g-p-6aa849c940508191a8d4fa2fa42dedc8/c/6aa45b77-95e8-83eb-b65b-c070d16a97db
+```
+
+Cette URL est conservée comme référence fournie par l’utilisateur. Le contenu verbatim complet de cette conversation n’a pas été réouvert et vérifié dans ce delta ; il est donc interdit de lui attribuer une transcription ou des faits précis non démontrés.
+
+Les thèmes métier/data déjà persistés dans les autres sources du programme — document maître, indices/taux, architecture N1–N6, allocation, pays, institutionnel — restent des contributions distinctes à rapprocher selon leur provenance. Ils ne deviennent pas des réalisations nouvelles de ce fil.
+
+### 34.5 État live observé immédiatement avant cette publication
+
+Observation GitHub directe effectuée avant écriture :
+
+```text
+API repository      = Wealthtechinnovations/api_opcv
+API branch          = claude/code-review-improvements-ikvuj
+API pre-write HEAD  = dae4c590c73318df43c11a58bc8571ceb94b6f00
+
+Frontend repository = Wealthtechinnovations/front_end_opcvm
+Frontend branch     = claude/code-review-improvements-ikvuj
+Frontend HEAD       = 1640ad2277cb913b53782ca0a428a0b9ca44e4a6
+```
+
+Le présent changement n’ajoute aucun identifiant de continuité, aucune queue, aucun claim, aucune branche et aucune autorité parallèle.
+
+### 34.6 Portée exacte de la publication
+
+L’ancienne candidate globale de révision 5 préparée lors du chantier de convergence documentaire reste hors de cette publication en bloc.
+
+Le message explicite de l’utilisateur dans cette conversation autorise ici uniquement l’intégration append-only du delta vérifié de ce fil dans les historiques canoniques et le journal inter-conversations.
+
+Aucune modification de Task Queue, claims/leases, S2, secrets, données métier, configuration runtime, automatisations ou production n’est réalisée par ce delta.
+
+### 34.7 Contrat de reprise après intégration
+
+À toute reprise future :
+
+1. lire les instructions permanentes et le journal inter-conversations ;
+2. lire ces historiques Git comme mémoire, pas comme état live ;
+3. réobserver les deux HEAD, la queue, les claims et les preuves ;
+4. ne jamais réactiver `AF-TASK-011` ou un ancien diagnostic à partir de cette section seule ;
+5. dédupliquer tout nouvel apport contre les historiques, matrices, `SUIVI`, evidence et Task Queue existants ;
+6. continuer exclusivement la première tâche encore admissible.
