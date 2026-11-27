@@ -364,6 +364,16 @@
         "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
         "document": "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json"
+      },
+      {
+        "id": "E34",
+        "date": "2026-11-27",
+        "title": "Boucle quotidienne d'inventaire, registre et sortie persistante",
+        "detail": "Directive utilisateur : créer B01-INVENTORY, boucle quotidienne d'inventaire incrémentale, avec registre visible et sortie consommable. Reprendre le dernier inventaire valide, observer les versions, détecter les écarts, actualiser les résultats dérivés et conserver les preuves. Premier passage B01-INVENTORY-0001 : comparaison intégrale des 8163 entrées enregistrées aux deux arbres Git actuels, zéro ajout/modification/disparition, huit tests du comparateur réussis. OK borné aux métadonnées Git. Planification quotidienne refusée par quota 5/5, aucune autre automatisation modifiée. Module de comparaison créé; orchestration automatique distante non attestée. E31/E32 restent applicables; aucun effet sur les sources.",
+        "status": "PARTIAL_IMPLEMENTATION_VERIFIED",
+        "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/discovery/INVENTORY_LOOP.md"
       }
     ],
     "source_heads": {

@@ -1,0 +1,93 @@
+{
+  "loop_id": "B01-INVENTORY",
+  "run_id": "B01-INVENTORY-0001",
+  "date": "2026-11-27",
+  "status": "OK",
+  "scope": "CANONICAL_GIT_TREE_METADATA_ONLY",
+  "execution": "LIVE_CONNECTOR_READ_AND_FULL_METADATA_COMPARISON",
+  "previous_checkpoint": "a932b4537510d4cd7ce9af1aac8265e53f0eeaf6",
+  "source_results": [
+    {
+      "role": "api",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+      "entry_count": 870,
+      "previous_head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "previous_tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+      "head_changed": false,
+      "tree_changed": false,
+      "added": [],
+      "modified": [],
+      "removed": [],
+      "complete": true,
+      "unique_paths": true,
+      "status": "UNCHANGED"
+    },
+    {
+      "role": "frontend",
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+      "entry_count": 7293,
+      "previous_head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "previous_tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+      "head_changed": false,
+      "tree_changed": false,
+      "added": [],
+      "modified": [],
+      "removed": [],
+      "complete": true,
+      "unique_paths": true,
+      "status": "UNCHANGED"
+    }
+  ],
+  "comparator_fixture_tests": [
+    {
+      "name": "unchanged",
+      "pass": true
+    },
+    {
+      "name": "head-only",
+      "pass": true
+    },
+    {
+      "name": "add-modify-remove",
+      "pass": true
+    },
+    {
+      "name": "truncated",
+      "pass": true
+    },
+    {
+      "name": "duplicate",
+      "pass": true
+    },
+    {
+      "name": "incomplete",
+      "pass": true
+    },
+    {
+      "name": "wrong source",
+      "pass": true
+    },
+    {
+      "name": "immutable tree inconsistent",
+      "pass": true
+    }
+  ],
+  "scheduling": {
+    "desired": "DAILY",
+    "timezone": "Europe/Paris",
+    "proposed_time": "08:00",
+    "status": "NOT_ACTIVE",
+    "reason": "too_many_active_automations",
+    "active": 5,
+    "limit": 5
+  },
+  "limitations": [
+    "Git tree metadata only; no semantic/runtime certification",
+    "No autonomous remote orchestration or scheduler active",
+    "Pure comparator tested in JS runtime; standalone Node CLI not executed"
+  ]
+}

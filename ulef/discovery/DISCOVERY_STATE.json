@@ -24,7 +24,7 @@
     "api": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
     "frontend": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
   },
-  "next_action": "Consume existing Markdown registry and canonical entry order; extract N0 project context with provenance and qualify existing N1 candidates, then inspect uncovered source surfaces incrementally",
+  "next_action": "Consume current inventory for N0 and N1 semantic discovery; replay inventory daily once scheduling enabled; currently manual only.",
   "limitations": [
     "Git path metadata complete for both observed trees; contents not exhaustively understood",
     "runtime and tool-project bindings incomplete",
@@ -56,5 +56,22 @@
         "entries": 7293
       }
     ]
+  },
+  "inventory_loop": {
+    "id": "B01-INVENTORY",
+    "status": "OK",
+    "scope": "CANONICAL_GIT_TREE_METADATA_ONLY",
+    "status_file": "ulef/discovery/inventories/INVENTORY_STATUS.json",
+    "receipt": "ulef/discovery/inventories/runs/B01-INVENTORY-0001.json",
+    "output": "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json",
+    "daily_schedule": {
+      "desired": "DAILY",
+      "timezone": "Europe/Paris",
+      "proposed_time": "08:00",
+      "status": "NOT_ACTIVE",
+      "reason": "too_many_active_automations",
+      "active": 5,
+      "limit": 5
+    }
   }
 }

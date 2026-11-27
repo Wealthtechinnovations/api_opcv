@@ -1,0 +1,61 @@
+{
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "loop_id": "B01-INVENTORY",
+  "status": "OK",
+  "status_scope": "CANONICAL_GIT_TREE_METADATA_ONLY",
+  "last_verified_date": "2026-11-27",
+  "last_run": "ulef/discovery/inventories/runs/B01-INVENTORY-0001.json",
+  "last_valid_inventory": "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json",
+  "source_results": [
+    {
+      "role": "api",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+      "entry_count": 870,
+      "previous_head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "previous_tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+      "head_changed": false,
+      "tree_changed": false,
+      "complete": true,
+      "unique_paths": true,
+      "status": "UNCHANGED",
+      "added_count": 0,
+      "modified_count": 0,
+      "removed_count": 0
+    },
+    {
+      "role": "frontend",
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+      "entry_count": 7293,
+      "previous_head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "previous_tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+      "head_changed": false,
+      "tree_changed": false,
+      "complete": true,
+      "unique_paths": true,
+      "status": "UNCHANGED",
+      "added_count": 0,
+      "modified_count": 0,
+      "removed_count": 0
+    }
+  ],
+  "pending_requalification": [],
+  "daily_schedule": {
+    "desired": "DAILY",
+    "timezone": "Europe/Paris",
+    "proposed_time": "08:00",
+    "status": "NOT_ACTIVE",
+    "reason": "too_many_active_automations",
+    "active": 5,
+    "limit": 5
+  },
+  "limitations": [
+    "Git tree metadata only; no semantic/runtime certification",
+    "No autonomous remote orchestration or scheduler active",
+    "Pure comparator tested in JS runtime; standalone Node CLI not executed"
+  ],
+  "next_action": "Manual or scheduled replay: observe both canonical HEADs; validate stored chunks; fetch changed trees only; persist delta and receipt or mark PARTIAL/ERROR. Semantic discovery separate."
+}
