@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0",
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "domain_id": "INV-01",
+  "project_uid": "CS-AFRICAFUNDS-001",
+  "status": "PARTIAL",
+  "identity_check": {
+    "status": "VERIFIED_DECLARED_IDENTITY",
+    "conflicts": []
+  },
+  "scope": "DECLARED_PROJECT_IDENTITY_ONLY",
+  "date": "2026-11-27",
+  "sources": [
+    {
+      "repository": "Wealthtechinnovations/api_opcv",
+      "role": "API",
+      "path": ".governance/project.json",
+      "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "blob_sha": "5cf6a1144ed24d377345af9aac1ef345cb00471c"
+    },
+    {
+      "repository": "Wealthtechinnovations/api_opcv",
+      "role": "API",
+      "path": ".governance/repository.json",
+      "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "blob_sha": "167e5ae9115575dd0a6ceb571b81b23e0d382f93"
+    },
+    {
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "role": "FRONTEND",
+      "path": ".governance/project.json",
+      "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "blob_sha": "5cf6a1144ed24d377345af9aac1ef345cb00471c"
+    },
+    {
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "role": "FRONTEND",
+      "path": ".governance/repository.json",
+      "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "blob_sha": "bff79e86d3cf4e61cc5857022d63f1f4adf9db8a"
+    }
+  ],
+  "identity": {
+    "project_uid": "CS-AFRICAFUNDS-001",
+    "project_id": "chainsolutions.africafunds",
+    "project_name": "AfricaFunds",
+    "project_kind": "MULTI_REPOSITORY_APPLICATION",
+    "repositories": [
+      {
+        "role": "API",
+        "full_name": "Wealthtechinnovations/api_opcv"
+      },
+      {
+        "role": "FRONTEND",
+        "full_name": "Wealthtechinnovations/front_end_opcvm"
+      }
+    ],
+    "canonical_branch": "claude/code-review-improvements-ikvuj",
+    "central_governance_repository": "Wealthtechinnovations/api_opcv",
+    "global_checkpoint_repository": "Wealthtechinnovations/front_end_opcvm",
+    "global_checkpoint_file": "SUIVI.md",
+    "production_target_declared": "S2",
+    "public_domain": "https://africafunds.chainsolutions.fr",
+    "state_fields": [
+      "API_SHA",
+      "FRONTEND_SHA",
+      "SUIVI_CHECKPOINT",
+      "PRODUCTION_ATTESTATION"
+    ]
+  },
+  "relations": [
+    {
+      "from": "CS-AFRICAFUNDS-001",
+      "type": "HAS_REPOSITORY",
+      "to": "Wealthtechinnovations/api_opcv"
+    },
+    {
+      "from": "CS-AFRICAFUNDS-001",
+      "type": "HAS_REPOSITORY",
+      "to": "Wealthtechinnovations/front_end_opcvm"
+    },
+    {
+      "from": "Wealthtechinnovations/api_opcv",
+      "type": "PEER_REPOSITORY",
+      "to": "Wealthtechinnovations/front_end_opcvm"
+    },
+    {
+      "from": "Wealthtechinnovations/front_end_opcvm",
+      "type": "PEER_REPOSITORY",
+      "to": "Wealthtechinnovations/api_opcv"
+    },
+    {
+      "from": "CS-AFRICAFUNDS-001",
+      "type": "DECLARED_PRODUCTION_TARGET",
+      "to": "S2"
+    }
+  ],
+  "comparison": {
+    "expected": {
+      "uid": "CS-AFRICAFUNDS-001",
+      "project_id": "chainsolutions.africafunds",
+      "name": "AfricaFunds",
+      "branch": "claude/code-review-improvements-ikvuj",
+      "repositories": {
+        "API": "Wealthtechinnovations/api_opcv",
+        "FRONTEND": "Wealthtechinnovations/front_end_opcvm"
+      }
+    },
+    "previous_baseline": null,
+    "baseline_mode": "FIRST_STRUCTURED_IDENTITY_SNAPSHOT",
+    "tests": [
+      {
+        "name": "current sources",
+        "pass": true
+      },
+      {
+        "name": "missing source",
+        "pass": true
+      },
+      {
+        "name": "duplicate source",
+        "pass": true
+      },
+      {
+        "name": "wrong UID",
+        "pass": true
+      },
+      {
+        "name": "wrong peer",
+        "pass": true
+      },
+      {
+        "name": "changed common fingerprint",
+        "pass": true
+      }
+    ],
+    "execution": "MANUAL_CONNECTOR_AND_PURE_JS_TESTS"
+  },
+  "limitations": [
+    "Only declared identity and repository reciprocity verified, not full project perimeter or runtime",
+    "Standalone Node and collector automation not tested",
+    "No scheduled execution"
+  ]
+}

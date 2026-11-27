@@ -69,7 +69,8 @@
     {
       "id": "INV-01",
       "status": "PARTIAL",
-      "output": "ulef/discovery/PROJECT_SCOPE_OBSERVATIONS.json"
+      "output": "ulef/discovery/inventories/PROJECT_IDENTITY_INVENTORY.json",
+      "verified_subscope": "VERIFIED_DECLARED_IDENTITY"
     },
     {
       "id": "INV-02",
@@ -146,5 +147,12 @@
       "status": "PENDING",
       "output": null
     }
-  ]
+  ],
+  "latest_domain_observation": {
+    "domain": "INV-01",
+    "date": "2026-11-27",
+    "output": "ulef/discovery/inventories/PROJECT_IDENTITY_INVENTORY.json",
+    "status": "PARTIAL",
+    "identity_check": "VERIFIED_DECLARED_IDENTITY"
+  }
 }

@@ -16,3 +16,7 @@ Planification quotidienne : **NON ACTIVE** (quota ChatGPT 5/5). Ce registre atte
 ## Dernier état — B01-INVENTORY-0002 / E35
 
 **PARTIAL — périmètre LIV global**. Arborescences : OK, 8163 entrées, arbres immuables concordants. Markdown : VERIFIED_METADATA, 251/251 empreintes. Catalogue : 16 domaines, seuls INV-03 et INV-04 vérifiés sur les métadonnées. Les autres restent partiels ou à inventorier. Aucun ordonnanceur actif. Voir [catalogue](INVENTORY_CATALOG.json), [registre documentaire dérivé](DOCUMENT_INVENTORY_INDEX.json), [reçu](runs/B01-INVENTORY-0002.json). Le bloc précédent est historique. 
+
+## INV-01 — observation E36
+
+Identité déclarée commune et rôles réciproques vérifiés sur quatre sources ; périmètre global PARTIAL. Voir [sortie INV-01](PROJECT_IDENTITY_INVENTORY.json). Aucun nouveau passage global LIV ni déclencheur actif.

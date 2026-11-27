@@ -384,6 +384,16 @@
         "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
         "document": "ulef/discovery/inventories/INVENTORY_CATALOG.json"
+      },
+      {
+        "id": "E36",
+        "date": "2026-11-27",
+        "title": "Définition des domaines et contrat commun de sortie des boucles",
+        "detail": "Un domaine LIV est un périmètre cohérent d'observation et de contrôle; il n'est pas nécessairement une composante du projet. Chaque boucle doit produire ou compléter les sorties et inventaires nécessaires à sa mission, réutiliser les identités existantes, définir modèles, collecteurs, comparateurs, relations, preuves, critères d'admission, reprise et automatisation. Ne pas déclarer opérationnelle une boucle dont les collecteurs, déclencheurs, actualisation et tests de bout en bout ne sont pas attestés; les sorties non applicables doivent être justifiées. INV-01 : quatre sources structurées des deux dépôts lues en direct, identité commune et rôles réciproques vérifiés, six tests de logique réussis dans le runtime JS; le périmètre global et l'automatisation restent partiels. Aucun changement dans les sources.",
+        "status": "DIRECTIVE_UTILISATEUR_ET_CONTROLE_PARTIEL",
+        "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/discovery/inventories/PROJECT_IDENTITY_INVENTORY.json"
       }
     ],
     "source_heads": {

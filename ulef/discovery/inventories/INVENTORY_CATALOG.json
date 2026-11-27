@@ -12,12 +12,15 @@
       "source_route": "PROJECT_CONTEXT.md; .governance/project.json; repository.json",
       "comparison_baseline": "Identité canonique et rattachements versionnés",
       "coverage": "PARTIAL",
-      "output_ref": "ulef/discovery/PROJECT_SCOPE_OBSERVATIONS.json",
+      "output_ref": "ulef/discovery/inventories/PROJECT_IDENTITY_INVENTORY.json",
       "checks": "Identifiants, rôles, dépôts associés, conflits",
       "required": true,
       "trigger": "DAILY_OR_CONSUMPTION_OR_SOURCE_CHANGE",
       "read_only": true,
-      "change_action": "REFRESH_DERIVED_INVENTORY_AND_QUEUE_AFFECTED_REQUALIFICATION"
+      "change_action": "REFRESH_DERIVED_INVENTORY_AND_QUEUE_AFFECTED_REQUALIFICATION",
+      "verified_subscope": "VERIFIED_DECLARED_IDENTITY",
+      "comparator": "ulef/discovery/identity_compare.mjs",
+      "collection_mode": "MANUAL_CONNECTOR"
     },
     {
       "id": "INV-02",
