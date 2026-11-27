@@ -1,0 +1,66 @@
+{
+  "id": "B01-INVENTORY-0002",
+  "date": "2026-11-27",
+  "mode": "MANUAL_CONNECTOR",
+  "status": "PARTIAL",
+  "verified_scope": [
+    "INV-03",
+    "INV-04"
+  ],
+  "tree_results": [
+    {
+      "role": "api",
+      "repository": "Wealthtechinnovations/api_opcv",
+      "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+      "entry_count": 870,
+      "previous_head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "previous_tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+      "head_changed": false,
+      "tree_changed": false,
+      "complete": true,
+      "unique_paths": true,
+      "status": "UNCHANGED",
+      "added_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "validation": "IMMUTABLE_TREE_SHA_AND_COUNT_MATCH_PREVIOUS_VERIFIED_RUN"
+    },
+    {
+      "role": "frontend",
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+      "entry_count": 7293,
+      "previous_head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "previous_tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+      "head_changed": false,
+      "tree_changed": false,
+      "complete": true,
+      "unique_paths": true,
+      "status": "UNCHANGED",
+      "added_count": 0,
+      "modified_count": 0,
+      "removed_count": 0,
+      "validation": "IMMUTABLE_TREE_SHA_AND_COUNT_MATCH_PREVIOUS_VERIFIED_RUN"
+    }
+  ],
+  "markdown_results": {
+    "live": 251,
+    "registry": 251,
+    "matched": 251,
+    "missing_or_changed_registry": 0,
+    "orphan_registry": 0
+  },
+  "source_heads": {
+    "api": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+    "frontend": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+  },
+  "previous_receipt": "ulef/discovery/inventories/runs/B01-INVENTORY-0001.json",
+  "coverage_catalog": "ulef/discovery/inventories/INVENTORY_CATALOG.json",
+  "limitations": [
+    "Only two domains metadata checked in this passage",
+    "No scheduled execution activated",
+    "No semantic/runtime certification"
+  ]
+}

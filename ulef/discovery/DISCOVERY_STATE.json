@@ -24,7 +24,7 @@
     "api": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
     "frontend": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
   },
-  "next_action": "Consume current inventory for N0 and N1 semantic discovery; replay inventory daily once scheduling enabled; currently manual only.",
+  "next_action": "Implement read-only collectors domain by domain; consume current INV-03/04 output; recheck source change and freshness before use; scheduling remains blocked",
   "limitations": [
     "Git path metadata complete for both observed trees; contents not exhaustively understood",
     "runtime and tool-project bindings incomplete",
@@ -59,10 +59,10 @@
   },
   "inventory_loop": {
     "id": "B01-INVENTORY",
-    "status": "OK",
-    "scope": "CANONICAL_GIT_TREE_METADATA_ONLY",
+    "status": "PARTIAL",
+    "scope": "LIV_MULTI_DOMAIN",
     "status_file": "ulef/discovery/inventories/INVENTORY_STATUS.json",
-    "receipt": "ulef/discovery/inventories/runs/B01-INVENTORY-0001.json",
+    "receipt": "ulef/discovery/inventories/runs/B01-INVENTORY-0002.json",
     "output": "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json",
     "daily_schedule": {
       "desired": "DAILY",
@@ -72,6 +72,10 @@
       "reason": "too_many_active_automations",
       "active": 5,
       "limit": 5
-    }
+    },
+    "catalog": "ulef/discovery/inventories/INVENTORY_CATALOG.json",
+    "document_output": "ulef/discovery/inventories/DOCUMENT_INVENTORY_INDEX.json",
+    "tree_status": "OK",
+    "document_status": "VERIFIED_METADATA"
   }
 }

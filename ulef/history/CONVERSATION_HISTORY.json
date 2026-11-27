@@ -374,6 +374,16 @@
         "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
         "document": "ulef/discovery/INVENTORY_LOOP.md"
+      },
+      {
+        "id": "E35",
+        "date": "2026-11-27",
+        "title": "LIV — inventaire vivant multi-domaines, routes et modèles de sortie",
+        "detail": "LIV (Loop d'Inventaire Vivant) conserve l'identifiant B01-INVENTORY. Catalogue ouvert de domaines d'inventaire, routes de collecte et de comparaison, modèles de sortie, registre global et reçus. Workflow logique WF-LIV-001, action ACT-LIV-RECONCILE, processus PROC-LIV-001; déclenchement quotidien et événementiel souhaité, non actif sous isolation/quota. Chaque domaine a sa source, son dernier état valide, ses contrôles, sa sortie, ses écarts et ses consommateurs; aucun OK global tant que la couverture demeure partielle. Reprise réelle B01-INVENTORY-0002 : arbres immuables et compteurs concordants, 8163 entrées Git; 251/251 Markdown concordent avec le registre documentaire existant. Les modèles et catalogue ne prouvent pas l'existence des collecteurs non réalisés. Aucun fichier source ni serveur modifié.",
+        "status": "SPECIFICATION_ET_CONTROLES_METADATA",
+        "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/discovery/inventories/INVENTORY_CATALOG.json"
       }
     ],
     "source_heads": {

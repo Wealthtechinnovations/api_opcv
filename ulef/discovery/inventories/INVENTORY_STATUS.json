@@ -1,10 +1,10 @@
 {
   "continuity_id": "ULEF-CONTINUITY-20261127-01",
   "loop_id": "B01-INVENTORY",
-  "status": "OK",
-  "status_scope": "CANONICAL_GIT_TREE_METADATA_ONLY",
+  "status": "PARTIAL",
+  "status_scope": "MULTI_DOMAIN_CATALOG_PARTIAL",
   "last_verified_date": "2026-11-27",
-  "last_run": "ulef/discovery/inventories/runs/B01-INVENTORY-0001.json",
+  "last_run": "ulef/discovery/inventories/runs/B01-INVENTORY-0002.json",
   "last_valid_inventory": "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json",
   "source_results": [
     {
@@ -22,7 +22,8 @@
       "status": "UNCHANGED",
       "added_count": 0,
       "modified_count": 0,
-      "removed_count": 0
+      "removed_count": 0,
+      "validation": "IMMUTABLE_TREE_SHA_AND_COUNT_MATCH_PREVIOUS_VERIFIED_RUN"
     },
     {
       "role": "frontend",
@@ -39,7 +40,8 @@
       "status": "UNCHANGED",
       "added_count": 0,
       "modified_count": 0,
-      "removed_count": 0
+      "removed_count": 0,
+      "validation": "IMMUTABLE_TREE_SHA_AND_COUNT_MATCH_PREVIOUS_VERIFIED_RUN"
     }
   ],
   "pending_requalification": [],
@@ -57,5 +59,92 @@
     "No autonomous remote orchestration or scheduler active",
     "Pure comparator tested in JS runtime; standalone Node CLI not executed"
   ],
-  "next_action": "Manual or scheduled replay: observe both canonical HEADs; validate stored chunks; fetch changed trees only; persist delta and receipt or mark PARTIAL/ERROR. Semantic discovery separate."
+  "next_action": "Implement read-only collectors domain by domain; consume current INV-03/04 output; recheck source change and freshness before use; scheduling remains blocked",
+  "name": "LIV — Loop d'Inventaire Vivant",
+  "tree_status": "OK",
+  "document_status": "VERIFIED_METADATA",
+  "catalog": "ulef/discovery/inventories/INVENTORY_CATALOG.json",
+  "document_output": "ulef/discovery/inventories/DOCUMENT_INVENTORY_INDEX.json",
+  "domain_coverage": [
+    {
+      "id": "INV-01",
+      "status": "PARTIAL",
+      "output": "ulef/discovery/PROJECT_SCOPE_OBSERVATIONS.json"
+    },
+    {
+      "id": "INV-02",
+      "status": "PARTIAL",
+      "output": "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json"
+    },
+    {
+      "id": "INV-03",
+      "status": "VERIFIED",
+      "output": "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json"
+    },
+    {
+      "id": "INV-04",
+      "status": "VERIFIED_METADATA",
+      "output": "ulef/discovery/inventories/DOCUMENT_INVENTORY_INDEX.json"
+    },
+    {
+      "id": "INV-05",
+      "status": "PARTIAL",
+      "output": null
+    },
+    {
+      "id": "INV-06",
+      "status": "PARTIAL",
+      "output": null
+    },
+    {
+      "id": "INV-07",
+      "status": "PENDING",
+      "output": null
+    },
+    {
+      "id": "INV-08",
+      "status": "PARTIAL",
+      "output": null
+    },
+    {
+      "id": "INV-09",
+      "status": "PARTIAL",
+      "output": null
+    },
+    {
+      "id": "INV-10",
+      "status": "PARTIAL",
+      "output": null
+    },
+    {
+      "id": "INV-11",
+      "status": "PARTIAL",
+      "output": null
+    },
+    {
+      "id": "INV-12",
+      "status": "PARTIAL",
+      "output": "ulef/discovery/PROJECT_SCOPE_OBSERVATIONS.json"
+    },
+    {
+      "id": "INV-13",
+      "status": "PENDING",
+      "output": null
+    },
+    {
+      "id": "INV-14",
+      "status": "PARTIAL",
+      "output": null
+    },
+    {
+      "id": "INV-15",
+      "status": "PENDING",
+      "output": null
+    },
+    {
+      "id": "INV-16",
+      "status": "PENDING",
+      "output": null
+    }
+  ]
 }

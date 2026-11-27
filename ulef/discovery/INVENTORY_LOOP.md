@@ -12,3 +12,9 @@ Directive utilisateur : créer B01-INVENTORY, boucle quotidienne d'inventaire in
 6. Consommateurs : B01 découverte sémantique, B02 et agents de reprise. Vérifier la fraîcheur avant usage. Un contrôle ancien n'est pas live. Si un jour est manqué, marquer contrôle dû et reprendre.
 
 Cadence voulue : quotidienne. Déclencheur planifié non actif (quota). Mode manuel utilisable. Le comparateur pur calcule les écarts; la collecte GitHub, la persistance CAS et le déclenchement restent orchestrés par le connecteur/agent, pas par ce module seul.
+
+## LIV et catalogue multi-domaines (E35)
+
+LIV (Loop d'Inventaire Vivant) conserve l'identifiant B01-INVENTORY. Catalogue ouvert de domaines d'inventaire, routes de collecte et de comparaison, modèles de sortie, registre global et reçus. Workflow logique WF-LIV-001, action ACT-LIV-RECONCILE, processus PROC-LIV-001; déclenchement quotidien et événementiel souhaité, non actif sous isolation/quota. Chaque domaine a sa source, son dernier état valide, ses contrôles, sa sortie, ses écarts et ses consommateurs; aucun OK global tant que la couverture demeure partielle. Reprise réelle B01-INVENTORY-0002 : arbres immuables et compteurs concordants, 8163 entrées Git; 251/251 Markdown concordent avec le registre documentaire existant. Les modèles et catalogue ne prouvent pas l'existence des collecteurs non réalisés. Aucun fichier source ni serveur modifié.
+
+Voir INVENTORY_ROUTES.md et inventories/INVENTORY_CATALOG.json.
