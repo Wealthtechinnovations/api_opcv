@@ -2,6 +2,8 @@
   "continuity_id": "ULEF-CONTINUITY-20261127-01",
   "documents": [
     "ulef/DOCUMENT_INDEX.json",
+    "ulef/ISOLATION_CONTRACT.md",
+    "ulef/KNOWLEDGE_SYSTEM_DESIGN.md",
     "ulef/LOOP_ENGINEERING.md",
     "ulef/LOOP_MAP.md",
     "ulef/MAQUETTE_MERE.md",

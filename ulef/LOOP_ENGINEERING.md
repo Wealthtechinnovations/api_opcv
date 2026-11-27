@@ -19,3 +19,7 @@ Entrée : AfricaFunds et ses sources autorisées. Sortie : inventaire des observ
 ## Procédure détaillée B01 (E22)
 
 Voir [discovery/N1_DISCOVERY_PROTOCOL.md](discovery/N1_DISCOVERY_PROTOCOL.md). La phase d'inventaire des métadonnées précède l'inspection ciblée des preuves; B02 approfondit les conflits. N1 reste le seul niveau autorisé.
+
+## Contrainte d'isolation (E31)
+
+Toutes les boucles ULEF sont soumises à [ISOLATION_CONTRACT.md](ISOLATION_CONTRACT.md). Aucun effet sur les sources; écrire uniquement les artefacts dérivés sous ulef/. B01 reste le niveau de travail N1, avec qualification du contexte N0.

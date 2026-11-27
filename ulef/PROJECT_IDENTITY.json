@@ -26,7 +26,18 @@
     "no_production_deploy": true,
     "no_canonical_branch_mutation": true,
     "public_repository": true,
-    "secret_or_private_content_publication": false
+    "secret_or_private_content_publication": false,
+    "observed_sources_read_only": true,
+    "write_scope": "ulef/ on ULEF-CONTINUITY-20261127-01 only",
+    "no_inherited_file_mutation": true,
+    "no_observed_registry_mutation": true,
+    "no_observed_workflow_or_settings_mutation": true,
+    "no_mcp_or_server_mutation": true,
+    "no_observed_database_mutation": true,
+    "no_pull_request_into_observed_project": true,
+    "isolated_tests_only": true,
+    "scope_expansion_requires_explicit_owner_authorization": true,
+    "record_significant_results_incrementally": true
   },
   "base": {
     "api_sha": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
