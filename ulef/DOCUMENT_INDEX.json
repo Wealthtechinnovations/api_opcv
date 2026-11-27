@@ -14,6 +14,7 @@
     "ulef/discovery/COMPONENT_REGISTRY.json",
     "ulef/discovery/DISCOVERY_STATE.json",
     "ulef/discovery/DOCUMENT_LIFECYCLE_OBSERVATIONS.md",
+    "ulef/discovery/FOUNDATION_FLOW_OBSERVATIONS.md",
     "ulef/discovery/INVENTORY_LOOP.md",
     "ulef/discovery/INVENTORY_ROUTES.md",
     "ulef/discovery/MARKDOWN_INVENTORY.json",
