@@ -49,3 +49,7 @@ Exigence confirmée par le propriétaire : conserver et organiser tous les résu
 - DOCUMENT_INDEX.json indexe les nouveaux artefacts lorsqu'ils sont effectivement créés. Ne pas déclarer un artefact présent avant sa persistance et sa relecture.
 - À chaque lot : enregistrer les résultats et le checkpoint ensemble, vérifier les références et la couverture, puis passer au lot suivant. En cas d'échec de persistance, conserver le statut incomplet et reprendre le lot.
 - Pas de fusion vers les branches applicatives, pas de déploiement, pas de publication de données confidentielles, pas de N2.
+
+## Finalité de B01 : préparer le squelette global (E24)
+
+B01 constitue la matière première vérifiable du squelette N1 d'AfricaFunds. Le registre de découverte alimente la reconstruction et la consolidation B02. La présence de structures existantes doit être recherchée et conservée, non niée a priori. La boucle reste au N1 et n'engage aucune reconstruction du code métier.
