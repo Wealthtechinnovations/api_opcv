@@ -225,6 +225,15 @@
         "user_excerpt": "Je t'ai dit aussi que tu m'as tout enregistré de ce qu'on dit. Tu as laissé des points. Et t'as ça juste avec l'idée canonique. Il faut retrouver toute la conversation",
         "source": "VISIBLE_CONVERSATION",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION"
+      },
+      {
+        "id": "E20",
+        "date": "2026-11-27",
+        "title": "Boucle 01 — découverte et consignation N1",
+        "detail": "L'usine de génération autonome est la finalité progressive ; la reconstruction des fondations d'AfricaFunds est le point de départ. La boucle 01 est exclusivement la découverte N1 : parcourir les sources réelles autorisées, consigner chaque observation pertinente avec provenance, inventorier fichiers, outils, ressources et relations, identifier et classifier les composantes N1 sans liste fermée ni doublon, conserver les inconnues, puis vérifier et persister les résultats. Distinguer observation brute, candidat et composante qualifiée. Ne pas engager N2 ni générer de code métier à ce stade. La mise au point de la boucle et sa convergence restent à réaliser ; aucune exhaustivité ni autonomie d'exécution n'est attestée.",
+        "status": "CLARIFICATION_UTILISATEUR",
+        "source": "VISIBLE_CONVERSATION",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION"
       }
     ],
     "source_heads": {

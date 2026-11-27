@@ -175,3 +175,9 @@ Ne pas limiter la mémoire au nom ou à l'identifiant. Retrouver la conversation
 ### Reprise et traçabilité
 
 Conserver cette paire de fichiers sous le même ID ; chaque nouvelle intervention ajoute un delta daté et un checkpoint. Ne jamais confondre historique conversationnel et preuve technique. Les données détaillées et documents privés ne sont pas publiés implicitement dans ce dépôt public. L'export intégral, les textes assistant mot pour mot et le premier échange exact demeurent à récupérer si une source complète devient accessible. Aucun changement de branche métier, de runtime ou de gouvernance.
+
+### E20 — Boucle 01 : découverte et consignation N1
+
+Statut : `CLARIFICATION_UTILISATEUR`.
+
+L'usine de génération autonome est la finalité progressive ; la reconstruction des fondations d'AfricaFunds est le point de départ. La boucle 01 est exclusivement la découverte N1 : parcourir les sources réelles autorisées, consigner chaque observation pertinente avec provenance, inventorier fichiers, outils, ressources et relations, identifier et classifier les composantes N1 sans liste fermée ni doublon, conserver les inconnues, puis vérifier et persister les résultats. Distinguer observation brute, candidat et composante qualifiée. Ne pas engager N2 ni générer de code métier à ce stade. La mise au point de la boucle et sa convergence restent à réaliser ; aucune exhaustivité ni autonomie d'exécution n'est attestée.
