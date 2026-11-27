@@ -1,0 +1,716 @@
+{
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "observed_project": "CS-AFRICAFUNDS-001",
+  "date": "2026-11-27",
+  "status": "PARTIAL_SOURCE_OBSERVATIONS_NOT_N1_CLASSIFICATION",
+  "source_heads": {
+    "api": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+    "frontend": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+  },
+  "sources": [
+    {
+      "repository": "Wealthtechinnovations/api_opcv",
+      "path": ".governance/matrices/africafunds-product-intake-matrix.json",
+      "blob_sha": "0c1e53f51547f934c9d0463a4dfbd85c92c0fc15",
+      "role": "non-authoritative candidate intake matrix"
+    },
+    {
+      "repository": "Wealthtechinnovations/api_opcv",
+      "path": ".governance/loop/task-queue.json",
+      "blob_sha": "e0019c220ebaeec31a60e953f8cc6a52c196fcd7",
+      "role": "canonical task queue at observed HEAD"
+    },
+    {
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "path": "ROADMAP.md",
+      "blob_sha": "c4d7a1bfc603e15d0476d8da2405c3a97714a70d",
+      "role": "unified product roadmap; historical statements require verification"
+    }
+  ],
+  "candidate_program_groups": {
+    "CANONICAL_DATA": [
+      "AF-INTAKE-CAND-001",
+      "AF-INTAKE-CAND-002",
+      "AF-INTAKE-CAND-004"
+    ],
+    "DATA_LINEAGE": [
+      "AF-INTAKE-CAND-003"
+    ],
+    "DOCUMENTS": [
+      "AF-INTAKE-CAND-005"
+    ],
+    "MARKET_DATA": [
+      "AF-INTAKE-CAND-006"
+    ],
+    "ANALYTICS": [
+      "AF-INTAKE-CAND-007"
+    ],
+    "DATA_QUALITY": [
+      "AF-INTAKE-CAND-008"
+    ],
+    "COUNTRY_PIPELINES": [
+      "AF-INTAKE-CAND-009"
+    ],
+    "COUNTRY_TUNISIA": [
+      "AF-INTAKE-CAND-010"
+    ],
+    "COUNTRY_NIGERIA": [
+      "AF-INTAKE-CAND-011"
+    ],
+    "COUNTRY_MOROCCO": [
+      "AF-INTAKE-CAND-012"
+    ],
+    "COUNTRY_CEMAC": [
+      "AF-INTAKE-CAND-013"
+    ],
+    "COUNTRY_UEMOA": [
+      "AF-INTAKE-CAND-014"
+    ],
+    "COUNTRY_ROLLOUT": [
+      "AF-INTAKE-CAND-015"
+    ],
+    "API_CONTRACTS": [
+      "AF-INTAKE-CAND-016"
+    ],
+    "FRONTEND_DESIGN_SYSTEM": [
+      "AF-INTAKE-CAND-017"
+    ],
+    "FRONTEND_ENTITY_PAGES": [
+      "AF-INTAKE-CAND-018"
+    ],
+    "USER_SPACES": [
+      "AF-INTAKE-CAND-019"
+    ],
+    "AUTH_SECURITY": [
+      "AF-INTAKE-CAND-020"
+    ],
+    "INSTITUTIONAL_MANDATES": [
+      "AF-INTAKE-CAND-021"
+    ],
+    "INSTITUTIONAL_DD": [
+      "AF-INTAKE-CAND-022"
+    ],
+    "INSTITUTIONAL_RFP": [
+      "AF-INTAKE-CAND-023"
+    ],
+    "INSTITUTIONAL_COMMITTEE": [
+      "AF-INTAKE-CAND-024"
+    ],
+    "INSTITUTIONAL_MONITORING": [
+      "AF-INTAKE-CAND-025"
+    ],
+    "REPORTING": [
+      "AF-INTAKE-CAND-026"
+    ],
+    "SEO_ARCHITECTURE": [
+      "AF-INTAKE-CAND-027"
+    ],
+    "SCHEMA_ORG": [
+      "AF-INTAKE-CAND-028"
+    ],
+    "WEB_SEMANTICS_ACCESSIBILITY": [
+      "AF-INTAKE-CAND-029"
+    ],
+    "SEO_VALIDATION": [
+      "AF-INTAKE-CAND-030"
+    ],
+    "DISCOVERY_SEARCH": [
+      "AF-INTAKE-CAND-031"
+    ],
+    "ALLOCATION": [
+      "AF-INTAKE-CAND-032"
+    ],
+    "BACKOFFICE": [
+      "AF-INTAKE-CAND-033"
+    ],
+    "OBSERVABILITY": [
+      "AF-INTAKE-CAND-034"
+    ],
+    "TESTING": [
+      "AF-INTAKE-CAND-035"
+    ],
+    "LEGACY_DEBT": [
+      "AF-INTAKE-CAND-036"
+    ],
+    "CONTINUITY": [
+      "AF-INTAKE-CAND-037"
+    ]
+  },
+  "candidate_intakes": [
+    {
+      "id": "AF-INTAKE-CAND-001",
+      "program": "CANONICAL_DATA",
+      "title": "Référentiel Fund / SubFund / ShareClass",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-002",
+      "program": "CANONICAL_DATA",
+      "title": "Organization / SGO / Manager Master et historique des gestionnaires",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-003",
+      "program": "DATA_LINEAGE",
+      "title": "Provenance, observations, artefacts bruts et lineage fin",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-004",
+      "program": "CANONICAL_DATA",
+      "title": "NAV / AUM / dividendes / distributions / événements",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-005",
+      "program": "DOCUMENTS",
+      "title": "Moteur documentaire canonique et classification des pièces officielles",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-006",
+      "program": "MARKET_DATA",
+      "title": "Market data / Benchmarks / FX / conventions communes",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-007",
+      "program": "ANALYTICS",
+      "title": "Moteur quantitatif commun performance / risque / ratios",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-008",
+      "program": "DATA_QUALITY",
+      "title": "Quality engine, fraîcheur, anomalies, lineage et qualité affichable",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-009",
+      "program": "COUNTRY_PIPELINES",
+      "title": "Framework réutilisable d'ingestion pays et sources officielles",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-010",
+      "program": "COUNTRY_TUNISIA",
+      "title": "Tunisie / CMF — réconciliation canonique fonds, VL, dividendes, gestionnaires et événements",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-011",
+      "program": "COUNTRY_NIGERIA",
+      "title": "Nigeria / SEC — réconciliation canonique des archives Weekly NAV",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-012",
+      "program": "COUNTRY_MOROCCO",
+      "title": "Maroc — complétude VL, documents, benchmarks et rattrapages gouvernés",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-013",
+      "program": "COUNTRY_CEMAC",
+      "title": "CEMAC — pipeline VL et benchmark depuis sources officielles/BVMAC",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-014",
+      "program": "COUNTRY_UEMOA",
+      "title": "UEMOA / BRVM — couverture fonds, VL, performances, indices et documents",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-015",
+      "program": "COUNTRY_ROLLOUT",
+      "title": "Expansion panafricaine — Ghana, Kenya, Égypte, Afrique du Sud, Botswana, Namibie, Éthiopie, Maurice",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-016",
+      "program": "API_CONTRACTS",
+      "title": "API canonique, view models et séparation données métier / présentation",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-017",
+      "program": "FRONTEND_DESIGN_SYSTEM",
+      "title": "Design System + Atomic Design AfricaFunds",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-018",
+      "program": "FRONTEND_ENTITY_PAGES",
+      "title": "Pages Fund / ShareClass / SGO / Country V2",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-019",
+      "program": "USER_SPACES",
+      "title": "Espaces utilisateurs unifiés et navigation par rôle",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-020",
+      "program": "AUTH_SECURITY",
+      "title": "Auth, RBAC, ownership, sécurité frontend/API et durcissement des routes",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-021",
+      "program": "INSTITUTIONAL_MANDATES",
+      "title": "Institutional — Mandates, Eligibility, Hard Gates, Screening et Long List",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-022",
+      "program": "INSTITUTIONAL_DD",
+      "title": "Institutional — DDQ, ODD, Findings et Short List",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-023",
+      "program": "INSTITUTIONAL_RFP",
+      "title": "Institutional — RFP, Clarifications, Technical/Financial Evaluation",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-024",
+      "program": "INSTITUTIONAL_COMMITTEE",
+      "title": "Institutional — Investment Committee, décision, approbation/rejet",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-025",
+      "program": "INSTITUTIONAL_MONITORING",
+      "title": "Institutional — Monitoring, revues périodiques et re-underwriting",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-026",
+      "program": "REPORTING",
+      "title": "Reporting et exports traçables fonds / portefeuille / institutionnel",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-027",
+      "program": "SEO_ARCHITECTURE",
+      "title": "SEO technique et architecture de découvrabilité",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-028",
+      "program": "SCHEMA_ORG",
+      "title": "Schema.org / JSON-LD — graphe d'entités reliées par @id",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-029",
+      "program": "WEB_SEMANTICS_ACCESSIBILITY",
+      "title": "HTML sémantique, accessibilité, responsive et Core Web Vitals",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-030",
+      "program": "SEO_VALIDATION",
+      "title": "Validation SEO/Schema.org et non-régression automatisée",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-031",
+      "program": "DISCOVERY_SEARCH",
+      "title": "Comparaison, screener, heatmap, recherche et découverte de fonds",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-032",
+      "program": "ALLOCATION",
+      "title": "Allocation / Robot Advisor / Portfolio Lab",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-033",
+      "program": "BACKOFFICE",
+      "title": "Back-office data, corrections gouvernées et opérations de contenu",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-034",
+      "program": "OBSERVABILITY",
+      "title": "Observabilité applicative, crons, workers, sources et alerting",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-035",
+      "program": "TESTING",
+      "title": "Stratégie de tests multi-couches et corpus de non-régression",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-036",
+      "program": "LEGACY_DEBT",
+      "title": "Dette technique, duplications, limites, routes mortes et retrait gouverné du legacy",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    },
+    {
+      "id": "AF-INTAKE-CAND-037",
+      "program": "CONTINUITY",
+      "title": "Continuité multi-agent, backlog exhaustif et promotion des intakes",
+      "status": "DISCOVERED_CANDIDATE_NOT_TASK"
+    }
+  ],
+  "task_observations": [
+    {
+      "id": "AF-TASK-001",
+      "title": "Intégration Regulatory Plus API",
+      "status": "DONE"
+    },
+    {
+      "id": "AF-TASK-002",
+      "title": "Intégration Regulatory Plus frontend",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-001"
+      ]
+    },
+    {
+      "id": "AF-TASK-003",
+      "title": "Attestation finale bi-repository de la gouvernance",
+      "status": "DONE_WITH_EXTERNAL_GAPS",
+      "depends_on": [
+        "AF-TASK-001",
+        "AF-TASK-002"
+      ]
+    },
+    {
+      "id": "AF-TASK-004",
+      "title": "Reconstruction de contexte et découverte croisée obligatoires",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-002"
+      ]
+    },
+    {
+      "id": "AF-TASK-005",
+      "title": "Certification exhaustive de tous les Markdown courants",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-004"
+      ]
+    },
+    {
+      "id": "AF-TASK-006",
+      "title": "Observabilité S2 sans bridge MCP",
+      "status": "DONE_WITH_EXTERNAL_TRUST_GAP",
+      "depends_on": [
+        "AF-TASK-004"
+      ]
+    },
+    {
+      "id": "AF-TASK-007",
+      "title": "Fallback déploiement API/frontend et preflight GOV-006 commun",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-006"
+      ]
+    },
+    {
+      "id": "AF-TASK-008",
+      "title": "Enforcement GitHub et détection de drift",
+      "status": "DONE_WITH_EXTERNAL_GAP",
+      "depends_on": [
+        "AF-TASK-004",
+        "AF-TASK-005"
+      ]
+    },
+    {
+      "id": "AF-TASK-009",
+      "title": "Tests reprise multi-agent, bridge-down et certification finale",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-005",
+        "AF-TASK-006",
+        "AF-TASK-007",
+        "AF-TASK-008"
+      ]
+    },
+    {
+      "id": "AF-OPS-001",
+      "title": "MariaDB Restart=on-failure après OOM",
+      "status": "BLOCKED_HUMAN_APPROVAL"
+    },
+    {
+      "id": "AF-TASK-010",
+      "title": "Remédiation des secrets suivis sans régression runtime",
+      "status": "BLOCKED_EXTERNAL_PROVIDER_ROTATION",
+      "depends_on": [
+        "AF-TASK-006"
+      ]
+    },
+    {
+      "id": "AF-TASK-011",
+      "title": "Synchronisation finale des registres et attestation bi-repository",
+      "status": "DONE",
+      "depends_on": [
+        "AF-TASK-006",
+        "AF-TASK-007",
+        "AF-TASK-008",
+        "AF-TASK-009",
+        "AF-TASK-010"
+      ]
+    },
+    {
+      "id": "AF-OPS-002",
+      "title": "Gouvernance des incidents, RCA, récurrence et postmortems",
+      "status": "DONE"
+    },
+    {
+      "id": "AF-OPS-003",
+      "title": "MariaDB — RCA des OOM répétés et durcissement de résilience",
+      "status": "IN_PROGRESS",
+      "program": "PRODUCTION_STABILITY",
+      "depends_on": []
+    },
+    {
+      "id": "AF-OPS-004",
+      "title": "S2 SSH — fiabiliser les resets KEX du canal read-only",
+      "status": "DONE"
+    },
+    {
+      "id": "AF-OPS-005",
+      "title": "DB auth — attribution des Access denied post-rotation",
+      "status": "OPEN",
+      "program": "SECURITY_RUNTIME_IDENTITY"
+    },
+    {
+      "id": "AF-OPS-006",
+      "title": "Health check production — éliminer les faux verts et isoler les contrôles",
+      "status": "DONE"
+    },
+    {
+      "id": "AF-OPS-007",
+      "title": "Data integrity — C7/C3 ruptures d'échelle et performances absurdes",
+      "status": "BLOCKED_HUMAN_APPROVAL",
+      "program": "DATA_QUALITY",
+      "depends_on": []
+    },
+    {
+      "id": "AF-OPS-008",
+      "title": "Performance integrity — C2/C8 orphelines et dérivés périmés",
+      "status": "OPEN",
+      "program": "DATA_QUALITY",
+      "depends_on": [
+        "AF-OPS-007",
+        "AF-OPS-009"
+      ]
+    },
+    {
+      "id": "AF-OPS-009",
+      "title": "Data freshness — rétablir les pipelines VL Nigeria et Tunisie",
+      "status": "IN_PROGRESS",
+      "program": "DATA_QUALITY",
+      "depends_on": []
+    },
+    {
+      "id": "AF-TASK-012",
+      "title": "Allocation / Robot Advisor — cartographie runtime et certification de l'existant",
+      "status": "DONE",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": []
+    },
+    {
+      "id": "AF-TASK-013",
+      "title": "Allocation — contrat API canonique, validation d'entrée, authentification et ownership",
+      "status": "DONE",
+      "program_id": "AF-ALLOC-001",
+      "program": "ALLOCATION",
+      "depends_on": [
+        "AF-TASK-012"
+      ]
+    },
+    {
+      "id": "AF-TASK-014",
+      "title": "Allocation — moteur canonique de préparation des données quantitatives",
+      "status": "DONE_WITH_EXTERNAL_GAPS",
+      "program_id": "AF-ALLOC-001",
+      "program": "ALLOCATION",
+      "depends_on": [
+        "AF-TASK-012"
+      ]
+    },
+    {
+      "id": "AF-TASK-015",
+      "title": "Allocation — persistance normalisée, provenance et reproductibilité des runs",
+      "status": "OPEN",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014"
+      ]
+    },
+    {
+      "id": "AF-TASK-016",
+      "title": "Allocation — adapter canonique et stratégies d'optimisation multi-méthodes",
+      "status": "DONE",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014"
+      ]
+    },
+    {
+      "id": "AF-TASK-017",
+      "title": "Allocation — moteur de contraintes AfricaFunds",
+      "status": "IN_PROGRESS",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-014",
+        "AF-TASK-016"
+      ]
+    },
+    {
+      "id": "AF-TASK-018",
+      "title": "Allocation — validation numérique, cross-engine et non-régression quantitative",
+      "status": "OPEN",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-016",
+        "AF-TASK-017"
+      ]
+    },
+    {
+      "id": "AF-TASK-019",
+      "title": "Allocation — backtesting, walk-forward, rebalancement et coûts",
+      "status": "OPEN",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-014",
+        "AF-TASK-016",
+        "AF-TASK-018"
+      ]
+    },
+    {
+      "id": "AF-TASK-020",
+      "title": "Allocation — analytics portefeuille, contribution au risque et explicabilité",
+      "status": "OPEN",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-018"
+      ]
+    },
+    {
+      "id": "AF-TASK-021",
+      "title": "Allocation — Portfolio Lab frontend V2 et comparaison multi-stratégies",
+      "status": "OPEN",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-013",
+        "AF-TASK-016",
+        "AF-TASK-017",
+        "AF-TASK-020"
+      ]
+    },
+    {
+      "id": "AF-TASK-022",
+      "title": "Allocation — Model Portfolios, Mandate Engine et reporting institutionnel",
+      "status": "OPEN",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-015",
+        "AF-TASK-017",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021"
+      ]
+    },
+    {
+      "id": "AF-TASK-023",
+      "title": "Allocation — rollout canonique, observabilité et retrait gouverné du legacy",
+      "status": "OPEN",
+      "program_id": "AF-ALLOC-001",
+      "depends_on": [
+        "AF-TASK-018",
+        "AF-TASK-019",
+        "AF-TASK-020",
+        "AF-TASK-021",
+        "AF-TASK-022"
+      ]
+    },
+    {
+      "id": "AF-TASK-024",
+      "title": "Programme Directeur — automatisation chronologique, projections et anti-régression",
+      "status": "DONE",
+      "program": "PROGRAMME_DIRECTOR",
+      "depends_on": [
+        "AF-TASK-005"
+      ]
+    },
+    {
+      "id": "AF-TASK-025",
+      "title": "Programme Directeur — générateur déterministe des projections humaines",
+      "status": "DONE",
+      "program": "PROGRAMME_DIRECTOR",
+      "depends_on": [
+        "AF-TASK-024"
+      ]
+    },
+    {
+      "id": "AF-TASK-026",
+      "title": "Programme Directeur — gate de write-back des blocs gérés",
+      "status": "DONE",
+      "program": "PROGRAMME_DIRECTOR",
+      "depends_on": [
+        "AF-TASK-025"
+      ]
+    },
+    {
+      "id": "AF-TASK-027",
+      "title": "Programme Directeur — moteur gouverné de maintenance des blocs gérés",
+      "status": "DONE",
+      "program": "PROGRAMME_DIRECTOR",
+      "depends_on": [
+        "AF-TASK-026"
+      ]
+    },
+    {
+      "id": "AF-TASK-028",
+      "title": "Programme Directeur — workflow manuel gouverné de maintenance des projections",
+      "status": "IN_PROGRESS",
+      "program": "PROGRAMME_DIRECTOR",
+      "depends_on": [
+        "AF-TASK-027"
+      ]
+    }
+  ],
+  "roadmap_headings": [
+    "# ROADMAP — Africafunds OPCVM Platform",
+    "## Vision",
+    "## CHANTIER MAJEUR (decide 2026-07-09) — Architecture benchmarks 3 couches",
+    "## Fait (mis a jour 2026-06-13)",
+    "### Infrastructure",
+    "### Donnees (snapshot 2026-06-13)",
+    "### Securite (2026-06-01 → 2026-06-13)",
+    "### Automatisation data",
+    "### Crons actifs (8 dans crontab, 7 operationnels)",
+    "### Frontend",
+    "### Audit global (LOTs AUDIT-A a D, 2026-06-13)",
+    "## En cours",
+    "### Priorite B (en attente validation Eric)",
+    "### Ameliorations crons (CODE_REVIEW #49, #50)",
+    "## Backlog (moyen terme)",
+    "### Qualite donnees",
+    "### Automatisation data",
+    "### Panels",
+    "### Architecture"
+  ],
+  "limitations": [
+    "Not exhaustive programme discovery",
+    "Candidate intake is not a task, proof of implementation, or automatic N1 node",
+    "Task status is a source declaration, not independently verified runtime",
+    "Programme/workstream and architecture component relationships require qualification"
+  ]
+}

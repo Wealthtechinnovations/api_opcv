@@ -285,6 +285,16 @@
         "user_excerpt": "C'est bien parce que je m'a dit qu'au départ il y a un projet, il y a des composants. Après les composants sont composés comment ?",
         "source": "VISIBLE_CONVERSATION",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION"
+      },
+      {
+        "id": "E26",
+        "date": "2026-11-27",
+        "title": "Périmètre du squelette : axes, programmes, chantiers et composition",
+        "detail": "Le squelette global AfricaFunds ne se limite pas à l'architecture technique. B01 doit découvrir aussi l'identité, la vision, les objectifs, les grands axes, programmes, chantiers, sous-chantiers, capacités existantes et prévues, exigences et travaux. Distinguer vues de composition produit/technique, fonctionnelle et programmatique, et ressources habilitantes; relier les vues par identifiants, sans confondre programme, tâche, composante logicielle et outil. Un grand axe ou programme peut être N1 dans la vue programmatique, uniquement si son rattachement direct est établi; un sous-chantier est enfant du chantier concerné, pas automatiquement N1. La découverte des sources peut être profonde mais la qualification du squelette reste N1. Les structures et IDs existants sont conservés. Observations directes : la matrice produit contient 37 intakes candidats et la queue canonique 37 entrées de travail au HEAD observé, non additionnables comme total de N1. Roadmap frontend et contexte API attestent des ambitions et plans documentés, pas de leur exécution. La taxonomie multi-vues est une proposition à stabiliser; aucun nouveau programme ni tâche métier créé.",
+        "status": "PRECISION_DE_CONCEPTION_ET_OBSERVATIONS",
+        "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/discovery/PROJECT_SCOPE_OBSERVATIONS.json"
       }
     ],
     "source_heads": {

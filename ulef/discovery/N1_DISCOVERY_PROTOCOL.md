@@ -53,3 +53,9 @@ Exigence confirmée par le propriétaire : conserver et organiser tous les résu
 ## Finalité de B01 : préparer le squelette global (E24)
 
 B01 constitue la matière première vérifiable du squelette N1 d'AfricaFunds. Le registre de découverte alimente la reconstruction et la consolidation B02. La présence de structures existantes doit être recherchée et conservée, non niée a priori. La boucle reste au N1 et n'engage aucune reconstruction du code métier.
+
+## Périmètre de découverte élargi aux plans existants (E26)
+
+Le squelette global AfricaFunds ne se limite pas à l'architecture technique. B01 doit découvrir aussi l'identité, la vision, les objectifs, les grands axes, programmes, chantiers, sous-chantiers, capacités existantes et prévues, exigences et travaux. Distinguer vues de composition produit/technique, fonctionnelle et programmatique, et ressources habilitantes; relier les vues par identifiants, sans confondre programme, tâche, composante logicielle et outil. Un grand axe ou programme peut être N1 dans la vue programmatique, uniquement si son rattachement direct est établi; un sous-chantier est enfant du chantier concerné, pas automatiquement N1. La découverte des sources peut être profonde mais la qualification du squelette reste N1. Les structures et IDs existants sont conservés. Observations directes : la matrice produit contient 37 intakes candidats et la queue canonique 37 entrées de travail au HEAD observé, non additionnables comme total de N1. Roadmap frontend et contexte API attestent des ambitions et plans documentés, pas de leur exécution. La taxonomie multi-vues est une proposition à stabiliser; aucun nouveau programme ni tâche métier créé.
+
+Voir PROJECT_SCOPE_OBSERVATIONS.json pour les observations source, distinctes du registre N1.

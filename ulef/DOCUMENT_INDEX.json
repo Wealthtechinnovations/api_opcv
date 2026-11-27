@@ -11,6 +11,7 @@
     "ulef/discovery/COMPONENT_REGISTRY.json",
     "ulef/discovery/DISCOVERY_STATE.json",
     "ulef/discovery/N1_DISCOVERY_PROTOCOL.md",
+    "ulef/discovery/PROJECT_SCOPE_OBSERVATIONS.json",
     "ulef/history/CONVERSATION_HISTORY.json",
     "ulef/history/CONVERSATION_HISTORY.md"
   ]
