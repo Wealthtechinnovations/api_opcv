@@ -413,6 +413,16 @@
         "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
         "document": "ulef/discovery/FOUNDATION_FLOW_OBSERVATIONS.md"
+      },
+      {
+        "id": "E39",
+        "date": "2026-11-27",
+        "title": "Remise en ordre hiérarchique des fondations et contrôle des mécanismes",
+        "detail": "Le propriétaire demande de remettre de l'ordre avant d'avancer, de synthétiser les découvertes et d'organiser hiérarchiquement les fondations, connaissances, structures, processus, fonctionnement et mise à jour. Priorité de contrôle : SUIVI et points d'arrêt/reprise, architecture et son avancement, ROADMAP/BACKLOG, exigences/candidats/matrices, mécanismes de planification/développement/qualité/livraison/exploitation, puis coordination documentaire. Proposition de six familles de lecture, non N1 définitif : (1) fondations — identité, vision/objectifs, périmètre, produit/exigences, architecture; (2) planification — roadmap, programmes/chantiers, backlog, lots/tâches, dépendances/priorités; (3) réalisation/exploitation — développement, qualité/tests, livraison/déploiement, exploitation/maintenance; (4) suivi/continuité — suivi global, état courant, avancement, arrêt/reprise, historique/preuves; (5) connaissances/documentation — inventaires, registres/matrices, autorités, relations/parcours, actualisation/synchronisation; (6) gouvernance/fonctionnement — règles, processus/workflows, boucles/automatisations, agents/outils, contrôles/réconciliation. Vérifier pour chaque famille existence, rôle, autorité, entrées/sorties, règle d'actualisation, mécanisme réel, preuve d'exécution, divergences. Ne pas confondre existence du fichier et fonctionnement. ARCHITECTURE.md existe sous docs/03-architecture/ mais est un adaptateur, non une carte consolidée. Conserver les autorités existantes, ne pas inventer de flux automatique; préparer les corrections dans ULEF seulement. Réutiliser E38 et les inventaires; aucun nouveau fichier métier ni nouveau registre concurrent. Proposition d'organisation à qualifier avec les sources, priorité LIV inchangée.",
+        "status": "PROPOSITION_A_QUALIFIER",
+        "source": "VISIBLE_CONVERSATION",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/discovery/FOUNDATION_FLOW_OBSERVATIONS.md"
       }
     ],
     "source_heads": {
