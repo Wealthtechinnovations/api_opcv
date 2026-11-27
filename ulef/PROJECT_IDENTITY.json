@@ -33,5 +33,12 @@
     "frontend_sha": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
   },
   "current_level": "N1",
-  "status": "DISCOVERY_PARTIAL"
+  "status": "DISCOVERY_PARTIAL",
+  "original_goal": {
+    "project": "AfricaFunds",
+    "objective": "Reconstruct existing foundations from the two repositories and related ecosystem without rebuilding the product from scratch",
+    "ulef_role": "Progressive engineering method and independent canonical idea",
+    "first_step": "Discover, identify, classify and register N1 components from direct evidence",
+    "source": "Owner clarification 2026-11-27; history R20261127-01"
+  }
 }
