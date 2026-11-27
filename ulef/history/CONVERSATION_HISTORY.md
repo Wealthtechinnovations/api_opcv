@@ -181,3 +181,11 @@ Conserver cette paire de fichiers sous le même ID ; chaque nouvelle interventio
 Statut : `CLARIFICATION_UTILISATEUR`.
 
 L'usine de génération autonome est la finalité progressive ; la reconstruction des fondations d'AfricaFunds est le point de départ. La boucle 01 est exclusivement la découverte N1 : parcourir les sources réelles autorisées, consigner chaque observation pertinente avec provenance, inventorier fichiers, outils, ressources et relations, identifier et classifier les composantes N1 sans liste fermée ni doublon, conserver les inconnues, puis vérifier et persister les résultats. Distinguer observation brute, candidat et composante qualifiée. Ne pas engager N2 ni générer de code métier à ce stade. La mise au point de la boucle et sa convergence restent à réaliser ; aucune exhaustivité ni autonomie d'exécution n'est attestée.
+
+### E21 — Cartographie générale des boucles et niveaux
+
+Statut : `PROPOSITION_A_VALIDER`.
+
+Proposition de cartographie générale en douze boucles B01–B12. Les niveaux N0, N1, N2… décrivent la structure, les boucles décrivent les processus ; un processus peut intervenir à plusieurs niveaux. B01 demeure le seul travail actuel, niveau N1 strict. B02–B12 sont des propositions non validées et non implémentées. Gouvernance, sécurité, continuité et non-collision transversales. Toute boucle reprend son checkpoint, traite une unité bornée, persiste et vérifie ses résultats, puis continue, revient en arrière ou signale les blocages.
+
+Voir [LOOP_MAP.md](../LOOP_MAP.md).

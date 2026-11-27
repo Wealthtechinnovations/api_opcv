@@ -234,6 +234,16 @@
         "status": "CLARIFICATION_UTILISATEUR",
         "source": "VISIBLE_CONVERSATION",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION"
+      },
+      {
+        "id": "E21",
+        "date": "2026-11-27",
+        "title": "Cartographie générale des boucles et niveaux",
+        "detail": "Proposition de cartographie générale en douze boucles B01–B12. Les niveaux N0, N1, N2… décrivent la structure, les boucles décrivent les processus ; un processus peut intervenir à plusieurs niveaux. B01 demeure le seul travail actuel, niveau N1 strict. B02–B12 sont des propositions non validées et non implémentées. Gouvernance, sécurité, continuité et non-collision transversales. Toute boucle reprend son checkpoint, traite une unité bornée, persiste et vérifie ses résultats, puis continue, revient en arrière ou signale les blocages.",
+        "status": "PROPOSITION_A_VALIDER",
+        "source": "VISIBLE_CONVERSATION",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/LOOP_MAP.md"
       }
     ],
     "source_heads": {
