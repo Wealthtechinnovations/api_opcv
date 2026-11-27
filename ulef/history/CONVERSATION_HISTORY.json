@@ -275,6 +275,16 @@
         "user_excerpt": "Mais tu sais déjà pourquoi on fait ça ? Parce qu'on n'avait pas de squelette pour le projet Africaf. Tu me suis moi ?",
         "source": "VISIBLE_CONVERSATION",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION"
+      },
+      {
+        "id": "E25",
+        "date": "2026-11-27",
+        "title": "Constitution récursive des composantes du squelette",
+        "detail": "Principe de constitution du squelette : un projet N0 contient des composantes N1 ; chaque composante contient des éléments N2 ; chaque élément peut à son tour être un parent d'éléments N3, et ainsi de suite jusqu'au niveau terminal utile. La profondeur est variable selon la branche et ne doit pas être imposée ; les noms fonctionnels ou techniques (module, service, fonctionnalité, fichier, etc.) sont des types à découvrir, non des niveaux universellement fixes. Chaque noeud est identifié et relié à son parent, ses enfants, ses dépendances et ses preuves ; les relations transversales ne sont pas assimilées à une relation de composition. Les processus de découverte s'appliquent récursivement lorsque la descente est autorisée. Un élément terminal n'est pas nécessairement une tâche : une unité de travail peut lui être associée ultérieurement. Pour l'instant, identifier uniquement les composantes N1 d'AfricaFunds, sans prétendre avoir découvert N2. Proposition de précision de la maquette mère en réponse à la question du propriétaire.",
+        "status": "PRECISION_DE_CONCEPTION",
+        "user_excerpt": "C'est bien parce que je m'a dit qu'au départ il y a un projet, il y a des composants. Après les composants sont composés comment ?",
+        "source": "VISIBLE_CONVERSATION",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION"
       }
     ],
     "source_heads": {
