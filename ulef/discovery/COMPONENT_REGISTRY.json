@@ -1,0 +1,45 @@
+{
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "level": "N1",
+  "status": "PARTIAL_CANDIDATES",
+  "case_study": "CS-AFRICAFUNDS-001",
+  "components": [
+    {
+      "id": "N1-CAND-001",
+      "name": "Frontend",
+      "class": "APPLICATION",
+      "evidence": [
+        "https://github.com/Wealthtechinnovations/front_end_opcvm/tree/1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+      ],
+      "status": "GIT_PRESENT"
+    },
+    {
+      "id": "N1-CAND-002",
+      "name": "Backend API",
+      "class": "APPLICATION",
+      "evidence": [
+        "https://github.com/Wealthtechinnovations/api_opcv/tree/eae81c5db5a4d46f3741ab6fa2922017aa2215eb"
+      ],
+      "status": "GIT_PRESENT"
+    },
+    {
+      "id": "N1-CAND-003",
+      "name": "GitHub",
+      "class": "PLATFORM",
+      "status": "OBSERVED"
+    },
+    {
+      "id": "N1-CAND-004",
+      "name": "MCP WealthTech",
+      "class": "SHARED_ORCHESTRATION",
+      "status": "OBSERVED_CATALOGUE_LINKS_TO_QUALIFY"
+    },
+    {
+      "id": "N1-CAND-005",
+      "name": "S2",
+      "class": "HOSTING",
+      "status": "OBSERVED_GIT_CHECKOUTS"
+    }
+  ],
+  "note": "Initial seed only; remaining candidate families and evidence require direct reconciliation. No N2."
+}

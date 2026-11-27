@@ -1,0 +1,15 @@
+{
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "documents": [
+    "ulef/DOCUMENT_INDEX.json",
+    "ulef/LOOP_ENGINEERING.md",
+    "ulef/MAQUETTE_MERE.md",
+    "ulef/PROJECT_IDENTITY.json",
+    "ulef/README.md",
+    "ulef/case-studies/africafunds/README.md",
+    "ulef/discovery/COMPONENT_REGISTRY.json",
+    "ulef/discovery/DISCOVERY_STATE.json",
+    "ulef/history/CONVERSATION_HISTORY.json",
+    "ulef/history/CONVERSATION_HISTORY.md"
+  ]
+}

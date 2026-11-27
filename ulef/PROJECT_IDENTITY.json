@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "idea_id": "ULEF-CONTINUITY-20261127-01",
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "name": "Universal Loop Engineering Factory",
+  "acronym": "ULEF",
+  "kind": "INDEPENDENT_CANONICAL_IDEA",
+  "created_on": "2026-11-27",
+  "storage": {
+    "repository": "Wealthtechinnovations/api_opcv",
+    "branch": "ULEF-CONTINUITY-20261127-01",
+    "path": "ulef/"
+  },
+  "observed_projects": [
+    {
+      "project_uid": "CS-AFRICAFUNDS-001",
+      "repositories": [
+        "Wealthtechinnovations/api_opcv",
+        "Wealthtechinnovations/front_end_opcvm"
+      ],
+      "mode": "READ_ONLY_DISCOVERY"
+    }
+  ],
+  "rules": {
+    "no_merge_into_observed_project": true,
+    "no_production_deploy": true,
+    "no_canonical_branch_mutation": true,
+    "public_repository": true,
+    "secret_or_private_content_publication": false
+  },
+  "base": {
+    "api_sha": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+    "frontend_sha": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
+  },
+  "current_level": "N1",
+  "status": "DISCOVERY_PARTIAL"
+}

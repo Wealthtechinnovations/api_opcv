@@ -1,0 +1,26 @@
+{
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "mode": "TECHNICAL_SEMANTIC_HISTORY",
+  "entries": [
+    {
+      "date": "2026-11-27",
+      "id": "D001",
+      "decision": "Universal factory, single root, recursive architecture"
+    },
+    {
+      "date": "2026-11-27",
+      "id": "D002",
+      "decision": "Discover ecosystem N1 from real sources; not limited to frontend/backend"
+    },
+    {
+      "date": "2026-11-27",
+      "id": "D003",
+      "decision": "ULEF independent of AfricaFunds"
+    },
+    {
+      "date": "2026-11-27",
+      "id": "D004",
+      "decision": "Dedicated branch in API repository, isolated ulef/ path; no merge or deploy"
+    }
+  ]
+}
