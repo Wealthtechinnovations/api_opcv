@@ -1,0 +1,614 @@
+{
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "date": "2026-11-27",
+  "status": "COMPLETE_GIT_TREE_METADATA_ONLY",
+  "repositories": [
+    {
+      "repository": "Wealthtechinnovations/api_opcv",
+      "role": "api",
+      "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+      "truncated": false,
+      "counts": {
+        "blob": 785,
+        "tree": 85
+      },
+      "extension_counts": {
+        "example": 1,
+        "production": 1,
+        "plan-b": 1,
+        "[no-extension]": 2,
+        "md": 226,
+        "yml": 46,
+        "gitignore": 1,
+        "json": 63,
+        "txt": 4,
+        "tofu": 1,
+        "sequelizerc": 1,
+        "xlsx": 13,
+        "js": 289,
+        "docx": 6,
+        "pdf": 3,
+        "png": 9,
+        "csv": 19,
+        "sql": 22,
+        "py": 60,
+        "sh": 16,
+        "jpeg": 1
+      },
+      "root_entries": [
+        {
+          "path": ".env.example",
+          "type": "blob"
+        },
+        {
+          "path": ".env.production",
+          "type": "blob"
+        },
+        {
+          "path": ".env.production.plan-b",
+          "type": "blob"
+        },
+        {
+          "path": ".github",
+          "type": "tree"
+        },
+        {
+          "path": ".gitignore",
+          "type": "blob"
+        },
+        {
+          "path": ".governance",
+          "type": "tree"
+        },
+        {
+          "path": ".sequelizerc",
+          "type": "blob"
+        },
+        {
+          "path": "00_START_HERE.md",
+          "type": "blob"
+        },
+        {
+          "path": "ACCEPTANCE_CRITERIA.md",
+          "type": "blob"
+        },
+        {
+          "path": "AGENTS.md",
+          "type": "blob"
+        },
+        {
+          "path": "ARCHITECTURE_DIAGNOSTIC.md",
+          "type": "blob"
+        },
+        {
+          "path": "ASSUMPTIONS.md",
+          "type": "blob"
+        },
+        {
+          "path": "BACKLOG.md",
+          "type": "blob"
+        },
+        {
+          "path": "BOOTSTRAP_CHECKLIST.md",
+          "type": "blob"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "type": "blob"
+        },
+        {
+          "path": "CLAUDE.md",
+          "type": "blob"
+        },
+        {
+          "path": "CODE_REVIEW.md",
+          "type": "blob"
+        },
+        {
+          "path": "CONSTRAINTS.md",
+          "type": "blob"
+        },
+        {
+          "path": "CORRECTIONS.md",
+          "type": "blob"
+        },
+        {
+          "path": "CURRENT_ITERATION.md",
+          "type": "blob"
+        },
+        {
+          "path": "DECISIONS.md",
+          "type": "blob"
+        },
+        {
+          "path": "DEFINITION_OF_DONE.md",
+          "type": "blob"
+        },
+        {
+          "path": "DEFINITION_OF_READY.md",
+          "type": "blob"
+        },
+        {
+          "path": "DEPENDENCIES.md",
+          "type": "blob"
+        },
+        {
+          "path": "DEPLOYMENT_PRODUCTION.md",
+          "type": "blob"
+        },
+        {
+          "path": "DIRECTIVE_TRAVAIL.md",
+          "type": "blob"
+        },
+        {
+          "path": "DOCUMENT_INDEX.md",
+          "type": "blob"
+        },
+        {
+          "path": "DOCUMENT_INTEGRATION_MATRIX.md",
+          "type": "blob"
+        },
+        {
+          "path": "FILES_CATALOG.md",
+          "type": "blob"
+        },
+        {
+          "path": "GOVERNANCE.md",
+          "type": "blob"
+        },
+        {
+          "path": "GPT.md",
+          "type": "blob"
+        },
+        {
+          "path": "HANDOFF.md",
+          "type": "blob"
+        },
+        {
+          "path": "Historique_Indices_Complet.xlsx",
+          "type": "blob"
+        },
+        {
+          "path": "LOOP_CONTRACT.md",
+          "type": "blob"
+        },
+        {
+          "path": "LOOP_ENGINEERING.md",
+          "type": "blob"
+        },
+        {
+          "path": "LOOP_ENGINEERING_MASTER_STANDARD.md",
+          "type": "blob"
+        },
+        {
+          "path": "LOOP_STATE.md",
+          "type": "blob"
+        },
+        {
+          "path": "MANIFEST.md",
+          "type": "blob"
+        },
+        {
+          "path": "MCP_AUTONOMY.md",
+          "type": "blob"
+        },
+        {
+          "path": "NEXT_ACTION.md",
+          "type": "blob"
+        },
+        {
+          "path": "OPEN_QUESTIONS.md",
+          "type": "blob"
+        },
+        {
+          "path": "PRODUCTION_STATE.json",
+          "type": "blob"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "type": "blob"
+        },
+        {
+          "path": "PROJECT_CHARTER.md",
+          "type": "blob"
+        },
+        {
+          "path": "PROJECT_CONTEXT.md",
+          "type": "blob"
+        },
+        {
+          "path": "PROJECT_START_PROMPT.md",
+          "type": "blob"
+        },
+        {
+          "path": "README.md",
+          "type": "blob"
+        },
+        {
+          "path": "README_DEV.md",
+          "type": "blob"
+        },
+        {
+          "path": "RISKS.md",
+          "type": "blob"
+        },
+        {
+          "path": "ROADMAP.md",
+          "type": "blob"
+        },
+        {
+          "path": "SCOPE.md",
+          "type": "blob"
+        },
+        {
+          "path": "SOURCE_OF_TRUTH.md",
+          "type": "blob"
+        },
+        {
+          "path": "STATUS.md",
+          "type": "blob"
+        },
+        {
+          "path": "SUIVI.md",
+          "type": "blob"
+        },
+        {
+          "path": "T13_DIAGNOSTIC_INDICES.md",
+          "type": "blob"
+        },
+        {
+          "path": "TASKS.md",
+          "type": "blob"
+        },
+        {
+          "path": "TODO.md",
+          "type": "blob"
+        },
+        {
+          "path": "TODO_DEPLOY.md",
+          "type": "blob"
+        },
+        {
+          "path": "WORK_LOG.md",
+          "type": "blob"
+        },
+        {
+          "path": "app.js",
+          "type": "blob"
+        },
+        {
+          "path": "data",
+          "type": "tree"
+        },
+        {
+          "path": "docs",
+          "type": "tree"
+        },
+        {
+          "path": "documents",
+          "type": "tree"
+        },
+        {
+          "path": "ecosystem.config.js",
+          "type": "blob"
+        },
+        {
+          "path": "ecosystem.production.config.js",
+          "type": "blob"
+        },
+        {
+          "path": "efficient_frontier.png",
+          "type": "blob"
+        },
+        {
+          "path": "fichiers",
+          "type": "tree"
+        },
+        {
+          "path": "migrations",
+          "type": "tree"
+        },
+        {
+          "path": "output.docx",
+          "type": "blob"
+        },
+        {
+          "path": "package-lock.json",
+          "type": "blob"
+        },
+        {
+          "path": "package.json",
+          "type": "blob"
+        },
+        {
+          "path": "referentiel_fundafrica.json",
+          "type": "blob"
+        },
+        {
+          "path": "report.json",
+          "type": "blob"
+        },
+        {
+          "path": "scripts",
+          "type": "tree"
+        },
+        {
+          "path": "sec_ng_nav_extractor_v6.py",
+          "type": "blob"
+        },
+        {
+          "path": "services",
+          "type": "tree"
+        },
+        {
+          "path": "src",
+          "type": "tree"
+        },
+        {
+          "path": "start.sh",
+          "type": "blob"
+        },
+        {
+          "path": "tests",
+          "type": "tree"
+        },
+        {
+          "path": "uploads",
+          "type": "tree"
+        }
+      ],
+      "chunks": [
+        "ulef/discovery/inventories/api-tree-01.json"
+      ],
+      "entry_count": 870
+    },
+    {
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "role": "frontend",
+      "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+      "truncated": false,
+      "counts": {
+        "blob": 6807,
+        "tree": 486
+      },
+      "extension_counts": {
+        "example": 1,
+        "production": 1,
+        "plan-b": 1,
+        "json": 12,
+        "yml": 7,
+        "gitignore": 1,
+        "md": 25,
+        "js": 231,
+        "html": 3,
+        "conf": 2,
+        "css": 203,
+        "eot": 40,
+        "svg": 3798,
+        "ttf": 42,
+        "woff": 42,
+        "scss": 135,
+        "map": 115,
+        "woff2": 16,
+        "otf": 2,
+        "less": 94,
+        "xlsx": 3,
+        "csv": 2,
+        "jpg": 831,
+        "png": 771,
+        "db": 70,
+        "gif": 10,
+        "ico": 3,
+        "psd": 6,
+        "jfif": 7,
+        "jpeg": 6,
+        "sh": 3,
+        "ts": 41,
+        "tsx": 273,
+        "rar": 1,
+        "[no-extension]": 1,
+        "jsx": 8
+      },
+      "root_entries": [
+        {
+          "path": ".env.example",
+          "type": "blob"
+        },
+        {
+          "path": ".env.production",
+          "type": "blob"
+        },
+        {
+          "path": ".env.production.plan-b",
+          "type": "blob"
+        },
+        {
+          "path": ".eslintrc.json",
+          "type": "blob"
+        },
+        {
+          "path": ".github",
+          "type": "tree"
+        },
+        {
+          "path": ".gitignore",
+          "type": "blob"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "type": "blob"
+        },
+        {
+          "path": ".governance",
+          "type": "tree"
+        },
+        {
+          "path": "00_START_HERE.md",
+          "type": "blob"
+        },
+        {
+          "path": "AGENTS.md",
+          "type": "blob"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "type": "blob"
+        },
+        {
+          "path": "CLAUDE.md",
+          "type": "blob"
+        },
+        {
+          "path": "CODE_REVIEW.md",
+          "type": "blob"
+        },
+        {
+          "path": "DEPLOYMENT_PRODUCTION.md",
+          "type": "blob"
+        },
+        {
+          "path": "DIRECTIVE_TRAVAIL.md",
+          "type": "blob"
+        },
+        {
+          "path": "GOVERNANCE.md",
+          "type": "blob"
+        },
+        {
+          "path": "GPT.md",
+          "type": "blob"
+        },
+        {
+          "path": "LOOP_ENGINEERING.md",
+          "type": "blob"
+        },
+        {
+          "path": "MCP_AUTONOMY.md",
+          "type": "blob"
+        },
+        {
+          "path": "PROJECT_CONTEXT.md",
+          "type": "blob"
+        },
+        {
+          "path": "README.md",
+          "type": "blob"
+        },
+        {
+          "path": "README_DEV.md",
+          "type": "blob"
+        },
+        {
+          "path": "ROADMAP.md",
+          "type": "blob"
+        },
+        {
+          "path": "SOURCE_OF_TRUTH.md",
+          "type": "blob"
+        },
+        {
+          "path": "SUIVI.md",
+          "type": "blob"
+        },
+        {
+          "path": "TASKS.md",
+          "type": "blob"
+        },
+        {
+          "path": "TODO.md",
+          "type": "blob"
+        },
+        {
+          "path": "T_RESPONSE_OK_AUDIT.md",
+          "type": "blob"
+        },
+        {
+          "path": "docs",
+          "type": "tree"
+        },
+        {
+          "path": "ecosystem.config.js",
+          "type": "blob"
+        },
+        {
+          "path": "generate-sitemap1.js",
+          "type": "blob"
+        },
+        {
+          "path": "generate-sitemap2.js",
+          "type": "blob"
+        },
+        {
+          "path": "googleacbcf86239571e05.html",
+          "type": "blob"
+        },
+        {
+          "path": "next.config.js",
+          "type": "blob"
+        },
+        {
+          "path": "nginx",
+          "type": "tree"
+        },
+        {
+          "path": "package-lock.json",
+          "type": "blob"
+        },
+        {
+          "path": "package.json",
+          "type": "blob"
+        },
+        {
+          "path": "postcss.config.js",
+          "type": "blob"
+        },
+        {
+          "path": "public",
+          "type": "tree"
+        },
+        {
+          "path": "scripts",
+          "type": "tree"
+        },
+        {
+          "path": "server.js",
+          "type": "blob"
+        },
+        {
+          "path": "src",
+          "type": "tree"
+        },
+        {
+          "path": "tailwind.config.js",
+          "type": "blob"
+        },
+        {
+          "path": "tsconfig.json",
+          "type": "blob"
+        },
+        {
+          "path": "utils.js",
+          "type": "blob"
+        }
+      ],
+      "chunks": [
+        "ulef/discovery/inventories/frontend-tree-01.json",
+        "ulef/discovery/inventories/frontend-tree-02.json",
+        "ulef/discovery/inventories/frontend-tree-03.json",
+        "ulef/discovery/inventories/frontend-tree-04.json",
+        "ulef/discovery/inventories/frontend-tree-05.json",
+        "ulef/discovery/inventories/frontend-tree-06.json",
+        "ulef/discovery/inventories/frontend-tree-07.json",
+        "ulef/discovery/inventories/frontend-tree-08.json"
+      ],
+      "entry_count": 7293
+    }
+  ],
+  "limitations": [
+    "No file contents copied or certified by this inventory",
+    "Git tree excludes untracked runtime files, external resources and unexpanded submodule contents",
+    "Semantic understanding and N1 qualification remain partial"
+  ]
+}

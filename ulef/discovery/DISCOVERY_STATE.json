@@ -24,11 +24,37 @@
     "api": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
     "frontend": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6"
   },
-  "next_action": "Reobserve both canonical trees; reconcile evidence and populate N1 candidate registry incrementally",
+  "next_action": "Consume existing Markdown registry and canonical entry order; extract N0 project context with provenance and qualify existing N1 candidates, then inspect uncovered source surfaces incrementally",
   "limitations": [
-    "historical counts not refreshed for latest API HEAD",
-    "not all file contents inspected",
+    "Git path metadata complete for both observed trees; contents not exhaustively understood",
     "runtime and tool-project bindings incomplete",
+    "N1 registry not yet fully qualified",
     "no automated executor installed"
-  ]
+  ],
+  "tree_inventory": {
+    "status": "COMPLETE_METADATA_ONLY",
+    "index": "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json",
+    "repositories": [
+      {
+        "role": "api",
+        "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+        "tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+        "counts": {
+          "blob": 785,
+          "tree": 85
+        },
+        "entries": 870
+      },
+      {
+        "role": "frontend",
+        "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+        "tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+        "counts": {
+          "blob": 6807,
+          "tree": 486
+        },
+        "entries": 7293
+      }
+    ]
+  }
 }

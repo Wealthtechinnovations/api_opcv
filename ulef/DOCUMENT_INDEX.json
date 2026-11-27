@@ -16,6 +16,16 @@
     "ulef/discovery/MARKDOWN_INVENTORY.json",
     "ulef/discovery/N1_DISCOVERY_PROTOCOL.md",
     "ulef/discovery/PROJECT_SCOPE_OBSERVATIONS.json",
+    "ulef/discovery/inventories/TREE_INVENTORY_INDEX.json",
+    "ulef/discovery/inventories/api-tree-01.json",
+    "ulef/discovery/inventories/frontend-tree-01.json",
+    "ulef/discovery/inventories/frontend-tree-02.json",
+    "ulef/discovery/inventories/frontend-tree-03.json",
+    "ulef/discovery/inventories/frontend-tree-04.json",
+    "ulef/discovery/inventories/frontend-tree-05.json",
+    "ulef/discovery/inventories/frontend-tree-06.json",
+    "ulef/discovery/inventories/frontend-tree-07.json",
+    "ulef/discovery/inventories/frontend-tree-08.json",
     "ulef/history/CONVERSATION_HISTORY.json",
     "ulef/history/CONVERSATION_HISTORY.md"
   ]
