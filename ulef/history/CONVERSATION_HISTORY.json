@@ -255,6 +255,16 @@
         "source": "VISIBLE_CONVERSATION",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
         "document": "ulef/discovery/N1_DISCOVERY_PROTOCOL.md"
+      },
+      {
+        "id": "E23",
+        "date": "2026-11-27",
+        "title": "Conservation et organisation intégrales des résultats B01",
+        "detail": "Exigence confirmée par le propriétaire : conserver et organiser tous les résultats de B01 de façon cumulative, persistante, traçable et réutilisable. Chaque passage doit produire un delta enregistré et vérifié avant d'être considéré terminé. Préserver observations brutes, candidats, composantes qualifiées, sources et versions, relations, preuves, classifications, divergences, limites d'accès et checkpoints. Aucun résultat pertinent ne doit rester uniquement dans le chat. Les changements et déduplications conservent les observations historiques et les alias; pas d'écrasement silencieux. Le registre de composantes et l'état de découverte existants restent les points de rattachement; les inventaires détaillés dérivés sont indexés et référencés, sans créer d'autorité concurrente. Le dépôt hôte étant public, conserver les données confidentielles et secrets hors Git et n'y référencer que des métadonnées autorisées. La sortie structurée B01 doit être directement exploitable par B02 sans refaire la collecte. Ceci est une exigence de conception; l'implémentation et la migration complète des résultats existants restent à réaliser.",
+        "status": "EXIGENCE_CONFIRMEE",
+        "user_excerpt": "On est bien d'accord qu'il faudra conserver tous les résultats bien organisés et bien les mettre en place, on est d'accord ?",
+        "source": "VISIBLE_CONVERSATION",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION"
       }
     ],
     "source_heads": {
