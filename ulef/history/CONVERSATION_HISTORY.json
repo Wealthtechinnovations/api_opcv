@@ -304,6 +304,16 @@
         "status": "PROPOSITION_A_VALIDER",
         "source": "VISIBLE_CONVERSATION",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION"
+      },
+      {
+        "id": "E28",
+        "date": "2026-11-27",
+        "title": "PROJECT_CONTEXT et organisation documentaire existante",
+        "detail": "Le PROJECT_CONTEXT.md des deux dépôts établit l'identité unique AfricaFunds, leurs rôles API/frontend, les branches canoniques, S2 déclaré, le checkpoint global SUIVI frontend et les registres structurés. L'API décrit aussi les matrices de 37 intakes, 125 marqueurs de gaps et historique consolidé. 00_START_HERE.md prescrit déjà un ordre de lecture, DOCUMENT_INDEX.md organise les familles documentaires, SOURCE_OF_TRUTH.md les autorités, PROJECT_BRIEF.md le produit, PROJECT_CHARTER.md le mandat, SCOPE.md le périmètre. Reprendre cette organisation existante avant de proposer un autre squelette. Inventaire nominatif Markdown Git : Wealthtechinnovations/api_opcv 226, Wealthtechinnovations/front_end_opcvm 25. Les arbres ne sont pas tronqués. Les 251 fichiers n'ont pas tous été lus intégralement; l'inventaire de chemins ne prouve pas leur analyse. N0 à qualifier puis N1; sources en lecture seule. La présente étape n'est pas une nouvelle cartographie certifiée.",
+        "status": "OBSERVATION_PARTIELLE",
+        "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/discovery/MARKDOWN_INVENTORY.json"
       }
     ],
     "source_heads": {

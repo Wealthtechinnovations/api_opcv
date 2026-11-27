@@ -1,0 +1,1040 @@
+{
+  "continuity_id": "ULEF-CONTINUITY-20261127-01",
+  "date": "2026-11-27",
+  "status": "PATH_INVENTORY_NOT_FULL_CONTENT_REVIEW",
+  "repositories": [
+    {
+      "repository": "Wealthtechinnovations/api_opcv",
+      "head": "eae81c5db5a4d46f3741ab6fa2922017aa2215eb",
+      "tree_sha": "5257fa21f1765b2173e7177854bafa549ff1fecc",
+      "truncated": false,
+      "markdown_count": 226,
+      "files": [
+        {
+          "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+          "blob_sha": "58b27387f575af77a7d7a38c09f24462b990f3cc"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/documentation.md",
+          "blob_sha": "0c84f2337e0525c57afb79a4c4d1ecb73c8df437"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+          "blob_sha": "c245f0c26fc73f7431b4ad09aa39773b4424f605"
+        },
+        {
+          "path": ".github/ISSUE_TEMPLATE/incident.md",
+          "blob_sha": "198bddb43e537847095444b809b98cb1606590ae"
+        },
+        {
+          "path": ".github/PULL_REQUEST_TEMPLATE.md",
+          "blob_sha": "7e7eca4e8e45a472f0384331997705a9924426df"
+        },
+        {
+          "path": ".governance/history/CS-AFRICAFUNDS-001-consolidated-conversation-history.md",
+          "blob_sha": "d4953189429ecbc52cbc476b27b0b098aaae7797"
+        },
+        {
+          "path": "00_START_HERE.md",
+          "blob_sha": "8a5cdc4628d5b6586e2f14c70fa4b26830198644"
+        },
+        {
+          "path": "ACCEPTANCE_CRITERIA.md",
+          "blob_sha": "ad720e2d94da1c0bd4ad5404a20c931e4b394790"
+        },
+        {
+          "path": "AGENTS.md",
+          "blob_sha": "e90ee50c8dadfbeb5373e85164a852830e952ac0"
+        },
+        {
+          "path": "ARCHITECTURE_DIAGNOSTIC.md",
+          "blob_sha": "25f97b4ac76637fdac35b9313011bb1c8490be42"
+        },
+        {
+          "path": "ASSUMPTIONS.md",
+          "blob_sha": "6171e3d081e6d44cfb4b6ed0482b2a218da45acd"
+        },
+        {
+          "path": "BACKLOG.md",
+          "blob_sha": "6f3eaefeabd5f344916b78b1d03b66d4878c62df"
+        },
+        {
+          "path": "BOOTSTRAP_CHECKLIST.md",
+          "blob_sha": "b3fec146a2f56a638f508bbb360a854196a184da"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "blob_sha": "0806aa2f73fcb447144e73ab4f2961ac3e8e855a"
+        },
+        {
+          "path": "CLAUDE.md",
+          "blob_sha": "5c978c5de0d76227ff51032764b9490d2fde1a5f"
+        },
+        {
+          "path": "CODE_REVIEW.md",
+          "blob_sha": "4abedb5ed5ec586e59e46aaaed4b12167ca981a7"
+        },
+        {
+          "path": "CONSTRAINTS.md",
+          "blob_sha": "cdcf9b6bca9e4b02776ec9578fd6f02c17102dd3"
+        },
+        {
+          "path": "CORRECTIONS.md",
+          "blob_sha": "e338129d96b4b82a3a3920b6a51090ec1426055c"
+        },
+        {
+          "path": "CURRENT_ITERATION.md",
+          "blob_sha": "42ffaa22d5efa5b5d93011977dd92861e5fb872f"
+        },
+        {
+          "path": "DECISIONS.md",
+          "blob_sha": "ecafb547386f8701504778fdc660159ae18cd9c6"
+        },
+        {
+          "path": "DEFINITION_OF_DONE.md",
+          "blob_sha": "b2a7779ab957684f32c8d2e32e8072f3e567fc74"
+        },
+        {
+          "path": "DEFINITION_OF_READY.md",
+          "blob_sha": "7962d475c6b958cc2cd76a30b5780fc290944184"
+        },
+        {
+          "path": "DEPENDENCIES.md",
+          "blob_sha": "26faa500d2d1a117aaeb5cb123704fa2df98d49a"
+        },
+        {
+          "path": "DEPLOYMENT_PRODUCTION.md",
+          "blob_sha": "d3a50fdfba2b9c5ab73802fc98b3fe80b6707be8"
+        },
+        {
+          "path": "DIRECTIVE_TRAVAIL.md",
+          "blob_sha": "c9402cdec039a1156825950fbb51b716b4b61a8a"
+        },
+        {
+          "path": "DOCUMENT_INDEX.md",
+          "blob_sha": "b0c66cb6a4c00959ce8a482354dd67e4bd9add76"
+        },
+        {
+          "path": "DOCUMENT_INTEGRATION_MATRIX.md",
+          "blob_sha": "fd80bce24b38e9bf74ce1ad8bc11d23188fea61a"
+        },
+        {
+          "path": "FILES_CATALOG.md",
+          "blob_sha": "b62b144c571cadf9cb811ddab98074511a56cdfe"
+        },
+        {
+          "path": "GOVERNANCE.md",
+          "blob_sha": "3a11150c6ec8d00b06dd128f11805a602c16601e"
+        },
+        {
+          "path": "GPT.md",
+          "blob_sha": "516f8da247ca79caa36405c6e263a4896361e8dd"
+        },
+        {
+          "path": "HANDOFF.md",
+          "blob_sha": "9be2c093ab22afcdeb7d922303622d0d25aefc77"
+        },
+        {
+          "path": "LOOP_CONTRACT.md",
+          "blob_sha": "41cd9981773d7c5bff9a83cd07f37c87ef052fae"
+        },
+        {
+          "path": "LOOP_ENGINEERING.md",
+          "blob_sha": "bb5b7c68657a875749aab290d9a9fdafe47d3326"
+        },
+        {
+          "path": "LOOP_ENGINEERING_MASTER_STANDARD.md",
+          "blob_sha": "9d3a5a2f85577b2fbb960965a5378b1340e0a040"
+        },
+        {
+          "path": "LOOP_STATE.md",
+          "blob_sha": "445254b690719dc9301c08c5469e6c16fc39eafe"
+        },
+        {
+          "path": "MANIFEST.md",
+          "blob_sha": "a1bb1dd07322b90c7953234c8c3c0dbbe7c3ca5d"
+        },
+        {
+          "path": "MCP_AUTONOMY.md",
+          "blob_sha": "9148b0a5075aff73381ee065c324439eb34dd1ee"
+        },
+        {
+          "path": "NEXT_ACTION.md",
+          "blob_sha": "00adccf92e473de9479aa6edc4fb8f7fe408b0eb"
+        },
+        {
+          "path": "OPEN_QUESTIONS.md",
+          "blob_sha": "6d9830a6dd03fae60d7a8e84e8c49e66d1a0d3c7"
+        },
+        {
+          "path": "PROJECT_BRIEF.md",
+          "blob_sha": "5667dfc8c7006a80580c66d26389eb40c204255e"
+        },
+        {
+          "path": "PROJECT_CHARTER.md",
+          "blob_sha": "25484a6c0cd7c5256a4196a7f6c631191619cbb6"
+        },
+        {
+          "path": "PROJECT_CONTEXT.md",
+          "blob_sha": "4a3b216d5ce96dd8510ba8ba3950f1cf4daa42d9"
+        },
+        {
+          "path": "PROJECT_START_PROMPT.md",
+          "blob_sha": "ecde5218bcac3fede64f762fc6450dfb67682b0f"
+        },
+        {
+          "path": "README.md",
+          "blob_sha": "0b45d5884e70415a89e6e9b9df034fc19d7ba582"
+        },
+        {
+          "path": "README_DEV.md",
+          "blob_sha": "034aff5a666c8f35b4c307126bb077e249094523"
+        },
+        {
+          "path": "RISKS.md",
+          "blob_sha": "dee4ea747d23868f0071c1767f64b5d1379288f7"
+        },
+        {
+          "path": "ROADMAP.md",
+          "blob_sha": "0b924dad1375903c8f396fdc553266ac274e168d"
+        },
+        {
+          "path": "SCOPE.md",
+          "blob_sha": "02fae8fa839e87a1686d733c931b6979bfc1fa04"
+        },
+        {
+          "path": "SOURCE_OF_TRUTH.md",
+          "blob_sha": "84c6798ef5cf672e9eaeb2040f5ff77bcb03ec9b"
+        },
+        {
+          "path": "STATUS.md",
+          "blob_sha": "c9f632a582e32b6844f319f0cd0612fe06c81d8b"
+        },
+        {
+          "path": "SUIVI.md",
+          "blob_sha": "3b73a7dcc787486034d5e5d0956215cd37abb76b"
+        },
+        {
+          "path": "T13_DIAGNOSTIC_INDICES.md",
+          "blob_sha": "5f68ca2e30ebe7e228e791ff936549805372834a"
+        },
+        {
+          "path": "TASKS.md",
+          "blob_sha": "8576939b6b1f6a1a6293501044b0a1bafad96f42"
+        },
+        {
+          "path": "TODO.md",
+          "blob_sha": "0c07cc424afccaac61d6ed4ac82f56ddbcded2d5"
+        },
+        {
+          "path": "TODO_DEPLOY.md",
+          "blob_sha": "e1c7da70afe5712079b39f4fc35dbf6df6f87ff6"
+        },
+        {
+          "path": "WORK_LOG.md",
+          "blob_sha": "9b62ffeb90fdab222887ca4d39daf2c525cbca8a"
+        },
+        {
+          "path": "docs/01-governance/AUDIT_TRAIL.md",
+          "blob_sha": "c86dc3b108f7ada2695b6563db4793175d85981a"
+        },
+        {
+          "path": "docs/01-governance/CHANGE_MANAGEMENT.md",
+          "blob_sha": "e1f4123850f782adce805a1b92dcc8dbe6053db8"
+        },
+        {
+          "path": "docs/01-governance/DECISION_PROCESS.md",
+          "blob_sha": "60fb7fea131d9cf3b8ee0054e4b7dc584ce7a580"
+        },
+        {
+          "path": "docs/01-governance/DEFINITION_OF_DONE.md",
+          "blob_sha": "45a68d70f0b5bc14d9fdc5bfa1988e89ab66bc2d"
+        },
+        {
+          "path": "docs/01-governance/DEFINITION_OF_READY.md",
+          "blob_sha": "8f20b5571b9b739d2b5aafce12c9277864f1c856"
+        },
+        {
+          "path": "docs/01-governance/DOCUMENTATION_POLICY.md",
+          "blob_sha": "5210c124cad514b8f4949313a900f4ce3310b55a"
+        },
+        {
+          "path": "docs/01-governance/ESCALATION_POLICY.md",
+          "blob_sha": "96c796b17f3ec84c75cef4e90268eb6fd965e134"
+        },
+        {
+          "path": "docs/01-governance/EXCEPTION_REGISTER.md",
+          "blob_sha": "0106c093e684d97506a940680375965ff7fc13b6"
+        },
+        {
+          "path": "docs/01-governance/OWNERSHIP.md",
+          "blob_sha": "9b71fd2a19a2325ae5510f5460fc011868ba122d"
+        },
+        {
+          "path": "docs/01-governance/PROJECT_IDENTITY.md",
+          "blob_sha": "afa95c6b2f990acdeaeaf7ff00fcd0a48e4a2303"
+        },
+        {
+          "path": "docs/01-governance/PROJECT_RULES.md",
+          "blob_sha": "c24701e7f10d96183ab6af355e8f9b9a2ee68a5f"
+        },
+        {
+          "path": "docs/01-governance/RACI.md",
+          "blob_sha": "b728538a0870713749566c86292c3e168e489af3"
+        },
+        {
+          "path": "docs/02-product/FEEDBACK_POLICY.md",
+          "blob_sha": "4ea0409565f969139241bb8f9a6f1c07eaf73b09"
+        },
+        {
+          "path": "docs/02-product/PERSONAS.md",
+          "blob_sha": "2363d9a1659ad0d627146e0090742891e727ce13"
+        },
+        {
+          "path": "docs/02-product/PRIORITIZATION.md",
+          "blob_sha": "3e7a779c329217e99c1733dcd0a5028e2420ea4e"
+        },
+        {
+          "path": "docs/02-product/PRODUCT_VISION.md",
+          "blob_sha": "02fd28f9990d6835591fd7956811f9ec3ec696d7"
+        },
+        {
+          "path": "docs/02-product/RELEASE_CRITERIA.md",
+          "blob_sha": "f065c1a136c1e109008ca30bee2a114450c5ecd8"
+        },
+        {
+          "path": "docs/02-product/USER_STORIES.md",
+          "blob_sha": "a5fd23cabe8f1e6f5906c2b072c8f9438f4bec24"
+        },
+        {
+          "path": "docs/02-product/USE_CASES.md",
+          "blob_sha": "6ce2a78ba9e8384b38c7875c246509d718eb5c07"
+        },
+        {
+          "path": "docs/02-product/VALIDATION_PLAN.md",
+          "blob_sha": "a9396731eebed09da0a4f3500723d0058079970d"
+        },
+        {
+          "path": "docs/03-architecture/API_CONTRACTS.md",
+          "blob_sha": "4d2764699ecd88dcd1f8eced10528e56974ef9bf"
+        },
+        {
+          "path": "docs/03-architecture/ARCHITECTURE.md",
+          "blob_sha": "86d7ec1296f59b50707d360799ee50a903962a87"
+        },
+        {
+          "path": "docs/03-architecture/ARCHITECTURE_REVIEW_CHECKLIST.md",
+          "blob_sha": "11d8c2b5383423713b5f068b262fb0229800ee57"
+        },
+        {
+          "path": "docs/03-architecture/COMPONENTS.md",
+          "blob_sha": "cf7447f48c736b87ad5c32254ae056910a90ecf8"
+        },
+        {
+          "path": "docs/03-architecture/DATA_FLOW.md",
+          "blob_sha": "9d9e15c6f591f871811b1bc658aaef00e6286eb6"
+        },
+        {
+          "path": "docs/03-architecture/DATA_MODEL.md",
+          "blob_sha": "9357d5879252e4c7dac1eae765cb8dc716ef2360"
+        },
+        {
+          "path": "docs/03-architecture/INTEGRATIONS.md",
+          "blob_sha": "602f43020610320cd27a0ed1399f059fbf3b93f3"
+        },
+        {
+          "path": "docs/03-architecture/INTERFACES.md",
+          "blob_sha": "744d9a4e7a1446bbe5a8ddc1dfd614851c684bd5"
+        },
+        {
+          "path": "docs/03-architecture/SYSTEM_CONTEXT.md",
+          "blob_sha": "ea8fdd64a149fa068b2b58142fb44a2c35ae9dab"
+        },
+        {
+          "path": "docs/03-architecture/TECHNICAL_DEBT.md",
+          "blob_sha": "c88ec2114de9502ea5ec5b42bb8ff1ce63594175"
+        },
+        {
+          "path": "docs/03-data/CANONICAL_DATA_DICTIONARY_V1.md",
+          "blob_sha": "67357359e66a4df276896afc82fb649ff9b3c6aa"
+        },
+        {
+          "path": "docs/03-data/SECURE_EVIDENCE_STORAGE.md",
+          "blob_sha": "afa82da6402c20968d2874dd9e37c36cf6b91610"
+        },
+        {
+          "path": "docs/04-development/BRANCH_POLICY.md",
+          "blob_sha": "f2d051b0757ff2df909e31480712d0d6612a979a"
+        },
+        {
+          "path": "docs/04-development/CLAUSE_LIFECYCLE_GOVERNANCE.md",
+          "blob_sha": "1b41cba5e10a9bd8e94895a8f84e8b3b63b7dd22"
+        },
+        {
+          "path": "docs/04-development/CODE_REVIEW.md",
+          "blob_sha": "33e2eebbd8d26994a973ab7ec53acc1091dd58e8"
+        },
+        {
+          "path": "docs/04-development/CODING_STANDARDS.md",
+          "blob_sha": "3264ff8ab7b043674f7491e582a886b234e15a0e"
+        },
+        {
+          "path": "docs/04-development/COMMIT_CONVENTION.md",
+          "blob_sha": "9e44d1dc9f485d6f29df23a7118ef964b21bdcf2"
+        },
+        {
+          "path": "docs/04-development/DEPENDENCY_MANAGEMENT.md",
+          "blob_sha": "4a134cb8df697e9bec94e5b844e333ccb7759f28"
+        },
+        {
+          "path": "docs/04-development/FEATURE_FLAGS.md",
+          "blob_sha": "c49f1049811b637ba228ec1bbca59f1ca9c876a9"
+        },
+        {
+          "path": "docs/04-development/GIT_WORKFLOW.md",
+          "blob_sha": "fb7ca97b0d702240b5545b79226c469b1707323b"
+        },
+        {
+          "path": "docs/04-development/LOCAL_SETUP.md",
+          "blob_sha": "ac6d8e639a7657dbddfd83016cd9e8152a0549b9"
+        },
+        {
+          "path": "docs/04-development/MIGRATION_POLICY.md",
+          "blob_sha": "7f497fff88f28da7d2a54bede53b7d2890cb68a8"
+        },
+        {
+          "path": "docs/04-development/NAMING_CONVENTIONS.md",
+          "blob_sha": "9319b9d54c76b2bd59887fbea8e8a0c0a8f609fc"
+        },
+        {
+          "path": "docs/04-development/NEXTJS_ATOMIC_DESIGN.md",
+          "blob_sha": "275b2cae12684947fc05b0401713d22ac66aaa8e"
+        },
+        {
+          "path": "docs/04-development/PROJECT_VERSION_HISTORY.md",
+          "blob_sha": "6b2b31d5542f3dacef35d4ee83d16cda01fdfede"
+        },
+        {
+          "path": "docs/04-development/PROSPECTUS_BINARY_IMPORT_PIPELINE.md",
+          "blob_sha": "8211c788256a1ac7f1ba08a629861bc61acda8e1"
+        },
+        {
+          "path": "docs/04-development/PROSPECTUS_IMPORT_HUMAN_REVIEW.md",
+          "blob_sha": "48cb555c71a437cdca1d10b1bda1402193cc6486"
+        },
+        {
+          "path": "docs/04-development/PROSPECTUS_IMPORT_STAGING.md",
+          "blob_sha": "8762f419225583d922b103a1922dd50cf032e9b7"
+        },
+        {
+          "path": "docs/04-development/PR_POLICY.md",
+          "blob_sha": "90dfab464e3e397cea0342608e3dc21eecc31e44"
+        },
+        {
+          "path": "docs/04-development/REPOSITORY_STRUCTURE.md",
+          "blob_sha": "642a740f664118b084782ca58965ab403e9a31a1"
+        },
+        {
+          "path": "docs/05-quality/ACCESSIBILITY.md",
+          "blob_sha": "373cff27b70946112a0dbbcd7e34c3f421adf364"
+        },
+        {
+          "path": "docs/05-quality/AUTONOMOUS_COMPLETION_MATRIX_2026-08-19.md",
+          "blob_sha": "c8b73737a51ef370b31f7ae2b1e29a129c694cb5"
+        },
+        {
+          "path": "docs/05-quality/BUG_POLICY.md",
+          "blob_sha": "9ee6ec71caaea3fe671e74104fb250b19e0aa217"
+        },
+        {
+          "path": "docs/05-quality/DOCX_VISUAL_INSPECTION_2026-08-05.md",
+          "blob_sha": "742e56be49b5b086508275b0f400a2e574f3eafa"
+        },
+        {
+          "path": "docs/05-quality/MULTI_PROFILE_REGRESSION_CORPUS.md",
+          "blob_sha": "13aad7bcf108696134a42760921ce93b3c2d70a7"
+        },
+        {
+          "path": "docs/05-quality/NEXTJS_FRONTEND_TEST_PLAN.md",
+          "blob_sha": "769fc6e9a960cdac483349716737256beedc8a66"
+        },
+        {
+          "path": "docs/05-quality/PERFORMANCE_TESTING.md",
+          "blob_sha": "cf9ad7c7034ede6f3790dc5215bb308770eac36f"
+        },
+        {
+          "path": "docs/05-quality/QUALITY_GATES.md",
+          "blob_sha": "ce522301d27e03e9cb6b539c606df7a876751881"
+        },
+        {
+          "path": "docs/05-quality/REGRESSION_POLICY.md",
+          "blob_sha": "4312c0b2623b462b5097dce424246d4c8c22d783"
+        },
+        {
+          "path": "docs/05-quality/RELEASE_CHECKLIST.md",
+          "blob_sha": "fa47caeb2770defc8ac1767bb86ce580f100e6fb"
+        },
+        {
+          "path": "docs/05-quality/SECURITY_TESTING.md",
+          "blob_sha": "806894fa90d626d607b2bcb1a5233a768be8b9ed"
+        },
+        {
+          "path": "docs/05-quality/STATIC_ANALYSIS.md",
+          "blob_sha": "5cf3fe59cd317ebbd0dd5b59bcd14078ea323893"
+        },
+        {
+          "path": "docs/05-quality/TEST_DATA.md",
+          "blob_sha": "ac0e1c96d7ec35d50434c0e571c1c8108135be4b"
+        },
+        {
+          "path": "docs/05-quality/TEST_MATRIX.md",
+          "blob_sha": "8cd7ddbf4326fcc5a69783636902b7eb767e0a26"
+        },
+        {
+          "path": "docs/05-quality/TEST_STRATEGY.md",
+          "blob_sha": "6c098c0641e20929da54985f8b758dd26be30449"
+        },
+        {
+          "path": "docs/05-quality/VALIDATION_PROTOCOL.md",
+          "blob_sha": "b93f89624c2713ad9132203fa457335f6b1ca691"
+        },
+        {
+          "path": "docs/06-delivery/BUILD.md",
+          "blob_sha": "f9db6c9a4361233c6629ac406f9dd35d78235115"
+        },
+        {
+          "path": "docs/06-delivery/CI_CD.md",
+          "blob_sha": "1494235c3de130f0a8dd8b8a40c0adbcd57128a7"
+        },
+        {
+          "path": "docs/06-delivery/DEPLOYMENT.md",
+          "blob_sha": "2aef9b92d5cdb5b10fd8a3ff2ede8dec8e11a71e"
+        },
+        {
+          "path": "docs/06-delivery/DEPRECATION.md",
+          "blob_sha": "735ec533a3988c7e6fcd30c0c6f4ac37ca77598c"
+        },
+        {
+          "path": "docs/06-delivery/ENVIRONMENTS.md",
+          "blob_sha": "5e163d67ba645b0a71f36e99b88a5b97b7bac9c0"
+        },
+        {
+          "path": "docs/06-delivery/HOTFIX.md",
+          "blob_sha": "361f717d0e6e488a1c248dc6bb51d16c724d2d3c"
+        },
+        {
+          "path": "docs/06-delivery/PRODUCTION_STATE.md",
+          "blob_sha": "de8fd8ce60c863521ca7b676f6b87ea8765d2b0c"
+        },
+        {
+          "path": "docs/06-delivery/RELEASE_PROCESS.md",
+          "blob_sha": "66af681631ac42c813666a4c181b1ce1762afd02"
+        },
+        {
+          "path": "docs/06-delivery/ROLLBACK.md",
+          "blob_sha": "8006073bd53b267bc7b13917df4d97de6ed6ff8b"
+        },
+        {
+          "path": "docs/06-delivery/VERSIONING.md",
+          "blob_sha": "0d6a8659c151df75b2452549debe0dec203030e6"
+        },
+        {
+          "path": "docs/07-operations/ALERTING.md",
+          "blob_sha": "f73de9694da6be16c7ea05b3e68604b33b399e5e"
+        },
+        {
+          "path": "docs/07-operations/BACKUP_RESTORE.md",
+          "blob_sha": "c772e81adc27216ef61f66eab1fb300f6b60fc1a"
+        },
+        {
+          "path": "docs/07-operations/DISASTER_RECOVERY.md",
+          "blob_sha": "302c7bfe0614a6a5b98bc2b81c69da3e8172b937"
+        },
+        {
+          "path": "docs/07-operations/INCIDENT_RESPONSE.md",
+          "blob_sha": "9be27b52373ad0e77d355d95f037a2bc81141a53"
+        },
+        {
+          "path": "docs/07-operations/MAINTENANCE.md",
+          "blob_sha": "593eb39bb2042141a652f03f7f05657f8fca54a6"
+        },
+        {
+          "path": "docs/07-operations/MARIADB_ALLOCATOR_AB_RUNBOOK.md",
+          "blob_sha": "6826f622a82b0249d4c160acf27f79fef16fca73"
+        },
+        {
+          "path": "docs/07-operations/MONITORING.md",
+          "blob_sha": "c76062a2a778f9ffb96cd371ffcdee61b8aa2631"
+        },
+        {
+          "path": "docs/07-operations/OBSERVABILITY.md",
+          "blob_sha": "e56e017764f8aa126b9b1c0d809cd1711a62d31e"
+        },
+        {
+          "path": "docs/07-operations/POSTMORTEM_TEMPLATE.md",
+          "blob_sha": "09e849546a399ac99508c555c06987b8491822c8"
+        },
+        {
+          "path": "docs/07-operations/RUNBOOK.md",
+          "blob_sha": "8e624fc4198823b2738bea4343c4a9f0693c280f"
+        },
+        {
+          "path": "docs/07-operations/TROUBLESHOOTING.md",
+          "blob_sha": "d234b620f5d2bf6deed13c3c46406abd227cd58e"
+        },
+        {
+          "path": "docs/07-operations/incidents/AF-INC-20260817-001-mariadb-oom.md",
+          "blob_sha": "8ff5b1ffde1194d3d7a13c9213b487f96fd0bba1"
+        },
+        {
+          "path": "docs/07-operations/incidents/AF-INC-20260912-001-s2-ssh-kex.md",
+          "blob_sha": "90045ac526f174a2c0cdf785083b3ca31a8fd251"
+        },
+        {
+          "path": "docs/07-operations/incidents/AF-INC-20260914-001-healthcheck-false-green.md",
+          "blob_sha": "ef6d380c198f5ba1e031b0a7a4f67d37e316a0dc"
+        },
+        {
+          "path": "docs/07-operations/incidents/AF-INC-20260914-002-db-auth-drift.md",
+          "blob_sha": "c033792b9cdbcacb1347de11770df51158ac02a6"
+        },
+        {
+          "path": "docs/07-operations/incidents/README.md",
+          "blob_sha": "ec0ec858f6708a340bc38048ebec3bd1cba2e819"
+        },
+        {
+          "path": "docs/08-security/ACCESS_CONTROL.md",
+          "blob_sha": "dfe14c3ad3801b50c5f8941cbc584931da7269a8"
+        },
+        {
+          "path": "docs/08-security/PRIVACY.md",
+          "blob_sha": "e976233c6b8b0edb5a2a36a3295c54c643b1e1dd"
+        },
+        {
+          "path": "docs/08-security/SECRETS_MANAGEMENT.md",
+          "blob_sha": "2f352c6fe03ca86d784b14f737310f9fc2aa9142"
+        },
+        {
+          "path": "docs/08-security/SECURITY_INCIDENT.md",
+          "blob_sha": "aa5b1c3d2f092f24799aead1ad5f17f9a6ae356b"
+        },
+        {
+          "path": "docs/08-security/SECURITY_REVIEW_CHECKLIST.md",
+          "blob_sha": "4194fb12828b22b53697b75f1388218ef714531d"
+        },
+        {
+          "path": "docs/08-security/THREAT_MODEL.md",
+          "blob_sha": "e57c44534bea308625df3bfec293e9a5a0792a65"
+        },
+        {
+          "path": "docs/08-security/VULNERABILITY_MANAGEMENT.md",
+          "blob_sha": "3329529cd60b085f843ad8cef1374a96b8efb35c"
+        },
+        {
+          "path": "docs/09-loop/AF-GOV-REGULATORY-PLUS-001.md",
+          "blob_sha": "9a5cbd364b7bc9a86a7b75932a1571b37e0014e9"
+        },
+        {
+          "path": "docs/09-loop/DRIFT_DETECTION.md",
+          "blob_sha": "9d43810ea4800954492da60942318be0cf78a08e"
+        },
+        {
+          "path": "docs/09-loop/EXPERIMENT_REGISTER.md",
+          "blob_sha": "e22e0ec3ba966d83064d28b0a02fb05b6b7644db"
+        },
+        {
+          "path": "docs/09-loop/FAILURE_REGISTER.md",
+          "blob_sha": "62470d28f7059bb4ac439bad9f861712bcfa014f"
+        },
+        {
+          "path": "docs/09-loop/FEEDBACK_LOOP.md",
+          "blob_sha": "6bfa62779928702706d128bb2bb232b62dd730f3"
+        },
+        {
+          "path": "docs/09-loop/HYPOTHESIS_REGISTER.md",
+          "blob_sha": "8b005d8bc2300cb84c1b5efd7352e1008c1335f4"
+        },
+        {
+          "path": "docs/09-loop/ITERATION_LOG.md",
+          "blob_sha": "3d7014b979e22d092b89cadde69cf3a935eb00ec"
+        },
+        {
+          "path": "docs/09-loop/ITERATION_PROTOCOL.md",
+          "blob_sha": "14af9d8fd09178ed75df811a7117789520400600"
+        },
+        {
+          "path": "docs/09-loop/LEARNING_REGISTER.md",
+          "blob_sha": "c92430635ebc81e77cb4c5387bb770e9b94127a6"
+        },
+        {
+          "path": "docs/09-loop/LOOP_HEALTH_CHECK.md",
+          "blob_sha": "b7cad9ae4687eb43eb42c82afb7de7d9663a5735"
+        },
+        {
+          "path": "docs/09-loop/METRICS.md",
+          "blob_sha": "2d3746270b533f29701664a19541ce51de52204e"
+        },
+        {
+          "path": "docs/09-loop/RESTART_PROTOCOL.md",
+          "blob_sha": "766bc86cc594cd6d9f984fc24137db8aee143f0b"
+        },
+        {
+          "path": "docs/09-loop/RETROSPECTIVE.md",
+          "blob_sha": "b573113e9d3f41947fdf57c39fd6fa628764ff53"
+        },
+        {
+          "path": "docs/09-loop/ROOT_CAUSE_REGISTER.md",
+          "blob_sha": "d1cbbd9b4209c64c09989c9dc266d873507628bf"
+        },
+        {
+          "path": "docs/09-loop/STOP_CONDITIONS.md",
+          "blob_sha": "170e2fa7970ca07a37c2b9c76afd50669c62d5d1"
+        },
+        {
+          "path": "docs/10-ai/AI_CAPABILITIES.md",
+          "blob_sha": "3d6dd1c2090946096cfa7bf2aa7eb053253e31b5"
+        },
+        {
+          "path": "docs/10-ai/AI_CONTEXT.md",
+          "blob_sha": "389c1550cb17207025ba039faac228491e9a783f"
+        },
+        {
+          "path": "docs/10-ai/AI_GOVERNANCE.md",
+          "blob_sha": "1159002c7064c4c2ed54c94d3d09e7b219cf3e23"
+        },
+        {
+          "path": "docs/10-ai/AI_HANDOFF.md",
+          "blob_sha": "ce3b53069855863112c7c4bae1e0f015739a0678"
+        },
+        {
+          "path": "docs/10-ai/AI_OPERATING_RULES.md",
+          "blob_sha": "d80d5b8c88dff63d5289d9d8d2f9f58ca6a987bc"
+        },
+        {
+          "path": "docs/10-ai/AI_REVIEW_POLICY.md",
+          "blob_sha": "2b3e23643db19023e2981e809c3bfcbf8b53052f"
+        },
+        {
+          "path": "docs/10-ai/AUTONOMY_LEVELS.md",
+          "blob_sha": "ff7337b7ad5cbed5fef9b1685f3a957a8eeaf562"
+        },
+        {
+          "path": "docs/10-ai/HUMAN_APPROVAL_MATRIX.md",
+          "blob_sha": "4089cfd45358ca238bfb2e06bf41c1a8a12df93d"
+        },
+        {
+          "path": "docs/10-ai/PROMPT_CATALOG.md",
+          "blob_sha": "722226171c17182374a690ce99d4c44162bf72c7"
+        },
+        {
+          "path": "docs/10-ai/PROMPT_CHANGELOG.md",
+          "blob_sha": "c6b90b9dfd04d6981d76ce3d5e3c021058d5508c"
+        },
+        {
+          "path": "docs/10-ai/TOOL_POLICY.md",
+          "blob_sha": "43d24f4dada527fce7ffce1b0e9371ee767ff283"
+        },
+        {
+          "path": "docs/11-templates/CHANGE_REQUEST_TEMPLATE.md",
+          "blob_sha": "7217b730bb91b00f1c0a5276fa82821543bf06b2"
+        },
+        {
+          "path": "docs/11-templates/EXPERIMENT_TEMPLATE.md",
+          "blob_sha": "aa5bb998b1c21e195377b0c741798cd4978eafaa"
+        },
+        {
+          "path": "docs/11-templates/HANDOFF_TEMPLATE.md",
+          "blob_sha": "03230658a371a58e80d1855eb9c4b45dbde8cbf7"
+        },
+        {
+          "path": "docs/11-templates/POSTMORTEM_TEMPLATE.md",
+          "blob_sha": "8d053a39ab9208a84655d360919de3e6ead5ffed"
+        },
+        {
+          "path": "docs/11-templates/PR_DESCRIPTION_TEMPLATE.md",
+          "blob_sha": "f86d66b240b8e9d46dac133107d4c62743064c0a"
+        },
+        {
+          "path": "docs/11-templates/RETROSPECTIVE_TEMPLATE.md",
+          "blob_sha": "787044882e9186824f3446454c4fc0b803e787bf"
+        },
+        {
+          "path": "docs/11-templates/RUNBOOK_TEMPLATE.md",
+          "blob_sha": "05702f3b001b48d31777297281276eeecd1d6214"
+        },
+        {
+          "path": "docs/11-templates/TASK_TEMPLATE.md",
+          "blob_sha": "8c6f868266b850ef7e6deaf175071ce7c60ed194"
+        },
+        {
+          "path": "docs/11-templates/TECH_SPEC_TEMPLATE.md",
+          "blob_sha": "cc2dc134f68862f885ed6be3c20a0fdf1daa8df4"
+        },
+        {
+          "path": "docs/12-optional/AI_MODEL_RISK.md",
+          "blob_sha": "60aeaf0606ea1ca2fc5f66b292faa21c41caec67"
+        },
+        {
+          "path": "docs/12-optional/COMPLIANCE.md",
+          "blob_sha": "0682dc7c122b38e5823ebc3ac35bdad6da750a0d"
+        },
+        {
+          "path": "docs/12-optional/DATABASE.md",
+          "blob_sha": "b7f4454fd6b703171a853442e8d8367edf7b7004"
+        },
+        {
+          "path": "docs/12-optional/DATA_DICTIONARY.md",
+          "blob_sha": "25acf4db8ab7f36f294db0f4f2029237c08f5f48"
+        },
+        {
+          "path": "docs/12-optional/DATA_LINEAGE.md",
+          "blob_sha": "9ba5c3baddcaa3562996074b1f68fcf94a9c883a"
+        },
+        {
+          "path": "docs/12-optional/DATA_QUALITY.md",
+          "blob_sha": "ee8c1ac52259d024217d742d2f28b3dff946848b"
+        },
+        {
+          "path": "docs/12-optional/LEGAL_NOTICES.md",
+          "blob_sha": "fbc93f5b20d917b03dcedc5525c40d34aef35277"
+        },
+        {
+          "path": "docs/12-optional/LOCALIZATION.md",
+          "blob_sha": "f1b27649964188d01dd9e9a95f21af6967c50993"
+        },
+        {
+          "path": "docs/12-optional/MIGRATIONS.md",
+          "blob_sha": "14a583dcaf383bf1d078d136d378b000ae92d1a5"
+        },
+        {
+          "path": "docs/12-optional/MOBILE.md",
+          "blob_sha": "e611edd8e9b2427c85073403193a8bfb5e961299"
+        },
+        {
+          "path": "docs/12-optional/RETENTION.md",
+          "blob_sha": "f476ca78eac09f0f57a0198d7608a2a1fb4adbcd"
+        },
+        {
+          "path": "docs/12-optional/SLA_SLO.md",
+          "blob_sha": "e380e9902a85e1d1d0ab771eeaf97d838cb8a46c"
+        },
+        {
+          "path": "docs/12-optional/THIRD_PARTY_SERVICES.md",
+          "blob_sha": "6cd40a1cb58368f1ac0316e8d6c702a9bc23852d"
+        },
+        {
+          "path": "docs/BENCHMARKS_AUDIT_F1.md",
+          "blob_sha": "351da8a78525b1471618e953ae6683c3a8c2d1c1"
+        },
+        {
+          "path": "docs/BENCHMARKS_F3_MAPPING_SCHEMA.md",
+          "blob_sha": "5bf84344f3651aad6837fbb4c8eb367a6abc04d5"
+        },
+        {
+          "path": "docs/BENCHMARKS_SOURCES_F2.md",
+          "blob_sha": "ce981cabe9bf78951c404a7f59a2c2553c2f4d5d"
+        },
+        {
+          "path": "docs/DECISIONS.md",
+          "blob_sha": "0668c90cd7a5055d15527cdc9187883255d6894b"
+        },
+        {
+          "path": "docs/DIAG_ONDEMAND.md",
+          "blob_sha": "23bf485d743a682c54202677c13eb8dcd2484285"
+        },
+        {
+          "path": "docs/ETAT_PRODUCTION_VERIFIE.md",
+          "blob_sha": "63656b58737799735b0bab7f22e6c7eee7601fe1"
+        },
+        {
+          "path": "docs/MESURE_DEVISE_SEC.md",
+          "blob_sha": "5241176f292a93008114d8c39fb2bcf80b79a71a"
+        },
+        {
+          "path": "docs/OPS_DEDUP_DOUBLONS_VL.md",
+          "blob_sha": "06dfad31051aea4c7b03109414fc0930c6c94987"
+        },
+        {
+          "path": "docs/OPS_FIX_SCALE_BREAK.md",
+          "blob_sha": "cd91f19f57e68795ef922e87f104535165dd64e1"
+        },
+        {
+          "path": "docs/OPS_FIX_SEGMENTS_NAIRA.md",
+          "blob_sha": "aa0f160aa10e3d2c40c2177190ccdc5192841254"
+        },
+        {
+          "path": "docs/OPS_MARIADB.md",
+          "blob_sha": "56945f932970f1b171f9d3366ef89686c53f3ff1"
+        },
+        {
+          "path": "docs/OPS_MYSQL_MEMOIRE.md",
+          "blob_sha": "79df38a7fc8f018d60f3ab089c1c99d1e315a8e4"
+        },
+        {
+          "path": "docs/OPS_RECALC_DERIVES.md",
+          "blob_sha": "9b72ee43c5ca4e87035560342f30edbeb3b2f574"
+        },
+        {
+          "path": "docs/PROMPT_NIGERIA_ZERO_REGRESSION_V2_2.md",
+          "blob_sha": "d191b73e3d83c1ea596cd578d431c062db83eb01"
+        },
+        {
+          "path": "docs/REGISTRE_SOURCES_MARCHE.md",
+          "blob_sha": "2bfa065af02a536ac97daf16b3bd9ad93b5441fa"
+        },
+        {
+          "path": "docs/REJEU_SEC_ETAPE2.md",
+          "blob_sha": "64a5bcfd188dee4362254915e156165d8d5fa654"
+        },
+        {
+          "path": "docs/adr/ADR-AF-0001-regulatory-plus-integration.md",
+          "blob_sha": "524a7c7012bc3bf84e0f531b08f364740e2e383e"
+        },
+        {
+          "path": "docs/adr/ADR-AF-0002-operational-memory-and-loop.md",
+          "blob_sha": "50aa0755e01673bc146a34ef767f80bd3a2dc6d9"
+        },
+        {
+          "path": "docs/adr/ADR-AF-0003-governed-git-knowledge.md",
+          "blob_sha": "7650c23ec0b19dd5da926481c9741e164c587d0c"
+        },
+        {
+          "path": "docs/adr/README.md",
+          "blob_sha": "9f9234265035f03ba6a7a6d2b80283b2567c68c5"
+        },
+        {
+          "path": "docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md",
+          "blob_sha": "73e7eb1a4b2d01111e8673e61b88642fba7523b6"
+        },
+        {
+          "path": "docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md",
+          "blob_sha": "66c1fde64f5bd9185733792d0ed03a23f1332e64"
+        },
+        {
+          "path": "docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md",
+          "blob_sha": "c18ecaf0787bed42cb324b37880cc3d997727fbb"
+        }
+      ]
+    },
+    {
+      "repository": "Wealthtechinnovations/front_end_opcvm",
+      "head": "1640ad2277cb913b53782ca0a428a0b9ca44e4a6",
+      "tree_sha": "78d630dae9d7365545cd4b89134e8c4f620e82d7",
+      "truncated": false,
+      "markdown_count": 25,
+      "files": [
+        {
+          "path": "00_START_HERE.md",
+          "blob_sha": "8a5cdc4628d5b6586e2f14c70fa4b26830198644"
+        },
+        {
+          "path": "AGENTS.md",
+          "blob_sha": "e90ee50c8dadfbeb5373e85164a852830e952ac0"
+        },
+        {
+          "path": "CHANGELOG.md",
+          "blob_sha": "ade0ed7948cfa50c504108deb3f11e94ce7ef645"
+        },
+        {
+          "path": "CLAUDE.md",
+          "blob_sha": "3956cad175eb967abea7eba080d8565d95a372b2"
+        },
+        {
+          "path": "CODE_REVIEW.md",
+          "blob_sha": "2f67b3340a795f5930520c544c72a54d398bbe2c"
+        },
+        {
+          "path": "DEPLOYMENT_PRODUCTION.md",
+          "blob_sha": "33a62aa2f13c56846950f1adbe878b0bad84ba96"
+        },
+        {
+          "path": "DIRECTIVE_TRAVAIL.md",
+          "blob_sha": "c9402cdec039a1156825950fbb51b716b4b61a8a"
+        },
+        {
+          "path": "GOVERNANCE.md",
+          "blob_sha": "3a11150c6ec8d00b06dd128f11805a602c16601e"
+        },
+        {
+          "path": "GPT.md",
+          "blob_sha": "848783de80288f8715d6b12fb8a04e3af8ab5c53"
+        },
+        {
+          "path": "LOOP_ENGINEERING.md",
+          "blob_sha": "bb5b7c68657a875749aab290d9a9fdafe47d3326"
+        },
+        {
+          "path": "MCP_AUTONOMY.md",
+          "blob_sha": "9786b71f07346eb19c58612b9b4f9189ef365021"
+        },
+        {
+          "path": "PROJECT_CONTEXT.md",
+          "blob_sha": "7ecba9d61722cb9ed2a60a16519552ae3cbe0277"
+        },
+        {
+          "path": "README.md",
+          "blob_sha": "2c6178cc777d74b0537288d15d4f61941c22b91c"
+        },
+        {
+          "path": "README_DEV.md",
+          "blob_sha": "07d380fdeae44e53a1a34c7aa2a8a8974104edf5"
+        },
+        {
+          "path": "ROADMAP.md",
+          "blob_sha": "c4d7a1bfc603e15d0476d8da2405c3a97714a70d"
+        },
+        {
+          "path": "SOURCE_OF_TRUTH.md",
+          "blob_sha": "84c6798ef5cf672e9eaeb2040f5ff77bcb03ec9b"
+        },
+        {
+          "path": "SUIVI.md",
+          "blob_sha": "6ab0defabe52a66d3db903377af8a5d6c052dc23"
+        },
+        {
+          "path": "TASKS.md",
+          "blob_sha": "c73faa8a9a04c224c8558b14e1b25da4c1d2fb68"
+        },
+        {
+          "path": "TODO.md",
+          "blob_sha": "24f6dd162cf1401a190dc6582d251e14df8bf208"
+        },
+        {
+          "path": "T_RESPONSE_OK_AUDIT.md",
+          "blob_sha": "69791fd52c37810783fa7852ab83a1d696f31c21"
+        },
+        {
+          "path": "docs/01-governance/PROJECT_IDENTITY.md",
+          "blob_sha": "afa95c6b2f990acdeaeaf7ff00fcd0a48e4a2303"
+        },
+        {
+          "path": "docs/architecture/GITHUB_S2_RUNTIME_AUTHORITY_MODEL.md",
+          "blob_sha": "73e7eb1a4b2d01111e8673e61b88642fba7523b6"
+        },
+        {
+          "path": "docs/governance/GOV-006_GITHUB_S2_RECONCILIATION_2026-09-10.md",
+          "blob_sha": "66c1fde64f5bd9185733792d0ed03a23f1332e64"
+        },
+        {
+          "path": "docs/runbooks/GITHUB_S2_RECONCILIATION_RUNBOOK.md",
+          "blob_sha": "c18ecaf0787bed42cb324b37880cc3d997727fbb"
+        },
+        {
+          "path": "docs/superpowers/plans/2026-09-10-africafunds-regulatory-plus-integration.md",
+          "blob_sha": "b03bdabac7cd1eaabb1d54796d07dacaa766439e"
+        }
+      ]
+    }
+  ],
+  "read_in_this_pass": [
+    "api_opcv/PROJECT_CONTEXT.md",
+    "front_end_opcvm/PROJECT_CONTEXT.md",
+    "api_opcv/00_START_HERE.md",
+    "api_opcv/PROJECT_CHARTER.md",
+    "api_opcv/PROJECT_BRIEF.md",
+    "api_opcv/SCOPE.md",
+    "api_opcv/DOCUMENT_INDEX.md",
+    "api_opcv/SOURCE_OF_TRUTH.md"
+  ],
+  "next_action": "Read and qualify Markdown sources in canonical order, retaining prior results and evidence"
+}
