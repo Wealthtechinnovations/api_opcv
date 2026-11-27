@@ -433,6 +433,16 @@
         "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
         "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
         "document": "ulef/discovery/FOUNDATION_FLOW_OBSERVATIONS.md"
+      },
+      {
+        "id": "E41",
+        "date": "2026-11-27",
+        "title": "Contrats de fonctionnement documentaire par fichier",
+        "detail": "E41 : définir un contrat de fonctionnement par fichier: identité, objectif, contenu, sources, lecture, consommateurs, déclencheurs, écriture, propagation, contrôle, historique et automatisation. Étendre DOCUMENT_INVENTORY_INDEX.json existant (251 documents), sans copie des fichiers. 19 fiches provisoires associées à des références exactes et règles existantes ou compléments explicitement proposés; 232 restantes. SOURCE_OF_TRUTH règle les autorités, PROJECT_CONTEXT porte identité/périmètre, STATUS photographie courante, SUIVI frontend journal/checkpoint unique, TODO vue court terme, TASKS frontend journal de lots (pas queue), ROADMAP frontend produit, BACKLOG idées non engagées, task-queue.json autorité des tâches. NEXT_ACTION et autres projections contiennent des sections anciennes pouvant paraître actuelles (026 vs 028), à qualifier sans supprimer l'histoire. Modèles et règles d'actualisation proposés non exécutés; aucun changement source.",
+        "status": "PARTIAL_DRAFT_WITH_SOURCE_REFERENCES",
+        "source": "VISIBLE_CONVERSATION_AND_GIT_OBSERVATIONS",
+        "assistant_text_mode": "SEMANTIC_RECONSTRUCTION",
+        "document": "ulef/discovery/inventories/DOCUMENT_INVENTORY_INDEX.json"
       }
     ],
     "source_heads": {

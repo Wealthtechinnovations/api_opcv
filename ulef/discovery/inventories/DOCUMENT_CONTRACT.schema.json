@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ULEF document operating contract draft",
+  "type": "object",
+  "required": [
+    "status",
+    "objective",
+    "inputs",
+    "read_when",
+    "update_trigger",
+    "write_rule",
+    "consumers",
+    "propagation_candidates",
+    "checks",
+    "automation_observation",
+    "source_ref",
+    "normative_sources",
+    "approval",
+    "history_rule"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "type": "string",
+      "minLength": 1
+    },
+    "read_when": {
+      "type": "string",
+      "minLength": 1
+    },
+    "update_trigger": {
+      "type": "string",
+      "minLength": 1
+    },
+    "write_rule": {
+      "type": "string",
+      "minLength": 1
+    },
+    "consumers": {
+      "type": "string",
+      "minLength": 1
+    },
+    "propagation_candidates": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checks": {
+      "type": "string",
+      "minLength": 1
+    },
+    "automation_observation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approval": {
+      "type": "string",
+      "minLength": 1
+    },
+    "history_rule": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_ref": {
+      "type": "object",
+      "required": [
+        "repository",
+        "path",
+        "blob_sha",
+        "head"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "blob_sha": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        },
+        "head": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$"
+        }
+      }
+    },
+    "normative_sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    }
+  }
+}

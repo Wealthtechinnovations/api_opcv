@@ -21,6 +21,7 @@
     "ulef/discovery/N1_DISCOVERY_PROTOCOL.md",
     "ulef/discovery/PROJECT_SCOPE_OBSERVATIONS.json",
     "ulef/discovery/identity_compare.mjs",
+    "ulef/discovery/inventories/DOCUMENT_CONTRACT.schema.json",
     "ulef/discovery/inventories/DOCUMENT_INVENTORY_INDEX.json",
     "ulef/discovery/inventories/INVENTORY_CATALOG.json",
     "ulef/discovery/inventories/INVENTORY_DOMAIN.schema.json",
